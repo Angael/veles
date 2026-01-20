@@ -28,8 +28,8 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: always
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/veles_dev
       VITE_TEST: "test"

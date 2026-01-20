@@ -12,6 +12,10 @@ Veles is a full-stack TypeScript application built with TanStack Start (React me
 # Development
 pnpm dev              # Start dev server on port 3000
 
+# Docker (Local Development)
+docker compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build
+                      # Run app + database in Docker with ports exposed
+
 # Production
 pnpm build            # Build for production
 pnpm start            # Run production build
@@ -32,6 +36,11 @@ pnpm db:studio        # Open Drizzle Studio GUI
 ```
 
 ## Architecture
+
+### Docker Setup
+- **`docker-compose.yaml`**: Production config (used by Dokploy) - exposes ports internally only
+- **`docker-compose.dev.yaml`**: Dev overrides - adds `ports: 3000:3000` for localhost access
+- To run locally: merge both files with `-f` flag (see commands above)
 
 ### Routing
 - **File-based routing**: Routes are in `src/routes/` and auto-generate `src/routeTree.gen.ts`
