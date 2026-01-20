@@ -52,9 +52,13 @@ pnpm db:studio        # Open Drizzle Studio GUI
 - **Drizzle ORM**: Schema in `src/db/schema.ts`, connection in `src/db/index.ts`
 
 ### Environment Variables
-- Defined and validated with T3 Env in `env.ts`
-- Server vars: `DATABASE_URL` (required), `SERVER_URL` (optional)
-- Client vars must be prefixed with `VITE_`
+- **Application**: Defined and validated with T3 Env in `env.ts`
+  - Server vars: `DATABASE_URL` (required), `SERVER_URL` (optional)
+  - Client vars must be prefixed with `VITE_`
+- **Docker**: Environment variables are in `.env` file (gitignored)
+  - Copy `.env.example` to `.env` for local development
+  - Docker Compose automatically loads `.env` file
+  - Dokploy manages production environment variables separately
 
 ### Code Style
 - Uses Biome for linting/formatting
