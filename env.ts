@@ -15,14 +15,25 @@ export const env = createEnv({
 
   client: {
     VITE_APP_TITLE: z.string().min(1).optional(),
-    VITE_TEST: z.string()
+    VITE_TEST: z.string().optional()
   },
 
   /**
    * What object holds the environment variables at runtime. This is usually
    * `process.env` or `import.meta.env`.
+   *
+   * For TanStack Start, we need to merge both sources:
+   * - Server vars come from process.env (available at runtime in production)
+   * - Client vars come from import.meta.env (baked in at build time)
    */
-  runtimeEnv: import.meta.env,
+  runtimeEnv: {
+    // Server variables from process.env
+    SERVER_URL: process.env.SERVER_URL,
+    DATABASE_URL: process.env.DATABASE_URL,
+    // Client variables from import.meta.env
+    VITE_APP_TITLE: import.meta.env.VITE_APP_TITLE,
+    VITE_TEST: import.meta.env.VITE_TEST,
+  },
 
   /**
    * By default, this library will feed the environment variables directly to
