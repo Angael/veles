@@ -16,7 +16,8 @@
 		"db:push": "drizzle-kit push",
 		"db:pull": "drizzle-kit pull",
 		"db:studio": "drizzle-kit studio",
-		"compose:dev": "sudo docker compose -f docker-compose.yaml -f docker-compose.dev.yaml up"
+		"compose:dev": "sudo docker compose -f docker-compose.yml -f docker-compose.dev.yml --build up",
+		"compose:db": "sudo docker compose -f docker-compose.yml -f docker-compose.dev.yml up db"
 	},
 	"dependencies": {
 		"@t3-oss/env-core": "^0.13.8",

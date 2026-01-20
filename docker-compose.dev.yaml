@@ -1,7 +1,0 @@
-# Local development configuration
-# Run with: docker compose -f docker-compose.yaml -f docker-compose.dev.yaml up
-
-services:
-  app:
-    ports:
-      - "3000:3000"
