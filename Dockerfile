@@ -29,6 +29,9 @@ COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
 # Copy package.json for drizzle-kit to work
 COPY --from=builder /app/package.json ./package.json
 
+# Copy database wait script
+COPY wait-for-db.mjs /app/wait-for-db.mjs
+
 # Copy entrypoint script
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
