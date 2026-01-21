@@ -6,6 +6,7 @@ services:
     restart: always
     expose:
       - "5432"
+    user: postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
