@@ -9,6 +9,136 @@ pnpm install
 pnpm start
 ```
 
+## Deployment
+
+### Local Development
+
+1. **Start the local database:**
+   ```bash
+   docker compose -f docker-compose.dev.yml up -d
+   ```
+
+2. **Run migrations:**
+   ```bash
+   pnpm db:migrate
+   ```
+
+3. **Start the development server:**
+   ```bash
+   pnpm dev
+   ```
+
+4. **Access:**
+   - App: http://localhost:3000
+   - Database: localhost:5432
+
+### Production Deployment (Dokploy)
+
+#### Initial Setup
+
+1. **Create Postgres Database Service in Dokploy:**
+   - Service Name: `veles-db`
+   - Type: Postgres
+   - Version: 18.1
+   - Note the "Internal Connection URL" (e.g., `postgresql://user:pass@postgres-veles-db:5432/veles_prod`)
+
+2. **Create Application Service in Dokploy:**
+   - Service Name: `veles-app`
+   - Type: Docker Compose
+   - Repository: Your Git repo
+   - Branch: `main`
+
+3. **Configure Environment Variables in Dokploy:**
+   ```
+   DATABASE_URL=<Internal Connection URL from database service>
+   VITE_TEST=prod-test
+   ```
+
+4. **Deploy the application** through Dokploy UI
+
+#### Running Migrations
+
+Migrations are **NOT** run automatically. Run them manually from your dev machine:
+
+1. **Get production DATABASE_URL from Dokploy:**
+   - Go to your database service in Dokploy
+   - Copy the "Internal Connection URL" (or use SSH tunnel for external URL)
+
+2. **Create `.env.prod` file locally:**
+   ```bash
+   # .env.prod (gitignored)
+   DATABASE_URL=postgresql://user:pass@dokploy-host:5432/veles_prod
+   ```
+
+3. **Run migrations:**
+   ```bash
+   pnpm db:migrate
+   ```
+
+   Drizzle will use the connection string from `.env.prod`
+
+4. **Verify migrations:**
+   ```bash
+   pnpm db:studio
+   ```
+
+   Opens Drizzle Studio connected to production database
+
+#### Deployment Flow
+
+1. **Make schema changes** in `src/db/schema.ts`
+2. **Generate migration:**
+   ```bash
+   pnpm db:generate
+   ```
+3. **Test migration locally:**
+   ```bash
+   pnpm db:migrate
+   ```
+4. **Commit and push:**
+   ```bash
+   git add -A
+   git commit -m "Add new database schema changes"
+   git push
+   ```
+5. **Run migration on production:**
+   - Ensure `.env.prod` has production DATABASE_URL
+   - Run `pnpm db:migrate`
+6. **Deploy app on Dokploy:**
+   - Trigger deployment through Dokploy UI
+   - Or it may auto-deploy if configured
+
+#### Database Access
+
+- **Via Dokploy UI:** Use the built-in database management tools
+- **Via SSH Tunnel:** Set up SSH tunnel to access from local tools
+- **Via Drizzle Studio:** Use `pnpm db:studio` with `.env.prod` configured
+
+### Docker Commands Reference
+
+```bash
+# Local development - database only
+docker compose -f docker-compose.dev.yml up -d
+
+# Stop local database
+docker compose -f docker-compose.dev.yml down
+
+# Stop and remove volumes (fresh start)
+docker compose -f docker-compose.dev.yml down -v
+
+# Production build (Dokploy does this automatically)
+docker compose build
+
+# View logs
+docker compose -f docker-compose.dev.yml logs -f
+```
+
+### Environment Variables
+
+- **Local Development:** Use `.env` or `.env.local`
+- **Production Migrations:** Use `.env.prod` (gitignored)
+- **Production App:** Environment variables managed in Dokploy UI
+
 # Building For Production
 
 To build this application for production:

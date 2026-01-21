@@ -1,8 +1,9 @@
 import { config } from "dotenv";
 import { defineConfig } from "drizzle-kit";
 
-config({ path: [".env.local", ".env"] });
-
+// Load from .env.prod first (for manual production migrations),
+// then .env.local, then .env (for local dev)
+config({ path: [".env.prod", ".env.local", ".env"] });
 if (!process.env.DATABASE_URL) {
 	throw new Error("DATABASE_URL is not defined in environment variables");
 }
