@@ -36,6 +36,11 @@ jobs:
         run: pnpm check
         continue-on-error: true
 
+      - name: Run TypeScript check
+        id: typecheck
+        run: pnpm ts
+        continue-on-error: true
+
       - name: Run tests
         id: test
         run: pnpm test
@@ -51,6 +56,7 @@ jobs:
         id: statuses
         run: |
           check_status="${{ steps.check.outcome }}"
+          typecheck_status="${{ steps.typecheck.outcome }}"
           test_status="${{ steps.test.outcome }}"
           build_status="${{ steps.build.outcome }}"
 
@@ -58,6 +64,12 @@ jobs:
             check_emoji="✅"
           else
             check_emoji="❌"
+          fi
+
+          if [ "$typecheck_status" = "success" ]; then
+            typecheck_emoji="✅"
+          else
+            typecheck_emoji="❌"
           fi
 
           if [ "$test_status" = "success" ]; then
@@ -73,10 +85,11 @@ jobs:
           fi
 
           echo "check_emoji=$check_emoji" >> $GITHUB_OUTPUT
+          echo "typecheck_emoji=$typecheck_emoji" >> $GITHUB_OUTPUT
           echo "test_emoji=$test_emoji" >> $GITHUB_OUTPUT
           echo "build_emoji=$build_emoji" >> $GITHUB_OUTPUT
 
-          if [ "$check_status" = "success" ] && [ "$test_status" = "success" ] && [ "$build_status" = "success" ]; then
+          if [ "$check_status" = "success" ] && [ "$typecheck_status" = "success" ] && [ "$test_status" = "success" ] && [ "$build_status" = "success" ]; then
             echo "all_passed=true" >> $GITHUB_OUTPUT
           else
             echo "all_passed=false" >> $GITHUB_OUTPUT
@@ -91,6 +104,7 @@ jobs:
             ## Checks Results
 
             ${{ steps.statuses.outputs.check_emoji }} **Biome Check** (lint + format)
+            ${{ steps.statuses.outputs.typecheck_emoji }} **TypeScript**
             ${{ steps.statuses.outputs.test_emoji }} **Tests**
             ${{ steps.statuses.outputs.build_emoji }} **Build**
 

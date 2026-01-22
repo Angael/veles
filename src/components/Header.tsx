@@ -18,6 +18,9 @@ export default function Header() {
 		Record<string, boolean>
 	>({});
 
+	const badVar: string = 123;
+	console.log({ badVar });
+
 	return (
 		<>
 			<header className='p-4 flex items-center bg-gray-800 text-white shadow-lg'>
