@@ -81,8 +81,6 @@ Migrations are **NOT** run automatically. Run them manually from your dev machin
    pnpm db:migrate:prod
    ```
 
-   Uses the `DB_ENV=prod` flag to load `.env.prod`
-
 4. **Verify migrations:**
 
    ```bash
@@ -146,8 +144,6 @@ docker compose -f docker-compose.dev.yml logs -f
 - **Local Development:** Use `.env` or `.env.local` (loaded by default scripts)
 - **Production Migrations:** Use `.env.prod` (committed to repo, loaded by `:prod` scripts)
 - **Production App:** Environment variables managed in Dokploy UI
-
-The `:prod` scripts (`db:migrate:prod`, `db:studio:prod`) automatically set `DB_ENV=prod` which tells drizzle.config.ts to load `.env.prod` instead of `.env` or `.env.local`.
 
 # Building For Production
 
