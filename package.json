@@ -18,8 +18,8 @@
 		"db:pull": "drizzle-kit pull",
 		"db:studio": "drizzle-kit studio",
 		"db:studio:prod": "drizzle-kit studio --config=drizzle-prod.config.ts",
-		"compose:dev": "docker compose -f docker-compose.dev.yml up",
-		"compose:dev:down": "docker compose -f docker-compose.dev.yml down"
+		"compose:dev": "sudo docker compose -f docker-compose.dev.yml up",
+		"compose:dev:down": "sudo docker compose -f docker-compose.dev.yml down"
 	},
 	"dependencies": {
 		"@t3-oss/env-core": "^0.13.8",
