@@ -1,4 +1,4 @@
-Welcome to your new TanStack app! 
+Welcome to your new TanStack app!
 
 # Getting Started
 
@@ -14,16 +14,19 @@ pnpm start
 ### Local Development
 
 1. **Start the local database:**
+
    ```bash
    docker compose -f docker-compose.dev.yml up -d
    ```
 
 2. **Run migrations:**
+
    ```bash
    pnpm db:migrate
    ```
 
 3. **Start the development server:**
+
    ```bash
    pnpm dev
    ```
@@ -49,6 +52,7 @@ pnpm start
    - Branch: `main`
 
 3. **Configure Environment Variables in Dokploy:**
+
    ```
    DATABASE_URL=<Internal Connection URL from database service>
    VITE_TEST=prod-test
@@ -64,22 +68,25 @@ Migrations are **NOT** run automatically. Run them manually from your dev machin
    - Go to your database service in Dokploy
    - Copy the "Internal Connection URL" (or use SSH tunnel for external URL)
 
-2. **Create `.env.prod` file locally:**
+2. **Configure `.env.prod` file in the repository:**
+
    ```bash
-   # .env.prod (gitignored)
+   # .env.prod
    DATABASE_URL=postgresql://user:pass@dokploy-host:5432/veles_prod
    ```
 
-3. **Run migrations:**
+3. **Run production migrations:**
+
    ```bash
-   pnpm db:migrate
+   pnpm db:migrate:prod
    ```
 
-   Drizzle will use the connection string from `.env.prod`
+   Uses the `DB_ENV=prod` flag to load `.env.prod`
 
 4. **Verify migrations:**
+
    ```bash
-   pnpm db:studio
+   pnpm db:studio:prod
    ```
 
    Opens Drizzle Studio connected to production database
@@ -102,8 +109,9 @@ Migrations are **NOT** run automatically. Run them manually from your dev machin
    git push
    ```
 5. **Run migration on production:**
-   - Ensure `.env.prod` has production DATABASE_URL
-   - Run `pnpm db:migrate`
+   ```bash
+   pnpm db:migrate:prod
+   ```
 6. **Deploy app on Dokploy:**
    - Trigger deployment through Dokploy UI
    - Or it may auto-deploy if configured
@@ -135,9 +143,11 @@ docker compose -f docker-compose.dev.yml logs -f
 
 ### Environment Variables
 
-- **Local Development:** Use `.env` or `.env.local`
-- **Production Migrations:** Use `.env.prod` (gitignored)
+- **Local Development:** Use `.env` or `.env.local` (loaded by default scripts)
+- **Production Migrations:** Use `.env.prod` (committed to repo, loaded by `:prod` scripts)
 - **Production App:** Environment variables managed in Dokploy UI
+
+The `:prod` scripts (`db:migrate:prod`, `db:studio:prod`) automatically set `DB_ENV=prod` which tells drizzle.config.ts to load `.env.prod` instead of `.env` or `.env.local`.
 
 # Building For Production
 
@@ -159,18 +169,15 @@ pnpm test
 
 This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
 
-
 ## Linting & Formatting
 
 This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
-
 
 ```bash
 pnpm lint
 pnpm format
 pnpm check
 ```
-
 
 ## Shadcn
 
@@ -179,7 +186,6 @@ Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
 ```bash
 pnpm dlx shadcn@latest add button
 ```
-
 
 ## T3Env
 
@@ -195,12 +201,8 @@ import { env } from "@/env";
 console.log(env.VITE_APP_TITLE);
 ```
 
-
-
-
-
-
 ## Routing
+
 This project uses [TanStack Router](https://tanstack.com/router). The initial setup is a file based router. Which means that the routes are managed as files in `src/routes`.
 
 ### Adding A Route
@@ -236,8 +238,8 @@ In the File Based Routing setup the layout is located in `src/routes/__root.tsx`
 Here is an example layout that includes a header:
 
 ```tsx
-import { Outlet, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { Outlet, createRootRoute } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import { Link } from "@tanstack/react-router";
 
@@ -253,14 +255,13 @@ export const Route = createRootRoute({
       <Outlet />
       <TanStackRouterDevtools />
     </>
-  ),
-})
+  )
+});
 ```
 
 The `<TanStackRouterDevtools />` component is not required so you can remove it if you don't want it in your layout.
 
 More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
 
 ## Data Fetching
 
@@ -289,7 +290,7 @@ const peopleRoute = createRoute({
         ))}
       </ul>
     );
-  },
+  }
 });
 ```
 
@@ -339,7 +340,7 @@ const rootRoute = createRootRoute({
       <ReactQueryDevtools buttonPosition="top-right" />
       <TanStackRouterDevtools />
     </>
-  ),
+  )
 });
 ```
 
@@ -357,7 +358,7 @@ function App() {
       fetch("https://swapi.dev/api/people")
         .then((res) => res.json())
         .then((data) => data.results as { name: string }[]),
-    initialData: [],
+    initialData: []
   });
 
   return (
@@ -422,7 +423,7 @@ const countStore = new Store(0);
 
 const doubledStore = new Derived({
   fn: () => countStore.state * 2,
-  deps: [countStore],
+  deps: [countStore]
 });
 doubledStore.mount();
 

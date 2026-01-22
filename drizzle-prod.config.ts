@@ -8,9 +8,9 @@ import { defineConfig } from "drizzle-kit";
 console.log("A:", process.env.A);
 console.log(`DB_ENV: ${process.env.DB_ENV}`);
 
-// config({
-// 	path: process.env.DB_ENV === "prod" ? [".env.prod"] : [".env"],
-// });
+config({
+	path: process.env.DB_ENV === "prod" ? [".env.prod"] : [".env"],
+});
 
 if (!process.env.DATABASE_URL) {
 	throw new Error("DATABASE_URL is not defined in environment variables");
