@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute("/demo/sentry/testing")({
+export const Route = createFileRoute('/demo/sentry/testing')({
 	component: () => (
 		<div className="min-h-screen flex items-center justify-center">
 			<div className="text-center p-8">
