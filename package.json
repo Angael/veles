@@ -7,17 +7,19 @@
 		"build": "vite build && cp instrument.server.mjs .output/server",
 		"preview": "vite preview",
 		"test": "vitest run",
-		"format": "biome format",
+		"format": "biome format --write",
 		"lint": "biome lint",
 		"check": "biome check",
 		"start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
+		"db:migrate:prod": "drizzle-kit migrate --config=drizzle-prod.config.ts",
 		"db:push": "drizzle-kit push",
 		"db:pull": "drizzle-kit pull",
 		"db:studio": "drizzle-kit studio",
-		"compose:dev": "sudo docker compose -f docker-compose.yml -f docker-compose.dev.yml --build up",
-		"compose:db": "sudo docker compose -f docker-compose.yml -f docker-compose.dev.yml up db"
+		"db:studio:prod": "drizzle-kit studio --config=drizzle-prod.config.ts",
+		"compose:dev": "sudo docker compose -f docker-compose.dev.yml up",
+		"compose:dev:down": "sudo docker compose -f docker-compose.dev.yml down"
 	},
 	"dependencies": {
 		"@t3-oss/env-core": "^0.13.8",

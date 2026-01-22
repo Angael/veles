@@ -1,17 +1,18 @@
-import { config } from "dotenv";
 import { defineConfig } from "drizzle-kit";
 
-config({ path: [".env.local", ".env"] });
+export const createDrizzleConfig = (dbUrl?: string) => {
+	if (!dbUrl) {
+		throw new Error("dbUrl is not defined in environment variables");
+	}
 
-if (!process.env.DATABASE_URL) {
-	throw new Error("DATABASE_URL is not defined in environment variables");
-}
+	return defineConfig({
+		out: "./drizzle",
+		schema: "./src/db/schema.ts",
+		dialect: "postgresql",
+		dbCredentials: {
+			url: dbUrl,
+		},
+	});
+};
 
-export default defineConfig({
-	out: "./drizzle",
-	schema: "./src/db/schema.ts",
-	dialect: "postgresql",
-	dbCredentials: {
-		url: process.env.DATABASE_URL,
-	},
-});
+export default createDrizzleConfig(process.env.DATABASE_URL);

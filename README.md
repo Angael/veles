@@ -1,4 +1,4 @@
-Welcome to your new TanStack app! 
+Welcome to your new TanStack app!
 
 # Getting Started
 
@@ -8,6 +8,153 @@ To run this application:
 pnpm install
 pnpm start
 ```
+
+## Deployment
+
+### Local Development
+
+1. **Start the local database:**
+
+   ```bash
+   sudo docker compose -f docker-compose.dev.yml up -d
+   ```
+
+   Or use the npm script:
+   ```bash
+   pnpm compose:dev
+   ```
+
+2. **Run migrations:**
+
+   ```bash
+   pnpm db:migrate
+   ```
+
+3. **Start the development server:**
+
+   ```bash
+   pnpm dev
+   ```
+
+4. **Access:**
+   - App: http://localhost:3000
+   - Database: localhost:5432
+
+### Production Deployment (Dokploy)
+
+#### Initial Setup
+
+1. **Create Postgres Database Service in Dokploy:**
+   - Service Name: `veles-db`
+   - Type: Postgres
+   - Version: 18.1
+   - Note the "Internal Connection URL" (e.g., `postgresql://user:pass@postgres-veles-db:5432/veles_prod`)
+
+2. **Create Application Service in Dokploy:**
+   - Service Name: `veles-app`
+   - Type: Docker Compose
+   - Repository: Your Git repo
+   - Branch: `main`
+
+3. **Configure Environment Variables in Dokploy:**
+
+   ```
+   DATABASE_URL=<Internal Connection URL from database service>
+   VITE_TEST=prod-test
+   ```
+
+4. **Deploy the application** through Dokploy UI
+
+#### Running Migrations
+
+Migrations are **NOT** run automatically. Run them manually from your dev machine:
+
+1. **Get production DATABASE_URL from Dokploy:**
+   - Go to your database service in Dokploy
+   - Copy the "Internal Connection URL" (or use SSH tunnel for external URL)
+
+2. **Configure `.env.prod` file in the repository:**
+
+   ```bash
+   # .env.prod
+   PROD_DATABASE_URL=postgresql://user:pass@dokploy-host:5432/veles_prod
+   ```
+
+3. **Run production migrations:**
+
+   ```bash
+   pnpm db:migrate:prod
+   ```
+
+4. **Verify migrations:**
+
+   ```bash
+   pnpm db:studio:prod
+   ```
+
+   Opens Drizzle Studio connected to production database
+
+#### Deployment Flow
+
+1. **Make schema changes** in `src/db/schema.ts`
+2. **Generate migration:**
+   ```bash
+   pnpm db:generate
+   ```
+3. **Test migration locally:**
+   ```bash
+   pnpm db:migrate
+   ```
+4. **Commit and push:**
+   ```bash
+   git add -A
+   git commit -m "Add new database schema changes"
+   git push
+   ```
+5. **Run migration on production:**
+   ```bash
+   pnpm db:migrate:prod
+   ```
+6. **Deploy app on Dokploy:**
+   - Trigger deployment through Dokploy UI
+   - Or it may auto-deploy if configured
+
+#### Database Access
+
+- **Via Dokploy UI:** Use the built-in database management tools
+- **Via SSH Tunnel:** Set up SSH tunnel to access from local tools
+- **Via Drizzle Studio:** Use `pnpm db:studio` with `.env.prod` configured
+
+### Docker Commands Reference
+
+```bash
+# Local development - database only
+sudo docker compose -f docker-compose.dev.yml up -d
+
+# Or use npm scripts
+pnpm compose:dev
+
+# Stop local database
+sudo docker compose -f docker-compose.dev.yml down
+
+# Or use npm script
+pnpm compose:dev:down
+
+# Stop and remove volumes (fresh start)
+sudo docker compose -f docker-compose.dev.yml down -v
+
+# Production build (Dokploy does this automatically)
+docker compose build
+
+# View logs
+sudo docker compose -f docker-compose.dev.yml logs -f
+```
+
+### Environment Variables
+
+- **Local Development:** Use `.env` or `.env.local` (loaded by default scripts)
+- **Production Migrations:** Use `.env.prod` (committed to repo, loaded by `:prod` scripts)
+- **Production App:** Environment variables managed in Dokploy UI
 
 # Building For Production
 
@@ -29,18 +176,15 @@ pnpm test
 
 This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
 
-
 ## Linting & Formatting
 
 This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
-
 
 ```bash
 pnpm lint
 pnpm format
 pnpm check
 ```
-
 
 ## Shadcn
 
@@ -49,7 +193,6 @@ Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
 ```bash
 pnpm dlx shadcn@latest add button
 ```
-
 
 ## T3Env
 
@@ -65,12 +208,8 @@ import { env } from "@/env";
 console.log(env.VITE_APP_TITLE);
 ```
 
-
-
-
-
-
 ## Routing
+
 This project uses [TanStack Router](https://tanstack.com/router). The initial setup is a file based router. Which means that the routes are managed as files in `src/routes`.
 
 ### Adding A Route
@@ -106,8 +245,8 @@ In the File Based Routing setup the layout is located in `src/routes/__root.tsx`
 Here is an example layout that includes a header:
 
 ```tsx
-import { Outlet, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { Outlet, createRootRoute } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import { Link } from "@tanstack/react-router";
 
@@ -123,14 +262,13 @@ export const Route = createRootRoute({
       <Outlet />
       <TanStackRouterDevtools />
     </>
-  ),
-})
+  )
+});
 ```
 
 The `<TanStackRouterDevtools />` component is not required so you can remove it if you don't want it in your layout.
 
 More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
 
 ## Data Fetching
 
@@ -159,7 +297,7 @@ const peopleRoute = createRoute({
         ))}
       </ul>
     );
-  },
+  }
 });
 ```
 
@@ -209,7 +347,7 @@ const rootRoute = createRootRoute({
       <ReactQueryDevtools buttonPosition="top-right" />
       <TanStackRouterDevtools />
     </>
-  ),
+  )
 });
 ```
 
@@ -227,7 +365,7 @@ function App() {
       fetch("https://swapi.dev/api/people")
         .then((res) => res.json())
         .then((data) => data.results as { name: string }[]),
-    initialData: [],
+    initialData: []
   });
 
   return (
@@ -292,7 +430,7 @@ const countStore = new Store(0);
 
 const doubledStore = new Derived({
   fn: () => countStore.state * 2,
-  deps: [countStore],
+  deps: [countStore]
 });
 doubledStore.mount();
 

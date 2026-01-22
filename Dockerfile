@@ -14,28 +14,10 @@ FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-# Copy built output
+# Copy only the built application
 COPY --from=builder /app/.output .output
-
-# Copy node_modules for drizzle-kit
-COPY --from=builder /app/node_modules ./node_modules
-
-# Copy migration files
-COPY --from=builder /app/drizzle ./drizzle
-
-# Copy drizzle config
-COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
-
-# Copy package.json for drizzle-kit to work
-COPY --from=builder /app/package.json ./package.json
-
-# Copy database wait script
-COPY wait-for-db.mjs /app/wait-for-db.mjs
-
-# Copy entrypoint script
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
 
 EXPOSE 3000
 
-CMD ["/docker-entrypoint.sh"]
+# Start the application directly (no migrations, no wait scripts)
+CMD ["node", "--import", "./.output/server/instrument.server.mjs", ".output/server/index.mjs"]
