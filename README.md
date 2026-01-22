@@ -16,7 +16,12 @@ pnpm start
 1. **Start the local database:**
 
    ```bash
-   docker compose -f docker-compose.dev.yml up -d
+   sudo docker compose -f docker-compose.dev.yml up -d
+   ```
+
+   Or use the npm script:
+   ```bash
+   pnpm compose:dev
    ```
 
 2. **Run migrations:**
@@ -72,7 +77,7 @@ Migrations are **NOT** run automatically. Run them manually from your dev machin
 
    ```bash
    # .env.prod
-   DATABASE_URL=postgresql://user:pass@dokploy-host:5432/veles_prod
+   PROD_DATABASE_URL=postgresql://user:pass@dokploy-host:5432/veles_prod
    ```
 
 3. **Run production migrations:**
@@ -124,19 +129,25 @@ Migrations are **NOT** run automatically. Run them manually from your dev machin
 
 ```bash
 # Local development - database only
-docker compose -f docker-compose.dev.yml up -d
+sudo docker compose -f docker-compose.dev.yml up -d
+
+# Or use npm scripts
+pnpm compose:dev
 
 # Stop local database
-docker compose -f docker-compose.dev.yml down
+sudo docker compose -f docker-compose.dev.yml down
+
+# Or use npm script
+pnpm compose:dev:down
 
 # Stop and remove volumes (fresh start)
-docker compose -f docker-compose.dev.yml down -v
+sudo docker compose -f docker-compose.dev.yml down -v
 
 # Production build (Dokploy does this automatically)
 docker compose build
 
 # View logs
-docker compose -f docker-compose.dev.yml logs -f
+sudo docker compose -f docker-compose.dev.yml logs -f
 ```
 
 ### Environment Variables

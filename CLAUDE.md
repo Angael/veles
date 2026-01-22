@@ -13,8 +13,9 @@ Veles is a full-stack TypeScript application built with TanStack Start (React me
 pnpm dev              # Start dev server on port 3000
 
 # Docker (Local Development)
-docker compose -f docker-compose.yaml -f docker-compose.dev.yaml up --build
-                      # Run app + database in Docker with ports exposed
+pnpm compose:dev      # Start database only (with sudo)
+# Or manually:
+sudo docker compose -f docker-compose.dev.yml up -d
 
 # Production
 pnpm build            # Build for production
@@ -30,17 +31,20 @@ pnpm check            # Run both lint and format checks
 
 # Database (Drizzle)
 pnpm db:generate      # Generate migrations from schema changes
-pnpm db:migrate       # Run migrations
+pnpm db:migrate       # Run migrations (local dev)
+pnpm db:migrate:prod  # Run migrations (production, uses drizzle-prod.config.ts)
 pnpm db:push          # Push schema directly (dev only)
-pnpm db:studio        # Open Drizzle Studio GUI
+pnpm db:studio        # Open Drizzle Studio GUI (local dev)
+pnpm db:studio:prod   # Open Drizzle Studio GUI (production)
 ```
 
 ## Architecture
 
 ### Docker Setup
-- **`docker-compose.yaml`**: Production config (used by Dokploy) - exposes ports internally only
-- **`docker-compose.dev.yaml`**: Dev overrides - adds `ports: 3000:3000` for localhost access
-- To run locally: merge both files with `-f` flag (see commands above)
+- **`docker-compose.yml`**: Production config (used by Dokploy) - exposes ports internally only
+- **`docker-compose.dev.yml`**: Dev database setup for local development
+- For local development: Use `pnpm compose:dev` or run docker compose with sudo
+- Database credentials are hardcoded in `docker-compose.dev.yml` (postgres/postgres/veles_dev)
 
 ### Routing
 - **File-based routing**: Routes are in `src/routes/` and auto-generate `src/routeTree.gen.ts`
@@ -53,12 +57,17 @@ pnpm db:studio        # Open Drizzle Studio GUI
 
 ### Environment Variables
 - **Application**: Defined and validated with T3 Env in `env.ts`
-  - Server vars: `DATABASE_URL` (required), `SERVER_URL` (optional)
+  - Server vars: `DATABASE_URL` (required for local dev), `SERVER_URL` (optional)
   - Client vars must be prefixed with `VITE_`
-- **Docker**: Environment variables are in `.env` file (gitignored)
-  - Copy `.env.example` to `.env` for local development
-  - Docker Compose automatically loads `.env` file
-  - Dokploy manages production environment variables separately
+- **Local Development**:
+  - `DATABASE_URL` in `.env` or `.env.local` (for app and migrations)
+  - Database credentials hardcoded in `docker-compose.dev.yml`
+- **Production Migrations**:
+  - `PROD_DATABASE_URL` in `.env.prod` (committed to repo)
+  - Used by `drizzle-prod.config.ts` for `:prod` scripts
+- **Production App**:
+  - Environment variables managed in Dokploy UI
+  - Dokploy sets `DATABASE_URL` for the running app
 
 ### Code Style
 - Uses Biome for linting/formatting
