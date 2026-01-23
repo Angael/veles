@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as CookieTestRouteImport } from './routes/cookie-test'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as NotesIndexRouteImport } from './routes/notes/index'
+import { Route as NotesIndexServerFnRouteImport } from './routes/notes/index-server-fn'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
 import { Route as NotesApiSaveRouteImport } from './routes/notes/api.save'
@@ -39,6 +40,11 @@ const IndexRoute = IndexRouteImport.update({
 const NotesIndexRoute = NotesIndexRouteImport.update({
   id: '/notes/',
   path: '/notes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesIndexServerFnRoute = NotesIndexServerFnRouteImport.update({
+  id: '/notes/index-server-fn',
+  path: '/notes/index-server-fn',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/cookie-test': typeof CookieTestRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/notes/index-server-fn': typeof NotesIndexServerFnRoute
   '/notes': typeof NotesIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/cookie-test': typeof CookieTestRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/notes/index-server-fn': typeof NotesIndexServerFnRoute
   '/notes': typeof NotesIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/cookie-test': typeof CookieTestRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/notes/index-server-fn': typeof NotesIndexServerFnRoute
   '/notes/': typeof NotesIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/cookie-test'
     | '/demo/drizzle'
     | '/demo/tanstack-query'
+    | '/notes/index-server-fn'
     | '/notes'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/cookie-test'
     | '/demo/drizzle'
     | '/demo/tanstack-query'
+    | '/notes/index-server-fn'
     | '/notes'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/cookie-test'
     | '/demo/drizzle'
     | '/demo/tanstack-query'
+    | '/notes/index-server-fn'
     | '/notes/'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -224,6 +236,7 @@ export interface RootRouteChildren {
   CookieTestRoute: typeof CookieTestRoute
   DemoDrizzleRoute: typeof DemoDrizzleRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  NotesIndexServerFnRoute: typeof NotesIndexServerFnRoute
   NotesIndexRoute: typeof NotesIndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
@@ -259,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/notes'
       fullPath: '/notes'
       preLoaderRoute: typeof NotesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes/index-server-fn': {
+      id: '/notes/index-server-fn'
+      path: '/notes/index-server-fn'
+      fullPath: '/notes/index-server-fn'
+      preLoaderRoute: typeof NotesIndexServerFnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/tanstack-query': {
@@ -360,6 +380,7 @@ const rootRouteChildren: RootRouteChildren = {
   CookieTestRoute: CookieTestRoute,
   DemoDrizzleRoute: DemoDrizzleRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  NotesIndexServerFnRoute: NotesIndexServerFnRoute,
   NotesIndexRoute: NotesIndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,

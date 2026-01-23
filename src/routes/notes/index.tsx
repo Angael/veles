@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
+import { saveNote } from './server-functions';
 
 export const Route = createFileRoute('/notes/')({ component: NotesPage });
 
@@ -23,7 +24,7 @@ function NotesPage() {
 		},
 	});
 
-	const saveMutation = useMutation({
+	const saveMutationFetch = useMutation({
 		mutationFn: async (noteContent: string) => {
 			const response = await fetch('/notes/api/save', {
 				method: 'POST',
@@ -39,9 +40,23 @@ function NotesPage() {
 		},
 	});
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const saveMutationServerFn = useMutation({
+		mutationFn: (noteContent: string) =>
+			saveNote({ data: { content: noteContent } }),
+		onSuccess: () => {
+			setContent('');
+			queryClient.invalidateQueries({ queryKey: ['notes'] });
+		},
+	});
+
+	const handleSubmitFetch = async (e: React.FormEvent) => {
 		e.preventDefault();
-		saveMutation.mutate(content);
+		saveMutationFetch.mutate(content);
+	};
+
+	const handleSubmitServerFn = async (e: React.FormEvent) => {
+		e.preventDefault();
+		saveMutationServerFn.mutate(content);
 	};
 
 	return (
@@ -49,7 +64,7 @@ function NotesPage() {
 			<div className='max-w-2xl mx-auto'>
 				<h1 className='text-4xl font-bold text-white mb-8'>Notes</h1>
 
-				<form onSubmit={handleSubmit} className='space-y-4 mb-8'>
+				<div className='space-y-4 mb-8'>
 					<textarea
 						value={content}
 						onChange={(e) => setContent(e.target.value)}
@@ -58,23 +73,39 @@ function NotesPage() {
 						required
 					/>
 
-					<button
-						type='submit'
-						disabled={saveMutation.isPending}
-						className='px-6 py-3 bg-cyan-500 hover:bg-cyan-600 disabled:bg-cyan-700 text-white font-semibold rounded-lg transition-colors'
-					>
-						{saveMutation.isPending ? 'Saving...' : 'Save Note'}
-					</button>
+					<div className='flex gap-4'>
+						<form onSubmit={handleSubmitFetch} className='flex-1'>
+							<button
+								type='submit'
+								disabled={saveMutationFetch.isPending}
+								className='w-full px-6 py-3 bg-cyan-500 hover:bg-cyan-600 disabled:bg-cyan-700 text-white font-semibold rounded-lg transition-colors'
+							>
+								{saveMutationFetch.isPending ? 'Saving...' : 'Save (API Route)'}
+							</button>
+						</form>
 
-					{saveMutation.isSuccess && (
+						<form onSubmit={handleSubmitServerFn} className='flex-1'>
+							<button
+								type='submit'
+								disabled={saveMutationServerFn.isPending}
+								className='w-full px-6 py-3 bg-purple-500 hover:bg-purple-600 disabled:bg-purple-700 text-white font-semibold rounded-lg transition-colors'
+							>
+								{saveMutationServerFn.isPending
+									? 'Saving...'
+									: 'Save (Server Fn)'}
+							</button>
+						</form>
+					</div>
+
+					{(saveMutationFetch.isSuccess || saveMutationServerFn.isSuccess) && (
 						<p className='text-green-400'>Note saved successfully!</p>
 					)}
-					{saveMutation.isError && (
+					{(saveMutationFetch.isError || saveMutationServerFn.isError) && (
 						<p className='text-red-400'>
 							Failed to save note. Please try again.
 						</p>
 					)}
-				</form>
+				</div>
 
 				<div className='space-y-4'>
 					<h2 className='text-2xl font-bold text-white'>Saved Notes</h2>
