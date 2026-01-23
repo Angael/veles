@@ -3,7 +3,6 @@ import {
 	ChevronDown,
 	ChevronRight,
 	Cookie,
-	Database,
 	Home,
 	Menu,
 	Network,
@@ -83,19 +82,6 @@ export default function Header() {
 					>
 						<Cookie size={20} />
 						<span className='font-medium'>Session Test</span>
-					</Link>
-
-					<Link
-						to='/notes'
-						onClick={() => setIsOpen(false)}
-						className='flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2'
-						activeProps={{
-							className:
-								'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-						}}
-					>
-						<StickyNote size={20} />
-						<span className='font-medium'>Notes</span>
 					</Link>
 
 					{/* Demo Links Start */}
@@ -198,21 +184,6 @@ export default function Header() {
 							</Link>
 						</div>
 					)}
-
-					{/* Removed demo link */}
-
-					<Link
-						to='/demo/drizzle'
-						onClick={() => setIsOpen(false)}
-						className='flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2'
-						activeProps={{
-							className:
-								'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-						}}
-					>
-						<Database size={20} />
-						<span className='font-medium'>Drizzle</span>
-					</Link>
 
 					<Link
 						to='/demo/tanstack-query'
