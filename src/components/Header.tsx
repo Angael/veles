@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import {
 	ChevronDown,
 	ChevronRight,
+	Cookie,
 	Database,
 	Home,
 	Menu,
@@ -69,6 +70,32 @@ export default function Header() {
 					>
 						<Home size={20} />
 						<span className='font-medium'>Home</span>
+					</Link>
+
+					<Link
+						to='/cookie-test'
+						onClick={() => setIsOpen(false)}
+						className='flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2'
+						activeProps={{
+							className:
+								'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+						}}
+					>
+						<Cookie size={20} />
+						<span className='font-medium'>Session Test</span>
+					</Link>
+
+					<Link
+						to='/notes'
+						onClick={() => setIsOpen(false)}
+						className='flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2'
+						activeProps={{
+							className:
+								'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+						}}
+					>
+						<StickyNote size={20} />
+						<span className='font-medium'>Notes</span>
 					</Link>
 
 					{/* Demo Links Start */}
