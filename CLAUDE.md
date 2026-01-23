@@ -74,3 +74,9 @@ pnpm db:studio:prod   # Open Drizzle Studio GUI (production)
 - Indent style: tabs
 - Quote style: double quotes
 - Path alias: `@/*` maps to `./src/*`
+
+### Tailwind & shadcn Guidance
+User is learning Tailwind and shadcn. When you see inefficient patterns or verbose solutions:
+- Proactively suggest better Tailwind utilities and patterns
+- Recommend shadcn components when applicable
+- Teach reusable approaches, not just fixes
