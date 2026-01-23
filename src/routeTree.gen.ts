@@ -11,8 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as CookieTestRouteImport } from './routes/cookie-test'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NotesIndexRouteImport } from './routes/notes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
+import { Route as NotesApiSaveRouteImport } from './routes/notes/api.save'
+import { Route as NotesApiNotesRouteImport } from './routes/notes/api.notes'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.testing'
@@ -33,6 +36,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotesIndexRoute = NotesIndexRouteImport.update({
+  id: '/notes/',
+  path: '/notes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
   path: '/demo/tanstack-query',
@@ -41,6 +49,16 @@ const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
 const DemoDrizzleRoute = DemoDrizzleRouteImport.update({
   id: '/demo/drizzle',
   path: '/demo/drizzle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesApiSaveRoute = NotesApiSaveRouteImport.update({
+  id: '/notes/api/save',
+  path: '/notes/api/save',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesApiNotesRoute = NotesApiNotesRouteImport.update({
+  id: '/notes/api/notes',
+  path: '/notes/api/notes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
@@ -94,11 +112,14 @@ export interface FileRoutesByFullPath {
   '/cookie-test': typeof CookieTestRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/notes': typeof NotesIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/notes/api/notes': typeof NotesApiNotesRoute
+  '/notes/api/save': typeof NotesApiSaveRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -109,11 +130,14 @@ export interface FileRoutesByTo {
   '/cookie-test': typeof CookieTestRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/notes': typeof NotesIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/notes/api/notes': typeof NotesApiNotesRoute
+  '/notes/api/save': typeof NotesApiSaveRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -125,11 +149,14 @@ export interface FileRoutesById {
   '/cookie-test': typeof CookieTestRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/notes/': typeof NotesIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/notes/api/notes': typeof NotesApiNotesRoute
+  '/notes/api/save': typeof NotesApiSaveRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -142,11 +169,14 @@ export interface FileRouteTypes {
     | '/cookie-test'
     | '/demo/drizzle'
     | '/demo/tanstack-query'
+    | '/notes'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/notes/api/notes'
+    | '/notes/api/save'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -157,11 +187,14 @@ export interface FileRouteTypes {
     | '/cookie-test'
     | '/demo/drizzle'
     | '/demo/tanstack-query'
+    | '/notes'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/notes/api/notes'
+    | '/notes/api/save'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -172,11 +205,14 @@ export interface FileRouteTypes {
     | '/cookie-test'
     | '/demo/drizzle'
     | '/demo/tanstack-query'
+    | '/notes/'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/notes/api/notes'
+    | '/notes/api/save'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -188,11 +224,14 @@ export interface RootRouteChildren {
   CookieTestRoute: typeof CookieTestRoute
   DemoDrizzleRoute: typeof DemoDrizzleRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  NotesIndexRoute: typeof NotesIndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
   DemoSentryTestingRoute: typeof DemoSentryTestingRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
+  NotesApiNotesRoute: typeof NotesApiNotesRoute
+  NotesApiSaveRoute: typeof NotesApiSaveRoute
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
@@ -215,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notes/': {
+      id: '/notes/'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof NotesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/tanstack-query': {
       id: '/demo/tanstack-query'
       path: '/demo/tanstack-query'
@@ -227,6 +273,20 @@ declare module '@tanstack/react-router' {
       path: '/demo/drizzle'
       fullPath: '/demo/drizzle'
       preLoaderRoute: typeof DemoDrizzleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes/api/save': {
+      id: '/notes/api/save'
+      path: '/notes/api/save'
+      fullPath: '/notes/api/save'
+      preLoaderRoute: typeof NotesApiSaveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes/api/notes': {
+      id: '/notes/api/notes'
+      path: '/notes/api/notes'
+      fullPath: '/notes/api/notes'
+      preLoaderRoute: typeof NotesApiNotesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/server-funcs': {
@@ -300,11 +360,14 @@ const rootRouteChildren: RootRouteChildren = {
   CookieTestRoute: CookieTestRoute,
   DemoDrizzleRoute: DemoDrizzleRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  NotesIndexRoute: NotesIndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
   DemoSentryTestingRoute: DemoSentryTestingRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
+  NotesApiNotesRoute: NotesApiNotesRoute,
+  NotesApiSaveRoute: NotesApiSaveRoute,
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,

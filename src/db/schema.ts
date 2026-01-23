@@ -5,3 +5,9 @@ export const todos = pgTable('todos', {
 	title: text().notNull(),
 	createdAt: timestamp('created_at').defaultNow(),
 });
+
+export const notes = pgTable('notes', {
+	id: serial().primaryKey(),
+	content: text().notNull(),
+	createdAt: timestamp('created_at').defaultNow(),
+});
