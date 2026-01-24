@@ -4,6 +4,7 @@ import {
 	ChevronRight,
 	Cookie,
 	Home,
+	Image,
 	Menu,
 	Network,
 	SquareFunction,
@@ -82,6 +83,19 @@ export default function Header() {
 					>
 						<Cookie size={20} />
 						<span className='font-medium'>Session Test</span>
+					</Link>
+
+					<Link
+						to='/media'
+						onClick={() => setIsOpen(false)}
+						className='flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2'
+						activeProps={{
+							className:
+								'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+						}}
+					>
+						<Image size={20} />
+						<span className='font-medium'>Media</span>
 					</Link>
 
 					{/* Demo Links Start */}
