@@ -53,8 +53,11 @@ const getMediaItems = createServerFn({ method: 'GET' }).handler(async () => {
 			});
 		}
 
-		if (row.thumbnail.id) {
-			itemsMap.get(row.id)?.thumbnails.push(row.thumbnail);
+		if (row.thumbnail?.id) {
+			const item = itemsMap.get(row.id);
+			if (item && row.thumbnail) {
+				item.thumbnails.push(row.thumbnail);
+			}
 		}
 	}
 
