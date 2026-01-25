@@ -107,7 +107,7 @@ function MediaPage() {
 								)}
 
 								{/* Overlay info on hover */}
-								<div className='absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all flex items-end'>
+								<div className='absolute inset-0 flex items-end'>
 									<div className='p-2 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity'>
 										<div className='flex items-center gap-2'>
 											<span className='px-2 py-0.5 bg-violet-600 rounded text-xs'>
