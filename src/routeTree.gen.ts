@@ -9,10 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as MediaRouteImport } from './routes/media'
 import { Route as ItemsRouteImport } from './routes/items'
 import { Route as CookieTestRouteImport } from './routes/cookie-test'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MediaIndexRouteImport } from './routes/media/index'
+import { Route as MediaIdRouteImport } from './routes/media/$id'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
@@ -23,11 +24,6 @@ import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
 
-const MediaRoute = MediaRouteImport.update({
-  id: '/media',
-  path: '/media',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ItemsRoute = ItemsRouteImport.update({
   id: '/items',
   path: '/items',
@@ -41,6 +37,16 @@ const CookieTestRoute = CookieTestRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MediaIndexRoute = MediaIndexRouteImport.update({
+  id: '/media/',
+  path: '/media/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MediaIdRoute = MediaIdRouteImport.update({
+  id: '/media/$id',
+  path: '/media/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
@@ -93,8 +99,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cookie-test': typeof CookieTestRoute
   '/items': typeof ItemsRoute
-  '/media': typeof MediaRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/media/$id': typeof MediaIdRoute
+  '/media': typeof MediaIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -108,8 +115,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cookie-test': typeof CookieTestRoute
   '/items': typeof ItemsRoute
-  '/media': typeof MediaRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/media/$id': typeof MediaIdRoute
+  '/media': typeof MediaIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -124,8 +132,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/cookie-test': typeof CookieTestRoute
   '/items': typeof ItemsRoute
-  '/media': typeof MediaRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/media/$id': typeof MediaIdRoute
+  '/media/': typeof MediaIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -141,8 +150,9 @@ export interface FileRouteTypes {
     | '/'
     | '/cookie-test'
     | '/items'
-    | '/media'
     | '/demo/tanstack-query'
+    | '/media/$id'
+    | '/media'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
@@ -156,8 +166,9 @@ export interface FileRouteTypes {
     | '/'
     | '/cookie-test'
     | '/items'
-    | '/media'
     | '/demo/tanstack-query'
+    | '/media/$id'
+    | '/media'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
@@ -171,8 +182,9 @@ export interface FileRouteTypes {
     | '/'
     | '/cookie-test'
     | '/items'
-    | '/media'
     | '/demo/tanstack-query'
+    | '/media/$id'
+    | '/media/'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
@@ -187,8 +199,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CookieTestRoute: typeof CookieTestRoute
   ItemsRoute: typeof ItemsRoute
-  MediaRoute: typeof MediaRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  MediaIdRoute: typeof MediaIdRoute
+  MediaIndexRoute: typeof MediaIndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
@@ -201,13 +214,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/media': {
-      id: '/media'
-      path: '/media'
-      fullPath: '/media'
-      preLoaderRoute: typeof MediaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/items': {
       id: '/items'
       path: '/items'
@@ -227,6 +233,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/media/': {
+      id: '/media/'
+      path: '/media'
+      fullPath: '/media'
+      preLoaderRoute: typeof MediaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/media/$id': {
+      id: '/media/$id'
+      path: '/media/$id'
+      fullPath: '/media/$id'
+      preLoaderRoute: typeof MediaIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/tanstack-query': {
@@ -299,8 +319,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CookieTestRoute: CookieTestRoute,
   ItemsRoute: ItemsRoute,
-  MediaRoute: MediaRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  MediaIdRoute: MediaIdRoute,
+  MediaIndexRoute: MediaIndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,

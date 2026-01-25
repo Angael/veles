@@ -41,11 +41,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang='en'>
+		<html lang='en' className='dark'>
 			<head>
 				<HeadContent />
 			</head>
-			<body>
+			<body className='bg-zinc-950 text-white'>
 				<Header />
 				{children}
 				<TanStackDevtools

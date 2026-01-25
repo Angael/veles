@@ -1,8 +1,22 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { desc, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { items, thumbnails } from '@/db/schema';
+import { getThumbnail } from '@/utils/getThumbnail';
+import { s3PathToUrl } from '@/utils/s3PathToUrl';
+
+type ThumbnailSelect = Pick<
+	typeof thumbnails.$inferSelect,
+	'id' | 'path' | 'width' | 'height' | 'type'
+>;
+
+type MediaItem = Pick<
+	typeof items.$inferSelect,
+	'id' | 'type' | 'private' | 'createdAt'
+> & {
+	thumbnails: ThumbnailSelect[];
+};
 
 const getMediaItems = createServerFn({ method: 'GET' }).handler(async () => {
 	const result = await db
@@ -25,22 +39,7 @@ const getMediaItems = createServerFn({ method: 'GET' }).handler(async () => {
 		.limit(100);
 
 	// Group thumbnails by item
-	const itemsMap = new Map<
-		number,
-		{
-			id: number;
-			type: string;
-			private: boolean;
-			createdAt: Date | null;
-			thumbnails: Array<{
-				id: number;
-				path: string;
-				width: number;
-				height: number;
-				type: string;
-			}>;
-		}
-	>();
+	const itemsMap = new Map<number, MediaItem>();
 
 	for (const row of result) {
 		if (!itemsMap.has(row.id)) {
@@ -64,7 +63,7 @@ const getMediaItems = createServerFn({ method: 'GET' }).handler(async () => {
 	return Array.from(itemsMap.values());
 });
 
-export const Route = createFileRoute('/media')({
+export const Route = createFileRoute('/media/')({
 	component: MediaPage,
 	loader: () => getMediaItems(),
 });
@@ -73,8 +72,8 @@ function MediaPage() {
 	const mediaItems = Route.useLoaderData();
 
 	return (
-		<div className='p-6'>
-			<h1 className='text-3xl font-bold mb-6'>Media</h1>
+		<div className='min-h-screen bg-zinc-950 p-6'>
+			<h1 className='text-3xl font-bold mb-6 text-violet-400'>Media</h1>
 
 			{mediaItems.length === 0 ? (
 				<div className='text-gray-500 text-center py-12'>
@@ -83,19 +82,18 @@ function MediaPage() {
 			) : (
 				<div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4'>
 					{mediaItems.map((item) => {
-						// Get the smallest available thumbnail
-						const thumbnail = item.thumbnails.sort(
-							(a, b) => a.width - b.width,
-						)[0];
+						const thumbnail = getThumbnail(item.thumbnails, 'MD');
 
 						return (
-							<div
+							<Link
 								key={item.id}
-								className='relative aspect-square bg-gray-100 rounded-lg overflow-hidden hover:ring-2 hover:ring-blue-500 transition-all cursor-pointer group'
+								to='/media/$id'
+								params={{ id: item.id.toString() }}
+								className='relative aspect-square bg-zinc-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-violet-500 transition-all cursor-pointer group border border-violet-900/20'
 							>
 								{thumbnail ? (
 									<img
-										src={thumbnail.path}
+										src={s3PathToUrl(thumbnail.path)}
 										alt={`Media item ${item.id}`}
 										className='w-full h-full object-cover'
 									/>
@@ -106,21 +104,21 @@ function MediaPage() {
 								)}
 
 								{/* Overlay info on hover */}
-								<div className='absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-end'>
+								<div className='absolute inset-0 flex items-end'>
 									<div className='p-2 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity'>
 										<div className='flex items-center gap-2'>
-											<span className='px-2 py-0.5 bg-blue-600 rounded text-xs'>
+											<span className='px-2 py-0.5 bg-violet-600 rounded text-xs'>
 												{item.type}
 											</span>
 											{item.private && (
-												<span className='px-2 py-0.5 bg-red-600 rounded text-xs'>
+												<span className='px-2 py-0.5 bg-fuchsia-600 rounded text-xs'>
 													Private
 												</span>
 											)}
 										</div>
 									</div>
 								</div>
-							</div>
+							</Link>
 						);
 					})}
 				</div>

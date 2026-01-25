@@ -21,37 +21,36 @@ export default function Header() {
 
 	return (
 		<>
-			<header className='p-4 flex items-center bg-gray-800 text-white shadow-lg'>
+			<header className='p-4 flex items-center bg-zinc-950 text-white shadow-lg border-b border-violet-900/20'>
 				<button
 					type='button'
 					onClick={() => setIsOpen(true)}
-					className='p-2 hover:bg-gray-700 rounded-lg transition-colors'
+					className='p-2 hover:bg-violet-900/20 rounded-lg transition-colors'
 					aria-label='Open menu'
 				>
 					<Menu size={24} />
 				</button>
 				<h1 className='ml-4 text-xl font-semibold'>
-					<Link to='/'>
-						<img
-							src='/tanstack-word-logo-white.svg'
-							alt='TanStack Logo'
-							className='h-10'
-						/>
+					<Link
+						to='/'
+						className='text-violet-400 hover:text-violet-300 transition-colors'
+					>
+						Veles
 					</Link>
 				</h1>
 			</header>
 
 			<aside
-				className={`fixed top-0 left-0 h-full w-80 bg-gray-900 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
+				className={`fixed top-0 left-0 h-full w-80 bg-zinc-950 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col border-r border-violet-900/20 ${
 					isOpen ? 'translate-x-0' : '-translate-x-full'
 				}`}
 			>
-				<div className='flex items-center justify-between p-4 border-b border-gray-700'>
-					<h2 className='text-xl font-bold'>Navigation</h2>
+				<div className='flex items-center justify-between p-4 border-b border-violet-900/20'>
+					<h2 className='text-xl font-bold text-violet-400'>Navigation</h2>
 					<button
 						type='button'
 						onClick={() => setIsOpen(false)}
-						className='p-2 hover:bg-gray-800 rounded-lg transition-colors'
+						className='p-2 hover:bg-violet-900/20 rounded-lg transition-colors'
 						aria-label='Close menu'
 					>
 						<X size={24} />
@@ -62,10 +61,10 @@ export default function Header() {
 					<Link
 						to='/'
 						onClick={() => setIsOpen(false)}
-						className='flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2'
+						className='flex items-center gap-3 p-3 rounded-lg hover:bg-violet-900/20 transition-colors mb-2'
 						activeProps={{
 							className:
-								'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+								'flex items-center gap-3 p-3 rounded-lg bg-violet-600 hover:bg-violet-700 transition-colors mb-2',
 						}}
 					>
 						<Home size={20} />
@@ -75,10 +74,10 @@ export default function Header() {
 					<Link
 						to='/cookie-test'
 						onClick={() => setIsOpen(false)}
-						className='flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2'
+						className='flex items-center gap-3 p-3 rounded-lg hover:bg-violet-900/20 transition-colors mb-2'
 						activeProps={{
 							className:
-								'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+								'flex items-center gap-3 p-3 rounded-lg bg-violet-600 hover:bg-violet-700 transition-colors mb-2',
 						}}
 					>
 						<Cookie size={20} />
@@ -88,10 +87,10 @@ export default function Header() {
 					<Link
 						to='/media'
 						onClick={() => setIsOpen(false)}
-						className='flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2'
+						className='flex items-center gap-3 p-3 rounded-lg hover:bg-violet-900/20 transition-colors mb-2'
 						activeProps={{
 							className:
-								'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+								'flex items-center gap-3 p-3 rounded-lg bg-violet-600 hover:bg-violet-700 transition-colors mb-2',
 						}}
 					>
 						<Image size={20} />
@@ -103,10 +102,10 @@ export default function Header() {
 					<Link
 						to='/demo/start/server-funcs'
 						onClick={() => setIsOpen(false)}
-						className='flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2'
+						className='flex items-center gap-3 p-3 rounded-lg hover:bg-violet-900/20 transition-colors mb-2'
 						activeProps={{
 							className:
-								'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+								'flex items-center gap-3 p-3 rounded-lg bg-violet-600 hover:bg-violet-700 transition-colors mb-2',
 						}}
 					>
 						<SquareFunction size={20} />
@@ -116,10 +115,10 @@ export default function Header() {
 					<Link
 						to='/demo/start/api-request'
 						onClick={() => setIsOpen(false)}
-						className='flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2'
+						className='flex items-center gap-3 p-3 rounded-lg hover:bg-violet-900/20 transition-colors mb-2'
 						activeProps={{
 							className:
-								'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+								'flex items-center gap-3 p-3 rounded-lg bg-violet-600 hover:bg-violet-700 transition-colors mb-2',
 						}}
 					>
 						<Network size={20} />
@@ -141,7 +140,7 @@ export default function Header() {
 						</Link>
 						<button
 							type='button'
-							className='p-2 hover:bg-gray-800 rounded-lg transition-colors'
+							className='p-2 hover:bg-violet-900/20 rounded-lg transition-colors'
 							onClick={() =>
 								setGroupedExpanded((prev) => ({
 									...prev,
@@ -202,10 +201,10 @@ export default function Header() {
 					<Link
 						to='/demo/tanstack-query'
 						onClick={() => setIsOpen(false)}
-						className='flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2'
+						className='flex items-center gap-3 p-3 rounded-lg hover:bg-violet-900/20 transition-colors mb-2'
 						activeProps={{
 							className:
-								'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+								'flex items-center gap-3 p-3 rounded-lg bg-violet-600 hover:bg-violet-700 transition-colors mb-2',
 						}}
 					>
 						<Network size={20} />
