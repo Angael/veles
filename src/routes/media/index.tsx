@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { desc, eq, lt } from 'drizzle-orm';
+import { useState } from 'react';
 import { db } from '@/db';
 import { items, thumbnails } from '@/db/schema';
 import { getThumbnail } from '@/utils/getThumbnail';
@@ -28,7 +28,7 @@ type PaginatedResponse = {
 };
 
 const getMediaItems = createServerFn({ method: 'GET' })
-	.validator((data: { cursor?: number; limit?: number }) => data)
+	.inputValidator((data: { cursor?: number; limit?: number }) => data)
 	.handler(async ({ data }): Promise<PaginatedResponse> => {
 		const limit = data.limit ?? DEFAULT_PAGE_SIZE;
 		const cursor = data.cursor;
@@ -120,7 +120,7 @@ function MediaPage() {
 	};
 
 	return (
-		<div className='min-h-screen bg-zinc-950 p-6'>
+		<div className='min-h-screen bg-zinc-950 p-6 container mx-auto'>
 			<h1 className='text-3xl font-bold mb-6 text-violet-400'>Media</h1>
 
 			{mediaItems.length === 0 ? (
