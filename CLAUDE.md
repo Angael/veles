@@ -75,6 +75,37 @@ pnpm db:studio:prod   # Open Drizzle Studio GUI (production)
 - Quote style: double quotes
 - Path alias: `@/*` maps to `./src/*`
 
+### Design System
+
+**Theme**: Dark theme only (no light mode)
+
+**Color Palette** (Tailwind colors):
+- **Background**:
+  - Primary: `zinc-950` (main background)
+  - Secondary: `zinc-900` (cards, panels)
+- **Primary (Violet)**:
+  - Main: `violet-600` (buttons, active states)
+  - Hover: `violet-700`
+  - Light: `violet-400` (headings, links)
+  - Border: `violet-900/20` (subtle borders)
+- **Accent (Fuchsia)**:
+  - Main: `fuchsia-600` (badges, highlights)
+  - Used for: Private indicators, special status
+- **Text**:
+  - Primary: `white` (headings, important text)
+  - Secondary: `gray-300` (body text)
+  - Tertiary: `gray-400` (muted text, descriptions)
+- **Interactive States**:
+  - Hover backgrounds: `violet-900/20`
+  - Focus rings: `ring-violet-500`
+  - Overlays: `bg-black bg-opacity-60`
+
+**Usage Guidelines**:
+- Use violet for primary actions and active states
+- Use fuchsia sparingly for accents and special indicators
+- Maintain consistent border styling with `border-violet-900/20`
+- Avoid gradients (solid colors only)
+
 ### Tailwind & shadcn Guidance
 User is learning Tailwind and shadcn. When you see inefficient patterns or verbose solutions:
 - Proactively suggest better Tailwind utilities and patterns

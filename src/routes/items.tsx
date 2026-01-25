@@ -22,9 +22,11 @@ function ItemsPage() {
 	const items = Route.useLoaderData();
 
 	return (
-		<div className='p-4'>
-			<h1 className='text-2xl font-bold mb-4'>Items (top 100)</h1>
-			<pre className='bg-gray-900 text-green-400 p-4 rounded overflow-auto max-h-[80vh] text-sm'>
+		<div className='min-h-screen bg-zinc-950 p-4'>
+			<h1 className='text-2xl font-bold mb-4 text-violet-400'>
+				Items (top 100)
+			</h1>
+			<pre className='text-green-400 p-4 rounded overflow-auto max-h-[80vh] text-sm border border-violet-900/20'>
 				{JSON.stringify(items, null, 2)}
 			</pre>
 		</div>
