@@ -6,6 +6,18 @@ import { items, thumbnails } from '@/db/schema';
 import { getThumbnail } from '@/utils/getThumbnail';
 import { s3PathToUrl } from '@/utils/s3PathToUrl';
 
+type ThumbnailSelect = Pick<
+	typeof thumbnails.$inferSelect,
+	'id' | 'path' | 'width' | 'height' | 'type'
+>;
+
+type MediaItem = Pick<
+	typeof items.$inferSelect,
+	'id' | 'type' | 'private' | 'createdAt'
+> & {
+	thumbnails: ThumbnailSelect[];
+};
+
 const getMediaItems = createServerFn({ method: 'GET' }).handler(async () => {
 	const result = await db
 		.select({
@@ -27,22 +39,7 @@ const getMediaItems = createServerFn({ method: 'GET' }).handler(async () => {
 		.limit(100);
 
 	// Group thumbnails by item
-	const itemsMap = new Map<
-		number,
-		{
-			id: number;
-			type: string;
-			private: boolean;
-			createdAt: Date | null;
-			thumbnails: Array<{
-				id: number;
-				path: string;
-				width: number;
-				height: number;
-				type: 'XS' | 'SM' | 'MD';
-			}>;
-		}
-	>();
+	const itemsMap = new Map<number, MediaItem>();
 
 	for (const row of result) {
 		if (!itemsMap.has(row.id)) {
