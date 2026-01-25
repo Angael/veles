@@ -12,6 +12,7 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL}
       VITE_TEST: ${VITE_TEST:-prod-test}
+      VITE_CF_CDN_URL: ${VITE_CF_CDN_URL}
     logging:
       driver: json-file
       options:
