@@ -141,6 +141,7 @@ function MediaItemPage() {
 						>
 							{/* biome-ignore lint/a11y/useMediaCaption: Videos don't have captions */}
 							<video
+								autoPlay
 								src={s3PathToUrl(mainMedia.path)}
 								poster={thumbnail ? s3PathToUrl(thumbnail.path) : undefined}
 								controls

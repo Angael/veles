@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
-import { desc, eq, lt } from 'drizzle-orm';
+import { desc, inArray, lt } from 'drizzle-orm';
 import { useState } from 'react';
 import { db } from '@/db';
 import { items, thumbnails } from '@/db/schema';
@@ -36,58 +36,68 @@ const getMediaItems = createServerFn({ method: 'GET' })
 		// Fetch one extra to determine if there are more items
 		const fetchLimit = limit + 1;
 
-		const result = await db
+		// First query: fetch items only (limit applies correctly to items)
+		const itemsResult = await db
 			.select({
 				id: items.id,
 				type: items.type,
 				private: items.private,
 				createdAt: items.createdAt,
-				thumbnail: {
-					id: thumbnails.id,
-					path: thumbnails.path,
-					width: thumbnails.width,
-					height: thumbnails.height,
-					type: thumbnails.type,
-				},
 			})
 			.from(items)
-			.leftJoin(thumbnails, eq(items.id, thumbnails.itemId))
 			.where(cursor ? lt(items.id, cursor) : undefined)
 			.orderBy(desc(items.id))
 			.limit(fetchLimit);
 
-		// Group thumbnails by item
-		const itemsMap = new Map<number, MediaItem>();
+		const hasMore = itemsResult.length > limit;
+		const paginatedItems = hasMore ? itemsResult.slice(0, limit) : itemsResult;
 
-		for (const row of result) {
-			if (!itemsMap.has(row.id)) {
-				itemsMap.set(row.id, {
-					id: row.id,
-					type: row.type,
-					private: row.private,
-					createdAt: row.createdAt,
-					thumbnails: [],
-				});
-			}
-
-			if (row.thumbnail?.id) {
-				const item = itemsMap.get(row.id);
-				if (item && row.thumbnail) {
-					item.thumbnails.push(row.thumbnail);
-				}
-			}
+		if (paginatedItems.length === 0) {
+			return { items: [], nextCursor: null, hasMore: false };
 		}
 
-		const allItems = Array.from(itemsMap.values());
-		const hasMore = allItems.length > limit;
-		const paginatedItems = hasMore ? allItems.slice(0, limit) : allItems;
+		const itemIds = paginatedItems.map((item) => item.id);
+
+		// Second query: fetch thumbnails for the selected items
+		const thumbnailsResult = await db
+			.select({
+				id: thumbnails.id,
+				itemId: thumbnails.itemId,
+				path: thumbnails.path,
+				width: thumbnails.width,
+				height: thumbnails.height,
+				type: thumbnails.type,
+			})
+			.from(thumbnails)
+			.where(inArray(thumbnails.itemId, itemIds));
+
+		// Group thumbnails by itemId
+		const thumbnailsByItemId = new Map<number, ThumbnailSelect[]>();
+		for (const thumb of thumbnailsResult) {
+			const existing = thumbnailsByItemId.get(thumb.itemId) ?? [];
+			existing.push({
+				id: thumb.id,
+				path: thumb.path,
+				width: thumb.width,
+				height: thumb.height,
+				type: thumb.type,
+			});
+			thumbnailsByItemId.set(thumb.itemId, existing);
+		}
+
+		// Merge items with their thumbnails
+		const mediaItems: MediaItem[] = paginatedItems.map((item) => ({
+			...item,
+			thumbnails: thumbnailsByItemId.get(item.id) ?? [],
+		}));
+
 		const nextCursor =
 			hasMore && paginatedItems.length > 0
 				? paginatedItems[paginatedItems.length - 1].id
 				: null;
 
 		return {
-			items: paginatedItems,
+			items: mediaItems,
 			nextCursor,
 			hasMore,
 		};
@@ -104,6 +114,8 @@ function MediaPage() {
 	const [cursor, setCursor] = useState<number | null>(initialData.nextCursor);
 	const [hasMore, setHasMore] = useState(initialData.hasMore);
 	const [isLoading, setIsLoading] = useState(false);
+
+	console.log('Initial data:', initialData);
 
 	const loadMore = async () => {
 		if (!cursor || isLoading) return;
