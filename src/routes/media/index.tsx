@@ -1,13 +1,13 @@
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { desc, inArray, lt } from 'drizzle-orm';
-import { useState } from 'react';
 import { db } from '@/db';
 import { items, thumbnails } from '@/db/schema';
 import { getThumbnail } from '@/utils/getThumbnail';
 import { s3PathToUrl } from '@/utils/s3PathToUrl';
 
-const DEFAULT_PAGE_SIZE = 24;
+const DEFAULT_PAGE_SIZE = 48;
 
 type ThumbnailSelect = Pick<
 	typeof thumbnails.$inferSelect,
@@ -110,26 +110,21 @@ export const Route = createFileRoute('/media/')({
 
 function MediaPage() {
 	const initialData = Route.useLoaderData();
-	const [mediaItems, setMediaItems] = useState<MediaItem[]>(initialData.items);
-	const [cursor, setCursor] = useState<number | null>(initialData.nextCursor);
-	const [hasMore, setHasMore] = useState(initialData.hasMore);
-	const [isLoading, setIsLoading] = useState(false);
 
-	console.log('Initial data:', initialData);
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+		useInfiniteQuery({
+			queryKey: ['media'],
+			queryFn: ({ pageParam }) =>
+				getMediaItems({ data: { cursor: pageParam } }),
+			initialPageParam: undefined as number | undefined,
+			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+			initialData: {
+				pages: [initialData],
+				pageParams: [undefined],
+			},
+		});
 
-	const loadMore = async () => {
-		if (!cursor || isLoading) return;
-
-		setIsLoading(true);
-		try {
-			const response = await getMediaItems({ data: { cursor } });
-			setMediaItems((prev) => [...prev, ...response.items]);
-			setCursor(response.nextCursor);
-			setHasMore(response.hasMore);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+	const mediaItems = data?.pages.flatMap((page) => page.items) ?? [];
 
 	return (
 		<div className='min-h-screen bg-zinc-950 p-6 container mx-auto'>
@@ -184,15 +179,15 @@ function MediaPage() {
 						})}
 					</div>
 
-					{hasMore && (
+					{hasNextPage && (
 						<div className='flex justify-center mt-8'>
 							<button
 								type='button'
-								onClick={loadMore}
-								disabled={isLoading}
+								onClick={() => fetchNextPage()}
+								disabled={isFetchingNextPage}
 								className='px-6 py-3 bg-violet-600 hover:bg-violet-700 disabled:bg-violet-600/50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors'
 							>
-								{isLoading ? 'Loading...' : 'Load More'}
+								{isFetchingNextPage ? 'Loading...' : 'Load More'}
 							</button>
 						</div>
 					)}
