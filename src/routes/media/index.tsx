@@ -1,11 +1,46 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { desc, inArray, lt } from 'drizzle-orm';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { db } from '@/db';
 import { items, thumbnails } from '@/db/schema';
 import { getThumbnail } from '@/utils/getThumbnail';
 import { s3PathToUrl } from '@/utils/s3PathToUrl';
+
+const GAP = 16; // gap-4 = 1rem = 16px
+
+// Breakpoints matching Tailwind's responsive grid
+const BREAKPOINTS = [
+	{ min: 1280, cols: 6 }, // xl
+	{ min: 1024, cols: 5 }, // lg
+	{ min: 768, cols: 4 }, // md
+	{ min: 640, cols: 3 }, // sm
+	{ min: 0, cols: 2 }, // default
+] as const;
+
+function useColumns() {
+	const [columns, setColumns] = useState(2);
+
+	useEffect(() => {
+		const updateColumns = () => {
+			const width = window.innerWidth;
+			for (const bp of BREAKPOINTS) {
+				if (width >= bp.min) {
+					setColumns(bp.cols);
+					return;
+				}
+			}
+		};
+
+		updateColumns();
+		window.addEventListener('resize', updateColumns);
+		return () => window.removeEventListener('resize', updateColumns);
+	}, []);
+
+	return columns;
+}
 
 const DEFAULT_PAGE_SIZE = 48;
 
@@ -110,6 +145,9 @@ export const Route = createFileRoute('/media/')({
 
 function MediaPage() {
 	const initialData = Route.useLoaderData();
+	const loadMoreRef = useRef<HTMLDivElement>(null);
+	const listRef = useRef<HTMLDivElement>(null);
+	const columns = useColumns();
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useInfiniteQuery({
@@ -122,9 +160,47 @@ function MediaPage() {
 				pages: [initialData],
 				pageParams: [undefined],
 			},
+			// Keep data in cache longer for better back navigation
+			staleTime: 5 * 60 * 1000, // 5 minutes
+			gcTime: 10 * 60 * 1000, // 10 minutes
 		});
 
 	const mediaItems = data?.pages.flatMap((page) => page.items) ?? [];
+	const rowCount = Math.ceil(mediaItems.length / columns);
+
+	// Calculate row height dynamically based on container width
+	const estimateRowSize = useCallback(() => {
+		if (!listRef.current) return 200; // fallback
+		const containerWidth = listRef.current.offsetWidth;
+		const itemWidth = (containerWidth - GAP * (columns - 1)) / columns;
+		return itemWidth + GAP; // item height (square) + gap
+	}, [columns]);
+
+	const virtualizer = useWindowVirtualizer({
+		count: rowCount,
+		estimateSize: estimateRowSize,
+		overscan: 2,
+	});
+
+	const virtualRows = virtualizer.getVirtualItems();
+
+	// Intersection Observer for infinite scroll
+	useEffect(() => {
+		const element = loadMoreRef.current;
+		if (!element) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+					fetchNextPage();
+				}
+			},
+			{ rootMargin: '200px' },
+		);
+
+		observer.observe(element);
+		return () => observer.disconnect();
+	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 	return (
 		<div className='min-h-screen bg-zinc-950 p-6 container mx-auto'>
@@ -136,63 +212,103 @@ function MediaPage() {
 				</div>
 			) : (
 				<>
-					<div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4'>
-						{mediaItems.map((item) => {
-							const thumbnail = getThumbnail(item.thumbnails, 'MD');
+					<div
+						ref={listRef}
+						style={{ height: `${virtualizer.getTotalSize()}px` }}
+						className='relative w-full'
+					>
+						{virtualRows.map((virtualRow) => {
+							const startIndex = virtualRow.index * columns;
+							const rowItems = mediaItems.slice(
+								startIndex,
+								startIndex + columns,
+							);
 
 							return (
-								<Link
-									key={item.id}
-									to='/media/$id'
-									params={{ id: item.id.toString() }}
-									className='relative aspect-square bg-zinc-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-violet-500 transition-all cursor-pointer group border border-violet-900/20'
+								<div
+									key={virtualRow.key}
+									style={{
+										position: 'absolute',
+										top: 0,
+										left: 0,
+										width: '100%',
+										height: `${virtualRow.size}px`,
+										transform: `translateY(${virtualRow.start}px)`,
+									}}
+									className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4'
 								>
-									{thumbnail ? (
-										<img
-											src={s3PathToUrl(thumbnail.path)}
-											alt={`Media item ${item.id}`}
-											className='w-full h-full object-cover'
-										/>
-									) : (
-										<div className='w-full h-full flex items-center justify-center text-gray-400'>
-											<span className='text-sm'>No thumbnail</span>
-										</div>
-									)}
-
-									{/* Overlay info on hover */}
-									<div className='absolute inset-0 flex items-end'>
-										<div className='p-2 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity'>
-											<div className='flex items-center gap-2'>
-												<span className='px-2 py-0.5 bg-violet-600 rounded text-xs'>
-													{item.type}
-												</span>
-												{item.private && (
-													<span className='px-2 py-0.5 bg-fuchsia-600 rounded text-xs'>
-														Private
-													</span>
-												)}
-											</div>
-										</div>
-									</div>
-								</Link>
+									{rowItems.map((item) => (
+										<MediaItem key={item.id} item={item} />
+									))}
+								</div>
 							);
 						})}
 					</div>
 
-					{hasNextPage && (
+					{/* Sentinel element for infinite scroll (outside virtualized area) */}
+					<div ref={loadMoreRef} className='h-1' />
+
+					{/* Loading indicator */}
+					{isFetchingNextPage && (
+						<div className='flex justify-center mt-8'>
+							<div className='text-gray-400'>Loading more...</div>
+						</div>
+					)}
+
+					{/* Fallback button (shown when not fetching and there are more pages) */}
+					{hasNextPage && !isFetchingNextPage && (
 						<div className='flex justify-center mt-8'>
 							<button
 								type='button'
 								onClick={() => fetchNextPage()}
-								disabled={isFetchingNextPage}
-								className='px-6 py-3 bg-violet-600 hover:bg-violet-700 disabled:bg-violet-600/50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors'
+								className='px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-lg transition-colors'
 							>
-								{isFetchingNextPage ? 'Loading...' : 'Load More'}
+								Load More
 							</button>
 						</div>
 					)}
 				</>
 			)}
 		</div>
+	);
+}
+
+function MediaItem({ item }: { item: MediaItem }) {
+	const thumbnail = getThumbnail(item.thumbnails, 'MD');
+
+	return (
+		<Link
+			to='/media/$id'
+			params={{ id: item.id.toString() }}
+			className='relative aspect-square bg-zinc-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-violet-500 transition-all cursor-pointer group border border-violet-900/20'
+		>
+			{thumbnail ? (
+				<img
+					src={s3PathToUrl(thumbnail.path)}
+					alt={`Media item ${item.id}`}
+					className='w-full h-full object-cover'
+				/>
+			) : (
+				<div className='w-full h-full flex items-center justify-center text-gray-400'>
+					<span className='text-sm'>No thumbnail</span>
+				</div>
+			)}
+
+			{/* Overlay info on hover */}
+			<div className='absolute inset-0 flex items-end'>
+				<div className='p-2 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity'>
+					<div className='flex items-center gap-2'>
+						<span className='px-2 py-0.5 bg-violet-600 rounded text-xs'>
+							{item.type}
+						</span>
+						{item.private && (
+							<span className='px-2 py-0.5 bg-fuchsia-600 rounded text-xs'>
+								Private
+							</span>
+						)}
+					</div>
+				</div>
+			</div>
+		</Link>
 	);
 }
