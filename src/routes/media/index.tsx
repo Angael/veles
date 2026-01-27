@@ -3,7 +3,13 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { desc, inArray, lt } from 'drizzle-orm';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from 'react';
 import { db } from '@/db';
 import { items, thumbnails } from '@/db/schema';
 import { getThumbnail } from '@/utils/getThumbnail';
@@ -183,6 +189,19 @@ function MediaPage() {
 		overscan: 2,
 	});
 
+	// Re-measure all rows when container resizes
+	useEffect(() => {
+		const element = listRef.current;
+		if (!element) return;
+
+		const resizeObserver = new ResizeObserver(() => {
+			virtualizer.measure();
+		});
+
+		resizeObserver.observe(element);
+		return () => resizeObserver.disconnect();
+	}, [virtualizer]);
+
 	const virtualRows = virtualizer.getVirtualItems();
 
 	// Restore scroll position on mount (after virtualizer is ready)
@@ -302,7 +321,10 @@ function MediaPage() {
 function MediaItem({
 	item,
 	onNavigate,
-}: { item: MediaItem; onNavigate: () => void }) {
+}: {
+	item: MediaItem;
+	onNavigate: () => void;
+}) {
 	const thumbnail = getThumbnail(item.thumbnails, 'MD');
 
 	return (
