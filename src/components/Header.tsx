@@ -5,39 +5,81 @@ import {
 	Cookie,
 	Home,
 	Image,
+	LogOut,
 	Menu,
 	Network,
 	SquareFunction,
 	StickyNote,
+	User,
 	X,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useSession, signOut } from '@/lib/auth/client';
 
 export default function Header() {
 	const [isOpen, setIsOpen] = useState(false);
 	const [groupedExpanded, setGroupedExpanded] = useState<
 		Record<string, boolean>
 	>({});
+	const { data: session, isPending } = useSession();
+
+	const handleLogout = async () => {
+		await signOut();
+		window.location.href = '/';
+	};
 
 	return (
 		<>
-			<header className='p-4 flex items-center bg-zinc-950 text-white shadow-lg border-b border-violet-900/20'>
-				<button
-					type='button'
-					onClick={() => setIsOpen(true)}
-					className='p-2 hover:bg-violet-900/20 rounded-lg transition-colors'
-					aria-label='Open menu'
-				>
-					<Menu size={24} />
-				</button>
-				<h1 className='ml-4 text-xl font-semibold'>
-					<Link
-						to='/'
-						className='text-violet-400 hover:text-violet-300 transition-colors'
+			<header className='p-4 flex items-center justify-between bg-zinc-950 text-white shadow-lg border-b border-violet-900/20'>
+				<div className='flex items-center'>
+					<button
+						type='button'
+						onClick={() => setIsOpen(true)}
+						className='p-2 hover:bg-violet-900/20 rounded-lg transition-colors'
+						aria-label='Open menu'
 					>
-						Veles
-					</Link>
-				</h1>
+						<Menu size={24} />
+					</button>
+					<h1 className='ml-4 text-xl font-semibold'>
+						<Link
+							to='/'
+							className='text-violet-400 hover:text-violet-300 transition-colors'
+						>
+							Veles
+						</Link>
+					</h1>
+				</div>
+
+				<div className='flex items-center gap-3'>
+					{isPending ? (
+						<div className='w-24 h-8 bg-zinc-800 rounded-lg animate-pulse' />
+					) : session?.user ? (
+						<div className='flex items-center gap-3'>
+							<div className='flex items-center gap-2 px-3 py-1.5 bg-zinc-900 rounded-lg border border-violet-900/20'>
+								<User size={16} className='text-violet-400' />
+								<span className='text-sm text-gray-300 max-w-32 truncate'>
+									{session.user.name || session.user.email}
+								</span>
+							</div>
+							<button
+								type='button'
+								onClick={handleLogout}
+								className='p-2 hover:bg-violet-900/20 rounded-lg transition-colors text-gray-400 hover:text-white'
+								aria-label='Logout'
+								title='Logout'
+							>
+								<LogOut size={20} />
+							</button>
+						</div>
+					) : (
+						<Link
+							to='/login'
+							className='px-4 py-2 bg-violet-600 hover:bg-violet-700 rounded-lg text-sm font-medium transition-colors'
+						>
+							Login
+						</Link>
+					)}
+				</div>
 			</header>
 
 			<aside
