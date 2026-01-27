@@ -55,9 +55,38 @@ pnpm db:studio:prod   # Open Drizzle Studio GUI (production)
 - **TanStack Query**: Provider in `src/integrations/tanstack-query/`, integrated with SSR via `@tanstack/react-router-ssr-query`
 - **Drizzle ORM**: Schema in `src/db/schema.ts`, connection in `src/db/index.ts`
 
+### Authentication
+Google OAuth only, using Arctic library for OAuth flow.
+
+**Files**:
+- `src/lib/auth/` - Auth module (session, user, google, middleware)
+- `src/routes/login/` - Login page and OAuth routes
+- `src/routes/logout.tsx` - Logout handler
+
+**Flow**: `/login` → `/login/google` (redirect to Google) → `/login/google/callback` (handle response, create session)
+
+**Database**: `user` table stores `googleId`, `email`, `name`, `picture`; `user_session` table stores sessions with 30-day expiry
+
+**Usage**:
+```typescript
+// Protect a route
+import { requireAuth } from '@/lib/auth';
+
+export const Route = createFileRoute('/protected')({
+  beforeLoad: async () => {
+    await requireAuth(); // Redirects to /login if not authenticated
+  },
+});
+
+// Access user in root context
+const { user } = Route.useRouteContext(); // Available in all routes via __root.tsx
+```
+
+**Env vars**: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (server-side)
+
 ### Environment Variables
 - **Application**: Defined and validated with T3 Env in `env.ts`
-  - Server vars: `DATABASE_URL` (required for local dev), `SERVER_URL` (optional)
+  - Server vars: `DATABASE_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (required), `SERVER_URL` (optional)
   - Client vars must be prefixed with `VITE_`
 - **Local Development**:
   - `DATABASE_URL` in `.env` or `.env.local` (for app and migrations)

@@ -5,15 +5,23 @@ import {
 	Cookie,
 	Home,
 	Image,
+	LogIn,
+	LogOut,
 	Menu,
 	Network,
 	SquareFunction,
 	StickyNote,
+	User,
 	X,
 } from 'lucide-react';
 import { useState } from 'react';
+import type { SessionUser } from '@/lib/auth';
 
-export default function Header() {
+interface HeaderProps {
+	user: SessionUser | null;
+}
+
+export default function Header({ user }: HeaderProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [groupedExpanded, setGroupedExpanded] = useState<
 		Record<string, boolean>
@@ -21,23 +29,61 @@ export default function Header() {
 
 	return (
 		<>
-			<header className='p-4 flex items-center bg-zinc-950 text-white shadow-lg border-b border-violet-900/20'>
-				<button
-					type='button'
-					onClick={() => setIsOpen(true)}
-					className='p-2 hover:bg-violet-900/20 rounded-lg transition-colors'
-					aria-label='Open menu'
-				>
-					<Menu size={24} />
-				</button>
-				<h1 className='ml-4 text-xl font-semibold'>
-					<Link
-						to='/'
-						className='text-violet-400 hover:text-violet-300 transition-colors'
+			<header className='p-4 flex items-center justify-between bg-zinc-950 text-white shadow-lg border-b border-violet-900/20'>
+				<div className='flex items-center'>
+					<button
+						type='button'
+						onClick={() => setIsOpen(true)}
+						className='p-2 hover:bg-violet-900/20 rounded-lg transition-colors'
+						aria-label='Open menu'
 					>
-						Veles
-					</Link>
-				</h1>
+						<Menu size={24} />
+					</button>
+					<h1 className='ml-4 text-xl font-semibold'>
+						<Link
+							to='/'
+							className='text-violet-400 hover:text-violet-300 transition-colors'
+						>
+							Veles
+						</Link>
+					</h1>
+				</div>
+
+				<div className='flex items-center gap-3'>
+					{user ? (
+						<>
+							<div className='flex items-center gap-2'>
+								{user.picture ? (
+									<img
+										src={user.picture}
+										alt={user.name ?? 'User'}
+										className='w-8 h-8 rounded-full'
+									/>
+								) : (
+									<User size={20} className='text-gray-400' />
+								)}
+								<span className='text-sm text-gray-300 hidden sm:inline'>
+									{user.name ?? user.email}
+								</span>
+							</div>
+							<Link
+								to='/logout'
+								className='p-2 hover:bg-violet-900/20 rounded-lg transition-colors text-gray-400 hover:text-white'
+								aria-label='Sign out'
+							>
+								<LogOut size={20} />
+							</Link>
+						</>
+					) : (
+						<Link
+							to='/login'
+							className='flex items-center gap-2 px-3 py-2 bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors text-sm font-medium'
+						>
+							<LogIn size={18} />
+							Sign in
+						</Link>
+					)}
+				</div>
 			</header>
 
 			<aside

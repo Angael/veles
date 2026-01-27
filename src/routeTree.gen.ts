@@ -9,12 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LogoutRouteImport } from './routes/logout'
 import { Route as ItemsRouteImport } from './routes/items'
 import { Route as CookieTestRouteImport } from './routes/cookie-test'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MediaIndexRouteImport } from './routes/media/index'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as MediaIdRouteImport } from './routes/media/$id'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
+import { Route as LoginGoogleIndexRouteImport } from './routes/login/google/index'
+import { Route as LoginGoogleCallbackRouteImport } from './routes/login/google/callback'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
@@ -24,6 +28,11 @@ import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
 
+const LogoutRoute = LogoutRouteImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ItemsRoute = ItemsRouteImport.update({
   id: '/items',
   path: '/items',
@@ -44,6 +53,11 @@ const MediaIndexRoute = MediaIndexRouteImport.update({
   path: '/media/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MediaIdRoute = MediaIdRouteImport.update({
   id: '/media/$id',
   path: '/media/$id',
@@ -52,6 +66,16 @@ const MediaIdRoute = MediaIdRouteImport.update({
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
   path: '/demo/tanstack-query',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginGoogleIndexRoute = LoginGoogleIndexRouteImport.update({
+  id: '/login/google/',
+  path: '/login/google/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginGoogleCallbackRoute = LoginGoogleCallbackRouteImport.update({
+  id: '/login/google/callback',
+  path: '/login/google/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
@@ -99,13 +123,17 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cookie-test': typeof CookieTestRoute
   '/items': typeof ItemsRoute
+  '/logout': typeof LogoutRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/media/$id': typeof MediaIdRoute
+  '/login': typeof LoginIndexRoute
   '/media': typeof MediaIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/login/google/callback': typeof LoginGoogleCallbackRoute
+  '/login/google': typeof LoginGoogleIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -115,13 +143,17 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cookie-test': typeof CookieTestRoute
   '/items': typeof ItemsRoute
+  '/logout': typeof LogoutRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/media/$id': typeof MediaIdRoute
+  '/login': typeof LoginIndexRoute
   '/media': typeof MediaIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/login/google/callback': typeof LoginGoogleCallbackRoute
+  '/login/google': typeof LoginGoogleIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -132,13 +164,17 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/cookie-test': typeof CookieTestRoute
   '/items': typeof ItemsRoute
+  '/logout': typeof LogoutRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/media/$id': typeof MediaIdRoute
+  '/login/': typeof LoginIndexRoute
   '/media/': typeof MediaIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/login/google/callback': typeof LoginGoogleCallbackRoute
+  '/login/google/': typeof LoginGoogleIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -150,13 +186,17 @@ export interface FileRouteTypes {
     | '/'
     | '/cookie-test'
     | '/items'
+    | '/logout'
     | '/demo/tanstack-query'
     | '/media/$id'
+    | '/login'
     | '/media'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/login/google/callback'
+    | '/login/google'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -166,13 +206,17 @@ export interface FileRouteTypes {
     | '/'
     | '/cookie-test'
     | '/items'
+    | '/logout'
     | '/demo/tanstack-query'
     | '/media/$id'
+    | '/login'
     | '/media'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/login/google/callback'
+    | '/login/google'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -182,13 +226,17 @@ export interface FileRouteTypes {
     | '/'
     | '/cookie-test'
     | '/items'
+    | '/logout'
     | '/demo/tanstack-query'
     | '/media/$id'
+    | '/login/'
     | '/media/'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/login/google/callback'
+    | '/login/google/'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -199,13 +247,17 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CookieTestRoute: typeof CookieTestRoute
   ItemsRoute: typeof ItemsRoute
+  LogoutRoute: typeof LogoutRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   MediaIdRoute: typeof MediaIdRoute
+  LoginIndexRoute: typeof LoginIndexRoute
   MediaIndexRoute: typeof MediaIndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
+  LoginGoogleCallbackRoute: typeof LoginGoogleCallbackRoute
+  LoginGoogleIndexRoute: typeof LoginGoogleIndexRoute
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
@@ -214,6 +266,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/logout': {
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/items': {
       id: '/items'
       path: '/items'
@@ -242,6 +301,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MediaIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/media/$id': {
       id: '/media/$id'
       path: '/media/$id'
@@ -254,6 +320,20 @@ declare module '@tanstack/react-router' {
       path: '/demo/tanstack-query'
       fullPath: '/demo/tanstack-query'
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login/google/': {
+      id: '/login/google/'
+      path: '/login/google'
+      fullPath: '/login/google'
+      preLoaderRoute: typeof LoginGoogleIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login/google/callback': {
+      id: '/login/google/callback'
+      path: '/login/google/callback'
+      fullPath: '/login/google/callback'
+      preLoaderRoute: typeof LoginGoogleCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/server-funcs': {
@@ -319,13 +399,17 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CookieTestRoute: CookieTestRoute,
   ItemsRoute: ItemsRoute,
+  LogoutRoute: LogoutRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   MediaIdRoute: MediaIdRoute,
+  LoginIndexRoute: LoginIndexRoute,
   MediaIndexRoute: MediaIndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
+  LoginGoogleCallbackRoute: LoginGoogleCallbackRoute,
+  LoginGoogleIndexRoute: LoginGoogleIndexRoute,
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,

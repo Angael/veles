@@ -5,6 +5,8 @@ export const env = createEnv({
   server: {
     SERVER_URL: z.url().optional(),
     DATABASE_URL: z.string().min(1),
+    GOOGLE_CLIENT_ID: z.string().min(1),
+    GOOGLE_CLIENT_SECRET: z.string().min(1),
   },
 
   /**
@@ -31,6 +33,8 @@ export const env = createEnv({
     // Server variables from process.env
     SERVER_URL: process.env.SERVER_URL,
     DATABASE_URL: process.env.DATABASE_URL,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     // Client variables from import.meta.env
     VITE_CF_CDN_URL: import.meta.env.VITE_CF_CDN_URL,
     VITE_APP_TITLE: import.meta.env.VITE_APP_TITLE,

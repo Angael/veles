@@ -11,7 +11,7 @@ export const getRouter = () => {
 
 	const router = createRouter({
 		routeTree,
-		context: { ...rqContext },
+		context: { ...rqContext, user: null },
 		defaultPreload: 'intent',
 		defaultNotFoundComponent: () => <div>404: Page Not Found</div>,
 		scrollRestoration: true,

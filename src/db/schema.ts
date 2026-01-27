@@ -40,8 +40,10 @@ export const stripePlanEnum = pgEnum('stripe_plan', ['VIP', 'ACCESS_PLAN']);
 
 export const users = pgTable('user', {
 	id: varchar({ length: 64 }).primaryKey(),
+	googleId: varchar('google_id', { length: 255 }).notNull().unique(),
 	email: varchar({ length: 254 }).notNull().unique(),
-	hashedPassword: varchar('hashed_password', { length: 256 }).notNull(),
+	name: varchar({ length: 255 }),
+	picture: varchar({ length: 2048 }),
 	type: userTypeEnum().notNull(),
 	lastLoginAt: timestamp('last_login_at', { precision: 3, mode: 'date' }),
 	createdAt: timestamp('created_at', {
@@ -56,7 +58,9 @@ export const users = pgTable('user', {
 
 export const userSessions = pgTable('user_session', {
 	id: varchar({ length: 64 }).primaryKey(),
-	userId: varchar('user_id', { length: 64 }).notNull(),
+	userId: varchar('user_id', { length: 64 })
+		.notNull()
+		.references(() => users.id, { onDelete: 'cascade' }),
 	expiresAt: timestamp('expires_at', { precision: 3, mode: 'date' }).notNull(),
 });
 
