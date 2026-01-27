@@ -90,23 +90,15 @@ function MediaItemPage() {
 	return (
 		<div className='min-h-screen bg-zinc-950 p-6'>
 			<div className='max-w-7xl mx-auto'>
-				<div className='mb-4 flex items-center gap-3'>
-					<a
-						href='/media'
-						className='text-violet-400 hover:text-violet-300 transition-colors'
-					>
-						← Back to Media
-					</a>
-					<div className='flex items-center gap-2'>
-						<span className='px-2 py-0.5 bg-violet-600 rounded text-xs text-white'>
-							{mediaItem.type}
+				<div className='mb-4 flex items-center gap-2'>
+					<span className='px-2 py-0.5 bg-violet-600 rounded text-xs text-white'>
+						{mediaItem.type}
+					</span>
+					{mediaItem.private && (
+						<span className='px-2 py-0.5 bg-fuchsia-600 rounded text-xs text-white'>
+							Private
 						</span>
-						{mediaItem.private && (
-							<span className='px-2 py-0.5 bg-fuchsia-600 rounded text-xs text-white'>
-								Private
-							</span>
-						)}
-					</div>
+					)}
 				</div>
 
 				<div className='bg-zinc-900 rounded-lg overflow-hidden border border-violet-900/20'>

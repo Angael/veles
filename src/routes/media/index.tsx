@@ -3,13 +3,14 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { desc, inArray, lt } from 'drizzle-orm';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { db } from '@/db';
 import { items, thumbnails } from '@/db/schema';
 import { getThumbnail } from '@/utils/getThumbnail';
 import { s3PathToUrl } from '@/utils/s3PathToUrl';
 
 const GAP = 16; // gap-4 = 1rem = 16px
+const SCROLL_STORAGE_KEY = 'media-scroll-position';
 
 // Breakpoints matching Tailwind's responsive grid
 const BREAKPOINTS = [
@@ -184,6 +185,27 @@ function MediaPage() {
 
 	const virtualRows = virtualizer.getVirtualItems();
 
+	// Restore scroll position on mount (after virtualizer is ready)
+	const hasRestoredScroll = useRef(false);
+	useLayoutEffect(() => {
+		if (hasRestoredScroll.current) return;
+		const saved = sessionStorage.getItem(SCROLL_STORAGE_KEY);
+		if (saved) {
+			const scrollY = Number.parseInt(saved, 10);
+			// Wait for virtualizer to calculate total size before scrolling
+			requestAnimationFrame(() => {
+				window.scrollTo(0, scrollY);
+				hasRestoredScroll.current = true;
+			});
+			sessionStorage.removeItem(SCROLL_STORAGE_KEY);
+		}
+	}, []);
+
+	// Save scroll position before navigating to detail page
+	const saveScrollPosition = useCallback(() => {
+		sessionStorage.setItem(SCROLL_STORAGE_KEY, String(window.scrollY));
+	}, []);
+
 	// Intersection Observer for infinite scroll
 	useEffect(() => {
 		const element = loadMoreRef.current;
@@ -238,7 +260,11 @@ function MediaPage() {
 									className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4'
 								>
 									{rowItems.map((item) => (
-										<MediaItem key={item.id} item={item} />
+										<MediaItem
+											key={item.id}
+											item={item}
+											onNavigate={saveScrollPosition}
+										/>
 									))}
 								</div>
 							);
@@ -273,13 +299,17 @@ function MediaPage() {
 	);
 }
 
-function MediaItem({ item }: { item: MediaItem }) {
+function MediaItem({
+	item,
+	onNavigate,
+}: { item: MediaItem; onNavigate: () => void }) {
 	const thumbnail = getThumbnail(item.thumbnails, 'MD');
 
 	return (
 		<Link
 			to='/media/$id'
 			params={{ id: item.id.toString() }}
+			onClick={onNavigate}
 			className='relative aspect-square bg-zinc-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-violet-500 transition-all cursor-pointer group border border-violet-900/20'
 		>
 			{thumbnail ? (
