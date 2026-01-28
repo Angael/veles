@@ -5,6 +5,11 @@ export const env = createEnv({
   server: {
     SERVER_URL: z.url().optional(),
     DATABASE_URL: z.string().min(1),
+    // Better Auth
+    BETTER_AUTH_SECRET: z.string().min(32),
+    // Google OAuth
+    GOOGLE_CLIENT_ID: z.string().min(1),
+    GOOGLE_CLIENT_SECRET: z.string().min(1),
   },
 
   /**
@@ -17,6 +22,7 @@ export const env = createEnv({
     VITE_APP_TITLE: z.string().min(1).optional(),
     VITE_TEST: z.string().optional(),
     VITE_CF_CDN_URL: z.url(),
+    VITE_BASE_URL: z.url(),
   },
 
   /**
@@ -31,10 +37,14 @@ export const env = createEnv({
     // Server variables from process.env
     SERVER_URL: process.env.SERVER_URL,
     DATABASE_URL: process.env.DATABASE_URL,
+    BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     // Client variables from import.meta.env
     VITE_CF_CDN_URL: import.meta.env.VITE_CF_CDN_URL,
     VITE_APP_TITLE: import.meta.env.VITE_APP_TITLE,
     VITE_TEST: import.meta.env.VITE_TEST,
+    VITE_BASE_URL: import.meta.env.VITE_BASE_URL,
   },
 
   /**

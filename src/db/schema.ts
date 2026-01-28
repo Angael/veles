@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import {
 	boolean,
 	date,
@@ -8,6 +9,7 @@ import {
 	real,
 	serial,
 	smallint,
+	text,
 	timestamp,
 	unique,
 	varchar,
@@ -35,45 +37,103 @@ export const thumbnailTypeEnum = pgEnum('thumbnail_type', ['XS', 'SM', 'MD']);
 export const stripePlanEnum = pgEnum('stripe_plan', ['VIP', 'ACCESS_PLAN']);
 
 // ============================================================================
-// AUTH TABLES
+// AUTH TABLES (Better Auth)
 // ============================================================================
 
 export const users = pgTable('user', {
-	id: varchar({ length: 64 }).primaryKey(),
-	email: varchar({ length: 254 }).notNull().unique(),
-	hashedPassword: varchar('hashed_password', { length: 256 }).notNull(),
-	type: userTypeEnum().notNull(),
-	lastLoginAt: timestamp('last_login_at', { precision: 3, mode: 'date' }),
-	createdAt: timestamp('created_at', {
-		precision: 3,
-		mode: 'date',
-	}).defaultNow(),
-	updatedAt: timestamp('updated_at', {
-		precision: 3,
-		mode: 'date',
-	}).defaultNow(),
+	id: text('id').primaryKey(),
+	name: text('name').notNull(),
+	email: text('email').notNull().unique(),
+	emailVerified: boolean('email_verified').notNull().default(false),
+	image: text('image'),
+	createdAt: timestamp('created_at').notNull().defaultNow(),
+	updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
-export const userSessions = pgTable('user_session', {
-	id: varchar({ length: 64 }).primaryKey(),
-	userId: varchar('user_id', { length: 64 }).notNull(),
-	expiresAt: timestamp('expires_at', { precision: 3, mode: 'date' }).notNull(),
-});
+export const sessions = pgTable(
+	'session',
+	{
+		id: text('id').primaryKey(),
+		expiresAt: timestamp('expires_at').notNull(),
+		token: text('token').notNull().unique(),
+		createdAt: timestamp('created_at').notNull().defaultNow(),
+		updatedAt: timestamp('updated_at').notNull().defaultNow(),
+		ipAddress: text('ip_address'),
+		userAgent: text('user_agent'),
+		userId: text('user_id')
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
+	},
+	(table) => [index('session_user_id_idx').on(table.userId)],
+);
+
+export const accounts = pgTable(
+	'account',
+	{
+		id: text('id').primaryKey(),
+		accountId: text('account_id').notNull(),
+		providerId: text('provider_id').notNull(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
+		accessToken: text('access_token'),
+		refreshToken: text('refresh_token'),
+		idToken: text('id_token'),
+		accessTokenExpiresAt: timestamp('access_token_expires_at'),
+		refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+		scope: text('scope'),
+		password: text('password'),
+		createdAt: timestamp('created_at').notNull().defaultNow(),
+		updatedAt: timestamp('updated_at').notNull().defaultNow(),
+	},
+	(table) => [index('account_user_id_idx').on(table.userId)],
+);
+
+export const verifications = pgTable(
+	'verification',
+	{
+		id: text('id').primaryKey(),
+		identifier: text('identifier').notNull(),
+		value: text('value').notNull(),
+		expiresAt: timestamp('expires_at').notNull(),
+		createdAt: timestamp('created_at').notNull().defaultNow(),
+		updatedAt: timestamp('updated_at').notNull().defaultNow(),
+	},
+	(table) => [index('verification_identifier_idx').on(table.identifier)],
+);
+
+// Auth Relations
+export const usersRelations = relations(users, ({ many }) => ({
+	sessions: many(sessions),
+	accounts: many(accounts),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+	user: one(users, {
+		fields: [sessions.userId],
+		references: [users.id],
+	}),
+}));
+
+export const accountsRelations = relations(accounts, ({ one }) => ({
+	user: one(users, {
+		fields: [accounts.userId],
+		references: [users.id],
+	}),
+}));
 
 // ============================================================================
 // STRIPE / PAYMENTS
 // ============================================================================
 
 export const stripeCustomers = pgTable('stripe_customer', {
-	id: varchar({ length: 64 }).primaryKey(),
-	userId: varchar('user_id', { length: 64 })
+	id: text('id').primaryKey(),
+	userId: text('user_id')
 		.notNull()
 		.unique()
-		.references(() => users.id, { onUpdate: 'cascade' }),
-	subscriptionId: varchar('subscription_id', { length: 64 }).unique(),
-	stripeCustomerId: varchar('stripe_customer_id', { length: 64 })
-		.notNull()
-		.unique(),
+		.references(() => users.id, { onDelete: 'cascade' }),
+	subscriptionId: text('subscription_id').unique(),
+	stripeCustomerId: text('stripe_customer_id').notNull().unique(),
 	activePlan: stripePlanEnum('active_plan'),
 	planExpiration: timestamp('plan_expiration', { mode: 'date' }),
 });
@@ -129,9 +189,9 @@ export const foodLogs = pgTable('food_log', {
 
 export const userWeights = pgTable('user_weight', {
 	id: serial().primaryKey(),
-	userId: varchar('user_id', { length: 64 })
+	userId: text('user_id')
 		.notNull()
-		.references(() => users.id),
+		.references(() => users.id, { onDelete: 'cascade' }),
 	weightKg: real('weight_kg').notNull(),
 	date: date().notNull(),
 });
@@ -144,9 +204,9 @@ export const items = pgTable(
 	'item',
 	{
 		id: serial().primaryKey(),
-		userId: varchar('user_id', { length: 64 })
+		userId: text('user_id')
 			.notNull()
-			.references(() => users.id, { onUpdate: 'cascade' }),
+			.references(() => users.id, { onDelete: 'cascade' }),
 		private: boolean().notNull().default(false),
 		type: itemTypeEnum().notNull(),
 		processed: processingStatusEnum().notNull().default('NO'),
