@@ -14,7 +14,7 @@ import {
 	X,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useSession, signOut } from '@/lib/auth/client';
+import { signOut, useSession } from '@/lib/auth/client';
 
 export default function Header() {
 	const [isOpen, setIsOpen] = useState(false);

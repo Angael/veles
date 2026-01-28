@@ -1,9 +1,9 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
+import { env } from 'env.ts';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
-import { env } from 'env.ts';
 
 export const auth = betterAuth({
 	baseURL: env.VITE_BASE_URL,
