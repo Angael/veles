@@ -20,7 +20,6 @@ export const env = createEnv({
 
   client: {
     VITE_APP_TITLE: z.string().min(1).optional(),
-    VITE_TEST: z.string().optional(),
     VITE_CF_CDN_URL: z.url(),
     VITE_BASE_URL: z.url(),
   },
@@ -43,7 +42,6 @@ export const env = createEnv({
     // Client variables from import.meta.env
     VITE_CF_CDN_URL: import.meta.env.VITE_CF_CDN_URL,
     VITE_APP_TITLE: import.meta.env.VITE_APP_TITLE,
-    VITE_TEST: import.meta.env.VITE_TEST,
     VITE_BASE_URL: import.meta.env.VITE_BASE_URL,
   },
 
