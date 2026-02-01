@@ -22,6 +22,7 @@
 		"db:studio:prod": "drizzle-kit studio --config=drizzle-prod.config.ts",
 		"db:check": "drizzle-kit check",
 		"db:seed": "tsx scripts/seed-db.ts",
+		"db:reset": "sudo docker compose -f docker-compose.dev.yml down -v && pnpm compose:dev -d && sleep 2 && drizzle-kit push --force && pnpm db:seed",
 		"compose:dev": "sudo docker compose -f docker-compose.dev.yml up",
 		"compose:dev:down": "sudo docker compose -f docker-compose.dev.yml down"
 	},
