@@ -8,6 +8,13 @@
       "when": 1769213099130,
       "tag": "0000_unique_black_tarantula",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769703318873,
+      "tag": "0001_conscious_wind_dancer",
+      "breakpoints": true
     }
   ]
 }
