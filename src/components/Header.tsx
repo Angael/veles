@@ -52,7 +52,10 @@ export default function Header() {
 
 				<div className='flex items-center gap-3'>
 					{isPending ? (
-						<div className='w-24 h-8 bg-zinc-800 rounded-lg animate-pulse' />
+						<div className='flex gap-3'>
+							<div className='w-24 h-8 bg-zinc-800 rounded-lg animate-pulse' />
+							<div className='size-8 bg-zinc-800 rounded-lg animate-pulse' />
+						</div>
 					) : session?.user ? (
 						<div className='flex items-center gap-3'>
 							<div className='flex items-center gap-2 px-3 py-1.5 bg-zinc-900 rounded-lg border border-violet-900/20'>
