@@ -11,18 +11,13 @@ function SignupPage() {
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [confirmPassword, setConfirmPassword] = useState('');
+	const [showPassword, setShowPassword] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 
 	const handleEmailSignup = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError(null);
-
-		if (password !== confirmPassword) {
-			setError('Passwords do not match');
-			return;
-		}
 
 		if (password.length < 8) {
 			setError('Password must be at least 8 characters');
@@ -114,33 +109,58 @@ function SignupPage() {
 							>
 								Password
 							</label>
-							<input
-								id='password'
-								type='password'
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-								required
-								className='w-full px-4 py-2 bg-zinc-950 border border-violet-900/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent'
-								placeholder='Min 8 characters'
-							/>
-						</div>
-
-						<div>
-							<label
-								htmlFor='confirmPassword'
-								className='block text-sm font-medium text-gray-300 mb-1'
-							>
-								Confirm Password
-							</label>
-							<input
-								id='confirmPassword'
-								type='password'
-								value={confirmPassword}
-								onChange={(e) => setConfirmPassword(e.target.value)}
-								required
-								className='w-full px-4 py-2 bg-zinc-950 border border-violet-900/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent'
-								placeholder='Confirm your password'
-							/>
+							<div className='relative'>
+								<input
+									id='password'
+									type={showPassword ? 'text' : 'password'}
+									autoComplete='new-password'
+									value={password}
+									onChange={(e) => setPassword(e.target.value)}
+									required
+									className='w-full px-4 py-2 pr-10 bg-zinc-950 border border-violet-900/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent'
+									placeholder='Min 8 characters'
+								/>
+								<button
+									type='button'
+									onClick={() => setShowPassword(!showPassword)}
+									className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors'
+									aria-label={showPassword ? 'Hide password' : 'Show password'}
+								>
+									{showPassword ? (
+										<svg
+											xmlns='http://www.w3.org/2000/svg'
+											viewBox='0 0 24 24'
+											fill='none'
+											stroke='currentColor'
+											strokeWidth='2'
+											strokeLinecap='round'
+											strokeLinejoin='round'
+											className='w-5 h-5'
+											aria-hidden='true'
+										>
+											<title>Hide password</title>
+											<path d='M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24' />
+											<line x1='1' y1='1' x2='23' y2='23' />
+										</svg>
+									) : (
+										<svg
+											xmlns='http://www.w3.org/2000/svg'
+											viewBox='0 0 24 24'
+											fill='none'
+											stroke='currentColor'
+											strokeWidth='2'
+											strokeLinecap='round'
+											strokeLinejoin='round'
+											className='w-5 h-5'
+											aria-hidden='true'
+										>
+											<title>Show password</title>
+											<path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z' />
+											<circle cx='12' cy='12' r='3' />
+										</svg>
+									)}
+								</button>
+							</div>
 						</div>
 
 						<button
