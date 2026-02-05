@@ -111,3 +111,8 @@ User is learning Tailwind and shadcn. When you see inefficient patterns or verbo
 - Proactively suggest better Tailwind utilities and patterns
 - Recommend shadcn components when applicable
 - Teach reusable approaches, not just fixes
+
+# Docs
+Big features require documentation/planning. 
+Docs are in `.docs/` folder as markdown files, named by feature, prefixed with a number for ordering.
+When working on a feature, check for an existing doc to follow.

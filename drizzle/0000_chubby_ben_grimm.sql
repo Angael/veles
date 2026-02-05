@@ -4,6 +4,22 @@ CREATE TYPE "public"."processing_status" AS ENUM('NO', 'STARTED', 'FAIL', 'V1');
 CREATE TYPE "public"."stripe_plan" AS ENUM('VIP', 'ACCESS_PLAN');--> statement-breakpoint
 CREATE TYPE "public"."thumbnail_type" AS ENUM('XS', 'SM', 'MD');--> statement-breakpoint
 CREATE TYPE "public"."user_type" AS ENUM('FREE', 'PREMIUM', 'ADMIN');--> statement-breakpoint
+CREATE TABLE "account" (
+	"id" text PRIMARY KEY NOT NULL,
+	"account_id" text NOT NULL,
+	"provider_id" text NOT NULL,
+	"user_id" text NOT NULL,
+	"access_token" text,
+	"refresh_token" text,
+	"id_token" text,
+	"access_token_expires_at" timestamp,
+	"refresh_token_expires_at" timestamp,
+	"scope" text,
+	"password" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "food_goal" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" varchar(255) NOT NULL,
@@ -58,7 +74,7 @@ CREATE TABLE "image" (
 --> statement-breakpoint
 CREATE TABLE "item" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" varchar(64) NOT NULL,
+	"user_id" text NOT NULL,
 	"private" boolean DEFAULT false NOT NULL,
 	"type" "item_type" NOT NULL,
 	"processed" "processing_status" DEFAULT 'NO' NOT NULL,
@@ -67,11 +83,23 @@ CREATE TABLE "item" (
 	"updated_at" timestamp (3) DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE "session" (
+	"id" text PRIMARY KEY NOT NULL,
+	"expires_at" timestamp NOT NULL,
+	"token" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	"ip_address" text,
+	"user_agent" text,
+	"user_id" text NOT NULL,
+	CONSTRAINT "session_token_unique" UNIQUE("token")
+);
+--> statement-breakpoint
 CREATE TABLE "stripe_customer" (
-	"id" varchar(64) PRIMARY KEY NOT NULL,
-	"user_id" varchar(64) NOT NULL,
-	"subscription_id" varchar(64),
-	"stripe_customer_id" varchar(64) NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"subscription_id" text,
+	"stripe_customer_id" text NOT NULL,
 	"active_plan" "stripe_plan",
 	"plan_expiration" timestamp,
 	CONSTRAINT "stripe_customer_user_id_unique" UNIQUE("user_id"),
@@ -91,28 +119,31 @@ CREATE TABLE "thumbnail" (
 	CONSTRAINT "thumbnail_item_id_type_unique" UNIQUE("item_id","type")
 );
 --> statement-breakpoint
-CREATE TABLE "user_session" (
-	"id" varchar(64) PRIMARY KEY NOT NULL,
-	"user_id" varchar(64) NOT NULL,
-	"expires_at" timestamp (3) NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE "user_weight" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" varchar(64) NOT NULL,
+	"user_id" text NOT NULL,
 	"weight_kg" real NOT NULL,
 	"date" date NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "user" (
-	"id" varchar(64) PRIMARY KEY NOT NULL,
-	"email" varchar(254) NOT NULL,
-	"hashed_password" varchar(256) NOT NULL,
-	"type" "user_type" NOT NULL,
-	"last_login_at" timestamp (3),
-	"created_at" timestamp (3) DEFAULT now(),
-	"updated_at" timestamp (3) DEFAULT now(),
+	"id" text PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"email" text NOT NULL,
+	"email_verified" boolean DEFAULT false NOT NULL,
+	"image" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "user_email_unique" UNIQUE("email")
+);
+--> statement-breakpoint
+CREATE TABLE "verification" (
+	"id" text PRIMARY KEY NOT NULL,
+	"identifier" text NOT NULL,
+	"value" text NOT NULL,
+	"expires_at" timestamp NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "video" (
@@ -128,14 +159,19 @@ CREATE TABLE "video" (
 	"created_at" timestamp (3) DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "food_log" ADD CONSTRAINT "food_log_food_product_id_food_product_id_fk" FOREIGN KEY ("food_product_id") REFERENCES "public"."food_product"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "image" ADD CONSTRAINT "image_item_id_item_id_fk" FOREIGN KEY ("item_id") REFERENCES "public"."item"("id") ON DELETE no action ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE "item" ADD CONSTRAINT "item_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE "stripe_customer" ADD CONSTRAINT "stripe_customer_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "item" ADD CONSTRAINT "item_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "stripe_customer" ADD CONSTRAINT "stripe_customer_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "thumbnail" ADD CONSTRAINT "thumbnail_item_id_item_id_fk" FOREIGN KEY ("item_id") REFERENCES "public"."item"("id") ON DELETE no action ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE "user_weight" ADD CONSTRAINT "user_weight_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "user_weight" ADD CONSTRAINT "user_weight_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "video" ADD CONSTRAINT "video_item_id_item_id_fk" FOREIGN KEY ("item_id") REFERENCES "public"."item"("id") ON DELETE no action ON UPDATE cascade;--> statement-breakpoint
+CREATE INDEX "account_user_id_idx" ON "account" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "idx_barcode_user_id" ON "food_product" USING btree ("barcode","user_id");--> statement-breakpoint
 CREATE INDEX "image_item_id_fkey" ON "image" USING btree ("item_id");--> statement-breakpoint
 CREATE INDEX "item_user_id_fkey" ON "item" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "session_user_id_idx" ON "session" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "verification_identifier_idx" ON "verification" USING btree ("identifier");--> statement-breakpoint
 CREATE INDEX "video_item_id_fkey" ON "video" USING btree ("item_id");

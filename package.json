@@ -20,6 +20,9 @@
 		"db:pull": "drizzle-kit pull",
 		"db:studio": "drizzle-kit studio",
 		"db:studio:prod": "drizzle-kit studio --config=drizzle-prod.config.ts",
+		"db:check": "drizzle-kit check",
+		"db:seed": "tsx scripts/seed-db.ts",
+		"db:reset": "sudo docker compose -f docker-compose.dev.yml down -v && pnpm compose:dev -d && sleep 2 && drizzle-kit push --force && pnpm db:seed",
 		"compose:dev": "sudo docker compose -f docker-compose.dev.yml up",
 		"compose:dev:down": "sudo docker compose -f docker-compose.dev.yml down"
 	},
@@ -35,6 +38,7 @@
 		"@tanstack/react-start": "^1.132.0",
 		"@tanstack/react-virtual": "^3.13.18",
 		"@tanstack/router-plugin": "^1.132.0",
+		"better-auth": "^1.4.17",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"cross-env": "^10.1.0",

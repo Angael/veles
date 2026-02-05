@@ -20,6 +20,7 @@ pnpm start
    ```
 
    Or use the npm script:
+
    ```bash
    pnpm compose:dev
    ```
@@ -60,7 +61,6 @@ pnpm start
 
    ```
    DATABASE_URL=<Internal Connection URL from database service>
-   VITE_TEST=prod-test
    ```
 
 4. **Deploy the application** through Dokploy UI
