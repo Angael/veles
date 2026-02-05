@@ -68,6 +68,10 @@ pnpm db:studio:prod   # Open Drizzle Studio GUI (production)
 - **Production App**:
   - Environment variables managed in Dokploy UI
   - Dokploy sets `DATABASE_URL` for the running app
+- **Sync Checklist**: When adding/modifying environment variables, update all three:
+  1. `env.ts` - validation schema and runtimeEnv
+  2. `Dockerfile` - ARG/ENV for build-time vars (VITE_*)
+  3. `docker-compose.yml` - build args (VITE_*) and environment (runtime vars)
 
 ### Code Style
 - Uses Biome for linting/formatting

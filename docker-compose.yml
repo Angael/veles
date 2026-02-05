@@ -9,11 +9,16 @@ services:
       args:
         # VITE_ vars must be passed at build time (baked in by Vite)
         VITE_CF_CDN_URL: ${VITE_CF_CDN_URL:-https://cdn.example.com}
+        VITE_BASE_URL: ${VITE_BASE_URL:-https://example.com}
+        VITE_APP_TITLE: ${VITE_APP_TITLE:-Veles}
     restart: always
     expose:
       - "3000"
     environment:
       DATABASE_URL: ${DATABASE_URL}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
     logging:
       driver: json-file
       options:
