@@ -2,7 +2,9 @@ FROM node:22-alpine AS builder
 
 # Build arguments for Vite (baked in at build time)
 ARG VITE_CF_CDN_URL
+ARG VITE_BASE_URL
 ENV VITE_CF_CDN_URL=$VITE_CF_CDN_URL
+ENV VITE_BASE_URL=$VITE_BASE_URL
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
