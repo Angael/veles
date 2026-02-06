@@ -1,6 +1,10 @@
 import { createEnv } from '@t3-oss/env-core'
 import { z } from 'zod'
 
+// Vite bakes VITE_ vars at build time via import.meta.env.
+// Outside Vite (bg-worker, scripts) they live in process.env instead.
+const clientEnv = import.meta.env ?? process.env
+
 export const env = createEnv({
   server: {
     SERVER_URL: z.url().optional(),
@@ -17,10 +21,6 @@ export const env = createEnv({
     R2_BUCKET_NAME: z.string().min(1),
   },
 
-  /**
-   * The prefix that client-side variables must have. This is enforced both at
-   * a type-level and at runtime.
-   */
   clientPrefix: 'VITE_',
 
   client: {
@@ -29,30 +29,21 @@ export const env = createEnv({
     VITE_BASE_URL: z.url(),
   },
 
-  /**
-   * What object holds the environment variables at runtime. This is usually
-   * `process.env` or `import.meta.env`.
-   *
-   * For TanStack Start, we need to merge both sources:
-   * - Server vars come from process.env (available at runtime in production)
-   * - Client vars come from import.meta.env (baked in at build time)
-   */
   runtimeEnv: {
-    // Server variables from process.env
+    // Server
     SERVER_URL: process.env.SERVER_URL,
     DATABASE_URL: process.env.DATABASE_URL,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-    // Cloudflare R2
     R2_ACCOUNT_ID: process.env.R2_ACCOUNT_ID,
     R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID,
     R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY,
     R2_BUCKET_NAME: process.env.R2_BUCKET_NAME,
-    // Client variables from import.meta.env
-    VITE_CF_CDN_URL: import.meta.env.VITE_CF_CDN_URL,
-    VITE_APP_TITLE: import.meta.env.VITE_APP_TITLE,
-    VITE_BASE_URL: import.meta.env.VITE_BASE_URL,
+    // Client
+    VITE_CF_CDN_URL: clientEnv.VITE_CF_CDN_URL,
+    VITE_APP_TITLE: clientEnv.VITE_APP_TITLE,
+    VITE_BASE_URL: clientEnv.VITE_BASE_URL,
   },
 
   /**

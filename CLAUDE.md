@@ -11,6 +11,7 @@ Veles is a full-stack TypeScript application built with TanStack Start (React me
 ```bash
 # Development
 pnpm dev              # Start dev server on port 3000
+pnpm worker           # Start background worker (separate process)
 
 # Docker (Local Development)
 pnpm compose:dev      # Start database only (with sudo)
@@ -42,9 +43,20 @@ pnpm db:studio:prod   # Open Drizzle Studio GUI (production)
 
 ### Docker Setup
 - **`docker-compose.yml`**: Production config (used by Dokploy) - exposes ports internally only
+  - `app` service: Main TanStack Start application
+  - `bg-worker` service: Background worker for async jobs
 - **`docker-compose.dev.yml`**: Dev database setup for local development
 - For local development: Use `pnpm compose:dev` or run docker compose with sudo
 - Database credentials are hardcoded in `docker-compose.dev.yml` (postgres/postgres/veles_dev)
+
+### Background Worker
+- **Location**: `src/bg-worker/` directory with its own Dockerfile
+- **Purpose**: Handles async tasks (file processing, scheduled jobs) separate from HTTP requests
+- **Dependency Direction**: Worker can use app utilities (DB, R2 client, etc.), but app CANNOT import worker code
+- **Running Locally**: `pnpm worker` (separate from `pnpm dev`)
+- **Production**: Runs as separate Docker service alongside main app
+- **Configuration**: `WORKER_INTERVAL_MS` env var (default: 5000ms)
+- **Documentation**: See `.docs/4-background-worker.md` for details
 
 ### Routing
 - **File-based routing**: Routes are in `src/routes/` and auto-generate `src/routeTree.gen.ts`

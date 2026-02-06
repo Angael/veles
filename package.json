@@ -13,6 +13,7 @@
 		"check": "biome check --write",
 		"fix": "biome check --write --assist-enabled=true; tsc --noEmit",
 		"start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs",
+		"worker": "tsx --env-file-if-exists=.env src/bg-worker/index.ts",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:migrate:prod": "drizzle-kit migrate --config=drizzle-prod.config.ts",
