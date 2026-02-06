@@ -36,6 +36,14 @@ export const thumbnailTypeEnum = pgEnum('thumbnail_type', ['XS', 'SM', 'MD']);
 
 export const stripePlanEnum = pgEnum('stripe_plan', ['VIP', 'ACCESS_PLAN']);
 
+export const uploadStatusEnum = pgEnum('upload_status', [
+	'PENDING',
+	'UPLOADED',
+	'PROCESSING',
+	'COMPLETED',
+	'FAILED',
+]);
+
 // ============================================================================
 // AUTH TABLES (Better Auth)
 // ============================================================================
@@ -285,3 +293,43 @@ export const thumbnails = pgTable(
 		unique('thumbnail_item_id_type_unique').on(table.itemId, table.type),
 	],
 );
+
+// ============================================================================
+// FILE UPLOADS
+// ============================================================================
+
+export const fileUploads = pgTable(
+	'file_upload',
+	{
+		id: serial().primaryKey(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
+		/** Original filename from the user */
+		originalName: varchar('original_name', { length: 512 }).notNull(),
+		/** R2 object key */
+		r2Key: varchar('r2_key', { length: 1024 }).notNull().unique(),
+		/** MIME type of the file */
+		contentType: varchar('content_type', { length: 255 }).notNull(),
+		/** File size in bytes */
+		size: integer().notNull(),
+		/** Processing status for backend pipeline */
+		status: uploadStatusEnum().notNull().default('PENDING'),
+		/** Optional error message if processing failed */
+		errorMessage: text('error_message'),
+		createdAt: timestamp('created_at', { precision: 3, mode: 'date' })
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp('updated_at', { precision: 3, mode: 'date' })
+			.notNull()
+			.defaultNow(),
+	},
+	(table) => [index('file_upload_user_id_idx').on(table.userId)],
+);
+
+export const fileUploadsRelations = relations(fileUploads, ({ one }) => ({
+	user: one(users, {
+		fields: [fileUploads.userId],
+		references: [users.id],
+	}),
+}));

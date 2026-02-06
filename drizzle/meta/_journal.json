@@ -8,6 +8,13 @@
       "when": 1769941260857,
       "tag": "0000_chubby_ben_grimm",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770360690600,
+      "tag": "0001_yielding_hemingway",
+      "breakpoints": true
     }
   ]
 }
