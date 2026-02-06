@@ -10,6 +10,7 @@ import {
 	Network,
 	SquareFunction,
 	StickyNote,
+	Upload,
 	User,
 	X,
 } from 'lucide-react';
@@ -140,6 +141,19 @@ export default function Header() {
 					>
 						<Image size={20} />
 						<span className='font-medium'>Media</span>
+					</Link>
+
+					<Link
+						to='/upload'
+						onClick={() => setIsOpen(false)}
+						className='flex items-center gap-3 p-3 rounded-lg hover:bg-violet-900/20 transition-colors mb-2'
+						activeProps={{
+							className:
+								'flex items-center gap-3 p-3 rounded-lg bg-violet-600 hover:bg-violet-700 transition-colors mb-2',
+						}}
+					>
+						<Upload size={20} />
+						<span className='font-medium'>Upload</span>
 					</Link>
 
 					{/* Demo Links Start */}
