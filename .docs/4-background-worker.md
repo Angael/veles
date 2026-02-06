@@ -1,204 +1,72 @@
-# Background Worker Architecture
+# Background Worker
 
 ## Overview
 
-The background worker (`src/bg-worker/`) is a separate process that runs alongside the main TanStack Start application. It handles asynchronous tasks that don't belong in the request/response cycle, such as:
+The background worker (`src/bg-worker/`) is a separate process that runs alongside the main TanStack Start app. It handles async tasks outside the request/response cycle — currently syncing file upload statuses with Cloudflare R2.
 
-- Syncing file upload statuses with Cloudflare R2
-- Processing uploaded files
-- Scheduled maintenance tasks
-- Any long-running background jobs
+## Architecture
 
-## Architecture Principles
-
-### Separation of Concerns
-- **Main App**: Handles HTTP requests, SSR, client interactions
-- **Background Worker**: Handles scheduled jobs, async processing, no HTTP server
-
-### Dependency Direction
-- ✅ **Worker → App**: Worker can import and use utilities from the main app (`src/db/`, `src/lib/`, etc.)
-- ❌ **App → Worker**: Main app should NOT import anything from `src/bg-worker/`
-
-This one-way dependency ensures:
-- The worker can leverage existing database connections, R2 clients, and utilities
-- The main app bundle doesn't include worker code
-- Clear separation between user-facing and background processes
-
-## Project Structure
+- **Main App**: HTTP requests, SSR, client interactions
+- **Background Worker**: Scheduled jobs, async processing, no HTTP server
+- **Dependency direction**: Worker imports app utilities (`src/db/`, `src/lib/`, `env.ts`). App must NOT import from `src/bg-worker/`.
 
 ```
 src/bg-worker/
 ├── Dockerfile          # Worker-specific Docker build
-├── index.ts           # Main entry point, job scheduler
-└── jobs/              # Individual job implementations
-    └── sync-uploads.ts # Example: sync R2 uploads with DB
+├── index.ts            # Entry point, interval scheduler, graceful shutdown
+└── jobs/
+    └── sync-uploads.ts # Lists R2 files, queries PENDING uploads from DB
 ```
 
-## Running Locally
+## Environment
 
-### Start the worker:
+The worker uses the shared `env.ts`. Since `import.meta.env` doesn't exist outside Vite, `env.ts` resolves client vars via a `clientEnv` fallback:
+```ts
+const clientEnv = import.meta.env ?? process.env
+```
+The worker doesn't need VITE_ vars, but this keeps `env.ts` importable from both contexts.
+
+The worker script uses `--env-file-if-exists=.env` so it works with or without a `.env` file.
+
+## Running
+
 ```bash
-pnpm worker
+# Local development (two terminals)
+pnpm dev       # Terminal 1: main app
+pnpm worker    # Terminal 2: background worker
+
+# Custom interval
+WORKER_INTERVAL_MS=10000 pnpm worker
 ```
 
-The worker runs independently from the main dev server. You'll typically run both:
-```bash
-# Terminal 1: Main app
-pnpm dev
+Default interval: 5000ms.
 
-# Terminal 2: Background worker
-pnpm worker
-```
+## Production
 
-### Configuration
-Set the interval via environment variable:
-```bash
-WORKER_INTERVAL_MS=10000 pnpm worker  # Run every 10 seconds
-```
-
-Default: 5000ms (5 seconds)
-
-## Production Deployment
-
-### Docker Compose
-The worker runs as a separate service in `docker-compose.yml`:
+Runs as a separate Docker Compose service in `docker-compose.yml`:
 
 ```yaml
-services:
-  app:
-    # Main TanStack Start app
-    build:
-      dockerfile: Dockerfile
-
-  bg-worker:
-    # Background worker
-    build:
-      dockerfile: src/bg-worker/Dockerfile
-    environment:
-      WORKER_INTERVAL_MS: 5000
+bg-worker:
+  build:
+    context: .
+    dockerfile: src/bg-worker/Dockerfile
+  environment:
+    DATABASE_URL: ${DATABASE_URL}
+    R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
+    R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+    R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+    R2_BUCKET_NAME: ${R2_BUCKET_NAME}
+    WORKER_INTERVAL_MS: ${WORKER_INTERVAL_MS:-5000}
 ```
 
-Both services:
-- Share the same database
-- Use the same R2 credentials
-- Run independently with separate logs
-- Can be scaled independently (if needed in the future)
+## Adding Jobs
 
-### Environment Variables
-The worker uses the same `env.ts` as the main app, but only needs server-side variables:
-- `DATABASE_URL`
-- `R2_ACCOUNT_ID`
-- `R2_ACCESS_KEY_ID`
-- `R2_SECRET_ACCESS_KEY`
-- `R2_BUCKET_NAME`
-- `WORKER_INTERVAL_MS` (optional, defaults to 5000ms)
+1. Create `src/bg-worker/jobs/my-job.ts` with an exported async function
+2. Import and call it in `src/bg-worker/index.ts` inside `runWorker()`
 
-Note: **No VITE_ variables** are needed since the worker doesn't use Vite.
+## Current Job: sync-uploads
 
-## Adding New Jobs
-
-### 1. Create a job file
-```typescript
-// src/bg-worker/jobs/my-job.ts
-export async function myJob() {
-  console.log('[my-job] Starting...');
-
-  // Use shared utilities
-  const records = await db.query.myTable.findMany();
-
-  // Do work...
-
-  console.log('[my-job] Completed');
-}
-```
-
-### 2. Register in index.ts
-```typescript
-// src/bg-worker/index.ts
-import { syncUploads } from './jobs/sync-uploads.ts';
-import { myJob } from './jobs/my-job.ts';
-
-async function runWorker() {
-  try {
-    await syncUploads();
-    await myJob();  // Add your job
-  } catch (error) {
-    console.error('[bg-worker] Job failed:', error);
-  }
-}
-```
-
-## Current Jobs
-
-### sync-uploads.ts
-Syncs file upload records between the database and Cloudflare R2.
-
-**Purpose**: Detect and handle orphaned uploads, verify file existence, update statuses.
-
-**Frequency**: Every 5 seconds (configurable)
-
-**What it does**:
-1. Lists objects in the R2 bucket
-2. Queries database for uploads with status = 'PENDING'
-3. Logs which uploads exist/are missing in R2
-4. (Future) Automatically update statuses, retry failed uploads, cleanup orphans
-
-## Monitoring
-
-### Logs
-The worker logs all activity with `[job-name]` prefixes:
-```
-[bg-worker] Starting background worker (interval: 5000ms)
-[sync-uploads] Starting sync job...
-[sync-uploads] Found 42 files in R2
-[sync-uploads] Found 3 PENDING uploads in DB
-[sync-uploads] Upload ID 123: uploads/abc.jpg - EXISTS in R2
-[sync-uploads] Sync job completed
-```
-
-### Health Checks (Future)
-Consider adding:
-- Prometheus metrics endpoint
-- Health check endpoint (HTTP server for k8s probes)
-- Sentry error tracking
-- Database logging of job runs
-
-## Scaling Considerations
-
-### Current: Single Instance
-The worker is designed to run as a single instance with a simple interval-based scheduler.
-
-### Future: Multiple Instances
-If you need to scale:
-- Add distributed locking (Redis, PostgreSQL advisory locks)
-- Use a proper job queue (BullMQ, Inngest, Trigger.dev)
-- Implement leader election for scheduled tasks
-
-For now, the simple approach is sufficient for most use cases.
-
-## Troubleshooting
-
-### Worker not starting
-- Check `DATABASE_URL` is set correctly
-- Verify R2 credentials in environment variables
-- Look for TypeScript errors: `pnpm ts`
-
-### Jobs not running
-- Check logs for errors
-- Verify `WORKER_INTERVAL_MS` is set (defaults to 5000)
-- Ensure the worker process is actually running (`ps aux | grep worker`)
-
-### High resource usage
-- Increase `WORKER_INTERVAL_MS` to reduce frequency
-- Add delays between operations in jobs
-- Batch database queries instead of individual lookups
-
-## Design Philosophy
-
-The worker is intentionally simple:
-- No complex scheduling library
-- No HTTP server (unless needed for health checks)
-- Uses existing app infrastructure (DB, R2 client, env config)
-- Easy to understand and modify
-
-If your needs outgrow this design, consider dedicated job queue solutions like BullMQ or Trigger.dev.
+Every interval tick:
+1. Lists objects in R2 bucket (max 100)
+2. Queries DB for `file_upload` rows with status = `PENDING`
+3. Logs which uploads exist or are missing in R2
