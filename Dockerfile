@@ -1,4 +1,4 @@
-FROM node:22-alpine AS builder
+FROM node:25-alpine AS builder
 
 # Build arguments for Vite (baked in at build time)
 ARG VITE_CF_CDN_URL
@@ -20,7 +20,7 @@ COPY . .
 RUN pnpm ts
 RUN pnpm build
 
-FROM node:22-alpine AS runner
+FROM node:25-alpine AS runner
 
 WORKDIR /app
 
