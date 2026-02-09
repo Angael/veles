@@ -1,14 +1,18 @@
-import { and, eq, lt, sql } from "drizzle-orm";
-import { db } from "../../db/index.ts";
-import { fileUploads } from "../../db/schema.ts";
+import { and, eq, lt } from 'drizzle-orm';
+import { db } from '../../db/index.ts';
+import { fileUploads } from '../../db/schema.ts';
+import { logger as baseLogger } from '../../lib/logger.ts';
+
+const logger = baseLogger.child(
+	{},
+	{ msgPrefix: '[cleanup-pending-uploads] ' },
+);
 
 /**
  * Cleanup job: removes file uploads that have been pending for more than 1 day
  * This prevents the database from accumulating stale upload records
  */
 export async function cleanupPendingUploads() {
-	console.log("[cleanup-pending-uploads] Starting cleanup job...");
-
 	try {
 		// Calculate the timestamp for 1 day ago
 		const oneDayAgo = new Date();
@@ -19,30 +23,25 @@ export async function cleanupPendingUploads() {
 			.delete(fileUploads)
 			.where(
 				and(
-					eq(fileUploads.status, "PENDING"),
+					eq(fileUploads.status, 'PENDING'),
 					lt(fileUploads.createdAt, oneDayAgo),
 				),
 			)
 			.returning({ id: fileUploads.id, r2Key: fileUploads.r2Key });
 
 		if (deletedUploads.length > 0) {
-			console.log(
-				`[cleanup-pending-uploads] Deleted ${deletedUploads.length} stale pending uploads:`,
+			logger.info(
+				{
+					count: deletedUploads.length,
+					uploads: deletedUploads.map((u) => u.r2Key),
+				},
+				'Deleted stale uploads',
 			);
-			for (const upload of deletedUploads) {
-				console.log(
-					`[cleanup-pending-uploads]   - ID ${upload.id}: ${upload.r2Key}`,
-				);
-			}
 		} else {
-			console.log(
-				"[cleanup-pending-uploads] No stale pending uploads found",
-			);
+			logger.debug('No stale uploads found');
 		}
-
-		console.log("[cleanup-pending-uploads] Cleanup job completed");
 	} catch (error) {
-		console.error("[cleanup-pending-uploads] Error during cleanup:", error);
+		logger.error({ err: error }, 'Failed');
 		throw error;
 	}
 }

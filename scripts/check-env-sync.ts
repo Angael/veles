@@ -1,5 +1,8 @@
 import { readFileSync, existsSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { logger as baseLogger } from '../src/lib/logger.ts'
+
+const logger = baseLogger.child({}, { msgPrefix: '[check-env-sync] ' })
 
 const ROOT = resolve(import.meta.dirname, '..')
 
@@ -20,7 +23,7 @@ function extractEnvKeys(lines: string[]): string[] {
 let hasIssues = false
 
 function note(msg: string) {
-	console.log(`  Note: ${msg}`)
+	logger.warn(msg)
 	hasIssues = true
 }
 
@@ -82,8 +85,8 @@ for (const key of serverKeys) {
 
 // ─── Result ──────────────────────────────────────────────────────────
 if (hasIssues) {
-	console.log('\nSome env sync notes found above. Review and fix if needed.')
+	logger.error('Some env sync issues found above. Review and fix if needed.')
 	process.exit(1)
 } else {
-	console.log('All env files are in sync.')
+	logger.info('All env files are in sync')
 }

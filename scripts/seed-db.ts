@@ -11,11 +11,14 @@ import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import * as schema from "../src/db/schema.ts";
+import { logger as baseLogger } from "../src/lib/logger.ts";
+
+const logger = baseLogger.child({}, { msgPrefix: "[seed-db] " });
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
-	console.error("❌ DATABASE_URL is required. Set it in .env or .env.local");
+	logger.error("DATABASE_URL is required. Set it in .env or .env.local");
 	process.exit(1);
 }
 
@@ -77,21 +80,21 @@ const ITEMS = [
 // ============================================================================
 
 async function seedUser() {
-	console.log("Seeding user...");
+	logger.debug("Seeding user");
 	await db.insert(schema.users).values(TEST_USER).onConflictDoNothing();
-	console.log(`  ✓ User: ${TEST_USER.email}`);
+	logger.debug({ email: TEST_USER.email }, "User created");
 }
 
 async function seedFoodProducts() {
-	console.log("Seeding food products...");
+	logger.debug("Seeding food products");
 	for (const product of FOOD_PRODUCTS) {
 		await db.insert(schema.foodProducts).values(product).onConflictDoNothing();
-		console.log(`  ✓ ${product.productName}`);
+		logger.debug({ product: product.productName }, "Food product created");
 	}
 }
 
 async function seedItems() {
-	console.log("Seeding items...");
+	logger.debug("Seeding items");
 
 	for (let i = 0; i < ITEMS.length; i++) {
 		const itemData = ITEMS[i];
@@ -116,7 +119,10 @@ async function seedItems() {
 				height: 1080,
 				mediaType: "SOURCE",
 			});
-			console.log(`  ✓ Image item #${item.id} (private: ${itemData.private})`);
+			logger.debug(
+				{ itemId: item.id, type: "image", private: itemData.private },
+				"Image item created",
+			);
 		} else {
 			await db.insert(schema.videos).values({
 				itemId: item.id,
@@ -128,13 +134,16 @@ async function seedItems() {
 				durationMs: 30000 + i * 5000,
 				mediaType: "SOURCE",
 			});
-			console.log(`  ✓ Video item #${item.id} (private: ${itemData.private})`);
+			logger.debug(
+				{ itemId: item.id, type: "video", private: itemData.private },
+				"Video item created",
+			);
 		}
 	}
 }
 
 async function seedFoodGoal() {
-	console.log("Seeding food goal...");
+	logger.debug("Seeding food goal");
 	const today = new Date().toISOString().split("T")[0];
 
 	await db.insert(schema.foodGoals).values({
@@ -146,7 +155,7 @@ async function seedFoodGoal() {
 		date: today,
 		weightKg: 75,
 	});
-	console.log(`  ✓ Food goal for ${today}`);
+	logger.debug({ date: today }, "Food goal created");
 }
 
 // ============================================================================
@@ -154,7 +163,7 @@ async function seedFoodGoal() {
 // ============================================================================
 
 async function main() {
-	console.log("🌱 Starting database seed...\n");
+	logger.info("Starting");
 
 	try {
 		await seedUser();
@@ -162,9 +171,9 @@ async function main() {
 		await seedItems();
 		await seedFoodGoal();
 
-		console.log("\n✅ Seed completed successfully!");
+		logger.info("Completed successfully");
 	} catch (error) {
-		console.error("\n❌ Seed failed:", error);
+		logger.error({ err: error }, "Failed");
 		process.exit(1);
 	} finally {
 		await pool.end();

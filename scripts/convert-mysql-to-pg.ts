@@ -13,6 +13,9 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { logger as baseLogger } from '../src/lib/logger.ts';
+
+const logger = baseLogger.child({}, { msgPrefix: '[convert-mysql-to-pg] ' });
 
 // Tables to migrate (in order for FK constraints)
 const TABLES_TO_MIGRATE = [
@@ -40,7 +43,7 @@ const BOOLEAN_COLUMNS: Record<string, number[]> = {
 function parseArgs(): string {
 	const args = process.argv.slice(2);
 	if (args.length === 0) {
-		console.error('Usage: pnpm tsx scripts/convert-mysql-to-pg.ts <dump.sql>');
+		logger.error('Usage: pnpm tsx scripts/convert-mysql-to-pg.ts <dump.sql>');
 		process.exit(1);
 	}
 	return args[0];
@@ -64,7 +67,7 @@ function extractInsertStatements(
 		}
 
 		if (!TABLES_TO_MIGRATE.includes(tableName)) {
-			console.error(`Warning: Unknown table "${tableName}" found, skipping`);
+			logger.warn({ tableName }, 'Unknown table found, skipping');
 			continue;
 		}
 
@@ -327,24 +330,24 @@ function generatePostgresSQL(
 function main() {
 	const dumpPath = parseArgs();
 
-	console.error(`Reading MySQL dump from: ${dumpPath}`);
+	logger.debug({ path: dumpPath }, 'Reading MySQL dump');
 	const content = readFileSync(dumpPath, 'utf-8');
 
-	console.error('Extracting INSERT statements...');
+	logger.debug('Extracting INSERT statements');
 	const data = extractInsertStatements(content);
 
-	console.error('Tables found:');
+	logger.info('Tables found:');
 	for (const [table, tableData] of data.entries()) {
-		console.error(`  - ${table}: ${tableData.values.length} rows`);
+		logger.info({ table, rows: tableData.values.length }, `  - ${table}`);
 	}
 
-	console.error('Generating PostgreSQL SQL...');
+	logger.debug('Generating PostgreSQL SQL');
 	const sql = generatePostgresSQL(data);
 
-	// Output to stdout
+	// Output to stdout (keep console.log for SQL output)
 	console.log(sql);
 
-	console.error('Done! Pipe stdout to a file or psql.');
+	logger.info('Done! Pipe stdout to a file or psql');
 }
 
 main();

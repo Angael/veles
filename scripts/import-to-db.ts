@@ -10,6 +10,9 @@
 
 import { readFileSync } from 'node:fs';
 import pg from 'pg';
+import { logger as baseLogger } from '../src/lib/logger.ts';
+
+const logger = baseLogger.child({}, { msgPrefix: '[import-to-db] ' });
 
 // Tables to migrate (in order for FK constraints)
 const TABLES_TO_MIGRATE = [
@@ -36,9 +39,7 @@ const BOOLEAN_COLUMNS: Record<string, number[]> = {
 function parseArgs(): { dumpPath: string; dbUrl: string } {
 	const args = process.argv.slice(2);
 	if (args.length < 2) {
-		console.error(
-			'Usage: pnpm tsx scripts/import-to-db.ts <dump.sql> <database_url>',
-		);
+		logger.error('Usage: pnpm tsx scripts/import-to-db.ts <dump.sql> <database_url>');
 		process.exit(1);
 	}
 	return { dumpPath: args[0], dbUrl: args[1] };
@@ -215,18 +216,18 @@ function convertRowToPostgres(row: string, tableName?: string): string {
 async function main() {
 	const { dumpPath, dbUrl } = parseArgs();
 
-	console.log(`Reading MySQL dump from: ${dumpPath}`);
+	logger.debug({ path: dumpPath }, 'Reading MySQL dump');
 	const content = readFileSync(dumpPath, 'utf-8');
 
-	console.log('Extracting INSERT statements...');
+	logger.debug('Extracting INSERT statements');
 	const data = extractInsertStatements(content);
 
-	console.log('Tables found:');
+	logger.info('Tables found:');
 	for (const [table, tableData] of data.entries()) {
-		console.log(`  - ${table}: ${tableData.values.length} rows`);
+		logger.info({ table, rows: tableData.values.length }, `  - ${table}`);
 	}
 
-	console.log('\nConnecting to database...');
+	logger.info('Connecting to database');
 	const client = new pg.Client({ connectionString: dbUrl });
 	await client.connect();
 
@@ -236,11 +237,14 @@ async function main() {
 		for (const tableName of TABLES_TO_MIGRATE) {
 			const tableData = data.get(tableName);
 			if (!tableData || tableData.values.length === 0) {
-				console.log(`Skipping ${tableName} (no data)`);
+				logger.debug({ table: tableName }, 'Skipping (no data)');
 				continue;
 			}
 
-			console.log(`Importing ${tableName} (${tableData.values.length} rows)...`);
+			logger.info(
+				{ table: tableName, rows: tableData.values.length },
+				'Importing',
+			);
 
 			const BATCH_SIZE = 100;
 			for (let i = 0; i < tableData.values.length; i += BATCH_SIZE) {
@@ -254,7 +258,7 @@ async function main() {
 		}
 
 		// Reset sequences
-		console.log('\nResetting sequences...');
+		logger.debug('Resetting sequences');
 		const sequenceTables = [
 			'food_goal',
 			'food_log',
@@ -272,19 +276,19 @@ async function main() {
 		}
 
 		await client.query('COMMIT');
-		console.log('\n✅ Import completed successfully!');
+		logger.info('Completed successfully');
 
 		// Verify counts
-		console.log('\nVerifying row counts:');
+		logger.info('Verifying row counts:');
 		for (const tableName of TABLES_TO_MIGRATE) {
 			const result = await client.query(
 				`SELECT COUNT(*) FROM "${tableName}"`,
 			);
-			console.log(`  ${tableName}: ${result.rows[0].count}`);
+			logger.info({ table: tableName, count: result.rows[0].count }, `  ${tableName}`);
 		}
 	} catch (error) {
 		await client.query('ROLLBACK');
-		console.error('❌ Import failed, rolled back:', error);
+		logger.error({ err: error }, 'Failed, rolled back');
 		process.exit(1);
 	} finally {
 		await client.end();
