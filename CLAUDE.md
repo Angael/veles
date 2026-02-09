@@ -42,6 +42,7 @@ pnpm db:studio:prod   # Open Drizzle Studio GUI (production)
 ## Architecture
 
 ### Docker Setup
+
 - **`docker-compose.yml`**: Production config (used by Dokploy) - exposes ports internally only
   - `app` service: Main TanStack Start application
   - `bg-worker` service: Background worker for async jobs
@@ -50,6 +51,7 @@ pnpm db:studio:prod   # Open Drizzle Studio GUI (production)
 - Database credentials are hardcoded in `docker-compose.dev.yml` (postgres/postgres/veles_dev)
 
 ### Background Worker
+
 - **Location**: `src/bg-worker/` directory with its own Dockerfile
 - **Purpose**: Handles async tasks (file processing, scheduled jobs) separate from HTTP requests
 - **Dependency Direction**: Worker can use app utilities (DB, R2 client, etc.), but app CANNOT import worker code
@@ -59,17 +61,20 @@ pnpm db:studio:prod   # Open Drizzle Studio GUI (production)
 - **Documentation**: See `.docs/4-background-worker.md` for details
 
 ### Routing
+
 - **File-based routing**: Routes are in `src/routes/` and auto-generate `src/routeTree.gen.ts`
 - **API routes**: Files named `api.*.ts` create API endpoints (e.g., `src/routes/demo/api.names.ts` → `/demo/api/names`)
 - **Root layout**: `src/routes/__root.tsx` provides the app shell with header and devtools
 
 ### Data Layer
+
 - **TanStack Query**: Provider in `src/integrations/tanstack-query/`, integrated with SSR via `@tanstack/react-router-ssr-query`
 - **Drizzle ORM**: Schema in `src/db/schema.ts`, connection in `src/db/index.ts`
 
 ### Environment Variables
+
 - **Application**: Defined and validated with T3 Env in `env.ts`
-  - Server vars: `DATABASE_URL` (required for local dev), `SERVER_URL` (optional)
+  - Server vars: `DATABASE_URL` (required for local dev)
   - Client vars must be prefixed with `VITE_`
 - **Local Development**:
   - `DATABASE_URL` in `.env` or `.env.local` (for app and migrations)
@@ -82,10 +87,11 @@ pnpm db:studio:prod   # Open Drizzle Studio GUI (production)
   - Dokploy sets `DATABASE_URL` for the running app
 - **Sync Checklist**: When adding/modifying environment variables, update all three:
   1. `env.ts` - validation schema and runtimeEnv
-  2. `Dockerfile` - ARG/ENV for build-time vars (VITE_*)
-  3. `docker-compose.yml` - build args (VITE_*) and environment (runtime vars)
+  2. `Dockerfile` - ARG/ENV for build-time vars (VITE\_\*)
+  3. `docker-compose.yml` - build args (VITE\_\*) and environment (runtime vars)
 
 ### Code Style
+
 - Uses Biome for linting/formatting
 - Indent style: tabs
 - Quote style: double quotes
@@ -96,6 +102,7 @@ pnpm db:studio:prod   # Open Drizzle Studio GUI (production)
 **Theme**: Dark theme only (no light mode)
 
 **Color Palette** (Tailwind colors):
+
 - **Background**:
   - Primary: `zinc-950` (main background)
   - Secondary: `zinc-900` (cards, panels)
@@ -117,18 +124,22 @@ pnpm db:studio:prod   # Open Drizzle Studio GUI (production)
   - Overlays: `bg-black bg-opacity-60`
 
 **Usage Guidelines**:
+
 - Use violet for primary actions and active states
 - Use fuchsia sparingly for accents and special indicators
 - Maintain consistent border styling with `border-violet-900/20`
 - Avoid gradients (solid colors only)
 
 ### Tailwind & shadcn Guidance
+
 User is learning Tailwind and shadcn. When you see inefficient patterns or verbose solutions:
+
 - Proactively suggest better Tailwind utilities and patterns
 - Recommend shadcn components when applicable
 - Teach reusable approaches, not just fixes
 
 # Docs
-Big features require documentation/planning. 
+
+Big features require documentation/planning.
 Docs are in `.docs/` folder as markdown files, named by feature, prefixed with a number for ordering.
 When working on a feature, check for an existing doc to follow.

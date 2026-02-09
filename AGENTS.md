@@ -85,7 +85,7 @@ src/routes/
 ### Environment Variables
 
 - Application: Defined and validated with T3 Env in `env.ts`
-  - Server vars: `DATABASE_URL` (required for local dev), `SERVER_URL` (optional)
+  - Server vars: `DATABASE_URL` (required for local dev)
   - Client vars must be prefixed with `VITE_`
 - Local Development:
   - `DATABASE_URL` in `.env` or `.env.local` (for app and migrations)
@@ -98,8 +98,8 @@ src/routes/
   - Dokploy sets `DATABASE_URL` for the running app
 - Sync Checklist: When adding/modifying environment variables, update all three:
   1. `env.ts` - validation schema and runtimeEnv
-  2. `Dockerfile` - ARG/ENV for build-time vars (VITE_*)
-  3. `docker-compose.yml` - build args (VITE_*) and environment (runtime vars)
+  2. `Dockerfile` - ARG/ENV for build-time vars (VITE\_\*)
+  3. `docker-compose.yml` - build args (VITE\_\*) and environment (runtime vars)
 
 ## Code Style
 
