@@ -1,3 +1,4 @@
+import { cleanupPendingUploads } from "./jobs/cleanup-pending-uploads.ts";
 import { syncUploads } from "./jobs/sync-uploads.ts";
 
 const INTERVAL_MS = Number(process.env.WORKER_INTERVAL_MS) || 5000;
@@ -6,21 +7,22 @@ console.log(`[bg-worker] Starting background worker (interval: ${INTERVAL_MS}ms)
 
 /**
  * Main worker loop
- * Runs jobs at specified interval
+ * Runs jobs sequentially, then schedules next run after completion
  */
 async function runWorker() {
 	try {
 		await syncUploads();
+		await cleanupPendingUploads();
 	} catch (error) {
 		console.error("[bg-worker] Job failed:", error);
 	}
+
+	// Schedule next run after current run completes
+	setTimeout(runWorker, INTERVAL_MS);
 }
 
-// Initial run
+// Start the worker loop
 runWorker();
-
-// Schedule subsequent runs
-setInterval(runWorker, INTERVAL_MS);
 
 // Graceful shutdown
 process.on("SIGTERM", () => {
