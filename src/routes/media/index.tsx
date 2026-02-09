@@ -1,7 +1,9 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
+import { UploadIcon } from 'lucide-react';
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import { Button } from '@/components/ui/button';
 import { useResponsiveColumns } from '@/hooks/useResponsiveColumns';
 import { getThumbnail } from '@/utils/getThumbnail';
 import { s3PathToUrl } from '@/utils/s3PathToUrl';
@@ -95,10 +97,22 @@ function MediaPage() {
 
 	const virtualRows = virtualizer.getVirtualItems();
 
+	const header = (
+		<div className='flex items-center justify-between mb-6'>
+			<h1 className='text-3xl font-bold text-violet-400'>Media</h1>
+			<Link to='/upload'>
+				<Button variant='ghost' color='red' className='cursor-pointer'>
+					<UploadIcon className='-ml-1' />
+					Upload
+				</Button>
+			</Link>
+		</div>
+	);
+
 	if (mediaItems.length === 0) {
 		return (
 			<div className='min-h-screen bg-zinc-950 p-6 container mx-auto'>
-				<h1 className='text-3xl font-bold mb-6 text-violet-400'>Media</h1>
+				{header}
 				<div className='text-gray-500 text-center py-12'>
 					No media items found
 				</div>
@@ -108,7 +122,7 @@ function MediaPage() {
 
 	return (
 		<div className='min-h-screen bg-zinc-950 p-6 container mx-auto'>
-			<h1 className='text-3xl font-bold mb-6 text-violet-400'>Media</h1>
+			{header}
 
 			<div
 				ref={listRef}
