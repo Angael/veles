@@ -1,28 +1,31 @@
-import { queryOptions, useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
-import styles from '@/styles/app.module.css'
+import { queryOptions, useQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
+import { createServerFn } from '@tanstack/react-start';
+import styles from '@/styles/app.module.css';
 
 const getTodos = createServerFn({ method: 'GET' }).handler(async () => {
   return [
     { id: '1', text: 'Prefetch with route loader' },
     { id: '2', text: 'Read with useQuery in the component' },
     { id: '3', text: 'Keep the example short and inspectable' },
-  ]
-})
+  ];
+});
 
 const todosQueryOptions = queryOptions({
   queryKey: ['demo-todos'],
   queryFn: () => getTodos(),
-})
+});
 
 export const Route = createFileRoute('/demo/tanstack-query')({
-  loader: ({ context }) => (context as { queryClient: import('@tanstack/react-query').QueryClient }).queryClient.ensureQueryData(todosQueryOptions),
+  loader: ({ context }) =>
+    (
+      context as { queryClient: import('@tanstack/react-query').QueryClient }
+    ).queryClient.ensureQueryData(todosQueryOptions),
   component: TanStackQueryPage,
-})
+});
 
 function TanStackQueryPage() {
-  const { data } = useQuery(todosQueryOptions)
+  const { data } = useQuery(todosQueryOptions);
 
   return (
     <article className={styles.demoCard}>
@@ -36,5 +39,5 @@ function TanStackQueryPage() {
         </ul>
       </div>
     </article>
-  )
+  );
 }

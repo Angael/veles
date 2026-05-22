@@ -1,4 +1,4 @@
-import type { ErrorComponentProps } from '@tanstack/react-router'
+import type { ErrorComponentProps } from '@tanstack/react-router';
 
 export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
   return (
@@ -6,5 +6,5 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
       <h1>Something failed</h1>
       <p>{error.message || 'Unexpected error'}</p>
     </main>
-  )
+  );
 }

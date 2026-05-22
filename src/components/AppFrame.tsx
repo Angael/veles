@@ -1,7 +1,7 @@
-import { Outlet } from '@tanstack/react-router'
-import { NavMenu } from '@/components/NavMenu'
-import { clientEnv } from '@/lib/env/client'
-import styles from '@/styles/app.module.css'
+import { Outlet } from '@tanstack/react-router';
+import { NavMenu } from '@/components/NavMenu';
+import { clientEnv } from '@/lib/env/client';
+import styles from '@/styles/app.module.css';
 
 export function AppFrame() {
   return (
@@ -17,5 +17,5 @@ export function AppFrame() {
         <Outlet />
       </div>
     </div>
-  )
+  );
 }

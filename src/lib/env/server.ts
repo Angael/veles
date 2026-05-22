@@ -1,9 +1,9 @@
-const requiredServerEnv = ['DATABASE_URL', 'BETTER_AUTH_SECRET'] as const
+const requiredServerEnv = ['DATABASE_URL', 'BETTER_AUTH_SECRET'] as const;
 
 export function getServerEnv() {
   for (const key of requiredServerEnv) {
     if (!process.env[key]) {
-      throw new Error(`Missing required environment variable: ${key}`)
+      throw new Error(`Missing required environment variable: ${key}`);
     }
   }
 
@@ -19,5 +19,5 @@ export function getServerEnv() {
     r2SecretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
     r2BucketName: process.env.R2_BUCKET_NAME,
     r2PublicUrl: process.env.R2_PUBLIC_URL,
-  }
+  };
 }

@@ -1,7 +1,7 @@
-import { getServerEnv } from '@/lib/env/server'
+import { getServerEnv } from '@/lib/env/server';
 
 export function getStorageConfig() {
-  const env = getServerEnv()
+  const env = getServerEnv();
 
   return {
     accountId: env.r2AccountId,
@@ -9,15 +9,15 @@ export function getStorageConfig() {
     secretAccessKey: env.r2SecretAccessKey,
     bucketName: env.r2BucketName,
     publicUrl: env.r2PublicUrl || env.cdnUrl,
-  }
+  };
 }
 
 export function storagePathToUrl(path: string | null | undefined) {
-  const { publicUrl } = getStorageConfig()
+  const { publicUrl } = getStorageConfig();
 
   if (!path || !publicUrl) {
-    return null
+    return null;
   }
 
-  return `${publicUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`
+  return `${publicUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
 }

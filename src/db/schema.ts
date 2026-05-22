@@ -1,4 +1,4 @@
-import { boolean, index, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import { boolean, index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('user', {
   id: text('id').primaryKey(),
@@ -8,7 +8,7 @@ export const users = pgTable('user', {
   image: text('image'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-})
+});
 
 export const sessions = pgTable(
   'session',
@@ -25,7 +25,7 @@ export const sessions = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
   },
   (table) => [index('session_user_id_idx').on(table.userId)],
-)
+);
 
 export const accounts = pgTable(
   'account',
@@ -47,7 +47,7 @@ export const accounts = pgTable(
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
   },
   (table) => [index('account_user_id_idx').on(table.userId)],
-)
+);
 
 export const verifications = pgTable(
   'verification',
@@ -60,7 +60,7 @@ export const verifications = pgTable(
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
   },
   (table) => [index('verification_identifier_idx').on(table.identifier)],
-)
+);
 
 export const uploadObjects = pgTable(
   'upload_object',
@@ -73,4 +73,4 @@ export const uploadObjects = pgTable(
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (table) => [index('upload_object_user_id_idx').on(table.userId)],
-)
+);

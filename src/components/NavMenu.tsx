@@ -1,6 +1,6 @@
-import { NavigationMenu } from '@base-ui/react/navigation-menu'
-import { Link, useRouterState } from '@tanstack/react-router'
-import styles from '@/styles/app.module.css'
+import { NavigationMenu } from '@base-ui/react/navigation-menu';
+import { Link, useRouterState } from '@tanstack/react-router';
+import styles from '@/styles/app.module.css';
 
 const links = [
   { to: '/', label: 'Home' },
@@ -13,18 +13,18 @@ const links = [
   { to: '/demo/start/server-funcs', label: 'Server Functions' },
   { to: '/demo/start/api-request', label: 'API Route' },
   { to: '/demo/tanstack-query', label: 'TanStack Query' },
-] as const
+] as const;
 
 export function NavMenu() {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
-  })
+  });
 
   return (
     <NavigationMenu.Root className={styles.navRoot}>
       <NavigationMenu.List className={styles.navList}>
         {links.map((link) => {
-          const active = pathname === link.to
+          const active = pathname === link.to;
 
           return (
             <NavigationMenu.Item key={link.to}>
@@ -32,9 +32,9 @@ export function NavMenu() {
                 <Link to={link.to as never}>{link.label}</Link>
               </NavigationMenu.Link>
             </NavigationMenu.Item>
-          )
+          );
         })}
       </NavigationMenu.List>
     </NavigationMenu.Root>
-  )
+  );
 }

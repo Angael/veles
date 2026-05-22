@@ -1,18 +1,14 @@
 /// <reference types="vite/client" />
-import type { QueryClient } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import {
-  HeadContent,
-  Scripts,
-  createRootRouteWithContext,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import * as React from 'react'
-import { AppFrame } from '@/components/AppFrame'
-import { DefaultCatchBoundary } from '@/components/DefaultCatchBoundary'
-import { NotFound } from '@/components/NotFound'
-import { clientEnv } from '@/lib/env/client'
-import resetCss from '@/styles/reset.css?url'
+import type { QueryClient } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import * as React from 'react';
+import { AppFrame } from '@/components/AppFrame';
+import { DefaultCatchBoundary } from '@/components/DefaultCatchBoundary';
+import { NotFound } from '@/components/NotFound';
+import { clientEnv } from '@/lib/env/client';
+import resetCss from '@/styles/reset.css?url';
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -22,7 +18,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: `${clientEnv.appName} | Fresh Start` },
       {
         name: 'description',
-        content: 'Minimal TanStack Start app with Better Auth, Drizzle/Postgres, Base UI, and R2-ready env scaffolding.',
+        content:
+          'Minimal TanStack Start app with Better Auth, Drizzle/Postgres, Base UI, and R2-ready env scaffolding.',
       },
     ],
     links: [{ rel: 'stylesheet', href: resetCss }],
@@ -34,14 +31,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   ),
   notFoundComponent: () => <NotFound />,
   component: RootComponent,
-})
+});
 
 function RootComponent() {
   return (
     <RootDocument>
       <AppFrame />
     </RootDocument>
-  )
+  );
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
@@ -57,5 +54,5 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }

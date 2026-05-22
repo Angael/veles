@@ -1,20 +1,21 @@
-import type * as React from 'react'
-import styles from '@/styles/app.module.css'
+import type * as React from 'react';
+import styles from '@/styles/app.module.css';
 
 type AuthCardProps = {
-  title: string
-  description: string
-  submitLabel: string
-  footer: React.ReactNode
-  onSubmit: (formData: FormData) => Promise<void>
-  onGoogle?: () => Promise<void>
-  busy: boolean
-  error: string | null
-  fields: React.ReactNode
-}
+  title: string;
+  description: string;
+  submitLabel: string;
+  footer: React.ReactNode;
+  onSubmit: (formData: FormData) => Promise<void>;
+  onGoogle?: () => Promise<void>;
+  busy: boolean;
+  error: string | null;
+  fields: React.ReactNode;
+};
 
 export function AuthCard(props: AuthCardProps) {
-  const { busy, description, error, fields, footer, onGoogle, onSubmit, submitLabel, title } = props
+  const { busy, description, error, fields, footer, onGoogle, onSubmit, submitLabel, title } =
+    props;
 
   return (
     <section className={styles.authShell}>
@@ -28,9 +29,9 @@ export function AuthCard(props: AuthCardProps) {
         <form
           className={styles.authForm}
           onSubmit={async (event: React.FormEvent<HTMLFormElement>) => {
-            event.preventDefault()
-            const formData = new FormData(event.currentTarget)
-            await onSubmit(formData)
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            await onSubmit(formData);
           }}
         >
           {fields}
@@ -42,12 +43,17 @@ export function AuthCard(props: AuthCardProps) {
 
         <div className={styles.authDivider}>or</div>
 
-        <button className={styles.secondaryButton} disabled={busy || !onGoogle} onClick={() => void onGoogle?.()} type='button'>
+        <button
+          className={styles.secondaryButton}
+          disabled={busy || !onGoogle}
+          onClick={() => void onGoogle?.()}
+          type='button'
+        >
           Continue with Google
         </button>
 
         <div className={styles.authFooter}>{footer}</div>
       </div>
     </section>
-  )
+  );
 }

@@ -1,9 +1,9 @@
-import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
-import styles from '@/styles/app.module.css'
+import { Link, Outlet, createFileRoute } from '@tanstack/react-router';
+import styles from '@/styles/app.module.css';
 
 export const Route = createFileRoute('/demo/start/ssr/')({
   component: SsrLayout,
-})
+});
 
 function SsrLayout() {
   return (
@@ -26,5 +26,5 @@ function SsrLayout() {
       </article>
       <Outlet />
     </section>
-  )
+  );
 }

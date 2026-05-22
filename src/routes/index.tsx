@@ -1,5 +1,5 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
-import styles from '@/styles/app.module.css'
+import { Link, createFileRoute } from '@tanstack/react-router';
+import styles from '@/styles/app.module.css';
 
 const demoCards = [
   {
@@ -32,11 +32,11 @@ const demoCards = [
     to: '/demo/tanstack-query',
     description: 'Shows query hydration and route-driven prefetching.',
   },
-] as const
+] as const;
 
 export const Route = createFileRoute('/')({
   component: HomePage,
-})
+});
 
 function HomePage() {
   return (
@@ -46,7 +46,8 @@ function HomePage() {
           <p className={styles.eyebrow}>Stage 3 foundation</p>
           <h1>Fresh TanStack Start, stripped to the useful parts.</h1>
           <p>
-            This reset keeps auth, Postgres/Drizzle, and R2-oriented storage config while removing the old product, media, food, queue, and styling layers.
+            This reset keeps auth, Postgres/Drizzle, and R2-oriented storage config while removing
+            the old product, media, food, queue, and styling layers.
           </p>
           <div className={styles.ctaRow}>
             <Link className={styles.primaryButton} to={'/login' as never}>
@@ -82,5 +83,5 @@ function HomePage() {
         ))}
       </section>
     </main>
-  )
+  );
 }

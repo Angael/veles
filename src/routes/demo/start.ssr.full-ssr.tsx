@@ -1,21 +1,21 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
-import styles from '@/styles/app.module.css'
+import { createFileRoute } from '@tanstack/react-router';
+import { createServerFn } from '@tanstack/react-start';
+import styles from '@/styles/app.module.css';
 
 const getServerTime = createServerFn({ method: 'GET' }).handler(async () => {
   return {
     renderedAt: new Date().toISOString(),
     mode: 'full-ssr',
-  }
-})
+  };
+});
 
 export const Route = createFileRoute('/demo/start/ssr/full-ssr')({
   loader: () => getServerTime(),
   component: FullSsrPage,
-})
+});
 
 function FullSsrPage() {
-  const data = Route.useLoaderData() as Awaited<ReturnType<typeof getServerTime>>
+  const data = Route.useLoaderData() as Awaited<ReturnType<typeof getServerTime>>;
 
   return (
     <article className={styles.demoCard}>
@@ -28,5 +28,5 @@ function FullSsrPage() {
         </div>
       </div>
     </article>
-  )
+  );
 }
