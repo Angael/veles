@@ -1,76 +1,86 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { Image, Video, Zap } from 'lucide-react';
+import { Link, createFileRoute } from '@tanstack/react-router'
+import styles from '@/styles/app.module.css'
+
+const demoCards = [
+  {
+    title: 'SPA mode',
+    to: '/demo/start/ssr/spa-mode',
+    description: 'Route code runs mostly like a client app with Start still handling the shell.',
+  },
+  {
+    title: 'Full SSR',
+    to: '/demo/start/ssr/full-ssr',
+    description: 'Loader-backed route showing the server-rendered path clearly.',
+  },
+  {
+    title: 'Data only',
+    to: '/demo/start/ssr/data-only',
+    description: 'Minimal server data delivery without extra visual noise.',
+  },
+  {
+    title: 'Server functions',
+    to: '/demo/start/server-funcs',
+    description: 'Shows `createServerFn` for per-request server code.',
+  },
+  {
+    title: 'API request',
+    to: '/demo/start/api-request',
+    description: 'Shows a plain Start API route and client fetch usage.',
+  },
+  {
+    title: 'TanStack Query',
+    to: '/demo/tanstack-query',
+    description: 'Shows query hydration and route-driven prefetching.',
+  },
+] as const
 
 export const Route = createFileRoute('/')({
-	component: App,
-});
+  component: HomePage,
+})
 
-function App() {
-	const features = [
-		{
-			icon: <Image className='w-12 h-12 text-violet-400' />,
-			title: 'Image Management',
-			description:
-				'Store and manage your images with automatic thumbnail generation and optimization.',
-		},
-		{
-			icon: <Video className='w-12 h-12 text-violet-400' />,
-			title: 'Video Support',
-			description:
-				'Upload and stream videos with poster thumbnails for instant preview.',
-		},
-		{
-			icon: <Zap className='w-12 h-12 text-violet-400' />,
-			title: 'Fast & Efficient',
-			description:
-				'Built with modern technologies for optimal performance and reliability.',
-		},
-	];
+function HomePage() {
+  return (
+    <main>
+      <section className={styles.hero}>
+        <article className={styles.heroCard}>
+          <p className={styles.eyebrow}>Stage 3 foundation</p>
+          <h1>Fresh TanStack Start, stripped to the useful parts.</h1>
+          <p>
+            This reset keeps auth, Postgres/Drizzle, and R2-oriented storage config while removing the old product, media, food, queue, and styling layers.
+          </p>
+          <div className={styles.ctaRow}>
+            <Link className={styles.primaryButton} to={'/login' as never}>
+              Open login
+            </Link>
+            <Link className={styles.secondaryButton} to={'/signup' as never}>
+              Create account
+            </Link>
+          </div>
+        </article>
 
-	return (
-		<div className='min-h-screen bg-zinc-950'>
-			<section className='relative py-20 px-6 text-center overflow-hidden'>
-				<div className='absolute inset-0 bg-gradient-to-b from-violet-500/5 via-fuchsia-500/5 to-transparent'></div>
-				<div className='relative max-w-5xl mx-auto'>
-					<h1 className='text-6xl md:text-7xl font-black text-white mb-6'>
-						<span className='text-violet-400'>Veles</span>
-					</h1>
-					<p className='text-2xl md:text-3xl text-gray-300 mb-4 font-light'>
-						Media Management Platform
-					</p>
-					<p className='text-lg text-gray-400 max-w-3xl mx-auto mb-8'>
-						A modern platform for storing, managing, and sharing your images and
-						videos with automatic optimization and thumbnail generation.
-					</p>
-					<div className='flex flex-col items-center gap-4'>
-						<a
-							href='/media'
-							className='px-8 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-lg transition-colors shadow-lg shadow-violet-500/50'
-						>
-							Browse Media
-						</a>
-					</div>
-				</div>
-			</section>
+        <aside className={styles.panel}>
+          <h2>What survived the reset</h2>
+          <ul>
+            <li>Fresh Better Auth with email/password and Google.</li>
+            <li>Fresh Drizzle + Postgres foundation.</li>
+            <li>R2/S3 env scaffolding and path-to-public-url helper.</li>
+            <li>Base UI plus CSS modules instead of Tailwind and shadcn.</li>
+          </ul>
+        </aside>
+      </section>
 
-			<section className='py-16 px-6 max-w-7xl mx-auto'>
-				<div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-					{features.map((feature, index) => (
-						<div
-							key={index}
-							className='bg-zinc-900 border border-violet-900/20 rounded-xl p-6 hover:border-violet-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/10'
-						>
-							<div className='mb-4'>{feature.icon}</div>
-							<h3 className='text-xl font-semibold text-white mb-3'>
-								{feature.title}
-							</h3>
-							<p className='text-gray-400 leading-relaxed'>
-								{feature.description}
-							</p>
-						</div>
-					))}
-				</div>
-			</section>
-		</div>
-	);
+      <section className={styles.grid}>
+        {demoCards.map((card) => (
+          <article className={styles.demoCard} key={card.to}>
+            <div className={styles.demoMeta}>Reference route</div>
+            <h2>{card.title}</h2>
+            <p>{card.description}</p>
+            <Link className={styles.linkButton} to={card.to as never}>
+              View route
+            </Link>
+          </article>
+        ))}
+      </section>
+    </main>
+  )
 }

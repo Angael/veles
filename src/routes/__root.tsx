@@ -1,67 +1,61 @@
-import { TanStackDevtools } from '@tanstack/react-devtools';
-import type { QueryClient } from '@tanstack/react-query';
+/// <reference types="vite/client" />
+import type { QueryClient } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import {
-	createRootRouteWithContext,
-	HeadContent,
-	Scripts,
-} from '@tanstack/react-router';
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
-import Header from '../components/Header';
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
-import appCss from '../styles.css?url';
+  HeadContent,
+  Scripts,
+  createRootRouteWithContext,
+} from '@tanstack/react-router'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import * as React from 'react'
+import { AppFrame } from '@/components/AppFrame'
+import { DefaultCatchBoundary } from '@/components/DefaultCatchBoundary'
+import { NotFound } from '@/components/NotFound'
+import { clientEnv } from '@/lib/env/client'
+import resetCss from '@/styles/reset.css?url'
 
-interface MyRouterContext {
-	queryClient: QueryClient;
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  head: () => ({
+    meta: [
+      { charSet: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { title: `${clientEnv.appName} | Fresh Start` },
+      {
+        name: 'description',
+        content: 'Minimal TanStack Start app with Better Auth, Drizzle/Postgres, Base UI, and R2-ready env scaffolding.',
+      },
+    ],
+    links: [{ rel: 'stylesheet', href: resetCss }],
+  }),
+  errorComponent: (props) => (
+    <RootDocument>
+      <DefaultCatchBoundary {...props} />
+    </RootDocument>
+  ),
+  notFoundComponent: () => <NotFound />,
+  component: RootComponent,
+})
+
+function RootComponent() {
+  return (
+    <RootDocument>
+      <AppFrame />
+    </RootDocument>
+  )
 }
 
-export const Route = createRootRouteWithContext<MyRouterContext>()({
-	head: () => ({
-		meta: [
-			{
-				charSet: 'utf-8',
-			},
-			{
-				name: 'viewport',
-				content: 'width=device-width, initial-scale=1',
-			},
-			{
-				title: 'TanStack Start Starter',
-			},
-		],
-		links: [
-			{
-				rel: 'stylesheet',
-				href: appCss,
-			},
-		],
-	}),
-
-	shellComponent: RootDocument,
-});
-
 function RootDocument({ children }: { children: React.ReactNode }) {
-	return (
-		<html lang='en' className='dark'>
-			<head>
-				<HeadContent />
-			</head>
-			<body className='bg-zinc-950 text-white'>
-				<Header />
-				{children}
-				<TanStackDevtools
-					config={{
-						position: 'bottom-right',
-					}}
-					plugins={[
-						{
-							name: 'Tanstack Router',
-							render: <TanStackRouterDevtoolsPanel />,
-						},
-						TanStackQueryDevtools,
-					]}
-				/>
-				<Scripts />
-			</body>
-		</html>
-	);
+  return (
+    <html lang='en'>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {children}
+        <TanStackRouterDevtools position='bottom-right' />
+        <ReactQueryDevtools buttonPosition='bottom-left' />
+        <Scripts />
+      </body>
+    </html>
+  )
 }

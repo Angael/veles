@@ -1,45 +1,33 @@
-import { useQuery } from '@tanstack/react-query';
-
-import { createFileRoute } from '@tanstack/react-router';
-
-function getNames() {
-	return fetch('/demo/api/names').then(
-		(res) => res.json() as Promise<string[]>,
-	);
-}
+import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
+import styles from '@/styles/app.module.css'
 
 export const Route = createFileRoute('/demo/start/api-request')({
-	component: Home,
-});
+  component: ApiRequestPage,
+})
 
-function Home() {
-	const { data: names = [] } = useQuery({
-		queryKey: ['names'],
-		queryFn: getNames,
-	});
+function ApiRequestPage() {
+  const [result, setResult] = useState<string>('Not fetched yet')
 
-	return (
-		<div
-			className='flex items-center justify-center min-h-screen p-4 text-white'
-			style={{
-				backgroundColor: '#000',
-				backgroundImage:
-					'radial-gradient(ellipse 60% 60% at 0% 100%, #444 0%, #222 60%, #000 100%)',
-			}}
-		>
-			<div className='w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10'>
-				<h1 className='text-2xl mb-4'>Start API Request Demo - Names List</h1>
-				<ul className='mb-4 space-y-2'>
-					{names.map((name) => (
-						<li
-							key={name}
-							className='bg-white/10 border border-white/20 rounded-lg p-3 backdrop-blur-sm shadow-md'
-						>
-							<span className='text-lg text-white'>{name}</span>
-						</li>
-					))}
-				</ul>
-			</div>
-		</div>
-	);
+  return (
+    <article className={styles.demoCard}>
+      <div className={styles.demoBody}>
+        <span className={styles.demoBadge}>server route fetch</span>
+        <h1>API request route</h1>
+        <p>This pairs with a plain TanStack Start API route under `/api/demo/ping`.</p>
+        <button
+          className={styles.primaryButton}
+          onClick={async () => {
+            const response = await fetch('/api/demo/ping')
+            const data = (await response.json()) as { message: string; timestamp: string }
+            setResult(`${data.message} at ${data.timestamp}`)
+          }}
+          type='button'
+        >
+          Fetch API route
+        </button>
+        <div className={styles.demoResult}>{result}</div>
+      </div>
+    </article>
+  )
 }

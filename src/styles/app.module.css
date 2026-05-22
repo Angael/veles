@@ -1,0 +1,284 @@
+.page {
+  min-height: 100vh;
+  color: #e8ecf7;
+  background:
+    radial-gradient(circle at top, rgba(96, 165, 250, 0.18), transparent 28%),
+    linear-gradient(180deg, #060816 0%, #0f172a 48%, #111827 100%);
+}
+
+.shell {
+  width: min(1100px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1rem 0 4rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0 2rem;
+}
+
+.brand {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.brand strong {
+  font-size: 1.05rem;
+}
+
+.brand span {
+  color: #9fb0d0;
+  font-size: 0.9rem;
+}
+
+.navRoot {
+  overflow-x: auto;
+}
+
+.navList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navLink,
+.navLinkActive {
+  display: inline-flex;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.navLink a,
+.navLinkActive a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0.95rem;
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navLinkActive {
+  border-color: rgba(96, 165, 250, 0.75);
+  background: rgba(37, 99, 235, 0.25);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.heroCard,
+.panel,
+.authCard,
+.demoCard {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.35);
+}
+
+.heroCard {
+  padding: 2rem;
+}
+
+.heroCard h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  line-height: 0.95;
+}
+
+.heroCard p,
+.panel p,
+.authHeader p,
+.demoBody p,
+.demoBody li {
+  color: #b5c0d9;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  color: #7dd3fc;
+}
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.primaryButton,
+.secondaryButton,
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primaryButton {
+  border: none;
+  color: white;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+}
+
+.secondaryButton,
+.linkButton {
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  color: #e8ecf7;
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.panel {
+  padding: 1.5rem;
+}
+
+.panel ul,
+.demoBody ul {
+  padding-left: 1.2rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.demoCard {
+  padding: 1.25rem;
+}
+
+.demoCard h2,
+.panel h2,
+.authHeader h1,
+.demoBody h1 {
+  margin-top: 0;
+}
+
+.demoMeta {
+  color: #7dd3fc;
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.authShell {
+  display: grid;
+  place-items: center;
+  min-height: calc(100vh - 11rem);
+}
+
+.authCard {
+  width: min(460px, 100%);
+  padding: 1.5rem;
+}
+
+.authHeader {
+  margin-bottom: 1.25rem;
+}
+
+.authForm {
+  display: grid;
+  gap: 1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.field label {
+  font-size: 0.92rem;
+  color: #c7d2fe;
+}
+
+.field input {
+  min-height: 44px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 14px;
+  padding: 0.75rem 0.9rem;
+  color: #f8fafc;
+  background: rgba(2, 6, 23, 0.55);
+}
+
+.authDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem 0;
+  color: #94a3b8;
+}
+
+.authFooter {
+  margin-top: 1rem;
+  color: #b5c0d9;
+}
+
+.authFooter a {
+  color: #7dd3fc;
+}
+
+.errorBox {
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.35);
+  border: 1px solid rgba(248, 113, 113, 0.35);
+}
+
+.demoPage {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.demoBody {
+  padding: 1.5rem;
+}
+
+.demoBadge {
+  display: inline-flex;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.18);
+  color: #bfdbfe;
+  font-size: 0.82rem;
+}
+
+.demoResult {
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(2, 6, 23, 0.5);
+}
+
+@media (max-width: 900px) {
+  .hero,
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

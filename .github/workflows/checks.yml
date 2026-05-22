@@ -9,9 +9,6 @@ on:
 jobs:
   checks:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
 
     steps:
       - name: Checkout code
@@ -29,92 +26,19 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
-      - name: Run Biome check (lint + format)
-        id: check
-        run: pnpm check
-        continue-on-error: true
+      - name: Check formatting
+        run: pnpm format:check
 
-      - name: Run TypeScript check
-        id: typecheck
-        run: pnpm ts
-        continue-on-error: true
+      - name: Check types
+        run: pnpm typecheck
 
       - name: Run tests
-        id: test
         run: pnpm test
-        continue-on-error: true
 
-      - name: Run build
-        id: build
+      - name: Build app
         run: pnpm build
-        continue-on-error: true
 
-      - name: Set check statuses
-        if: always()
-        id: statuses
-        run: |
-          check_status="${{ steps.check.outcome }}"
-          typecheck_status="${{ steps.typecheck.outcome }}"
-          test_status="${{ steps.test.outcome }}"
-          build_status="${{ steps.build.outcome }}"
-
-          if [ "$check_status" = "success" ]; then
-            check_emoji="✅"
-          else
-            check_emoji="❌"
-          fi
-
-          if [ "$typecheck_status" = "success" ]; then
-            typecheck_emoji="✅"
-          else
-            typecheck_emoji="❌"
-          fi
-
-          if [ "$test_status" = "success" ]; then
-            test_emoji="✅"
-          else
-            test_emoji="❌"
-          fi
-
-          if [ "$build_status" = "success" ]; then
-            build_emoji="✅"
-          else
-            build_emoji="❌"
-          fi
-
-          echo "check_emoji=$check_emoji" >> $GITHUB_OUTPUT
-          echo "typecheck_emoji=$typecheck_emoji" >> $GITHUB_OUTPUT
-          echo "test_emoji=$test_emoji" >> $GITHUB_OUTPUT
-          echo "build_emoji=$build_emoji" >> $GITHUB_OUTPUT
-
-          if [ "$check_status" = "success" ] && [ "$typecheck_status" = "success" ] && [ "$test_status" = "success" ] && [ "$build_status" = "success" ]; then
-            echo "all_passed=true" >> $GITHUB_OUTPUT
-          else
-            echo "all_passed=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Comment PR
-        if: always() && github.event_name == 'pull_request'
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: checks
-          message: |
-            ## Checks Results
-
-            ${{ steps.statuses.outputs.check_emoji }} **Biome Check** (lint + format)
-            ${{ steps.statuses.outputs.typecheck_emoji }} **TypeScript**
-            ${{ steps.statuses.outputs.test_emoji }} **Tests**
-            ${{ steps.statuses.outputs.build_emoji }} **Build**
-
-            ---
-            ${{ steps.statuses.outputs.all_passed == 'true' && '✨ All checks passed!' || '⚠️ Some checks failed. Please review the logs above.' }}
-
-      - name: Fail if any check failed
-        if: always()
-        run: |
-          if [ "${{ steps.statuses.outputs.all_passed }}" != "true" ]; then
-            echo "One or more checks failed"
-            exit 1
-          fi
+      - name: Audit production deps
+        run: pnpm audit --prod --audit-level=high

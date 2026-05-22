@@ -1,18 +1,14 @@
-import { defineConfig } from "drizzle-kit";
+import { defineConfig } from 'drizzle-kit'
 
-export const createDrizzleConfig = (dbUrl?: string) => {
-	if (!dbUrl) {
-		throw new Error("dbUrl is not defined in environment variables");
-	}
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is required for Drizzle operations')
+}
 
-	return defineConfig({
-		out: "./drizzle",
-		schema: "./src/db/schema.ts",
-		dialect: "postgresql",
-		dbCredentials: {
-			url: dbUrl,
-		},
-	});
-};
-
-export default createDrizzleConfig(process.env.DATABASE_URL);
+export default defineConfig({
+  out: './drizzle',
+  schema: './src/db/schema.ts',
+  dialect: 'postgresql',
+  dbCredentials: {
+    url: process.env.DATABASE_URL,
+  },
+})
