@@ -1,6 +1,8 @@
+import { Avatar } from '@base-ui/react/avatar';
 import { NavigationMenu } from '@base-ui/react/navigation-menu';
 import type { ComponentProps } from 'react';
 import { Link, useRouterState } from '@tanstack/react-router';
+import { useSession } from '@/lib/auth/client';
 import css from './NavMenu.module.css';
 
 const menuGroups = [
@@ -67,6 +69,9 @@ export function NavMenu() {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
+  const { data: session } = useSession();
+  const user = session?.user;
+  const accountInitials = getInitials(user?.name ?? user?.email ?? 'Account');
 
   return (
     <NavigationMenu.Root className={css.navRoot}>
@@ -77,6 +82,20 @@ export function NavMenu() {
           return (
             <NavigationMenu.Item key={group.label}>
               <NavigationMenu.Trigger className={active ? css.navTriggerActive : css.navTrigger}>
+                {group.label === 'Account' ? (
+                  <Avatar.Root className={css.accountAvatar}>
+                    {user?.image ? (
+                      <Avatar.Image
+                        src={user.image}
+                        alt={user.name ?? user.email ?? 'Account avatar'}
+                        className={css.accountAvatarImage}
+                      />
+                    ) : null}
+                    <Avatar.Fallback className={css.accountAvatarFallback}>
+                      {accountInitials}
+                    </Avatar.Fallback>
+                  </Avatar.Root>
+                ) : null}
                 {group.label}
                 <NavigationMenu.Icon className={css.navIcon}>
                   <CaretDownIcon />
@@ -143,6 +162,26 @@ function CaretDownIcon(props: ComponentProps<'svg'>) {
       <path d='M12 6H4l4 4.5z' />
     </svg>
   );
+}
+
+function getInitials(value: string) {
+  const parts = value.trim().split(/\s+/).filter(Boolean);
+
+  if (parts.length > 1) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  const compact = parts[0] ?? value.trim();
+
+  if (!compact) {
+    return 'A';
+  }
+
+  if (compact.includes('@')) {
+    return compact.slice(0, 2).toUpperCase();
+  }
+
+  return compact.slice(0, 2).toUpperCase();
 }
 
 type MenuLinkProps = Omit<NavigationMenu.Link.Props, 'render'> & {
