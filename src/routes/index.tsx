@@ -34,7 +34,7 @@ function HomePage() {
     <main className={css.layout}>
       <article className={css.hero}>
         <div className={css.heroContent}>
-          <p className='eyebrow'>Private app</p>
+          <p className={css.eyebrow}>Private app</p>
           <h1>Veles</h1>
           <p>Private place for workouts, body weight, food logging, and shared personal files.</p>
           <div className={css.buttonRow}>

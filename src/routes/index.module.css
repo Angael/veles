@@ -4,6 +4,14 @@
   gap: 1rem;
 }
 
+.eyebrow {
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  color: #7dd3fc;
+}
+
 .hero {
   position: relative;
   grid-column: span 2;
