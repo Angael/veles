@@ -10,6 +10,27 @@ import { NotFound } from '@/components/NotFound';
 import { clientEnv } from '@/lib/env/client';
 import resetCss from '@/styles/reset.css?url';
 
+const isLocalhostApp =
+  import.meta.env.DEV ||
+  clientEnv.appUrl.includes('://localhost') ||
+  clientEnv.appUrl.includes('://127.0.0.1');
+
+const faviconLinks = isLocalhostApp
+  ? [
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon-localhost.ico' },
+      { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32-localhost.png' },
+      { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16-localhost.png' },
+      { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon-localhost.png' },
+      { rel: 'manifest', href: '/site-localhost.webmanifest' },
+    ]
+  : [
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
+      { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
+      { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+      { rel: 'manifest', href: '/site.webmanifest' },
+    ];
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
@@ -22,7 +43,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           'Private place for workouts, body weight, food logging, and shared personal files.',
       },
     ],
-    links: [{ rel: 'stylesheet', href: resetCss }],
+    links: [{ rel: 'stylesheet', href: resetCss }, ...faviconLinks],
   }),
   errorComponent: (props) => (
     <RootDocument>
