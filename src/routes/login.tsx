@@ -6,8 +6,35 @@ import css from './auth.module.css';
 
 export const Route = createFileRoute('/login')({
   component: LoginPage,
+  pendingComponent: AuthPendingPage,
   ssr: false,
 });
+
+function AuthPendingPage() {
+  return (
+    <AuthCard
+      busy={true}
+      description='Loading sign-in form.'
+      error={null}
+      fields={
+        <>
+          <div className={css.field}>
+            <label htmlFor='pending-email'>Email</label>
+            <input autoComplete='email' disabled id='pending-email' type='email' />
+          </div>
+          <div className={css.field}>
+            <label htmlFor='pending-password'>Password</label>
+            <input disabled id='pending-password' type='password' />
+          </div>
+        </>
+      }
+      footer='Need an account? Sign up'
+      onSubmit={async () => {}}
+      submitLabel='Sign in'
+      title='Login'
+    />
+  );
+}
 
 function LoginPage() {
   const navigate = useNavigate();
