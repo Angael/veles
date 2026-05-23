@@ -1,4 +1,4 @@
-type LogLevel = 'info' | 'warn' | 'error';
+import pino from 'pino';
 
 type LogValue = string | number | boolean | null | undefined | LogRecord | LogValue[];
 
@@ -6,35 +6,28 @@ type LogRecord = {
   [key: string]: LogValue;
 };
 
-function write(level: LogLevel, event: string, data?: LogRecord) {
-  const entry = JSON.stringify({
-    level,
-    event,
-    ...data,
-    timestamp: new Date().toISOString(),
-  });
-
-  if (level === 'error') {
-    console.error(entry);
-    return;
-  }
-
-  if (level === 'warn') {
-    console.warn(entry);
-    return;
-  }
-
-  console.info(entry);
-}
+const baseLogger = pino({
+  level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+  messageKey: 'event',
+  timestamp: pino.stdTimeFunctions.isoTime,
+  formatters: {
+    level(label) {
+      return { level: label };
+    },
+    bindings() {
+      return {};
+    },
+  },
+});
 
 export const logger = {
   info(event: string, data?: LogRecord) {
-    write('info', event, data);
+    baseLogger.info(data || {}, event);
   },
   warn(event: string, data?: LogRecord) {
-    write('warn', event, data);
+    baseLogger.warn(data || {}, event);
   },
   error(event: string, data?: LogRecord) {
-    write('error', event, data);
+    baseLogger.error(data || {}, event);
   },
 };
