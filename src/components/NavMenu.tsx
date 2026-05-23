@@ -1,8 +1,8 @@
 import { Avatar } from '@base-ui/react/avatar';
 import { NavigationMenu } from '@base-ui/react/navigation-menu';
-import type { ComponentProps } from 'react';
-import { Link, useRouterState } from '@tanstack/react-router';
-import { useSession } from '@/lib/auth/client';
+import { useState, type ComponentProps } from 'react';
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
+import { signOut, useSession } from '@/lib/auth/client';
 import css from './NavMenu.module.css';
 
 const menuGroups = [
@@ -66,12 +66,41 @@ const menuGroups = [
 ] as const;
 
 export function NavMenu() {
+  const navigate = useNavigate();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
   const { data: session } = useSession();
   const user = session?.user;
+  const [logoutBusy, setLogoutBusy] = useState(false);
   const accountInitials = getInitials(user?.name ?? user?.email ?? 'Account');
+  const accountLinks = user
+    ? [
+        {
+          type: 'action' as const,
+          label: 'Logout',
+          description: 'Sign out of the current account.',
+        },
+      ]
+    : (menuGroups.find((group) => group.label === 'Account')?.links ?? []);
+
+  async function handleLogout() {
+    if (logoutBusy) {
+      return;
+    }
+
+    setLogoutBusy(true);
+
+    const result = await signOut();
+
+    setLogoutBusy(false);
+
+    if (result.error) {
+      return;
+    }
+
+    navigate({ to: '/login' as never });
+  }
 
   return (
     <NavigationMenu.Root className={css.navRoot}>
@@ -104,7 +133,25 @@ export function NavMenu() {
 
               <NavigationMenu.Content className={css.navContent}>
                 <ul className={css.navLinkList}>
-                  {group.links.map((link) => {
+                  {(group.label === 'Account' ? accountLinks : group.links).map((link) => {
+                    if ('type' in link) {
+                      return (
+                        <li key={link.label}>
+                          <button
+                            className={css.navCard}
+                            disabled={logoutBusy}
+                            onClick={handleLogout}
+                            type='button'
+                          >
+                            <h3 className={css.navCardTitle}>
+                              {logoutBusy ? 'Logging out...' : link.label}
+                            </h3>
+                            <p className={css.navCardDescription}>{link.description}</p>
+                          </button>
+                        </li>
+                      );
+                    }
+
                     const linkActive = pathname === link.to;
 
                     return (
