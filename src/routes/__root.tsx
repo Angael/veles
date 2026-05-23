@@ -18,7 +18,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: clientEnv.appName },
       {
         name: 'description',
-        content: 'Private workout, weight, food, and cloud storage app.',
+        content:
+          'Private place for workouts, body weight, food logging, and shared personal files.',
       },
     ],
     links: [{ rel: 'stylesheet', href: resetCss }],
@@ -48,8 +49,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
-        <TanStackRouterDevtools position='bottom-right' />
-        <ReactQueryDevtools buttonPosition='bottom-left' />
+        {import.meta.env.DEV ? (
+          <>
+            <TanStackRouterDevtools position='bottom-right' />
+            <ReactQueryDevtools buttonPosition='bottom-left' />
+          </>
+        ) : null}
         <Scripts />
       </body>
     </html>
