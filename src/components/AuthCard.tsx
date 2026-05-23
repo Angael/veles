@@ -1,5 +1,5 @@
 import type * as React from 'react';
-import styles from '@/styles/app.module.css';
+import css from './AuthCard.module.css';
 
 type AuthCardProps = {
   title: string;
@@ -18,16 +18,16 @@ export function AuthCard(props: AuthCardProps) {
     props;
 
   return (
-    <section className={styles.authShell}>
-      <div className={styles.authCard}>
-        <div className={styles.authHeader}>
-          <p className={styles.eyebrow}>Minimal auth</p>
+    <section className={css.authShell}>
+      <div className={css.authCard}>
+        <div className={css.authHeader}>
+          <p className={css.eyebrow}>Private access</p>
           <h1>{title}</h1>
           <p>{description}</p>
         </div>
 
         <form
-          className={styles.authForm}
+          className={css.authForm}
           onSubmit={async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
@@ -35,16 +35,16 @@ export function AuthCard(props: AuthCardProps) {
           }}
         >
           {fields}
-          {error ? <div className={styles.errorBox}>{error}</div> : null}
-          <button className={styles.primaryButton} disabled={busy} type='submit'>
+          {error ? <div className={css.errorBox}>{error}</div> : null}
+          <button className={css.primaryButton} disabled={busy} type='submit'>
             {busy ? 'Working...' : submitLabel}
           </button>
         </form>
 
-        <div className={styles.authDivider}>or</div>
+        <div className={css.authDivider}>or</div>
 
         <button
-          className={styles.secondaryButton}
+          className={css.secondaryButton}
           disabled={busy || !onGoogle}
           onClick={() => void onGoogle?.()}
           type='button'
@@ -52,7 +52,7 @@ export function AuthCard(props: AuthCardProps) {
           Continue with Google
         </button>
 
-        <div className={styles.authFooter}>{footer}</div>
+        <div className={css.authFooter}>{footer}</div>
       </div>
     </section>
   );

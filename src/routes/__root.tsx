@@ -15,11 +15,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: `${clientEnv.appName} | Fresh Start` },
+      { title: clientEnv.appName },
       {
         name: 'description',
-        content:
-          'Minimal TanStack Start app with Better Auth, Drizzle/Postgres, Base UI, and R2-ready env scaffolding.',
+        content: 'Private workout, weight, food, and cloud storage app.',
       },
     ],
     links: [{ rel: 'stylesheet', href: resetCss }],

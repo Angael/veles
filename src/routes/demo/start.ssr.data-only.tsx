@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
-import styles from '@/styles/app.module.css';
+import css from './demo.module.css';
 
 const getFacts = createServerFn({ method: 'GET' }).handler(async () => {
   return [
@@ -19,9 +19,9 @@ function DataOnlyPage() {
   const facts = Route.useLoaderData() as Awaited<ReturnType<typeof getFacts>>;
 
   return (
-    <article className={styles.demoCard}>
-      <div className={styles.demoBody}>
-        <span className={styles.demoBadge}>server data only</span>
+    <article className={css.card}>
+      <div className={css.body}>
+        <span className={css.badge}>server data only</span>
         <h1>Data-only route</h1>
         <ul>
           {facts.map((fact) => (

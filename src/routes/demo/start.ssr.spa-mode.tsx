@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import styles from '@/styles/app.module.css';
+import css from './demo.module.css';
 
 export const Route = createFileRoute('/demo/start/ssr/spa-mode')({
   component: SpaModePage,
@@ -8,14 +8,17 @@ export const Route = createFileRoute('/demo/start/ssr/spa-mode')({
 
 function SpaModePage() {
   return (
-    <article className={styles.demoCard}>
-      <div className={styles.demoBody}>
-        <span className={styles.demoBadge}>`ssr: false`</span>
+    <article className={css.card}>
+      <div className={css.body}>
+        <span className={css.badge}>`ssr: false`</span>
         <h1>SPA mode route</h1>
         <p>This file shows the simplest TanStack Start opt-out for route-level SSR.</p>
         <pre
-          className={styles.demoResult}
-        >{`export const Route = createFileRoute('/demo/start/ssr/spa-mode')({\n  component: SpaModePage,\n  ssr: false,\n})`}</pre>
+          className={css.result}
+        >{`export const Route = createFileRoute('/demo/start/ssr/spa-mode')({
+  component: SpaModePage,
+  ssr: false,
+})`}</pre>
       </div>
     </article>
   );

@@ -2,7 +2,7 @@ import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { AuthCard } from '@/components/AuthCard';
 import { signIn } from '@/lib/auth/client';
-import styles from '@/styles/app.module.css';
+import css from './auth.module.css';
 
 export const Route = createFileRoute('/login')({
   component: LoginPage,
@@ -16,15 +16,15 @@ function LoginPage() {
   return (
     <AuthCard
       busy={busy}
-      description='Use the same auth motive as before, but on the new stripped-down stack.'
+      description='Sign in to Veles.'
       error={error}
       fields={
         <>
-          <div className={styles.field}>
+          <div className={css.field}>
             <label htmlFor='email'>Email</label>
             <input autoComplete='email' id='email' name='email' required type='email' />
           </div>
-          <div className={styles.field}>
+          <div className={css.field}>
             <label htmlFor='password'>Password</label>
             <input
               autoComplete='current-password'

@@ -1,0 +1,40 @@
+.navRoot {
+  overflow-x: auto;
+}
+
+.navList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navLink,
+.navLinkActive {
+  display: inline-flex;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.navLink {
+  color: #e8ecf7;
+}
+
+.navLinkActive {
+  color: #e8ecf7;
+  border-color: rgba(96, 165, 250, 0.75);
+  background: rgba(37, 99, 235, 0.25);
+}
+
+.navLinkAnchor {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0.95rem;
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}

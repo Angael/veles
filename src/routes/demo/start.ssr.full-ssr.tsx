@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
-import styles from '@/styles/app.module.css';
+import css from './demo.module.css';
 
 const getServerTime = createServerFn({ method: 'GET' }).handler(async () => {
   return {
@@ -18,12 +18,12 @@ function FullSsrPage() {
   const data = Route.useLoaderData() as Awaited<ReturnType<typeof getServerTime>>;
 
   return (
-    <article className={styles.demoCard}>
-      <div className={styles.demoBody}>
-        <span className={styles.demoBadge}>loader + server fn</span>
+    <article className={css.card}>
+      <div className={css.body}>
+        <span className={css.badge}>loader + server fn</span>
         <h1>Full SSR route</h1>
         <p>The loader resolves on the server first, then hydrates on the client.</p>
-        <div className={styles.demoResult}>
+        <div className={css.result}>
           <strong>Rendered at:</strong> {data.renderedAt}
         </div>
       </div>

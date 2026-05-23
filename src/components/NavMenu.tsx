@@ -1,6 +1,6 @@
 import { NavigationMenu } from '@base-ui/react/navigation-menu';
 import { Link, useRouterState } from '@tanstack/react-router';
-import styles from '@/styles/app.module.css';
+import css from './NavMenu.module.css';
 
 const links = [
   { to: '/', label: 'Home' },
@@ -21,15 +21,19 @@ export function NavMenu() {
   });
 
   return (
-    <NavigationMenu.Root className={styles.navRoot}>
-      <NavigationMenu.List className={styles.navList}>
+    <NavigationMenu.Root className={css.navRoot}>
+      <NavigationMenu.List className={css.navList}>
         {links.map((link) => {
           const active = pathname === link.to;
 
           return (
             <NavigationMenu.Item key={link.to}>
-              <NavigationMenu.Link className={active ? styles.navLinkActive : styles.navLink}>
-                <Link to={link.to as never}>{link.label}</Link>
+              <NavigationMenu.Link
+                active={active}
+                className={active ? css.navLinkActive : css.navLink}
+                render={<Link className={css.navLinkAnchor} to={link.to as never} />}
+              >
+                {link.label}
               </NavigationMenu.Link>
             </NavigationMenu.Item>
           );

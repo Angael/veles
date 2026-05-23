@@ -1,36 +1,27 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
-import styles from '@/styles/app.module.css';
+import todoBoardUrl from '@/assets/todo-board.svg?url';
+import css from './index.module.css';
 
-const demoCards = [
+const featureCards = [
   {
-    title: 'SPA mode',
-    to: '/demo/start/ssr/spa-mode',
-    description: 'Route code runs mostly like a client app with Start still handling the shell.',
+    title: 'Workout tracker',
+    description: 'Track sessions, exercises, and notes across training blocks.',
+    accent: '01',
   },
   {
-    title: 'Full SSR',
-    to: '/demo/start/ssr/full-ssr',
-    description: 'Loader-backed route showing the server-rendered path clearly.',
+    title: 'Weight tracker',
+    description: 'Log body weight privately and watch long-term trends.',
+    accent: '02',
   },
   {
-    title: 'Data only',
-    to: '/demo/start/ssr/data-only',
-    description: 'Minimal server data delivery without extra visual noise.',
+    title: 'Food tracker',
+    description: 'Record meals, calories, and macros.',
+    accent: '03',
   },
   {
-    title: 'Server functions',
-    to: '/demo/start/server-funcs',
-    description: 'Shows `createServerFn` for per-request server code.',
-  },
-  {
-    title: 'API request',
-    to: '/demo/start/api-request',
-    description: 'Shows a plain Start API route and client fetch usage.',
-  },
-  {
-    title: 'TanStack Query',
-    to: '/demo/tanstack-query',
-    description: 'Shows query hydration and route-driven prefetching.',
+    title: 'Shared cloud storage',
+    description: 'Keep personal files in one place with upload-ready storage plumbing.',
+    accent: '04',
   },
 ] as const;
 
@@ -40,48 +31,31 @@ export const Route = createFileRoute('/')({
 
 function HomePage() {
   return (
-    <main>
-      <section className={styles.hero}>
-        <article className={styles.heroCard}>
-          <p className={styles.eyebrow}>Stage 3 foundation</p>
-          <h1>Fresh TanStack Start, stripped to the useful parts.</h1>
-          <p>
-            This reset keeps auth, Postgres/Drizzle, and R2-oriented storage config while removing
-            the old product, media, food, queue, and styling layers.
-          </p>
-          <div className={styles.ctaRow}>
-            <Link className={styles.primaryButton} to={'/login' as never}>
+    <main className={css.layout}>
+      <article className={css.hero}>
+        <div className={css.heroContent}>
+          <p className='eyebrow'>Private app</p>
+          <h1>Veles</h1>
+          <p>Private place for workouts, body weight, food logging, and shared personal files.</p>
+          <div className={css.buttonRow}>
+            <Link className={css.primaryButton} to={'/login' as never}>
               Open login
             </Link>
-            <Link className={styles.secondaryButton} to={'/signup' as never}>
+            <Link className={css.secondaryButton} to={'/signup' as never}>
               Create account
             </Link>
           </div>
+        </div>
+        <div className={css.heroImage} style={{ backgroundImage: `url(${todoBoardUrl})` }} />
+      </article>
+
+      {featureCards.map((card) => (
+        <article className={css.tile} key={card.title}>
+          <div className={css.tileAccent}>{card.accent}</div>
+          <h2>{card.title}</h2>
+          <p>{card.description}</p>
         </article>
-
-        <aside className={styles.panel}>
-          <h2>What survived the reset</h2>
-          <ul>
-            <li>Fresh Better Auth with email/password and Google.</li>
-            <li>Fresh Drizzle + Postgres foundation.</li>
-            <li>R2/S3 env scaffolding and path-to-public-url helper.</li>
-            <li>Base UI plus CSS modules instead of Tailwind and shadcn.</li>
-          </ul>
-        </aside>
-      </section>
-
-      <section className={styles.grid}>
-        {demoCards.map((card) => (
-          <article className={styles.demoCard} key={card.to}>
-            <div className={styles.demoMeta}>Reference route</div>
-            <h2>{card.title}</h2>
-            <p>{card.description}</p>
-            <Link className={styles.linkButton} to={card.to as never}>
-              View route
-            </Link>
-          </article>
-        ))}
-      </section>
+      ))}
     </main>
   );
 }

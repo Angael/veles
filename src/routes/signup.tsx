@@ -2,7 +2,7 @@ import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { AuthCard } from '@/components/AuthCard';
 import { signIn, signUp } from '@/lib/auth/client';
-import styles from '@/styles/app.module.css';
+import css from './auth.module.css';
 
 export const Route = createFileRoute('/signup')({
   component: SignupPage,
@@ -16,19 +16,19 @@ function SignupPage() {
   return (
     <AuthCard
       busy={busy}
-      description='Fresh install, same login options: email/password and Google.'
+      description='Create a Veles account.'
       error={error}
       fields={
         <>
-          <div className={styles.field}>
+          <div className={css.field}>
             <label htmlFor='name'>Name</label>
             <input autoComplete='name' id='name' name='name' required type='text' />
           </div>
-          <div className={styles.field}>
+          <div className={css.field}>
             <label htmlFor='email'>Email</label>
             <input autoComplete='email' id='email' name='email' required type='email' />
           </div>
-          <div className={styles.field}>
+          <div className={css.field}>
             <label htmlFor='password'>Password</label>
             <input
               autoComplete='new-password'

@@ -1,0 +1,136 @@
+.layout {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.hero {
+  position: relative;
+  grid-column: span 2;
+  grid-row: span 2;
+  overflow: hidden;
+  padding: 2rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.35);
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1rem;
+  max-width: 28rem;
+}
+
+.heroContent h1 {
+  margin: 0;
+  font-size: clamp(2.7rem, 7vw, 4.8rem);
+  line-height: 0.93;
+}
+
+.heroContent p {
+  margin: 0;
+  color: #b5c0d9;
+}
+
+.heroImage {
+  position: absolute;
+  right: -1rem;
+  bottom: -1rem;
+  width: min(46%, 320px);
+  aspect-ratio: 1;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.28;
+  filter: drop-shadow(0 30px 60px rgba(15, 23, 42, 0.5));
+}
+
+.buttonRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  text-decoration: none;
+}
+
+.primaryButton {
+  border: none;
+  color: white;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+}
+
+.secondaryButton {
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  color: #e8ecf7;
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.tile {
+  padding: 1.35rem;
+  min-height: 180px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.35);
+}
+
+.tile h2 {
+  margin: 0 0 0.75rem;
+}
+
+.tile p {
+  margin: 0;
+  color: #b5c0d9;
+}
+
+.tileAccent {
+  margin-bottom: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.18);
+  color: #bfdbfe;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 700px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    grid-column: span 1;
+  }
+
+  .heroImage {
+    width: min(52%, 240px);
+  }
+}
