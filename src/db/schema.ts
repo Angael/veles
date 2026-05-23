@@ -1,4 +1,4 @@
-import { boolean, index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { boolean, index, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('user', {
   id: text('id').primaryKey(),
@@ -46,7 +46,10 @@ export const accounts = pgTable(
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
   },
-  (table) => [index('account_user_id_idx').on(table.userId)],
+  (table) => [
+    index('account_user_id_idx').on(table.userId),
+    uniqueIndex('account_provider_id_account_id_idx').on(table.providerId, table.accountId),
+  ],
 );
 
 export const verifications = pgTable(
