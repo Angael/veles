@@ -6,16 +6,16 @@
 
 .authCard {
   width: min(460px, 100%);
-  padding: 1.5rem;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 24px;
-  background: rgba(15, 23, 42, 0.72);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.35);
+  padding: var(--space-4xl);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  backdrop-filter: var(--blur-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .authHeader {
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--space-2xl);
 }
 
 .authHeader h1 {
@@ -23,20 +23,20 @@
 }
 
 .authHeader p {
-  color: #b5c0d9;
+  color: var(--color-muted);
 }
 
 .eyebrow {
   margin: 0 0 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 0.75rem;
-  color: #7dd3fc;
+  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--text-xs);
+  color: var(--color-accent);
 }
 
 .authForm {
   display: grid;
-  gap: 1rem;
+  gap: var(--space-xl);
 }
 
 .primaryButton,
@@ -44,47 +44,47 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  border-radius: 14px;
-  padding: 0.75rem 1rem;
+  min-height: var(--button-min-height);
+  border-radius: var(--radius-sm);
+  padding: var(--space-lg) var(--space-xl);
   font: inherit;
   cursor: pointer;
 }
 
 .primaryButton {
   border: none;
-  color: white;
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  color: var(--color-primary-contrast);
+  background: var(--gradient-primary);
 }
 
 .secondaryButton {
   width: 100%;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  color: #e8ecf7;
-  background: rgba(15, 23, 42, 0.85);
+  border: var(--border-width) solid var(--color-border-strong);
+  color: var(--color-page);
+  background: var(--color-surface-strong);
 }
 
 .authDivider {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 1rem 0;
-  color: #94a3b8;
+  margin: var(--space-xl) 0;
+  color: var(--color-muted-strong);
 }
 
 .authFooter {
-  margin-top: 1rem;
-  color: #b5c0d9;
+  margin-top: var(--space-xl);
+  color: var(--color-muted);
 }
 
 .authFooter a {
-  color: #7dd3fc;
+  color: var(--color-accent);
 }
 
 .errorBox {
-  border-radius: 14px;
+  border-radius: var(--radius-sm);
   padding: 0.85rem 1rem;
-  color: #fecaca;
-  background: rgba(127, 29, 29, 0.35);
-  border: 1px solid rgba(248, 113, 113, 0.35);
+  color: var(--color-danger-text);
+  background: var(--color-danger-surface);
+  border: var(--border-width) solid var(--color-danger-border);
 }

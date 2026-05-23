@@ -1,15 +1,15 @@
 .layout {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
+  gap: var(--space-xl);
 }
 
 .eyebrow {
   margin: 0 0 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 0.75rem;
-  color: #7dd3fc;
+  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--text-xs);
+  color: var(--color-accent);
 }
 
 .hero {
@@ -17,31 +17,31 @@
   grid-column: span 2;
   grid-row: span 2;
   overflow: hidden;
-  padding: 2rem;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 24px;
-  background: rgba(15, 23, 42, 0.72);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.35);
+  padding: var(--space-5xl);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  backdrop-filter: var(--blur-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .heroContent {
   position: relative;
   z-index: 1;
   display: grid;
-  gap: 1rem;
+  gap: var(--space-xl);
   max-width: 28rem;
 }
 
 .heroContent h1 {
   margin: 0;
-  font-size: clamp(2.7rem, 7vw, 4.8rem);
+  font-size: var(--text-hero);
   line-height: 0.93;
 }
 
 .heroContent p {
   margin: 0;
-  color: #b5c0d9;
+  color: var(--color-muted);
 }
 
 .heroImage {
@@ -54,13 +54,13 @@
   background-repeat: no-repeat;
   background-size: contain;
   opacity: 0.28;
-  filter: drop-shadow(0 30px 60px rgba(15, 23, 42, 0.5));
+  filter: var(--shadow-image);
 }
 
 .buttonRow {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: var(--space-lg);
 }
 
 .primaryButton,
@@ -68,33 +68,33 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  border-radius: 14px;
-  padding: 0.75rem 1rem;
+  min-height: var(--button-min-height);
+  border-radius: var(--radius-sm);
+  padding: var(--space-lg) var(--space-xl);
   font: inherit;
   text-decoration: none;
 }
 
 .primaryButton {
   border: none;
-  color: white;
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  color: var(--color-primary-contrast);
+  background: var(--gradient-primary);
 }
 
 .secondaryButton {
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  color: #e8ecf7;
-  background: rgba(15, 23, 42, 0.85);
+  border: var(--border-width) solid var(--color-border-strong);
+  color: var(--color-page);
+  background: var(--color-surface-strong);
 }
 
 .tile {
   padding: 1.35rem;
   min-height: 180px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 24px;
-  background: rgba(15, 23, 42, 0.72);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.35);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  backdrop-filter: var(--blur-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .tile h2 {
@@ -103,7 +103,7 @@
 
 .tile p {
   margin: 0;
-  color: #b5c0d9;
+  color: var(--color-muted);
 }
 
 .tileAccent {
@@ -113,10 +113,10 @@
   justify-content: center;
   width: 2.3rem;
   height: 2.3rem;
-  border-radius: 999px;
-  background: rgba(37, 99, 235, 0.18);
-  color: #bfdbfe;
-  font-size: 0.82rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-surface);
+  color: var(--color-accent-soft);
+  font-size: var(--text-sm);
 }
 
 @media (max-width: 1000px) {

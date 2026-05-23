@@ -1,4 +1,4 @@
 - when using css modules, prefer name `import css from ...`
-- Never use Global CSS
+- Never use Global CSS, though this app uses global reset.css and theme.css
 - Run `pnpm check:fix` before finishing
 - pushing to main deploys to prod
