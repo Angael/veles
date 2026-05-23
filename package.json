@@ -27,6 +27,7 @@
     "@tanstack/react-router-devtools": "^1.167.0",
     "@tanstack/react-router-ssr-query": "^1.167.0",
     "@tanstack/react-start": "^1.168.10",
+    "arktype": "^2.2.0",
     "better-auth": "^1.6.11",
     "drizzle-orm": "^0.45.2",
     "pg": "^8.16.3",
