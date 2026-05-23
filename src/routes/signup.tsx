@@ -6,6 +6,7 @@ import css from './auth.module.css';
 
 export const Route = createFileRoute('/signup')({
   component: SignupPage,
+  ssr: false,
 });
 
 function SignupPage() {

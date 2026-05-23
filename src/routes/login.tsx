@@ -6,6 +6,7 @@ import css from './auth.module.css';
 
 export const Route = createFileRoute('/login')({
   component: LoginPage,
+  ssr: false,
 });
 
 function LoginPage() {
