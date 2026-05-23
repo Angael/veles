@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { useState } from 'react';
 import css from './demo.module.css';
-import console from 'console';
 
 const explainServerFn = createServerFn({ method: 'GET' }).handler(async () => {
   const requestId = crypto.randomUUID();
