@@ -10,15 +10,14 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "format": "oxfmt --write .",
-    "format:check": "oxfmt --check .",
-    "check": "pnpm format:check && pnpm typecheck && pnpm test",
+    "fmt": "oxfmt --write .",
+    "fmt:check": "oxfmt --check .",
+    "check": "pnpm fmt:check && pnpm typecheck && pnpm test",
+    "check:fix": "pnpm fmt && pnpm typecheck && pnpm test",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
-    "compose:dev": "docker compose -f docker-compose.dev.yml up",
-    "compose:dev:down": "docker compose -f docker-compose.dev.yml down"
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

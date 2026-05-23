@@ -1,5 +1,13 @@
 FROM node:22-alpine AS builder
 
+ARG VITE_APP_NAME=Veles
+ARG VITE_APP_URL=http://localhost:3000
+ARG VITE_CF_CDN_URL=https://cdn.example.com
+
+ENV VITE_APP_NAME=$VITE_APP_NAME
+ENV VITE_APP_URL=$VITE_APP_URL
+ENV VITE_CF_CDN_URL=$VITE_CF_CDN_URL
+
 RUN corepack enable && corepack prepare pnpm@10.28.1 --activate
 
 WORKDIR /app

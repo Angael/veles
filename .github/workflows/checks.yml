@@ -29,7 +29,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check formatting
-        run: pnpm format:check
+        run: pnpm fmt:check
 
       - name: Check types
         run: pnpm typecheck

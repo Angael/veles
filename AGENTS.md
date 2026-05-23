@@ -1,0 +1,4 @@
+- when using css modules, prefer name `import css from ...`
+- Never use Global CSS
+- Run `pnpm check:fix` before finishing
+- pushing to main deploys to prod
