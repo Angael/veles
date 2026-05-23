@@ -45,10 +45,17 @@ function LoginPage() {
       onGoogle={async () => {
         setBusy(true);
         setError(null);
-        await signIn.social({
-          provider: 'google',
-          callbackURL: '/',
-        });
+
+        try {
+          await signIn.social({
+            provider: 'google',
+            callbackURL: '/',
+          });
+        } catch (error) {
+          setError(error instanceof Error ? error.message : 'Google sign-in failed');
+        } finally {
+          setBusy(false);
+        }
       }}
       onSubmit={async (formData) => {
         setBusy(true);
