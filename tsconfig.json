@@ -20,7 +20,6 @@
     "skipLibCheck": true,
     "target": "ES2024",
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
