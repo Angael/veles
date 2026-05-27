@@ -11,7 +11,6 @@ export default defineConfig({
     alias: {
       '@': '/src',
     },
-    tsconfigPaths: true,
   },
   plugins: [
     tanstackStart({

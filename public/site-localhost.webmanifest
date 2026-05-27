@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "short_name": "",
+  "name": "Veles (Local)",
+  "short_name": "Veles Local",
   "icons": [
     { "src": "/android-chrome-192x192-localhost.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/android-chrome-512x512-localhost.png", "sizes": "512x512", "type": "image/png" }
