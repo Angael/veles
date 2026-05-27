@@ -3,7 +3,7 @@ import css from './demo.module.css';
 
 export const Route = createFileRoute('/demo/start/ssr/spa-mode')({
   component: SpaModePage,
-  ssr: 'data-only',
+  ssr: false,
 });
 
 function SpaModePage() {

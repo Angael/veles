@@ -13,6 +13,7 @@ const getFacts = createServerFn({ method: 'GET' }).handler(async () => {
 export const Route = createFileRoute('/demo/start/ssr/data-only')({
   loader: () => getFacts(),
   component: DataOnlyPage,
+  ssr: 'data-only',
 });
 
 function DataOnlyPage() {
