@@ -8,7 +8,7 @@ ENV VITE_APP_NAME=$VITE_APP_NAME
 ENV VITE_APP_URL=$VITE_APP_URL
 ENV VITE_CF_CDN_URL=$VITE_CF_CDN_URL
 
-RUN corepack enable && corepack prepare pnpm@10.28.1 --activate
+RUN npm install -g pnpm@10.28.1
 
 WORKDIR /app
 
