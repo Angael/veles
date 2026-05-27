@@ -88,19 +88,26 @@ function LoginPage() {
         setBusy(true);
         setError(null);
 
-        const result = await signIn.email({
-          email: String(formData.get('email') || ''),
-          password: String(formData.get('password') || ''),
-        });
+        try {
+          const result = await signIn.email({
+            email: String(formData.get('email') || ''),
+            password: String(formData.get('password') || ''),
+          });
 
-        setBusy(false);
+          if (result.error) {
+            setError(result.error.message || 'Login failed');
+            return;
+          }
 
-        if (result.error) {
-          setError(result.error.message || 'Login failed');
-          return;
+          navigate({ to: '/' as never });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Login failed';
+
+          alert(message);
+          setError(message);
+        } finally {
+          setBusy(false);
         }
-
-        navigate({ to: '/' as never });
       }}
       submitLabel='Sign in'
       title='Login'
