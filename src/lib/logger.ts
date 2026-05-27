@@ -1,0 +1,33 @@
+import pino from 'pino';
+
+type LogValue = string | number | boolean | null | undefined | LogRecord | LogValue[];
+
+type LogRecord = {
+  [key: string]: LogValue;
+};
+
+const baseLogger = pino({
+  level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+  messageKey: 'event',
+  timestamp: pino.stdTimeFunctions.isoTime,
+  formatters: {
+    level(label) {
+      return { level: label };
+    },
+    bindings() {
+      return {};
+    },
+  },
+});
+
+export const logger = {
+  info(event: string, data?: LogRecord) {
+    baseLogger.info(data || {}, event);
+  },
+  warn(event: string, data?: LogRecord) {
+    baseLogger.warn(data || {}, event);
+  },
+  error(event: string, data?: LogRecord) {
+    baseLogger.error(data || {}, event);
+  },
+};

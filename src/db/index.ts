@@ -1,10 +1,20 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { env } from 'env.ts';
 import { Pool } from 'pg';
-import * as schema from './schema.ts';
+import { getServerEnv } from '@/lib/env/server';
+import * as schema from './schema';
 
-const pool = new Pool({
-	connectionString: env.DATABASE_URL,
-});
+const globalForDb = globalThis as typeof globalThis & {
+  __velesPool?: Pool;
+};
 
-export const db = drizzle(pool, { schema });
+function getPool() {
+  if (!globalForDb.__velesPool) {
+    globalForDb.__velesPool = new Pool({
+      connectionString: getServerEnv().databaseUrl,
+    });
+  }
+
+  return globalForDb.__velesPool;
+}
+
+export const db = drizzle(getPool(), { schema });

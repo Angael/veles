@@ -1,67 +1,83 @@
-import { TanStackDevtools } from '@tanstack/react-devtools';
+/// <reference types="vite/client" />
 import type { QueryClient } from '@tanstack/react-query';
-import {
-	createRootRouteWithContext,
-	HeadContent,
-	Scripts,
-} from '@tanstack/react-router';
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
-import Header from '../components/Header';
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
-import appCss from '../styles.css?url';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import * as React from 'react';
+import { AppFrame } from '@/components/AppFrame';
+import { DefaultCatchBoundary } from '@/components/DefaultCatchBoundary';
+import { NotFound } from '@/components/NotFound';
+import { clientEnv } from '@/lib/env/client';
+import resetCss from '@/styles/reset.css?url';
 
-interface MyRouterContext {
-	queryClient: QueryClient;
-}
+const isLocalhostApp =
+  import.meta.env.DEV ||
+  clientEnv.appUrl.includes('://localhost') ||
+  clientEnv.appUrl.includes('://127.0.0.1');
 
-export const Route = createRootRouteWithContext<MyRouterContext>()({
-	head: () => ({
-		meta: [
-			{
-				charSet: 'utf-8',
-			},
-			{
-				name: 'viewport',
-				content: 'width=device-width, initial-scale=1',
-			},
-			{
-				title: 'TanStack Start Starter',
-			},
-		],
-		links: [
-			{
-				rel: 'stylesheet',
-				href: appCss,
-			},
-		],
-	}),
+const faviconLinks = isLocalhostApp
+  ? [
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon-localhost.ico' },
+      { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32-localhost.png' },
+      { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16-localhost.png' },
+      { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon-localhost.png' },
+      { rel: 'manifest', href: '/site-localhost.webmanifest' },
+    ]
+  : [
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
+      { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
+      { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+      { rel: 'manifest', href: '/site.webmanifest' },
+    ];
 
-	shellComponent: RootDocument,
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  head: () => ({
+    meta: [
+      { charSet: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { title: clientEnv.appName },
+      {
+        name: 'description',
+        content:
+          'Private place for workouts, body weight, food logging, and shared personal files.',
+      },
+    ],
+    links: [{ rel: 'stylesheet', href: resetCss }, ...faviconLinks],
+  }),
+  errorComponent: (props) => (
+    <RootDocument>
+      <DefaultCatchBoundary {...props} />
+    </RootDocument>
+  ),
+  notFoundComponent: () => <NotFound />,
+  component: RootComponent,
 });
 
+function RootComponent() {
+  return (
+    <RootDocument>
+      <AppFrame />
+    </RootDocument>
+  );
+}
+
 function RootDocument({ children }: { children: React.ReactNode }) {
-	return (
-		<html lang='en' className='dark'>
-			<head>
-				<HeadContent />
-			</head>
-			<body className='bg-zinc-950 text-white'>
-				<Header />
-				{children}
-				<TanStackDevtools
-					config={{
-						position: 'bottom-right',
-					}}
-					plugins={[
-						{
-							name: 'Tanstack Router',
-							render: <TanStackRouterDevtoolsPanel />,
-						},
-						TanStackQueryDevtools,
-					]}
-				/>
-				<Scripts />
-			</body>
-		</html>
-	);
+  return (
+    <html lang='en'>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {children}
+        {import.meta.env.DEV ? (
+          <>
+            <TanStackRouterDevtools position='bottom-right' />
+            <ReactQueryDevtools buttonPosition='bottom-left' />
+          </>
+        ) : null}
+        <Scripts />
+      </body>
+    </html>
+  );
 }
