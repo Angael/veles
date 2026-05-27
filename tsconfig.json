@@ -5,7 +5,8 @@
     "src/**/*.d.ts",
     "vite.config.ts",
     "vitest.config.ts",
-    "drizzle.config.ts"
+    "drizzle.config.ts",
+    "drizzle-prod.config.ts"
   ],
   "exclude": ["_archive", "node_modules", ".output"],
   "compilerOptions": {
