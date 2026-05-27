@@ -1,4 +1,7 @@
 - when using css modules, prefer name `import css from ...`
 - Never use Global CSS, though this app uses global reset.css and theme.css
 - Run `pnpm check:fix` before finishing
-- pushing to main deploys to prod
+- This is a solo hobby app; prefer low-friction solutions
+- Avoid GitHub Actions and GitHub CI/CD for sensitive prod workflows; this repo is public
+- Pushing to `main` makes Dokploy pull, install, and deploy to prod
+- Never run Drizzle commands yourself; leave them to the human user
