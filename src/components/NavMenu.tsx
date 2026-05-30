@@ -4,10 +4,31 @@ import { useState, type ComponentProps } from 'react';
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
 import { signOut, useSession } from '@/lib/auth/client';
 import css from './NavMenu.module.css';
+import { clientEnv } from '@/lib/env/client';
 
-const menuGroups = [
+interface MenuGroup {
+  label: string;
+  shouldRender?: boolean;
+  matches: string[];
+  links: (MenuLink | MenuAction)[];
+}
+
+interface MenuLink {
+  to: string;
+  label: string;
+  description: string;
+}
+
+interface MenuAction {
+  type: 'action';
+  label: string;
+  description: string;
+}
+
+const menuGroups: MenuGroup[] = [
   {
     label: 'Demo',
+    shouldRender: !clientEnv.isProd,
     matches: ['/demo'],
     links: [
       {
@@ -90,9 +111,7 @@ export function NavMenu() {
     }
 
     setLogoutBusy(true);
-
     const result = await signOut();
-
     setLogoutBusy(false);
 
     if (result.error) {
@@ -106,6 +125,10 @@ export function NavMenu() {
     <NavigationMenu.Root className={css.navRoot}>
       <NavigationMenu.List className={css.navList}>
         {menuGroups.map((group) => {
+          if (group.shouldRender === false) {
+            return null;
+          }
+
           const active = group.matches.some((prefix) => pathname.startsWith(prefix));
 
           return (
