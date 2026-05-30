@@ -5,3 +5,4 @@
 - Avoid GitHub Actions and GitHub CI/CD for sensitive prod workflows; this repo is public
 - Pushing to `main` makes Dokploy pull, install, and deploy to prod
 - Never run Drizzle commands yourself; leave them to the human user
+- Components should not have more than 250 lines of code. If they have, it's a code smell that it does too much.
