@@ -102,8 +102,10 @@
 .imageLayout {
   display: grid;
   height: 200px;
+  margin: -1.35rem -1.35rem 0;
   overflow: hidden;
-  border-radius: var(--radius-md);
+  border-radius: calc(var(--radius-lg) - var(--border-width))
+    calc(var(--radius-lg) - var(--border-width)) 0 0;
   background: var(--color-surface-inset);
 }
 
