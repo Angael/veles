@@ -78,67 +78,53 @@
   gap: var(--space-xl);
 }
 
-.cardLink {
-  color: inherit;
-  text-decoration: none;
-}
-
 .card {
   display: grid;
   gap: var(--space-lg);
   height: 100%;
   padding-bottom: var(--space-md);
+  cursor: pointer;
 }
 
-.cardLink:hover .card,
-.cardLink:focus-visible .card {
+.card:hover,
+.card:focus-visible {
   border-color: var(--color-primary-border);
   box-shadow:
     0 0 0 1px var(--color-primary-border-soft),
     var(--shadow-card);
 }
 
-.cardLink,
 .card,
-.mainImage,
-.sideImage {
+.recipeImage {
   user-select: none;
 }
 
 .imageLayout {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(96px, 1fr);
-  gap: var(--space-sm);
-}
-
-.imageLayout:has(.sideImages:empty),
-.imageLayout:not(:has(.sideImages)) {
-  grid-template-columns: 1fr;
-}
-
-.mainImageWrap,
-.sideImageWrap {
+  height: 200px;
   overflow: hidden;
   border-radius: var(--radius-md);
   background: var(--color-surface-inset);
 }
 
-.mainImageWrap {
-  aspect-ratio: 16 / 10;
+.imageLayoutOne {
+  grid-template-columns: 1fr;
 }
 
-.sideImages {
-  display: grid;
-  gap: var(--space-sm);
+.imageLayoutTwo {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
 }
 
-.sideImageWrap {
-  min-height: 0;
-  aspect-ratio: 1.35 / 1;
+.imageLayoutThree {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
 }
 
-.mainImage,
-.sideImage {
+.imageLayoutThree .recipeImage:first-child {
+  grid-row: 1 / span 2;
+}
+
+.recipeImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -154,7 +140,6 @@
 .cardHeader {
   display: flex;
   align-items: start;
-  justify-content: space-between;
   gap: var(--space-lg);
 }
 
@@ -197,12 +182,12 @@
   justify-content: space-between;
   gap: var(--space-lg);
   margin: auto 0 0 auto;
+}
 
-  .footerItem {
-    color: var(--color-accent-label);
-    letter-spacing: var(--letter-spacing-eyebrow);
-    font-size: var(--text-md);
-  }
+.footerItem {
+  color: var(--color-accent-label);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--text-md);
 }
 
 .floatingButton {
@@ -231,7 +216,6 @@
 @media (max-width: 720px) {
   .resultsHeader,
   .cardHeader,
-  .imageLayout,
   .grid,
   .filtersPanel,
   .nutritionGrid {
@@ -241,6 +225,10 @@
 
   .resultsHeader {
     align-items: start;
+  }
+
+  .imageLayout {
+    height: 150px;
   }
 
   .floatingButton {

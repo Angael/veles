@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { useState } from 'react';
 import { Card } from '@/components/Card';
 import { recipesQueryOptions, DEFAULT_RECIPES_QUERY_INPUT } from './recipes.query';
@@ -17,6 +18,7 @@ type NutritionField = 'none' | 'kcal' | 'protein' | 'carbs' | 'fats';
 type FilterDirection = 'gte' | 'lte';
 
 function RecipesPage() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [nutritionField, setNutritionField] = useState<NutritionField>('none');
@@ -135,41 +137,40 @@ function RecipesPage() {
 
       <section className={css.grid}>
         {recipes.map((recipe) => (
-          <Link
-            className={css.cardLink}
+          <Card
+            as='article'
+            className={css.card}
             key={recipe.id}
-            to='/recipes/view/$id'
-            params={{ id: recipe.id }}
+            compact
+            onClick={() => navigate({ to: '/recipes/view/$id', params: { id: recipe.id } })}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                navigate({ to: '/recipes/view/$id', params: { id: recipe.id } });
+              }
+            }}
+            role='link'
+            tabIndex={0}
           >
-            <Card as='article' className={css.card} compact>
-              <div className={css.imageLayout}>
-                {recipe.images[0] ? (
-                  <div className={css.mainImageWrap}>
-                    <img alt='' className={css.mainImage} src={recipe.images[0].url} />
-                  </div>
-                ) : null}
-
-                {recipe.images[1] || recipe.images[2] ? (
-                  <div className={css.sideImages}>
-                    {recipe.images[1] ? (
-                      <div className={css.sideImageWrap}>
-                        <img alt='' className={css.sideImage} src={recipe.images[1].url} />
-                      </div>
-                    ) : null}
-                    {recipe.images[2] ? (
-                      <div className={css.sideImageWrap}>
-                        <img alt='' className={css.sideImage} src={recipe.images[2].url} />
-                      </div>
-                    ) : null}
-                  </div>
-                ) : null}
+            {recipe.images.length > 0 ? (
+              <div className={clsx(css.imageLayout, getImageLayoutClass(recipe.images.length))}>
+                {recipe.images.slice(0, 3).map((image, index) => (
+                  <img
+                    alt=''
+                    className={css.recipeImage}
+                    key={`${recipe.id}-${index}`}
+                    src={image.url}
+                  />
+                ))}
               </div>
+            ) : null}
 
-              <div className={css.cardBody}>
-                <div className={css.cardHeader}>
-                  <div className={css.titleBlock}>
-                    <h2>{recipe.name}</h2>
+            <div className={css.cardBody}>
+              <div className={css.cardHeader}>
+                <div className={css.titleBlock}>
+                  <h2>{recipe.name}</h2>
 
+                  {recipe.tags.length > 0 ? (
                     <div className={css.tags}>
                       {recipe.tags.map((tag) => (
                         <button
@@ -186,20 +187,20 @@ function RecipesPage() {
                         </button>
                       ))}
                     </div>
-                  </div>
-                </div>
-
-                <p className={css.description}>{recipe.description}</p>
-
-                <div className={css.recipeFooter}>
-                  <span className={css.footerItem}>{recipe.rating}/5</span>
-                  <p className={css.footerItem}>
-                    {recipe.nutrition.kcal === null ? 'N/A' : String(recipe.nutrition.kcal)} KCAL
-                  </p>
+                  ) : null}
                 </div>
               </div>
-            </Card>
-          </Link>
+
+              {recipe.description ? <p className={css.description}>{recipe.description}</p> : null}
+
+              <div className={css.recipeFooter}>
+                <span className={css.footerItem}>{recipe.rating}/5</span>
+                {recipe.nutrition.kcal !== null ? (
+                  <p className={css.footerItem}>{String(recipe.nutrition.kcal)} KCAL</p>
+                ) : null}
+              </div>
+            </div>
+          </Card>
         ))}
       </section>
 
@@ -218,4 +219,16 @@ function parseOptionalNumber(value: string) {
   const parsedValue = Number(value);
 
   return Number.isFinite(parsedValue) ? parsedValue : null;
+}
+
+function getImageLayoutClass(imageCount: number) {
+  if (imageCount >= 3) {
+    return css.imageLayoutThree;
+  }
+
+  if (imageCount === 2) {
+    return css.imageLayoutTwo;
+  }
+
+  return css.imageLayoutOne;
 }

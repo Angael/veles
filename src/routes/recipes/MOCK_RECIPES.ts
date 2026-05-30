@@ -141,6 +141,60 @@ export const MOCK_RECIPES: RecipeListItem[] = [
     createdAt: '2026-02-12T08:00:00.000Z',
     updatedAt: '2026-05-12T08:30:00.000Z',
   },
+  {
+    id: '01972f90-8398-7bd5-a5b1-a3d21d7a6106',
+    name: 'No-Picture Cottage Cheese Plate',
+    ingredients: ['Cottage cheese', 'Cherry tomatoes', 'Cucumber', 'Olive oil', 'Salt'],
+    description:
+      'A cold plate for lazy afternoons when assembling beats cooking and the point is mostly protein with crunch.',
+    images: [],
+    tags: ['quick', 'cold', 'high protein'],
+    rating: 3,
+    nutrition: {
+      kcal: 280,
+      protein: 28,
+      carbs: 11,
+      fats: 13,
+    },
+    createdAt: '2026-04-28T12:15:00.000Z',
+    updatedAt: '2026-05-26T12:20:00.000Z',
+  },
+  {
+    id: '01972f90-8398-7bd5-a5b1-a3d21d7a6107',
+    name: 'Sesame Tofu Rice Skillet',
+    ingredients: ['Tofu', 'Rice', 'Soy sauce', 'Sesame oil', 'Cabbage', 'Scallion'],
+    description:
+      'Sticky skillet rice with crisp tofu and cabbage. Good enough to repeat, but macros are still only partly estimated.',
+    images: [image('tofu-main'), image('tofu-2'), image('tofu-3')],
+    tags: ['tofu', 'dinner', 'skillet'],
+    rating: 4,
+    nutrition: {
+      kcal: null,
+      protein: 27,
+      carbs: 62,
+      fats: 18,
+    },
+    createdAt: '2026-03-18T18:10:00.000Z',
+    updatedAt: '2026-05-22T19:00:00.000Z',
+  },
+  {
+    id: '01972f90-8398-7bd5-a5b1-a3d21d7a6108',
+    name: 'Plain Roast Chicken Dinner',
+    ingredients: ['Chicken breast', 'Potatoes', 'Carrots', 'Butter', 'Rosemary'],
+    description:
+      'Straightforward roast dinner kept around because it is reliable, reheats cleanly, and needs almost no thinking.',
+    images: [image('roast-main'), image('roast-2')],
+    tags: [],
+    rating: 4,
+    nutrition: {
+      kcal: 650,
+      protein: 46,
+      carbs: 37,
+      fats: 31,
+    },
+    createdAt: '2026-02-02T15:00:00.000Z',
+    updatedAt: '2026-05-21T15:30:00.000Z',
+  },
 ];
 
 const MOCK_LAST_VIEWED_BY_USER: Record<string, string[]> = {
