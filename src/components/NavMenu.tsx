@@ -1,170 +1,33 @@
-import { Avatar } from '@base-ui/react/avatar';
 import { NavigationMenu } from '@base-ui/react/navigation-menu';
-import { useState, type ComponentProps, type ReactNode } from 'react';
-import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
-import { signOut, useSession } from '@/lib/auth/client';
+import type { ComponentProps } from 'react';
+import { Link, useRouterState } from '@tanstack/react-router';
 import css from './NavMenu.module.css';
-import { clientEnv } from '@/lib/env/client';
-
-interface MenuGroup {
-  label: string;
-  shouldRender?: boolean;
-  matches: string[];
-  links: MenuEntry[];
-  triggerPrefix?: ReactNode;
-}
-
-interface MenuLink {
-  to: string;
-  label: string;
-  description: string;
-}
-
-interface MenuAction {
-  type: 'action';
-  label: string;
-  description: string;
-}
-
-type MenuEntry = MenuLink | MenuAction;
+import { useNavMenuGroups } from './useNavMenuGroups';
 
 export function NavMenu() {
-  const navigate = useNavigate();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
-  const { data: session } = useSession();
-  const user = session?.user;
-  const [logoutBusy, setLogoutBusy] = useState(false);
-  const accountInitials = getInitials(user?.name ?? user?.email ?? 'Account');
-  const accountTriggerPrefix = (
-    <Avatar.Root className={css.accountAvatar}>
-      {user?.image ? (
-        <Avatar.Image
-          src={user.image}
-          alt={user.name ?? user.email ?? 'Account avatar'}
-          className={css.accountAvatarImage}
-        />
-      ) : null}
-      <Avatar.Fallback className={css.accountAvatarFallback}>{accountInitials}</Avatar.Fallback>
-    </Avatar.Root>
-  );
-  const menuGroups: MenuGroup[] = [
-    {
-      label: 'Trackers',
-      matches: ['/weight', '/recipes'],
-      links: [
-        {
-          to: '/weight',
-          label: 'Weight',
-          description: 'Mock dashboard for body weight logging and trend review.',
-        },
-        {
-          to: '/recipes',
-          label: 'Recipes',
-          description: 'Recipe notes and cooking references.',
-        },
-      ],
-    },
-    {
-      label: 'Demo',
-      shouldRender: !clientEnv.isProd,
-      matches: ['/demo'],
-      links: [
-        {
-          to: '/demo/start/ssr',
-          label: 'SSR',
-          description: 'TanStack Start SSR entry point.',
-        },
-        {
-          to: '/demo/start/ssr/spa-mode',
-          label: 'SPA Mode',
-          description: 'SSR route configured for SPA rendering.',
-        },
-        {
-          to: '/demo/start/ssr/full-ssr',
-          label: 'Full SSR',
-          description: 'Server-rendered page with full HTML output.',
-        },
-        {
-          to: '/demo/start/ssr/data-only',
-          label: 'Data Only',
-          description: 'Loader-driven data rendering example.',
-        },
-        {
-          to: '/demo/start/server-funcs',
-          label: 'Server Functions',
-          description: 'Calls TanStack Start server functions.',
-        },
-        {
-          to: '/demo/start/api-request',
-          label: 'API Route',
-          description: 'Hits a server API route from the client.',
-        },
-        {
-          to: '/demo/tanstack-query',
-          label: 'TanStack Query',
-          description: 'Query caching and async state demo.',
-        },
-      ],
-    },
-    {
-      label: 'Account',
-      matches: ['/login', '/signup'],
-      links: user
-        ? [
-            {
-              type: 'action' as const,
-              label: 'Logout',
-              description: 'Sign out of the current account.',
-            },
-          ]
-        : [
-            {
-              to: '/login',
-              label: 'Login',
-              description: 'Sign in to an existing account.',
-            },
-            {
-              to: '/signup',
-              label: 'Sign Up',
-              description: 'Create an account and get started.',
-            },
-          ],
-      triggerPrefix: accountTriggerPrefix,
-    },
-  ];
-
-  async function handleLogout() {
-    if (logoutBusy) {
-      return;
-    }
-
-    setLogoutBusy(true);
-    const result = await signOut();
-    setLogoutBusy(false);
-
-    if (result.error) {
-      return;
-    }
-
-    navigate({ to: '/login' as never });
-  }
+  const { groups } = useNavMenuGroups();
 
   return (
     <NavigationMenu.Root className={css.navRoot}>
       <NavigationMenu.List className={css.navList}>
-        {menuGroups.map((group) => {
+        {groups.map((group) => {
           if (group.shouldRender === false) {
             return null;
           }
 
-          const active = group.matches.some((prefix) => pathname.startsWith(prefix));
+          const active = group.matchPrefixes.some((prefix) => pathname.startsWith(prefix));
+          const visibleItems = group.items.filter((item) => item.shouldRender !== false);
+
+          if (visibleItems.length === 0) {
+            return null;
+          }
 
           return (
-            <NavigationMenu.Item key={group.label}>
+            <NavigationMenu.Item key={group.key}>
               <NavigationMenu.Trigger className={active ? css.navTriggerActive : css.navTrigger}>
-                {group.triggerPrefix}
                 {group.label}
                 <NavigationMenu.Icon className={css.navIcon}>
                   <CaretDownIcon />
@@ -173,36 +36,35 @@ export function NavMenu() {
 
               <NavigationMenu.Content className={css.navContent}>
                 <ul className={css.navLinkList}>
-                  {group.links.map((link) => {
-                    if ('type' in link) {
+                  {visibleItems.map((item) => {
+                    if (!item.link) {
                       return (
-                        <li key={link.label}>
+                        <li key={item.key}>
                           <button
                             className={css.navCard}
-                            disabled={logoutBusy}
-                            onClick={handleLogout}
+                            disabled={item.disabled}
+                            onClick={() => void item.onClick?.()}
                             type='button'
                           >
-                            <h3 className={css.navCardTitle}>
-                              {logoutBusy ? 'Logging out...' : link.label}
-                            </h3>
-                            <p className={css.navCardDescription}>{link.description}</p>
+                            <h3 className={css.navCardTitle}>{item.label}</h3>
+                            <p className={css.navCardDescription}>{item.description}</p>
                           </button>
                         </li>
                       );
                     }
 
-                    const linkActive = pathname === link.to;
+                    const linkActive = pathname === item.link;
 
                     return (
-                      <li key={link.to}>
+                      <li key={item.key}>
                         <MenuLink
                           active={linkActive}
                           className={linkActive ? css.navCardActive : css.navCard}
-                          to={link.to}
+                          onClick={item.onClick}
+                          to={item.link}
                         >
-                          <h3 className={css.navCardTitle}>{link.label}</h3>
-                          <p className={css.navCardDescription}>{link.description}</p>
+                          <h3 className={css.navCardTitle}>{item.label}</h3>
+                          <p className={css.navCardDescription}>{item.description}</p>
                         </MenuLink>
                       </li>
                     );
@@ -249,26 +111,6 @@ function CaretDownIcon(props: ComponentProps<'svg'>) {
       <path d='M12 6H4l4 4.5z' />
     </svg>
   );
-}
-
-function getInitials(value: string) {
-  const parts = value.trim().split(/\s+/).filter(Boolean);
-
-  if (parts.length > 1) {
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  }
-
-  const compact = parts[0] ?? value.trim();
-
-  if (!compact) {
-    return 'A';
-  }
-
-  if (compact.includes('@')) {
-    return compact.slice(0, 2).toUpperCase();
-  }
-
-  return compact.slice(0, 2).toUpperCase();
 }
 
 type MenuLinkProps = Omit<NavigationMenu.Link.Props, 'render'> & {
