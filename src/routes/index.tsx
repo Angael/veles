@@ -1,5 +1,4 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
-import todoBoardUrl from '@/assets/todo-board.svg?url';
 import css from './index.module.css';
 
 const featureCards = [
@@ -38,6 +37,9 @@ function HomePage() {
           <h1>Veles</h1>
           <p>Private place for workouts, body weight, food logging, and shared personal files.</p>
           <div className={css.buttonRow}>
+            <Link className={css.secondaryButton} to={'/weight' as never}>
+              Preview weight tracker
+            </Link>
             <Link className={css.primaryButton} to={'/login' as never}>
               Open login
             </Link>
@@ -46,7 +48,6 @@ function HomePage() {
             </Link>
           </div>
         </div>
-        <div className={css.heroImage} style={{ backgroundImage: `url(${todoBoardUrl})` }} />
       </article>
 
       {featureCards.map((card) => (
