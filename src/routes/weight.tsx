@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import type { SVGProps } from 'react';
+import { Card } from '@/components/Card';
 import css from './weight.module.css';
 
 type WeightEntry = {
@@ -25,29 +26,29 @@ function WeightPage() {
   return (
     <main className={css.page}>
       <section className={css.summaryGrid}>
-        <article className={css.summaryCard}>
+        <Card as='article' className={css.summaryCard}>
           <span className={css.statLabel}>Current kg</span>
           <strong>{formatWeight(currentWeight)}</strong>
           <p>{formatLongDate(latestEntry.date)}</p>
-        </article>
-        <article className={css.summaryCard}>
+        </Card>
+        <Card as='article' className={css.summaryCard}>
           <span className={css.statLabel}>2 week change</span>
           <strong className={twoWeekChange <= 0 ? css.deltaDown : css.deltaUp}>
             {formatSignedWeight(twoWeekChange)}
           </strong>
           <p>Compared with {formatLongDate(shiftIsoDate(latestEntry.date, -14))}</p>
-        </article>
-        <article className={css.summaryCard}>
+        </Card>
+        <Card as='article' className={css.summaryCard}>
           <span className={css.statLabel}>1 month change</span>
           <strong className={oneMonthChange <= 0 ? css.deltaDown : css.deltaUp}>
             {formatSignedWeight(oneMonthChange)}
           </strong>
           <p>Compared with {formatLongDate(shiftIsoDate(latestEntry.date, -30))}</p>
-        </article>
+        </Card>
       </section>
 
       <section className={css.grid}>
-        <article className={`${css.card} ${css.captureCard}`}>
+        <Card as='article' className={`${css.card} ${css.captureCard}`}>
           <div className={css.cardHeader}>
             <div>
               <h2>Daily entry</h2>
@@ -72,9 +73,9 @@ function WeightPage() {
               Save flow next
             </button>
           </div>
-        </article>
+        </Card>
 
-        <article className={`${css.card} ${css.logCard}`}>
+        <Card as='article' className={css.card}>
           <div className={css.cardHeader}>
             <div>
               <h2>Recent entries</h2>
@@ -95,7 +96,7 @@ function WeightPage() {
               </div>
             ))}
           </div>
-        </article>
+        </Card>
       </section>
     </main>
   );

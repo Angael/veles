@@ -1,4 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
+import { Card } from '@/components/Card';
 import css from './index.module.css';
 
 const featureCards = [
@@ -31,7 +32,7 @@ export const Route = createFileRoute('/')({
 function HomePage() {
   return (
     <main className={css.layout}>
-      <article className={css.hero}>
+      <Card as='article' className={css.hero}>
         <div className={css.heroContent}>
           <p className={css.eyebrow}>Private app</p>
           <h1>Veles</h1>
@@ -48,14 +49,14 @@ function HomePage() {
             </Link>
           </div>
         </div>
-      </article>
+      </Card>
 
       {featureCards.map((card) => (
-        <article className={css.tile} key={card.title}>
+        <Card as='article' className={css.tile} compact key={card.title}>
           <div className={css.tileAccent}>{card.accent}</div>
           <h2>{card.title}</h2>
           <p>{card.description}</p>
-        </article>
+        </Card>
       ))}
     </main>
   );

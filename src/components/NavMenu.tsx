@@ -1,6 +1,6 @@
 import { Avatar } from '@base-ui/react/avatar';
 import { NavigationMenu } from '@base-ui/react/navigation-menu';
-import { useState, type ComponentProps } from 'react';
+import { useState, type ComponentProps, type ReactNode } from 'react';
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
 import { signOut, useSession } from '@/lib/auth/client';
 import css from './NavMenu.module.css';
@@ -10,7 +10,8 @@ interface MenuGroup {
   label: string;
   shouldRender?: boolean;
   matches: string[];
-  links: (MenuLink | MenuAction)[];
+  links: MenuEntry[];
+  triggerPrefix?: ReactNode;
 }
 
 interface MenuLink {
@@ -25,77 +26,7 @@ interface MenuAction {
   description: string;
 }
 
-const menuGroups: MenuGroup[] = [
-  {
-    label: 'Trackers',
-    matches: ['/weight'],
-    links: [
-      {
-        to: '/weight',
-        label: 'Weight',
-        description: 'Mock dashboard for body weight logging and trend review.',
-      },
-    ],
-  },
-  {
-    label: 'Demo',
-    shouldRender: !clientEnv.isProd,
-    matches: ['/demo'],
-    links: [
-      {
-        to: '/demo/start/ssr',
-        label: 'SSR',
-        description: 'TanStack Start SSR entry point.',
-      },
-      {
-        to: '/demo/start/ssr/spa-mode',
-        label: 'SPA Mode',
-        description: 'SSR route configured for SPA rendering.',
-      },
-      {
-        to: '/demo/start/ssr/full-ssr',
-        label: 'Full SSR',
-        description: 'Server-rendered page with full HTML output.',
-      },
-      {
-        to: '/demo/start/ssr/data-only',
-        label: 'Data Only',
-        description: 'Loader-driven data rendering example.',
-      },
-      {
-        to: '/demo/start/server-funcs',
-        label: 'Server Functions',
-        description: 'Calls TanStack Start server functions.',
-      },
-      {
-        to: '/demo/start/api-request',
-        label: 'API Route',
-        description: 'Hits a server API route from the client.',
-      },
-      {
-        to: '/demo/tanstack-query',
-        label: 'TanStack Query',
-        description: 'Query caching and async state demo.',
-      },
-    ],
-  },
-  {
-    label: 'Account',
-    matches: ['/login', '/signup'],
-    links: [
-      {
-        to: '/login',
-        label: 'Login',
-        description: 'Sign in to an existing account.',
-      },
-      {
-        to: '/signup',
-        label: 'Sign Up',
-        description: 'Create an account and get started.',
-      },
-    ],
-  },
-] as const;
+type MenuEntry = MenuLink | MenuAction;
 
 export function NavMenu() {
   const navigate = useNavigate();
@@ -106,15 +37,103 @@ export function NavMenu() {
   const user = session?.user;
   const [logoutBusy, setLogoutBusy] = useState(false);
   const accountInitials = getInitials(user?.name ?? user?.email ?? 'Account');
-  const accountLinks = user
-    ? [
+  const accountTriggerPrefix = (
+    <Avatar.Root className={css.accountAvatar}>
+      {user?.image ? (
+        <Avatar.Image
+          src={user.image}
+          alt={user.name ?? user.email ?? 'Account avatar'}
+          className={css.accountAvatarImage}
+        />
+      ) : null}
+      <Avatar.Fallback className={css.accountAvatarFallback}>{accountInitials}</Avatar.Fallback>
+    </Avatar.Root>
+  );
+  const menuGroups: MenuGroup[] = [
+    {
+      label: 'Trackers',
+      matches: ['/weight', '/recipes'],
+      links: [
         {
-          type: 'action' as const,
-          label: 'Logout',
-          description: 'Sign out of the current account.',
+          to: '/weight',
+          label: 'Weight',
+          description: 'Mock dashboard for body weight logging and trend review.',
         },
-      ]
-    : (menuGroups.find((group) => group.label === 'Account')?.links ?? []);
+        {
+          to: '/recipes',
+          label: 'Recipes',
+          description: 'Recipe notes and cooking references.',
+        },
+      ],
+    },
+    {
+      label: 'Demo',
+      shouldRender: !clientEnv.isProd,
+      matches: ['/demo'],
+      links: [
+        {
+          to: '/demo/start/ssr',
+          label: 'SSR',
+          description: 'TanStack Start SSR entry point.',
+        },
+        {
+          to: '/demo/start/ssr/spa-mode',
+          label: 'SPA Mode',
+          description: 'SSR route configured for SPA rendering.',
+        },
+        {
+          to: '/demo/start/ssr/full-ssr',
+          label: 'Full SSR',
+          description: 'Server-rendered page with full HTML output.',
+        },
+        {
+          to: '/demo/start/ssr/data-only',
+          label: 'Data Only',
+          description: 'Loader-driven data rendering example.',
+        },
+        {
+          to: '/demo/start/server-funcs',
+          label: 'Server Functions',
+          description: 'Calls TanStack Start server functions.',
+        },
+        {
+          to: '/demo/start/api-request',
+          label: 'API Route',
+          description: 'Hits a server API route from the client.',
+        },
+        {
+          to: '/demo/tanstack-query',
+          label: 'TanStack Query',
+          description: 'Query caching and async state demo.',
+        },
+      ],
+    },
+    {
+      label: 'Account',
+      matches: ['/login', '/signup'],
+      links: user
+        ? [
+            {
+              type: 'action' as const,
+              label: 'Logout',
+              description: 'Sign out of the current account.',
+            },
+          ]
+        : [
+            {
+              to: '/login',
+              label: 'Login',
+              description: 'Sign in to an existing account.',
+            },
+            {
+              to: '/signup',
+              label: 'Sign Up',
+              description: 'Create an account and get started.',
+            },
+          ],
+      triggerPrefix: accountTriggerPrefix,
+    },
+  ];
 
   async function handleLogout() {
     if (logoutBusy) {
@@ -145,20 +164,7 @@ export function NavMenu() {
           return (
             <NavigationMenu.Item key={group.label}>
               <NavigationMenu.Trigger className={active ? css.navTriggerActive : css.navTrigger}>
-                {group.label === 'Account' ? (
-                  <Avatar.Root className={css.accountAvatar}>
-                    {user?.image ? (
-                      <Avatar.Image
-                        src={user.image}
-                        alt={user.name ?? user.email ?? 'Account avatar'}
-                        className={css.accountAvatarImage}
-                      />
-                    ) : null}
-                    <Avatar.Fallback className={css.accountAvatarFallback}>
-                      {accountInitials}
-                    </Avatar.Fallback>
-                  </Avatar.Root>
-                ) : null}
+                {group.triggerPrefix}
                 {group.label}
                 <NavigationMenu.Icon className={css.navIcon}>
                   <CaretDownIcon />
@@ -167,7 +173,7 @@ export function NavMenu() {
 
               <NavigationMenu.Content className={css.navContent}>
                 <ul className={css.navLinkList}>
-                  {(group.label === 'Account' ? accountLinks : group.links).map((link) => {
+                  {group.links.map((link) => {
                     if ('type' in link) {
                       return (
                         <li key={link.label}>

@@ -1,4 +1,5 @@
 import { Link, Outlet, createFileRoute } from '@tanstack/react-router';
+import { Card } from '@/components/Card';
 import css from './demo.module.css';
 
 export const Route = createFileRoute('/demo/start/ssr/')({
@@ -8,7 +9,7 @@ export const Route = createFileRoute('/demo/start/ssr/')({
 function SsrLayout() {
   return (
     <section className={css.page}>
-      <article className={css.card}>
+      <Card as='article'>
         <span className={css.badge}>Route group</span>
         <h1>TanStack Start SSR references</h1>
         <p>These routes are intentionally plain so the framework behavior is easy to inspect.</p>
@@ -23,7 +24,7 @@ function SsrLayout() {
             Data only
           </Link>
         </div>
-      </article>
+      </Card>
       <Outlet />
     </section>
   );

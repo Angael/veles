@@ -9,16 +9,14 @@
   gap: var(--space-2xl);
 }
 
-.summaryCard,
 .card {
   display: grid;
   gap: 0.35rem;
-  padding: var(--space-2xl);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  backdrop-filter: var(--blur-surface);
-  box-shadow: var(--shadow-card);
+}
+
+.summaryCard {
+  display: grid;
+  gap: 0.35rem;
 }
 
 .summaryCard strong {

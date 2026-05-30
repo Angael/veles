@@ -1,4 +1,5 @@
 import type * as React from 'react';
+import { Card } from '@/components/Card';
 import css from './AuthCard.module.css';
 
 type AuthCardProps = {
@@ -19,7 +20,7 @@ export function AuthCard(props: AuthCardProps) {
 
   return (
     <section className={css.authShell}>
-      <div className={css.authCard}>
+      <Card className={css.authCard}>
         <div className={css.authHeader}>
           <p className={css.eyebrow}>Private access</p>
           <h1>{title}</h1>
@@ -53,7 +54,7 @@ export function AuthCard(props: AuthCardProps) {
         </button>
 
         <div className={css.authFooter}>{footer}</div>
-      </div>
+      </Card>
     </section>
   );
 }

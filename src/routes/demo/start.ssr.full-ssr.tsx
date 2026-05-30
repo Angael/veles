@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
+import { Card } from '@/components/Card';
 import css from './demo.module.css';
 
 const getServerTime = createServerFn({ method: 'GET' }).handler(async () => {
@@ -18,7 +19,7 @@ function FullSsrPage() {
   const data = Route.useLoaderData() as Awaited<ReturnType<typeof getServerTime>>;
 
   return (
-    <article className={css.card}>
+    <Card as='article'>
       <div className={css.body}>
         <span className={css.badge}>loader + server fn</span>
         <h1>Full SSR route</h1>
@@ -27,6 +28,6 @@ function FullSsrPage() {
           <strong>Rendered at:</strong> {data.renderedAt}
         </div>
       </div>
-    </article>
+    </Card>
   );
 }

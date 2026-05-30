@@ -1,6 +1,7 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
+import { Card } from '@/components/Card';
 import css from './demo.module.css';
 
 const getTodos = createServerFn({ method: 'GET' }).handler(async () => {
@@ -28,7 +29,7 @@ function TanStackQueryPage() {
   const { data } = useQuery(todosQueryOptions);
 
   return (
-    <article className={css.card}>
+    <Card as='article'>
       <div className={css.body}>
         <span className={css.badge}>loader + query hydration</span>
         <h1>TanStack Query route</h1>
@@ -38,6 +39,6 @@ function TanStackQueryPage() {
           ))}
         </ul>
       </div>
-    </article>
+    </Card>
   );
 }

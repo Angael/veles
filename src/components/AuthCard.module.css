@@ -7,11 +7,6 @@
 .authCard {
   width: min(460px, 100%);
   padding: var(--space-4xl);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  backdrop-filter: var(--blur-surface);
-  box-shadow: var(--shadow-card);
 }
 
 .authHeader {
