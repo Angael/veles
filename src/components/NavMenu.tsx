@@ -27,6 +27,17 @@ interface MenuAction {
 
 const menuGroups: MenuGroup[] = [
   {
+    label: 'Trackers',
+    matches: ['/weight'],
+    links: [
+      {
+        to: '/weight',
+        label: 'Weight',
+        description: 'Mock dashboard for body weight logging and trend review.',
+      },
+    ],
+  },
+  {
     label: 'Demo',
     shouldRender: !clientEnv.isProd,
     matches: ['/demo'],
