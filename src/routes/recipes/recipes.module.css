@@ -1,5 +1,242 @@
-.layout {
+.page {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2xl);
+}
+
+.controls {
+  display: grid;
   gap: var(--space-xl);
+}
+
+.filterField span {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--text-xs);
+  color: var(--color-accent-label);
+}
+
+.searchField {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.searchInput,
+.selectInput,
+.numberInput {
+  min-height: var(--button-min-height);
+  width: 100%;
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: rgba(2, 6, 23, 0.4);
+  color: var(--color-page);
+  padding: 0 1rem;
+  font: inherit;
+}
+
+.filterToggle,
+.floatingButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--button-min-height);
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.filterToggle {
+  justify-self: start;
+  border-radius: var(--radius-pill);
+  padding: 0.65rem 1rem;
+  background: var(--color-surface-strong);
+  color: var(--color-page);
+}
+
+.filtersPanel {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-inset);
+}
+
+.filterField {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.cardHeader h2 {
+  margin: 0;
+}
+
+.description {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-xl);
+}
+
+.cardLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.card {
+  display: grid;
+  gap: var(--space-lg);
+  height: 100%;
+  padding-bottom: var(--space-md);
+}
+
+.cardLink:hover .card,
+.cardLink:focus-visible .card {
+  border-color: var(--color-primary-border);
+  box-shadow:
+    0 0 0 1px var(--color-primary-border-soft),
+    var(--shadow-card);
+}
+
+.cardLink,
+.card,
+.mainImage,
+.sideImage {
+  user-select: none;
+}
+
+.imageLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(96px, 1fr);
+  gap: var(--space-sm);
+}
+
+.imageLayout:has(.sideImages:empty),
+.imageLayout:not(:has(.sideImages)) {
+  grid-template-columns: 1fr;
+}
+
+.mainImageWrap,
+.sideImageWrap {
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-inset);
+}
+
+.mainImageWrap {
+  aspect-ratio: 16 / 10;
+}
+
+.sideImages {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.sideImageWrap {
+  min-height: 0;
+  aspect-ratio: 1.35 / 1;
+}
+
+.mainImage,
+.sideImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cardBody {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.tag {
+  padding: 0 0.65rem;
+  border: var(--border-width) solid var(--color-border);
+  color: var(--color-muted-strong);
+}
+
+.recipeFooter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin: auto 0 0 auto;
+
+  .footerItem {
+    color: var(--color-accent-label);
+    letter-spacing: var(--letter-spacing-eyebrow);
+    font-size: var(--text-md);
+  }
+}
+
+.floatingButton {
+  position: fixed;
+  right: var(--space-xl);
+  bottom: var(--space-xl);
+  z-index: 2;
+  border-radius: var(--radius-pill);
+  padding: 0.8rem 1.1rem;
+  background: var(--gradient-primary);
+  color: var(--color-primary-contrast);
+  box-shadow: var(--shadow-card);
+}
+
+@media (max-width: 1100px) {
+  .filtersPanel,
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filtersPanel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .resultsHeader,
+  .cardHeader,
+  .imageLayout,
+  .grid,
+  .filtersPanel,
+  .nutritionGrid {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .resultsHeader {
+    align-items: start;
+  }
+
+  .floatingButton {
+    right: var(--space-lg);
+    bottom: var(--space-lg);
+  }
 }

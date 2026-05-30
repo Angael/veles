@@ -14,7 +14,9 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecipesIndexRouteImport } from './routes/recipes/index'
+import { Route as RecipesAddRouteImport } from './routes/recipes/add'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
+import { Route as RecipesViewIdRouteImport } from './routes/recipes/view.$id'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as ApiDemoPingRouteImport } from './routes/api/demo/ping'
@@ -49,9 +51,19 @@ const RecipesIndexRoute = RecipesIndexRouteImport.update({
   path: '/recipes/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecipesAddRoute = RecipesAddRouteImport.update({
+  id: '/recipes/add',
+  path: '/recipes/add',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
   path: '/demo/tanstack-query',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecipesViewIdRoute = RecipesViewIdRouteImport.update({
+  id: '/recipes/view/$id',
+  path: '/recipes/view/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
@@ -101,11 +113,13 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/weight': typeof WeightRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/recipes/add': typeof RecipesAddRoute
   '/recipes/': typeof RecipesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/recipes/view/$id': typeof RecipesViewIdRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -117,11 +131,13 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/weight': typeof WeightRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/recipes/add': typeof RecipesAddRoute
   '/recipes': typeof RecipesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/recipes/view/$id': typeof RecipesViewIdRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -134,11 +150,13 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/weight': typeof WeightRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/recipes/add': typeof RecipesAddRoute
   '/recipes/': typeof RecipesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/recipes/view/$id': typeof RecipesViewIdRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -152,11 +170,13 @@ export interface FileRouteTypes {
     | '/signup'
     | '/weight'
     | '/demo/tanstack-query'
+    | '/recipes/add'
     | '/recipes/'
     | '/api/auth/$'
     | '/api/demo/ping'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/recipes/view/$id'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -168,11 +188,13 @@ export interface FileRouteTypes {
     | '/signup'
     | '/weight'
     | '/demo/tanstack-query'
+    | '/recipes/add'
     | '/recipes'
     | '/api/auth/$'
     | '/api/demo/ping'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/recipes/view/$id'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -184,11 +206,13 @@ export interface FileRouteTypes {
     | '/signup'
     | '/weight'
     | '/demo/tanstack-query'
+    | '/recipes/add'
     | '/recipes/'
     | '/api/auth/$'
     | '/api/demo/ping'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/recipes/view/$id'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -201,11 +225,13 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   WeightRoute: typeof WeightRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  RecipesAddRoute: typeof RecipesAddRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDemoPingRoute: typeof ApiDemoPingRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
+  RecipesViewIdRoute: typeof RecipesViewIdRoute
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
@@ -249,11 +275,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecipesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recipes/add': {
+      id: '/recipes/add'
+      path: '/recipes/add'
+      fullPath: '/recipes/add'
+      preLoaderRoute: typeof RecipesAddRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/tanstack-query': {
       id: '/demo/tanstack-query'
       path: '/demo/tanstack-query'
       fullPath: '/demo/tanstack-query'
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recipes/view/$id': {
+      id: '/recipes/view/$id'
+      path: '/recipes/view/$id'
+      fullPath: '/recipes/view/$id'
+      preLoaderRoute: typeof RecipesViewIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/server-funcs': {
@@ -321,11 +361,13 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   WeightRoute: WeightRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  RecipesAddRoute: RecipesAddRoute,
   RecipesIndexRoute: RecipesIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDemoPingRoute: ApiDemoPingRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
+  RecipesViewIdRoute: RecipesViewIdRoute,
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
