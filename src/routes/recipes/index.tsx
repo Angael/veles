@@ -167,15 +167,26 @@ function RecipesPage() {
 
               <div className={css.cardBody}>
                 <div className={css.cardHeader}>
-                  <h2>{recipe.name}</h2>
-                </div>
+                  <div className={css.titleBlock}>
+                    <h2>{recipe.name}</h2>
 
-                <div className={css.tags}>
-                  {recipe.tags.map((tag) => (
-                    <span className={css.tag} key={tag}>
-                      {tag}
-                    </span>
-                  ))}
+                    <div className={css.tags}>
+                      {recipe.tags.map((tag) => (
+                        <button
+                          className={css.tag}
+                          key={tag}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            setSearch(tag);
+                          }}
+                          type='button'
+                        >
+                          #{tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 <p className={css.description}>{recipe.description}</p>

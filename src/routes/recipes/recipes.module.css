@@ -9,7 +9,6 @@
 }
 
 .filterField span {
-  margin: 0;
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-eyebrow);
   font-size: var(--text-xs);
@@ -69,12 +68,7 @@
   gap: var(--space-sm);
 }
 
-.cardHeader h2 {
-  margin: 0;
-}
-
 .description {
-  margin: 0;
   color: var(--color-muted);
 }
 
@@ -152,7 +146,8 @@
 }
 
 .cardBody {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var(--space-md);
 }
 
@@ -163,24 +158,37 @@
   gap: var(--space-lg);
 }
 
+.titleBlock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem;
+  line-height: 1.6rem;
+}
+
 .tag {
   display: inline-flex;
   align-items: center;
-  min-height: 2rem;
-  border-radius: var(--radius-pill);
   font-size: var(--text-xs);
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: var(--space-md);
 }
 
 .tag {
-  padding: 0 0.65rem;
-  border: var(--border-width) solid var(--color-border);
+  padding: 0;
+  border: none;
+  background: transparent;
   color: var(--color-muted-strong);
+  cursor: pointer;
+}
+
+.tag:hover,
+.tag:focus-visible {
+  color: var(--color-accent-soft);
 }
 
 .recipeFooter {
