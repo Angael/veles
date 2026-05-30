@@ -2,6 +2,7 @@ import type { Route as rootRouteImport } from './routes/__root';
 import type { Route as SignupRouteImport } from './routes/signup';
 import type { Route as LoginRouteImport } from './routes/login';
 import type { Route as IndexRouteImport } from './routes/index';
+import type { Route as WeightRouteImport } from './routes/weight';
 import type { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query';
 import type { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs';
 import type { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request';
@@ -26,6 +27,13 @@ declare module '@tanstack/react-router' {
       path: '/login';
       fullPath: '/login';
       preLoaderRoute: typeof LoginRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    '/weight': {
+      id: '/weight';
+      path: '/weight';
+      fullPath: '/weight';
+      preLoaderRoute: typeof WeightRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     '/signup': {

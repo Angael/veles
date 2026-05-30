@@ -1,0 +1,182 @@
+.page {
+  display: grid;
+  gap: var(--space-2xl);
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2xl);
+}
+
+.summaryCard,
+.card {
+  display: grid;
+  gap: 0.35rem;
+  padding: var(--space-2xl);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  backdrop-filter: var(--blur-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.summaryCard strong {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+}
+
+.statLabel,
+.captureField span {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--text-xs);
+  color: var(--color-accent-label);
+}
+
+.summaryCard p,
+.logRow p,
+.photoPlaceholder p {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.deltaDown {
+  color: #86efac;
+}
+
+.deltaUp {
+  color: #fca5a5;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  gap: var(--space-2xl);
+}
+
+.captureCard {
+  align-content: start;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-xl);
+}
+
+.primaryButton {
+  min-height: var(--button-min-height);
+  border-radius: var(--radius-pill);
+  padding: 0.65rem 1rem;
+  font: inherit;
+}
+
+.primaryButton {
+  border-color: transparent;
+  background: var(--gradient-primary);
+  color: var(--color-primary-contrast);
+}
+
+.captureField {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.mockBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0 0.75rem;
+  border: var(--border-width) solid var(--color-primary-border-soft);
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-surface);
+  color: var(--color-accent);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-eyebrow);
+}
+
+.capturePanel,
+.logList {
+  display: grid;
+  gap: var(--space-xl);
+  margin-top: var(--space-xl);
+}
+
+.captureValue {
+  display: inline-flex;
+  align-items: center;
+  min-height: 3.5rem;
+  padding: 0 1rem;
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: rgba(2, 6, 23, 0.4);
+  font-size: 1.4rem;
+  font-weight: var(--font-weight-semibold);
+}
+
+.photoPlaceholder {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+  border: 1px dashed var(--color-primary-border);
+  border-radius: var(--radius-md);
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.photoIcon {
+  width: 1.8rem;
+  height: 1.8rem;
+  color: var(--color-accent-soft);
+}
+
+.primaryButton {
+  border: none;
+  cursor: pointer;
+}
+
+.logRow {
+  display: grid;
+  grid-template-columns: minmax(0, 160px) minmax(0, 1fr);
+  gap: var(--space-xl);
+  padding-bottom: var(--space-xl);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.logRow:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.logMeta {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.logMeta span {
+  color: var(--color-accent-soft);
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 1000px) {
+  .summaryGrid,
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .summaryCard,
+  .card {
+    padding: var(--space-xl);
+  }
+
+  .cardHeader,
+  .logRow {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+}
