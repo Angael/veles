@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Card } from '@/components/Card';
+import { Card } from '@/components/card/Card';
 import css from './demo.module.css';
 
 export const Route = createFileRoute('/demo/start/ssr/spa-mode')({

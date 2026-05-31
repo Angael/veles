@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
-import { Card } from '@/components/Card';
+import { Card } from '@/components/card/Card';
 import css from './demo.module.css';
 
 const getServerTime = createServerFn({ method: 'GET' }).handler(async () => {
