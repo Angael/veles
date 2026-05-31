@@ -1,9 +1,15 @@
-- when using css modules, prefer name `import css from ...`
-- Never use Global CSS, though this app uses global reset.css and theme.css
-- Run `pnpm check:fix` before finishing
+# Rules
 - This is a solo hobby app; prefer low-friction solutions
+- Run `pnpm check:fix` before finishing
+
+## CI/CD
 - Avoid GitHub Actions and GitHub CI/CD for sensitive prod workflows; this repo is public
 - Pushing to `main` makes Dokploy pull, install, and deploy to prod
 - Never run Drizzle commands yourself; leave them to the human user
-- Components should not have more than 250 lines of code. If they have, it's a code smell that it does too much.
+- DB migrations need to be run before pushing/merging to `main`
+
+## UI
+- Prefer css modules to global css, prefer syntax `import css from ...`
+- This app uses global reset.css and theme.css
+- Components generally should not have more than ~250 lines of code. It's a code smell that file does too much.
 - Final UI needs to use emil-design-eng skill, it needs to give good user experience.
