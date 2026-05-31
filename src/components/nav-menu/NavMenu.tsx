@@ -1,6 +1,6 @@
 import { NavigationMenu } from '@base-ui/react/navigation-menu';
-import type { ComponentProps } from 'react';
 import { Link, useRouterState } from '@tanstack/react-router';
+import type { ComponentProps } from 'react';
 import css from './NavMenu.module.css';
 import { useNavMenuGroups } from './useNavMenuGroups';
 

@@ -1,5 +1,5 @@
-import { Outlet, Link } from '@tanstack/react-router';
-import { NavMenu } from '@/components/NavMenu';
+import { Link, Outlet } from '@tanstack/react-router';
+import { NavMenu } from '@/components/nav-menu/NavMenu';
 import { clientEnv } from '@/lib/env/client';
 import css from './AppFrame.module.css';
 

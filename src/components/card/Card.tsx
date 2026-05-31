@@ -1,6 +1,6 @@
+import clsx from 'clsx';
 import type { ComponentPropsWithoutRef } from 'react';
 import css from './Card.module.css';
-import clsx from 'clsx';
 
 type CardProps = ComponentPropsWithoutRef<'div'> & {
   as?: 'article' | 'div' | 'section';

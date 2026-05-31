@@ -34,31 +34,6 @@
   gap: var(--space-xl);
 }
 
-.primaryButton,
-.secondaryButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: var(--button-min-height);
-  border-radius: var(--radius-sm);
-  padding: var(--space-lg) var(--space-xl);
-  font: inherit;
-  cursor: pointer;
-}
-
-.primaryButton {
-  border: none;
-  color: var(--color-primary-contrast);
-  background: var(--gradient-primary);
-}
-
-.secondaryButton {
-  width: 100%;
-  border: var(--border-width) solid var(--color-border-strong);
-  color: var(--color-page);
-  background: var(--color-surface-strong);
-}
-
 .authDivider {
   display: flex;
   align-items: center;

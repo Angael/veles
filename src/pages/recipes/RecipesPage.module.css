@@ -5,7 +5,14 @@
 
 .controls {
   display: grid;
-  gap: var(--space-xl);
+  gap: var(--space-lg);
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-md);
+  align-items: center;
 }
 
 .filterField span {
@@ -33,24 +40,15 @@
   font: inherit;
 }
 
-.filterToggle,
-.floatingButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: var(--button-min-height);
-  border: none;
-  font: inherit;
-  cursor: pointer;
-  text-decoration: none;
+.searchInput:focus-visible,
+.selectInput:focus-visible,
+.numberInput:focus-visible {
+  outline: 2px solid var(--color-primary-focus);
+  outline-offset: 2px;
 }
 
 .filterToggle {
-  justify-self: start;
-  border-radius: var(--radius-pill);
-  padding: 0.65rem 1rem;
-  background: var(--color-surface-strong);
-  color: var(--color-page);
+  justify-self: end;
 }
 
 .filtersPanel {
@@ -84,6 +82,10 @@
   height: 100%;
   padding-bottom: var(--space-md);
   cursor: pointer;
+  transition:
+    border-color 180ms var(--ease-out),
+    box-shadow 180ms var(--ease-out),
+    transform 140ms var(--ease-out);
 }
 
 .card:hover,
@@ -92,6 +94,10 @@
   box-shadow:
     0 0 0 1px var(--color-primary-border-soft),
     var(--shadow-card);
+}
+
+.card:active {
+  transform: scale(0.99);
 }
 
 .card,
@@ -153,12 +159,6 @@
   line-height: 1.6rem;
 }
 
-.tag {
-  display: inline-flex;
-  align-items: center;
-  font-size: var(--text-xs);
-}
-
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -170,6 +170,7 @@
   border: none;
   background: transparent;
   color: var(--color-muted-strong);
+  font-size: var(--text-xs);
   cursor: pointer;
 }
 
@@ -192,16 +193,8 @@
   font-size: var(--text-md);
 }
 
-.floatingButton {
-  position: fixed;
-  right: var(--space-xl);
-  bottom: var(--space-xl);
-  z-index: 2;
-  border-radius: var(--radius-pill);
-  padding: 0.8rem 1.1rem;
-  background: var(--gradient-primary);
-  color: var(--color-primary-contrast);
-  box-shadow: var(--shadow-card);
+.desktopLabel {
+  display: inline;
 }
 
 @media (max-width: 1100px) {
@@ -216,25 +209,24 @@
 }
 
 @media (max-width: 720px) {
-  .resultsHeader,
-  .cardHeader,
   .grid,
-  .filtersPanel,
-  .nutritionGrid {
+  .filtersPanel {
     grid-template-columns: 1fr;
-    display: grid;
   }
 
-  .resultsHeader {
-    align-items: start;
+  .toolbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .filterToggle {
+    width: var(--button-min-height);
+  }
+
+  .desktopLabel {
+    display: none;
   }
 
   .imageLayout {
     height: 150px;
-  }
-
-  .floatingButton {
-    right: var(--space-lg);
-    bottom: var(--space-lg);
   }
 }
