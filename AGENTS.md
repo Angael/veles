@@ -6,3 +6,4 @@
 - Pushing to `main` makes Dokploy pull, install, and deploy to prod
 - Never run Drizzle commands yourself; leave them to the human user
 - Components should not have more than 250 lines of code. If they have, it's a code smell that it does too much.
+- Final UI needs to use emil-design-eng skill, it needs to give good user experience.
