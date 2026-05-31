@@ -6,7 +6,8 @@
     ".tanstack",
     "node_modules",
     "routeTree.gen.ts",
-    "AGENTS.md"
+    "AGENTS.md",
+    "SKILL.md"
   ],
   "jsxSingleQuote": true,
   "singleQuote": true
