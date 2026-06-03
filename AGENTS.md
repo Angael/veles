@@ -24,3 +24,4 @@
 - `src/routes/*.tsx` files should stay minimal. They can contain up to ~200 lines of JSX, but beyond that should always move into `src/pages`.
 - Keep demo route code outside reusable `src/components`.
 - Final UI needs to use emil-design-eng skill, it needs to give good user experience.
+- for icons use `lucide-react` package, always rename imported icons so they have 'Icon' suffix to avoid naming conflicts
