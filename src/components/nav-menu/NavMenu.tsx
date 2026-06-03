@@ -1,6 +1,7 @@
 import { NavigationMenu } from '@base-ui/react/navigation-menu';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { ChevronDownIcon } from 'lucide-react';
+import { useState } from 'react';
 import css from './NavMenu.module.css';
 import { useNavMenuGroups } from './useNavMenuGroups';
 
@@ -9,9 +10,10 @@ export function NavMenu() {
     select: (state) => state.location.pathname,
   });
   const { groups } = useNavMenuGroups();
+  const [value, setValue] = useState<string | null>(null);
 
   return (
-    <NavigationMenu.Root className={css.navRoot}>
+    <NavigationMenu.Root className={css.navRoot} onValueChange={setValue} value={value}>
       <NavigationMenu.List className={css.navList}>
         {groups.map((group) => {
           if (group.shouldRender === false) {
@@ -26,7 +28,7 @@ export function NavMenu() {
           }
 
           return (
-            <NavigationMenu.Item key={group.key}>
+            <NavigationMenu.Item key={group.key} value={group.key}>
               <NavigationMenu.Trigger className={active ? css.navTriggerActive : css.navTrigger}>
                 {group.label}
                 <NavigationMenu.Icon className={css.navIcon}>
@@ -48,7 +50,10 @@ export function NavMenu() {
                           <button
                             className={css.navCard}
                             disabled={item.disabled}
-                            onClick={() => void item.onClick?.()}
+                            onClick={() => {
+                              setValue(null);
+                              void item.onClick?.();
+                            }}
                             type='button'
                           >
                             <h3 className={css.navCardTitle}>{item.label}</h3>
@@ -65,7 +70,10 @@ export function NavMenu() {
                         <MenuLink
                           active={linkActive}
                           className={linkActive ? css.navCardActive : css.navCard}
-                          onClick={item.onClick}
+                          onClick={() => {
+                            setValue(null);
+                            void item.onClick?.();
+                          }}
                           to={item.link}
                         >
                           <h3 className={css.navCardTitle}>{item.label}</h3>
