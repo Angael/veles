@@ -1,4 +1,4 @@
-import type { SVGProps } from 'react';
+import { CameraIcon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import css from './WeightPage.module.css';
@@ -60,7 +60,7 @@ export function WeightPage() {
             <label className={css.captureField}>
               <span>Photo</span>
               <div className={css.photoPlaceholder}>
-                <PhotoIcon className={css.photoIcon} />
+                <CameraIcon aria-hidden='true' className={css.photoIcon} strokeWidth={1.5} />
                 <strong>Optional progress photo</strong>
                 <p>Kept private, attached only when it helps the trend tell the truth.</p>
               </div>
@@ -177,19 +177,4 @@ function getDayDistance(startDate: string, endDate: string) {
 
 function roundToOneDecimal(value: number) {
   return Math.round(value * 10) / 10;
-}
-
-function PhotoIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg aria-hidden='true' fill='none' viewBox='0 0 24 24' {...props}>
-      <path
-        d='M7.5 7.5 9 5.25h6l1.5 2.25H19.5A1.5 1.5 0 0 1 21 9v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18V9a1.5 1.5 0 0 1 1.5-1.5z'
-        stroke='currentColor'
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        strokeWidth='1.5'
-      />
-      <circle cx='12' cy='13' r='3.25' stroke='currentColor' strokeWidth='1.5' />
-    </svg>
-  );
 }

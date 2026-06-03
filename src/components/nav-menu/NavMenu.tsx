@@ -1,6 +1,6 @@
 import { NavigationMenu } from '@base-ui/react/navigation-menu';
 import { Link, useRouterState } from '@tanstack/react-router';
-import type { ComponentProps } from 'react';
+import { ChevronDownIcon } from 'lucide-react';
 import css from './NavMenu.module.css';
 import { useNavMenuGroups } from './useNavMenuGroups';
 
@@ -30,7 +30,12 @@ export function NavMenu() {
               <NavigationMenu.Trigger className={active ? css.navTriggerActive : css.navTrigger}>
                 {group.label}
                 <NavigationMenu.Icon className={css.navIcon}>
-                  <CaretDownIcon />
+                  <ChevronDownIcon
+                    aria-hidden='true'
+                    size={16}
+                    strokeWidth={1.75}
+                    style={{ display: 'block' }}
+                  />
                 </NavigationMenu.Icon>
               </NavigationMenu.Trigger>
 
@@ -95,22 +100,6 @@ export function NavMenu() {
 
 function MenuLink({ to, ...props }: MenuLinkProps) {
   return <NavigationMenu.Link render={<Link to={to as never} />} {...props} />;
-}
-
-function CaretDownIcon(props: ComponentProps<'svg'>) {
-  return (
-    <svg
-      width='16'
-      height='16'
-      viewBox='0 0 16 16'
-      fill='currentColor'
-      aria-hidden='true'
-      {...props}
-      style={{ display: 'block', ...props.style }}
-    >
-      <path d='M12 6H4l4 4.5z' />
-    </svg>
-  );
 }
 
 type MenuLinkProps = Omit<NavigationMenu.Link.Props, 'render'> & {

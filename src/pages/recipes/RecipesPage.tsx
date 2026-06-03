@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
+import { ListFilterIcon, PlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
@@ -53,7 +54,7 @@ export function RecipesPage() {
           <Btn
             aria-label={showFilters ? 'Hide advanced filters' : 'Show advanced filters'}
             className={css.filterToggle}
-            icon={<FilterIcon />}
+            icon={<ListFilterIcon aria-hidden='true' size={18} strokeWidth={1.8} />}
             onClick={() => setShowFilters((value) => !value)}
             radius='pill'
             type='button'
@@ -206,7 +207,10 @@ export function RecipesPage() {
         ))}
       </section>
 
-      <FloatingButton icon={<PlusIcon />} to='/recipes/add'>
+      <FloatingButton
+        icon={<PlusIcon aria-hidden='true' size={18} strokeWidth={1.8} />}
+        to='/recipes/add'
+      >
         Add recipe
       </FloatingButton>
     </main>
@@ -233,25 +237,4 @@ function getImageLayoutClass(imageCount: number) {
   }
 
   return css.imageLayoutOne;
-}
-
-function FilterIcon() {
-  return (
-    <svg aria-hidden='true' fill='none' height='18' viewBox='0 0 24 24' width='18'>
-      <path
-        d='M4 7h16M7 12h10m-7 5h4'
-        stroke='currentColor'
-        strokeLinecap='round'
-        strokeWidth='1.8'
-      />
-    </svg>
-  );
-}
-
-function PlusIcon() {
-  return (
-    <svg aria-hidden='true' fill='none' height='18' viewBox='0 0 24 24' width='18'>
-      <path d='M12 5v14M5 12h14' stroke='currentColor' strokeLinecap='round' strokeWidth='1.8' />
-    </svg>
-  );
 }
