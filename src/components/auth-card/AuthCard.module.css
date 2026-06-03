@@ -7,6 +7,9 @@
 .authCard {
   width: min(460px, 100%);
   padding: var(--space-4xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
 
 .authHeader {
@@ -43,7 +46,7 @@
 }
 
 .authFooter {
-  margin-top: var(--space-xl);
+  margin: var(--space-xl) auto 0;
   color: var(--color-muted);
 }
 
@@ -57,4 +60,8 @@
   color: var(--color-danger-text);
   background: var(--color-danger-surface);
   border: var(--border-width) solid var(--color-danger-border);
+}
+
+.authGoogle {
+  width: 100%;
 }

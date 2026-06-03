@@ -45,7 +45,12 @@ export function AuthCard(props: AuthCardProps) {
 
         <div className={css.authDivider}>or</div>
 
-        <Btn disabled={busy || !onGoogle} onClick={() => void onGoogle?.()} variant='secondary'>
+        <Btn
+          className={css.authGoogle}
+          disabled={busy || !onGoogle}
+          onClick={() => void onGoogle?.()}
+          variant='secondary'
+        >
           Continue with Google
         </Btn>
 
