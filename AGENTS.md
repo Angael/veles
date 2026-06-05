@@ -19,6 +19,7 @@
 
 ## UI
 - Prefer css modules to global css, prefer syntax `import css from ...`
+- In css modules, prefer nested selectors when it keeps related styles together.
 - This app uses global reset.css and theme.css
 - Components generally should not have more than ~250 lines of code. It's a code smell that file does too much.
 - `src/routes/*.tsx` files should stay minimal. They can contain up to ~200 lines of JSX, but beyond that should always move into `src/pages`.
