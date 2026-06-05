@@ -1,4 +1,4 @@
-import { queryOptions } from '@tanstack/react-query';
+import { keepPreviousData, queryOptions } from '@tanstack/react-query';
 import type { RecipesQueryInput } from './recipes.data';
 import { getRecipes } from './recipes.api';
 
@@ -16,5 +16,6 @@ export function recipesQueryOptions(input: RecipesQueryInput = DEFAULT_RECIPES_Q
   return queryOptions({
     queryKey: ['recipes', input],
     queryFn: () => getRecipes({ data: input }),
+    placeholderData: keepPreviousData,
   });
 }

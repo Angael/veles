@@ -39,6 +39,8 @@ export type RecipesQueryResult = {
   appliedFilters: RecipesQueryInput;
 };
 
+export type RecipeDetail = RecipeListItem;
+
 const image = (id: string) => ({
   url: `https://picsum.photos/seed/${id}/1200/900`,
 });
@@ -222,6 +224,10 @@ export function getMockRecipes(input: RecipesQueryInput): RecipesQueryResult {
     recipes: sortedRecipes,
     appliedFilters: normalizedInput,
   };
+}
+
+export function getMockRecipeById(id: string): RecipeDetail | null {
+  return MOCK_RECIPES.find((recipe) => recipe.id === id) ?? null;
 }
 
 function normalizeRecipesQueryInput(input: RecipesQueryInput): RecipesQueryInput {
