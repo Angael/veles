@@ -1,4 +1,5 @@
 import { type } from 'arktype';
+import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { getMockRecipeById, getMockRecipes, type RecipesQueryInput } from './recipes.data';
 
@@ -12,39 +13,19 @@ const recipesInputType = type({
   'userId?': 'string | null',
 });
 
-function recipesInputValidator(data: unknown): RecipesQueryInput {
-  const result = recipesInputType(data);
-
-  if (result instanceof type.errors) {
-    throw new Error(result.summary);
-  }
-
-  return {
-    ...result,
-    userId: result.userId ?? 'mock-user',
-  };
-}
-
 export const getRecipes = createServerFn({ method: 'GET' })
-  .inputValidator(recipesInputValidator)
+  .inputValidator(arkTypeValidator(recipesInputType))
   .handler(async ({ data }) => {
-    return getMockRecipes(data);
+    return getMockRecipes({
+      ...data,
+      userId: data.userId ?? 'mock-user',
+    } satisfies RecipesQueryInput);
   });
 
 const recipeByIdInputType = type({ id: 'string' });
 
-function recipeByIdInputValidator(data: unknown) {
-  const result = recipeByIdInputType(data);
-
-  if (result instanceof type.errors) {
-    throw new Error(result.summary);
-  }
-
-  return result;
-}
-
 export const getRecipeById = createServerFn({ method: 'GET' })
-  .inputValidator(recipeByIdInputValidator)
+  .inputValidator(arkTypeValidator(recipeByIdInputType))
   .handler(async ({ data }) => {
     return getMockRecipeById(data.id);
   });
