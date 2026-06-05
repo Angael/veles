@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { ListFilterIcon, PlusIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -13,7 +13,6 @@ type NutritionField = 'none' | 'kcal' | 'protein' | 'carbs' | 'fats';
 type FilterDirection = 'gte' | 'lte';
 
 export function RecipesPage() {
-  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [nutritionField, setNutritionField] = useState<NutritionField>('none');
@@ -141,70 +140,56 @@ export function RecipesPage() {
 
       <section className={css.grid}>
         {recipes.map((recipe) => (
-          <Card
-            as='article'
-            className={css.card}
+          <Link
+            className={css.cardLink}
             key={recipe.id}
-            compact
-            onClick={() => navigate({ to: '/recipes/view/$id', params: { id: recipe.id } })}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                navigate({ to: '/recipes/view/$id', params: { id: recipe.id } });
-              }
-            }}
-            role='link'
-            tabIndex={0}
+            params={{ id: recipe.id }}
+            to='/recipes/view/$id'
           >
-            {recipe.images.length > 0 ? (
-              <div className={clsx(css.imageLayout, getImageLayoutClass(recipe.images.length))}>
-                {recipe.images.slice(0, 3).map((image, index) => (
-                  <img
-                    alt=''
-                    className={css.recipeImage}
-                    key={`${recipe.id}-${index}`}
-                    src={image.url}
-                  />
-                ))}
-              </div>
-            ) : null}
+            <Card as='article' className={css.card} compact>
+              {recipe.images.length > 0 ? (
+                <div className={clsx(css.imageLayout, getImageLayoutClass(recipe.images.length))}>
+                  {recipe.images.slice(0, 3).map((image, index) => (
+                    <img
+                      alt=''
+                      className={css.recipeImage}
+                      key={`${recipe.id}-${index}`}
+                      src={image.url}
+                    />
+                  ))}
+                </div>
+              ) : null}
 
-            <div className={css.cardBody}>
-              <div className={css.cardHeader}>
-                <div className={css.titleBlock}>
-                  <h2>{recipe.name}</h2>
+              <div className={css.cardBody}>
+                <div className={css.cardHeader}>
+                  <div className={css.titleBlock}>
+                    <h2>{recipe.name}</h2>
 
-                  {recipe.tags.length > 0 ? (
-                    <div className={css.tags}>
-                      {recipe.tags.map((tag) => (
-                        <button
-                          className={css.tag}
-                          key={tag}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            setSearch(tag);
-                          }}
-                          type='button'
-                        >
-                          #{tag}
-                        </button>
-                      ))}
-                    </div>
+                    {recipe.tags.length > 0 ? (
+                      <div className={css.tags}>
+                        {recipe.tags.map((tag) => (
+                          <span className={css.tag} key={tag}>
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+
+                {recipe.description ? (
+                  <p className={css.description}>{recipe.description}</p>
+                ) : null}
+
+                <div className={css.recipeFooter}>
+                  <span className={css.footerItem}>{recipe.rating}/5</span>
+                  {recipe.nutrition.kcal !== null ? (
+                    <p className={css.footerItem}>{String(recipe.nutrition.kcal)} KCAL</p>
                   ) : null}
                 </div>
               </div>
-
-              {recipe.description ? <p className={css.description}>{recipe.description}</p> : null}
-
-              <div className={css.recipeFooter}>
-                <span className={css.footerItem}>{recipe.rating}/5</span>
-                {recipe.nutrition.kcal !== null ? (
-                  <p className={css.footerItem}>{String(recipe.nutrition.kcal)} KCAL</p>
-                ) : null}
-              </div>
-            </div>
-          </Card>
+            </Card>
+          </Link>
         ))}
       </section>
 
