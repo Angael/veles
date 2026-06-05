@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useThrottledValue } from '@tanstack/react-pacer';
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { ListFilterIcon, PlusIcon } from 'lucide-react';
@@ -13,13 +14,14 @@ type NutritionField = 'none' | 'kcal' | 'protein' | 'carbs' | 'fats';
 type FilterDirection = 'gte' | 'lte';
 
 export function RecipesPage() {
-  const [search, setSearch] = useState('');
+  const [searchInputValue, setSearchInputValue] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [nutritionField, setNutritionField] = useState<NutritionField>('none');
   const [nutritionDirection, setNutritionDirection] = useState<FilterDirection>('lte');
   const [nutritionValueInput, setNutritionValueInput] = useState('');
   const [ratingDirection, setRatingDirection] = useState<FilterDirection>('gte');
   const [ratingValueInput, setRatingValueInput] = useState('');
+  const [search] = useThrottledValue(searchInputValue, { wait: 200 });
 
   const queryInput = {
     search,
@@ -44,10 +46,10 @@ export function RecipesPage() {
               autoComplete='off'
               className={css.searchInput}
               name='search'
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => setSearchInputValue(event.target.value)}
               placeholder='Search by name, tags, or description'
               type='search'
-              value={search}
+              value={searchInputValue}
             />
           </label>
 
