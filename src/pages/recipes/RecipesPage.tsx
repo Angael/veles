@@ -6,6 +6,7 @@ import { ListFilterIcon, PlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
+import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { DEFAULT_RECIPES_QUERY_INPUT, recipesQueryOptions } from './recipes.query';
 import css from './RecipesPage.module.css';
@@ -140,11 +141,7 @@ export function RecipesPage() {
         ) : null}
 
         {error?.message ? (
-          <ErrorCard
-            className={css.errorCard}
-            message={error.message}
-            title='Could not load recipes'
-          />
+          <ErrorCard message={error.message} title='Could not load recipes' />
         ) : null}
       </section>
 
