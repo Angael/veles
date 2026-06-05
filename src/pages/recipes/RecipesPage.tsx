@@ -138,6 +138,14 @@ export function RecipesPage() {
             </label>
           </div>
         ) : null}
+
+        {error?.message ? (
+          <ErrorCard
+            className={css.errorCard}
+            message={error.message}
+            title='Could not load recipes'
+          />
+        ) : null}
       </section>
 
       <section className={css.grid}>
@@ -203,16 +211,6 @@ export function RecipesPage() {
       </FloatingButton>
     </main>
   );
-}
-
-function parseOptionalNumber(value: string) {
-  if (!value.trim()) {
-    return null;
-  }
-
-  const parsedValue = Number(value);
-
-  return Number.isFinite(parsedValue) ? parsedValue : null;
 }
 
 function getImageLayoutClass(imageCount: number) {
