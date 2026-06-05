@@ -41,6 +41,7 @@ export function RecipesPage() {
         <div className={css.toolbar}>
           <label className={css.searchField}>
             <input
+              aria-label='Search recipes'
               autoComplete='off'
               className={css.searchInput}
               name='search'

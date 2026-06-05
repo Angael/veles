@@ -97,7 +97,6 @@ export function LoginPage() {
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Login failed';
 
-          alert(message);
           setError(message);
         } finally {
           setBusy(false);

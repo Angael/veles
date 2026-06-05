@@ -91,20 +91,25 @@ export function SignupPage() {
         setBusy(true);
         setError(null);
 
-        const result = await signUp.email({
-          name: String(formData.get('name') || ''),
-          email: String(formData.get('email') || ''),
-          password: String(formData.get('password') || ''),
-        });
+        try {
+          const result = await signUp.email({
+            name: String(formData.get('name') || ''),
+            email: String(formData.get('email') || ''),
+            password: String(formData.get('password') || ''),
+          });
 
-        setBusy(false);
+          if (result.error) {
+            setError(result.error.message || 'Signup failed');
+            return;
+          }
 
-        if (result.error) {
-          setError(result.error.message || 'Signup failed');
+          navigate({ to: '/' });
+        } catch (err) {
+          setError(String(err || 'Signup failed'));
           return;
+        } finally {
+          setBusy(false);
         }
-
-        navigate({ to: '/' });
       }}
       submitLabel='Create account'
       title='Sign up'
