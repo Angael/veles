@@ -3,13 +3,27 @@ import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { getMockRecipeById, getMockRecipes, type RecipesQueryInput } from './recipes.data';
 
+const nullableNumberInputType = type('string | number | null').pipe((value) => {
+  if (value === null || typeof value === 'number') {
+    return value;
+  }
+
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) {
+    return null;
+  }
+
+  return Number(trimmedValue);
+}, type('number | null'));
+
 const recipesInputType = type({
   search: 'string',
   nutritionField: '"kcal" | "protein" | "carbs" | "fats" | "none"',
   nutritionDirection: '"gte" | "lte"',
-  nutritionValue: 'number | null',
+  nutritionValue: nullableNumberInputType,
   ratingDirection: '"gte" | "lte"',
-  ratingValue: 'number | null',
+  ratingValue: nullableNumberInputType,
   'userId?': 'string | null',
 });
 

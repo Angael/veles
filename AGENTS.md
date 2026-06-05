@@ -27,3 +27,6 @@
 - Keep demo route code outside reusable `src/components`.
 - Final UI needs to use emil-design-eng skill, it needs to give good user experience.
 - for icons use `lucide-react` package, always rename imported icons so they have 'Icon' suffix to avoid naming conflicts
+
+## TS
+- avoid `as any` `as unknown` `as never`, if you find yourself needing to use them - ask user for approval
