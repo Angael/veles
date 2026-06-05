@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
+import { Card } from '@/components/card/Card';
 import css from './demo.module.css';
 
 const getFacts = createServerFn({ method: 'GET' }).handler(async () => {
@@ -20,7 +21,7 @@ function DataOnlyPage() {
   const facts = Route.useLoaderData() as Awaited<ReturnType<typeof getFacts>>;
 
   return (
-    <article className={css.card}>
+    <Card as='article'>
       <div className={css.body}>
         <span className={css.badge}>server data only</span>
         <h1>Data-only route</h1>
@@ -30,6 +31,6 @@ function DataOnlyPage() {
           ))}
         </ul>
       </div>
-    </article>
+    </Card>
   );
 }

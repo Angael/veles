@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
+import { Card } from '@/components/card/Card';
 import css from './demo.module.css';
 
 export const Route = createFileRoute('/demo/start/api-request')({
@@ -10,7 +11,7 @@ function ApiRequestPage() {
   const [result, setResult] = useState<string>('Not fetched yet');
 
   return (
-    <article className={css.card}>
+    <Card as='article'>
       <div className={css.body}>
         <span className={css.badge}>server route fetch</span>
         <h1>API request route</h1>
@@ -28,6 +29,6 @@ function ApiRequestPage() {
         </button>
         <div className={css.result}>{result}</div>
       </div>
-    </article>
+    </Card>
   );
 }

@@ -4,9 +4,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import * as React from 'react';
-import { AppFrame } from '@/components/AppFrame';
-import { DefaultCatchBoundary } from '@/components/DefaultCatchBoundary';
-import { NotFound } from '@/components/NotFound';
+import { AppFrame } from '@/components/app-frame/AppFrame';
+import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
+import { NotFound } from '@/components/not-found/NotFound';
 import { clientEnv } from '@/lib/env/client';
 import resetCss from '@/styles/reset.css?url';
 

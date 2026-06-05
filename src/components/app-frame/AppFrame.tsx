@@ -1,5 +1,5 @@
-import { Outlet } from '@tanstack/react-router';
-import { NavMenu } from '@/components/NavMenu';
+import { Link, Outlet } from '@tanstack/react-router';
+import { NavMenu } from '@/components/nav-menu/NavMenu';
 import { clientEnv } from '@/lib/env/client';
 import css from './AppFrame.module.css';
 
@@ -9,7 +9,9 @@ export function AppFrame() {
       <div className={css.shell}>
         <header className={css.header}>
           <div className={css.brand}>
-            <strong>{clientEnv.appName}</strong>
+            <Link to='/'>
+              <strong>{clientEnv.appName}</strong>
+            </Link>
           </div>
           <NavMenu />
         </header>

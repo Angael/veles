@@ -26,6 +26,24 @@ input {
   font: inherit;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+dl,
+dt,
+dd {
+  margin: 0;
+}
+
 a {
   color: inherit;
+}
+
+p {
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-regular);
 }

@@ -9,16 +9,14 @@
   gap: var(--space-2xl);
 }
 
-.summaryCard,
 .card {
   display: grid;
   gap: 0.35rem;
-  padding: var(--space-2xl);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  backdrop-filter: var(--blur-surface);
-  box-shadow: var(--shadow-card);
+}
+
+.summaryCard {
+  display: grid;
+  gap: 0.35rem;
 }
 
 .summaryCard strong {
@@ -64,19 +62,6 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-xl);
-}
-
-.primaryButton {
-  min-height: var(--button-min-height);
-  border-radius: var(--radius-pill);
-  padding: 0.65rem 1rem;
-  font: inherit;
-}
-
-.primaryButton {
-  border-color: transparent;
-  background: var(--gradient-primary);
-  color: var(--color-primary-contrast);
 }
 
 .captureField {
@@ -131,11 +116,7 @@
   width: 1.8rem;
   height: 1.8rem;
   color: var(--color-accent-soft);
-}
-
-.primaryButton {
-  border: none;
-  cursor: pointer;
+  margin: auto;
 }
 
 .logRow {

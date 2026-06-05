@@ -18,11 +18,6 @@
   grid-row: span 2;
   overflow: hidden;
   padding: var(--space-5xl);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  backdrop-filter: var(--blur-surface);
-  box-shadow: var(--shadow-card);
 }
 
 .hero::after {
@@ -65,38 +60,8 @@
   gap: var(--space-lg);
 }
 
-.primaryButton,
-.secondaryButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: var(--button-min-height);
-  border-radius: var(--radius-sm);
-  padding: var(--space-lg) var(--space-xl);
-  font: inherit;
-  text-decoration: none;
-}
-
-.primaryButton {
-  border: none;
-  color: var(--color-primary-contrast);
-  background: var(--gradient-primary);
-}
-
-.secondaryButton {
-  border: var(--border-width) solid var(--color-border-strong);
-  color: var(--color-page);
-  background: var(--color-surface-strong);
-}
-
 .tile {
-  padding: 1.35rem;
   min-height: 180px;
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  backdrop-filter: var(--blur-surface);
-  box-shadow: var(--shadow-card);
 }
 
 .tile h2 {

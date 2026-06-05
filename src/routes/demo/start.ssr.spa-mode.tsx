@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { Card } from '@/components/card/Card';
 import css from './demo.module.css';
 
 export const Route = createFileRoute('/demo/start/ssr/spa-mode')({
@@ -8,7 +9,7 @@ export const Route = createFileRoute('/demo/start/ssr/spa-mode')({
 
 function SpaModePage() {
   return (
-    <article className={css.card}>
+    <Card as='article'>
       <div className={css.body}>
         <span className={css.badge}>`ssr: false`</span>
         <h1>SPA mode route</h1>
@@ -20,6 +21,6 @@ function SpaModePage() {
   ssr: false,
 })`}</pre>
       </div>
-    </article>
+    </Card>
   );
 }

@@ -3,15 +3,6 @@
   gap: var(--space-2xl);
 }
 
-.card {
-  padding: var(--space-2xl);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  backdrop-filter: var(--blur-surface);
-  box-shadow: var(--shadow-card);
-}
-
 .body {
   padding: var(--space-4xl);
 }

@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { useState } from 'react';
+import { Card } from '@/components/card/Card';
 import css from './demo.module.css';
 
 const explainServerFn = createServerFn({ method: 'GET' }).handler(async () => {
@@ -26,7 +27,7 @@ function ServerFunctionsPage() {
   const [result, setResult] = useState<string>('Waiting for a server call.');
 
   return (
-    <article className={css.card}>
+    <Card as='article'>
       <div className={css.body}>
         <span className={css.badge}>createServerFn</span>
         <h1>Server function route</h1>
@@ -43,6 +44,6 @@ function ServerFunctionsPage() {
         </button>
         <div className={css.result}>{result}</div>
       </div>
-    </article>
+    </Card>
   );
 }

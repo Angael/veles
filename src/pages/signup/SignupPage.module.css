@@ -1,0 +1,18 @@
+.field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.field label {
+  font-size: var(--text-label);
+  color: var(--color-accent-label);
+}
+
+.field input {
+  min-height: var(--button-min-height);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.9rem;
+  color: var(--color-page-strong);
+  background: var(--color-surface-input);
+}

@@ -1,4 +1,6 @@
 import type * as React from 'react';
+import { Btn } from '@/components/btn/Btn';
+import { Card } from '@/components/card/Card';
 import css from './AuthCard.module.css';
 
 type AuthCardProps = {
@@ -19,7 +21,7 @@ export function AuthCard(props: AuthCardProps) {
 
   return (
     <section className={css.authShell}>
-      <div className={css.authCard}>
+      <Card className={css.authCard}>
         <div className={css.authHeader}>
           <p className={css.eyebrow}>Private access</p>
           <h1>{title}</h1>
@@ -36,24 +38,24 @@ export function AuthCard(props: AuthCardProps) {
         >
           {fields}
           {error ? <div className={css.errorBox}>{error}</div> : null}
-          <button className={css.primaryButton} disabled={busy} type='submit'>
+          <Btn disabled={busy} type='submit' variant='primary'>
             {busy ? 'Working...' : submitLabel}
-          </button>
+          </Btn>
         </form>
 
         <div className={css.authDivider}>or</div>
 
-        <button
-          className={css.secondaryButton}
+        <Btn
+          className={css.authGoogle}
           disabled={busy || !onGoogle}
           onClick={() => void onGoogle?.()}
-          type='button'
+          variant='secondary'
         >
           Continue with Google
-        </button>
+        </Btn>
 
         <div className={css.authFooter}>{footer}</div>
-      </div>
+      </Card>
     </section>
   );
 }
