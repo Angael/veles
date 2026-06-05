@@ -17,5 +17,7 @@ export function recipesQueryOptions(input: RecipesQueryInput = DEFAULT_RECIPES_Q
     queryKey: ['recipes', input],
     queryFn: () => getRecipes({ data: input }),
     placeholderData: keepPreviousData,
+    // TODO: invalidate after adding recipe
+    staleTime: 1000 * 60, // 1 min
   });
 }
