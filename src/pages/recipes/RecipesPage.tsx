@@ -33,7 +33,7 @@ export function RecipesPage() {
     userId: DEFAULT_RECIPES_QUERY_INPUT.userId,
   } as const;
 
-  const { data } = useQuery(recipesQueryOptions(queryInput));
+  const { data, error } = useQuery(recipesQueryOptions(queryInput));
   const recipes = data?.recipes ?? [];
 
   return (
