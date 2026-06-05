@@ -17,7 +17,7 @@ export function FloatingButton({ children, icon, to }: FloatingButtonProps) {
       icon={icon}
       isLink
       radius='pill'
-      render={<Link to={to as never} />}
+      render={<Link to={to} />}
       size='md'
       variant='primary'
     >

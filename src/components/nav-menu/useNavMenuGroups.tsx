@@ -43,7 +43,7 @@ export function useNavMenuGroups() {
       return;
     }
 
-    navigate({ to: '/login' as never });
+    navigate({ to: '/login' });
   }
 
   const accountLabel = (

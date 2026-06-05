@@ -14,13 +14,13 @@ function SsrLayout() {
         <h1>TanStack Start SSR references</h1>
         <p>These routes are intentionally plain so the framework behavior is easy to inspect.</p>
         <div className={css.buttonRow}>
-          <Link className={css.linkButton} to={'/demo/start/ssr/spa-mode' as never}>
+          <Link className={css.linkButton} to={'/demo/start/ssr/spa-mode'}>
             SPA mode
           </Link>
-          <Link className={css.linkButton} to={'/demo/start/ssr/full-ssr' as never}>
+          <Link className={css.linkButton} to={'/demo/start/ssr/full-ssr'}>
             Full SSR
           </Link>
-          <Link className={css.linkButton} to={'/demo/start/ssr/data-only' as never}>
+          <Link className={css.linkButton} to={'/demo/start/ssr/data-only'}>
             Data only
           </Link>
         </div>

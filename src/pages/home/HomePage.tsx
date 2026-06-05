@@ -35,13 +35,13 @@ export function HomePage() {
           <h1>Veles</h1>
           <p>Private place for workouts, body weight, food logging, and shared personal files.</p>
           <div className={css.buttonRow}>
-            <Btn isLink render={<Link to={'/weight' as never} />} variant='secondary'>
+            <Btn isLink render={<Link to={'/weight'} />} variant='secondary'>
               Preview weight tracker
             </Btn>
-            <Btn isLink render={<Link to={'/login' as never} />} variant='primary'>
+            <Btn isLink render={<Link to={'/login'} />} variant='primary'>
               Open login
             </Btn>
-            <Btn isLink render={<Link to={'/signup' as never} />} variant='secondary'>
+            <Btn isLink render={<Link to={'/signup'} />} variant='secondary'>
               Create account
             </Btn>
           </div>

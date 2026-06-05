@@ -60,7 +60,7 @@ export function LoginPage() {
       }
       footer={
         <>
-          Need an account? <Link to={'/signup' as never}>Sign up</Link>
+          Need an account? <Link to={'/signup'}>Sign up</Link>
         </>
       }
       onGoogle={async () => {
@@ -93,7 +93,7 @@ export function LoginPage() {
             return;
           }
 
-          navigate({ to: '/' as never });
+          navigate({ to: '/' });
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Login failed';
 

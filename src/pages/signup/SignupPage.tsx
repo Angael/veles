@@ -69,7 +69,7 @@ export function SignupPage() {
       }
       footer={
         <>
-          Already have an account? <Link to={'/login' as never}>Log in</Link>
+          Already have an account? <Link to={'/login'}>Log in</Link>
         </>
       }
       onGoogle={async () => {
@@ -104,7 +104,7 @@ export function SignupPage() {
           return;
         }
 
-        navigate({ to: '/' as never });
+        navigate({ to: '/' });
       }}
       submitLabel='Create account'
       title='Sign up'

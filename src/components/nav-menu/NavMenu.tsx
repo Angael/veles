@@ -107,7 +107,7 @@ export function NavMenu() {
 }
 
 function MenuLink({ to, ...props }: MenuLinkProps) {
-  return <NavigationMenu.Link render={<Link to={to as never} />} {...props} />;
+  return <NavigationMenu.Link render={<Link to={to} />} {...props} />;
 }
 
 type MenuLinkProps = Omit<NavigationMenu.Link.Props, 'render'> & {
