@@ -20,6 +20,9 @@
 - they should always use log middleware: `.middleware([logMiddleware('<name>')])`
 - If it accepts input, use `inputValidator` with `arktype` and `@tanstack/arktype-adapter`.
 
+# API Routes
+- If an API route accepts input, validate the parsed input with `arktype` before using it.
+
 ## UI
 - Prefer css modules to global css, prefer syntax `import css from ...`
 - In css modules, prefer nested selectors when it keeps related styles together.

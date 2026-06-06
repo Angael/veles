@@ -20,6 +20,7 @@ import { Route as DemoComponentsRouteImport } from './routes/demo/components'
 import { Route as RecipesViewIdRouteImport } from './routes/recipes/view.$id'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
+import { Route as ApiRecipesUploadRouteImport } from './routes/api/recipes/upload'
 import { Route as ApiDemoPingRouteImport } from './routes/api/demo/ping'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
@@ -82,6 +83,11 @@ const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
   path: '/demo/start/api-request',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiRecipesUploadRoute = ApiRecipesUploadRouteImport.update({
+  id: '/api/recipes/upload',
+  path: '/api/recipes/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiDemoPingRoute = ApiDemoPingRouteImport.update({
   id: '/api/demo/ping',
   path: '/api/demo/ping',
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/recipes/': typeof RecipesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
+  '/api/recipes/upload': typeof ApiRecipesUploadRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/recipes/view/$id': typeof RecipesViewIdRoute
@@ -143,6 +150,7 @@ export interface FileRoutesByTo {
   '/recipes': typeof RecipesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
+  '/api/recipes/upload': typeof ApiRecipesUploadRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/recipes/view/$id': typeof RecipesViewIdRoute
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/recipes/': typeof RecipesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
+  '/api/recipes/upload': typeof ApiRecipesUploadRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/recipes/view/$id': typeof RecipesViewIdRoute
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/recipes/'
     | '/api/auth/$'
     | '/api/demo/ping'
+    | '/api/recipes/upload'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/recipes/view/$id'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/recipes'
     | '/api/auth/$'
     | '/api/demo/ping'
+    | '/api/recipes/upload'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/recipes/view/$id'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/recipes/'
     | '/api/auth/$'
     | '/api/demo/ping'
+    | '/api/recipes/upload'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/recipes/view/$id'
@@ -242,6 +254,7 @@ export interface RootRouteChildren {
   RecipesIndexRoute: typeof RecipesIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDemoPingRoute: typeof ApiDemoPingRoute
+  ApiRecipesUploadRoute: typeof ApiRecipesUploadRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
   RecipesViewIdRoute: typeof RecipesViewIdRoute
@@ -330,6 +343,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStartApiRequestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/recipes/upload': {
+      id: '/api/recipes/upload'
+      path: '/api/recipes/upload'
+      fullPath: '/api/recipes/upload'
+      preLoaderRoute: typeof ApiRecipesUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/demo/ping': {
       id: '/api/demo/ping'
       path: '/api/demo/ping'
@@ -386,6 +406,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecipesIndexRoute: RecipesIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDemoPingRoute: ApiDemoPingRoute,
+  ApiRecipesUploadRoute: ApiRecipesUploadRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
   RecipesViewIdRoute: RecipesViewIdRoute,

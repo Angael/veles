@@ -35,7 +35,7 @@
   text-align: left;
 
   &::placeholder {
-    color: var(--color-muted);
+    color: var(--color-placeholder);
   }
 
   &:focus-visible {
