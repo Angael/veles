@@ -8,8 +8,14 @@ type LogRecord = {
 
 const baseLogger = pino({
   level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
-  messageKey: 'event',
   timestamp: pino.stdTimeFunctions.isoTime,
+  transport:
+    process.env.NODE_ENV === 'production'
+      ? undefined
+      : {
+          target: 'pino-pretty',
+          options: { colorize: true },
+        },
   formatters: {
     level(label) {
       return { level: label };
@@ -20,7 +26,7 @@ const baseLogger = pino({
   },
 });
 
-export const logger = {
+export const log = {
   info(event: string, data?: LogRecord) {
     baseLogger.info(data || {}, event);
   },

@@ -14,8 +14,11 @@
 - `src/pages` is for route-specific components and their logic.
 - `src/pages` components should accept mostly SSR-fetched data when data is needed.
 - `src/lib` is for code reusable across the codebase.
-- Server functions should live in `.api.ts` files near their usage.
-- If a server function accepts input, use `inputValidator` with `arktype` and `@tanstack/arktype-adapter`.
+
+# Server Functions
+- they should live in `.api.ts` files near their usage.
+- they should always use log middleware: `.middleware([logMiddleware('<name>')])`
+- If it accepts input, use `inputValidator` with `arktype` and `@tanstack/arktype-adapter`.
 
 ## UI
 - Prefer css modules to global css, prefer syntax `import css from ...`

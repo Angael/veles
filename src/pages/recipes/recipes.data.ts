@@ -31,7 +31,6 @@ export type RecipesQueryInput = {
   nutritionValue: number | null;
   ratingDirection: 'gte' | 'lte';
   ratingValue: number | null;
-  userId?: string | null;
 };
 
 export type RecipesQueryResult = {
@@ -207,7 +206,10 @@ const MOCK_LAST_VIEWED_BY_USER: Record<string, string[]> = {
   ],
 };
 
-export function getMockRecipes(input: RecipesQueryInput): RecipesQueryResult {
+export function getMockRecipes(
+  input: RecipesQueryInput,
+  userId: string | null = null,
+): RecipesQueryResult {
   const normalizedInput = normalizeRecipesQueryInput(input);
   const searchedRecipes = MOCK_RECIPES.filter((recipe) =>
     matchesSearch(recipe, normalizedInput.search),
@@ -218,7 +220,7 @@ export function getMockRecipes(input: RecipesQueryInput): RecipesQueryResult {
   const ratingFilteredRecipes = filteredRecipes.filter((recipe) =>
     matchesRating(recipe, normalizedInput),
   );
-  const sortedRecipes = sortRecipes(ratingFilteredRecipes, normalizedInput.userId ?? null);
+  const sortedRecipes = sortRecipes(ratingFilteredRecipes, userId);
 
   return {
     recipes: sortedRecipes,
@@ -242,7 +244,6 @@ function normalizeRecipesQueryInput(input: RecipesQueryInput): RecipesQueryInput
     nutritionValue,
     ratingDirection: input.ratingDirection,
     ratingValue,
-    userId: input.userId ?? null,
   };
 }
 

@@ -9,7 +9,6 @@ export const DEFAULT_RECIPES_QUERY_INPUT: RecipesQueryInput = {
   nutritionValue: null,
   ratingDirection: 'gte',
   ratingValue: null,
-  userId: 'mock-user',
 };
 
 export function recipesQueryOptions(input: RecipesQueryInput = DEFAULT_RECIPES_QUERY_INPUT) {
