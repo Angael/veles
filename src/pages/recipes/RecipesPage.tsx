@@ -27,6 +27,8 @@ const RATING_DIRECTION_OPTIONS = [
   { label: 'Less than or equal', value: 'lte' },
 ] as const satisfies readonly { label: string; value: FilterDirection }[];
 
+const FILTERS_PANEL_ID = 'recipes-filters-panel';
+
 export function RecipesPage() {
   const [searchInputValue, setSearchInputValue] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -49,7 +51,6 @@ export function RecipesPage() {
 
   return (
     <main className={css.page}>
-      <title>Recipes</title>
       <section className={css.controls}>
         <div className={css.toolbar}>
           <label className={css.searchField}>
@@ -66,6 +67,8 @@ export function RecipesPage() {
           </label>
 
           <Btn
+            aria-controls={FILTERS_PANEL_ID}
+            aria-expanded={showFilters}
             aria-label='advanced filters'
             className={css.filterToggle}
             icon={<ListFilterIcon aria-hidden='true' size={18} strokeWidth={1.8} />}
@@ -77,64 +80,67 @@ export function RecipesPage() {
           ></Btn>
         </div>
 
-        {showFilters ? (
-          <div className={css.filtersPanel}>
-            <label className={css.filterField}>
-              <span>Kcal comparison</span>
-              <SelectInput
-                aria-label='Kcal comparison'
-                className={css.selectInput}
-                items={NUTRITION_DIRECTION_OPTIONS}
-                onValueChange={(value) => {
-                  if (value !== null) {
-                    setNutritionDirection(value);
-                  }
-                }}
-                value={nutritionDirection}
-              />
-            </label>
+        <div
+          aria-hidden={!showFilters}
+          className={css.filtersPanel}
+          hidden={!showFilters}
+          id={FILTERS_PANEL_ID}
+        >
+          <label className={css.filterField}>
+            <span>Kcal comparison</span>
+            <SelectInput
+              aria-label='Kcal comparison'
+              className={css.selectInput}
+              items={NUTRITION_DIRECTION_OPTIONS}
+              onValueChange={(value) => {
+                if (value !== null) {
+                  setNutritionDirection(value);
+                }
+              }}
+              value={nutritionDirection}
+            />
+          </label>
 
-            <label className={css.filterField}>
-              <span>Kcal value</span>
-              <NumberInput
-                className={css.numberInput}
-                min={0}
-                onValueChange={setNutritionValue}
-                placeholder='e.g. 500'
-                step={100}
-                value={nutritionValue}
-              />
-            </label>
+          <label className={css.filterField}>
+            <span>Kcal value</span>
+            <NumberInput
+              className={css.numberInput}
+              min={0}
+              onValueChange={setNutritionValue}
+              placeholder='e.g. 500'
+              step={100}
+              value={nutritionValue}
+            />
+          </label>
 
-            <label className={css.filterField}>
-              <span>Rating comparison</span>
-              <SelectInput
-                aria-label='Rating comparison'
-                className={css.selectInput}
-                items={RATING_DIRECTION_OPTIONS}
-                onValueChange={(value) => {
-                  if (value !== null) {
-                    setRatingDirection(value);
-                  }
-                }}
-                value={ratingDirection}
-              />
-            </label>
+          <label className={css.filterField}>
+            <span>Rating comparison</span>
+            <SelectInput
+              aria-label='Rating comparison'
+              className={css.selectInput}
+              items={RATING_DIRECTION_OPTIONS}
+              onValueChange={(value) => {
+                if (value !== null) {
+                  setRatingDirection(value);
+                }
+              }}
+              value={ratingDirection}
+            />
+          </label>
 
-            <label className={css.filterField}>
-              <span>Rating value</span>
-              <NumberInput
-                className={css.numberInput}
-                max={5}
-                min={0}
-                onValueChange={setRatingValue}
-                placeholder='e.g. 4'
-                step={1}
-                value={ratingValue}
-              />
-            </label>
-          </div>
-        ) : null}
+          <label className={css.filterField}>
+            <span>Rating value</span>
+            <NumberInput
+              className={css.numberInput}
+              max={5}
+              min={0}
+              onValueChange={setRatingValue}
+              placeholder='e.g. 4'
+              step={1}
+              value={ratingValue}
+            />
+          </label>
+        </div>
 
         {error?.message ? (
           <ErrorCard message={error.message} title='Could not load recipes' />
