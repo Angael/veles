@@ -8,7 +8,6 @@ import { getMockRecipeById, getMockRecipes } from './recipes.data';
 
 const recipesInputType = type({
   search: 'string',
-  nutritionField: '"kcal" | "protein" | "carbs" | "fats" | "none"',
   nutritionDirection: '"gte" | "lte"',
   nutritionValue: 'number | null',
   ratingDirection: '"gte" | "lte"',

@@ -8,31 +8,41 @@ import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
-import { DEFAULT_RECIPES_QUERY_INPUT, recipesQueryOptions } from './recipes.query';
+import { NumberInput } from '@/components/number-input/NumberInput';
+import { SelectInput } from '@/components/select-input/SelectInput';
+import { TextInput } from '@/components/text-input/TextInput';
+import type { RecipesQueryInput } from './recipes.data';
+import { recipesQueryOptions } from './recipes.query';
 import css from './RecipesPage.module.css';
 
-type NutritionField = 'none' | 'kcal' | 'protein' | 'carbs' | 'fats';
 type FilterDirection = 'gte' | 'lte';
+
+const NUTRITION_DIRECTION_OPTIONS = [
+  { label: 'Less than or equal', value: 'lte' },
+  { label: 'More than or equal', value: 'gte' },
+] as const satisfies readonly { label: string; value: FilterDirection }[];
+
+const RATING_DIRECTION_OPTIONS = [
+  { label: 'More than or equal', value: 'gte' },
+  { label: 'Less than or equal', value: 'lte' },
+] as const satisfies readonly { label: string; value: FilterDirection }[];
 
 export function RecipesPage() {
   const [searchInputValue, setSearchInputValue] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  const [nutritionField, setNutritionField] = useState<NutritionField>('none');
   const [nutritionDirection, setNutritionDirection] = useState<FilterDirection>('lte');
-  const [nutritionValueInput, setNutritionValueInput] = useState('');
+  const [nutritionValue, setNutritionValue] = useState<number | null>(null);
   const [ratingDirection, setRatingDirection] = useState<FilterDirection>('gte');
-  const [ratingValueInput, setRatingValueInput] = useState('');
+  const [ratingValue, setRatingValue] = useState<number | null>(null);
   const [search] = useThrottledValue(searchInputValue, { wait: 200 });
 
   const queryInput = {
     search,
-    nutritionField,
     nutritionDirection,
-    nutritionValue: parseOptionalNumber(nutritionValueInput),
+    nutritionValue,
     ratingDirection,
-    ratingValue: parseOptionalNumber(ratingValueInput),
-    userId: DEFAULT_RECIPES_QUERY_INPUT.userId,
-  } as const;
+    ratingValue,
+  } satisfies RecipesQueryInput;
 
   const { data, error } = useQuery(recipesQueryOptions(queryInput));
   const recipes = data?.recipes ?? [];
@@ -43,12 +53,12 @@ export function RecipesPage() {
       <section className={css.controls}>
         <div className={css.toolbar}>
           <label className={css.searchField}>
-            <input
+            <TextInput
               aria-label='Search recipes'
               autoComplete='off'
               className={css.searchInput}
               name='search'
-              onChange={(event) => setSearchInputValue(event.target.value)}
+              onValueChange={setSearchInputValue}
               placeholder='Search by name, tags, or description'
               type='search'
               value={searchInputValue}
@@ -73,69 +83,56 @@ export function RecipesPage() {
         {showFilters ? (
           <div className={css.filtersPanel}>
             <label className={css.filterField}>
-              <span>Nutrition field</span>
-              <select
+              <span>Kcal comparison</span>
+              <SelectInput
+                aria-label='Kcal comparison'
                 className={css.selectInput}
-                onChange={(event) => setNutritionField(event.target.value as NutritionField)}
-                value={nutritionField}
-              >
-                <option value='none'>Disabled</option>
-                <option value='kcal'>Kcal</option>
-                <option value='protein'>Protein</option>
-                <option value='carbs'>Carbs</option>
-                <option value='fats'>Fats</option>
-              </select>
-            </label>
-
-            <label className={css.filterField}>
-              <span>Nutrition comparison</span>
-              <select
-                className={css.selectInput}
-                onChange={(event) => setNutritionDirection(event.target.value as FilterDirection)}
+                items={NUTRITION_DIRECTION_OPTIONS}
+                onValueChange={(value) => {
+                  if (value !== null) {
+                    setNutritionDirection(value);
+                  }
+                }}
                 value={nutritionDirection}
-              >
-                <option value='lte'>Less than or equal</option>
-                <option value='gte'>More than or equal</option>
-              </select>
+              />
             </label>
 
             <label className={css.filterField}>
-              <span>Nutrition value</span>
-              <input
+              <span>Kcal value</span>
+              <NumberInput
                 className={css.numberInput}
-                inputMode='numeric'
-                min='0'
-                onChange={(event) => setNutritionValueInput(event.target.value)}
+                min={0}
+                onValueChange={setNutritionValue}
                 placeholder='e.g. 500'
-                type='number'
-                value={nutritionValueInput}
+                value={nutritionValue}
               />
             </label>
 
             <label className={css.filterField}>
               <span>Rating comparison</span>
-              <select
+              <SelectInput
+                aria-label='Rating comparison'
                 className={css.selectInput}
-                onChange={(event) => setRatingDirection(event.target.value as FilterDirection)}
+                items={RATING_DIRECTION_OPTIONS}
+                onValueChange={(value) => {
+                  if (value !== null) {
+                    setRatingDirection(value);
+                  }
+                }}
                 value={ratingDirection}
-              >
-                <option value='gte'>More than or equal</option>
-                <option value='lte'>Less than or equal</option>
-              </select>
+              />
             </label>
 
             <label className={css.filterField}>
               <span>Rating value</span>
-              <input
+              <NumberInput
                 className={css.numberInput}
-                inputMode='numeric'
-                max='5'
-                min='0'
-                onChange={(event) => setRatingValueInput(event.target.value)}
+                max={5}
+                min={0}
+                onValueChange={setRatingValue}
                 placeholder='e.g. 4'
-                step='1'
-                type='number'
-                value={ratingValueInput}
+                step={1}
+                value={ratingValue}
               />
             </label>
           </div>

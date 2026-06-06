@@ -1,0 +1,110 @@
+.root {
+  width: 100%;
+}
+
+.group {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  width: 100%;
+  min-height: var(--button-min-height);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: rgba(2, 6, 23, 0.4);
+  overflow: hidden;
+  transition:
+    border-color 180ms var(--ease-out),
+    box-shadow 180ms var(--ease-out),
+    background-color 180ms var(--ease-out);
+}
+
+.root:focus-within .group {
+  box-shadow: 0 0 0 2px var(--color-primary-focus);
+  border-color: var(--color-primary-border);
+}
+
+.input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-page);
+  padding: 0 0.85rem;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+
+  &::placeholder {
+    color: var(--color-muted);
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--button-min-height) - (var(--border-width) * 2));
+  border: 0;
+  background: color-mix(in srgb, var(--color-surface-strong) 72%, transparent);
+  color: var(--color-muted-strong);
+  transition:
+    transform 140ms var(--ease-out),
+    background-color 180ms var(--ease-out),
+    color 180ms var(--ease-out),
+    opacity 180ms var(--ease-out);
+}
+
+.stepper[data-disabled] {
+  opacity: 0.48;
+}
+
+.stepper:focus-visible {
+  outline: none;
+}
+
+.stepper:active:not([data-disabled]) {
+  transform: scale(0.97);
+}
+
+.decrement {
+  border-right: var(--border-width) solid var(--color-border);
+}
+
+.increment {
+  border-left: var(--border-width) solid var(--color-border);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .root:hover .group {
+    border-color: var(--color-primary-border-soft);
+    background: color-mix(in srgb, rgba(2, 6, 23, 0.4) 84%, var(--color-primary-surface) 16%);
+  }
+
+  .stepper:hover:not([data-disabled]) {
+    background: color-mix(
+      in srgb,
+      var(--color-primary-surface) 68%,
+      var(--color-surface-strong) 32%
+    );
+    color: var(--color-page);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .group,
+  .stepper {
+    transition:
+      background-color 140ms ease,
+      border-color 140ms ease,
+      box-shadow 140ms ease,
+      color 140ms ease,
+      opacity 140ms ease;
+  }
+
+  .stepper:active:not([data-disabled]) {
+    transform: none;
+  }
+}

@@ -26,7 +26,6 @@ export type RecipeListItem = {
 
 export type RecipesQueryInput = {
   search: string;
-  nutritionField: 'kcal' | 'protein' | 'carbs' | 'fats' | 'none';
   nutritionDirection: 'gte' | 'lte';
   nutritionValue: number | null;
   ratingDirection: 'gte' | 'lte';
@@ -239,7 +238,6 @@ function normalizeRecipesQueryInput(input: RecipesQueryInput): RecipesQueryInput
 
   return {
     search: trimmedSearch,
-    nutritionField: input.nutritionField,
     nutritionDirection: input.nutritionDirection,
     nutritionValue,
     ratingDirection: input.ratingDirection,
@@ -267,11 +265,11 @@ function matchesSearch(recipe: RecipeListItem, search: string) {
 }
 
 function matchesNutrition(recipe: RecipeListItem, input: RecipesQueryInput) {
-  if (input.nutritionField === 'none' || input.nutritionValue === null) {
+  if (input.nutritionValue === null) {
     return true;
   }
 
-  const fieldValue = recipe.nutrition[input.nutritionField];
+  const fieldValue = recipe.nutrition.kcal;
 
   if (fieldValue === null) {
     return false;

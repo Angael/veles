@@ -4,7 +4,6 @@ import { getRecipes } from './recipes.api';
 
 export const DEFAULT_RECIPES_QUERY_INPUT: RecipesQueryInput = {
   search: '',
-  nutritionField: 'none',
   nutritionDirection: 'lte',
   nutritionValue: null,
   ratingDirection: 'gte',

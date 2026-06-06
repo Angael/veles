@@ -11,15 +11,23 @@ import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { NavMenu } from '@/components/nav-menu/NavMenu';
 import { NotFound } from '@/components/not-found/NotFound';
 import { NumberInput } from '@/components/number-input/NumberInput';
+import { SelectInput } from '@/components/select-input/SelectInput';
 import { TextInput } from '@/components/text-input/TextInput';
+
+const SELECT_OPTIONS = [
+  { label: 'Less than or equal', value: 'lte' },
+  { label: 'More than or equal', value: 'gte' },
+] as const;
 
 export const Route = createFileRoute('/demo/components')({
   component: ComponentsDemoPage,
+  head: () => ({ meta: [{ title: 'Components Demo' }] }),
 });
 
 function ComponentsDemoPage() {
   const [textValue, setTextValue] = useState('Smoky bowl');
   const [numberValue, setNumberValue] = useState<number | null>(320);
+  const [selectValue, setSelectValue] = useState<(typeof SELECT_OPTIONS)[number]['value']>('lte');
 
   return (
     <main
@@ -73,6 +81,20 @@ function ComponentsDemoPage() {
           placeholder='Calories'
           step={10}
           value={numberValue}
+        />
+      </section>
+
+      <section style={{ width: 'min(42rem, 100%)' }}>
+        <h2>SelectInput</h2>
+        <SelectInput
+          aria-label='Demo select input'
+          items={SELECT_OPTIONS}
+          onValueChange={(value) => {
+            if (value !== null) {
+              setSelectValue(value);
+            }
+          }}
+          value={selectValue}
         />
       </section>
 

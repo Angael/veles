@@ -27,24 +27,9 @@
   gap: var(--space-md);
 }
 
-.searchInput,
-.selectInput,
-.numberInput {
-  min-height: var(--button-min-height);
+.selectInput {
   width: 100%;
-  border: var(--border-width) solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  background: rgba(2, 6, 23, 0.4);
-  color: var(--color-page);
-  padding: 0 1rem;
   font: inherit;
-}
-
-.searchInput:focus-visible,
-.selectInput:focus-visible,
-.numberInput:focus-visible {
-  outline: 2px solid var(--color-primary-focus);
-  outline-offset: 2px;
 }
 
 .filterToggle {
@@ -53,7 +38,7 @@
 
 .filtersPanel {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-lg);
   padding: var(--space-xl);
   border: var(--border-width) solid var(--color-border);
@@ -63,7 +48,7 @@
 
 .filterField {
   display: grid;
-  gap: var(--space-sm);
+  gap: var(--space-md);
 }
 
 .description {

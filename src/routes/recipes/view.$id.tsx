@@ -12,6 +12,7 @@ export const Route = createFileRoute('/recipes/view/$id')({
     return recipe;
   },
   component: RecipeViewPage,
+  head: ({ loaderData }) => ({ meta: [{ title: loaderData?.name ?? 'Recipe' }] }),
 });
 
 function RecipeViewPage() {
@@ -19,7 +20,6 @@ function RecipeViewPage() {
 
   return (
     <main>
-      <title>{recipe.name}</title>
       <h1>{recipe.name}</h1>
 
       <p>{recipe.description}</p>

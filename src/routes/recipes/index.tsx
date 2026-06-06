@@ -8,4 +8,5 @@ export const Route = createFileRoute('/recipes/')({
       context as { queryClient: import('@tanstack/react-query').QueryClient }
     ).queryClient.ensureQueryData(recipesQueryOptions(DEFAULT_RECIPES_QUERY_INPUT)),
   component: RecipesPage,
+  head: () => ({ meta: [{ title: 'Recipes' }] }),
 });
