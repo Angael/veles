@@ -66,18 +66,15 @@ export function RecipesPage() {
           </label>
 
           <Btn
-            aria-label={showFilters ? 'Hide advanced filters' : 'Show advanced filters'}
+            aria-label='advanced filters'
             className={css.filterToggle}
             icon={<ListFilterIcon aria-hidden='true' size={18} strokeWidth={1.8} />}
+            iconOnly
             onClick={() => setShowFilters((value) => !value)}
             radius='pill'
             type='button'
             variant='secondary'
-          >
-            <span className={css.desktopLabel}>
-              {showFilters ? 'Hide advanced filters' : 'Show advanced filters'}
-            </span>
-          </Btn>
+          ></Btn>
         </div>
 
         {showFilters ? (

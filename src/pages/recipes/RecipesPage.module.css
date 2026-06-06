@@ -174,10 +174,6 @@
   font-size: var(--text-md);
 }
 
-.desktopLabel {
-  display: inline;
-}
-
 @media (max-width: 1100px) {
   .filtersPanel,
   .grid {
@@ -201,10 +197,6 @@
 
   .filterToggle {
     width: var(--button-min-height);
-  }
-
-  .desktopLabel {
-    display: none;
   }
 
   .imageLayout {
