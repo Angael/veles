@@ -4,13 +4,12 @@ import { log } from '@/lib/logger';
 export const logMiddleware = (name: string) =>
   createMiddleware({ type: 'request' }).server(async ({ next, request }) => {
     const startedAt = Date.now();
-    const timestamp = new Date().toISOString();
     const method = request.method;
     const _path = new URL(request.url).pathname;
     const path = _path.startsWith('/_serverFn/') ? undefined : _path;
 
     log.info(`${name} start`, {
-      timestamp,
+      timestamp: new Date().toISOString(),
       method,
       path,
     });
@@ -19,7 +18,7 @@ export const logMiddleware = (name: string) =>
       const result = await next();
 
       log.info(`${name} done`, {
-        timestamp,
+        timestamp: new Date().toISOString(),
         method,
         path,
         durationMs: Date.now() - startedAt,
@@ -28,7 +27,7 @@ export const logMiddleware = (name: string) =>
       return result;
     } catch (error) {
       log.error(`${name} error`, {
-        timestamp,
+        timestamp: new Date().toISOString(),
         method,
         path,
         durationMs: Date.now() - startedAt,

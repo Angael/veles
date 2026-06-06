@@ -74,8 +74,7 @@
   padding-bottom: var(--space-md);
   transition:
     border-color 180ms var(--ease-out),
-    box-shadow 180ms var(--ease-out),
-    transform 140ms var(--ease-out);
+    box-shadow 180ms var(--ease-out);
 }
 
 .cardLink:hover .card,
@@ -84,10 +83,6 @@
   box-shadow:
     0 0 0 1px var(--color-primary-border-soft),
     var(--shadow-card);
-}
-
-.cardLink:active .card {
-  transform: scale(0.99);
 }
 
 .card,
