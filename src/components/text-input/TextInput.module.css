@@ -27,6 +27,11 @@
   }
 }
 
+label:has(.root[data-required]) > span:first-child::after {
+  content: ' *';
+  color: var(--color-danger-text);
+}
+
 @media (hover: hover) and (pointer: fine) {
   .root:hover:not(:disabled) {
     border-color: var(--color-primary-border-soft);

@@ -16,7 +16,11 @@ export function NumberInput({
   ...props
 }: NumberInputProps) {
   return (
-    <NumberField.Root className={clsx(css.root, className)} {...props}>
+    <NumberField.Root
+      className={clsx(css.root, className)}
+      data-required={props.required ? '' : undefined}
+      {...props}
+    >
       <NumberField.Group className={css.group}>
         <NumberField.Decrement
           aria-label='Decrease value'

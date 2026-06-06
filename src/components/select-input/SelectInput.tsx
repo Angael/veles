@@ -25,7 +25,10 @@ export function SelectInput<Value extends string>({
 }: SelectInputProps<Value>) {
   return (
     <Select.Root items={items} {...props}>
-      <Select.Trigger className={clsx(css.trigger, className)}>
+      <Select.Trigger
+        className={clsx(css.trigger, className)}
+        data-required={props.required ? '' : undefined}
+      >
         <Select.Value className={css.value} placeholder={placeholder} />
 
         <Select.Icon className={css.icon}>

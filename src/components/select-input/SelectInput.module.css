@@ -38,6 +38,11 @@
   }
 }
 
+label:has(.trigger[data-required]) > span:first-child::after {
+  content: ' *';
+  color: var(--color-danger-text);
+}
+
 .value {
   min-width: 0;
   overflow: hidden;

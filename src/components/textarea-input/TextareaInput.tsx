@@ -7,5 +7,11 @@ type TextareaInputProps = Omit<ComponentPropsWithoutRef<'textarea'>, 'className'
 };
 
 export function TextareaInput({ className, ...props }: TextareaInputProps) {
-  return <textarea className={clsx(css.root, className)} {...props} />;
+  return (
+    <textarea
+      className={clsx(css.root, className)}
+      data-required={props.required ? '' : undefined}
+      {...props}
+    />
+  );
 }

@@ -22,6 +22,16 @@ const uploadRecipeInputType = type({
   tags: 'string[]',
 });
 
+function getOptionalNumericFormValue(formData: FormData, key: string) {
+  const value = formData.get(key);
+
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  return value.trim() === '' ? null : value;
+}
+
 export const Route = createFileRoute('/api/recipes/upload')({
   server: {
     handlers: {
@@ -40,9 +50,9 @@ export const Route = createFileRoute('/api/recipes/upload')({
           const ingredientsValue = formData.get('ingredients');
           const tagsValue = formData.get('tags');
           const validation = uploadRecipeInputType({
-            carbs: formData.get('carbs'),
+            carbs: getOptionalNumericFormValue(formData, 'carbs'),
             description: formData.get('description'),
-            fats: formData.get('fats'),
+            fats: getOptionalNumericFormValue(formData, 'fats'),
             ingredients:
               typeof ingredientsValue === 'string'
                 ? ingredientsValue
@@ -50,11 +60,11 @@ export const Route = createFileRoute('/api/recipes/upload')({
                     .map((item) => item.trim())
                     .filter(Boolean)
                 : [],
-            kcal: formData.get('kcal'),
+            kcal: getOptionalNumericFormValue(formData, 'kcal'),
             name: formData.get('name'),
             photos: files,
-            protein: formData.get('protein'),
-            rating: formData.get('rating'),
+            protein: getOptionalNumericFormValue(formData, 'protein'),
+            rating: getOptionalNumericFormValue(formData, 'rating'),
             tags:
               typeof tagsValue === 'string'
                 ? tagsValue

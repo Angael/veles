@@ -2,6 +2,11 @@
   width: 100%;
 }
 
+label:has(.root[data-required]) > span:first-child::after {
+  content: ' *';
+  color: var(--color-danger-text);
+}
+
 .group {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
