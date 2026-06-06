@@ -6,15 +6,13 @@ import { auth } from '@/lib/auth/auth';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { getMockRecipeById, getMockRecipes } from './recipes.data';
 
-const nullableNumberInputType = type('number | null');
-
 const recipesInputType = type({
   search: 'string',
   nutritionField: '"kcal" | "protein" | "carbs" | "fats" | "none"',
   nutritionDirection: '"gte" | "lte"',
-  nutritionValue: nullableNumberInputType,
+  nutritionValue: 'number | null',
   ratingDirection: '"gte" | "lte"',
-  ratingValue: nullableNumberInputType,
+  ratingValue: 'number | null',
 });
 
 export const getRecipes = createServerFn({ method: 'GET' })
