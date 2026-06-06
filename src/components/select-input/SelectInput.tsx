@@ -1,6 +1,6 @@
 import { Select } from '@base-ui/react/select';
 import clsx from 'clsx';
-import { CheckIcon, ChevronDownIcon } from 'lucide-react';
+import { ChevronDownIcon } from 'lucide-react';
 import css from './SelectInput.module.css';
 
 type SelectInputItem<Value extends string> = {
@@ -39,9 +39,6 @@ export function SelectInput<Value extends string>({
             <Select.List className={css.list}>
               {items.map((item) => (
                 <Select.Item className={css.item} key={item.value} value={item.value}>
-                  <Select.ItemIndicator className={css.itemIndicator}>
-                    <CheckIcon aria-hidden='true' size={16} strokeWidth={1.8} />
-                  </Select.ItemIndicator>
                   <Select.ItemText className={css.itemText}>{item.label}</Select.ItemText>
                 </Select.Item>
               ))}
