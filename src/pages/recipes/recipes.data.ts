@@ -26,18 +26,18 @@ export type RecipeListItem = {
 
 export type RecipesQueryInput = {
   search: string;
-  nutritionField: 'kcal' | 'protein' | 'carbs' | 'fats' | 'none';
   nutritionDirection: 'gte' | 'lte';
   nutritionValue: number | null;
   ratingDirection: 'gte' | 'lte';
   ratingValue: number | null;
-  userId?: string | null;
 };
 
 export type RecipesQueryResult = {
   recipes: RecipeListItem[];
   appliedFilters: RecipesQueryInput;
 };
+
+export type RecipeDetail = RecipeListItem;
 
 const image = (id: string) => ({
   url: `https://picsum.photos/seed/${id}/1200/900`,
@@ -205,7 +205,10 @@ const MOCK_LAST_VIEWED_BY_USER: Record<string, string[]> = {
   ],
 };
 
-export function getMockRecipes(input: RecipesQueryInput): RecipesQueryResult {
+export function getMockRecipes(
+  input: RecipesQueryInput,
+  userId: string | null = null,
+): RecipesQueryResult {
   const normalizedInput = normalizeRecipesQueryInput(input);
   const searchedRecipes = MOCK_RECIPES.filter((recipe) =>
     matchesSearch(recipe, normalizedInput.search),
@@ -216,12 +219,16 @@ export function getMockRecipes(input: RecipesQueryInput): RecipesQueryResult {
   const ratingFilteredRecipes = filteredRecipes.filter((recipe) =>
     matchesRating(recipe, normalizedInput),
   );
-  const sortedRecipes = sortRecipes(ratingFilteredRecipes, normalizedInput.userId ?? null);
+  const sortedRecipes = sortRecipes(ratingFilteredRecipes, userId);
 
   return {
     recipes: sortedRecipes,
     appliedFilters: normalizedInput,
   };
+}
+
+export function getMockRecipeById(id: string): RecipeDetail | null {
+  return MOCK_RECIPES.find((recipe) => recipe.id === id) ?? null;
 }
 
 function normalizeRecipesQueryInput(input: RecipesQueryInput): RecipesQueryInput {
@@ -231,12 +238,10 @@ function normalizeRecipesQueryInput(input: RecipesQueryInput): RecipesQueryInput
 
   return {
     search: trimmedSearch,
-    nutritionField: input.nutritionField,
     nutritionDirection: input.nutritionDirection,
     nutritionValue,
     ratingDirection: input.ratingDirection,
     ratingValue,
-    userId: input.userId ?? null,
   };
 }
 
@@ -260,11 +265,11 @@ function matchesSearch(recipe: RecipeListItem, search: string) {
 }
 
 function matchesNutrition(recipe: RecipeListItem, input: RecipesQueryInput) {
-  if (input.nutritionField === 'none' || input.nutritionValue === null) {
+  if (input.nutritionValue === null) {
     return true;
   }
 
-  const fieldValue = recipe.nutrition[input.nutritionField];
+  const fieldValue = recipe.nutrition.kcal;
 
   if (fieldValue === null) {
     return false;

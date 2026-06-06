@@ -1,0 +1,45 @@
+.card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-md);
+  align-items: start;
+  padding: var(--space-lg);
+  border-color: var(--color-danger-border);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent), var(--color-danger-surface);
+}
+
+.icon {
+  color: var(--color-danger-text);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.content {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--text-xs);
+  color: var(--color-danger-text);
+}
+
+.message {
+  color: var(--color-page);
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 720px) {
+  .card {
+    grid-template-columns: 1fr;
+  }
+
+  .icon {
+    display: none;
+  }
+}

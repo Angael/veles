@@ -2,7 +2,6 @@ import { Avatar } from '@base-ui/react/avatar';
 import { useNavigate } from '@tanstack/react-router';
 import { type ReactNode, useState } from 'react';
 import { signOut, useSession } from '@/lib/auth/client';
-import { clientEnv } from '@/lib/env/client';
 import css from './NavMenu.module.css';
 
 export interface NavMenuGroup {
@@ -79,56 +78,6 @@ export function useNavMenuGroups() {
           link: '/recipes',
           label: 'Recipes',
           description: 'Recipe notes and cooking references.',
-        },
-      ],
-    },
-    {
-      key: 'demo',
-      label: 'Demo',
-      shouldRender: !clientEnv.isProd,
-      matchPrefixes: ['/demo'],
-      items: [
-        {
-          key: 'demo-ssr',
-          link: '/demo/start/ssr',
-          label: 'SSR',
-          description: 'TanStack Start SSR entry point.',
-        },
-        {
-          key: 'demo-spa-mode',
-          link: '/demo/start/ssr/spa-mode',
-          label: 'SPA Mode',
-          description: 'SSR route configured for SPA rendering.',
-        },
-        {
-          key: 'demo-full-ssr',
-          link: '/demo/start/ssr/full-ssr',
-          label: 'Full SSR',
-          description: 'Server-rendered page with full HTML output.',
-        },
-        {
-          key: 'demo-data-only',
-          link: '/demo/start/ssr/data-only',
-          label: 'Data Only',
-          description: 'Loader-driven data rendering example.',
-        },
-        {
-          key: 'demo-server-funcs',
-          link: '/demo/start/server-funcs',
-          label: 'Server Functions',
-          description: 'Calls TanStack Start server functions.',
-        },
-        {
-          key: 'demo-api-request',
-          link: '/demo/start/api-request',
-          label: 'API Route',
-          description: 'Hits a server API route from the client.',
-        },
-        {
-          key: 'demo-query',
-          link: '/demo/tanstack-query',
-          label: 'TanStack Query',
-          description: 'Query caching and async state demo.',
         },
       ],
     },

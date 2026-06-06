@@ -44,7 +44,7 @@ When reviewing UI code, you MUST use a markdown table with Before/After columns.
 | `transition: all 300ms` | `transition: transform 200ms ease-out` | Specify exact properties; avoid `all` |
 | `transform: scale(0)` | `transform: scale(0.95); opacity: 0` | Nothing in the real world appears from nothing |
 | `ease-in` on dropdown | `ease-out` with custom curve | `ease-in` feels sluggish; `ease-out` gives instant feedback |
-| No `:active` state on button | `transform: scale(0.97)` on `:active` | Buttons must feel responsive to press |
+| Press-state scale on buttons or inputs | Remove the scale effect; prefer color, shadow, or border feedback | High-frequency controls should stay visually stable under the pointer |
 | `transform-origin: center` on popover | `transform-origin: var(--radix-popover-content-transform-origin)` | Popovers should scale from their trigger (not modals — modals stay centered) |
 
 Wrong format (never do this):
@@ -87,7 +87,7 @@ Valid purposes:
 - **Spatial consistency**: toast enters and exits from the same direction, making swipe-to-dismiss feel intuitive
 - **State indication**: a morphing feedback button shows the state change
 - **Explanation**: a marketing animation that shows how a feature works
-- **Feedback**: a button scales down on press, confirming the interface heard the user
+- **Feedback**: color, border, shadow, or opacity changes can confirm the interface heard the user without shifting the control
 - **Preventing jarring changes**: elements appearing or disappearing without transition feel broken
 
 If the purpose is just "it looks cool" and the user will see it often, don't animate.
@@ -196,21 +196,24 @@ Springs maintain velocity when interrupted — CSS animations and keyframes rest
 
 ## Component Building Principles
 
-### Buttons must feel responsive
+### Buttons and inputs should not scale on press
 
-Add `transform: scale(0.97)` on `:active`. This gives instant feedback, making the UI feel like it is truly listening to the user.
+Do not add `transform: scale(...)` to high-frequency controls such as buttons, inputs, selects, or steppers. Press feedback should come from color, border, shadow, or opacity so the control feels stable under the pointer.
 
 ```css
 .button {
-  transition: transform 160ms ease-out;
+  transition:
+    background-color 160ms ease-out,
+    border-color 160ms ease-out,
+    box-shadow 160ms ease-out;
 }
 
 .button:active {
-  transform: scale(0.97);
+  background-color: var(--button-bg-active);
 }
 ```
 
-This applies to any pressable element. The scale should be subtle (0.95-0.98).
+Reserve scale effects for infrequent decorative or spatial transitions, not core form controls.
 
 ### Never animate from scale(0)
 
@@ -298,17 +301,9 @@ When a crossfade between two states feels off despite trying different easings a
 
 **Why blur works:** Without blur, you see two distinct objects during a crossfade — the old state and the new state overlapping. This looks unnatural. Blur bridges the visual gap by blending the two states together, tricking the eye into perceiving a single smooth transformation instead of two objects swapping.
 
-Combine blur with scale-on-press (`scale(0.97)`) for a polished button state transition:
+Combine blur with non-geometric press feedback for a polished button state transition:
 
 ```css
-.button {
-  transition: transform 160ms ease-out;
-}
-
-.button:active {
-  transform: scale(0.97);
-}
-
 .button-content {
   transition: filter 200ms ease, opacity 200ms ease;
 }
@@ -370,7 +365,7 @@ Prefer percentages over hardcoded pixel values. They are less error-prone and ad
 
 ### scale() scales children too
 
-Unlike `width`/`height`, `scale()` also scales an element's children. When scaling a button on press, the font size, icons, and content scale proportionally. This is a feature, not a bug.
+Unlike `width`/`height`, `scale()` also scales an element's children. Avoid that behavior on buttons and form controls because it makes text and icons feel jittery during frequent interactions.
 
 ### 3D transforms for depth
 
@@ -431,7 +426,7 @@ Duplicate the tab list. Style the copy as "active" (different background, differ
 
 ### Hold-to-delete pattern
 
-Use `clip-path: inset(0 100% 0 0)` on a colored overlay. On `:active`, transition to `inset(0 0 0 0)` over 2s with linear timing. On release, snap back with 200ms ease-out. Add `scale(0.97)` on the button for press feedback.
+Use `clip-path: inset(0 100% 0 0)` on a colored overlay. On `:active`, transition to `inset(0 0 0 0)` over 2s with linear timing. On release, snap back with 200ms ease-out. Keep the button itself geometrically stable.
 
 ### Image reveals on scroll
 
@@ -552,7 +547,7 @@ const closedX = shouldReduceMotion ? 0 : '-100%';
 ```css
 @media (hover: hover) and (pointer: fine) {
   .element:hover {
-    transform: scale(1.05);
+    box-shadow: 0 0 0 1px var(--color-primary-border-soft);
   }
 }
 ```
@@ -673,6 +668,7 @@ When reviewing UI code, check for:
 | Animation on keyboard action               | Remove animation entirely                                        |
 | Duration > 300ms on UI element             | Reduce to 150-250ms                                              |
 | Hover animation without media query        | Add `@media (hover: hover) and (pointer: fine)`                  |
+| Press-state scale on button/input          | Remove scale; use color, border, shadow, or opacity feedback     |
 | Keyframes on rapidly-triggered element     | Use CSS transitions for interruptibility                         |
 | Framer Motion `x`/`y` props under load     | Use `transform: "translateX()"` for hardware acceleration        |
 | Same enter/exit transition speed           | Make exit faster than enter (e.g., enter 2s, exit 200ms)         |

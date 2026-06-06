@@ -1,0 +1,35 @@
+.root {
+  width: 100%;
+  min-height: var(--button-min-height);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: rgba(2, 6, 23, 0.4);
+  color: var(--color-page);
+  padding: 0 1rem;
+  font: inherit;
+  transition:
+    border-color 180ms var(--ease-out),
+    box-shadow 180ms var(--ease-out),
+    background-color 180ms var(--ease-out);
+
+  &:focus {
+    border-color: var(--color-primary-border);
+    box-shadow: 0 0 0 2px var(--color-primary-focus);
+    outline: none;
+  }
+
+  &::placeholder {
+    color: var(--color-muted);
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .root:hover:not(:disabled) {
+    border-color: var(--color-primary-border-soft);
+    background: color-mix(in srgb, rgba(2, 6, 23, 0.4) 84%, var(--color-primary-surface) 16%);
+  }
+}

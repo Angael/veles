@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecipesIndexRouteImport } from './routes/recipes/index'
 import { Route as RecipesAddRouteImport } from './routes/recipes/add'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
+import { Route as DemoComponentsRouteImport } from './routes/demo/components'
 import { Route as RecipesViewIdRouteImport } from './routes/recipes/view.$id'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
@@ -59,6 +60,11 @@ const RecipesAddRoute = RecipesAddRouteImport.update({
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
   path: '/demo/tanstack-query',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoComponentsRoute = DemoComponentsRouteImport.update({
+  id: '/demo/components',
+  path: '/demo/components',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecipesViewIdRoute = RecipesViewIdRouteImport.update({
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/weight': typeof WeightRoute
+  '/demo/components': typeof DemoComponentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/recipes/add': typeof RecipesAddRoute
   '/recipes/': typeof RecipesIndexRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/weight': typeof WeightRoute
+  '/demo/components': typeof DemoComponentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/recipes/add': typeof RecipesAddRoute
   '/recipes': typeof RecipesIndexRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/weight': typeof WeightRoute
+  '/demo/components': typeof DemoComponentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/recipes/add': typeof RecipesAddRoute
   '/recipes/': typeof RecipesIndexRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/weight'
+    | '/demo/components'
     | '/demo/tanstack-query'
     | '/recipes/add'
     | '/recipes/'
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/weight'
+    | '/demo/components'
     | '/demo/tanstack-query'
     | '/recipes/add'
     | '/recipes'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/weight'
+    | '/demo/components'
     | '/demo/tanstack-query'
     | '/recipes/add'
     | '/recipes/'
@@ -224,6 +236,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
   WeightRoute: typeof WeightRoute
+  DemoComponentsRoute: typeof DemoComponentsRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   RecipesAddRoute: typeof RecipesAddRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
@@ -287,6 +300,13 @@ declare module '@tanstack/react-router' {
       path: '/demo/tanstack-query'
       fullPath: '/demo/tanstack-query'
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/components': {
+      id: '/demo/components'
+      path: '/demo/components'
+      fullPath: '/demo/components'
+      preLoaderRoute: typeof DemoComponentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recipes/view/$id': {
@@ -360,6 +380,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
   WeightRoute: WeightRoute,
+  DemoComponentsRoute: DemoComponentsRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   RecipesAddRoute: RecipesAddRoute,
   RecipesIndexRoute: RecipesIndexRoute,

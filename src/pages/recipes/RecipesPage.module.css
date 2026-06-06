@@ -27,24 +27,9 @@
   gap: var(--space-md);
 }
 
-.searchInput,
-.selectInput,
-.numberInput {
-  min-height: var(--button-min-height);
+.selectInput {
   width: 100%;
-  border: var(--border-width) solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  background: rgba(2, 6, 23, 0.4);
-  color: var(--color-page);
-  padding: 0 1rem;
   font: inherit;
-}
-
-.searchInput:focus-visible,
-.selectInput:focus-visible,
-.numberInput:focus-visible {
-  outline: 2px solid var(--color-primary-focus);
-  outline-offset: 2px;
 }
 
 .filterToggle {
@@ -53,7 +38,7 @@
 
 .filtersPanel {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-lg);
   padding: var(--space-xl);
   border: var(--border-width) solid var(--color-border);
@@ -63,7 +48,7 @@
 
 .filterField {
   display: grid;
-  gap: var(--space-sm);
+  gap: var(--space-md);
 }
 
 .description {
@@ -76,28 +61,28 @@
   gap: var(--space-xl);
 }
 
+.cardLink {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
 .card {
   display: grid;
   gap: var(--space-lg);
   height: 100%;
   padding-bottom: var(--space-md);
-  cursor: pointer;
   transition:
     border-color 180ms var(--ease-out),
-    box-shadow 180ms var(--ease-out),
-    transform 140ms var(--ease-out);
+    box-shadow 180ms var(--ease-out);
 }
 
-.card:hover,
-.card:focus-visible {
+.cardLink:hover .card,
+.cardLink:focus-visible .card {
   border-color: var(--color-primary-border);
   box-shadow:
     0 0 0 1px var(--color-primary-border-soft),
     var(--shadow-card);
-}
-
-.card:active {
-  transform: scale(0.99);
 }
 
 .card,
@@ -166,17 +151,8 @@
 }
 
 .tag {
-  padding: 0;
-  border: none;
-  background: transparent;
   color: var(--color-muted-strong);
   font-size: var(--text-xs);
-  cursor: pointer;
-}
-
-.tag:hover,
-.tag:focus-visible {
-  color: var(--color-accent-soft);
 }
 
 .recipeFooter {
@@ -191,10 +167,6 @@
   color: var(--color-accent-label);
   letter-spacing: var(--letter-spacing-eyebrow);
   font-size: var(--text-md);
-}
-
-.desktopLabel {
-  display: inline;
 }
 
 @media (max-width: 1100px) {
@@ -220,10 +192,6 @@
 
   .filterToggle {
     width: var(--button-min-height);
-  }
-
-  .desktopLabel {
-    display: none;
   }
 
   .imageLayout {
