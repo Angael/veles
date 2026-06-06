@@ -19,6 +19,7 @@ function RecipeViewPage() {
 
   return (
     <main>
+      <title>{recipe.name}</title>
       <h1>{recipe.name}</h1>
 
       <p>{recipe.description}</p>

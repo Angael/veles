@@ -39,6 +39,7 @@ export function RecipesPage() {
 
   return (
     <main className={css.page}>
+      <title>Recipes</title>
       <section className={css.controls}>
         <div className={css.toolbar}>
           <label className={css.searchField}>
