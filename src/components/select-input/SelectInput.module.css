@@ -15,8 +15,13 @@
   transition:
     border-color 180ms var(--ease-out),
     box-shadow 180ms var(--ease-out),
-    background-color 180ms var(--ease-out),
-    transform 140ms var(--ease-out);
+    background-color 180ms var(--ease-out);
+
+  &:focus {
+    border-color: var(--color-primary-border);
+    box-shadow: 0 0 0 2px var(--color-primary-focus);
+    outline: none;
+  }
 
   &[data-popup-open] {
     border-color: var(--color-primary-border);
@@ -25,12 +30,7 @@
   }
 
   &:focus-visible {
-    outline: 2px solid var(--color-primary-focus);
-    outline-offset: 2px;
-  }
-
-  &:active:not([data-disabled]) {
-    transform: scale(0.985);
+    outline: none;
   }
 
   &[data-disabled] {
@@ -159,9 +159,5 @@
       color 140ms ease,
       opacity 140ms ease,
       transform 140ms ease;
-  }
-
-  .trigger:active:not([data-disabled]) {
-    transform: none;
   }
 }

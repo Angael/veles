@@ -104,6 +104,7 @@ export function RecipesPage() {
                 min={0}
                 onValueChange={setNutritionValue}
                 placeholder='e.g. 500'
+                step={100}
                 value={nutritionValue}
               />
             </label>

@@ -20,6 +20,7 @@
 .root:focus-within .group {
   box-shadow: 0 0 0 2px var(--color-primary-focus);
   border-color: var(--color-primary-border);
+  outline: none;
 }
 
 .input {
@@ -51,7 +52,6 @@
   background: color-mix(in srgb, var(--color-surface-strong) 72%, transparent);
   color: var(--color-muted-strong);
   transition:
-    transform 140ms var(--ease-out),
     background-color 180ms var(--ease-out),
     color 180ms var(--ease-out),
     opacity 180ms var(--ease-out);
@@ -63,10 +63,6 @@
 
 .stepper:focus-visible {
   outline: none;
-}
-
-.stepper:active:not([data-disabled]) {
-  transform: scale(0.97);
 }
 
 .decrement {
@@ -102,9 +98,5 @@
       box-shadow 140ms ease,
       color 140ms ease,
       opacity 140ms ease;
-  }
-
-  .stepper:active:not([data-disabled]) {
-    transform: none;
   }
 }

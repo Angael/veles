@@ -12,13 +12,18 @@
     box-shadow 180ms var(--ease-out),
     background-color 180ms var(--ease-out);
 
+  &:focus {
+    border-color: var(--color-primary-border);
+    box-shadow: 0 0 0 2px var(--color-primary-focus);
+    outline: none;
+  }
+
   &::placeholder {
     color: var(--color-muted);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--color-primary-focus);
-    outline-offset: 2px;
+    outline: none;
   }
 }
 
