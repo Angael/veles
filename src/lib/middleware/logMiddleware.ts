@@ -6,7 +6,8 @@ export const logMiddleware = (name: string) =>
     const startedAt = Date.now();
     const timestamp = new Date().toISOString();
     const method = request.method;
-    const path = new URL(request.url).pathname;
+    const _path = new URL(request.url).pathname;
+    const path = _path.startsWith('/_serverFn/') ? undefined : _path;
 
     log.info(`${name} start`, {
       timestamp,
