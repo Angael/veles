@@ -37,8 +37,6 @@ export function AppFrame() {
 }
 
 function RouteLabel({ routeLabel }: { routeLabel?: string }) {
-  const label = routeLabel ?? clientEnv.appName;
-
   return (
     <div className={css.brand}>
       {routeLabel ? (
@@ -52,13 +50,7 @@ function RouteLabel({ routeLabel }: { routeLabel?: string }) {
           size='sm'
         />
       ) : null}
-      {routeLabel ? (
-        <strong className={css.routeLabelTitle}>{label}</strong>
-      ) : (
-        <Link className={css.brandTitleLink} to='/'>
-          <strong>{label}</strong>
-        </Link>
-      )}
+      {routeLabel ? <strong className={css.routeLabelTitle}>{routeLabel}</strong> : null}
     </div>
   );
 }
