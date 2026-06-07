@@ -46,6 +46,10 @@
   background: var(--c-surface-inset);
 }
 
+.filtersPanel[hidden] {
+  display: none;
+}
+
 .filterField {
   display: grid;
   gap: var(--space-xs);
