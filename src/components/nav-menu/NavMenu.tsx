@@ -3,13 +3,13 @@ import { Link, useRouterState } from '@tanstack/react-router';
 import { ChevronDownIcon } from 'lucide-react';
 import { useState } from 'react';
 import css from './NavMenu.module.css';
-import { useNavMenuGroups } from './useNavMenuGroups';
+import { useDesktopNavMenu } from './useNavMenuGroups';
 
 export function NavMenu() {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
-  const { groups } = useNavMenuGroups();
+  const groups = useDesktopNavMenu();
   const [value, setValue] = useState<string | null>(null);
 
   return (

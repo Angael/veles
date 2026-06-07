@@ -3,7 +3,7 @@ import { ToggleGroup } from '@base-ui/react/toggle-group';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { BookOpenIcon, FlameIcon, LogInIcon, ScaleIcon, UserIcon } from 'lucide-react';
 import css from './MobileNavMenu.module.css';
-import { MOBILE_NAV_ITEMS, useNavMenuGroups } from './useNavMenuGroups';
+import { MOBILE_NAV_ITEMS, useMobileNavMenu } from './useNavMenuGroups';
 
 const itemIcons = {
   account: UserIcon,
@@ -17,7 +17,7 @@ export function MobileNavMenu() {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
-  const { mobileAccountItem } = useNavMenuGroups();
+  const mobileAccountItem = useMobileNavMenu();
   const items = [...MOBILE_NAV_ITEMS, mobileAccountItem];
   const activeValue = items.find((item) =>
     item.matchPrefixes.some((prefix) => pathname.startsWith(prefix)),

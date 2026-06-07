@@ -4,28 +4,6 @@ import { type ReactNode, useState } from 'react';
 import { signOut, useSession } from '@/lib/auth/client';
 import css from './NavMenu.module.css';
 
-export const MOBILE_NAV_ITEMS = [
-  {
-    key: 'recipes',
-    label: 'Recipes',
-    link: '/recipes',
-    matchPrefixes: ['/recipes'],
-  },
-  {
-    key: 'weight',
-    label: 'Weight tracker',
-    link: '/weight',
-    matchPrefixes: ['/weight'],
-  },
-  {
-    key: 'calories',
-    label: 'Calorie tracker',
-    link: '/calories',
-    matchPrefixes: ['/calories'],
-  },
-] as const;
-
-export type MobileNavItem = (typeof MOBILE_NAV_ITEMS)[number];
 type MobileAccountLink = '/account' | '/login';
 type SessionUser = {
   email?: string | null;
@@ -59,7 +37,7 @@ export interface NavMenuItem {
   disabled?: boolean;
 }
 
-export function useNavMenuGroups() {
+export function useDesktopNavMenu() {
   const navigate = useNavigate();
   const { data: session } = useSession();
   const user = session?.user;
@@ -149,6 +127,36 @@ export function useNavMenuGroups() {
     },
   ];
 
+  return groups;
+}
+
+export const MOBILE_NAV_ITEMS = [
+  {
+    key: 'recipes',
+    label: 'Recipes',
+    link: '/recipes',
+    matchPrefixes: ['/recipes'],
+  },
+  {
+    key: 'weight',
+    label: 'Weight tracker',
+    link: '/weight',
+    matchPrefixes: ['/weight'],
+  },
+  {
+    key: 'calories',
+    label: 'Calorie tracker',
+    link: '/calories',
+    matchPrefixes: ['/calories'],
+  },
+] as const;
+
+export type MobileNavItem = (typeof MOBILE_NAV_ITEMS)[number];
+
+export function useMobileNavMenu() {
+  const { data: session } = useSession();
+  const user = session?.user;
+
   const mobileAccountItem: MobileAccountItem = {
     key: 'account',
     label: user ? 'Account' : 'Login',
@@ -157,7 +165,7 @@ export function useNavMenuGroups() {
     user,
   };
 
-  return { groups, mobileAccountItem };
+  return mobileAccountItem;
 }
 
 function getInitials(value: string) {
