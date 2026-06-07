@@ -1,7 +1,7 @@
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { type } from 'arktype';
+import { ArkErrors, type } from 'arktype';
 import sharp from 'sharp';
 import { createFileRoute } from '@tanstack/react-router';
 import { auth } from '@/lib/auth/auth';
@@ -11,28 +11,22 @@ const TEMP_IMAGE_DIRECTORY = path.join(process.cwd(), '_temp', 'recipe-images');
 const MAX_PHOTO_COUNT = 8;
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 
+const optionalNumericFormValueType = type('string.trim').pipe((value): number | null | ArkErrors =>
+  value === '' ? null : type('string.numeric.parse')(value),
+);
+
 const uploadRecipeInputType = type({
-  carbs: 'null | string.trim |> string.numeric.parse',
+  carbs: optionalNumericFormValueType,
   description: 'string.trim',
-  fats: 'null | string.trim |> string.numeric.parse',
+  fats: optionalNumericFormValueType,
   ingredients: 'string[]',
-  kcal: 'null | string.trim |> string.numeric.parse',
+  kcal: optionalNumericFormValueType,
   name: 'string.trim |> string >= 1',
   photos: 'File[]',
-  protein: 'null | string.trim |> string.numeric.parse',
-  rating: 'null | string.trim |> string.numeric.parse',
+  protein: optionalNumericFormValueType,
+  rating: optionalNumericFormValueType,
   tags: 'string[]',
 });
-
-function getOptionalNumericFormValue(formData: FormData, key: string) {
-  const value = formData.get(key);
-
-  if (typeof value !== 'string') {
-    return null;
-  }
-
-  return value.trim() === '' ? null : value;
-}
 
 export const Route = createFileRoute('/api/recipes/upload')({
   server: {
@@ -61,9 +55,9 @@ export const Route = createFileRoute('/api/recipes/upload')({
           const ingredientsValue = formData.get('ingredients');
           const tagsValue = formData.get('tags');
           const validation = uploadRecipeInputType({
-            carbs: getOptionalNumericFormValue(formData, 'carbs'),
+            carbs: formData.get('carbs'),
             description: formData.get('description'),
-            fats: getOptionalNumericFormValue(formData, 'fats'),
+            fats: formData.get('fats'),
             ingredients:
               typeof ingredientsValue === 'string'
                 ? ingredientsValue
@@ -71,11 +65,11 @@ export const Route = createFileRoute('/api/recipes/upload')({
                     .map((item) => item.trim())
                     .filter(Boolean)
                 : [],
-            kcal: getOptionalNumericFormValue(formData, 'kcal'),
+            kcal: formData.get('kcal'),
             name: formData.get('name'),
             photos: files,
-            protein: getOptionalNumericFormValue(formData, 'protein'),
-            rating: getOptionalNumericFormValue(formData, 'rating'),
+            protein: formData.get('protein'),
+            rating: formData.get('rating'),
             tags:
               typeof tagsValue === 'string'
                 ? tagsValue
