@@ -1,4 +1,4 @@
-import { mkdir } from 'node:fs/promises';
+import { mkdir, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { ArkErrors, type } from 'arktype';
@@ -34,6 +34,8 @@ export const Route = createFileRoute('/api/recipes/upload')({
     middleware: [logMiddleware('POST /recipes/upload')],
     handlers: {
       POST: async ({ request }) => {
+        const images: Awaited<ReturnType<typeof saveOptimizedImage>>[] = [];
+
         try {
           const session = await auth.api.getSession({ headers: request.headers });
 
@@ -90,10 +92,18 @@ export const Route = createFileRoute('/api/recipes/upload')({
 
           await mkdir(TEMP_IMAGE_DIRECTORY, { recursive: true });
 
-          const images: Awaited<ReturnType<typeof saveOptimizedImage>>[] = [];
-
           for (const file of validation.photos) {
-            const image = await saveOptimizedImage(file);
+            let image: Awaited<ReturnType<typeof saveOptimizedImage>>;
+
+            try {
+              image = await saveOptimizedImage(file);
+            } catch (error) {
+              return Response.json(
+                { error: `Image \"${file.name}\" could not be processed` },
+                { status: 422 },
+              );
+            }
+
             images.push(image);
 
             log.debug('recipe upload image saved', {
@@ -117,11 +127,17 @@ export const Route = createFileRoute('/api/recipes/upload')({
           });
 
           return Response.json({ error: 'Recipe upload failed' }, { status: 500 });
+        } finally {
+          await cleanupFiles(images);
         }
       },
     },
   },
 });
+
+async function cleanupFiles(images: Array<{ path: string }>) {
+  await Promise.allSettled(images.map((image) => unlink(image.path)));
+}
 
 async function saveOptimizedImage(file: File) {
   if (!file.type.startsWith('image/')) {
@@ -144,9 +160,15 @@ async function saveOptimizedImage(file: File) {
       .webp({ quality: 82 })
       .toFile(outputPath);
   } catch (error) {
-    throw new Error(
-      `Failed to optimize image ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`,
-    );
+    await unlink(outputPath).catch(() => {});
+
+    log.error('Failed to optimize image', {
+      fileName: file.name,
+      errorMsg: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack?.split('\n') : undefined,
+    });
+
+    throw new Error('Failed to optimize image');
   }
 
   return {
