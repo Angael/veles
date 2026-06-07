@@ -9,8 +9,8 @@ import { log } from '@/lib/logger';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 
 const TEMP_IMAGE_DIRECTORY = path.join(process.cwd(), '_temp', 'recipe-images');
-const MAX_PHOTO_COUNT = 8;
-const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
+export const RECIPE_UPLOAD_MAX_PHOTO_COUNT = 8;
+export const RECIPE_UPLOAD_MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 
 const optionalNumericFormValueType = type('string.trim').pipe((value): number | null | ArkErrors =>
   value === '' ? null : type('string.numeric.parse')(value),
@@ -48,11 +48,11 @@ export const Route = createFileRoute('/api/recipes/upload')({
             .getAll('photos')
             .filter((value): value is File => value instanceof File && value.size > 0);
 
-          if (files.length > MAX_PHOTO_COUNT) {
+          if (files.length > RECIPE_UPLOAD_MAX_PHOTO_COUNT) {
             return Response.json({ error: `Too many photos.` }, { status: 400 });
           }
 
-          if (files.some((file) => file.size > MAX_PHOTO_BYTES)) {
+          if (files.some((file) => file.size > RECIPE_UPLOAD_MAX_PHOTO_BYTES)) {
             return Response.json({ error: `File too large` }, { status: 400 });
           }
 

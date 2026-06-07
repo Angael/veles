@@ -20,7 +20,6 @@
 
 .form,
 .fieldList,
-.fileList,
 .actions {
   display: grid;
 }
@@ -44,74 +43,6 @@
   gap: var(--space-md);
 }
 
-.uploadField {
-  display: grid;
-  gap: var(--space-md);
-  padding: var(--space-lg);
-  border: 1px dashed rgba(148, 163, 184, 0.3);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-inset);
-}
-
-.uploadCopy,
-.fileItem {
-  display: flex;
-  align-items: start;
-  gap: var(--space-md);
-}
-
-.uploadCopy strong {
-  font-weight: 600;
-}
-
-.fileInput {
-  width: 100%;
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--color-surface-strong) 72%, transparent);
-  color: inherit;
-  padding: 0.8rem;
-  font: inherit;
-}
-
-.fileInput:focus-visible {
-  outline: none;
-  border-color: var(--color-primary-border);
-  box-shadow: 0 0 0 1px var(--color-primary-border-soft);
-}
-
-.fileInput::file-selector-button {
-  margin-right: 0.75rem;
-  padding: 0.55rem 0.8rem;
-  border: none;
-  border-radius: 999px;
-  background: rgba(96, 165, 250, 0.14);
-  color: var(--color-primary-text);
-  font: inherit;
-  cursor: pointer;
-}
-
-.fileList {
-  gap: 0.6rem;
-}
-
-.fileItem {
-  justify-content: space-between;
-  padding: 0.85rem 0.95rem;
-  border: var(--border-width) solid rgba(148, 163, 184, 0.16);
-  border-radius: var(--radius-lg);
-  background: rgba(2, 6, 23, 0.22);
-}
-
-.fileItem span:last-child {
-  color: var(--color-accent-label);
-  font-size: var(--text-sm);
-}
-
-.fileHint {
-  color: var(--color-muted);
-}
-
 .errorBox {
   padding: 0.85rem 1rem;
   border: var(--border-width) solid var(--color-danger-border);
@@ -127,11 +58,5 @@
 @media (max-width: 720px) {
   .formCard {
     width: 100%;
-  }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .fileInput::file-selector-button:hover {
-    background: rgba(96, 165, 250, 0.2);
   }
 }

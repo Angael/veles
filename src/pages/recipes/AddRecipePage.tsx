@@ -1,12 +1,17 @@
 import clsx from 'clsx';
-import { ImagePlusIcon, SendHorizontalIcon } from 'lucide-react';
-import { type ChangeEvent, type FormEvent, useState } from 'react';
+import { SendHorizontalIcon } from 'lucide-react';
+import { type FormEvent, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextareaInput } from '@/components/textarea-input/TextareaInput';
 import { TextInput } from '@/components/text-input/TextInput';
+import { UploadTileGrid } from '@/components/upload-tile-grid/UploadTileGrid';
 import css from './AddRecipePage.module.css';
+import {
+  RECIPE_UPLOAD_MAX_PHOTO_BYTES,
+  RECIPE_UPLOAD_MAX_PHOTO_COUNT,
+} from '@/routes/api/recipes/upload';
 
 type AddRecipeDraft = {
   carbs: number | null;
@@ -54,6 +59,11 @@ export function AddRecipePage() {
 
               try {
                 const formData = new FormData(event.currentTarget);
+
+                for (const file of draft.selectedFiles) {
+                  formData.append('photos', file);
+                }
+
                 const response = await fetch('/api/recipes/upload', {
                   body: formData,
                   method: 'POST',
@@ -177,40 +187,17 @@ export function AddRecipePage() {
                 />
               </label>
 
-              <label className={clsx(css.field, css.uploadFieldWrap)}>
+              <div className={clsx(css.field, css.uploadFieldWrap)}>
                 <span>Photos</span>
-                <div className={css.uploadField}>
-                  <div className={css.uploadCopy}>
-                    <ImagePlusIcon aria-hidden='true' size={18} strokeWidth={1.8} />
-                    <strong>Add photos</strong>
-                  </div>
-
-                  <input
-                    accept='image/*'
-                    className={css.fileInput}
-                    multiple
-                    name='photos'
-                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                      const files = Array.from(event.currentTarget.files ?? []);
-                      setDraft((current) => ({ ...current, selectedFiles: files }));
-                    }}
-                    type='file'
-                  />
-                </div>
-
-                <div className={css.fileList}>
-                  {draft.selectedFiles.length ? (
-                    draft.selectedFiles.map((file) => (
-                      <div className={css.fileItem} key={`${file.name}-${file.lastModified}`}>
-                        <span>{file.name}</span>
-                        <span>{formatBytes(file.size)}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className={css.fileHint}>No files selected.</p>
-                  )}
-                </div>
-              </label>
+                <UploadTileGrid
+                  files={draft.selectedFiles}
+                  maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES}
+                  maxItems={RECIPE_UPLOAD_MAX_PHOTO_COUNT}
+                  onFilesChange={(selectedFiles) =>
+                    setDraft((current) => ({ ...current, selectedFiles }))
+                  }
+                />
+              </div>
             </div>
 
             {error ? <div className={css.errorBox}>{error}</div> : null}
@@ -230,16 +217,4 @@ export function AddRecipePage() {
       </section>
     </main>
   );
-}
-
-function formatBytes(bytes: number) {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-
-  if (bytes < 1024 * 1024) {
-    return `${(bytes / 1024).toFixed(1)} KB`;
-  }
-
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
