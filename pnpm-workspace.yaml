@@ -1,5 +1,6 @@
 allowBuilds:
   esbuild: true
+  sharp: true
 overrides:
   seroval: 1.5.4
   defu: 6.1.7

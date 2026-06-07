@@ -7,5 +7,11 @@ type TextInputProps = Omit<InputProps, 'className'> & {
 };
 
 export function TextInput({ className, ...props }: TextInputProps) {
-  return <Input className={clsx(css.root, className)} {...props} />;
+  return (
+    <Input
+      className={clsx(css.root, className)}
+      data-required={props.required ? '' : undefined}
+      {...props}
+    />
+  );
 }

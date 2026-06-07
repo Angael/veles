@@ -8,7 +8,7 @@
     "drizzle.config.ts",
     "drizzle-prod.config.ts"
   ],
-  "exclude": ["_archive", "node_modules", ".output"],
+  "exclude": ["_archive", "node_modules", ".output", "_temp"],
   "compilerOptions": {
     "strict": true,
     "esModuleInterop": true,

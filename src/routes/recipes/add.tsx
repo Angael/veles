@@ -1,15 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { RecipePlaceholderPage } from '@/pages/recipes/RecipePlaceholderPage';
+import { AddRecipePage } from '@/pages/recipes/AddRecipePage';
 
 export const Route = createFileRoute('/recipes/add')({
   component: RecipesAddPage,
+  head: () => ({ meta: [{ title: 'Add recipe' }] }),
+  ssr: false,
 });
 
 function RecipesAddPage() {
-  return (
-    <RecipePlaceholderPage
-      body='Recipe creation is the next slice. This route exists so the list page can link there now.'
-      title='Add recipe'
-    />
-  );
+  return <AddRecipePage />;
 }

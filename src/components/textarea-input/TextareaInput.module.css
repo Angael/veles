@@ -1,12 +1,13 @@
 .root {
   width: 100%;
-  min-height: var(--button-min-height);
+  min-height: 8rem;
   border: var(--border-width) solid var(--color-border-strong);
   border-radius: var(--radius-md);
   background: rgba(2, 6, 23, 0.4);
   color: var(--color-page);
-  padding: 0 1rem;
+  padding: 0.9rem 1rem;
   font: inherit;
+  resize: vertical;
   transition:
     border-color 180ms var(--ease-out),
     box-shadow 180ms var(--ease-out),
