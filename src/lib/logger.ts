@@ -7,7 +7,7 @@ type LogRecord = {
 };
 
 const isProduction = process.env.NODE_ENV === 'production';
-const level = isProduction ? 'trace' : 'debug';
+const level = isProduction ? 'info' : 'trace';
 
 const baseLogger = pino({
   level,
