@@ -4,7 +4,7 @@
 
 label:has(.root[data-required]) > span:first-child::after {
   content: ' *';
-  color: var(--color-danger-text);
+  color: var(--c-danger-text);
 }
 
 .group {
@@ -12,8 +12,8 @@ label:has(.root[data-required]) > span:first-child::after {
   grid-template-columns: auto minmax(0, 1fr) auto;
   width: 100%;
   min-height: var(--button-min-height);
-  border: var(--border-width) solid var(--color-border-strong);
-  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--c-border-strong);
+  border-radius: var(--radius-xs);
   background: rgba(2, 6, 23, 0.4);
   overflow: hidden;
   transition:
@@ -23,8 +23,8 @@ label:has(.root[data-required]) > span:first-child::after {
 }
 
 .root:focus-within .group {
-  box-shadow: 0 0 0 2px var(--color-primary-focus);
-  border-color: var(--color-primary-border);
+  box-shadow: 0 0 0 2px var(--c-primary-focus);
+  border-color: var(--c-primary-border);
   outline: none;
 }
 
@@ -33,14 +33,14 @@ label:has(.root[data-required]) > span:first-child::after {
   min-width: 0;
   border: 0;
   background: transparent;
-  color: var(--color-page);
+  color: var(--c-text);
   padding: 0 0.85rem;
   font: inherit;
   font-variant-numeric: tabular-nums;
   text-align: left;
 
   &::placeholder {
-    color: var(--color-placeholder);
+    color: var(--c-placeholder);
   }
 
   &:focus-visible {
@@ -54,8 +54,8 @@ label:has(.root[data-required]) > span:first-child::after {
   justify-content: center;
   width: calc(var(--button-min-height) - (var(--border-width) * 2));
   border: 0;
-  background: color-mix(in srgb, var(--color-surface-strong) 72%, transparent);
-  color: var(--color-muted-strong);
+  background: color-mix(in srgb, var(--c-surface-strong) 72%, transparent);
+  color: var(--c-muted-strong);
   transition:
     background-color 180ms var(--ease-out),
     color 180ms var(--ease-out),
@@ -71,26 +71,22 @@ label:has(.root[data-required]) > span:first-child::after {
 }
 
 .decrement {
-  border-right: var(--border-width) solid var(--color-border);
+  border-right: var(--border-width) solid var(--c-border);
 }
 
 .increment {
-  border-left: var(--border-width) solid var(--color-border);
+  border-left: var(--border-width) solid var(--c-border);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .root:hover .group {
-    border-color: var(--color-primary-border-soft);
-    background: color-mix(in srgb, rgba(2, 6, 23, 0.4) 84%, var(--color-primary-surface) 16%);
+    border-color: var(--c-primary-border-soft);
+    background: color-mix(in srgb, rgba(2, 6, 23, 0.4) 84%, var(--c-primary-surface) 16%);
   }
 
   .stepper:hover:not([data-disabled]) {
-    background: color-mix(
-      in srgb,
-      var(--color-primary-surface) 68%,
-      var(--color-surface-strong) 32%
-    );
-    color: var(--color-page);
+    background: color-mix(in srgb, var(--c-primary-surface) 68%, var(--c-surface-strong) 32%);
+    color: var(--c-text);
   }
 }
 

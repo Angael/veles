@@ -6,14 +6,14 @@
 
 .authCard {
   width: min(460px, 100%);
-  padding: var(--space-4xl);
+  padding: var(--space-lg);
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-xs);
 }
 
 .authHeader {
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-lg);
 }
 
 .authHeader h1 {
@@ -21,45 +21,37 @@
 }
 
 .authHeader p {
-  color: var(--color-muted);
-}
-
-.eyebrow {
-  margin: 0 0 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-eyebrow);
-  font-size: var(--text-xs);
-  color: var(--color-accent);
+  color: var(--c-muted);
 }
 
 .authForm {
   display: grid;
-  gap: var(--space-xl);
+  gap: var(--space-md);
 }
 
 .authDivider {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: var(--space-xl) 0;
-  color: var(--color-muted-strong);
+  margin: var(--space-md) 0;
+  color: var(--c-muted-strong);
 }
 
 .authFooter {
-  margin: var(--space-xl) auto 0;
-  color: var(--color-muted);
+  margin: var(--space-md) auto 0;
+  color: var(--c-muted);
 }
 
 .authFooter a {
-  color: var(--color-accent);
+  color: var(--c-accent);
 }
 
 .errorBox {
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   padding: 0.85rem 1rem;
-  color: var(--color-danger-text);
-  background: var(--color-danger-surface);
-  border: var(--border-width) solid var(--color-danger-border);
+  color: var(--c-danger-text);
+  background: var(--c-danger-surface);
+  border: var(--border-width) solid var(--c-danger-border);
 }
 
 .authGoogle {

@@ -1,15 +1,15 @@
 .layout {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-xl);
+  gap: var(--space-md);
 }
 
 .eyebrow {
   margin: 0 0 0.75rem;
   text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-eyebrow);
+  letter-spacing: 0.14em;
   font-size: var(--text-xs);
-  color: var(--color-accent);
+  color: var(--c-accent);
 }
 
 .hero {
@@ -17,7 +17,7 @@
   grid-column: span 2;
   grid-row: span 2;
   overflow: hidden;
-  padding: var(--space-5xl);
+  padding: var(--space-xl);
 }
 
 .hero::after {
@@ -39,7 +39,7 @@
   position: relative;
   z-index: 1;
   display: grid;
-  gap: var(--space-xl);
+  gap: var(--space-md);
   max-width: 28rem;
 }
 
@@ -51,13 +51,13 @@
 
 .heroContent p {
   margin: 0;
-  color: var(--color-muted);
+  color: var(--c-muted);
 }
 
 .buttonRow {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-lg);
+  gap: var(--space-sm);
 }
 
 .tile {
@@ -70,7 +70,7 @@
 
 .tile p {
   margin: 0;
-  color: var(--color-muted);
+  color: var(--c-muted);
 }
 
 .tileAccent {
@@ -81,8 +81,8 @@
   width: 2.3rem;
   height: 2.3rem;
   border-radius: var(--radius-pill);
-  background: var(--color-primary-surface);
-  color: var(--color-accent-soft);
+  background: var(--c-primary-surface);
+  color: var(--c-accent-soft);
   font-size: var(--text-sm);
 }
 

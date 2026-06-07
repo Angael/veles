@@ -10,63 +10,59 @@
   --text-xs: 0.75rem;
   --text-sm: 0.82rem;
   --text-md: 0.875rem;
-  --text-label: 0.92rem;
   --text-hero: clamp(2.7rem, 7vw, 4.8rem);
 
-  --letter-spacing-eyebrow: 0.14em;
+  --c-text: #e8ecf7;
+  --c-text-strong: #f8fafc;
+  --c-muted: #b5c0d9;
+  --c-muted-strong: #94a3b8;
+  --c-placeholder: rgba(148, 163, 184, 0.72);
+  --c-muted-soft: rgba(226, 232, 240, 0.82);
 
-  --color-page: #e8ecf7;
-  --color-page-strong: #f8fafc;
-  --color-muted: #b5c0d9;
-  --color-muted-strong: #94a3b8;
-  --color-placeholder: rgba(148, 163, 184, 0.72);
-  --color-muted-transparent: rgba(226, 232, 240, 0.82);
+  --c-accent: #7dd3fc;
+  --c-accent-soft: #bfdbfe;
+  --c-accent-strong: #c7d2fe;
 
-  --color-accent: #7dd3fc;
-  --color-accent-soft: #bfdbfe;
-  --color-accent-label: #c7d2fe;
+  --c-primary: #2563eb;
+  --c-primary-contrast: white;
+  --c-primary-border: rgba(96, 165, 250, 0.75);
+  --c-primary-border-soft: rgba(96, 165, 250, 0.55);
+  --c-primary-focus: rgba(96, 165, 250, 0.85);
+  --c-primary-surface: rgba(37, 99, 235, 0.18);
+  --c-primary-surface-strong: rgba(37, 99, 235, 0.25);
 
-  --color-primary: #2563eb;
-  --color-primary-contrast: white;
-  --color-primary-border: rgba(96, 165, 250, 0.75);
-  --color-primary-border-soft: rgba(96, 165, 250, 0.55);
-  --color-primary-focus: rgba(96, 165, 250, 0.85);
-  --color-primary-surface: rgba(37, 99, 235, 0.18);
-  --color-primary-surface-strong: rgba(37, 99, 235, 0.25);
+  --c-surface: rgba(15, 23, 42, 0.72);
+  --c-surface-strong: rgba(15, 23, 42, 0.85);
+  --c-surface-solid: rgba(15, 23, 42, 0.96);
+  --c-surface-raised: rgba(30, 41, 59, 0.9);
+  --c-surface-input: rgba(2, 6, 23, 0.55);
+  --c-surface-inset: rgba(2, 6, 23, 0.5);
 
-  --color-surface: rgba(15, 23, 42, 0.72);
-  --color-surface-strong: rgba(15, 23, 42, 0.85);
-  --color-surface-solid: rgba(15, 23, 42, 0.96);
-  --color-surface-raised: rgba(30, 41, 59, 0.9);
-  --color-surface-input: rgba(2, 6, 23, 0.55);
-  --color-surface-inset: rgba(2, 6, 23, 0.5);
+  --c-border: rgba(148, 163, 184, 0.2);
+  --c-border-hover: rgba(148, 163, 184, 0.22);
+  --c-border-strong: rgba(148, 163, 184, 0.24);
+  --c-border-popup: rgba(148, 163, 184, 0.28);
 
-  --color-border: rgba(148, 163, 184, 0.2);
-  --color-border-hover: rgba(148, 163, 184, 0.22);
-  --color-border-strong: rgba(148, 163, 184, 0.24);
-  --color-border-popup: rgba(148, 163, 184, 0.28);
-
-  --color-danger-text: #fecaca;
-  --color-danger-surface: rgba(127, 29, 29, 0.35);
-  --color-danger-border: rgba(248, 113, 113, 0.35);
+  --c-danger-text: #fecaca;
+  --c-danger-surface: rgba(127, 29, 29, 0.35);
+  --c-danger-border: rgba(248, 113, 113, 0.35);
 
   --gradient-page:
     radial-gradient(circle at top, rgba(96, 165, 250, 0.18), transparent 28%),
     linear-gradient(180deg, #060816 0%, #0f172a 48%, #111827 100%);
-  --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, #7c3aed 100%);
+  --gradient-primary: linear-gradient(135deg, var(--c-primary) 0%, #7c3aed 100%);
 
-  --space-md: 0.5rem;
-  --space-lg: 0.75rem;
-  --space-xl: 1rem;
-  --space-2xl: 1.25rem;
-  --space-4xl: 1.5rem;
-  --space-5xl: 2rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.25rem;
+  --space-xl: 2rem;
 
   --button-min-height: 44px;
 
-  --radius-sm: 14px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  --radius-xs: 14px;
+  --radius-sm: 16px;
+  --radius-md: 24px;
   --radius-pill: 999px;
 
   --border-width: 1px;

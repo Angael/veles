@@ -1,21 +1,21 @@
 .page {
   min-height: 100vh;
-  color: var(--color-page);
+  color: var(--c-text);
   background: var(--gradient-page);
 }
 
 .shell {
   width: min(1100px, calc(100% - 2rem));
   margin: 0 auto;
-  padding: var(--space-xl) 0 4rem;
+  padding: var(--space-md) 0 4rem;
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-xl);
-  padding: var(--space-xl) 0 var(--space-5xl);
+  gap: var(--space-md);
+  padding: var(--space-md) 0 var(--space-xl);
 }
 
 .brand {

@@ -23,7 +23,6 @@ export function AuthCard(props: AuthCardProps) {
     <section className={css.authShell}>
       <Card className={css.authCard}>
         <div className={css.authHeader}>
-          <p className={css.eyebrow}>Private access</p>
           <h1>{title}</h1>
           <p>{description}</p>
         </div>

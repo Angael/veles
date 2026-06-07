@@ -1,6 +1,6 @@
 .page {
   display: grid;
-  gap: var(--space-xl);
+  gap: var(--space-md);
 }
 
 .content {
@@ -10,7 +10,7 @@
 
 .formCard {
   display: grid;
-  gap: var(--space-lg);
+  gap: var(--space-sm);
   width: min(100%, 44rem);
 }
 
@@ -26,7 +26,7 @@
 
 .form,
 .fieldList {
-  gap: var(--space-lg);
+  gap: var(--space-sm);
 }
 
 .field {
@@ -35,20 +35,20 @@
 }
 
 .field span {
-  color: var(--color-accent-label);
+  color: var(--c-accent-strong);
   font-size: var(--text-sm);
 }
 
 .uploadFieldWrap {
-  gap: var(--space-md);
+  gap: var(--space-xs);
 }
 
 .errorBox {
   padding: 0.85rem 1rem;
-  border: var(--border-width) solid var(--color-danger-border);
-  border-radius: var(--radius-lg);
-  color: var(--color-danger-text);
-  background: var(--color-danger-surface);
+  border: var(--border-width) solid var(--c-danger-border);
+  border-radius: var(--radius-xs);
+  color: var(--c-danger-text);
+  background: var(--c-danger-surface);
 }
 
 .actions {

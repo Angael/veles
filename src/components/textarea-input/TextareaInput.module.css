@@ -1,10 +1,10 @@
 .root {
   width: 100%;
   min-height: 8rem;
-  border: var(--border-width) solid var(--color-border-strong);
-  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--c-border-strong);
+  border-radius: var(--radius-xs);
   background: rgba(2, 6, 23, 0.4);
-  color: var(--color-page);
+  color: var(--c-text);
   padding: 0.9rem 1rem;
   font: inherit;
   resize: vertical;
@@ -14,13 +14,13 @@
     background-color 180ms var(--ease-out);
 
   &:focus {
-    border-color: var(--color-primary-border);
-    box-shadow: 0 0 0 2px var(--color-primary-focus);
+    border-color: var(--c-primary-border);
+    box-shadow: 0 0 0 2px var(--c-primary-focus);
     outline: none;
   }
 
   &::placeholder {
-    color: var(--color-placeholder);
+    color: var(--c-placeholder);
   }
 
   &:focus-visible {
@@ -30,12 +30,12 @@
 
 label:has(.root[data-required]) > span:first-child::after {
   content: ' *';
-  color: var(--color-danger-text);
+  color: var(--c-danger-text);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .root:hover:not(:disabled) {
-    border-color: var(--color-primary-border-soft);
-    background: color-mix(in srgb, rgba(2, 6, 23, 0.4) 84%, var(--color-primary-surface) 16%);
+    border-color: var(--c-primary-border-soft);
+    background: color-mix(in srgb, rgba(2, 6, 23, 0.4) 84%, var(--c-primary-surface) 16%);
   }
 }

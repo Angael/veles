@@ -12,7 +12,7 @@
   color: var(--btn-color);
   box-shadow: var(--btn-shadow, none);
   font: inherit;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   line-height: 1;
   text-decoration: none;
   white-space: nowrap;
@@ -39,7 +39,7 @@
 }
 
 .root:focus-visible {
-  outline: 2px solid var(--color-primary-focus);
+  outline: 2px solid var(--c-primary-focus);
   outline-offset: 2px;
 }
 
@@ -57,44 +57,44 @@
   --btn-bg-hover: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   --btn-border: transparent;
   --btn-border-hover: transparent;
-  --btn-color: var(--color-primary-contrast);
+  --btn-color: var(--c-primary-contrast);
   --btn-shadow: var(--shadow-card);
   --btn-shadow-hover: 0 18px 40px rgba(2, 6, 23, 0.26);
 }
 
 .secondary {
-  --btn-bg: color-mix(in srgb, var(--color-surface-strong) 82%, transparent);
-  --btn-bg-hover: color-mix(in srgb, var(--color-surface) 74%, var(--color-primary-surface) 26%);
-  --btn-border: var(--color-border-strong);
-  --btn-border-hover: var(--color-primary-border-soft);
-  --btn-color: var(--color-page);
+  --btn-bg: color-mix(in srgb, var(--c-surface-strong) 82%, transparent);
+  --btn-bg-hover: color-mix(in srgb, var(--c-surface) 74%, var(--c-primary-surface) 26%);
+  --btn-border: var(--c-border-strong);
+  --btn-border-hover: var(--c-primary-border-soft);
+  --btn-color: var(--c-text);
 }
 
 .ghost {
   --btn-bg: transparent;
-  --btn-bg-hover: color-mix(in srgb, var(--color-primary-surface) 54%, transparent);
+  --btn-bg-hover: color-mix(in srgb, var(--c-primary-surface) 54%, transparent);
   --btn-border: transparent;
   --btn-border-hover: transparent;
-  --btn-color: var(--color-muted-strong);
-  --btn-color-hover: var(--color-page);
+  --btn-color: var(--c-muted-strong);
+  --btn-color-hover: var(--c-text);
 }
 
 .sm {
   --btn-height: 2.35rem;
   --btn-padding-x: 0.85rem;
-  --btn-radius: var(--radius-sm);
+  --btn-radius: var(--radius-xs);
 }
 
 .md {
   --btn-height: var(--button-min-height);
   --btn-padding-x: 1rem;
-  --btn-radius: var(--radius-md);
+  --btn-radius: var(--radius-xs);
 }
 
 .lg {
   --btn-height: 3.25rem;
   --btn-padding-x: 1.2rem;
-  --btn-radius: var(--radius-md);
+  --btn-radius: var(--radius-xs);
 }
 
 .pill {

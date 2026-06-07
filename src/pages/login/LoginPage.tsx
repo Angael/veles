@@ -14,11 +14,17 @@ export function LoginPendingPage() {
         <>
           <div className={css.field}>
             <label htmlFor='pending-email'>Email</label>
-            <input autoComplete='email' disabled id='pending-email' type='email' />
+            <input
+              autoComplete='email'
+              disabled
+              id='pending-email'
+              placeholder='name@example.com'
+              type='email'
+            />
           </div>
           <div className={css.field}>
             <label htmlFor='pending-password'>Password</label>
-            <input disabled id='pending-password' type='password' />
+            <input disabled id='pending-password' placeholder='********' type='password' />
           </div>
         </>
       }
@@ -44,7 +50,14 @@ export function LoginPage() {
         <>
           <div className={css.field}>
             <label htmlFor='email'>Email</label>
-            <input autoComplete='email' id='email' name='email' required type='email' />
+            <input
+              autoComplete='email'
+              id='email'
+              name='email'
+              placeholder='name@example.com'
+              required
+              type='email'
+            />
           </div>
           <div className={css.field}>
             <label htmlFor='password'>Password</label>
@@ -52,6 +65,7 @@ export function LoginPage() {
               autoComplete='current-password'
               id='password'
               name='password'
+              placeholder='********'
               required
               type='password'
             />

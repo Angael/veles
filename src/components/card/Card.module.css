@@ -1,8 +1,8 @@
 .card {
-  padding: var(--space-2xl);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
+  padding: var(--space-lg);
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-xs);
+  background: var(--c-surface);
   backdrop-filter: var(--blur-surface);
   box-shadow: var(--shadow-card);
 }

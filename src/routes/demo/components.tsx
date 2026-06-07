@@ -35,7 +35,7 @@ function ComponentsDemoPage() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
-        gap: 'var(--space-xl)',
+        gap: 'var(--space-md)',
       }}
     >
       <h1>Components</h1>

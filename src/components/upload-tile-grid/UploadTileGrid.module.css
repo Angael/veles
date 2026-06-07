@@ -3,8 +3,8 @@
   gap: var(--space-sm);
   padding: var(--space-sm);
   border: 1px dashed rgba(148, 163, 184, 0.22);
-  border-radius: calc(var(--radius-xl) + var(--space-2xs));
-  background: color-mix(in srgb, var(--color-surface-inset) 28%, transparent);
+  border-radius: calc(var(--radius-md) + var(--space-xs));
+  background: color-mix(in srgb, var(--c-surface-inset) 28%, transparent);
   transition:
     border-color 180ms ease-out,
     background-color 180ms ease-out,
@@ -12,9 +12,9 @@
 }
 
 .dragActive {
-  border-color: color-mix(in srgb, var(--color-primary-border) 72%, white 8%);
-  background: color-mix(in srgb, var(--color-primary-surface) 28%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-primary-border-soft) 70%, transparent);
+  border-color: color-mix(in srgb, var(--c-primary-border) 72%, white 8%);
+  background: color-mix(in srgb, var(--c-primary-surface) 28%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-primary-border-soft) 70%, transparent);
 }
 
 .grid {
@@ -32,8 +32,8 @@
   aspect-ratio: 1;
   overflow: hidden;
   border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: var(--radius-xl);
-  background: color-mix(in srgb, var(--color-surface-strong) 62%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--c-surface-strong) 62%, transparent);
   box-shadow: 0 10px 30px -24px rgba(15, 23, 42, 0.8);
 }
 
@@ -129,8 +129,8 @@
   padding: 1rem;
   border-style: dashed;
   border-color: rgba(148, 163, 184, 0.28);
-  background: color-mix(in srgb, var(--color-surface-inset) 24%, transparent);
-  color: var(--color-muted);
+  background: color-mix(in srgb, var(--c-surface-inset) 24%, transparent);
+  color: var(--c-muted);
   cursor: pointer;
   text-align: center;
 }
@@ -146,7 +146,7 @@
 }
 
 .uploadTile strong {
-  color: var(--color-text);
+  color: var(--c-text);
   font-size: var(--text-sm);
 }
 
@@ -169,7 +169,7 @@
 @media (hover: hover) and (pointer: fine) {
   .uploadTile:hover {
     border-color: rgba(148, 163, 184, 0.44);
-    background: color-mix(in srgb, var(--color-surface-strong) 52%, transparent);
+    background: color-mix(in srgb, var(--c-surface-strong) 52%, transparent);
   }
 }
 

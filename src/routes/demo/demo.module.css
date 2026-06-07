@@ -1,15 +1,15 @@
 .page {
   display: grid;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
 }
 
 .body {
-  padding: var(--space-4xl);
+  padding: var(--space-lg);
 }
 
 .body p,
 .body li {
-  color: var(--color-muted);
+  color: var(--c-muted);
 }
 
 .body h1 {
@@ -20,24 +20,24 @@
   display: inline-flex;
   padding: 0.3rem 0.6rem;
   border-radius: var(--radius-pill);
-  background: var(--color-primary-surface);
-  color: var(--color-accent-soft);
+  background: var(--c-primary-surface);
+  color: var(--c-accent-soft);
   font-size: var(--text-sm);
 }
 
 .result {
   margin-top: 1rem;
-  padding: var(--space-xl);
-  border-radius: var(--radius-md);
-  border: var(--border-width) solid var(--color-border);
-  background: var(--color-surface-inset);
+  padding: var(--space-md);
+  border-radius: var(--radius-xs);
+  border: var(--border-width) solid var(--c-border);
+  background: var(--c-surface-inset);
 }
 
 .buttonRow {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-lg);
-  margin-top: var(--space-xl);
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
 }
 
 .linkButton,
@@ -46,21 +46,21 @@
   align-items: center;
   justify-content: center;
   min-height: var(--button-min-height);
-  border-radius: var(--radius-sm);
-  padding: var(--space-lg) var(--space-xl);
+  border-radius: var(--radius-xs);
+  padding: var(--space-sm) var(--space-md);
   font: inherit;
   text-decoration: none;
 }
 
 .linkButton {
-  border: var(--border-width) solid var(--color-border-strong);
-  color: var(--color-page);
-  background: var(--color-surface-strong);
+  border: var(--border-width) solid var(--c-border-strong);
+  color: var(--c-text);
+  background: var(--c-surface-strong);
 }
 
 .primaryButton {
   border: none;
-  color: var(--color-primary-contrast);
+  color: var(--c-primary-contrast);
   cursor: pointer;
   background: var(--gradient-primary);
 }
