@@ -142,14 +142,12 @@
   font-size: var(--text-sm);
 }
 
-@media (--laptop) {
+@media (--phone) {
   .summaryGrid,
   .grid {
     grid-template-columns: 1fr;
   }
-}
 
-@media (--phone) {
   .summaryCard,
   .card {
     padding: var(--space-md);
