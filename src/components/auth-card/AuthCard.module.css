@@ -1,7 +1,19 @@
 .authShell {
   display: grid;
-  place-items: center;
+  grid-template-rows: auto auto;
+  align-content: center;
+  justify-items: center;
+  gap: var(--space-lg);
   min-height: calc(100vh - 11rem);
+}
+
+.authTitle {
+  color: var(--c-text-strong);
+  font-size: clamp(2.4rem, 8vw, 4.8rem);
+  font-weight: var(--font-weight-semibold);
+  line-height: 0.95;
+  text-align: center;
+  text-wrap: balance;
 }
 
 .authCard {
@@ -12,11 +24,8 @@
 }
 
 .authHeader {
-  margin-bottom: var(--space-lg);
-}
-
-.authHeader h1 {
-  margin-top: 0;
+  margin-bottom: var(--space-md);
+  text-align: center;
 }
 
 .authHeader p {
@@ -55,4 +64,27 @@
 
 .authGoogle {
   width: 100%;
+  --btn-height: 3.4rem;
+  --btn-bg: color-mix(in srgb, var(--c-text-strong) 92%, var(--c-primary-surface) 8%);
+  --btn-bg-hover: var(--c-text-strong);
+  --btn-border: color-mix(in srgb, var(--c-text-strong) 68%, var(--c-primary-border) 32%);
+  --btn-border-hover: var(--c-text-strong);
+  --btn-color: #0f172a;
+  --btn-shadow: 0 14px 34px rgba(2, 6, 23, 0.26);
+  --btn-shadow-hover:
+    0 0 0 1px color-mix(in srgb, var(--c-text-strong) 46%, transparent),
+    0 18px 44px rgba(2, 6, 23, 0.34);
+}
+
+@media (--phone) {
+  .authShell {
+    align-content: start;
+    gap: var(--space-md);
+    min-height: calc(100vh - 8rem);
+    padding-top: var(--space-xl);
+  }
+
+  .authTitle {
+    font-size: 2.8rem;
+  }
 }

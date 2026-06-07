@@ -1,4 +1,5 @@
 import type * as React from 'react';
+import { GlobeIcon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import css from './AuthCard.module.css';
@@ -21,9 +22,9 @@ export function AuthCard(props: AuthCardProps) {
 
   return (
     <section className={css.authShell}>
+      <h1 className={css.authTitle}>{title}</h1>
       <Card className={css.authCard}>
         <div className={css.authHeader}>
-          <h1>{title}</h1>
           <p>{description}</p>
         </div>
 
@@ -47,6 +48,7 @@ export function AuthCard(props: AuthCardProps) {
         <Btn
           className={css.authGoogle}
           disabled={busy || !onGoogle}
+          icon={<GlobeIcon aria-hidden size={18} strokeWidth={2.2} />}
           onClick={() => void onGoogle?.()}
           variant='secondary'
         >
