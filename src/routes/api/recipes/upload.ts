@@ -6,6 +6,7 @@ import sharp from 'sharp';
 import { createFileRoute } from '@tanstack/react-router';
 import { auth } from '@/lib/auth/auth';
 import { log } from '@/lib/logger';
+import { logMiddleware } from '@/lib/middleware/logMiddleware';
 
 const TEMP_IMAGE_DIRECTORY = path.join(process.cwd(), '_temp', 'recipe-images');
 const MAX_PHOTO_COUNT = 8;
@@ -30,6 +31,7 @@ const uploadRecipeInputType = type({
 
 export const Route = createFileRoute('/api/recipes/upload')({
   server: {
+    middleware: [logMiddleware('POST /recipes/upload')],
     handlers: {
       POST: async ({ request }) => {
         try {
