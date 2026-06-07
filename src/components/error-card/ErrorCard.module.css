@@ -34,7 +34,7 @@
   font-size: var(--text-sm);
 }
 
-@media (max-width: 720px) {
+@media (--phone) {
   .card {
     grid-template-columns: 1fr;
   }

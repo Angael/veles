@@ -1,7 +1,12 @@
 /** @type {import('stylelint').Config} */
 export default {
   rules: {
-    'at-rule-no-unknown': true,
+    'at-rule-no-unknown': [
+      true,
+      {
+        ignoreAtRules: ['custom-media'],
+      },
+    ],
     'block-no-empty': true,
     'color-no-invalid-hex': true,
     'custom-property-no-missing-var-function': true,

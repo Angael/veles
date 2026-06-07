@@ -62,7 +62,7 @@
   background-size: cover;
 }
 
-@media (min-width: 721px) {
+@media (--not-phone) {
   .wrapper {
     display: none;
   }

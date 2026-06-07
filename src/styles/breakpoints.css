@@ -1,0 +1,20 @@
+/* Tight two-column media grids on small phones. */
+@custom-media --small-phone (max-width: 640px);
+
+/* Single-column home layout for phones. */
+@custom-media --phone-home (max-width: 700px);
+
+/* Mobile navigation and stacked app layouts for phones. */
+@custom-media --phone (max-width: 720px);
+
+/* Desktop navigation starts above the phone shell. */
+@custom-media --not-phone (min-width: 721px);
+
+/* Reduce shared shell and card spacing for tablets. */
+@custom-media --tablet (max-width: 900px);
+
+/* Collapse dense dashboard grids for tablets and small laptops. */
+@custom-media --small-desktop (max-width: 1000px);
+
+/* Reduce recipe listing columns before laptop widths feel crowded. */
+@custom-media --medium-desktop (max-width: 1100px);

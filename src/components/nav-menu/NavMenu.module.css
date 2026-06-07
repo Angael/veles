@@ -3,7 +3,7 @@
   overflow-x: auto;
 }
 
-@media (max-width: 720px) {
+@media (--phone) {
   .navRoot {
     display: none;
   }

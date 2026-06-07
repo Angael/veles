@@ -173,7 +173,7 @@
   font-size: var(--text-md);
 }
 
-@media (max-width: 1100px) {
+@media (--medium-desktop) {
   .filtersPanel,
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -184,7 +184,7 @@
   }
 }
 
-@media (max-width: 720px) {
+@media (--phone) {
   .grid,
   .filtersPanel {
     grid-template-columns: 1fr;

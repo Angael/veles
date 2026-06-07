@@ -142,14 +142,14 @@
   font-size: var(--text-sm);
 }
 
-@media (max-width: 1000px) {
+@media (--small-desktop) {
   .summaryGrid,
   .grid {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 720px) {
+@media (--phone) {
   .summaryCard,
   .card {
     padding: var(--space-md);

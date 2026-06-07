@@ -9,7 +9,7 @@
   margin: 0 auto;
   padding: var(--space-md) 0 4rem;
 
-  @media (max-width: 900px) {
+  @media (--tablet) {
     width: min(1100px, calc(100% - 1rem));
   }
 }
@@ -31,7 +31,7 @@
   font-size: 1.05rem;
 }
 
-@media (max-width: 720px) {
+@media (--phone) {
   .shell {
     padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
   }

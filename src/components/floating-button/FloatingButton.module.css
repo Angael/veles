@@ -7,7 +7,7 @@
   transition: bottom 180ms;
 }
 
-@media (max-width: 720px) {
+@media (--phone) {
   .button {
     right: var(--space-lg);
     bottom: calc(4rem + env(safe-area-inset-bottom, 0px));

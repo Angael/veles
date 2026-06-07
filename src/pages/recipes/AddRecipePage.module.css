@@ -55,7 +55,7 @@
   justify-content: start;
 }
 
-@media (max-width: 720px) {
+@media (--phone) {
   .formCard {
     width: 100%;
   }

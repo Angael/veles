@@ -27,6 +27,7 @@
 - Prefer css modules to global css, prefer syntax `import css from ...`
 - In css modules, prefer nested selectors when it keeps related styles together.
 - This app uses css reset and theme.css
+- Shared responsive breakpoints live in `src/styles/breakpoints.css`; use its custom media names instead of repeating raw width queries.
 - Respect the css reset first: margins for text blocks, base font inheritance, and default line-height are already normalized there, so only restyle them when a component intentionally needs to diverge.
 - Avoid decorative eyebrow/kicker UI text that only repeats context without adding clarity.
 - Components should not have more than soft cap 200 lines of code, hard cap 300 lines. It's a code smell that file does too much.

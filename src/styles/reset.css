@@ -1,4 +1,5 @@
 @import './theme.css';
+@import './breakpoints.css';
 
 :root {
   font-family: var(--font-sans);
