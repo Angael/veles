@@ -1,7 +1,9 @@
 .page {
-  min-height: 100vh;
+  min-height: 100dvh;
   color: var(--c-text);
   background: var(--gradient-page);
+  background-attachment: fixed;
+  background-size: 100vw 100dvh;
 }
 
 .shell {

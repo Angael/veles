@@ -12,8 +12,6 @@ const ROUTE_LABEL_ITEMS = [
   { matchPrefix: '/recipes', label: 'Recipes' },
   { matchPrefix: '/calories', label: 'Calories' },
   { matchPrefix: '/account', label: 'Account' },
-  { matchPrefix: '/login', label: 'Login' },
-  { matchPrefix: '/signup', label: 'Sign Up' },
 ] as const;
 
 export function AppFrame() {
