@@ -1,24 +1,51 @@
-import { Link, Outlet } from '@tanstack/react-router';
+import { Link, Outlet, useRouterState } from '@tanstack/react-router';
+import { ChevronLeftIcon } from 'lucide-react';
 import { NavMenu } from '@/components/nav-menu/NavMenu';
 import { MobileNavMenu } from '@/components/nav-menu/MobileNavMenu';
 import { clientEnv } from '@/lib/env/client';
 import css from './AppFrame.module.css';
+
+const ROUTE_BRAND_ITEMS = [
+  { matchPrefix: '/weight', label: 'Weight' },
+  { matchPrefix: '/recipes', label: 'Recipes' },
+  { matchPrefix: '/calories', label: 'Calories' },
+  { matchPrefix: '/account', label: 'Account' },
+  { matchPrefix: '/login', label: 'Login' },
+  { matchPrefix: '/signup', label: 'Sign Up' },
+] as const;
 
 export function AppFrame() {
   return (
     <div className={css.page}>
       <div className={css.shell}>
         <header className={css.header}>
-          <div className={css.brand}>
-            <Link to='/'>
-              <strong>{clientEnv.appName}</strong>
-            </Link>
-          </div>
+          <AppBrand />
           <NavMenu />
         </header>
         <Outlet />
         <MobileNavMenu />
       </div>
+    </div>
+  );
+}
+
+function AppBrand() {
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const routeBrand = ROUTE_BRAND_ITEMS.find((item) => pathname.startsWith(item.matchPrefix));
+  const label = routeBrand?.label ?? clientEnv.appName;
+
+  return (
+    <div className={css.brand}>
+      {routeBrand ? (
+        <Link aria-label='Back home' className={css.brandBackLink} to='/'>
+          <ChevronLeftIcon aria-hidden='true' size={18} strokeWidth={2} />
+        </Link>
+      ) : null}
+      <Link className={css.brandTitleLink} to='/'>
+        <strong>{label}</strong>
+      </Link>
     </div>
   );
 }
