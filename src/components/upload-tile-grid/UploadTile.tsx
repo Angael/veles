@@ -42,13 +42,7 @@ export const UploadTile = memo(function UploadTile({ file, metaLabel, onRemove }
         variant='ghost'
       />
 
-      <div className={css.bottomLeftStack}>
-        <span className={css.nameBadge} title={file.name}>
-          {file.name}
-        </span>
-
-        <span className={css.metaBadge}>{metaLabel}</span>
-      </div>
+      <span className={css.metaBadge}>{metaLabel}</span>
     </article>
   );
 });

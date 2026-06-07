@@ -1,9 +1,10 @@
 .root {
   display: grid;
-  gap: var(--space-sm);
-  padding: var(--space-sm);
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0;
+  overflow: hidden;
   border: 1px dashed rgba(148, 163, 184, 0.22);
-  border-radius: calc(var(--radius-md) + var(--space-xs));
+  border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--c-surface-inset) 28%, transparent);
   transition:
     border-color 180ms ease-out,
@@ -17,22 +18,16 @@
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-primary-border-soft) 70%, transparent);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
-  gap: var(--space-sm);
-}
-
 .tile {
   position: relative;
   isolation: isolate;
   display: grid;
   align-items: end;
-  min-height: 9.5rem;
   aspect-ratio: 1;
   overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: var(--radius-md);
+  border: 0;
+  border-right: 1px solid rgba(148, 163, 184, 0.16);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
   background: color-mix(in srgb, var(--c-surface-strong) 62%, transparent);
   box-shadow: 0 10px 30px -24px rgba(15, 23, 42, 0.8);
 }
@@ -57,42 +52,20 @@
 }
 
 .removeButton,
-.bottomLeftStack {
+.metaBadge {
   position: absolute;
   z-index: 1;
 }
 
-.nameBadge,
 .metaBadge {
-  max-width: 100%;
-  backdrop-filter: blur(8px);
-  color: white;
-}
-
-.nameBadge {
-  padding: 0.25rem 0.45rem;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.5);
-  font-size: 0.72rem;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.bottomLeftStack {
   left: 0.45rem;
   bottom: 0.45rem;
-  display: grid;
-  justify-items: start;
-  max-width: calc(100% - 0.9rem);
-  gap: 0.25rem;
-}
-
-.metaBadge {
+  max-width: 100%;
   padding: 0.25rem 0.45rem;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(8px);
+  color: white;
   font-size: 0.68rem;
   line-height: 1.2;
   white-space: nowrap;
@@ -174,7 +147,7 @@
 }
 
 @media (max-width: 640px) {
-  .grid {
+  .root {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

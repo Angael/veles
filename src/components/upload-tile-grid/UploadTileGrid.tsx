@@ -99,37 +99,35 @@ export function UploadTileGrid({
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <div className={css.grid}>
-        {files.map((file) => {
-          const fileKey = getFileKey(file);
+      {files.map((file) => {
+        const fileKey = getFileKey(file);
 
-          return (
-            <UploadTile
-              file={file}
-              key={fileKey}
-              metaLabel={formatFileMeta(file)}
-              onRemove={() =>
-                onFilesChange(files.filter((currentFile) => getFileKey(currentFile) !== fileKey))
-              }
-            />
-          );
-        })}
-
-        <label className={clsx(css.tile, css.uploadTile)} htmlFor={inputId}>
-          <input
-            accept='image/*'
-            className={css.fileInput}
-            id={inputId}
-            multiple
-            onChange={handleInputChange}
-            type='file'
+        return (
+          <UploadTile
+            file={file}
+            key={fileKey}
+            metaLabel={formatFileMeta(file)}
+            onRemove={() =>
+              onFilesChange(files.filter((currentFile) => getFileKey(currentFile) !== fileKey))
+            }
           />
+        );
+      })}
 
-          <UploadIcon aria-hidden='true' size={20} strokeWidth={1.9} />
-          <strong>Add images</strong>
-          <span>{files.length ? 'Drop here or browse' : `Up to ${maxItems} images`}</span>
-        </label>
-      </div>
+      <label className={clsx(css.tile, css.uploadTile)} htmlFor={inputId}>
+        <input
+          accept='image/*'
+          className={css.fileInput}
+          id={inputId}
+          multiple
+          onChange={handleInputChange}
+          type='file'
+        />
+
+        <UploadIcon aria-hidden='true' size={20} strokeWidth={1.9} />
+        <strong>Add images</strong>
+        <span>{files.length ? 'Drop here or browse' : `Up to ${maxItems} images`}</span>
+      </label>
     </div>
   );
 }
