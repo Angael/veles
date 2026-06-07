@@ -130,16 +130,22 @@ async function saveOptimizedImage(file: File) {
   const filename = `${randomUUID()}.webp`;
   const outputPath = path.join(TEMP_IMAGE_DIRECTORY, filename);
 
-  await sharp(input)
-    .rotate()
-    .resize({
-      fit: 'inside',
-      height: 720,
-      width: 720,
-      withoutEnlargement: true,
-    })
-    .webp({ quality: 82 })
-    .toFile(outputPath);
+  try {
+    await sharp(input, { failOn: 'none' })
+      .rotate()
+      .resize({
+        fit: 'inside',
+        height: 720,
+        width: 720,
+        withoutEnlargement: true,
+      })
+      .webp({ quality: 82 })
+      .toFile(outputPath);
+  } catch (error) {
+    throw new Error(
+      `Failed to optimize image ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
+  }
 
   return {
     originalName: file.name,
