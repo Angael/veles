@@ -8,10 +8,11 @@
 }
 
 .authTitle {
-  color: var(--c-text-strong);
-  font-size: clamp(2.4rem, 8vw, 4.8rem);
+  color: color-mix(in srgb, var(--c-text-strong) 78%, var(--c-muted) 22%);
+  font-size: clamp(2rem, 5vw, 3.35rem);
   font-weight: var(--font-weight-semibold);
-  line-height: 0.95;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
   text-align: center;
   text-wrap: balance;
 }
@@ -85,6 +86,6 @@
   }
 
   .authTitle {
-    font-size: 2.8rem;
+    font-size: 2.25rem;
   }
 }
