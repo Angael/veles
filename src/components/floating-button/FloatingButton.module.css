@@ -3,11 +3,13 @@
   right: var(--space-md);
   bottom: var(--space-md);
   z-index: 2;
+
+  transition: bottom 180ms;
 }
 
 @media (max-width: 720px) {
   .button {
-    right: var(--space-sm);
-    bottom: var(--space-sm);
+    right: var(--space-lg);
+    bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
   }
 }

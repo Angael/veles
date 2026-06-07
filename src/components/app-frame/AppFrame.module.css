@@ -31,9 +31,13 @@
   font-size: 1.05rem;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 720px) {
+  .shell {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
   .header {
-    align-items: flex-start;
-    flex-direction: column;
+    justify-content: flex-start;
+    padding-bottom: var(--space-xl);
   }
 }

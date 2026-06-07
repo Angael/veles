@@ -3,6 +3,12 @@
   overflow-x: auto;
 }
 
+@media (max-width: 720px) {
+  .navRoot {
+    display: none;
+  }
+}
+
 .navList {
   display: flex;
   position: relative;

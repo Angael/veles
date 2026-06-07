@@ -10,6 +10,8 @@ type FloatingButtonProps = {
 };
 
 export function FloatingButton({ children, icon, to }: FloatingButtonProps) {
+  // TODO: hide this on scroll down once the mobile bottom nav behavior is finalized.
+  // TODO: move this toward a more centered desktop position on large screens.
   return (
     <Btn
       aria-label={typeof children === 'string' ? children : undefined}

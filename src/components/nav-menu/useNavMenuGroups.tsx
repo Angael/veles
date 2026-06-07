@@ -4,6 +4,43 @@ import { type ReactNode, useState } from 'react';
 import { signOut, useSession } from '@/lib/auth/client';
 import css from './NavMenu.module.css';
 
+export const MOBILE_NAV_ITEMS = [
+  {
+    key: 'recipes',
+    label: 'Recipes',
+    link: '/recipes',
+    matchPrefixes: ['/recipes'],
+  },
+  {
+    key: 'weight',
+    label: 'Weight tracker',
+    link: '/weight',
+    matchPrefixes: ['/weight'],
+  },
+  {
+    key: 'calories',
+    label: 'Calorie tracker',
+    link: '/calories',
+    matchPrefixes: ['/calories'],
+  },
+] as const;
+
+export type MobileNavItem = (typeof MOBILE_NAV_ITEMS)[number];
+type MobileAccountLink = '/account' | '/login';
+type SessionUser = {
+  email?: string | null;
+  image?: string | null;
+  name?: string | null;
+};
+
+export type MobileAccountItem = {
+  key: 'account';
+  label: string;
+  link: MobileAccountLink;
+  matchPrefixes: string[];
+  user: SessionUser | null | undefined;
+};
+
 export interface NavMenuGroup {
   key: string;
   label: ReactNode;
@@ -84,7 +121,7 @@ export function useNavMenuGroups() {
     {
       key: 'account',
       label: accountLabel,
-      matchPrefixes: ['/login', '/signup'],
+      matchPrefixes: ['/login', '/signup', '/account'],
       items: [
         {
           key: 'login',
@@ -112,7 +149,15 @@ export function useNavMenuGroups() {
     },
   ];
 
-  return { groups };
+  const mobileAccountItem: MobileAccountItem = {
+    key: 'account',
+    label: user ? 'Account' : 'Login',
+    link: user ? '/account' : '/login',
+    matchPrefixes: user ? ['/account'] : ['/login', '/signup'],
+    user,
+  };
+
+  return { groups, mobileAccountItem };
 }
 
 function getInitials(value: string) {
