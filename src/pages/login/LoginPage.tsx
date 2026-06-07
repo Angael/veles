@@ -1,6 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { AuthCard } from '@/components/auth-card/AuthCard';
+import { TextInput } from '@/components/text-input/TextInput';
 import css from './LoginPage.module.css';
 import { signIn } from '@/lib/auth/client';
 
@@ -14,7 +15,7 @@ export function LoginPendingPage() {
         <>
           <div className={css.field}>
             <label htmlFor='pending-email'>Email</label>
-            <input
+            <TextInput
               autoComplete='email'
               disabled
               id='pending-email'
@@ -24,7 +25,7 @@ export function LoginPendingPage() {
           </div>
           <div className={css.field}>
             <label htmlFor='pending-password'>Password</label>
-            <input disabled id='pending-password' placeholder='********' type='password' />
+            <TextInput disabled id='pending-password' placeholder='********' type='password' />
           </div>
         </>
       }
@@ -50,7 +51,7 @@ export function LoginPage() {
         <>
           <div className={css.field}>
             <label htmlFor='email'>Email</label>
-            <input
+            <TextInput
               autoComplete='email'
               id='email'
               name='email'
@@ -61,7 +62,7 @@ export function LoginPage() {
           </div>
           <div className={css.field}>
             <label htmlFor='password'>Password</label>
-            <input
+            <TextInput
               autoComplete='current-password'
               id='password'
               name='password'

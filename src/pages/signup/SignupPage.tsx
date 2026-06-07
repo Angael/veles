@@ -1,6 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { AuthCard } from '@/components/auth-card/AuthCard';
+import { TextInput } from '@/components/text-input/TextInput';
 import css from './SignupPage.module.css';
 import { signIn, signUp } from '@/lib/auth/client';
 
@@ -14,7 +15,7 @@ export function SignupPendingPage() {
         <>
           <div className={css.field}>
             <label htmlFor='pending-name'>Name</label>
-            <input
+            <TextInput
               autoComplete='name'
               disabled
               id='pending-name'
@@ -24,7 +25,7 @@ export function SignupPendingPage() {
           </div>
           <div className={css.field}>
             <label htmlFor='pending-email'>Email</label>
-            <input
+            <TextInput
               autoComplete='email'
               disabled
               id='pending-email'
@@ -34,7 +35,7 @@ export function SignupPendingPage() {
           </div>
           <div className={css.field}>
             <label htmlFor='pending-password'>Password</label>
-            <input disabled id='pending-password' placeholder='********' type='password' />
+            <TextInput disabled id='pending-password' placeholder='********' type='password' />
           </div>
         </>
       }
@@ -60,7 +61,7 @@ export function SignupPage() {
         <>
           <div className={css.field}>
             <label htmlFor='name'>Name</label>
-            <input
+            <TextInput
               autoComplete='name'
               id='name'
               name='name'
@@ -71,7 +72,7 @@ export function SignupPage() {
           </div>
           <div className={css.field}>
             <label htmlFor='email'>Email</label>
-            <input
+            <TextInput
               autoComplete='email'
               id='email'
               name='email'
@@ -82,7 +83,7 @@ export function SignupPage() {
           </div>
           <div className={css.field}>
             <label htmlFor='password'>Password</label>
-            <input
+            <TextInput
               autoComplete='new-password'
               id='password'
               minLength={8}
