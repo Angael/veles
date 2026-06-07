@@ -11,6 +11,7 @@
 
   @media (--phone) {
     width: min(1100px, calc(100% - 1rem));
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -20,6 +21,10 @@
   justify-content: space-between;
   gap: var(--space-md);
   padding: var(--space-md) 0 var(--space-xl);
+
+  @media (--phone) {
+    display: none;
+  }
 }
 
 .brand {
@@ -29,15 +34,4 @@
 
 .brand strong {
   font-size: 1.05rem;
-}
-
-@media (--phone) {
-  .shell {
-    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
-  }
-
-  .header {
-    justify-content: flex-start;
-    padding-bottom: var(--space-xl);
-  }
 }
