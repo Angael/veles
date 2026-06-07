@@ -5,6 +5,10 @@
   background: var(--c-surface);
   backdrop-filter: var(--blur-surface);
   box-shadow: var(--shadow-card);
+
+  @media (max-width: 900px) {
+    padding: var(--space-sm);
+  }
 }
 
 .compact {

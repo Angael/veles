@@ -6,7 +6,6 @@
 
 .authCard {
   width: min(460px, 100%);
-  padding: var(--space-lg);
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
