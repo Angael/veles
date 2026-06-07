@@ -1,4 +1,5 @@
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { ChevronLeftIcon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { NavMenu } from '@/components/nav-menu/NavMenu';
@@ -6,7 +7,7 @@ import { MobileNavMenu } from '@/components/nav-menu/MobileNavMenu';
 import { clientEnv } from '@/lib/env/client';
 import css from './AppFrame.module.css';
 
-const ROUTE_BRAND_ITEMS = [
+const ROUTE_LABEL_ITEMS = [
   { matchPrefix: '/weight', label: 'Weight' },
   { matchPrefix: '/recipes', label: 'Recipes' },
   { matchPrefix: '/calories', label: 'Calories' },
@@ -16,11 +17,16 @@ const ROUTE_BRAND_ITEMS = [
 ] as const;
 
 export function AppFrame() {
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const routeLabel = ROUTE_LABEL_ITEMS.find((item) => pathname.startsWith(item.matchPrefix));
+
   return (
     <div className={css.page}>
       <div className={css.shell}>
-        <header className={css.header}>
-          <AppBrand />
+        <header className={clsx(css.header, !routeLabel && css.headerDefaultBrand)}>
+          <RouteLabel routeLabel={routeLabel?.label} />
           <NavMenu />
         </header>
         <Outlet />
@@ -30,16 +36,12 @@ export function AppFrame() {
   );
 }
 
-function AppBrand() {
-  const pathname = useRouterState({
-    select: (state) => state.location.pathname,
-  });
-  const routeBrand = ROUTE_BRAND_ITEMS.find((item) => pathname.startsWith(item.matchPrefix));
-  const label = routeBrand?.label ?? clientEnv.appName;
+function RouteLabel({ routeLabel }: { routeLabel?: string }) {
+  const label = routeLabel ?? clientEnv.appName;
 
   return (
     <div className={css.brand}>
-      {routeBrand ? (
+      {routeLabel ? (
         <Btn
           aria-label='Back home'
           className={css.brandBackLink}
@@ -50,8 +52,8 @@ function AppBrand() {
           size='sm'
         />
       ) : null}
-      {routeBrand ? (
-        <strong className={css.routeBrandTitle}>{label}</strong>
+      {routeLabel ? (
+        <strong className={css.routeLabelTitle}>{label}</strong>
       ) : (
         <Link className={css.brandTitleLink} to='/'>
           <strong>{label}</strong>

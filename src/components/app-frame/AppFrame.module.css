@@ -27,6 +27,12 @@
   }
 }
 
+.headerDefaultBrand {
+  @media (--phone) {
+    display: none;
+  }
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -48,7 +54,7 @@
   text-decoration: none;
 }
 
-.routeBrandTitle {
+.routeLabelTitle {
   min-width: 0;
   font-size: var(--text-lg);
   line-height: 1.1;

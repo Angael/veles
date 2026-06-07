@@ -3,6 +3,7 @@ import { SendHorizontalIcon } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
+import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextareaInput } from '@/components/textarea-input/TextareaInput';
 import { TextInput } from '@/components/text-input/TextInput';
@@ -86,8 +87,7 @@ export function AddRecipePage() {
             }}
           >
             <div className={css.fieldList}>
-              <label className={css.field}>
-                <span>Name</span>
+              <Label text='Name'>
                 <TextInput
                   name='name'
                   onValueChange={(value) => setDraft((current) => ({ ...current, name: value }))}
@@ -95,10 +95,9 @@ export function AddRecipePage() {
                   required
                   value={draft.name}
                 />
-              </label>
+              </Label>
 
-              <label className={css.field}>
-                <span>Description</span>
+              <Label text='Description'>
                 <TextareaInput
                   name='description'
                   onChange={(event) => {
@@ -109,10 +108,9 @@ export function AddRecipePage() {
                   rows={4}
                   value={draft.description}
                 />
-              </label>
+              </Label>
 
-              <label className={css.field}>
-                <span>Ingredients</span>
+              <Label text='Ingredients'>
                 <TextareaInput
                   name='ingredients'
                   onChange={(event) => {
@@ -123,20 +121,18 @@ export function AddRecipePage() {
                   rows={6}
                   value={draft.ingredients}
                 />
-              </label>
+              </Label>
 
-              <label className={css.field}>
-                <span>Tags</span>
+              <Label text='Tags'>
                 <TextInput
                   name='tags'
                   onValueChange={(value) => setDraft((current) => ({ ...current, tags: value }))}
                   placeholder='dinner, chicken, high protein'
                   value={draft.tags}
                 />
-              </label>
+              </Label>
 
-              <label className={css.field}>
-                <span>Rating</span>
+              <Label text='Rating'>
                 <NumberInput
                   max={5}
                   min={1}
@@ -145,47 +141,43 @@ export function AddRecipePage() {
                   placeholder='1-5'
                   value={draft.rating}
                 />
-              </label>
+              </Label>
 
-              <label className={css.field}>
-                <span>Kcal</span>
+              <Label text='Kcal'>
                 <NumberInput
                   min={0}
                   name='kcal'
                   onValueChange={(value) => setDraft((current) => ({ ...current, kcal: value }))}
                   value={draft.kcal}
                 />
-              </label>
+              </Label>
 
-              <label className={css.field}>
-                <span>Protein</span>
+              <Label text='Protein'>
                 <NumberInput
                   min={0}
                   name='protein'
                   onValueChange={(value) => setDraft((current) => ({ ...current, protein: value }))}
                   value={draft.protein}
                 />
-              </label>
+              </Label>
 
-              <label className={css.field}>
-                <span>Carbs</span>
+              <Label text='Carbs'>
                 <NumberInput
                   min={0}
                   name='carbs'
                   onValueChange={(value) => setDraft((current) => ({ ...current, carbs: value }))}
                   value={draft.carbs}
                 />
-              </label>
+              </Label>
 
-              <label className={css.field}>
-                <span>Fats</span>
+              <Label text='Fats'>
                 <NumberInput
                   min={0}
                   name='fats'
                   onValueChange={(value) => setDraft((current) => ({ ...current, fats: value }))}
                   value={draft.fats}
                 />
-              </label>
+              </Label>
 
               <div className={clsx(css.field, css.uploadFieldWrap)}>
                 <span>Photos</span>
