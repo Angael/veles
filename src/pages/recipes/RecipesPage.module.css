@@ -176,7 +176,7 @@
 .footerItem {
   color: var(--c-accent-strong);
   letter-spacing: 0.14em;
-  font-size: var(--text-md);
+  font-size: var(--text-sm);
 }
 
 @media (--laptop) {

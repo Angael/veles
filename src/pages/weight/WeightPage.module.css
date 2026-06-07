@@ -139,7 +139,7 @@
 
 .logMeta span {
   color: var(--c-accent-soft);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
 }
 
 @media (--phone) {

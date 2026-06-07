@@ -32,45 +32,24 @@
   align-items: center;
   min-width: 0;
   gap: var(--space-xs);
-}
 
-.brand strong {
-  font-size: 1.05rem;
+  & strong {
+    font-size: var(--text-lg);
+  }
 }
 
 .brandBackLink {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
   flex: 0 0 auto;
-  border: var(--border-width) solid var(--c-border-strong);
-  border-radius: var(--radius-pill);
-  background: var(--c-surface);
-  color: var(--c-text);
-  text-decoration: none;
-  transition:
-    background-color var(--duration-fast) ease,
-    border-color var(--duration-fast) ease;
-
-  &:hover {
-    border-color: var(--c-border-hover);
-    background: var(--c-surface-raised);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--c-primary-focus);
-    outline-offset: 2px;
-  }
-
-  @media (--phone) {
-    display: inline-flex;
-  }
 }
 
 .brandTitleLink {
   min-width: 0;
   color: inherit;
   text-decoration: none;
+}
+
+.routeBrandTitle {
+  min-width: 0;
+  font-size: var(--text-lg);
+  line-height: 1.1;
 }

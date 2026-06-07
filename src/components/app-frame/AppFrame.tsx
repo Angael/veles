@@ -1,5 +1,6 @@
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { ChevronLeftIcon } from 'lucide-react';
+import { Btn } from '@/components/btn/Btn';
 import { NavMenu } from '@/components/nav-menu/NavMenu';
 import { MobileNavMenu } from '@/components/nav-menu/MobileNavMenu';
 import { clientEnv } from '@/lib/env/client';
@@ -39,13 +40,23 @@ function AppBrand() {
   return (
     <div className={css.brand}>
       {routeBrand ? (
-        <Link aria-label='Back home' className={css.brandBackLink} to='/'>
-          <ChevronLeftIcon aria-hidden='true' size={18} strokeWidth={2} />
-        </Link>
+        <Btn
+          aria-label='Back home'
+          className={css.brandBackLink}
+          icon={<ChevronLeftIcon aria-hidden='true' size={18} strokeWidth={2} />}
+          iconOnly
+          isLink
+          render={<Link to='/' />}
+          size='sm'
+        />
       ) : null}
-      <Link className={css.brandTitleLink} to='/'>
-        <strong>{label}</strong>
-      </Link>
+      {routeBrand ? (
+        <strong className={css.routeBrandTitle}>{label}</strong>
+      ) : (
+        <Link className={css.brandTitleLink} to='/'>
+          <strong>{label}</strong>
+        </Link>
+      )}
     </div>
   );
 }

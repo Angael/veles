@@ -120,7 +120,7 @@
 
 .uploadTile strong {
   color: var(--c-text);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
 }
 
 .uploadTile span {
