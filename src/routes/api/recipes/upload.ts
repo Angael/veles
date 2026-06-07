@@ -120,12 +120,7 @@ export const Route = createFileRoute('/api/recipes/upload')({
             stack: error instanceof Error ? error.stack?.split('\n') : undefined,
           });
 
-          return Response.json(
-            {
-              error: error instanceof Error ? error.message : 'Recipe upload failed',
-            },
-            { status: 500 },
-          );
+          return Response.json({ error: 'Recipe upload failed' }, { status: 500 });
         }
       },
     },
