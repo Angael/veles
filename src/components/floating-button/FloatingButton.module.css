@@ -1,13 +1,13 @@
 .button {
   position: fixed;
-  right: var(--space-xl);
-  bottom: var(--space-xl);
+  right: var(--space-md);
+  bottom: var(--space-md);
   z-index: 2;
 }
 
 @media (max-width: 720px) {
   .button {
-    right: var(--space-lg);
-    bottom: var(--space-lg);
+    right: var(--space-sm);
+    bottom: var(--space-sm);
   }
 }

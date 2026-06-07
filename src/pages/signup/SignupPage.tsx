@@ -1,6 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { AuthCard } from '@/components/auth-card/AuthCard';
+import { TextInput } from '@/components/text-input/TextInput';
 import css from './SignupPage.module.css';
 import { signIn, signUp } from '@/lib/auth/client';
 
@@ -14,15 +15,27 @@ export function SignupPendingPage() {
         <>
           <div className={css.field}>
             <label htmlFor='pending-name'>Name</label>
-            <input autoComplete='name' disabled id='pending-name' type='text' />
+            <TextInput
+              autoComplete='name'
+              disabled
+              id='pending-name'
+              placeholder='Ada Lovelace'
+              type='text'
+            />
           </div>
           <div className={css.field}>
             <label htmlFor='pending-email'>Email</label>
-            <input autoComplete='email' disabled id='pending-email' type='email' />
+            <TextInput
+              autoComplete='email'
+              disabled
+              id='pending-email'
+              placeholder='name@example.com'
+              type='email'
+            />
           </div>
           <div className={css.field}>
             <label htmlFor='pending-password'>Password</label>
-            <input disabled id='pending-password' type='password' />
+            <TextInput disabled id='pending-password' placeholder='********' type='password' />
           </div>
         </>
       }
@@ -48,19 +61,34 @@ export function SignupPage() {
         <>
           <div className={css.field}>
             <label htmlFor='name'>Name</label>
-            <input autoComplete='name' id='name' name='name' required type='text' />
+            <TextInput
+              autoComplete='name'
+              id='name'
+              name='name'
+              placeholder='Ada Lovelace'
+              required
+              type='text'
+            />
           </div>
           <div className={css.field}>
             <label htmlFor='email'>Email</label>
-            <input autoComplete='email' id='email' name='email' required type='email' />
+            <TextInput
+              autoComplete='email'
+              id='email'
+              name='email'
+              placeholder='name@example.com'
+              required
+              type='email'
+            />
           </div>
           <div className={css.field}>
             <label htmlFor='password'>Password</label>
-            <input
+            <TextInput
               autoComplete='new-password'
               id='password'
               minLength={8}
               name='password'
+              placeholder='********'
               required
               type='password'
             />

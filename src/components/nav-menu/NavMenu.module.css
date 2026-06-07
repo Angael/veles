@@ -7,7 +7,7 @@
   display: flex;
   position: relative;
   flex-wrap: wrap;
-  gap: var(--space-md);
+  gap: var(--space-xs);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -21,10 +21,10 @@
   gap: 0.375rem;
   margin: 0;
   padding: 0.65rem 0.95rem;
-  border: var(--border-width) solid var(--color-border-strong);
+  border: var(--border-width) solid var(--c-border-strong);
   border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  color: var(--color-page);
+  background: var(--c-surface);
+  color: var(--c-text);
   font: inherit;
   line-height: 1;
   text-decoration: none;
@@ -38,14 +38,14 @@
 .navTriggerActive,
 .navTrigger[data-popup-open],
 .navTriggerActive[data-popup-open] {
-  border-color: var(--color-primary-border);
-  background: var(--color-primary-surface-strong);
+  border-color: var(--c-primary-border);
+  background: var(--c-primary-surface-strong);
 }
 
 .navTrigger:focus-visible,
 .navCard:focus-visible,
 .navCardActive:focus-visible {
-  outline: 2px solid var(--color-primary-focus);
+  outline: 2px solid var(--c-primary-focus);
   outline-offset: 2px;
 }
 
@@ -64,8 +64,8 @@
   height: 1.5rem;
   overflow: hidden;
   border-radius: 999px;
-  background: var(--color-primary-surface);
-  color: var(--color-page);
+  background: var(--c-primary-surface);
+  color: var(--c-text);
   flex-shrink: 0;
   margin: -0.25rem 0 -0.25rem -0.25rem;
 }
@@ -112,10 +112,10 @@
   width: var(--popup-width);
   height: var(--popup-height);
   max-width: min(32rem, calc(100vw - 2rem));
-  border: var(--border-width) solid var(--color-border-popup);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-solid);
-  color: var(--color-page);
+  border: var(--border-width) solid var(--c-border-popup);
+  border-radius: var(--radius-xs);
+  background: var(--c-surface-solid);
+  color: var(--c-text);
   box-shadow: var(--shadow-popup);
   outline: none;
   transform-origin: var(--transform-origin);
@@ -132,7 +132,7 @@
 
 .navContent {
   width: min(32rem, calc(100vw - 2rem));
-  padding: var(--space-lg);
+  padding: var(--space-sm);
   box-sizing: border-box;
   transition:
     opacity calc(var(--duration) * 0.8) ease,
@@ -169,7 +169,7 @@
 .navLinkList {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-  gap: var(--space-md);
+  gap: var(--space-xs);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -180,9 +180,9 @@
   display: block;
   height: 100%;
   width: 100%;
-  padding: var(--space-lg);
+  padding: var(--space-sm);
   border: var(--border-width) solid transparent;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   background: transparent;
   color: inherit;
   font: inherit;
@@ -199,13 +199,13 @@
 .navCardActive,
 .navCardActive:hover,
 .navCardActive[data-popup-open] {
-  border-color: var(--color-border-hover);
-  background: var(--color-surface-raised);
+  border-color: var(--c-border-hover);
+  background: var(--c-surface-raised);
 }
 
 .navCardActive {
-  border-color: var(--color-primary-border-soft);
-  background: var(--color-primary-surface);
+  border-color: var(--c-primary-border-soft);
+  background: var(--c-primary-surface);
 }
 
 .navCard:disabled {
@@ -222,7 +222,7 @@
 
 .navCardDescription {
   margin: 0;
-  color: var(--color-muted-transparent);
+  color: var(--c-muted-soft);
   font-size: var(--text-md);
   line-height: 1.4;
 }
@@ -261,7 +261,7 @@
   left: 50%;
   width: calc(6px * sqrt(2));
   height: calc(6px * sqrt(2));
-  border: var(--border-width) solid var(--color-border-popup);
-  background: var(--color-surface-solid);
+  border: var(--border-width) solid var(--c-border-popup);
+  background: var(--c-surface-solid);
   transform: translate(-50%, 50%) rotate(45deg);
 }

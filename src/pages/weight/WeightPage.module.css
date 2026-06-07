@@ -1,12 +1,12 @@
 .page {
   display: grid;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
 }
 
 .summaryGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
 }
 
 .card {
@@ -27,16 +27,16 @@
 .captureField span {
   margin: 0;
   text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-eyebrow);
+  letter-spacing: 0.14em;
   font-size: var(--text-xs);
-  color: var(--color-accent-label);
+  color: var(--c-accent-strong);
 }
 
 .summaryCard p,
 .logRow p,
 .photoPlaceholder p {
   margin: 0;
-  color: var(--color-muted);
+  color: var(--c-muted);
 }
 
 .deltaDown {
@@ -50,7 +50,7 @@
 .grid {
   display: grid;
   grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
 }
 
 .captureCard {
@@ -61,12 +61,12 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--space-xl);
+  gap: var(--space-md);
 }
 
 .captureField {
   display: grid;
-  gap: var(--space-md);
+  gap: var(--space-xs);
 }
 
 .mockBadge {
@@ -74,20 +74,20 @@
   align-items: center;
   min-height: 2rem;
   padding: 0 0.75rem;
-  border: var(--border-width) solid var(--color-primary-border-soft);
+  border: var(--border-width) solid var(--c-primary-border-soft);
   border-radius: var(--radius-pill);
-  background: var(--color-primary-surface);
-  color: var(--color-accent);
+  background: var(--c-primary-surface);
+  color: var(--c-accent);
   font-size: var(--text-xs);
   text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-eyebrow);
+  letter-spacing: 0.14em;
 }
 
 .capturePanel,
 .logList {
   display: grid;
-  gap: var(--space-xl);
-  margin-top: var(--space-xl);
+  gap: var(--space-md);
+  margin-top: var(--space-md);
 }
 
 .captureValue {
@@ -95,8 +95,8 @@
   align-items: center;
   min-height: 3.5rem;
   padding: 0 1rem;
-  border: var(--border-width) solid var(--color-border-strong);
-  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--c-border-strong);
+  border-radius: var(--radius-xs);
   background: rgba(2, 6, 23, 0.4);
   font-size: 1.4rem;
   font-weight: var(--font-weight-semibold);
@@ -105,26 +105,26 @@
 .photoPlaceholder {
   display: grid;
   justify-items: start;
-  gap: var(--space-md);
-  padding: var(--space-xl);
-  border: 1px dashed var(--color-primary-border);
-  border-radius: var(--radius-md);
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  border: 1px dashed var(--c-primary-border);
+  border-radius: var(--radius-xs);
   background: rgba(37, 99, 235, 0.08);
 }
 
 .photoIcon {
   width: 1.8rem;
   height: 1.8rem;
-  color: var(--color-accent-soft);
+  color: var(--c-accent-soft);
   margin: auto;
 }
 
 .logRow {
   display: grid;
   grid-template-columns: minmax(0, 160px) minmax(0, 1fr);
-  gap: var(--space-xl);
-  padding-bottom: var(--space-xl);
-  border-bottom: var(--border-width) solid var(--color-border);
+  gap: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: var(--border-width) solid var(--c-border);
 }
 
 .logRow:last-child {
@@ -138,7 +138,7 @@
 }
 
 .logMeta span {
-  color: var(--color-accent-soft);
+  color: var(--c-accent-soft);
   font-size: var(--text-sm);
 }
 
@@ -152,7 +152,7 @@
 @media (max-width: 720px) {
   .summaryCard,
   .card {
-    padding: var(--space-xl);
+    padding: var(--space-md);
   }
 
   .cardHeader,

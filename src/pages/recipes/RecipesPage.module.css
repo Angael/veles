@@ -1,30 +1,30 @@
 .page {
   display: grid;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
 }
 
 .controls {
   display: grid;
-  gap: var(--space-lg);
+  gap: var(--space-sm);
 }
 
 .toolbar {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--space-md);
+  gap: var(--space-xs);
   align-items: center;
 }
 
 .filterField span {
   text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-eyebrow);
+  letter-spacing: 0.14em;
   font-size: var(--text-xs);
-  color: var(--color-accent-label);
+  color: var(--c-accent-strong);
 }
 
 .searchField {
   display: grid;
-  gap: var(--space-md);
+  gap: var(--space-xs);
 }
 
 .selectInput {
@@ -39,26 +39,30 @@
 .filtersPanel {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-lg);
-  padding: var(--space-xl);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-inset);
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-xs);
+  background: var(--c-surface-inset);
+}
+
+.filtersPanel[hidden] {
+  display: none;
 }
 
 .filterField {
   display: grid;
-  gap: var(--space-md);
+  gap: var(--space-xs);
 }
 
 .description {
-  color: var(--color-muted);
+  color: var(--c-muted);
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-xl);
+  gap: var(--space-md);
 }
 
 .cardLink {
@@ -69,9 +73,9 @@
 
 .card {
   display: grid;
-  gap: var(--space-lg);
+  gap: var(--space-sm);
   height: 100%;
-  padding-bottom: var(--space-md);
+  padding-bottom: var(--space-xs);
   transition:
     border-color 180ms var(--ease-out),
     box-shadow 180ms var(--ease-out);
@@ -79,9 +83,9 @@
 
 .cardLink:hover .card,
 .cardLink:focus-visible .card {
-  border-color: var(--color-primary-border);
+  border-color: var(--c-primary-border);
   box-shadow:
-    0 0 0 1px var(--color-primary-border-soft),
+    0 0 0 1px var(--c-primary-border-soft),
     var(--shadow-card);
 }
 
@@ -95,9 +99,9 @@
   height: 200px;
   margin: -1.35rem -1.35rem 0;
   overflow: hidden;
-  border-radius: calc(var(--radius-lg) - var(--border-width))
-    calc(var(--radius-lg) - var(--border-width)) 0 0;
-  background: var(--color-surface-inset);
+  border-radius: calc(var(--radius-xs) - var(--border-width))
+    calc(var(--radius-xs) - var(--border-width)) 0 0;
+  background: var(--c-surface-inset);
 }
 
 .imageLayoutOne {
@@ -127,13 +131,13 @@
 .cardBody {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-xs);
 }
 
 .cardHeader {
   display: flex;
   align-items: start;
-  gap: var(--space-lg);
+  gap: var(--space-sm);
 }
 
 .titleBlock {
@@ -147,11 +151,11 @@
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-md);
+  gap: var(--space-xs);
 }
 
 .tag {
-  color: var(--color-muted-strong);
+  color: var(--c-muted-strong);
   font-size: var(--text-xs);
 }
 
@@ -159,13 +163,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-lg);
+  gap: var(--space-sm);
   margin: auto 0 0 auto;
 }
 
 .footerItem {
-  color: var(--color-accent-label);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  color: var(--c-accent-strong);
+  letter-spacing: 0.14em;
   font-size: var(--text-md);
 }
 
