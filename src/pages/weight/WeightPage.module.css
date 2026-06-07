@@ -139,17 +139,15 @@
 
 .logMeta span {
   color: var(--c-accent-soft);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
 }
 
-@media (max-width: 1000px) {
+@media (--phone) {
   .summaryGrid,
   .grid {
     grid-template-columns: 1fr;
   }
-}
 
-@media (max-width: 720px) {
   .summaryCard,
   .card {
     padding: var(--space-md);

@@ -31,12 +31,12 @@
 
 .field {
   display: grid;
-  gap: 0.7rem;
+  gap: 0.3rem;
 }
 
 .field span {
   color: var(--c-accent-strong);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
 }
 
 .uploadFieldWrap {
@@ -55,7 +55,7 @@
   justify-content: start;
 }
 
-@media (max-width: 720px) {
+@media (--phone) {
   .formCard {
     width: 100%;
   }

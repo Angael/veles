@@ -9,8 +9,9 @@
   margin: 0 auto;
   padding: var(--space-md) 0 4rem;
 
-  @media (max-width: 900px) {
+  @media (--phone) {
     width: min(1100px, calc(100% - 1rem));
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -20,20 +21,35 @@
   justify-content: space-between;
   gap: var(--space-md);
   padding: var(--space-md) 0 var(--space-xl);
+
+  @media (--phone) {
+    padding: var(--space-sm) 0 var(--space-lg);
+  }
+}
+
+.headerDefaultBrand {
+  @media (--phone) {
+    display: none;
+  }
 }
 
 .brand {
-  display: grid;
-  gap: 0.15rem;
-}
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: var(--space-xs);
 
-.brand strong {
-  font-size: 1.05rem;
-}
-
-@media (max-width: 900px) {
-  .header {
-    align-items: flex-start;
-    flex-direction: column;
+  & strong {
+    font-size: var(--text-lg);
   }
+}
+
+.brandBackLink {
+  flex: 0 0 auto;
+}
+
+.routeLabelTitle {
+  min-width: 0;
+  font-size: var(--text-lg);
+  line-height: 1.1;
 }

@@ -6,11 +6,7 @@
   backdrop-filter: var(--blur-surface);
   box-shadow: var(--shadow-card);
 
-  @media (max-width: 900px) {
+  @media (--phone) {
     padding: var(--space-sm);
   }
-}
-
-.compact {
-  padding: 1.35rem;
 }

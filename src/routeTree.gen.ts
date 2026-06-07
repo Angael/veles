@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WeightRouteImport } from './routes/weight'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as CaloriesRouteImport } from './routes/calories'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecipesIndexRouteImport } from './routes/recipes/index'
 import { Route as RecipesAddRouteImport } from './routes/recipes/add'
@@ -41,6 +43,16 @@ const SignupRoute = SignupRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CaloriesRoute = CaloriesRouteImport.update({
+  id: '/calories',
+  path: '/calories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -121,6 +133,8 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/calories': typeof CaloriesRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/weight': typeof WeightRoute
@@ -141,6 +155,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/calories': typeof CaloriesRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/weight': typeof WeightRoute
@@ -162,6 +178,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/calories': typeof CaloriesRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/weight': typeof WeightRoute
@@ -184,6 +202,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account'
+    | '/calories'
     | '/login'
     | '/signup'
     | '/weight'
@@ -204,6 +224,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account'
+    | '/calories'
     | '/login'
     | '/signup'
     | '/weight'
@@ -224,6 +246,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/account'
+    | '/calories'
     | '/login'
     | '/signup'
     | '/weight'
@@ -245,6 +269,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
+  CaloriesRoute: typeof CaloriesRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
   WeightRoute: typeof WeightRoute
@@ -285,6 +311,20 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calories': {
+      id: '/calories'
+      path: '/calories'
+      fullPath: '/calories'
+      preLoaderRoute: typeof CaloriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -397,6 +437,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
+  CaloriesRoute: CaloriesRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
   WeightRoute: WeightRoute,

@@ -49,7 +49,7 @@ export function HomePage() {
       </Card>
 
       {featureCards.map((card) => (
-        <Card as='article' className={css.tile} compact key={card.title}>
+        <Card as='article' className={css.tile} key={card.title}>
           <div className={css.tileAccent}>{card.accent}</div>
           <h2>{card.title}</h2>
           <p>{card.description}</p>

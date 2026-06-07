@@ -1,8 +1,8 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { AuthCard } from '@/components/auth-card/AuthCard';
+import { Label } from '@/components/label/Label';
 import { TextInput } from '@/components/text-input/TextInput';
-import css from './SignupPage.module.css';
 import { signIn, signUp } from '@/lib/auth/client';
 
 export function SignupPendingPage() {
@@ -13,8 +13,7 @@ export function SignupPendingPage() {
       error={null}
       fields={
         <>
-          <div className={css.field}>
-            <label htmlFor='pending-name'>Name</label>
+          <Label htmlFor='pending-name' text='Name'>
             <TextInput
               autoComplete='name'
               disabled
@@ -22,9 +21,8 @@ export function SignupPendingPage() {
               placeholder='Ada Lovelace'
               type='text'
             />
-          </div>
-          <div className={css.field}>
-            <label htmlFor='pending-email'>Email</label>
+          </Label>
+          <Label htmlFor='pending-email' text='Email'>
             <TextInput
               autoComplete='email'
               disabled
@@ -32,11 +30,10 @@ export function SignupPendingPage() {
               placeholder='name@example.com'
               type='email'
             />
-          </div>
-          <div className={css.field}>
-            <label htmlFor='pending-password'>Password</label>
+          </Label>
+          <Label htmlFor='pending-password' text='Password'>
             <TextInput disabled id='pending-password' placeholder='********' type='password' />
-          </div>
+          </Label>
         </>
       }
       footer='Already have an account? Log in'
@@ -59,8 +56,7 @@ export function SignupPage() {
       error={error}
       fields={
         <>
-          <div className={css.field}>
-            <label htmlFor='name'>Name</label>
+          <Label htmlFor='name' text='Name'>
             <TextInput
               autoComplete='name'
               id='name'
@@ -69,9 +65,8 @@ export function SignupPage() {
               required
               type='text'
             />
-          </div>
-          <div className={css.field}>
-            <label htmlFor='email'>Email</label>
+          </Label>
+          <Label htmlFor='email' text='Email'>
             <TextInput
               autoComplete='email'
               id='email'
@@ -80,9 +75,8 @@ export function SignupPage() {
               required
               type='email'
             />
-          </div>
-          <div className={css.field}>
-            <label htmlFor='password'>Password</label>
+          </Label>
+          <Label htmlFor='password' text='Password'>
             <TextInput
               autoComplete='new-password'
               id='password'
@@ -92,7 +86,7 @@ export function SignupPage() {
               required
               type='password'
             />
-          </div>
+          </Label>
         </>
       }
       footer={

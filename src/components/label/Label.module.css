@@ -1,0 +1,9 @@
+.root {
+  display: grid;
+  gap: 0.3rem;
+
+  & > span:first-child {
+    color: var(--c-accent-strong);
+    font-size: var(--text-xs);
+  }
+}

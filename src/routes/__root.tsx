@@ -70,12 +70,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
-        {import.meta.env.DEV ? (
+        {/* {import.meta.env.DEV ? (
           <>
             <TanStackRouterDevtools position='bottom-right' />
             <ReactQueryDevtools buttonPosition='bottom-left' />
           </>
-        ) : null}
+        ) : null} */}
         <Scripts />
       </body>
     </html>

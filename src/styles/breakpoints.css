@@ -1,0 +1,8 @@
+/* Stacked navigation and single-column layouts for phones. */
+@custom-media --phone (max-width: 720px);
+
+/* Tighter shared shell and card spacing for tablets. */
+@custom-media --tablet (max-width: 900px);
+
+/* Reduced dense grids before laptop widths feel crowded. */
+@custom-media --laptop (max-width: 1100px);

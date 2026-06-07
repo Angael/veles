@@ -31,10 +31,10 @@
 
 .message {
   color: var(--c-text);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
 }
 
-@media (max-width: 720px) {
+@media (--phone) {
   .card {
     grid-template-columns: 1fr;
   }

@@ -3,6 +3,12 @@
   overflow-x: auto;
 }
 
+@media (--phone) {
+  .navRoot {
+    display: none;
+  }
+}
+
 .navList {
   display: flex;
   position: relative;
