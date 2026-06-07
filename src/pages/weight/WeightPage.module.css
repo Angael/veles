@@ -142,7 +142,7 @@
   font-size: var(--text-sm);
 }
 
-@media (--small-desktop) {
+@media (--laptop) {
   .summaryGrid,
   .grid {
     grid-template-columns: 1fr;

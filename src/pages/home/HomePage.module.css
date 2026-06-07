@@ -86,7 +86,7 @@
   font-size: var(--text-sm);
 }
 
-@media (--small-desktop) {
+@media (--laptop) {
   .layout {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -96,7 +96,7 @@
   }
 }
 
-@media (--phone-home) {
+@media (--phone) {
   .layout {
     grid-template-columns: 1fr;
   }

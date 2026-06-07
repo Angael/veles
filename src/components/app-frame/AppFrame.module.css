@@ -9,7 +9,7 @@
   margin: 0 auto;
   padding: var(--space-md) 0 4rem;
 
-  @media (--tablet) {
+  @media (--phone) {
     width: min(1100px, calc(100% - 1rem));
   }
 }
