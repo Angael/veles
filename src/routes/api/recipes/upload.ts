@@ -8,6 +8,8 @@ import { auth } from '@/lib/auth/auth';
 import { log } from '@/lib/logger';
 
 const TEMP_IMAGE_DIRECTORY = path.join(process.cwd(), '_temp', 'recipe-images');
+const MAX_PHOTO_COUNT = 8;
+const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 
 const uploadRecipeInputType = type({
   carbs: 'null | string.trim |> string.numeric.parse',
@@ -47,6 +49,15 @@ export const Route = createFileRoute('/api/recipes/upload')({
           const files = formData
             .getAll('photos')
             .filter((value): value is File => value instanceof File && value.size > 0);
+
+          if (files.length > MAX_PHOTO_COUNT) {
+            return Response.json({ error: `Too many photos.` }, { status: 400 });
+          }
+
+          if (files.some((file) => file.size > MAX_PHOTO_BYTES)) {
+            return Response.json({ error: `File too large` }, { status: 400 });
+          }
+
           const ingredientsValue = formData.get('ingredients');
           const tagsValue = formData.get('tags');
           const validation = uploadRecipeInputType({
@@ -83,9 +94,18 @@ export const Route = createFileRoute('/api/recipes/upload')({
 
           await mkdir(TEMP_IMAGE_DIRECTORY, { recursive: true });
 
-          const images = await Promise.all(
-            validation.photos.map((file) => saveOptimizedImage(file)),
-          );
+          const images: Awaited<ReturnType<typeof saveOptimizedImage>>[] = [];
+
+          for (const file of validation.photos) {
+            const image = await saveOptimizedImage(file);
+            images.push(image);
+
+            log.debug('recipe upload image saved', {
+              recipeName: validation.name,
+              userId: session.user.id,
+              image,
+            });
+          }
 
           log.info('recipe upload payload', {
             userId: session.user.id,
