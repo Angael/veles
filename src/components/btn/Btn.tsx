@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import css from './Btn.module.css';
 
-type BtnVariant = 'primary' | 'secondary' | 'ghost';
+type BtnVariant = 'primary' | 'secondary' | 'white' | 'ghost';
 type BtnSize = 'sm' | 'md' | 'lg';
 type BtnRadius = 'md' | 'pill';
 
