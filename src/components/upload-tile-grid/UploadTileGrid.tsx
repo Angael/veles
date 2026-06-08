@@ -48,31 +48,28 @@ export function UploadTileGrid({
   }
 
   function handleDragEnter(event: DragEvent<HTMLDivElement>) {
-    if (!hasDraggedFiles(event)) {
+    if (!preventDefaultFileDrag(event)) {
       return;
     }
 
-    event.preventDefault();
     dragDepthRef.current += 1;
     setIsDragActive(true);
   }
 
   function handleDragOver(event: DragEvent<HTMLDivElement>) {
-    if (!hasDraggedFiles(event)) {
+    if (!preventDefaultFileDrag(event)) {
       return;
     }
 
-    event.preventDefault();
     event.dataTransfer.dropEffect = 'copy';
     setIsDragActive(true);
   }
 
   function handleDragLeave(event: DragEvent<HTMLDivElement>) {
-    if (!hasDraggedFiles(event)) {
+    if (!preventDefaultFileDrag(event)) {
       return;
     }
 
-    event.preventDefault();
     dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
 
     if (dragDepthRef.current === 0) {
@@ -81,11 +78,10 @@ export function UploadTileGrid({
   }
 
   function handleDrop(event: DragEvent<HTMLDivElement>) {
-    if (!hasDraggedFiles(event)) {
+    if (!preventDefaultFileDrag(event)) {
       return;
     }
 
-    event.preventDefault();
     dragDepthRef.current = 0;
     setIsDragActive(false);
     addFiles(Array.from(event.dataTransfer.files));
@@ -132,8 +128,13 @@ export function UploadTileGrid({
   );
 }
 
-function hasDraggedFiles(event: DragEvent<HTMLDivElement>) {
-  return Array.from(event.dataTransfer.types).includes('Files');
+function preventDefaultFileDrag(event: DragEvent<HTMLDivElement>) {
+  if (!Array.from(event.dataTransfer.types).includes('Files')) {
+    return false;
+  }
+
+  event.preventDefault();
+  return true;
 }
 
 function mergeFiles({
