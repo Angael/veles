@@ -70,6 +70,16 @@
   --btn-color: var(--c-text);
 }
 
+.white {
+  --btn-bg: color-mix(in srgb, white 94%, var(--c-primary-surface) 6%);
+  --btn-bg-hover: white;
+  --btn-border: color-mix(in srgb, var(--c-border-strong) 42%, white 58%);
+  --btn-border-hover: color-mix(in srgb, var(--c-primary-border-soft) 48%, white 52%);
+  --btn-color: #0f172a;
+  --btn-shadow: 0 10px 26px rgba(2, 6, 23, 0.14);
+  --btn-shadow-hover: 0 14px 32px rgba(2, 6, 23, 0.18);
+}
+
 .ghost {
   --btn-bg: transparent;
   --btn-bg-hover: color-mix(in srgb, var(--c-primary-surface) 54%, transparent);

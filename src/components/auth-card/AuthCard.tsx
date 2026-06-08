@@ -1,5 +1,4 @@
 import type * as React from 'react';
-import { GlobeIcon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import css from './AuthCard.module.css';
@@ -45,13 +44,7 @@ export function AuthCard(props: AuthCardProps) {
 
         <div className={css.authDivider}>or</div>
 
-        <Btn
-          className={css.authGoogle}
-          disabled={busy || !onGoogle}
-          icon={<GlobeIcon aria-hidden size={18} strokeWidth={2.2} />}
-          onClick={() => void onGoogle?.()}
-          variant='secondary'
-        >
+        <Btn disabled={busy || !onGoogle} onClick={() => void onGoogle?.()} variant='white'>
           Continue with Google
         </Btn>
 

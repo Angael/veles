@@ -8,6 +8,7 @@ import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
+import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { SelectInput } from '@/components/select-input/SelectInput';
 import { TextInput } from '@/components/text-input/TextInput';
@@ -87,8 +88,7 @@ export function RecipesPage() {
           hidden={!showFilters}
           id={FILTERS_PANEL_ID}
         >
-          <label className={css.filterField}>
-            <span>Kcal comparison</span>
+          <Label text='Kcal comparison'>
             <SelectInput
               aria-label='Kcal comparison'
               className={css.selectInput}
@@ -100,10 +100,9 @@ export function RecipesPage() {
               }}
               value={nutritionDirection}
             />
-          </label>
+          </Label>
 
-          <label className={css.filterField}>
-            <span>Kcal value</span>
+          <Label text='Kcal value'>
             <NumberInput
               className={css.numberInput}
               min={0}
@@ -112,10 +111,9 @@ export function RecipesPage() {
               step={100}
               value={nutritionValue}
             />
-          </label>
+          </Label>
 
-          <label className={css.filterField}>
-            <span>Rating comparison</span>
+          <Label text='Rating comparison'>
             <SelectInput
               aria-label='Rating comparison'
               className={css.selectInput}
@@ -127,10 +125,9 @@ export function RecipesPage() {
               }}
               value={ratingDirection}
             />
-          </label>
+          </Label>
 
-          <label className={css.filterField}>
-            <span>Rating value</span>
+          <Label text='Rating value'>
             <NumberInput
               className={css.numberInput}
               max={5}
@@ -140,12 +137,8 @@ export function RecipesPage() {
               step={1}
               value={ratingValue}
             />
-          </label>
+          </Label>
         </div>
-
-        {error?.message ? (
-          <ErrorCard message={error.message} title='Could not load recipes' />
-        ) : null}
 
         {error?.message ? (
           <ErrorCard message={error.message} title='Could not load recipes' />

@@ -1,9 +1,9 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
 import { AuthCard } from '@/components/auth-card/AuthCard';
 import { Label } from '@/components/label/Label';
 import { TextInput } from '@/components/text-input/TextInput';
 import { signIn } from '@/lib/auth/client';
+import { useAuthAction } from '@/lib/auth/useAuthAction';
 
 export function LoginPendingPage() {
   return (
@@ -37,8 +37,7 @@ export function LoginPendingPage() {
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { busy, error, runAuthAction, setError } = useAuthAction();
 
   return (
     <AuthCard
@@ -75,25 +74,15 @@ export function LoginPage() {
         </>
       }
       onGoogle={async () => {
-        setBusy(true);
-        setError(null);
-
-        try {
+        await runAuthAction(async () => {
           await signIn.social({
             provider: 'google',
             callbackURL: '/',
           });
-        } catch (error) {
-          setError(error instanceof Error ? error.message : 'Google sign-in failed');
-        } finally {
-          setBusy(false);
-        }
+        }, 'Google sign-in failed');
       }}
       onSubmit={async (formData) => {
-        setBusy(true);
-        setError(null);
-
-        try {
+        await runAuthAction(async () => {
           const result = await signIn.email({
             email: String(formData.get('email') || ''),
             password: String(formData.get('password') || ''),
@@ -105,13 +94,7 @@ export function LoginPage() {
           }
 
           navigate({ to: '/' });
-        } catch (error) {
-          const message = error instanceof Error ? error.message : 'Login failed';
-
-          setError(message);
-        } finally {
-          setBusy(false);
-        }
+        }, 'Login failed');
       }}
       submitLabel='Sign in'
       title='Login'
