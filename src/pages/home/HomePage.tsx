@@ -38,7 +38,7 @@ export function HomePage() {
             <Btn isLink render={<Link to={'/weight'} />} variant='main'>
               Preview weight tracker
             </Btn>
-            <Btn isLink render={<Link to={'/login'} />} variant='gradient'>
+            <Btn isLink render={<Link to={'/login'} />} variant='main'>
               Open login
             </Btn>
             <Btn isLink render={<Link to={'/signup'} />} variant='main'>

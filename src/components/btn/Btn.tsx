@@ -4,7 +4,6 @@ import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import css from './Btn.module.css';
 
 export type BtnVariant =
-  | 'gradient'
   | 'main'
   | 'danger'
   | 'outlineMain'
