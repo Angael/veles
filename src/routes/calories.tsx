@@ -4,6 +4,7 @@ import { PlaceholderPage } from '@/pages/placeholder/PlaceholderPage';
 export const Route = createFileRoute('/calories')({
   component: CaloriesPage,
   head: () => ({ meta: [{ title: 'Calorie tracker' }] }),
+  staticData: { navbar: { label: 'Calories', upTo: { to: '/' } } },
 });
 
 function CaloriesPage() {

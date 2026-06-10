@@ -37,7 +37,7 @@ export function AuthCard(props: AuthCardProps) {
         >
           {fields}
           {error ? <div className={css.errorBox}>{error}</div> : null}
-          <Btn disabled={busy} type='submit' variant='primary'>
+          <Btn disabled={busy} type='submit' variant='gradient'>
             {busy ? 'Working...' : submitLabel}
           </Btn>
         </form>

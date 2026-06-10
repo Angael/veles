@@ -65,7 +65,7 @@ export function WeightPage() {
                 <p>Kept private, attached only when it helps the trend tell the truth.</p>
               </div>
             </label>
-            <Btn radius='pill' type='button' variant='primary'>
+            <Btn radius='pill' type='button' variant='gradient'>
               Save flow next
             </Btn>
           </div>

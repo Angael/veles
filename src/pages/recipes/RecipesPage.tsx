@@ -78,7 +78,7 @@ export function RecipesPage() {
             onClick={() => setShowFilters((value) => !value)}
             radius='pill'
             type='button'
-            variant='secondary'
+            variant='outlineMain'
           ></Btn>
         </div>
 

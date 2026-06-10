@@ -9,4 +9,5 @@ export const Route = createFileRoute('/recipes/')({
     ).queryClient.ensureQueryData(recipesQueryOptions(DEFAULT_RECIPES_QUERY_INPUT)),
   component: RecipesPage,
   head: () => ({ meta: [{ title: 'Recipes' }] }),
+  staticData: { navbar: { label: 'Recipes', upTo: { to: '/' } } },
 });

@@ -4,6 +4,7 @@ import { PlaceholderPage } from '@/pages/placeholder/PlaceholderPage';
 export const Route = createFileRoute('/account')({
   component: AccountPage,
   head: () => ({ meta: [{ title: 'Account' }] }),
+  staticData: { navbar: { label: 'Account', upTo: { to: '/' } } },
 });
 
 function AccountPage() {

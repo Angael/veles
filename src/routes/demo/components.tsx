@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { PlusIcon, SearchIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { AppFrame } from '@/components/app-frame/AppFrame';
 import { AuthCard } from '@/components/auth-card/AuthCard';
-import { Btn } from '@/components/btn/Btn';
+import { Btn, type BtnSize, type BtnVariant } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
 import { ErrorCard } from '@/components/error-card/ErrorCard';
@@ -18,6 +19,28 @@ const SELECT_OPTIONS = [
   { label: 'Less than or equal', value: 'lte' },
   { label: 'More than or equal', value: 'gte' },
 ] as const;
+
+const BTN_VARIANTS = [
+  { label: 'Gradient', value: 'gradient' },
+  { label: 'Main', value: 'main' },
+  { label: 'Danger', value: 'danger' },
+  { label: 'Outline main', value: 'outlineMain' },
+  { label: 'Outline danger', value: 'outlineDanger' },
+  { label: 'White', value: 'white' },
+  { label: 'Ghost', value: 'ghost' },
+  { label: 'Ghost danger', value: 'ghostDanger' },
+] satisfies DemoProp<BtnVariant>[];
+
+const BTN_SIZES = [
+  { label: 'Small', value: 'sm' },
+  { label: 'Medium', value: 'md' },
+  { label: 'Large', value: 'lg' },
+] satisfies DemoProp<BtnSize>[];
+
+type DemoProp<T extends string> = {
+  label: string;
+  value: T;
+};
 
 export const Route = createFileRoute('/demo/components')({
   component: ComponentsDemoPage,
@@ -40,19 +63,43 @@ function ComponentsDemoPage() {
     >
       <h1>Components</h1>
 
-      <section style={{ width: 'min(42rem, 100%)' }}>
+      <section>
         <h2>Btn</h2>
-        <Btn icon={<PlusIcon aria-hidden='true' size={16} strokeWidth={1.8} />} variant='primary'>
-          Primary action
-        </Btn>
+        <DemoTable
+          columns={BTN_SIZES}
+          renderCell={({ column, row }) => (
+            <Btn
+              icon={<PlusIcon aria-hidden='true' size={16} strokeWidth={1.8} />}
+              size={column.value}
+              variant={row.value}
+            >
+              {row.label}
+            </Btn>
+          )}
+          rows={BTN_VARIANTS}
+        />
+        <h3>Icon only</h3>
+        <DemoTable
+          columns={BTN_SIZES}
+          renderCell={({ column, row }) => (
+            <Btn
+              aria-label={`${row.label} ${column.label.toLowerCase()} icon button`}
+              icon={<SearchIcon aria-hidden='true' size={16} strokeWidth={1.8} />}
+              iconOnly
+              size={column.value}
+              variant={row.value}
+            />
+          )}
+          rows={BTN_VARIANTS}
+        />
       </section>
 
-      <section style={{ width: 'min(42rem, 100%)' }}>
+      <section>
         <h2>Card</h2>
         <Card as='article'>Simple card content</Card>
       </section>
 
-      <section style={{ width: 'min(42rem, 100%)' }}>
+      <section>
         <h2>ErrorCard</h2>
         <ErrorCard
           message='Network request failed in this demo state.'
@@ -60,7 +107,7 @@ function ComponentsDemoPage() {
         />
       </section>
 
-      <section style={{ width: 'min(42rem, 100%)' }}>
+      <section>
         <h2>TextInput</h2>
         <TextInput
           aria-label='Demo text input'
@@ -71,7 +118,7 @@ function ComponentsDemoPage() {
         />
       </section>
 
-      <section style={{ width: 'min(42rem, 100%)' }}>
+      <section>
         <h2>NumberInput</h2>
         <NumberInput
           aria-label='Demo number input'
@@ -84,7 +131,7 @@ function ComponentsDemoPage() {
         />
       </section>
 
-      <section style={{ width: 'min(42rem, 100%)' }}>
+      <section>
         <h2>SelectInput</h2>
         <SelectInput
           aria-label='Demo select input'
@@ -98,7 +145,7 @@ function ComponentsDemoPage() {
         />
       </section>
 
-      <section style={{ width: 'min(42rem, 100%)' }}>
+      <section>
         <h2>AuthCard</h2>
         <AuthCard
           busy={false}
@@ -128,24 +175,24 @@ function ComponentsDemoPage() {
         />
       </section>
 
-      <section style={{ width: 'min(42rem, 100%)' }}>
+      <section>
         <h2>NavMenu</h2>
         <NavMenu />
       </section>
 
-      <section style={{ width: 'min(42rem, 100%)' }}>
+      <section>
         <h2>AppFrame</h2>
         <AppFrame />
       </section>
 
-      <section style={{ width: 'min(42rem, 100%)' }}>
+      <section>
         <h2>NotFound</h2>
         <Card>
           <NotFound />
         </Card>
       </section>
 
-      <section style={{ width: 'min(42rem, 100%)' }}>
+      <section>
         <h2>DefaultCatchBoundary</h2>
         <Card>
           <DefaultCatchBoundary
@@ -156,7 +203,7 @@ function ComponentsDemoPage() {
         </Card>
       </section>
 
-      <section style={{ width: 'min(42rem, 100%)' }}>
+      <section>
         <h2>FloatingButton</h2>
         <p>
           This one stays fixed to the viewport, so it is rendered once here rather than inside a
@@ -171,5 +218,49 @@ function ComponentsDemoPage() {
         Floating action
       </FloatingButton>
     </main>
+  );
+}
+
+function DemoTable<RowValue extends string, ColumnValue extends string>({
+  columns,
+  renderCell,
+  rows,
+}: {
+  columns: DemoProp<ColumnValue>[];
+  renderCell: (props: { column: DemoProp<ColumnValue>; row: DemoProp<RowValue> }) => ReactNode;
+  rows: DemoProp<RowValue>[];
+}) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gap: 'var(--space-xs)',
+        overflowX: 'auto',
+      }}
+    >
+      <div
+        style={{
+          alignItems: 'center',
+          display: 'grid',
+          gap: 'var(--space-xs)',
+          gridTemplateColumns: `8rem repeat(${columns.length}, max-content)`,
+        }}
+      >
+        <span aria-hidden='true' />
+        {columns.map((column) => (
+          <strong key={column.value} style={{ color: 'var(--c-muted-strong)' }}>
+            {column.label}
+          </strong>
+        ))}
+        {rows.map((row) => (
+          <div key={row.value} style={{ display: 'contents' }}>
+            <strong style={{ color: 'var(--c-muted-strong)' }}>{row.label}</strong>
+            {columns.map((column) => (
+              <div key={column.value}>{renderCell({ column, row })}</div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
