@@ -53,6 +53,7 @@ function RouteLabel({ label, upTo }: { label: string; upTo?: NavbarTarget }) {
           isLink
           render={<Link {...upTo} />}
           size='sm'
+          variant='outlineMain'
         />
       ) : null}
       <strong className={css.routeLabelTitle}>{label}</strong>

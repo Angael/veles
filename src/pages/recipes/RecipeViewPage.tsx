@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { PencilIcon, StarIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
+import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import type { RecipeDetail } from './recipes.data';
 import css from './RecipeViewPage.module.css';
@@ -38,18 +39,25 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
 
             {canManageRecipe ? (
               <div className={css.actions} aria-label='Recipe management actions'>
-                <Link
-                  className={css.actionButton}
-                  params={{ id: recipe.id }}
-                  to='/recipes/view/$id/edit'
+                <Btn
+                  icon={<PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
+                  isLink
+                  radius='pill'
+                  render={<Link params={{ id: recipe.id }} to='/recipes/view/$id/edit' />}
+                  size='sm'
+                  variant='outlineMain'
                 >
-                  <PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />
                   Edit
-                </Link>
-                <button className={css.actionButton} data-danger type='button'>
-                  <Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />
+                </Btn>
+                <Btn
+                  icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
+                  radius='pill'
+                  size='sm'
+                  type='button'
+                  variant='outlineDanger'
+                >
                   Delete
-                </button>
+                </Btn>
               </div>
             ) : null}
           </header>

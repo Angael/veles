@@ -21,7 +21,7 @@ export function FloatingButton({ children, icon, to }: FloatingButtonProps) {
       radius='pill'
       render={<Link to={to} />}
       size='md'
-      variant='primary'
+      variant='gradient'
     >
       {children}
     </Btn>

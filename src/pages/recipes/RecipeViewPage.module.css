@@ -67,32 +67,6 @@
   gap: var(--space-xs);
 }
 
-.actionButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  min-height: 2.4rem;
-  padding: 0 var(--space-md);
-  border: var(--border-width) solid var(--c-border-strong);
-  border-radius: var(--radius-pill);
-  background: var(--c-surface-strong);
-  color: var(--c-text);
-  font: inherit;
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
-  text-decoration: none;
-  transition:
-    background-color 160ms var(--ease-out),
-    border-color 160ms var(--ease-out),
-    color 160ms var(--ease-out);
-}
-
-.actionButton[data-danger] {
-  color: var(--c-danger-text);
-}
-
-.actionButton:focus-visible,
 .starButton:focus-visible {
   outline: 2px solid var(--c-primary-focus);
   outline-offset: 2px;
@@ -211,7 +185,6 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .actionButton:hover,
   .starButton:hover {
     border-color: var(--c-primary-border-soft);
     background: var(--c-primary-surface);
@@ -243,9 +216,5 @@
   .contentGrid,
   .nutritionGrid {
     grid-template-columns: 1fr;
-  }
-
-  .actionButton {
-    flex: 1;
   }
 }

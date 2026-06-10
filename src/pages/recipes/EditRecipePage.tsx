@@ -19,7 +19,7 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
           </p>
         </div>
 
-        <Btn disabled icon={<SaveIcon aria-hidden='true' size={18} />} variant='primary'>
+        <Btn disabled icon={<SaveIcon aria-hidden='true' size={18} />} variant='gradient'>
           Save changes
         </Btn>
       </Card>
