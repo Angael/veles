@@ -54,6 +54,10 @@
     box-shadow: var(--btn-shadow-hover, var(--btn-shadow, none));
     color: var(--btn-color-hover, var(--btn-color));
   }
+
+  .gradient:hover:not([data-disabled])::before {
+    transform: rotate(25deg) scale(1.15);
+  }
 }
 
 .main {
