@@ -40,6 +40,7 @@ export function Btn({
         isLink ? css.link : css.button,
         className,
       )}
+      nativeButton={!isLink}
       {...props}
     >
       {icon ? <span className={css.icon}>{icon}</span> : null}

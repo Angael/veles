@@ -38,6 +38,7 @@ export function MobileNavMenu() {
               key={item.key}
               aria-label={item.label}
               className={css.item}
+              nativeButton={false}
               render={<Link to={item.link} />}
               value={item.key}
             >
