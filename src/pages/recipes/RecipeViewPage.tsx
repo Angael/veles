@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { PencilIcon, StarIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
 import { Card } from '@/components/card/Card';
@@ -37,10 +38,14 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
 
             {canManageRecipe ? (
               <div className={css.actions} aria-label='Recipe management actions'>
-                <button className={css.actionButton} type='button'>
+                <Link
+                  className={css.actionButton}
+                  params={{ id: recipe.id }}
+                  to='/recipes/view/$id/edit'
+                >
                   <PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />
                   Edit
-                </button>
+                </Link>
                 <button className={css.actionButton} data-danger type='button'>
                   <Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />
                   Delete

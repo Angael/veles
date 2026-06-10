@@ -5,6 +5,7 @@ export const Route = createFileRoute('/recipes/add')({
   component: RecipesAddPage,
   head: () => ({ meta: [{ title: 'Add recipe' }] }),
   ssr: false,
+  staticData: { navbar: { label: 'Add recipe', upTo: { to: '/recipes' } } },
 });
 
 function RecipesAddPage() {

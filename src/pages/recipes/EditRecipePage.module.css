@@ -1,0 +1,27 @@
+.page {
+  display: grid;
+  justify-items: center;
+}
+
+.card {
+  display: grid;
+  gap: var(--space-md);
+  width: min(100%, 42rem);
+}
+
+.copy {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.copy h1 {
+  color: var(--c-text-strong);
+  font-size: clamp(2rem, 7vw, 3.2rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.copy p {
+  max-width: 54ch;
+  color: var(--c-muted);
+}

@@ -3,4 +3,5 @@ import { WeightPage } from '@/pages/weight/WeightPage';
 
 export const Route = createFileRoute('/weight')({
   component: WeightPage,
+  staticData: { navbar: { label: 'Weight', upTo: { to: '/' } } },
 });

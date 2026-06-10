@@ -53,7 +53,7 @@ TanStack Router treats edit as a child of `view.$id`; the parent must render `<O
 
 For app shell concerns like labels, breadcrumbs, layout visibility, or app-level “up” navigation, prefer route-owned `staticData` over global route maps.
 
-In this repo, use `appFrameChrome` from `src/lib/routing/appFrameChrome.ts` for AppFrame metadata.
+In this repo, set `staticData.navbar` inline for route-owned navbar metadata. The shared type lives in `src/lib/routing/staticRouteData.ts`.
 
 ## Before Creating A Route
 

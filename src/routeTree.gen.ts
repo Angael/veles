@@ -26,6 +26,7 @@ import { Route as ApiRecipesUploadRouteImport } from './routes/api/recipes/uploa
 import { Route as ApiDemoPingRouteImport } from './routes/api/demo/ping'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
+import { Route as RecipesViewIdEditRouteImport } from './routes/recipes/view.$id_.edit'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
@@ -115,6 +116,11 @@ const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
   path: '/demo/start/ssr/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecipesViewIdEditRoute = RecipesViewIdEditRouteImport.update({
+  id: '/recipes/view/$id_/edit',
+  path: '/recipes/view/$id/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoStartSsrSpaModeRoute = DemoStartSsrSpaModeRouteImport.update({
   id: '/demo/start/ssr/spa-mode',
   path: '/demo/start/ssr/spa-mode',
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/recipes/view/$id/edit': typeof RecipesViewIdEditRoute
   '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesByTo {
@@ -173,6 +180,7 @@ export interface FileRoutesByTo {
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/recipes/view/$id/edit': typeof RecipesViewIdEditRoute
   '/demo/start/ssr': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesById {
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/recipes/view/$id_/edit': typeof RecipesViewIdEditRoute
   '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
 }
 export interface FileRouteTypes {
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/recipes/view/$id/edit'
     | '/demo/start/ssr/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -242,6 +252,7 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/recipes/view/$id/edit'
     | '/demo/start/ssr'
   id:
     | '__root__'
@@ -264,6 +275,7 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/recipes/view/$id_/edit'
     | '/demo/start/ssr/'
   fileRoutesById: FileRoutesById
 }
@@ -287,6 +299,7 @@ export interface RootRouteChildren {
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
+  RecipesViewIdEditRoute: typeof RecipesViewIdEditRoute
   DemoStartSsrIndexRoute: typeof DemoStartSsrIndexRoute
 }
 
@@ -411,6 +424,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStartSsrIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recipes/view/$id_/edit': {
+      id: '/recipes/view/$id_/edit'
+      path: '/recipes/view/$id/edit'
+      fullPath: '/recipes/view/$id/edit'
+      preLoaderRoute: typeof RecipesViewIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/start/ssr/spa-mode': {
       id: '/demo/start/ssr/spa-mode'
       path: '/demo/start/ssr/spa-mode'
@@ -455,6 +475,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
+  RecipesViewIdEditRoute: RecipesViewIdEditRoute,
   DemoStartSsrIndexRoute: DemoStartSsrIndexRoute,
 }
 export const routeTree = rootRouteImport
