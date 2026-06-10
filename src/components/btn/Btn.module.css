@@ -60,30 +60,6 @@
   }
 }
 
-.gradient {
-  --btn-bg: #1d4ed8;
-  --btn-bg-hover: #1d4ed8;
-  --btn-border: transparent;
-  --btn-border-width: 0;
-  --btn-border-hover: transparent;
-  --btn-color: var(--c-primary-contrast);
-  --btn-shadow: var(--shadow-card);
-  --btn-shadow-hover: 0 18px 40px rgba(2, 6, 23, 0.26);
-
-  &::before {
-    position: absolute;
-    inset: -36%;
-    z-index: 0;
-    background:
-      radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.18) 0 10%, transparent 28%),
-      radial-gradient(circle at 84% 18%, rgba(14, 165, 233, 0.28) 0 16%, transparent 34%),
-      radial-gradient(circle at 72% 88%, rgba(168, 85, 247, 0.42) 0 18%, transparent 38%),
-      linear-gradient(135deg, #1d4ed8 0%, #5b21b6 54%, #1e40af 100%);
-    content: '';
-    transition: transform 420ms var(--ease-out);
-  }
-}
-
 .main {
   --btn-bg: color-mix(in srgb, var(--c-primary) 70%, var(--c-surface-strong) 30%);
   --btn-bg-hover: color-mix(in srgb, var(--c-primary) 78%, var(--c-surface-strong) 22%);
@@ -186,7 +162,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-left: -0.12em;
+  margin-left: -0.25em;
 
   & svg {
     width: var(--btn-icon-size);

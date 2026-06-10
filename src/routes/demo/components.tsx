@@ -21,7 +21,6 @@ const SELECT_OPTIONS = [
 ] as const;
 
 const BTN_VARIANTS = [
-  { label: 'Gradient', value: 'gradient' },
   { label: 'Main', value: 'main' },
   { label: 'Danger', value: 'danger' },
   { label: 'Outline main', value: 'outlineMain' },

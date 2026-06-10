@@ -199,7 +199,7 @@ export function AddRecipePage() {
                 disabled={busy}
                 icon={<SendHorizontalIcon aria-hidden='true' size={18} />}
                 type='submit'
-                variant='gradient'
+                variant='main'
               >
                 {busy ? 'Saving...' : 'Save recipe'}
               </Btn>
