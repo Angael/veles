@@ -10,7 +10,7 @@
 
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-xs);
   align-items: center;
 }
@@ -18,29 +18,6 @@
 .searchField {
   display: grid;
   gap: var(--space-xs);
-}
-
-.selectInput {
-  width: 100%;
-  font: inherit;
-}
-
-.filterToggle {
-  justify-self: end;
-}
-
-.filtersPanel {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-sm);
-  padding: var(--space-md);
-  border: var(--border-width) solid var(--c-border);
-  border-radius: var(--radius-xs);
-  background: var(--c-surface-inset);
-}
-
-.filtersPanel[hidden] {
-  display: none;
 }
 
 .description {
@@ -168,28 +145,14 @@
 }
 
 @media (--laptop) {
-  .filtersPanel,
   .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .filtersPanel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (--phone) {
-  .grid,
-  .filtersPanel {
+  .grid {
     grid-template-columns: 1fr;
-  }
-
-  .toolbar {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .filterToggle {
-    width: var(--button-min-height);
   }
 
   .imageLayout {

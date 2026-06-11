@@ -1,14 +1,15 @@
-import { mkdir, unlink } from 'node:fs/promises';
-import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { ArkErrors, type } from 'arktype';
 import sharp from 'sharp';
 import { createFileRoute } from '@tanstack/react-router';
+import { db } from '@/db';
+import { recipeImages, recipes, uploadObjects } from '@/db/schema';
 import { auth } from '@/lib/auth/auth';
 import { log } from '@/lib/logger';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
+import { getStorageConfig } from '@/lib/storage/config';
+import { deleteFileByKey, uploadFileByKey } from '@/lib/storage/r2';
 
-const TEMP_IMAGE_DIRECTORY = path.join(process.cwd(), '_temp', 'recipe-images');
 export const RECIPE_UPLOAD_MAX_PHOTO_COUNT = 8;
 export const RECIPE_UPLOAD_MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 
@@ -34,7 +35,7 @@ export const Route = createFileRoute('/api/recipes/upload')({
     middleware: [logMiddleware('POST /recipes/upload')],
     handlers: {
       POST: async ({ request }) => {
-        const images: Awaited<ReturnType<typeof saveOptimizedImage>>[] = [];
+        const uploadedKeys: string[] = [];
 
         try {
           const session = await auth.api.getSession({ headers: request.headers });
@@ -56,32 +57,7 @@ export const Route = createFileRoute('/api/recipes/upload')({
             return Response.json({ error: `File too large` }, { status: 400 });
           }
 
-          const ingredientsValue = formData.get('ingredients');
-          const tagsValue = formData.get('tags');
-          const validation = uploadRecipeInputType({
-            carbs: formData.get('carbs'),
-            description: formData.get('description'),
-            fats: formData.get('fats'),
-            ingredients:
-              typeof ingredientsValue === 'string'
-                ? ingredientsValue
-                    .split('\n')
-                    .map((item) => item.trim())
-                    .filter(Boolean)
-                : [],
-            kcal: formData.get('kcal'),
-            name: formData.get('name'),
-            photos: files,
-            protein: formData.get('protein'),
-            rating: formData.get('rating'),
-            tags:
-              typeof tagsValue === 'string'
-                ? tagsValue
-                    .split(',')
-                    .map((item) => item.trim())
-                    .filter(Boolean)
-                : [],
-          });
+          const validation = validateRecipeForm(formData, files);
 
           if (validation instanceof type.errors) {
             return Response.json(
@@ -90,66 +66,133 @@ export const Route = createFileRoute('/api/recipes/upload')({
             );
           }
 
-          await mkdir(TEMP_IMAGE_DIRECTORY, { recursive: true });
+          if (validation.rating !== null && (validation.rating < 1 || validation.rating > 5)) {
+            return Response.json({ error: 'Rating must be between 1 and 5' }, { status: 400 });
+          }
 
-          for (const file of validation.photos) {
-            let image: Awaited<ReturnType<typeof saveOptimizedImage>>;
+          const optimizedImages = await Promise.all(
+            validation.photos.map(async (file) => ({
+              ...(await optimizeImage(file)),
+              id: randomUUID(),
+              key: `recipe-images/${session.user.id}/${randomUUID()}.webp`,
+            })),
+          );
 
-            try {
-              image = await saveOptimizedImage(file);
-            } catch (error) {
-              return Response.json(
-                { error: `Image \"${file.name}\" could not be processed` },
-                { status: 422 },
+          for (const image of optimizedImages) {
+            await uploadFileByKey({
+              body: image.buffer,
+              contentType: image.type,
+              key: image.key,
+            });
+            uploadedKeys.push(image.key);
+          }
+
+          const { bucketName } = getStorageConfig();
+
+          if (!bucketName) {
+            throw new Error('R2 bucket is not configured');
+          }
+
+          const recipeId = await db.transaction(async (tx) => {
+            const insertedRecipes = await tx
+              .insert(recipes)
+              .values({
+                carbs: validation.carbs,
+                description: validation.description,
+                fats: validation.fats,
+                ingredients: validation.ingredients,
+                kcal: validation.kcal,
+                name: validation.name,
+                protein: validation.protein,
+                rating: validation.rating,
+                tags: validation.tags,
+                userId: session.user.id,
+              })
+              .returning({ id: recipes.id });
+            const recipe = insertedRecipes[0];
+
+            if (!recipe) {
+              throw new Error('Recipe insert failed');
+            }
+
+            if (optimizedImages.length > 0) {
+              await tx.insert(uploadObjects).values(
+                optimizedImages.map((image) => ({
+                  bucket: bucketName,
+                  id: image.id,
+                  key: image.key,
+                  mimeType: image.type,
+                  userId: session.user.id,
+                })),
+              );
+
+              await tx.insert(recipeImages).values(
+                optimizedImages.map((image, position) => ({
+                  position,
+                  recipeId: recipe.id,
+                  uploadObjectId: image.id,
+                })),
               );
             }
 
-            images.push(image);
-
-            log.debug('recipe upload image saved', {
-              recipeName: validation.name,
-              userId: session.user.id,
-              image,
-            });
-          }
-
-          log.info('recipe upload payload', {
-            userId: session.user.id,
-            recipeName: validation.name,
-            images,
+            return recipe.id;
           });
 
-          return Response.json({ ok: true });
+          return Response.json({ id: recipeId, ok: true });
         } catch (error) {
+          await Promise.allSettled(uploadedKeys.map((key) => deleteFileByKey(key)));
+
           log.error('recipe upload error', {
             error: error instanceof Error ? error.message : 'Unknown error',
             stack: error instanceof Error ? error.stack?.split('\n') : undefined,
           });
 
           return Response.json({ error: 'Recipe upload failed' }, { status: 500 });
-        } finally {
-          await cleanupFiles(images);
         }
       },
     },
   },
 });
 
-async function cleanupFiles(images: Array<{ path: string }>) {
-  await Promise.allSettled(images.map((image) => unlink(image.path)));
+function validateRecipeForm(formData: FormData, files: File[]) {
+  const ingredientsValue = formData.get('ingredients');
+  const tagsValue = formData.get('tags');
+
+  return uploadRecipeInputType({
+    carbs: formData.get('carbs'),
+    description: formData.get('description'),
+    fats: formData.get('fats'),
+    ingredients:
+      typeof ingredientsValue === 'string'
+        ? ingredientsValue
+            .split('\n')
+            .map((item) => item.trim())
+            .filter(Boolean)
+        : [],
+    kcal: formData.get('kcal'),
+    name: formData.get('name'),
+    photos: files,
+    protein: formData.get('protein'),
+    rating: formData.get('rating'),
+    tags:
+      typeof tagsValue === 'string'
+        ? tagsValue
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean)
+        : [],
+  });
 }
 
-async function saveOptimizedImage(file: File) {
+async function optimizeImage(file: File) {
   if (!file.type.startsWith('image/')) {
     throw new Error(`Unsupported file type for ${file.name}`);
   }
 
   const input = Buffer.from(await file.arrayBuffer());
-  const filename = `${randomUUID()}.webp`;
-  const outputPath = path.join(TEMP_IMAGE_DIRECTORY, filename);
 
   try {
-    await sharp(input, { failOn: 'none' })
+    const buffer = await sharp(input, { failOn: 'none' })
       .rotate()
       .resize({
         fit: 'inside',
@@ -158,22 +201,20 @@ async function saveOptimizedImage(file: File) {
         withoutEnlargement: true,
       })
       .webp({ quality: 82 })
-      .toFile(outputPath);
-  } catch (error) {
-    await unlink(outputPath).catch(() => {});
+      .toBuffer();
 
+    return {
+      buffer,
+      originalName: file.name,
+      type: 'image/webp',
+    };
+  } catch (error) {
     log.error('Failed to optimize image', {
-      fileName: file.name,
       errorMsg: error instanceof Error ? error.message : 'Unknown error',
+      fileName: file.name,
       stack: error instanceof Error ? error.stack?.split('\n') : undefined,
     });
 
     throw new Error('Failed to optimize image');
   }
-
-  return {
-    originalName: file.name,
-    path: outputPath,
-    type: 'image/webp',
-  };
 }

@@ -21,6 +21,7 @@
     "skipLibCheck": true,
     "target": "ES2024",
     "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true,
     "paths": {
       "@/*": ["./src/*"]
     },
