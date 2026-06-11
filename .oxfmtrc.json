@@ -7,7 +7,8 @@
     "node_modules",
     "routeTree.gen.ts",
     "AGENTS.md",
-    "SKILL.md"
+    "SKILL.md",
+    "drizzle"
   ],
   "jsxSingleQuote": true,
   "singleQuote": true
