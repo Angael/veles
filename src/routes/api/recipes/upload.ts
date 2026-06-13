@@ -70,21 +70,23 @@ export const Route = createFileRoute('/api/recipes/upload')({
             return Response.json({ error: 'Rating must be between 1 and 5' }, { status: 400 });
           }
 
-          const optimizedImages = await Promise.all(
-            validation.photos.map(async (file) => ({
-              ...(await optimizeImage(file)),
+          const optimizedImages: Array<{ id: string; key: string; type: string }> = [];
+
+          for (const file of validation.photos) {
+            const optimizedImage = await optimizeImage(file);
+            const image = {
               id: randomUUID(),
               key: `recipe-images/${session.user.id}/${randomUUID()}.webp`,
-            })),
-          );
+              type: optimizedImage.type,
+            };
 
-          for (const image of optimizedImages) {
             await uploadFileByKey({
-              body: image.buffer,
-              contentType: image.type,
+              body: optimizedImage.buffer,
+              contentType: optimizedImage.type,
               key: image.key,
             });
             uploadedKeys.push(image.key);
+            optimizedImages.push(image);
           }
 
           const { bucketName } = getStorageConfig();
@@ -141,13 +143,15 @@ export const Route = createFileRoute('/api/recipes/upload')({
           return Response.json({ id: recipeId, ok: true });
         } catch (error) {
           await Promise.allSettled(uploadedKeys.map((key) => deleteFileByKey(key)));
+          const status = error instanceof ImageOptimizationError ? 400 : 500;
 
           log.error('recipe upload error', {
             error: error instanceof Error ? error.message : 'Unknown error',
+            name: error instanceof Error ? error.name : undefined,
             stack: error instanceof Error ? error.stack?.split('\n') : undefined,
           });
 
-          return Response.json({ error: 'Recipe upload failed' }, { status: 500 });
+          return Response.json({ error: 'Recipe upload failed' }, { status });
         }
       },
     },
@@ -186,7 +190,7 @@ function validateRecipeForm(formData: FormData, files: File[]) {
 
 async function optimizeImage(file: File) {
   if (!file.type.startsWith('image/')) {
-    throw new Error(`Unsupported file type for ${file.name}`);
+    throw new ImageOptimizationError(`Unsupported file type for ${file.name}`);
   }
 
   const input = Buffer.from(await file.arrayBuffer());
@@ -215,6 +219,13 @@ async function optimizeImage(file: File) {
       stack: error instanceof Error ? error.stack?.split('\n') : undefined,
     });
 
-    throw new Error('Failed to optimize image');
+    throw new ImageOptimizationError('Failed to optimize image');
+  }
+}
+
+class ImageOptimizationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ImageOptimizationError';
   }
 }

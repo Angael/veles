@@ -59,7 +59,7 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
             ) : null}
           </header>
 
-          <section className={css.rating} aria-label='Your recipe rating'>
+          <section className={css.rating} aria-label='Owner rating'>
             <span>Owner rating</span>
             <div className={css.stars}>
               {Array.from({ length: MAX_RATING }, (_, index) => {
