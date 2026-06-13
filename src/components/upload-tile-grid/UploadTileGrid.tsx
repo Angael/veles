@@ -186,7 +186,7 @@ function areFilesEqual(left: File[], right: File[]) {
     return false;
   }
 
-  return left.every((file, index) => getFileKey(file) === getFileKey(right[index]));
+  return left.every((file, index) => getFileKey(file) === getFileKey(right[index]!));
 }
 
 function getFileKey(file: File) {
