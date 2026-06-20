@@ -28,7 +28,7 @@ describe('theme tokens', () => {
       const matches = source.matchAll(/var\((--[a-z0-9-]+)/g);
 
       for (const match of matches) {
-        const token = match[1];
+        const token = match[1]!;
 
         if (
           declaredTokens.has(token) ||
