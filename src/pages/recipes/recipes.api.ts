@@ -88,7 +88,7 @@ const recipeByIdInputType = type({ id: 'string.uuid' });
 
 export const getRecipeById = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRecipeById')])
-  .inputValidator(arkTypeValidator(recipeByIdInputType))
+  .validator(arkTypeValidator(recipeByIdInputType))
   .handler(async ({ data }) => {
     const session = await getSession();
 
