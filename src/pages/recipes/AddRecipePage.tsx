@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { useNavigate } from '@tanstack/react-router';
 import { SendHorizontalIcon } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
@@ -41,6 +42,7 @@ const EMPTY_DRAFT: AddRecipeDraft = {
 };
 
 export function AddRecipePage() {
+  const navigate = useNavigate();
   const [draft, setDraft] = useState<AddRecipeDraft>(EMPTY_DRAFT);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +79,14 @@ export function AddRecipePage() {
 
                   throw new Error(result?.error ?? 'Recipe upload failed');
                 }
+
+                const result = (await response.json()) as { id?: string };
+
+                if (!result.id) {
+                  throw new Error('Recipe upload failed');
+                }
+
+                navigate({ params: { id: result.id }, to: '/recipes/view/$id' });
               } catch (submitError) {
                 setError(
                   submitError instanceof Error ? submitError.message : 'Recipe upload failed',
