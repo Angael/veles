@@ -23,7 +23,6 @@
     "db:studio:prod": "drizzle-kit studio --config=drizzle-prod.config.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1065.0",
     "@base-ui/react": "1.5.0",
     "@better-auth/drizzle-adapter": "1.6.11",
     "@tanstack/arktype-adapter": "1.167.0",
