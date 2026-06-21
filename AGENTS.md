@@ -18,7 +18,7 @@
 # Server Functions
 - they should live in `.api.ts` files near their usage.
 - they should always use log middleware: `.middleware([logMiddleware('<name>')])`
-- If it accepts input, use `inputValidator` with `arktype` and `@tanstack/arktype-adapter`.
+- If it accepts input, use `.validator(arkTypeValidator(...))` with `arktype` and `@tanstack/arktype-adapter`.
 
 # API Routes
 - If an API route accepts input, validate the parsed input with `arktype` before using it.
