@@ -1,54 +1,22 @@
-import { useQuery } from '@tanstack/react-query';
 import { useThrottledValue } from '@tanstack/react-pacer';
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { ListFilterIcon, PlusIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
-import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
-import { Label } from '@/components/label/Label';
-import { NumberInput } from '@/components/number-input/NumberInput';
-import { SelectInput } from '@/components/select-input/SelectInput';
 import { TextInput } from '@/components/text-input/TextInput';
-import type { RecipesQueryInput } from './recipes.data';
-import { recipesQueryOptions } from './recipes.query';
+import type { RecipeLibraryItem } from './recipes.api';
 import css from './RecipesPage.module.css';
 
-type FilterDirection = 'gte' | 'lte';
+type RecipesPageProps = {
+  recipes: RecipeLibraryItem[];
+};
 
-const NUTRITION_DIRECTION_OPTIONS = [
-  { label: 'Less than or equal', value: 'lte' },
-  { label: 'More than or equal', value: 'gte' },
-] as const satisfies readonly { label: string; value: FilterDirection }[];
-
-const RATING_DIRECTION_OPTIONS = [
-  { label: 'More than or equal', value: 'gte' },
-  { label: 'Less than or equal', value: 'lte' },
-] as const satisfies readonly { label: string; value: FilterDirection }[];
-
-const FILTERS_PANEL_ID = 'recipes-filters-panel';
-
-export function RecipesPage() {
+export function RecipesPage({ recipes }: RecipesPageProps) {
   const [searchInputValue, setSearchInputValue] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
-  const [nutritionDirection, setNutritionDirection] = useState<FilterDirection>('lte');
-  const [nutritionValue, setNutritionValue] = useState<number | null>(null);
-  const [ratingDirection, setRatingDirection] = useState<FilterDirection>('gte');
-  const [ratingValue, setRatingValue] = useState<number | null>(null);
   const [search] = useThrottledValue(searchInputValue, { wait: 200 });
-
-  const queryInput = {
-    search,
-    nutritionDirection,
-    nutritionValue,
-    ratingDirection,
-    ratingValue,
-  } satisfies RecipesQueryInput;
-
-  const { data, error } = useQuery(recipesQueryOptions(queryInput));
-  const recipes = data?.recipes ?? [];
+  const visibleRecipes = rankRecipesBySearch(recipes, search);
 
   return (
     <main className={css.page}>
@@ -67,86 +35,11 @@ export function RecipesPage() {
               value={searchInputValue}
             />
           </label>
-
-          <Btn
-            aria-controls={FILTERS_PANEL_ID}
-            aria-expanded={showFilters}
-            aria-label='advanced filters'
-            className={css.filterToggle}
-            icon={<ListFilterIcon aria-hidden='true' size={18} strokeWidth={1.8} />}
-            iconOnly
-            onClick={() => setShowFilters((value) => !value)}
-            radius='pill'
-            type='button'
-            variant='outlineMain'
-          ></Btn>
         </div>
-
-        <div
-          aria-hidden={!showFilters}
-          className={css.filtersPanel}
-          hidden={!showFilters}
-          id={FILTERS_PANEL_ID}
-        >
-          <Label text='Kcal comparison'>
-            <SelectInput
-              aria-label='Kcal comparison'
-              className={css.selectInput}
-              items={NUTRITION_DIRECTION_OPTIONS}
-              onValueChange={(value) => {
-                if (value !== null) {
-                  setNutritionDirection(value);
-                }
-              }}
-              value={nutritionDirection}
-            />
-          </Label>
-
-          <Label text='Kcal value'>
-            <NumberInput
-              className={css.numberInput}
-              min={0}
-              onValueChange={setNutritionValue}
-              placeholder='e.g. 500'
-              step={100}
-              value={nutritionValue}
-            />
-          </Label>
-
-          <Label text='Rating comparison'>
-            <SelectInput
-              aria-label='Rating comparison'
-              className={css.selectInput}
-              items={RATING_DIRECTION_OPTIONS}
-              onValueChange={(value) => {
-                if (value !== null) {
-                  setRatingDirection(value);
-                }
-              }}
-              value={ratingDirection}
-            />
-          </Label>
-
-          <Label text='Rating value'>
-            <NumberInput
-              className={css.numberInput}
-              max={5}
-              min={0}
-              onValueChange={setRatingValue}
-              placeholder='e.g. 4'
-              step={1}
-              value={ratingValue}
-            />
-          </Label>
-        </div>
-
-        {error?.message ? (
-          <ErrorCard message={error.message} title='Could not load recipes' />
-        ) : null}
       </section>
 
       <section className={css.grid}>
-        {recipes.map((recipe) => (
+        {visibleRecipes.map((recipe) => (
           <Link
             className={css.cardLink}
             key={recipe.id}
@@ -189,9 +82,11 @@ export function RecipesPage() {
                 ) : null}
 
                 <div className={css.recipeFooter}>
-                  <span className={css.footerItem}>{recipe.rating}/5</span>
-                  {recipe.nutrition.kcal !== null ? (
-                    <p className={css.footerItem}>{String(recipe.nutrition.kcal)} KCAL</p>
+                  {recipe.rating !== null ? (
+                    <span className={css.footerItem}>{recipe.rating}/5</span>
+                  ) : null}
+                  {recipe.kcal !== null ? (
+                    <p className={css.footerItem}>{String(recipe.kcal)} KCAL</p>
                   ) : null}
                 </div>
               </div>
@@ -208,6 +103,42 @@ export function RecipesPage() {
       </FloatingButton>
     </main>
   );
+}
+
+/**
+ * Filters and sorts matching recipes so name hits appear before tag hits, then description hits.
+ */
+function rankRecipesBySearch(recipes: RecipeLibraryItem[], search: string) {
+  const normalizedSearch = search.trim().toLowerCase();
+
+  if (!normalizedSearch) {
+    return recipes;
+  }
+
+  return recipes
+    .flatMap((recipe, index) => {
+      const name = recipe.name.toLowerCase();
+      const hasMatchingTag = recipe.tags.some((tag) =>
+        tag.toLowerCase().includes(normalizedSearch),
+      );
+      const description = recipe.description.toLowerCase();
+
+      if (name.includes(normalizedSearch)) {
+        return [{ index, rank: 0, recipe }];
+      }
+
+      if (hasMatchingTag) {
+        return [{ index, rank: 1, recipe }];
+      }
+
+      if (description.includes(normalizedSearch)) {
+        return [{ index, rank: 2, recipe }];
+      }
+
+      return [];
+    })
+    .sort((left, right) => left.rank - right.rank || left.index - right.index)
+    .map((result) => result.recipe);
 }
 
 function getImageLayoutClass(imageCount: number) {

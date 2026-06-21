@@ -1,23 +1,20 @@
 import { Link } from '@tanstack/react-router';
 import { PencilIcon, StarIcon, Trash2Icon } from 'lucide-react';
-import { useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
-import type { RecipeDetail } from './recipes.data';
+import type { RecipeLibraryItem } from './recipes.api';
 import css from './RecipeViewPage.module.css';
 
 type RecipeViewPageProps = {
-  recipe: RecipeDetail;
+  recipe: RecipeLibraryItem;
 };
 
 const MAX_RATING = 5;
 
 export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
-  const [userRating, setUserRating] = useState<number | null>(null);
-  // Mock owner check: recipes are editable/deletable for everyone until ownership comes from DB.
   const canManageRecipe = true;
   const heroImage = recipe.images[0];
-  const visibleRating = userRating ?? 0;
+  const visibleRating = recipe.rating ?? 0;
 
   return (
     <main className={css.page}>
@@ -62,8 +59,8 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
             ) : null}
           </header>
 
-          <section className={css.rating} aria-label='Your recipe rating'>
-            <span>Your rating</span>
+          <section className={css.rating} aria-label='Owner rating'>
+            <span>Owner rating</span>
             <div className={css.stars}>
               {Array.from({ length: MAX_RATING }, (_, index) => {
                 const ratingValue = index + 1;
@@ -75,7 +72,7 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
                     aria-pressed={isSelected}
                     className={css.starButton}
                     key={ratingValue}
-                    onClick={() => setUserRating(ratingValue)}
+                    disabled
                     type='button'
                   >
                     <StarIcon
@@ -104,10 +101,10 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
             <Card as='section' className={css.panel}>
               <h2>Nutrition</h2>
               <dl className={css.nutritionGrid}>
-                <NutritionItem label='Kcal' value={recipe.nutrition.kcal} />
-                <NutritionItem label='Protein' value={recipe.nutrition.protein} unit='g' />
-                <NutritionItem label='Carbs' value={recipe.nutrition.carbs} unit='g' />
-                <NutritionItem label='Fats' value={recipe.nutrition.fats} unit='g' />
+                <NutritionItem label='Kcal' value={recipe.kcal} />
+                <NutritionItem label='Protein' value={recipe.protein} unit='g' />
+                <NutritionItem label='Carbs' value={recipe.carbs} unit='g' />
+                <NutritionItem label='Fats' value={recipe.fats} unit='g' />
               </dl>
             </Card>
           </div>
