@@ -5,38 +5,19 @@ description: Use when writing or reviewing validation, arktype, input parsing.
 
 # ArkType
 
-Use ArkType as the primary boundary validation layer. Prefer expressing validation, coercion, and simple constraints in the ArkType definition instead of validating once and then adding separate scalar `if` checks.
+Use ArkType as the primary boundary validation layer. Prefer keywords, ranges, lengths, formats, unions, and pipes over separate scalar `if` checks after validation.
 
-## Repo Patterns
+## Repo Rules
 
-- Server functions that accept input should use `arkTypeValidator(...)` from `@tanstack/arktype-adapter` with `createServerFn(...).validator(...)`.
-- API routes validate manually by invoking a `type(...)` and checking `result instanceof type.errors` before using the parsed result.
-- Current examples use `string.uuid`, `string.trim`, `string.numeric.parse`, `File[]`, and object schemas.
-- Some current code manually checks constraints after ArkType validation. Prefer moving separable constraints like number ranges, string lengths, array lengths, UUID/email/date formats, and integer checks into ArkType.
+- Server functions: `.validator(arkTypeValidator(inputType))`.
+- API routes: call the type, then check `result instanceof type.errors`.
+- Server functions always still use `logMiddleware(...)` per repo rules.
+- Empty optional numeric form fields become `null` unless told otherwise.
+- File upload routes may manually extract/filter `FormData`; let ArkType handle scalar parsing and constraints.
+- Separate `if` checks are fine for auth, permissions, DB/storage state, async checks, and business logic.
+- Avoid `as any`, `as unknown`, `as never`; ask if a cast seems unavoidable.
 
-## Validation Workflow
-
-1. Define the input boundary shape with `type(...)` near the server function or route that consumes it.
-2. Use built-in keywords first: `string.trim`, `string.email`, `string.uuid`, `string.date`, `string.date.iso`, `string.numeric.parse`, `string.integer.parse`, `string.json.parse`, `File`, `FormData`, `number.integer`, and `number.safe`.
-3. Put scalar constraints in ArkType expressions: `1 <= number <= 5`, `number.integer >= 0`, `string >= 1`, `0 < string <= 120`, `string.email`, `string.uuid.v7`, `string[] <= 8`.
-4. Use `|>` or `.pipe(...)` when boundary data needs coercion before final validation, for example `string.numeric.parse |> 1 <= number <= 5`.
-5. Return or throw based on `type.errors` at the boundary. After validation succeeds, treat the output as already safe for those declared constraints.
-
-## Preferred Examples
-
-Range validation belongs in the type:
-
-```ts
-const ratingType = type('string.numeric.parse |> 1 <= number <= 5');
-```
-
-Non-empty trimmed strings should trim and validate in one expression:
-
-```ts
-const recipeNameType = type('string.trim |> string >= 1');
-```
-
-Server function inputs should validate through the TanStack adapter:
+## Boundary Patterns
 
 ```ts
 const recipeByIdInputType = type({ id: 'string.uuid' });
@@ -44,12 +25,8 @@ const recipeByIdInputType = type({ id: 'string.uuid' });
 export const getRecipeById = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRecipeById')])
   .validator(arkTypeValidator(recipeByIdInputType))
-  .handler(async ({ data }) => {
-    // data.id is already a UUID-shaped string.
-  });
+  .handler(async ({ data }) => data.id);
 ```
-
-Manual API routes should validate once before consuming parsed data:
 
 ```ts
 const validation = uploadRecipeInputType(input);
@@ -59,15 +36,6 @@ if (validation instanceof type.errors) {
 }
 ```
 
-## FormData
-
-- Prefer ArkType transform pipelines or `FormData.parse` when they keep the code readable.
-- For file uploads, some manual `FormData` handling is acceptable because file filtering, empty file omission, and multi-file fields often need route-specific logic.
-- Keep manual code focused on extracting boundary values. Let ArkType handle scalar parsing, trimming, requiredness, ranges, lengths, and formats.
-- Empty optional numeric form fields should parse to `null` in this repo unless the user asks for different behavior.
-
-Example optional numeric field that preserves empty as `null` but validates non-empty values through ArkType:
-
 ```ts
 const optionalRatingFormValueType = type('string.trim').pipe(
   (value): number | null | ArkErrors =>
@@ -75,31 +43,136 @@ const optionalRatingFormValueType = type('string.trim').pipe(
 );
 ```
 
-## Pipes, Narrows, And Manual Logic
+## Use First
 
-- Pipes are fine. Use them for coercion, normalization, and composing built-in parsing with output validation.
-- Prefer built-in keywords, ranges, length constraints, unions, array constraints, and `|>` before writing `.narrow(...)`, `.filter(...)`, or separate `if` validation.
-- Use `.narrow(...)` for custom output validation that ArkType syntax cannot express, especially cross-field checks.
-- Use `.filter(...)` when the check must happen on the input before a morph runs.
-- Keep separate `if` checks for auth/session state, permissions, database existence, storage configuration, async checks, and business logic that is not just input shape or scalar validity.
-
-## Anti-Patterns
-
-- Do not validate a field with ArkType and then add a separate scalar range check like `if (rating < 1 || rating > 5)`. Use `1 <= number <= 5` in the ArkType pipeline.
-- Do not manually trim and then validate non-empty strings in unrelated code when `string.trim |> string >= 1` would keep the rule at the boundary.
-- Do not use `as any`, `as unknown`, or `as never` to get around ArkType inference. Ask the user if a cast seems unavoidable.
-- Do not default to custom regex or manual parsing before checking ArkType keywords and autocomplete for available subtypes.
+- Keywords: `string.email`, `string.uuid`, `string.date.iso`, `string.numeric.parse`.
+- Constraints: `1 <= number <= 5`, `string >= 1`, `string[] <= 8`.
+- Pipes: `string.trim |> string >= 1`, `string.numeric.parse |> number.integer >= 0`.
+- Unions: `string | null`, `'draft' | 'published'`, `number | undefined`.
+- Arrays/tuples/objects: `string[]`, `['string', 'number']`, `{ id: 'string.uuid' }`.
+- Custom `.narrow(...)` / `.filter(...)` only after keywords and expressions cannot express it cleanly.
 
 ## Quick Reference
 
-- Numeric range: `1 <= number <= 5`
-- Integer minimum: `number.integer >= 0`
-- String length: `0 < string <= 120`
-- Trimmed non-empty string: `string.trim |> string >= 1`
-- Numeric string to bounded number: `string.numeric.parse |> 1 <= number <= 5`
-- Email: `string.email`
-- UUID: `string.uuid` or a versioned variant like `string.uuid.v7`
-- ISO date string: `string.date.iso`
-- ISO date string to Date: `string.date.iso.parse`
-- JSON string to typed object: `string.json.parse |> { name: string }`
-- Array length: `string[] <= 8`
+```ts
+// strings
+type('string');
+type('string >= 1');
+type('0 < string <= 120');
+type('string.trim');
+type('string.trim |> string >= 1');
+type('string.lower');
+type('string.lower.preformatted');
+type('string.upper');
+type('string.normalize.NFC');
+type('string.alpha');
+type('string.alphanumeric');
+type('string.digits');
+type('/^[a-z0-9-]+$/');
+
+// common string formats
+type('string.email');
+type('string.url');
+type('string.url.parse');
+type('string.uuid');
+type('string.uuid.v4');
+type('string.uuid.v7');
+type('string.semver');
+type('string.ip');
+type('string.ip.v4');
+type('string.base64');
+type('string.hex');
+
+// dates
+type('string.date');
+type('string.date.parse');
+type('string.date.iso');
+type('string.date.iso.parse');
+type('Date');
+type("Date > d'2000-01-01'");
+type(`Date < ${Date.now()}`);
+
+// numbers
+type('number');
+type('number.safe');
+type('number.integer');
+type('number.integer >= 0');
+type('1 <= number <= 5');
+type('0 < number < 100');
+type('number % 2');
+type('-50 < (number % 2) < 50');
+
+// numeric strings and form fields
+type('string.numeric');
+type('string.numeric.parse');
+type('string.numeric.parse |> number.integer');
+type('string.numeric.parse |> number.integer >= 1');
+type('string.trim |> string.numeric.parse');
+type('string.trim |> string.numeric.parse |> 1 <= number <= 5');
+
+// arrays
+type('string[]');
+type('string.email[]');
+type('string[] > 0');
+type('string[] <= 8');
+type('0 < string[] <= 8');
+type('(string | number)[]');
+type('File[]');
+type('File[] <= 8');
+
+// objects
+type({ id: 'string.uuid' });
+type({ name: 'string.trim |> string >= 1' });
+type({ email: 'string.email', age: 'number.integer >= 0' });
+type({ '+': 'reject', id: 'string.uuid' });
+type({ '[string]': 'number' });
+type({ 'nickname?': 'string.trim |> string >= 1' });
+type({ role: "'admin' | 'user' = 'user'" });
+
+// unions and literals
+type('string | number');
+type('number | null');
+type('string | undefined');
+type("'draft' | 'published' | 'archived'");
+type('true | false');
+type('null');
+
+// JSON and FormData
+type('string.json');
+type('string.json.parse');
+type('string.json.parse').to({ name: 'string', version: 'string.semver' });
+type('FormData');
+type('FormData.parse');
+type('FormData.value');
+
+// files and web platform types
+type('File');
+type('Blob');
+type('URL');
+type('Request');
+type('Response');
+type('Headers');
+
+// composition
+type({ id: 'string.uuid' }).array();
+type({ id: 'string.uuid' }).array().atLeastLength(1);
+type({ email: 'string.email' }).merge({ name: 'string.trim |> string >= 1' });
+type.or({ id: 'string.uuid' }, { slug: 'string >= 1' });
+type.and({ id: 'string.uuid' }, { name: 'string' });
+
+// custom logic when expression syntax is not enough
+type('number').narrow((n, ctx) => (n % 2 === 0 ? true : ctx.mustBe('even')));
+type('string.numeric.parse').filter((s, ctx) => (s.length <= 10 ? true : ctx.reject('at most 10 chars')));
+type('string').pipe((s) => s.trim(), type('string >= 1'));
+type('string').pipe.try((s): object => JSON.parse(s), type({ name: 'string' }));
+```
+
+## Anti-Patterns
+
+```ts
+// avoid
+if (validation.rating !== null && (validation.rating < 1 || validation.rating > 5)) {}
+
+// prefer
+type('string.numeric.parse |> 1 <= number <= 5');
+```
