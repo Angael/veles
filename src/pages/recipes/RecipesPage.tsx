@@ -16,7 +16,7 @@ type RecipesPageProps = {
 export function RecipesPage({ recipes }: RecipesPageProps) {
   const [searchInputValue, setSearchInputValue] = useState('');
   const [search] = useThrottledValue(searchInputValue, { wait: 200 });
-  const visibleRecipes = filterRecipesBySearch(recipes, search);
+  const visibleRecipes = rankRecipesBySearch(recipes, search);
 
   return (
     <main className={css.page}>
@@ -105,24 +105,40 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
   );
 }
 
-function filterRecipesBySearch(recipes: RecipeLibraryItem[], search: string) {
+/**
+ * Filters and sorts matching recipes so name hits appear before tag hits, then description hits.
+ */
+function rankRecipesBySearch(recipes: RecipeLibraryItem[], search: string) {
   const normalizedSearch = search.trim().toLowerCase();
 
   if (!normalizedSearch) {
     return recipes;
   }
 
-  return recipes.filter((recipe) => {
-    const name = recipe.name.toLowerCase();
-    const tags = recipe.tags.join(' ').toLowerCase();
-    const description = recipe.description.toLowerCase();
+  return recipes
+    .flatMap((recipe, index) => {
+      const name = recipe.name.toLowerCase();
+      const hasMatchingTag = recipe.tags.some((tag) =>
+        tag.toLowerCase().includes(normalizedSearch),
+      );
+      const description = recipe.description.toLowerCase();
 
-    return (
-      name.includes(normalizedSearch) ||
-      tags.includes(normalizedSearch) ||
-      description.includes(normalizedSearch)
-    );
-  });
+      if (name.includes(normalizedSearch)) {
+        return [{ index, rank: 0, recipe }];
+      }
+
+      if (hasMatchingTag) {
+        return [{ index, rank: 1, recipe }];
+      }
+
+      if (description.includes(normalizedSearch)) {
+        return [{ index, rank: 2, recipe }];
+      }
+
+      return [];
+    })
+    .sort((left, right) => left.rank - right.rank || left.index - right.index)
+    .map((result) => result.recipe);
 }
 
 function getImageLayoutClass(imageCount: number) {
