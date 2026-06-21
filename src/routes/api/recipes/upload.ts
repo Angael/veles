@@ -17,6 +17,10 @@ const optionalNumericFormValueType = type('string.trim').pipe((value): number | 
   value === '' ? null : type('string.numeric.parse')(value),
 );
 
+const optionalRatingFormValueType = type('string.trim').pipe((value): number | null | ArkErrors =>
+  value === '' ? null : type('string.numeric.parse |> 1 <= number <= 5')(value),
+);
+
 const uploadRecipeInputType = type({
   carbs: optionalNumericFormValueType,
   description: 'string.trim',
@@ -26,7 +30,7 @@ const uploadRecipeInputType = type({
   name: 'string.trim |> string >= 1',
   photos: 'File[]',
   protein: optionalNumericFormValueType,
-  rating: optionalNumericFormValueType,
+  rating: optionalRatingFormValueType,
   tags: 'string[]',
 });
 
@@ -64,10 +68,6 @@ export const Route = createFileRoute('/api/recipes/upload')({
               { error: validation.summary ?? 'Invalid upload input' },
               { status: 400 },
             );
-          }
-
-          if (validation.rating !== null && (validation.rating < 1 || validation.rating > 5)) {
-            return Response.json({ error: 'Rating must be between 1 and 5' }, { status: 400 });
           }
 
           const optimizedImages: Array<{ id: string; key: string; type: string }> = [];
