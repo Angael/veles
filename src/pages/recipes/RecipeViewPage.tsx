@@ -2,11 +2,11 @@ import { Link } from '@tanstack/react-router';
 import { PencilIcon, StarIcon, Trash2Icon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
-import type { RecipeDetail } from './recipes.api';
+import type { RecipeLibraryItem } from './recipes.api';
 import css from './RecipeViewPage.module.css';
 
 type RecipeViewPageProps = {
-  recipe: RecipeDetail;
+  recipe: RecipeLibraryItem;
 };
 
 const MAX_RATING = 5;

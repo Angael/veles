@@ -1,11 +1,11 @@
 import { SaveIcon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
-import type { RecipeDetail } from './recipes.api';
+import type { RecipeLibraryItem } from './recipes.api';
 import css from './EditRecipePage.module.css';
 
 type EditRecipePageProps = {
-  recipe: RecipeDetail;
+  recipe: RecipeLibraryItem;
 };
 
 export function EditRecipePage({ recipe }: EditRecipePageProps) {

@@ -19,8 +19,6 @@ export type RecipeLibraryItem = Omit<RecipeSelect, 'createdAt' | 'updatedAt' | '
   updatedAt: string;
 };
 
-export type RecipeDetail = RecipeLibraryItem;
-
 export const getRecipeLibrary = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRecipeLibrary')])
   .handler(async () => {
@@ -140,7 +138,7 @@ export const getRecipeById = createServerFn({ method: 'GET' })
       rating: recipe.rating,
       tags: recipe.tags,
       updatedAt: recipe.updatedAt.toISOString(),
-    } satisfies RecipeDetail;
+    } satisfies RecipeLibraryItem;
   });
 
 async function getImagesByRecipeId(recipeIds: string[]) {
