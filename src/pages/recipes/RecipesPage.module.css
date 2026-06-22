@@ -21,8 +21,13 @@
 }
 
 .description {
+  display: -webkit-box;
+  max-height: calc(1.5em * 3);
+  overflow: hidden;
   color: var(--c-muted);
   text-wrap: pretty;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 .grid {

@@ -228,7 +228,7 @@
 .description {
   width: 100%;
   color: var(--c-text-strong);
-  font-size: clamp(1.08rem, 2vw, 1.35rem);
+  font-size: var(--text-lg-dynamic);
   white-space: pre-line;
 }
 
