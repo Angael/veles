@@ -3,11 +3,10 @@ import { Link } from '@tanstack/react-router';
 import { ChevronLeftIcon, ChevronRightIcon, PencilIcon, StarIcon, Trash2Icon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
+import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import type { RecipeLibraryItem } from './recipes.api';
 import css from './RecipeViewPage.module.css';
-import { FieldLabel } from '@base-ui/react/field';
-import { Label } from '@/components/label/Label';
 
 type RecipeViewPageProps = {
   recipe: RecipeLibraryItem;
@@ -97,31 +96,6 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
           </Card>
 
           <Card as='aside' className={css.rightColumn}>
-            {canManageRecipe ? (
-              <div className={css.actions} aria-label='Recipe management actions'>
-                <Btn
-                  icon={<PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
-                  isLink
-                  radius='pill'
-                  render={<Link params={{ id: recipe.id }} to='/recipes/view/$id/edit' />}
-                  size='sm'
-                  variant='outlineMain'
-                >
-                  Edit
-                </Btn>
-                <Btn
-                  icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
-                  onClick={() => window.confirm('Delete this recipe?')}
-                  radius='pill'
-                  size='sm'
-                  type='button'
-                  variant='outlineDanger'
-                >
-                  Delete
-                </Btn>
-              </div>
-            ) : null}
-
             <section className={css.rating} aria-label='Owner rating'>
               <div className={css.stars}>
                 {Array.from({ length: MAX_RATING }, (_, index) => {
@@ -189,6 +163,33 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
                 />
               </dl>
             </section>
+
+            {canManageRecipe ? (
+              <div className={css.actions} aria-label='Recipe management actions'>
+                <Btn
+                  className={css.actionButton}
+                  icon={<PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
+                  isLink
+                  radius='pill'
+                  render={<Link params={{ id: recipe.id }} to='/recipes/view/$id/edit' />}
+                  size='sm'
+                  variant='outlineMain'
+                >
+                  Edit
+                </Btn>
+                <Btn
+                  className={css.actionButton}
+                  icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
+                  onClick={() => window.confirm('Delete this recipe?')}
+                  radius='pill'
+                  size='sm'
+                  type='button'
+                  variant='outlineDanger'
+                >
+                  Delete
+                </Btn>
+              </div>
+            ) : null}
           </Card>
         </div>
       </article>

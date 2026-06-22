@@ -39,9 +39,14 @@
   z-index: 1;
   display: grid;
   width: 100%;
-  height: 100%;
+  min-height: 5rem;
   place-items: center;
   color: var(--c-muted-strong);
+}
+
+.hero:has(.heroFallback) {
+  height: auto;
+  min-height: 0;
 }
 
 .heroImage {
@@ -93,9 +98,15 @@
 }
 
 .actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--space-xs);
+  margin-top: auto;
+  padding-top: var(--space-md);
+  border-top: var(--border-width) solid var(--c-border);
+}
+
+.actionButton {
+  width: 100%;
 }
 
 .rating {
@@ -139,6 +150,8 @@
 .nutrition {
   display: grid;
   gap: var(--space-xs);
+  padding-top: var(--space-md);
+  border-top: var(--border-width) solid var(--c-border);
 }
 
 .nutrition h2,
@@ -182,7 +195,7 @@
 
 .recipeTextGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.4fr);
+  grid-template-columns: 1fr 16rem;
   gap: var(--space-lg);
   align-items: start;
 }
@@ -222,6 +235,8 @@
 .ingredients {
   display: grid;
   gap: var(--space-xs);
+  padding-top: var(--space-md);
+  border-top: var(--border-width) solid var(--c-border);
 }
 
 .ingredientList {
@@ -271,7 +286,7 @@
   }
 
   .actions {
-    flex-wrap: nowrap;
+    margin-top: 0;
   }
 
   .nutritionGrid,
@@ -281,10 +296,6 @@
 
   .rightColumn {
     order: 1;
-  }
-
-  .ingredients {
-    order: -1;
   }
 
   .descriptionCard {
