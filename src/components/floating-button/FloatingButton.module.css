@@ -4,7 +4,7 @@
   bottom: var(--space-md);
   z-index: 2;
 
-  transition: bottom 180ms;
+  transition: bottom 180ms var(--ease-out);
 }
 
 @media (--phone) {

@@ -22,6 +22,7 @@
 
 .description {
   color: var(--c-muted);
+  text-wrap: pretty;
 }
 
 .grid {
@@ -43,7 +44,8 @@
   padding-bottom: var(--space-xs);
   transition:
     border-color 180ms var(--ease-out),
-    box-shadow 180ms var(--ease-out);
+    box-shadow 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
 }
 
 .cardLink:hover .card,
@@ -52,6 +54,7 @@
   box-shadow:
     0 0 0 1px var(--c-primary-border-soft),
     var(--shadow-card);
+  transform: translateY(-2px);
 }
 
 .card,
@@ -97,6 +100,8 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  outline: 1px solid rgba(255, 255, 255, 0.1);
+  outline-offset: -1px;
 }
 
 .cardBody {
@@ -117,6 +122,10 @@
   align-items: baseline;
   gap: 0.25rem;
   line-height: 1.6rem;
+
+  & h2 {
+    text-wrap: balance;
+  }
 }
 
 .tags {
@@ -142,6 +151,20 @@
   color: var(--c-accent-strong);
   letter-spacing: 0.14em;
   font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition:
+      border-color 140ms ease,
+      box-shadow 140ms ease;
+  }
+
+  .cardLink:hover .card,
+  .cardLink:focus-visible .card {
+    transform: none;
+  }
 }
 
 @media (--laptop) {
