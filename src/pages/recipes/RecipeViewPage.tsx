@@ -1,5 +1,6 @@
+import { type ReactNode, useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { PencilIcon, StarIcon, Trash2Icon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon, PencilIcon, StarIcon, Trash2Icon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import type { RecipeLibraryItem } from './recipes.api';
@@ -13,27 +14,90 @@ const MAX_RATING = 5;
 
 export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
   const canManageRecipe = true;
-  const heroImage = recipe.images[0];
-  const visibleRating = recipe.rating ?? 0;
+  const basePortions = Math.max(1, recipe.portions);
+  const [imageIndex, setImageIndex] = useState(0);
+  const [portions, setPortions] = useState(basePortions);
+  const [visibleRating, setVisibleRating] = useState(recipe.rating ?? 0);
+  const heroImage = recipe.images[imageIndex];
+  const hasMultipleImages = recipe.images.length > 1;
+  const nutritionScale = portions / basePortions;
+
+  const showPreviousImage = () => {
+    setImageIndex((current) => (current === 0 ? recipe.images.length - 1 : current - 1));
+  };
+
+  const showNextImage = () => {
+    setImageIndex((current) => (current === recipe.images.length - 1 ? 0 : current + 1));
+  };
 
   return (
     <main className={css.page}>
       <article className={css.recipe}>
+        <header className={css.header}>
+          <div>
+            <h1>{recipe.name}</h1>
+
+            {recipe.tags.length > 0 ? (
+              <div className={css.tags} aria-label='Recipe tags'>
+                {recipe.tags.map((tag) => (
+                  <span className={css.tag} key={tag}>
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </header>
+
         <div className={css.hero}>
           {heroImage ? (
-            <img alt='' className={css.heroImage} src={heroImage.url} />
+            <>
+              <img
+                alt=''
+                aria-hidden='true'
+                className={css.heroImageBackdrop}
+                src={heroImage.url}
+              />
+              <div className={css.heroImageFrame}>
+                <img alt='' className={css.heroImage} src={heroImage.url} />
+              </div>
+              {hasMultipleImages ? (
+                <div className={css.carouselControls}>
+                  <button
+                    aria-label='Show previous recipe image'
+                    className={css.carouselButton}
+                    onClick={showPreviousImage}
+                    type='button'
+                  >
+                    <ChevronLeftIcon aria-hidden='true' size={22} strokeWidth={2} />
+                  </button>
+                  <span className={css.imageCount}>
+                    {imageIndex + 1}/{recipe.images.length}
+                  </span>
+                  <button
+                    aria-label='Show next recipe image'
+                    className={css.carouselButton}
+                    onClick={showNextImage}
+                    type='button'
+                  >
+                    <ChevronRightIcon aria-hidden='true' size={22} strokeWidth={2} />
+                  </button>
+                </div>
+              ) : null}
+            </>
           ) : (
             <div className={css.heroFallback}>No photo yet</div>
           )}
         </div>
 
-        <div className={css.body}>
-          <header className={css.header}>
-            <div className={css.titleBlock}>
-              <h1>{recipe.name}</h1>
-              {recipe.description ? <p>{recipe.description}</p> : null}
-            </div>
+        <div className={css.recipeTextGrid}>
+          {recipe.description ? (
+            <Card as='section' className={css.descriptionCard}>
+              <p className={css.description}>{recipe.description}</p>
+            </Card>
+          ) : null}
 
+          <Card as='aside' className={css.rightColumn}>
             {canManageRecipe ? (
               <div className={css.actions} aria-label='Recipe management actions'>
                 <Btn
@@ -48,6 +112,7 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
                 </Btn>
                 <Btn
                   icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
+                  onClick={() => window.confirm('Delete this recipe?')}
                   radius='pill'
                   size='sm'
                   type='button'
@@ -57,86 +122,109 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
                 </Btn>
               </div>
             ) : null}
-          </header>
 
-          <section className={css.rating} aria-label='Owner rating'>
-            <span>Owner rating</span>
-            <div className={css.stars}>
-              {Array.from({ length: MAX_RATING }, (_, index) => {
-                const ratingValue = index + 1;
-                const isSelected = ratingValue <= visibleRating;
+            <section className={css.rating} aria-label='Owner rating'>
+              <div className={css.stars}>
+                {Array.from({ length: MAX_RATING }, (_, index) => {
+                  const ratingValue = index + 1;
+                  const isSelected = ratingValue <= visibleRating;
 
-                return (
-                  <button
-                    aria-label={`Rate ${ratingValue} ${ratingValue === 1 ? 'star' : 'stars'}`}
-                    aria-pressed={isSelected}
-                    className={css.starButton}
-                    key={ratingValue}
-                    disabled
-                    type='button'
-                  >
-                    <StarIcon
-                      aria-hidden='true'
-                      className={isSelected ? css.starSelected : css.star}
-                      fill={isSelected ? 'currentColor' : 'none'}
-                      size={24}
-                      strokeWidth={1.8}
-                    />
-                  </button>
-                );
-              })}
-            </div>
-          </section>
+                  return (
+                    <button
+                      aria-label={`Rate ${ratingValue} ${ratingValue === 1 ? 'star' : 'stars'}`}
+                      aria-pressed={isSelected}
+                      className={css.starButton}
+                      key={ratingValue}
+                      onClick={() => setVisibleRating(ratingValue)}
+                      type='button'
+                    >
+                      <StarIcon
+                        aria-hidden='true'
+                        className={isSelected ? css.starSelected : css.star}
+                        fill={isSelected ? 'currentColor' : 'none'}
+                        size={24}
+                        strokeWidth={1.8}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
-          <div className={css.contentGrid}>
-            <Card as='section' className={css.panel}>
+            <section className={css.ingredients}>
               <h2>Ingredients</h2>
               <ul className={css.ingredientList}>
                 {recipe.ingredients.map((ingredient) => (
                   <li key={ingredient}>{ingredient}</li>
                 ))}
               </ul>
-            </Card>
+            </section>
 
-            <Card as='section' className={css.panel}>
-              <h2>Nutrition</h2>
+            <section className={css.nutrition} aria-labelledby='nutrition-heading'>
+              <h2 id='nutrition-heading'>Nutrition</h2>
               <dl className={css.nutritionGrid}>
-                <NutritionItem label='Kcal' value={recipe.kcal} />
-                <NutritionItem label='Protein' value={recipe.protein} unit='g' />
-                <NutritionItem label='Carbs' value={recipe.carbs} unit='g' />
-                <NutritionItem label='Fats' value={recipe.fats} unit='g' />
+                <NutritionItem label='Portions' value={portions}>
+                  <input
+                    aria-label='Portions'
+                    className={css.portionsInput}
+                    min={1}
+                    onChange={(event) =>
+                      setPortions(Math.max(1, event.currentTarget.valueAsNumber || 1))
+                    }
+                    type='number'
+                    value={portions}
+                  />
+                </NutritionItem>
+                <NutritionItem label='Kcal' value={scaleNutrition(recipe.kcal, nutritionScale)} />
+                <NutritionItem
+                  label='Protein'
+                  unit='g'
+                  value={scaleNutrition(recipe.protein, nutritionScale)}
+                />
+                <NutritionItem
+                  label='Carbs'
+                  unit='g'
+                  value={scaleNutrition(recipe.carbs, nutritionScale)}
+                />
+                <NutritionItem
+                  label='Fats'
+                  unit='g'
+                  value={scaleNutrition(recipe.fats, nutritionScale)}
+                />
               </dl>
-            </Card>
-          </div>
-
-          {recipe.tags.length > 0 ? (
-            <div className={css.tags} aria-label='Recipe tags'>
-              {recipe.tags.map((tag) => (
-                <span className={css.tag} key={tag}>
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          ) : null}
+            </section>
+          </Card>
         </div>
       </article>
     </main>
   );
 }
 
+function scaleNutrition(value: number | null, scale: number) {
+  return value === null ? null : value * scale;
+}
+
 function NutritionItem({
+  children,
   label,
   unit = '',
   value,
 }: {
+  children?: ReactNode;
   label: string;
   unit?: string;
   value: number | null;
 }) {
+  if (value === null) {
+    return null;
+  }
+
+  const formattedValue = Number.isInteger(value) ? value : Number(value.toFixed(1));
+
   return (
     <div className={css.nutritionItem}>
       <dt>{label}</dt>
-      <dd>{value === null ? 'Unknown' : `${value}${unit}`}</dd>
+      <dd>{children ?? `${formattedValue}${unit}`}</dd>
     </div>
   );
 }
