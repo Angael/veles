@@ -1,10 +1,13 @@
-import { type ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ChevronLeftIcon, ChevronRightIcon, PencilIcon, StarIcon, Trash2Icon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
+import { NumberInput } from '@/components/number-input/NumberInput';
 import type { RecipeLibraryItem } from './recipes.api';
 import css from './RecipeViewPage.module.css';
+import { FieldLabel } from '@base-ui/react/field';
+import { Label } from '@/components/label/Label';
 
 type RecipeViewPageProps = {
   recipe: RecipeLibraryItem;
@@ -33,22 +36,6 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
   return (
     <main className={css.page}>
       <article className={css.recipe}>
-        <header className={css.header}>
-          <div>
-            <h1>{recipe.name}</h1>
-
-            {recipe.tags.length > 0 ? (
-              <div className={css.tags} aria-label='Recipe tags'>
-                {recipe.tags.map((tag) => (
-                  <span className={css.tag} key={tag}>
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            ) : null}
-          </div>
-        </header>
-
         <div className={css.hero}>
           {heroImage ? (
             <>
@@ -91,11 +78,23 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
         </div>
 
         <div className={css.recipeTextGrid}>
-          {recipe.description ? (
-            <Card as='section' className={css.descriptionCard}>
-              <p className={css.description}>{recipe.description}</p>
-            </Card>
-          ) : null}
+          <Card as='section' className={css.descriptionCard}>
+            <div className={css.descriptionHeader}>
+              <h1>{recipe.name}</h1>
+
+              {recipe.tags.length > 0 ? (
+                <div className={css.tags} aria-label='Recipe tags'>
+                  {recipe.tags.map((tag) => (
+                    <span className={css.tag} key={tag}>
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
+            {recipe.description ? <p className={css.description}>{recipe.description}</p> : null}
+          </Card>
 
           <Card as='aside' className={css.rightColumn}>
             {canManageRecipe ? (
@@ -162,19 +161,16 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
 
             <section className={css.nutrition} aria-labelledby='nutrition-heading'>
               <h2 id='nutrition-heading'>Nutrition</h2>
+              <Label text='Portions'>
+                <NumberInput
+                  className={css.portionsInput}
+                  min={0.5}
+                  step={0.5}
+                  onValueChange={(value) => setPortions(Math.max(0.5, value ?? 1))}
+                  value={portions}
+                />
+              </Label>
               <dl className={css.nutritionGrid}>
-                <NutritionItem label='Portions' value={portions}>
-                  <input
-                    aria-label='Portions'
-                    className={css.portionsInput}
-                    min={1}
-                    onChange={(event) =>
-                      setPortions(Math.max(1, event.currentTarget.valueAsNumber || 1))
-                    }
-                    type='number'
-                    value={portions}
-                  />
-                </NutritionItem>
                 <NutritionItem label='Kcal' value={scaleNutrition(recipe.kcal, nutritionScale)} />
                 <NutritionItem
                   label='Protein'
@@ -205,12 +201,10 @@ function scaleNutrition(value: number | null, scale: number) {
 }
 
 function NutritionItem({
-  children,
   label,
   unit = '',
   value,
 }: {
-  children?: ReactNode;
   label: string;
   unit?: string;
   value: number | null;
@@ -224,7 +218,10 @@ function NutritionItem({
   return (
     <div className={css.nutritionItem}>
       <dt>{label}</dt>
-      <dd>{children ?? `${formattedValue}${unit}`}</dd>
+      <dd>
+        {formattedValue}
+        {unit}
+      </dd>
     </div>
   );
 }

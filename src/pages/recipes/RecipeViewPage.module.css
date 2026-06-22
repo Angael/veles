@@ -8,19 +8,6 @@
   gap: var(--space-lg);
 }
 
-.header {
-  display: grid;
-  gap: var(--space-xs);
-}
-
-.header h1 {
-  max-width: 22ch;
-  color: var(--c-text-strong);
-  font-size: clamp(1.75rem, 4.5vw, 2.8rem);
-  line-height: 1;
-  letter-spacing: -0.045em;
-}
-
 .hero {
   position: relative;
   overflow: hidden;
@@ -113,6 +100,7 @@
 
 .rating {
   display: flex;
+  justify-content: center;
 }
 
 .starButton:focus-visible {
@@ -163,13 +151,14 @@
 
 .nutritionGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-sm);
+  gap: var(--space-xs);
 }
 
 .nutritionItem {
   display: grid;
-  gap: 0.1rem;
+  grid-template-columns: minmax(5.5rem, auto) minmax(0, 1fr);
+  gap: var(--space-sm);
+  align-items: center;
 }
 
 .nutritionItem dt {
@@ -178,20 +167,17 @@
 }
 
 .nutritionItem dd {
+  display: flex;
+  justify-content: flex-end;
   color: var(--c-text-strong);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 .portionsInput {
-  width: 4rem;
-  border: var(--border-width) solid var(--c-border);
-  border-radius: var(--radius-xs);
-  background: var(--c-surface);
-  color: var(--c-text-strong);
-  font: inherit;
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
+  width: 100%;
 }
 
 .recipeTextGrid {
@@ -207,7 +193,23 @@
 }
 
 .descriptionCard {
+  display: grid;
+  gap: var(--space-md);
+  align-content: start;
   min-height: 100%;
+}
+
+.descriptionHeader {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.descriptionHeader h1 {
+  max-width: 22ch;
+  color: var(--c-text-strong);
+  font-size: clamp(1.75rem, 4.5vw, 2.8rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
 }
 
 .description {
@@ -258,7 +260,7 @@
 }
 
 @media (--phone) {
-  .header h1 {
+  .descriptionHeader h1 {
     max-width: none;
   }
 
