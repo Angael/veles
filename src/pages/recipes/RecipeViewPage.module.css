@@ -126,10 +126,10 @@
 
 .starButton {
   display: inline-grid;
-  width: 2rem;
-  height: 2rem;
   place-items: center;
   border: 0;
+  padding: 6px;
+  margin: 0;
   border-radius: var(--radius-pill);
   background: transparent;
   color: var(--c-muted-strong);
