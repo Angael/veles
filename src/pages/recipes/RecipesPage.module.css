@@ -44,17 +44,13 @@
   padding-bottom: var(--space-xs);
   transition:
     border-color 180ms var(--ease-out),
-    box-shadow 180ms var(--ease-out),
-    transform 180ms var(--ease-out);
+    background-color 180ms var(--ease-out);
 }
 
 .cardLink:hover .card,
 .cardLink:focus-visible .card {
   border-color: var(--c-primary-border);
-  box-shadow:
-    0 0 0 1px var(--c-primary-border-soft),
-    var(--shadow-card);
-  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--c-surface) 88%, var(--c-primary) 12%);
 }
 
 .card,
@@ -158,12 +154,7 @@
   .card {
     transition:
       border-color 140ms ease,
-      box-shadow 140ms ease;
-  }
-
-  .cardLink:hover .card,
-  .cardLink:focus-visible .card {
-    transform: none;
+      background-color 140ms ease;
   }
 }
 

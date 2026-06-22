@@ -23,10 +23,8 @@
   transition:
     background-color 180ms var(--ease-out),
     border-color 180ms var(--ease-out),
-    box-shadow 180ms var(--ease-out),
     color 180ms var(--ease-out),
-    opacity 180ms var(--ease-out),
-    transform 180ms var(--ease-out);
+    opacity 180ms var(--ease-out);
 }
 
 .button {
@@ -47,10 +45,6 @@
   outline-offset: 2px;
 }
 
-.root:active:not([data-disabled]) {
-  transform: scale(0.96);
-}
-
 @media (hover: hover) and (pointer: fine) {
   .root:hover:not([data-disabled]) {
     background: var(--btn-bg-hover, var(--btn-bg));
@@ -58,10 +52,6 @@
     border-color: var(--btn-border-hover, var(--btn-border));
     box-shadow: var(--btn-shadow-hover, var(--btn-shadow, none));
     color: var(--btn-color-hover, var(--btn-color));
-  }
-
-  .gradient:hover:not([data-disabled])::before {
-    transform: rotate(25deg) scale(1.15);
   }
 }
 
@@ -103,7 +93,7 @@
   --btn-border-hover: color-mix(in srgb, var(--c-primary-border-soft) 48%, white 52%);
   --btn-color: #0f172a;
   --btn-shadow: 0 10px 26px rgba(2, 6, 23, 0.14);
-  --btn-shadow-hover: 0 14px 32px rgba(2, 6, 23, 0.18);
+  --btn-shadow-hover: var(--btn-shadow);
 }
 
 .ghost {
@@ -197,12 +187,7 @@
     transition:
       background-color 140ms ease,
       border-color 140ms ease,
-      box-shadow 140ms ease,
       color 140ms ease,
       opacity 140ms ease;
-  }
-
-  .root:active:not([data-disabled]) {
-    transform: none;
   }
 }
