@@ -33,7 +33,7 @@
 - Components should not have more than soft cap 200 lines of code, hard cap 300 lines. It's a code smell that file does too much.
 - `src/routes/*.tsx` files should stay small. They can contain up to soft cap ~200, hard cap 300 lines. Beyond that start exporting/importing from `src/pages`.
 - Keep demo route code outside reusable `src/components`.
-- Final UI needs to use emil-design-eng skill, it needs to give good user experience.
+- Final UI needs to use ui-polish skill, it needs to give good user experience.
 - for icons use `lucide-react` package, always rename imported icons so they have 'Icon' suffix to avoid naming conflicts
 
 ## TS
