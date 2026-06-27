@@ -19,6 +19,7 @@ describe('theme tokens', () => {
       '--transform-origin',
       '--anchor-width',
       '--card-padding',
+      '--toast-',
     ];
     const errors: string[] = [];
 
