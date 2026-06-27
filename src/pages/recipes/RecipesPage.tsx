@@ -78,7 +78,7 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
                 </div>
 
                 {recipe.description ? (
-                  <p className={css.description}>{recipe.description}</p>
+                  <p className={css.description}>{recipe.description.slice(0, 240)}</p>
                 ) : null}
 
                 <div className={css.recipeFooter}>

@@ -2,11 +2,10 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { getRequestHeaders } from '@tanstack/react-start/server';
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '@/db';
-import { recipeImages, recipeLastViews, recipes, uploadObjects } from '@/db/schema';
+import { recipeImages, recipes, uploadObjects } from '@/db/schema';
 import { auth } from '@/lib/auth/auth';
-import { log } from '@/lib/logger';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { storagePathToUrl } from '@/lib/storage/config';
 
@@ -15,7 +14,6 @@ type RecipeSelect = typeof recipes.$inferSelect;
 export type RecipeLibraryItem = Omit<RecipeSelect, 'createdAt' | 'updatedAt' | 'userId'> & {
   createdAt: string;
   images: Array<{ url: string }>;
-  lastViewedAt: string | null;
   updatedAt: string;
 };
 
@@ -37,7 +35,6 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
         id: recipes.id,
         ingredients: recipes.ingredients,
         kcal: recipes.kcal,
-        lastViewedAt: recipeLastViews.viewedAt,
         name: recipes.name,
         protein: recipes.protein,
         portions: recipes.portions,
@@ -46,10 +43,6 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
         updatedAt: recipes.updatedAt,
       })
       .from(recipes)
-      .leftJoin(
-        recipeLastViews,
-        and(eq(recipeLastViews.recipeId, recipes.id), eq(recipeLastViews.userId, session.user.id)),
-      )
       .where(eq(recipes.userId, session.user.id));
 
     const imagesByRecipeId = await getImagesByRecipeId(recipeRows.map((recipe) => recipe.id));
@@ -64,7 +57,6 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
           images: imagesByRecipeId.get(recipe.id) ?? [],
           ingredients: recipe.ingredients,
           kcal: recipe.kcal,
-          lastViewedAt: recipe.lastViewedAt?.toISOString() ?? null,
           name: recipe.name,
           portions: recipe.portions,
           protein: recipe.protein,
@@ -73,13 +65,7 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
           updatedAt: recipe.updatedAt.toISOString(),
         }),
       )
-      .sort((left, right) => {
-        if (left.lastViewedAt || right.lastViewedAt) {
-          return (right.lastViewedAt ?? '').localeCompare(left.lastViewedAt ?? '');
-        }
-
-        return right.updatedAt.localeCompare(left.updatedAt);
-      });
+      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
   });
 
 const recipeByIdInputType = type({ id: 'string.uuid' });
@@ -105,21 +91,6 @@ export const getRecipeById = createServerFn({ method: 'GET' })
       return null;
     }
 
-    void db
-      .insert(recipeLastViews)
-      .values({ recipeId: recipe.id, userId: session.user.id })
-      .onConflictDoUpdate({
-        set: { viewedAt: sql`now()` },
-        target: [recipeLastViews.userId, recipeLastViews.recipeId],
-      })
-      .catch((error: unknown) => {
-        log.error('Failed to update recipe last view', {
-          error: error instanceof Error ? error.message : 'Unknown error',
-          recipeId: recipe.id,
-          userId: session.user.id,
-        });
-      });
-
     const imagesByRecipeId = await getImagesByRecipeId([recipe.id]);
 
     return {
@@ -131,7 +102,6 @@ export const getRecipeById = createServerFn({ method: 'GET' })
       images: imagesByRecipeId.get(recipe.id) ?? [],
       ingredients: recipe.ingredients,
       kcal: recipe.kcal,
-      lastViewedAt: new Date().toISOString(),
       name: recipe.name,
       portions: recipe.portions,
       protein: recipe.protein,

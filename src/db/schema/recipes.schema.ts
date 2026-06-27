@@ -75,6 +75,7 @@ export const recipeImages = pgTable(
   ],
 );
 
+// Deprecated: retained to match existing databases, but app code no longer tracks recipe views.
 export const recipeLastViews = pgTable(
   'recipe_last_view',
   {

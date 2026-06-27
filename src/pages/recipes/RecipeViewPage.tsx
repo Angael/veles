@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { PencilIcon, StarIcon, Trash2Icon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
+import { Label } from '@/components/label/Label';
+import { NumberInput } from '@/components/number-input/NumberInput';
+import { RecipeImgSlider } from './RecipeImgSlider';
 import type { RecipeLibraryItem } from './recipes.api';
 import css from './RecipeViewPage.module.css';
 
@@ -13,30 +17,108 @@ const MAX_RATING = 5;
 
 export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
   const canManageRecipe = true;
-  const heroImage = recipe.images[0];
-  const visibleRating = recipe.rating ?? 0;
+  const basePortions = Math.max(1, recipe.portions);
+  const [portions, setPortions] = useState(basePortions);
+  const [visibleRating, setVisibleRating] = useState(recipe.rating ?? 0);
+  const nutritionScale = portions / basePortions;
 
   return (
     <main className={css.page}>
       <article className={css.recipe}>
-        <div className={css.hero}>
-          {heroImage ? (
-            <img alt='' className={css.heroImage} src={heroImage.url} />
-          ) : (
-            <div className={css.heroFallback}>No photo yet</div>
-          )}
-        </div>
+        <RecipeImgSlider images={recipe.images} />
 
-        <div className={css.body}>
-          <header className={css.header}>
-            <div className={css.titleBlock}>
+        <div className={css.recipeTextGrid}>
+          <Card as='section' className={css.descriptionCard}>
+            <div className={css.descriptionHeader}>
               <h1>{recipe.name}</h1>
-              {recipe.description ? <p>{recipe.description}</p> : null}
+
+              {recipe.tags.length > 0 ? (
+                <div className={css.tags} aria-label='Recipe tags'>
+                  {recipe.tags.map((tag) => (
+                    <span className={css.tag} key={tag}>
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
             </div>
+
+            {recipe.description ? <p className={css.description}>{recipe.description}</p> : null}
+          </Card>
+
+          <Card as='aside' className={css.rightColumn}>
+            <section className={css.rating} aria-label='Owner rating'>
+              <div className={css.stars}>
+                {Array.from({ length: MAX_RATING }, (_, index) => {
+                  const ratingValue = index + 1;
+                  const isSelected = ratingValue <= visibleRating;
+
+                  return (
+                    <button
+                      aria-label={`Rate ${ratingValue} ${ratingValue === 1 ? 'star' : 'stars'}`}
+                      aria-pressed={isSelected}
+                      className={css.starButton}
+                      key={ratingValue}
+                      onClick={() => setVisibleRating(ratingValue)}
+                      type='button'
+                    >
+                      <StarIcon
+                        aria-hidden='true'
+                        className={isSelected ? css.starSelected : css.star}
+                        fill={isSelected ? 'currentColor' : 'none'}
+                        size={24}
+                        strokeWidth={1.8}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section className={css.ingredients}>
+              <h2>Ingredients</h2>
+              <ul className={css.ingredientList}>
+                {recipe.ingredients.map((ingredient) => (
+                  <li key={ingredient}>{ingredient}</li>
+                ))}
+              </ul>
+            </section>
+
+            <section className={css.nutrition} aria-labelledby='nutrition-heading'>
+              <h2 id='nutrition-heading'>Nutrition</h2>
+              <Label text='Portions'>
+                <NumberInput
+                  className={css.portionsInput}
+                  min={0.5}
+                  step={0.5}
+                  onValueChange={(value) => setPortions(Math.max(0.5, value ?? 1))}
+                  value={portions}
+                />
+              </Label>
+              <dl className={css.nutritionGrid}>
+                <NutritionItem label='Kcal' value={scaleNutrition(recipe.kcal, nutritionScale)} />
+                <NutritionItem
+                  label='Protein'
+                  unit='g'
+                  value={scaleNutrition(recipe.protein, nutritionScale)}
+                />
+                <NutritionItem
+                  label='Carbs'
+                  unit='g'
+                  value={scaleNutrition(recipe.carbs, nutritionScale)}
+                />
+                <NutritionItem
+                  label='Fats'
+                  unit='g'
+                  value={scaleNutrition(recipe.fats, nutritionScale)}
+                />
+              </dl>
+            </section>
 
             {canManageRecipe ? (
               <div className={css.actions} aria-label='Recipe management actions'>
                 <Btn
+                  className={css.actionButton}
                   icon={<PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
                   isLink
                   radius='pill'
@@ -47,7 +129,9 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
                   Edit
                 </Btn>
                 <Btn
+                  className={css.actionButton}
                   icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
+                  onClick={() => window.confirm('Delete this recipe?')}
                   radius='pill'
                   size='sm'
                   type='button'
@@ -57,71 +141,15 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
                 </Btn>
               </div>
             ) : null}
-          </header>
-
-          <section className={css.rating} aria-label='Owner rating'>
-            <span>Owner rating</span>
-            <div className={css.stars}>
-              {Array.from({ length: MAX_RATING }, (_, index) => {
-                const ratingValue = index + 1;
-                const isSelected = ratingValue <= visibleRating;
-
-                return (
-                  <button
-                    aria-label={`Rate ${ratingValue} ${ratingValue === 1 ? 'star' : 'stars'}`}
-                    aria-pressed={isSelected}
-                    className={css.starButton}
-                    key={ratingValue}
-                    disabled
-                    type='button'
-                  >
-                    <StarIcon
-                      aria-hidden='true'
-                      className={isSelected ? css.starSelected : css.star}
-                      fill={isSelected ? 'currentColor' : 'none'}
-                      size={24}
-                      strokeWidth={1.8}
-                    />
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          <div className={css.contentGrid}>
-            <Card as='section' className={css.panel}>
-              <h2>Ingredients</h2>
-              <ul className={css.ingredientList}>
-                {recipe.ingredients.map((ingredient) => (
-                  <li key={ingredient}>{ingredient}</li>
-                ))}
-              </ul>
-            </Card>
-
-            <Card as='section' className={css.panel}>
-              <h2>Nutrition</h2>
-              <dl className={css.nutritionGrid}>
-                <NutritionItem label='Kcal' value={recipe.kcal} />
-                <NutritionItem label='Protein' value={recipe.protein} unit='g' />
-                <NutritionItem label='Carbs' value={recipe.carbs} unit='g' />
-                <NutritionItem label='Fats' value={recipe.fats} unit='g' />
-              </dl>
-            </Card>
-          </div>
-
-          {recipe.tags.length > 0 ? (
-            <div className={css.tags} aria-label='Recipe tags'>
-              {recipe.tags.map((tag) => (
-                <span className={css.tag} key={tag}>
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          ) : null}
+          </Card>
         </div>
       </article>
     </main>
   );
+}
+
+function scaleNutrition(value: number | null, scale: number) {
+  return value === null ? null : value * scale;
 }
 
 function NutritionItem({
@@ -133,10 +161,19 @@ function NutritionItem({
   unit?: string;
   value: number | null;
 }) {
+  if (value === null) {
+    return null;
+  }
+
+  const formattedValue = Number.isInteger(value) ? value : Number(value.toFixed(1));
+
   return (
     <div className={css.nutritionItem}>
       <dt>{label}</dt>
-      <dd>{value === null ? 'Unknown' : `${value}${unit}`}</dd>
+      <dd>
+        {formattedValue}
+        {unit}
+      </dd>
     </div>
   );
 }
