@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { ChevronLeftIcon, ChevronRightIcon, PencilIcon, StarIcon, Trash2Icon } from 'lucide-react';
+import { PencilIcon, StarIcon, Trash2Icon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
+import { RecipeImgSlider } from './RecipeImgSlider';
 import type { RecipeLibraryItem } from './recipes.api';
 import css from './RecipeViewPage.module.css';
 
@@ -17,64 +18,14 @@ const MAX_RATING = 5;
 export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
   const canManageRecipe = true;
   const basePortions = Math.max(1, recipe.portions);
-  const [imageIndex, setImageIndex] = useState(0);
   const [portions, setPortions] = useState(basePortions);
   const [visibleRating, setVisibleRating] = useState(recipe.rating ?? 0);
-  const heroImage = recipe.images[imageIndex];
-  const hasMultipleImages = recipe.images.length > 1;
   const nutritionScale = portions / basePortions;
-
-  const showPreviousImage = () => {
-    setImageIndex((current) => (current === 0 ? recipe.images.length - 1 : current - 1));
-  };
-
-  const showNextImage = () => {
-    setImageIndex((current) => (current === recipe.images.length - 1 ? 0 : current + 1));
-  };
 
   return (
     <main className={css.page}>
       <article className={css.recipe}>
-        <div className={css.hero}>
-          {heroImage ? (
-            <>
-              <img
-                alt=''
-                aria-hidden='true'
-                className={css.heroImageBackdrop}
-                src={heroImage.url}
-              />
-              <div className={css.heroImageFrame}>
-                <img alt='' className={css.heroImage} src={heroImage.url} />
-              </div>
-              {hasMultipleImages ? (
-                <div className={css.carouselControls}>
-                  <button
-                    aria-label='Show previous recipe image'
-                    className={css.carouselButton}
-                    onClick={showPreviousImage}
-                    type='button'
-                  >
-                    <ChevronLeftIcon aria-hidden='true' size={22} strokeWidth={2} />
-                  </button>
-                  <span className={css.imageCount}>
-                    {imageIndex + 1}/{recipe.images.length}
-                  </span>
-                  <button
-                    aria-label='Show next recipe image'
-                    className={css.carouselButton}
-                    onClick={showNextImage}
-                    type='button'
-                  >
-                    <ChevronRightIcon aria-hidden='true' size={22} strokeWidth={2} />
-                  </button>
-                </div>
-              ) : null}
-            </>
-          ) : (
-            <div className={css.heroFallback}>No photo yet</div>
-          )}
-        </div>
+        <RecipeImgSlider images={recipe.images} />
 
         <div className={css.recipeTextGrid}>
           <Card as='section' className={css.descriptionCard}>
