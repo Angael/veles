@@ -64,7 +64,9 @@ This document anchors the PR stack for recipe editing work. Each PR should refer
 
 ## PR Stack
 
-### PR 1: PRD And Toast Infrastructure
+Current point: PR 1 is implemented locally and ready for review after final cleanup. PR 2 has not started.
+
+### PR 1: PRD And Toast Infrastructure - Implemented Locally
 
 Create this document and add reusable app toast support using Base UI.
 
@@ -80,10 +82,17 @@ Requirements:
 
 - Toast provider is mounted once near the app root.
 - Toast styling uses CSS modules.
-- Expose a low-friction way to show error toasts from client components.
+- Expose a low-friction toast manager for client components.
 - Keep all toast-specific code inside `src/components/toast`.
 
-### PR 2: Editable Rating
+Implemented notes:
+
+- `ToastProvider` is mounted from the root route.
+- Toasts use `@base-ui/react/toast` with a shared `toastManager`.
+- Toast styles include theme backdrop blur, a light custom shadow, stacked motion, and an icon-only dismiss button.
+- The CSS token test allows `--toast-` local/runtime variables.
+
+### PR 2: Editable Rating - Next
 
 Move rating UI into its own component and persist rating changes.
 
