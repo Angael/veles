@@ -51,7 +51,7 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
         (recipe): RecipeLibraryItem => ({
           carbs: recipe.carbs,
           createdAt: recipe.createdAt.toISOString(),
-          description: recipe.description.slice(0, 280),
+          description: recipe.description,
           fats: recipe.fats,
           id: recipe.id,
           images: imagesByRecipeId.get(recipe.id) ?? [],
