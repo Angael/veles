@@ -1,0 +1,178 @@
+.viewport {
+  position: fixed;
+  z-index: 1000;
+  right: var(--space-md);
+  bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+  left: auto;
+  width: min(24rem, calc(100vw - (var(--space-md) * 2)));
+  outline: 0;
+}
+
+.toast {
+  --toast-gap: 0.75rem;
+  --toast-peek: 0.75rem;
+  --toast-scale: calc(max(0, 1 - (var(--toast-index) * 0.08)));
+  --toast-shrink: calc(1 - var(--toast-scale));
+  --toast-current-height: var(--toast-frontmost-height, var(--toast-height));
+  --toast-offset-expanded-y: calc(
+    (var(--toast-offset-y) * -1) + (var(--toast-index) * var(--toast-gap) * -1) +
+      var(--toast-swipe-movement-y)
+  );
+
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: auto;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--toast-current-height);
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--c-surface), transparent 8%);
+  backdrop-filter: var(--blur-surface);
+  color: var(--c-text-strong);
+  box-shadow:
+    0 16px 42px rgba(2, 6, 23, 0.22),
+    0 1px 0 color-mix(in srgb, white, transparent 88%) inset;
+  cursor: default;
+  transform: translateX(var(--toast-swipe-movement-x))
+    translateY(
+      calc(
+        var(--toast-swipe-movement-y) - (var(--toast-index) * var(--toast-peek)) -
+          (var(--toast-shrink) * var(--toast-current-height))
+      )
+    )
+    scale(var(--toast-scale));
+  transform-origin: bottom right;
+  transition:
+    transform 420ms var(--ease-out),
+    opacity 220ms var(--ease-out),
+    height 150ms var(--ease-out);
+  user-select: none;
+  z-index: calc(1000 - var(--toast-index));
+
+  &[data-expanded] {
+    height: var(--toast-height);
+    transform: translateX(var(--toast-swipe-movement-x)) translateY(var(--toast-offset-expanded-y));
+  }
+
+  &[data-starting-style],
+  &[data-ending-style] {
+    opacity: 0;
+    transform: translateY(125%);
+  }
+
+  &[data-limited] {
+    opacity: 0;
+  }
+
+  &[data-ending-style][data-swipe-direction='left'] {
+    transform: translateX(calc(var(--toast-swipe-movement-x) - 125%))
+      translateY(var(--toast-offset-expanded-y));
+  }
+
+  &[data-ending-style][data-swipe-direction='right'] {
+    transform: translateX(calc(var(--toast-swipe-movement-x) + 125%))
+      translateY(var(--toast-offset-expanded-y));
+  }
+
+  &[data-ending-style][data-swipe-direction='up'] {
+    transform: translateY(calc(var(--toast-swipe-movement-y) - 125%));
+  }
+
+  &[data-ending-style][data-swipe-direction='down'] {
+    transform: translateY(calc(var(--toast-swipe-movement-y) + 125%));
+  }
+
+  &::after {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: calc(var(--toast-gap) + 1px);
+    content: '';
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 2px;
+  }
+}
+
+.content {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+  height: 100%;
+  padding: var(--space-sm);
+  overflow: hidden;
+  transition: opacity 180ms var(--ease-out);
+
+  &[data-behind] {
+    opacity: 0;
+  }
+
+  &[data-expanded] {
+    opacity: 1;
+  }
+}
+
+.text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 0.15rem;
+}
+
+.title {
+  color: var(--c-text-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.description {
+  color: var(--c-muted-strong);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.close {
+  display: inline-grid;
+  align-self: flex-start;
+  flex: 0 0 auto;
+  height: 2rem;
+  width: 2rem;
+  padding: 0;
+  place-items: center;
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-pill);
+  background: var(--c-surface-inset);
+  color: var(--c-text-strong);
+  font: inherit;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  transition:
+    border-color 140ms var(--ease-out),
+    background-color 140ms var(--ease-out);
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 2px;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .close:hover {
+    border-color: var(--c-primary-border-soft);
+    background: var(--c-primary-surface);
+  }
+}
+
+@media (--phone) {
+  .viewport {
+    right: var(--space-sm);
+    bottom: calc(var(--space-sm) + env(safe-area-inset-bottom));
+    width: calc(100vw - (var(--space-sm) * 2));
+  }
+}

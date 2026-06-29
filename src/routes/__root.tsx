@@ -7,6 +7,7 @@ import * as React from 'react';
 import { AppFrame } from '@/components/app-frame/AppFrame';
 import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
 import { NotFound } from '@/components/not-found/NotFound';
+import { ToastProvider } from '@/components/toast/ToastProvider';
 import { clientEnv } from '@/lib/env/client';
 import resetCss from '@/styles/reset.css?url';
 
@@ -57,7 +58,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootComponent() {
   return (
     <RootDocument>
-      <AppFrame />
+      <ToastProvider>
+        <AppFrame />
+      </ToastProvider>
     </RootDocument>
   );
 }
