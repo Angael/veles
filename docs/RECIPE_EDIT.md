@@ -64,7 +64,7 @@ This document anchors the PR stack for recipe editing work. Each PR should refer
 
 ## PR Stack
 
-Current point: PR 2 is implemented locally and ready for review. PR 3 has not started.
+Current point: PR 3 is implemented locally and ready for review. PR 4 has not started.
 
 ### PR 1: PRD And Toast Infrastructure - Implemented Locally
 
@@ -121,7 +121,7 @@ Implemented notes:
 - `updateRecipeRating` validates `{ id, rating }`, uses log middleware, and scopes updates to the signed-in owner.
 - Successful saves invalidate the router so loader data catches up.
 
-### PR 3: Portions In Add Flow - Next
+### PR 3: Portions In Add Flow - Implemented Locally
 
 Add portion count support to recipe creation.
 
@@ -137,6 +137,12 @@ Requirements:
 - Render a positive whole-number portions input.
 - Validate `portions` in the upload API route before insert.
 - Insert `portions` into the recipe row.
+
+Implemented notes:
+
+- Add form draft defaults `portions` to `1` and renders a required positive-number input.
+- Upload validation parses `portions` as a positive whole number.
+- Recipe creation inserts the validated `portions` value.
 
 ### PR 4: Edit Form
 
