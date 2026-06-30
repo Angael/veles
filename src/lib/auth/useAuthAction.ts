@@ -1,5 +1,8 @@
 import { useState } from 'react';
 
+/**
+ * Wraps login/signup client calls with shared busy and error state for auth forms.
+ */
 export function useAuthAction() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

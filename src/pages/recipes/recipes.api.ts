@@ -1,11 +1,10 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { getRequestHeaders } from '@tanstack/react-start/server';
 import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '@/db';
 import { recipeImages, recipes, uploadObjects } from '@/db/schema';
-import { auth } from '@/lib/auth/auth';
+import { getSessionUserId, requireSession } from '@/lib/auth/getSession';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { storagePathToUrl } from '@/lib/storage/config';
 
@@ -20,9 +19,9 @@ export type RecipeLibraryItem = Omit<RecipeSelect, 'createdAt' | 'updatedAt' | '
 export const getRecipeLibrary = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRecipeLibrary')])
   .handler(async () => {
-    const session = await getSession();
+    const userId = await getSessionUserId();
 
-    if (!session?.user.id) {
+    if (!userId) {
       return [];
     }
 
@@ -43,7 +42,7 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
         updatedAt: recipes.updatedAt,
       })
       .from(recipes)
-      .where(eq(recipes.userId, session.user.id));
+      .where(eq(recipes.userId, userId));
 
     const imagesByRecipeId = await getImagesByRecipeId(recipeRows.map((recipe) => recipe.id));
     return recipeRows
@@ -70,20 +69,25 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
 
 const recipeByIdInputType = type({ id: 'string.uuid' });
 
+const updateRecipeRatingInputType = type({
+  id: 'string.uuid',
+  rating: '1 <= number.integer <= 5',
+});
+
 export const getRecipeById = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRecipeById')])
   .validator(arkTypeValidator(recipeByIdInputType))
   .handler(async ({ data }) => {
-    const session = await getSession();
+    const userId = await getSessionUserId();
 
-    if (!session?.user.id) {
+    if (!userId) {
       return null;
     }
 
     const recipeRows = await db
       .select()
       .from(recipes)
-      .where(and(eq(recipes.id, data.id), eq(recipes.userId, session.user.id)))
+      .where(and(eq(recipes.id, data.id), eq(recipes.userId, userId)))
       .limit(1);
     const recipe = recipeRows[0];
 
@@ -109,6 +113,25 @@ export const getRecipeById = createServerFn({ method: 'GET' })
       tags: recipe.tags,
       updatedAt: recipe.updatedAt.toISOString(),
     } satisfies RecipeLibraryItem;
+  });
+
+export const updateRecipeRating = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('updateRecipeRating')])
+  .validator(arkTypeValidator(updateRecipeRatingInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+
+    const updatedRows = await db
+      .update(recipes)
+      .set({ rating: data.rating, updatedAt: new Date() })
+      .where(and(eq(recipes.id, data.id), eq(recipes.userId, session.user.id)))
+      .returning({ id: recipes.id });
+
+    if (!updatedRows[0]) {
+      throw new Error('Recipe not found.');
+    }
+
+    return { ok: true };
   });
 
 async function getImagesByRecipeId(recipeIds: string[]) {
@@ -142,10 +165,4 @@ async function getImagesByRecipeId(recipeIds: string[]) {
   }
 
   return imagesByRecipeId;
-}
-
-async function getSession() {
-  const headers = getRequestHeaders();
-
-  return auth.api.getSession({ headers });
 }

@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { PencilIcon, StarIcon, Trash2Icon } from 'lucide-react';
+import { PencilIcon, Trash2Icon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { RecipeImgSlider } from './RecipeImgSlider';
+import { RecipeRating } from './RecipeRating';
 import type { RecipeLibraryItem } from './recipes.api';
 import css from './RecipeViewPage.module.css';
 
@@ -13,13 +14,10 @@ type RecipeViewPageProps = {
   recipe: RecipeLibraryItem;
 };
 
-const MAX_RATING = 5;
-
 export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
   const canManageRecipe = true;
   const basePortions = Math.max(1, recipe.portions);
   const [portions, setPortions] = useState(basePortions);
-  const [visibleRating, setVisibleRating] = useState(recipe.rating ?? 0);
   const nutritionScale = portions / basePortions;
 
   return (
@@ -47,33 +45,7 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
           </Card>
 
           <Card as='aside' className={css.rightColumn}>
-            <section className={css.rating} aria-label='Owner rating'>
-              <div className={css.stars}>
-                {Array.from({ length: MAX_RATING }, (_, index) => {
-                  const ratingValue = index + 1;
-                  const isSelected = ratingValue <= visibleRating;
-
-                  return (
-                    <button
-                      aria-label={`Rate ${ratingValue} ${ratingValue === 1 ? 'star' : 'stars'}`}
-                      aria-pressed={isSelected}
-                      className={css.starButton}
-                      key={ratingValue}
-                      onClick={() => setVisibleRating(ratingValue)}
-                      type='button'
-                    >
-                      <StarIcon
-                        aria-hidden='true'
-                        className={isSelected ? css.starSelected : css.star}
-                        fill={isSelected ? 'currentColor' : 'none'}
-                        size={24}
-                        strokeWidth={1.8}
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
+            <RecipeRating rating={recipe.rating} recipeId={recipe.id} />
 
             <section className={css.ingredients}>
               <h2>Ingredients</h2>

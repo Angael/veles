@@ -109,44 +109,6 @@
   width: 100%;
 }
 
-.rating {
-  display: flex;
-  justify-content: center;
-}
-
-.starButton:focus-visible {
-  outline: 2px solid var(--c-primary-focus);
-  outline-offset: 2px;
-}
-
-.stars {
-  display: flex;
-  gap: 0.05rem;
-}
-
-.starButton {
-  display: inline-grid;
-  place-items: center;
-  border: 0;
-  padding: 6px;
-  margin: 0;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--c-muted-strong);
-  transition:
-    background-color 140ms var(--ease-out),
-    color 140ms var(--ease-out);
-}
-
-.star,
-.starSelected {
-  transition: color 140ms var(--ease-out);
-}
-
-.starSelected {
-  color: var(--c-accent-strong);
-}
-
 .nutrition {
   display: grid;
   gap: var(--space-xs);
@@ -265,12 +227,6 @@
 @media (hover: hover) and (pointer: fine) {
   .carouselButton:hover {
     background: var(--c-surface-inset);
-  }
-
-  .starButton:hover {
-    border-color: var(--c-primary-border-soft);
-    background: var(--c-primary-surface);
-    color: var(--c-text-strong);
   }
 }
 

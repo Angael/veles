@@ -64,7 +64,7 @@ This document anchors the PR stack for recipe editing work. Each PR should refer
 
 ## PR Stack
 
-Current point: PR 1 is implemented locally and ready for review after final cleanup. PR 2 has not started.
+Current point: PR 2 is implemented locally and ready for review. PR 3 has not started.
 
 ### PR 1: PRD And Toast Infrastructure - Implemented Locally
 
@@ -92,7 +92,7 @@ Implemented notes:
 - Toast styles include theme backdrop blur, a light custom shadow, stacked motion, and an icon-only dismiss button.
 - The CSS token test allows `--toast-` local/runtime variables.
 
-### PR 2: Editable Rating - Next
+### PR 2: Editable Rating - Implemented Locally
 
 Move rating UI into its own component and persist rating changes.
 
@@ -115,7 +115,13 @@ Requirements:
 - Invalidate the router on success.
 - Never unset rating through the star UI.
 
-### PR 3: Portions In Add Flow
+Implemented notes:
+
+- `RecipeRating` owns the star UI, optimistic local state, same-rating no-op, rollback, and failure toast.
+- `updateRecipeRating` validates `{ id, rating }`, uses log middleware, and scopes updates to the signed-in owner.
+- Successful saves invalidate the router so loader data catches up.
+
+### PR 3: Portions In Add Flow - Next
 
 Add portion count support to recipe creation.
 
