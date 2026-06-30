@@ -21,6 +21,10 @@ const optionalRatingFormValueType = type('string.trim').pipe((value): number | n
   value === '' ? null : type('string.numeric.parse |> 1 <= number <= 5')(value),
 );
 
+const portionsFormValueType = type('string.trim').pipe((value): number | ArkErrors =>
+  type('string.numeric.parse |> number.integer >= 1')(value),
+);
+
 const uploadRecipeInputType = type({
   carbs: optionalNumericFormValueType,
   description: 'string.trim',
@@ -29,6 +33,7 @@ const uploadRecipeInputType = type({
   kcal: optionalNumericFormValueType,
   name: 'string.trim |> string >= 1',
   photos: 'File[]',
+  portions: portionsFormValueType,
   protein: optionalNumericFormValueType,
   rating: optionalRatingFormValueType,
   tags: 'string[]',
@@ -105,6 +110,7 @@ export const Route = createFileRoute('/api/recipes/upload')({
                 ingredients: validation.ingredients,
                 kcal: validation.kcal,
                 name: validation.name,
+                portions: validation.portions,
                 protein: validation.protein,
                 rating: validation.rating,
                 tags: validation.tags,
@@ -176,6 +182,7 @@ function validateRecipeForm(formData: FormData, files: File[]) {
     kcal: formData.get('kcal'),
     name: formData.get('name'),
     photos: files,
+    portions: formData.get('portions'),
     protein: formData.get('protein'),
     rating: formData.get('rating'),
     tags:

@@ -22,6 +22,7 @@ type AddRecipeDraft = {
   ingredients: string;
   kcal: number | null;
   name: string;
+  portions: number;
   protein: number | null;
   rating: number | null;
   selectedFiles: File[];
@@ -35,6 +36,7 @@ const EMPTY_DRAFT: AddRecipeDraft = {
   ingredients: '',
   kcal: null,
   name: '',
+  portions: 1,
   protein: null,
   rating: null,
   selectedFiles: [],
@@ -150,6 +152,19 @@ export function AddRecipePage() {
                   onValueChange={(value) => setDraft((current) => ({ ...current, rating: value }))}
                   placeholder='1-5'
                   value={draft.rating}
+                />
+              </Label>
+
+              <Label text='Portions'>
+                <NumberInput
+                  min={1}
+                  name='portions'
+                  onValueChange={(value) =>
+                    setDraft((current) => ({ ...current, portions: value ?? 1 }))
+                  }
+                  required
+                  step={1}
+                  value={draft.portions}
                 />
               </Label>
 
