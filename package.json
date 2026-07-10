@@ -25,7 +25,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1073.0",
     "@base-ui/react": "1.5.0",
-    "@better-auth/drizzle-adapter": "1.6.11",
+    "@better-auth/drizzle-adapter": "1.6.23",
     "@tanstack/arktype-adapter": "1.167.0",
     "@tanstack/react-pacer": "0.22.1",
     "@tanstack/react-query": "5.100.12",
@@ -35,7 +35,7 @@
     "@tanstack/react-router-ssr-query": "1.167.1",
     "@tanstack/react-start": "1.168.25",
     "arktype": "2.2.0",
-    "better-auth": "1.6.11",
+    "better-auth": "1.6.23",
     "clsx": "2.1.1",
     "drizzle-orm": "0.45.2",
     "lucide-react": "1.17.0",

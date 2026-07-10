@@ -7,3 +7,6 @@ overrides:
   undici: 8.5.0
   picomatch: 4.0.4
   esbuild: 0.28.1
+  js-yaml: 4.3.0
+  diff: 8.0.3
+  '@babel/core': 7.29.6
