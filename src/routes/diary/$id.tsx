@@ -1,16 +1,10 @@
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { DiaryEntryPage } from '@/pages/diary/DiaryEntryPage';
 import { getDiaryEntryById } from '@/pages/diary/diary.api';
 
 export const Route = createFileRoute('/diary/$id')({
   loader: async ({ params }) => {
-    const entry = await getDiaryEntryById({ data: { id: params.id } });
-
-    if (!entry) {
-      throw notFound();
-    }
-
-    return entry;
+    return getDiaryEntryById({ data: { id: params.id } });
   },
   component: RouteComponent,
   head: ({ loaderData }) => ({ meta: [{ title: loaderData?.title ?? 'Diary entry' }] }),

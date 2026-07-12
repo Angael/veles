@@ -1,10 +1,12 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
+import { notFound } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { and, desc, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { diaryEntries } from '@/db/schema';
 import { requireSession } from '@/lib/auth/getSession';
+import { invariant } from '@/lib/invariant';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 
 export type DiaryEntrySummary = {
@@ -60,9 +62,9 @@ export const getDiaryEntryById = createServerFn({ method: 'GET' })
       .limit(1);
     const entry = entries[0];
 
-    if (!entry) {
-      return null;
-    }
+    invariant(entry, () => {
+      throw notFound();
+    });
 
     return {
       entryAt: entry.entryAt.toISOString(),
