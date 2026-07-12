@@ -74,6 +74,20 @@ const updateRecipeRatingInputType = type({
   rating: '1 <= number.integer <= 5',
 });
 
+const updateRecipeInputType = type({
+  carbs: 'number.integer >= 0 | null',
+  description: 'string.trim',
+  fats: 'number.integer >= 0 | null',
+  id: 'string.uuid',
+  ingredients: 'string[]',
+  kcal: 'number.integer >= 0 | null',
+  name: 'string.trim |> string >= 1',
+  portions: 'number.integer >= 1',
+  protein: 'number.integer >= 0 | null',
+  rating: '1 <= number.integer <= 5 | null',
+  tags: 'string[]',
+});
+
 export const getRecipeById = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRecipeById')])
   .validator(arkTypeValidator(recipeByIdInputType))
@@ -124,6 +138,37 @@ export const updateRecipeRating = createServerFn({ method: 'POST' })
     const updatedRows = await db
       .update(recipes)
       .set({ rating: data.rating, updatedAt: new Date() })
+      .where(and(eq(recipes.id, data.id), eq(recipes.userId, session.user.id)))
+      .returning({ id: recipes.id });
+
+    if (!updatedRows[0]) {
+      throw new Error('Recipe not found.');
+    }
+
+    return { ok: true };
+  });
+
+export const updateRecipe = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('updateRecipe')])
+  .validator(arkTypeValidator(updateRecipeInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+
+    const updatedRows = await db
+      .update(recipes)
+      .set({
+        carbs: data.carbs,
+        description: data.description,
+        fats: data.fats,
+        ingredients: data.ingredients,
+        kcal: data.kcal,
+        name: data.name,
+        portions: data.portions,
+        protein: data.protein,
+        rating: data.rating,
+        tags: data.tags,
+        updatedAt: new Date(),
+      })
       .where(and(eq(recipes.id, data.id), eq(recipes.userId, session.user.id)))
       .returning({ id: recipes.id });
 

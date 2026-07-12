@@ -19,13 +19,13 @@
 }
 
 .form,
-.fieldList,
+.formBody,
 .actions {
   display: grid;
 }
 
 .form,
-.fieldList {
+.formBody {
   gap: var(--space-sm);
 }
 
