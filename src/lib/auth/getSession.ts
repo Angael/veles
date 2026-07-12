@@ -1,4 +1,4 @@
-import { getRequestHeaders } from '@tanstack/react-start/server';
+import { getRequestHeaders, setResponseStatus } from '@tanstack/react-start/server';
 import { auth } from './auth';
 
 export async function getSession() {
@@ -17,6 +17,7 @@ export async function requireSession() {
   const session = await getSession();
 
   if (!session?.user.id) {
+    setResponseStatus(401);
     throw new Error('You need to be signed in.');
   }
 

@@ -5,6 +5,7 @@
   font-family: var(--font-sans);
   line-height: var(--line-height-body);
   font-weight: var(--font-weight-regular);
+  scrollbar-gutter: stable;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
