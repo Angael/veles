@@ -1,5 +1,6 @@
 export type NavbarTarget =
   | { to: '/' }
+  | { to: '/diary' }
   | { to: '/recipes' }
   | { params: { id: string }; to: '/recipes/view/$id' };
 

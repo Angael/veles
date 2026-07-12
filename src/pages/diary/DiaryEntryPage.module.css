@@ -1,0 +1,42 @@
+.page {
+  display: grid;
+  justify-items: center;
+}
+
+.page > article {
+  width: min(100%, 50rem);
+}
+
+.header {
+  display: grid;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+
+  & time {
+    color: var(--c-accent-strong);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  & h1 {
+    text-wrap: balance;
+  }
+}
+
+.body {
+  padding: var(--space-xl);
+  overflow-x: auto;
+
+  & pre {
+    color: var(--c-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-md);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  @media (--phone) {
+    padding: var(--space-md);
+  }
+}
