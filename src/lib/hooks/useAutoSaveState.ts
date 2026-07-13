@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type DependencyList,
-  type SetStateAction,
-} from 'react';
+import { useEffect, useRef, useState, type DependencyList, type SetStateAction } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 type UseAutoSaveStateOptions = {
@@ -17,35 +10,29 @@ type UseAutoSaveStateOptions = {
 export function useAutoSaveState<State>(
   initialState: State,
   onDebouncedSave: (state: State) => Promise<void>,
-  options: UseAutoSaveStateOptions,
+  options: UseAutoSaveStateOptions = { debounceMs: 300, deps: [initialState] },
 ) {
   const [state, setState] = useState(initialState);
   const latestStateRef = useRef(state);
-  const onDebouncedSaveRef = useRef(onDebouncedSave);
-  const saveRequestRef = useRef(Promise.resolve());
-  onDebouncedSaveRef.current = onDebouncedSave;
 
-  const save = useCallback((stateToSave: State) => {
-    saveRequestRef.current = saveRequestRef.current
-      .then(() => onDebouncedSaveRef.current(stateToSave))
-      .catch(() => undefined);
-  }, []);
-
-  const debouncedSave = useDebouncedCallback(save, options.debounceMs, { flushOnExit: true });
-
-  const setAutoSaveState = useCallback(
-    (nextState: SetStateAction<State>) => {
-      const resolvedState =
-        typeof nextState === 'function'
-          ? (nextState as (previousState: State) => State)(latestStateRef.current)
-          : nextState;
-
-      latestStateRef.current = resolvedState;
-      setState(resolvedState);
-      debouncedSave(resolvedState);
+  const debouncedSave = useDebouncedCallback(
+    (stateToSave: State) => {
+      onDebouncedSave(stateToSave);
     },
-    [debouncedSave],
+    options.debounceMs,
+    { flushOnExit: true },
   );
+
+  const setAutoSaveState = (nextState: SetStateAction<State>) => {
+    const resolvedState =
+      typeof nextState === 'function'
+        ? (nextState as (previousState: State) => State)(latestStateRef.current)
+        : nextState;
+
+    latestStateRef.current = resolvedState;
+    setState(resolvedState);
+    debouncedSave(resolvedState);
+  };
 
   useEffect(() => {
     latestStateRef.current = initialState;
