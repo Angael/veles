@@ -46,8 +46,8 @@ const diaryEntryByIdInputType = type({ id: 'string.uuid' });
 const deleteDiaryEntryInputType = type({ id: 'string.uuid' });
 const updateDiaryEntryInputType = type({
   id: 'string.uuid',
-  markdown: 'string < 16000',
-  title: 'string < 1000',
+  markdown: 'string <= 16000',
+  title: 'string <= 160',
 });
 
 export const getDiaryEntryById = createServerFn({ method: 'GET' })

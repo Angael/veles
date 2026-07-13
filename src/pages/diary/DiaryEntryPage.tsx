@@ -60,7 +60,7 @@ export function DiaryEntryPage({ entry }: DiaryEntryPageProps) {
             <SeamlessTextInput
               aria-label='Diary entry title'
               className={css.titleInput}
-              maxLength={999}
+              maxLength={160}
               onChange={(event) => {
                 setDraft((currentDraft) => ({ ...currentDraft, title: event.target.value }));
               }}
@@ -72,7 +72,7 @@ export function DiaryEntryPage({ entry }: DiaryEntryPageProps) {
           <SeamlessTextarea
             aria-label='Diary entry'
             className={css.editor}
-            maxLength={15_999}
+            maxLength={16000}
             onChange={(event) => {
               setDraft((currentDraft) => ({ ...currentDraft, markdown: event.target.value }));
             }}
