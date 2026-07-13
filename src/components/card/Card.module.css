@@ -4,9 +4,25 @@
   border-radius: var(--radius-xs);
   background: var(--c-surface);
   backdrop-filter: var(--blur-surface);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.35);
 
   @media (--phone) {
     padding: var(--space-sm);
   }
+}
+
+.primary {
+  border-color: var(--c-primary-border-soft);
+  background: color-mix(in srgb, var(--c-surface-solid) 82%, var(--c-primary-surface));
+  box-shadow: 0 24px 70px rgba(37, 99, 235, 0.2);
+}
+
+.danger {
+  border-color: var(--c-danger-border);
+  background: color-mix(in srgb, var(--c-surface-solid) 82%, var(--c-danger-surface));
+  box-shadow: 0 24px 70px rgba(127, 29, 29, 0.28);
+}
+
+.noShadow {
+  box-shadow: none;
 }
