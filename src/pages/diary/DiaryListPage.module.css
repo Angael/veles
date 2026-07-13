@@ -3,6 +3,16 @@
   gap: var(--space-lg);
 }
 
+.searchField {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.searchLabel {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+}
+
 .list {
   display: grid;
   gap: var(--space-sm);

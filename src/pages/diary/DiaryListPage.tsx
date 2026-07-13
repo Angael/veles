@@ -1,5 +1,8 @@
 import { Link } from '@tanstack/react-router';
+import { useState } from 'react';
 import { Card } from '@/components/card/Card';
+import { TextInput } from '@/components/text-input/TextInput';
+import { useThrottledValue } from '@/lib/hooks/useThrottledValue';
 import type { DiaryEntrySummary } from './diary.api';
 import css from './DiaryListPage.module.css';
 
@@ -8,16 +11,43 @@ type DiaryListPageProps = {
 };
 
 export function DiaryListPage({ entries }: DiaryListPageProps) {
-  return (
-    <main className={css.page}>
-      {entries.length === 0 ? (
+  const [searchInputValue, setSearchInputValue] = useState('');
+  const [search] = useThrottledValue(searchInputValue, 200);
+  const visibleEntries = rankDiaryEntriesBySearch(entries, search);
+
+  if (entries.length === 0) {
+    return (
+      <main className={css.page}>
         <Card as='section' className={css.emptyState}>
           <h1>No diary entries yet</h1>
-          <p>Imported Penzu entries will appear here.</p>
+        </Card>
+      </main>
+    );
+  }
+
+  return (
+    <main className={css.page}>
+      <label className={css.searchField}>
+        <span className={css.searchLabel}>Search entries</span>
+        <TextInput
+          aria-label='Search diary entries'
+          autoComplete='off'
+          name='search'
+          onValueChange={setSearchInputValue}
+          placeholder='Search titles and entries'
+          type='search'
+          value={searchInputValue}
+        />
+      </label>
+
+      {visibleEntries.length === 0 ? (
+        <Card as='section' className={css.emptyState}>
+          <h1>No matching entries</h1>
+          <p>Try a different title or phrase from an entry.</p>
         </Card>
       ) : (
         <section aria-label='Diary entries' className={css.list}>
-          {entries.map((entry) => (
+          {visibleEntries.map((entry) => (
             <Link
               className={css.entryLink}
               key={entry.id}
@@ -41,4 +71,28 @@ export function DiaryListPage({ entries }: DiaryListPageProps) {
 
 function formatDiaryDate(value: string) {
   return new Intl.DateTimeFormat('en', { dateStyle: 'long' }).format(new Date(value));
+}
+
+/** Filters and sorts matching entries so title hits appear before entry-content hits. */
+function rankDiaryEntriesBySearch(entries: DiaryEntrySummary[], search: string) {
+  const normalizedSearch = search.trim().toLowerCase();
+
+  if (!normalizedSearch) {
+    return entries;
+  }
+
+  return entries
+    .flatMap((entry, index) => {
+      if (entry.title.toLowerCase().includes(normalizedSearch)) {
+        return [{ entry, index, rank: 0 }];
+      }
+
+      if (entry.markdown.toLowerCase().includes(normalizedSearch)) {
+        return [{ entry, index, rank: 1 }];
+      }
+
+      return [];
+    })
+    .sort((left, right) => left.rank - right.rank || left.index - right.index)
+    .map((result) => result.entry);
 }

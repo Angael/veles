@@ -23,20 +23,52 @@
   }
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  & time {
+    color: var(--c-accent-strong);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.titleInput {
+  font: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+}
+
 .body {
   padding: var(--space-xl);
-  overflow-x: auto;
-
-  & pre {
-    color: var(--c-text);
-    font-family: var(--font-sans);
-    font-size: var(--text-md);
-    line-height: 1.7;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
 
   @media (--phone) {
     padding: var(--space-md);
   }
+}
+
+.editor {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--c-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+
+  &:focus {
+    box-shadow: none;
+  }
+}
+
+.saveState {
+  min-height: 1.25rem;
+  margin-top: var(--space-sm);
+  color: var(--c-text);
+  font-size: var(--text-sm);
+  opacity: 0.72;
 }

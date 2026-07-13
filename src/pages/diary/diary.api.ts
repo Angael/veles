@@ -43,6 +43,12 @@ export const getDiaryEntries = createServerFn({ method: 'GET' })
   });
 
 const diaryEntryByIdInputType = type({ id: 'string.uuid' });
+const deleteDiaryEntryInputType = type({ id: 'string.uuid' });
+const updateDiaryEntryInputType = type({
+  id: 'string.uuid',
+  markdown: 'string < 16000',
+  title: 'string < 1000',
+});
 
 export const getDiaryEntryById = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getDiaryEntryById')])
@@ -72,4 +78,27 @@ export const getDiaryEntryById = createServerFn({ method: 'GET' })
       markdown: entry.markdown,
       title: entry.title,
     };
+  });
+
+export const updateDiaryEntry = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('updateDiaryEntry')])
+  .validator(arkTypeValidator(updateDiaryEntryInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+
+    await db
+      .update(diaryEntries)
+      .set({ markdown: data.markdown, title: data.title, updatedAt: new Date() })
+      .where(and(eq(diaryEntries.id, data.id), eq(diaryEntries.userId, session.user.id)));
+  });
+
+export const deleteDiaryEntry = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('deleteDiaryEntry')])
+  .validator(arkTypeValidator(deleteDiaryEntryInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+
+    await db
+      .delete(diaryEntries)
+      .where(and(eq(diaryEntries.id, data.id), eq(diaryEntries.userId, session.user.id)));
   });

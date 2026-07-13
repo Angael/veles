@@ -1,4 +1,3 @@
-import { useThrottledValue } from '@tanstack/react-pacer';
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { PlusIcon } from 'lucide-react';
@@ -6,6 +5,7 @@ import { useState } from 'react';
 import { Card } from '@/components/card/Card';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { TextInput } from '@/components/text-input/TextInput';
+import { useThrottledValue } from '@/lib/hooks/useThrottledValue';
 import type { RecipeLibraryItem } from './recipes.api';
 import css from './RecipesPage.module.css';
 
@@ -15,7 +15,7 @@ type RecipesPageProps = {
 
 export function RecipesPage({ recipes }: RecipesPageProps) {
   const [searchInputValue, setSearchInputValue] = useState('');
-  const [search] = useThrottledValue(searchInputValue, { wait: 200 });
+  const [search] = useThrottledValue(searchInputValue, 200);
   const visibleRecipes = rankRecipesBySearch(recipes, search);
 
   return (
