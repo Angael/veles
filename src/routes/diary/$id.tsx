@@ -13,6 +13,5 @@ export const Route = createFileRoute('/diary/$id')({
 
 function RouteComponent() {
   const entry = Route.useLoaderData();
-
   return <DiaryEntryPage entry={entry} />;
 }

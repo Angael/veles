@@ -16,10 +16,11 @@ type DiaryEntryPageProps = {
 export function DiaryEntryPage({ entry }: DiaryEntryPageProps) {
   const navigate = useNavigate();
   const router = useRouter();
+
   const saveMutation = useMutation({
     mutationFn: updateDiaryEntry,
-    onSuccess: () => router.invalidate(),
   });
+
   const deleteMutation = useMutation({
     mutationFn: deleteDiaryEntry,
     onSuccess: async () => {
@@ -27,6 +28,7 @@ export function DiaryEntryPage({ entry }: DiaryEntryPageProps) {
       await router.invalidate();
     },
   });
+
   const [draft, setDraft] = useAutoSaveState(
     { id: entry.id, markdown: entry.markdown, title: entry.title },
     (nextDraft) => saveMutation.mutateAsync({ data: nextDraft }),
