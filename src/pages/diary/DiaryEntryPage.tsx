@@ -31,7 +31,7 @@ export function DiaryEntryPage({ entry }: DiaryEntryPageProps) {
 
   const [draft, setDraft] = useAutoSaveState(
     { id: entry.id, markdown: entry.markdown, title: entry.title },
-    (nextDraft) => saveMutation.mutateAsync({ data: nextDraft }),
+    (nextDraft) => saveMutation.mutate({ data: nextDraft }),
     { debounceMs: 400, deps: [entry.id, entry.markdown, entry.title] },
   );
 

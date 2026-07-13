@@ -9,7 +9,7 @@ type UseAutoSaveStateOptions = {
 /** Keeps an editable local value in sync with source data and saves edits after a short pause. */
 export function useAutoSaveState<State>(
   initialState: State,
-  onDebouncedSave: (state: State) => Promise<void>,
+  onDebouncedSave: (state: State) => unknown,
   options: UseAutoSaveStateOptions = { debounceMs: 300, deps: [initialState] },
 ) {
   const [state, setState] = useState(initialState);
