@@ -5,6 +5,7 @@ import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '@/db';
 import { recipeImages, recipes, uploadObjects } from '@/db/schema';
 import { getSessionUserId, requireSession } from '@/lib/auth/getSession';
+import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { storagePathToUrl } from '@/lib/storage/config';
 
@@ -128,7 +129,7 @@ export const updateRecipeRating = createServerFn({ method: 'POST' })
       .returning({ id: recipes.id });
 
     if (!updatedRows[0]) {
-      throw new Error('Recipe not found.');
+      throw new ClientSafeError('Recipe not found.');
     }
 
     return { ok: true };

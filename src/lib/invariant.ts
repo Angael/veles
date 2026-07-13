@@ -1,5 +1,12 @@
-export function invariant<T>(value: T, onViolation: () => never): asserts value is NonNullable<T> {
+export function invariant<T>(
+  value: T,
+  messageOrOnViolation: string | (() => never),
+): asserts value is NonNullable<T> {
   if (value == null) {
-    onViolation();
+    if (typeof messageOrOnViolation === 'string') {
+      throw new Error(messageOrOnViolation);
+    }
+
+    messageOrOnViolation();
   }
 }
