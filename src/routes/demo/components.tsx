@@ -50,6 +50,7 @@ function ComponentsDemoPage() {
   const [textValue, setTextValue] = useState('Smoky bowl');
   const [numberValue, setNumberValue] = useState<number | null>(320);
   const [selectValue, setSelectValue] = useState<(typeof SELECT_OPTIONS)[number]['value']>('lte');
+  const [btnLoading, setBtnLoading] = useState(false);
 
   return (
     <main
@@ -64,11 +65,20 @@ function ComponentsDemoPage() {
 
       <section>
         <h2>Btn</h2>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>
+          <input
+            checked={btnLoading}
+            onChange={(event) => setBtnLoading(event.target.checked)}
+            type='checkbox'
+          />
+          Show loaders on buttons
+        </label>
         <DemoTable
           columns={BTN_SIZES}
           renderCell={({ column, row }) => (
             <Btn
               icon={<PlusIcon aria-hidden='true' size={16} strokeWidth={1.8} />}
+              loading={btnLoading}
               size={column.value}
               variant={row.value}
             >
@@ -85,6 +95,7 @@ function ComponentsDemoPage() {
               aria-label={`${row.label} ${column.label.toLowerCase()} icon button`}
               icon={<SearchIcon aria-hidden='true' size={16} strokeWidth={1.8} />}
               iconOnly
+              loading={btnLoading}
               size={column.value}
               variant={row.value}
             />
@@ -95,7 +106,18 @@ function ComponentsDemoPage() {
 
       <section>
         <h2>Card</h2>
-        <Card as='article'>Simple card content</Card>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)' }}>
+          <Card as='article'>Default card</Card>
+          <Card as='article' variant='primary'>
+            Primary card
+          </Card>
+          <Card as='article' variant='danger'>
+            Danger card
+          </Card>
+          <Card as='article' shadow={false}>
+            Card without shadow
+          </Card>
+        </div>
       </section>
 
       <section>
