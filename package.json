@@ -19,6 +19,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:migrate:prod": "drizzle-kit migrate --config=drizzle-prod.config.ts",
     "db:push": "drizzle-kit push",
+    "db:reset": "node --env-file-if-exists=.env scripts/db-reset.mjs",
+    "db:seed": "node --env-file-if-exists=.env scripts/db-seed.mjs",
     "db:studio": "drizzle-kit studio",
     "db:studio:prod": "drizzle-kit studio --config=drizzle-prod.config.ts"
   },
