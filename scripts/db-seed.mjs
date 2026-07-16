@@ -2,6 +2,26 @@ import { Client } from 'pg';
 
 const expectedDatabaseName = 'veles_dev';
 const databaseUrl = process.env.DATABASE_URL;
+const devUser = {
+  id: 'qG07LJs8rynlLrMLsXLX7pdUskIbfHGw',
+  name: 'Krzysztof Widacki',
+  email: 'krzysztofwidacki@gmail.com',
+  emailVerified: true,
+  image:
+    'https://lh3.googleusercontent.com/a/ACg8ocKZn5-2SPNdDEDK81bb4eBtRbn8K_cXFMJe-xXvdvTpcy6B3AP-=s96-c',
+  createdAt: '2026-05-23T08:23:25.039Z',
+  updatedAt: '2026-05-23T08:23:25.039Z',
+};
+const devAccount = {
+  id: 'gmRClvZqFGhm8EJgMfNIPWBCGebKz5FB',
+  accountId: '115846091622187499143',
+  providerId: 'google',
+  userId: devUser.id,
+  scope:
+    'https://www.googleapis.com/auth/userinfo.profile,https://www.googleapis.com/auth/userinfo.email,openid',
+  createdAt: '2026-05-23T08:23:25.075Z',
+  updatedAt: '2026-07-15T21:22:28.896Z',
+};
 
 if (!databaseUrl) {
   throw new Error('DATABASE_URL is required.');
@@ -13,7 +33,7 @@ if (process.env.PROD_DATABASE_URL && databaseUrl === process.env.PROD_DATABASE_U
 
 await seedDatabase(databaseUrl);
 
-/** Seeds deterministic dev fixtures for the sole user and is safe to run repeatedly. */
+/** Seeds the fixed dev identity and deterministic fixtures, and is safe to run repeatedly. */
 async function seedDatabase(connectionString) {
   const client = new Client({ connectionString });
   await client.connect();
@@ -28,15 +48,10 @@ async function seedDatabase(connectionString) {
       );
     }
 
-    const users = await client.query('SELECT id FROM "user" ORDER BY id LIMIT 2');
-
-    if (users.rowCount !== 1) {
-      throw new Error(`Expected exactly one dev user, found ${users.rowCount}.`);
-    }
-
     await client.query('BEGIN');
-    await seedRecipes(client, users.rows[0].id);
-    await seedDiaryEntries(client, users.rows[0].id);
+    await seedIdentity(client);
+    await seedRecipes(client, devUser.id);
+    await seedDiaryEntries(client, devUser.id);
     await client.query('COMMIT');
     console.info('Seeded deterministic recipe and diary fixtures.');
   } catch (error) {
@@ -45,6 +60,51 @@ async function seedDatabase(connectionString) {
   } finally {
     await client.end();
   }
+}
+
+async function seedIdentity(client) {
+  await client.query(
+    `INSERT INTO "user"
+      (id, name, email, email_verified, image, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     ON CONFLICT (id) DO UPDATE SET
+       name = EXCLUDED.name,
+       email = EXCLUDED.email,
+       email_verified = EXCLUDED.email_verified,
+       image = EXCLUDED.image,
+       created_at = EXCLUDED.created_at,
+       updated_at = EXCLUDED.updated_at`,
+    [
+      devUser.id,
+      devUser.name,
+      devUser.email,
+      devUser.emailVerified,
+      devUser.image,
+      devUser.createdAt,
+      devUser.updatedAt,
+    ],
+  );
+  await client.query(
+    `INSERT INTO account
+      (id, account_id, provider_id, user_id, scope, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     ON CONFLICT (id) DO UPDATE SET
+       account_id = EXCLUDED.account_id,
+       provider_id = EXCLUDED.provider_id,
+       user_id = EXCLUDED.user_id,
+       scope = EXCLUDED.scope,
+       created_at = EXCLUDED.created_at,
+       updated_at = EXCLUDED.updated_at`,
+    [
+      devAccount.id,
+      devAccount.accountId,
+      devAccount.providerId,
+      devAccount.userId,
+      devAccount.scope,
+      devAccount.createdAt,
+      devAccount.updatedAt,
+    ],
+  );
 }
 
 async function seedRecipes(client, userId) {

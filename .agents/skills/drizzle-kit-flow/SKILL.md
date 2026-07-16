@@ -24,7 +24,7 @@ When the schema is final:
 
 1. Ask the user to run `pnpm db:generate -- --name=<feature>`.
 2. Review the generated SQL and snapshot.
-3. Ask the user to run `pnpm db:reset`; it preserves the sole dev identity, resets the app and Drizzle schemas, migrates from scratch, restores login identity, and seeds fixtures.
+3. Ask the user to run `pnpm db:reset`; it resets the app and Drizzle schemas, migrates from scratch, and inserts the fixed dev identity and fixtures.
 4. Verify the application against the fully migrated database.
 5. Commit the schema and migration together.
 
