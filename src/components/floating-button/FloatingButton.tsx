@@ -6,24 +6,43 @@ import css from './FloatingButton.module.css';
 type FloatingButtonProps = {
   children: ReactNode;
   icon?: ReactNode;
-  to: string;
-};
+} & (
+  | { loading?: never; onClick?: never; to: string }
+  | { loading?: boolean; onClick: () => void; to?: never }
+);
 
-export function FloatingButton({ children, icon, to }: FloatingButtonProps) {
+export function FloatingButton(props: FloatingButtonProps) {
   // TODO: hide this on scroll down once the mobile bottom nav behavior is finalized.
-  // TODO: move this toward a more centered desktop position on large screens.
+  if (props.to) {
+    return (
+      <Btn
+        aria-label={typeof props.children === 'string' ? props.children : undefined}
+        className={css.button}
+        icon={props.icon}
+        isLink
+        radius='pill'
+        render={<Link to={props.to} />}
+        size='md'
+        variant='main'
+      >
+        {props.children}
+      </Btn>
+    );
+  }
+
   return (
     <Btn
-      aria-label={typeof children === 'string' ? children : undefined}
+      aria-label={typeof props.children === 'string' ? props.children : undefined}
       className={css.button}
-      icon={icon}
-      isLink
+      icon={props.icon}
+      loading={props.loading}
+      onClick={props.onClick}
       radius='pill'
-      render={<Link to={to} />}
       size='md'
+      type='button'
       variant='main'
     >
-      {children}
+      {props.children}
     </Btn>
   );
 }
