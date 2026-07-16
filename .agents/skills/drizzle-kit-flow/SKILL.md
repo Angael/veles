@@ -24,7 +24,7 @@ When the schema is final:
 
 1. Ask the user to run `pnpm db:generate -- --name=<feature>`.
 2. Review the generated SQL and snapshot.
-3. Ask the user to recreate the dev database, then run `pnpm db:migrate` on the clean database.
+3. Ask the user to run `pnpm db:reset`; it preserves the sole dev identity, resets the app and Drizzle schemas, migrates from scratch, restores login identity, and seeds fixtures.
 4. Verify the application against the fully migrated database.
 5. Commit the schema and migration together.
 
@@ -36,8 +36,8 @@ If a migration exists only on the current branch and has never been deployed or 
 
 1. Restore the migration directory to the `main` state by removing only that branch's generated migration files.
 2. Keep the final desired schema.
-3. Recreate the disposable dev database.
-4. Generate one clean migration and test all migrations from scratch.
+3. Generate one clean migration.
+4. Ask the user to run `pnpm db:reset` to test all migrations from scratch.
 
 Delete a generated migration and its snapshot as one unit. Do not hand-edit snapshots.
 
@@ -46,6 +46,7 @@ Multiple migrations in one PR are appropriate when they are intentional deployme
 ## Production Rules
 
 - Never use `push` against production.
+- `pnpm db:reset` and `pnpm db:seed` are dev-only and must refuse any database other than `veles_dev`.
 - Never edit or delete a migration that reached production. Add a forward-fix migration.
 - Production flow is: schema change, generate, review SQL, commit, then `pnpm db:migrate:prod` as one controlled deployment step.
 - The human must run required production migrations before pushing or merging to `main` because pushing `main` deploys the application.
