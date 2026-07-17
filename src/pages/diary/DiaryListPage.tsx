@@ -1,11 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
+import { useThrottledValue } from '@tanstack/react-pacer';
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
 import { PlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Card } from '@/components/card/Card';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { TextInput } from '@/components/text-input/TextInput';
-import { useThrottledValue } from '@/lib/hooks/useThrottledValue';
 import { createDiaryEntry, type DiaryEntrySummary } from './diary.api';
 import css from './DiaryListPage.module.css';
 
@@ -17,7 +17,7 @@ export function DiaryListPage({ entries }: DiaryListPageProps) {
   const navigate = useNavigate();
   const router = useRouter();
   const [searchInputValue, setSearchInputValue] = useState('');
-  const [search] = useThrottledValue(searchInputValue, 200);
+  const [search] = useThrottledValue(searchInputValue, { wait: 200 });
   const visibleEntries = rankDiaryEntriesBySearch(entries, search);
   const createMutation = useMutation({
     mutationFn: createDiaryEntry,

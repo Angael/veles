@@ -1,5 +1,5 @@
+import { useDebouncer } from '@tanstack/react-pacer';
 import { useEffect, useRef, useState, type DependencyList, type SetStateAction } from 'react';
-import { useDebouncedCallback } from 'use-debounce';
 
 type UseAutoSaveStateOptions = {
   debounceMs: number;
@@ -15,12 +15,14 @@ export function useAutoSaveState<State>(
   const [state, setState] = useState(initialState);
   const latestStateRef = useRef(state);
 
-  const debouncedSave = useDebouncedCallback(
+  const saveDebouncer = useDebouncer(
     (stateToSave: State) => {
       onDebouncedSave(stateToSave);
     },
-    options.debounceMs,
-    { flushOnExit: true },
+    {
+      onUnmount: (debouncer) => debouncer.flush(),
+      wait: options.debounceMs,
+    },
   );
 
   const setAutoSaveState = (nextState: SetStateAction<State>) => {
@@ -31,8 +33,19 @@ export function useAutoSaveState<State>(
 
     latestStateRef.current = resolvedState;
     setState(resolvedState);
-    debouncedSave(resolvedState);
+    saveDebouncer.maybeExecute(resolvedState);
   };
+
+  useEffect(() => {
+    const flushSaveWhenHidden = () => {
+      if (document.visibilityState === 'hidden') {
+        saveDebouncer.flush();
+      }
+    };
+
+    document.addEventListener('visibilitychange', flushSaveWhenHidden);
+    return () => document.removeEventListener('visibilitychange', flushSaveWhenHidden);
+  }, [saveDebouncer]);
 
   useEffect(() => {
     latestStateRef.current = initialState;
