@@ -4,6 +4,7 @@ import { SendHorizontalIcon } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
+import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { UploadTileGrid } from '@/components/upload-tile-grid/UploadTileGrid';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import css from './AddRecipePage.module.css';
@@ -104,16 +105,16 @@ export function AddRecipePage() {
               </div>
             </div>
 
-            {error ? <div className={css.errorBox}>{error}</div> : null}
+            {error ? <ErrorCard message={error} title='Recipe not saved' /> : null}
 
             <div className={css.actions}>
               <Btn
-                disabled={busy}
                 icon={<SendHorizontalIcon aria-hidden='true' size={18} />}
+                loading={busy}
                 type='submit'
                 variant='main'
               >
-                {busy ? 'Saving...' : 'Save recipe'}
+                Save recipe
               </Btn>
             </div>
           </form>

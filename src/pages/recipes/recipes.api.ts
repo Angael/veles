@@ -174,7 +174,7 @@ export const updateRecipe = createServerFn({ method: 'POST' })
       .returning({ id: recipes.id });
 
     if (!updatedRows[0]) {
-      throw new Error('Recipe not found.');
+      throw new ClientSafeError('Recipe not found.');
     }
 
     return { ok: true };

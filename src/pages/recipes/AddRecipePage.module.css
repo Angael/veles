@@ -14,10 +14,6 @@
   width: min(100%, 44rem);
 }
 
-.formCard h1 {
-  margin: 0;
-}
-
 .form,
 .formBody,
 .actions {
@@ -41,14 +37,6 @@
 
 .uploadFieldWrap {
   gap: var(--space-xs);
-}
-
-.errorBox {
-  padding: 0.85rem 1rem;
-  border: var(--border-width) solid var(--c-danger-border);
-  border-radius: var(--radius-xs);
-  color: var(--c-danger-text);
-  background: var(--c-danger-surface);
 }
 
 .actions {

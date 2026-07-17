@@ -9,11 +9,6 @@
   width: min(100%, 42rem);
 }
 
-.card h1,
-.card p {
-  margin: 0;
-}
-
 .form,
 .actions {
   display: grid;
@@ -27,16 +22,7 @@
   justify-content: start;
 }
 
-.errorBox {
-  padding: 0.85rem 1rem;
-  border: var(--border-width) solid var(--c-danger-border);
-  border-radius: var(--radius-xs);
-  color: var(--c-danger-text);
-  background: var(--c-danger-surface);
-}
-
 .photoNote {
-  gap: var(--space-xs);
   padding: 0.85rem 1rem;
   border: var(--border-width) solid var(--c-border);
   border-radius: var(--radius-xs);
