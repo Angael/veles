@@ -1,13 +1,14 @@
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { ChevronLeftIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { NavMenu } from '@/components/nav-menu/NavMenu';
 import { MobileNavMenu } from '@/components/nav-menu/MobileNavMenu';
 import type { NavbarTarget } from '@/lib/routing/staticRouteData';
 import css from './AppFrame.module.css';
 
-export function AppFrame() {
+export function AppFrame({ children }: { children?: ReactNode }) {
   const navbar = useRouterState({
     select: (state) => {
       const match = state.matches.at(-1);
@@ -34,7 +35,7 @@ export function AppFrame() {
           {navbar ? <RouteLabel label={navbar.label} upTo={navbar.upTo} /> : <div />}
           <NavMenu />
         </header>
-        <Outlet />
+        {children === undefined ? <Outlet /> : children}
         <MobileNavMenu />
       </div>
     </div>

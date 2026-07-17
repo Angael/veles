@@ -29,7 +29,7 @@ const featureCards = [
 export function HomePage() {
   return (
     <main className={css.layout}>
-      <Card as='article' className={css.hero}>
+      <Card as='article' className={css.hero} variant='primary'>
         <div className={css.heroContent}>
           <p className={css.eyebrow}>Private app</p>
           <h1>Veles</h1>

@@ -48,7 +48,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   }),
   errorComponent: (props) => (
     <RootDocument>
-      <DefaultCatchBoundary {...props} />
+      <AppFrame>
+        <DefaultCatchBoundary {...props} />
+      </AppFrame>
     </RootDocument>
   ),
   notFoundComponent: () => <NotFound />,
@@ -73,12 +75,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
-        {/* {import.meta.env.DEV ? (
+        {import.meta.env.DEV ? (
           <>
             <TanStackRouterDevtools position='bottom-right' />
             <ReactQueryDevtools buttonPosition='bottom-left' />
           </>
-        ) : null} */}
+        ) : null}
         <Scripts />
       </body>
     </html>

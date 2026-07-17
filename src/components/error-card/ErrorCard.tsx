@@ -16,7 +16,7 @@ export const ErrorCard = memo(function ErrorCard({
   title = 'Something went wrong',
 }: ErrorCardProps) {
   return (
-    <Card aria-live='polite' className={clsx(css.card, className)} role='alert'>
+    <Card aria-live='polite' className={clsx(css.card, className)} role='alert' variant='danger'>
       <CircleAlertIcon aria-hidden='true' className={css.icon} size={22} strokeWidth={1.9} />
 
       <div className={css.content}>

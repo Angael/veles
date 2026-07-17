@@ -16,7 +16,9 @@ import { Route as CaloriesRouteImport } from './routes/calories'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecipesIndexRouteImport } from './routes/recipes/index'
+import { Route as DiaryIndexRouteImport } from './routes/diary/index'
 import { Route as RecipesAddRouteImport } from './routes/recipes/add'
+import { Route as DiaryIdRouteImport } from './routes/diary/$id'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoComponentsRouteImport } from './routes/demo/components'
 import { Route as RecipesViewIdRouteImport } from './routes/recipes/view.$id'
@@ -66,9 +68,19 @@ const RecipesIndexRoute = RecipesIndexRouteImport.update({
   path: '/recipes/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiaryIndexRoute = DiaryIndexRouteImport.update({
+  id: '/diary/',
+  path: '/diary/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RecipesAddRoute = RecipesAddRouteImport.update({
   id: '/recipes/add',
   path: '/recipes/add',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiaryIdRoute = DiaryIdRouteImport.update({
+  id: '/diary/$id',
+  path: '/diary/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
@@ -146,7 +158,9 @@ export interface FileRoutesByFullPath {
   '/weight': typeof WeightRoute
   '/demo/components': typeof DemoComponentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/diary/$id': typeof DiaryIdRoute
   '/recipes/add': typeof RecipesAddRoute
+  '/diary/': typeof DiaryIndexRoute
   '/recipes/': typeof RecipesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
@@ -169,7 +183,9 @@ export interface FileRoutesByTo {
   '/weight': typeof WeightRoute
   '/demo/components': typeof DemoComponentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/diary/$id': typeof DiaryIdRoute
   '/recipes/add': typeof RecipesAddRoute
+  '/diary': typeof DiaryIndexRoute
   '/recipes': typeof RecipesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
@@ -193,7 +209,9 @@ export interface FileRoutesById {
   '/weight': typeof WeightRoute
   '/demo/components': typeof DemoComponentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/diary/$id': typeof DiaryIdRoute
   '/recipes/add': typeof RecipesAddRoute
+  '/diary/': typeof DiaryIndexRoute
   '/recipes/': typeof RecipesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
@@ -218,7 +236,9 @@ export interface FileRouteTypes {
     | '/weight'
     | '/demo/components'
     | '/demo/tanstack-query'
+    | '/diary/$id'
     | '/recipes/add'
+    | '/diary/'
     | '/recipes/'
     | '/api/auth/$'
     | '/api/demo/ping'
@@ -241,7 +261,9 @@ export interface FileRouteTypes {
     | '/weight'
     | '/demo/components'
     | '/demo/tanstack-query'
+    | '/diary/$id'
     | '/recipes/add'
+    | '/diary'
     | '/recipes'
     | '/api/auth/$'
     | '/api/demo/ping'
@@ -264,7 +286,9 @@ export interface FileRouteTypes {
     | '/weight'
     | '/demo/components'
     | '/demo/tanstack-query'
+    | '/diary/$id'
     | '/recipes/add'
+    | '/diary/'
     | '/recipes/'
     | '/api/auth/$'
     | '/api/demo/ping'
@@ -288,7 +312,9 @@ export interface RootRouteChildren {
   WeightRoute: typeof WeightRoute
   DemoComponentsRoute: typeof DemoComponentsRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  DiaryIdRoute: typeof DiaryIdRoute
   RecipesAddRoute: typeof RecipesAddRoute
+  DiaryIndexRoute: typeof DiaryIndexRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDemoPingRoute: typeof ApiDemoPingRoute
@@ -354,11 +380,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecipesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/diary/': {
+      id: '/diary/'
+      path: '/diary'
+      fullPath: '/diary/'
+      preLoaderRoute: typeof DiaryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/recipes/add': {
       id: '/recipes/add'
       path: '/recipes/add'
       fullPath: '/recipes/add'
       preLoaderRoute: typeof RecipesAddRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diary/$id': {
+      id: '/diary/$id'
+      path: '/diary/$id'
+      fullPath: '/diary/$id'
+      preLoaderRoute: typeof DiaryIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/tanstack-query': {
@@ -464,7 +504,9 @@ const rootRouteChildren: RootRouteChildren = {
   WeightRoute: WeightRoute,
   DemoComponentsRoute: DemoComponentsRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  DiaryIdRoute: DiaryIdRoute,
   RecipesAddRoute: RecipesAddRoute,
+  DiaryIndexRoute: DiaryIndexRoute,
   RecipesIndexRoute: RecipesIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDemoPingRoute: ApiDemoPingRoute,
@@ -483,10 +525,11 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

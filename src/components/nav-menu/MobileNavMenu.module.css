@@ -9,7 +9,7 @@
 
 .group {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.25rem;
   padding: 0.3rem;
   border: 1px solid rgba(148, 163, 184, 0.26);

@@ -1,4 +1,5 @@
 import { getRequestHeaders } from '@tanstack/react-start/server';
+import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { auth } from './auth';
 
 export async function getSession() {
@@ -17,7 +18,8 @@ export async function requireSession() {
   const session = await getSession();
 
   if (!session?.user.id) {
-    throw new Error('You need to be signed in.');
+    // Used in server functions, no need for 401 http status code
+    throw new ClientSafeError('You need to be signed in.');
   }
 
   return session;

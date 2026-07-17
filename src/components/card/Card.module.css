@@ -10,3 +10,19 @@
     padding: var(--space-sm);
   }
 }
+
+.primary {
+  border-color: var(--c-primary-border-soft);
+  background: color-mix(in srgb, var(--c-surface-solid) 82%, var(--c-primary-surface));
+  box-shadow: var(--shadow-card-primary);
+}
+
+.danger {
+  border-color: var(--c-danger-border);
+  background: color-mix(in srgb, var(--c-surface-solid) 82%, var(--c-danger-surface));
+  box-shadow: var(--shadow-card-danger);
+}
+
+.noShadow {
+  box-shadow: none;
+}

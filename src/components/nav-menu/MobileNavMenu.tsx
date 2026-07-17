@@ -1,13 +1,21 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
 import { Link, useRouterState } from '@tanstack/react-router';
-import { BookOpenIcon, FlameIcon, LogInIcon, ScaleIcon, UserIcon } from 'lucide-react';
+import {
+  BookOpenIcon,
+  FlameIcon,
+  LogInIcon,
+  NotebookPenIcon,
+  ScaleIcon,
+  UserIcon,
+} from 'lucide-react';
 import css from './MobileNavMenu.module.css';
 import { MOBILE_NAV_ITEMS, useMobileNavMenu } from './useNavMenuGroups';
 
 const itemIcons = {
   account: UserIcon,
   calories: FlameIcon,
+  diary: NotebookPenIcon,
   login: LogInIcon,
   recipes: BookOpenIcon,
   weight: ScaleIcon,
