@@ -35,17 +35,8 @@ export const getDiaryEntries = createServerFn({ method: 'GET' })
     return entries;
   });
 
-const diaryEntryByIdInputType = type({ id: 'string.uuid' });
-const deleteDiaryEntryInputType = type({ id: 'string.uuid' });
-const diaryEntryDateType = type('string').narrow((value, ctx) => {
-  const parsedDate = new Date(`${value}T00:00:00Z`);
-
-  return /^\d{4}-\d{2}-\d{2}$/.test(value) &&
-    !Number.isNaN(parsedDate.valueOf()) &&
-    parsedDate.toISOString().startsWith(value)
-    ? true
-    : ctx.mustBe('a valid calendar date');
-});
+const idType = type({ id: 'string.uuid' });
+const diaryEntryDateType = type('string.date');
 const createDiaryEntryInputType = type({ entryDate: diaryEntryDateType });
 const updateDiaryEntryInputType = type({
   entryDate: diaryEntryDateType,
@@ -56,7 +47,7 @@ const updateDiaryEntryInputType = type({
 
 export const getDiaryEntryById = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getDiaryEntryById')])
-  .validator(arkTypeValidator(diaryEntryByIdInputType))
+  .validator(arkTypeValidator(idType))
   .handler(async ({ data }) => {
     const session = await requireSession();
 
@@ -123,7 +114,7 @@ export const updateDiaryEntry = createServerFn({ method: 'POST' })
 
 export const deleteDiaryEntry = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('deleteDiaryEntry')])
-  .validator(arkTypeValidator(deleteDiaryEntryInputType))
+  .validator(arkTypeValidator(idType))
   .handler(async ({ data }) => {
     const session = await requireSession();
 
