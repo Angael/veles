@@ -75,7 +75,7 @@ async function assertDevDatabase(client) {
   }
 }
 
-/** Seeds the fixed dev identity and deterministic recipe fixtures. */
+/** Seeds the fixed dev identity and deterministic application fixtures. */
 async function seedDatabase(connectionString) {
   const client = new Client({ connectionString });
   await client.connect();
@@ -85,6 +85,7 @@ async function seedDatabase(connectionString) {
     await client.query('BEGIN');
     await seedIdentity(client);
     await seedRecipes(client, devUser.id);
+    await seedDiaryEntries(client, devUser.id);
     await client.query('COMMIT');
   } catch (error) {
     await client.query('ROLLBACK');
@@ -201,6 +202,37 @@ async function seedRecipes(client, userId) {
         recipe.carbs,
         recipe.fats,
       ],
+    );
+  }
+}
+
+async function seedDiaryEntries(client, userId) {
+  const entries = [
+    {
+      id: '01900000-0000-7000-8000-000000000101',
+      title: 'First seeded entry',
+      markdown: 'A stable fixture for checking the diary list and detail views.',
+      entryDate: '2026-01-12',
+    },
+    {
+      id: '01900000-0000-7000-8000-000000000102',
+      title: 'Markdown playground',
+      markdown: '## Things to verify\n\n- headings\n- lists\n- **formatting**',
+      entryDate: '2026-02-08',
+    },
+  ];
+
+  for (const entry of entries) {
+    await client.query(
+      `INSERT INTO diary_entry (id, user_id, title, markdown, entry_date)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (id) DO UPDATE SET
+         user_id = EXCLUDED.user_id,
+         title = EXCLUDED.title,
+         markdown = EXCLUDED.markdown,
+         entry_date = EXCLUDED.entry_date,
+         updated_at = now()`,
+      [entry.id, userId, entry.title, entry.markdown, entry.entryDate],
     );
   }
 }
