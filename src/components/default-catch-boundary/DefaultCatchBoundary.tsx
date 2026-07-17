@@ -1,5 +1,4 @@
 import { useRouter, type ErrorComponentProps } from '@tanstack/react-router';
-import { CircleAlertIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';

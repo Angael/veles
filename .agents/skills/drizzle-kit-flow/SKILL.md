@@ -46,7 +46,7 @@ Multiple migrations in one PR are appropriate when they are intentional deployme
 ## Production Rules
 
 - Never use `push` against production.
-- `pnpm db:reset` and `pnpm db:seed` are dev-only and must refuse any database other than `veles_dev`.
+- `pnpm db:reset` is dev-only and must refuse any database other than `veles_dev`.
 - Never edit or delete a migration that reached production. Add a forward-fix migration.
 - Production flow is: schema change, generate, review SQL, commit, then `pnpm db:migrate:prod` as one controlled deployment step.
 - The human must run required production migrations before pushing or merging to `main` because pushing `main` deploys the application.
