@@ -1,0 +1,37 @@
+.page {
+  display: grid;
+  min-height: calc(100dvh - 9rem);
+  place-items: center;
+  padding: var(--space-xl) 0;
+}
+
+.panel {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-sm);
+  width: min(100%, 30rem);
+  text-align: center;
+}
+
+.copy {
+  & h1 {
+    color: var(--c-text-strong);
+    font-size: var(--text-xl-dynamic);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+}
+
+.message {
+  color: var(--c-muted-soft);
+  font-size: var(--text-md);
+  text-wrap: pretty;
+}
+
+@media (--phone) {
+  .page {
+    min-height: calc(100dvh - 6rem);
+    padding: var(--space-lg) 0;
+  }
+}

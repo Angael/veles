@@ -4,10 +4,7 @@
   gap: var(--space-xs);
   align-items: start;
   padding: var(--space-sm);
-  border-color: var(--c-danger-border);
   border-radius: var(--radius-xs);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent), var(--c-danger-surface);
 }
 
 .icon {

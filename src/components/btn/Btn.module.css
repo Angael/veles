@@ -165,6 +165,14 @@
   }
 }
 
+.loader {
+  position: absolute;
+  z-index: 2;
+  width: var(--btn-icon-size);
+  height: var(--btn-icon-size);
+  animation: spin 700ms linear infinite;
+}
+
 .content {
   position: relative;
   z-index: 1;
@@ -182,6 +190,17 @@
   margin-left: 0;
 }
 
+.loading .icon,
+.loading .content {
+  opacity: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .root {
     transition:
@@ -189,5 +208,9 @@
       border-color 140ms ease,
       color 140ms ease,
       opacity 140ms ease;
+  }
+
+  .loader {
+    animation-duration: 1.4s;
   }
 }

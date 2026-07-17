@@ -48,7 +48,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   }),
   errorComponent: (props) => (
     <RootDocument>
-      <DefaultCatchBoundary {...props} />
+      <AppFrame>
+        <DefaultCatchBoundary {...props} />
+      </AppFrame>
     </RootDocument>
   ),
   notFoundComponent: () => <NotFound />,
