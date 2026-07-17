@@ -1,6 +1,6 @@
 .button {
   position: fixed;
-  right: var(--space-md);
+  right: max(var(--space-md), calc((100vw - 1100px) / 2));
   bottom: var(--space-md);
   z-index: 2;
 
