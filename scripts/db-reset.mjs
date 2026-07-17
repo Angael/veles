@@ -6,7 +6,7 @@ const databaseUrl = process.env.DATABASE_URL;
 const devUser = {
   id: 'qG07LJs8rynlLrMLsXLX7pdUskIbfHGw',
   name: 'Krzysztof Widacki',
-  email: 'krzysztofwidacki@gmail.com',
+  email: 'dev-user@example.test',
   emailVerified: true,
   image:
     'https://lh3.googleusercontent.com/a/ACg8ocKZn5-2SPNdDEDK81bb4eBtRbn8K_cXFMJe-xXvdvTpcy6B3AP-=s96-c',

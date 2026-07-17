@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 /**
- * Wraps login/signup client calls with shared busy and error state for auth forms.
+ * Wraps authentication client calls with shared busy and error state for the sign-in view.
  */
 export function useAuthAction() {
   const [busy, setBusy] = useState(false);

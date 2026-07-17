@@ -1,11 +1,9 @@
 FROM node:26.2.0-alpine AS builder
 
 ARG VITE_APP_NAME=Veles
-ARG VITE_APP_URL=http://localhost:3000
 ARG VITE_CF_CDN_URL=https://cdn.example.com
 
 ENV VITE_APP_NAME=$VITE_APP_NAME
-ENV VITE_APP_URL=$VITE_APP_URL
 ENV VITE_CF_CDN_URL=$VITE_CF_CDN_URL
 
 RUN npm install -g pnpm@11.5.0
@@ -21,9 +19,13 @@ RUN pnpm build
 
 FROM node:26.2.0-alpine AS runner
 
+ENV NODE_ENV=production
+
 WORKDIR /app
 
-COPY --from=builder /app/.output ./.output
+COPY --chown=node:node --from=builder /app/.output ./.output
+
+USER node
 
 EXPOSE 3000
 

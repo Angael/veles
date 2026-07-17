@@ -170,28 +170,9 @@ function ComponentsDemoPage() {
         <h2>AuthCard</h2>
         <AuthCard
           busy={false}
-          description='Simple demo state for the reusable auth shell.'
+          description='Continue with an invited Google account.'
           error={null}
-          fields={
-            <>
-              <TextInput
-                aria-label='Email'
-                defaultValue='cook@example.com'
-                name='email'
-                type='email'
-              />
-              <TextInput
-                aria-label='Password'
-                defaultValue='hunter2'
-                name='password'
-                type='password'
-              />
-            </>
-          }
-          footer='Footer copy'
           onGoogle={async () => {}}
-          onSubmit={async () => {}}
-          submitLabel='Continue'
           title='Welcome back'
         />
       </section>
