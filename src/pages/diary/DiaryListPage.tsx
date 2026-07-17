@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query';
-import { useThrottledValue } from '@tanstack/react-pacer';
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
 import { PlusIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -19,12 +18,16 @@ const diarySearchFields = [
   (entry) => entry.markdown,
 ] satisfies RankedSearchFields<DiaryEntrySummary>;
 
+const diaryDateFormatter = new Intl.DateTimeFormat('en', {
+  dateStyle: 'long',
+  timeZone: 'UTC',
+});
+
 export function DiaryListPage({ entries }: DiaryListPageProps) {
   const navigate = useNavigate();
   const router = useRouter();
   const [searchInputValue, setSearchInputValue] = useState('');
-  const [search] = useThrottledValue(searchInputValue, { wait: 200 });
-  const visibleEntries = filterAndRankBySearch(entries, search, diarySearchFields);
+  const visibleEntries = filterAndRankBySearch(entries, searchInputValue, diarySearchFields);
   const createMutation = useMutation({
     mutationFn: createDiaryEntry,
     onSuccess: async (entry) => {
@@ -106,9 +109,7 @@ export function DiaryListPage({ entries }: DiaryListPageProps) {
 }
 
 function formatDiaryDate(value: string) {
-  return new Intl.DateTimeFormat('en', { dateStyle: 'long', timeZone: 'UTC' }).format(
-    new Date(`${value}T00:00:00Z`),
-  );
+  return diaryDateFormatter.format(new Date(`${value}T00:00:00Z`));
 }
 
 function getLocalDate() {
