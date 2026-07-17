@@ -10,7 +10,7 @@ import { invariant } from '@/lib/invariant';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 
 export type DiaryEntrySummary = {
-  entryAt: string;
+  entryDate: string;
   id: string;
   markdown: string;
   title: string;
@@ -23,28 +23,32 @@ export const getDiaryEntries = createServerFn({ method: 'GET' })
 
     const entries = await db
       .select({
-        entryAt: diaryEntries.entryAt,
+        entryDate: diaryEntries.entryDate,
         id: diaryEntries.id,
         markdown: diaryEntries.markdown,
         title: diaryEntries.title,
       })
       .from(diaryEntries)
       .where(eq(diaryEntries.userId, session.user.id))
-      .orderBy(desc(diaryEntries.entryAt));
+      .orderBy(desc(diaryEntries.entryDate), desc(diaryEntries.createdAt));
 
-    return entries.map(
-      (entry): DiaryEntrySummary => ({
-        entryAt: entry.entryAt.toISOString(),
-        id: entry.id,
-        markdown: entry.markdown,
-        title: entry.title,
-      }),
-    );
+    return entries;
   });
 
 const diaryEntryByIdInputType = type({ id: 'string.uuid' });
 const deleteDiaryEntryInputType = type({ id: 'string.uuid' });
+const diaryEntryDateType = type('string').narrow((value, ctx) => {
+  const parsedDate = new Date(`${value}T00:00:00Z`);
+
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    !Number.isNaN(parsedDate.valueOf()) &&
+    parsedDate.toISOString().startsWith(value)
+    ? true
+    : ctx.mustBe('a valid calendar date');
+});
+const createDiaryEntryInputType = type({ entryDate: diaryEntryDateType });
 const updateDiaryEntryInputType = type({
+  entryDate: diaryEntryDateType,
   id: 'string.uuid',
   markdown: 'string <= 16000',
   title: 'string <= 160',
@@ -58,7 +62,7 @@ export const getDiaryEntryById = createServerFn({ method: 'GET' })
 
     const entries = await db
       .select({
-        entryAt: diaryEntries.entryAt,
+        entryDate: diaryEntries.entryDate,
         id: diaryEntries.id,
         markdown: diaryEntries.markdown,
         title: diaryEntries.title,
@@ -73,11 +77,31 @@ export const getDiaryEntryById = createServerFn({ method: 'GET' })
     });
 
     return {
-      entryAt: entry.entryAt.toISOString(),
+      entryDate: entry.entryDate,
       id: entry.id,
       markdown: entry.markdown,
       title: entry.title,
     };
+  });
+
+export const createDiaryEntry = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('createDiaryEntry')])
+  .validator(arkTypeValidator(createDiaryEntryInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    const entries = await db
+      .insert(diaryEntries)
+      .values({
+        entryDate: data.entryDate,
+        markdown: '',
+        title: '',
+        userId: session.user.id,
+      })
+      .returning({ id: diaryEntries.id });
+    const entry = entries[0];
+
+    invariant(entry, 'Diary entry could not be created.');
+    return entry;
   });
 
 export const updateDiaryEntry = createServerFn({ method: 'POST' })
@@ -88,7 +112,12 @@ export const updateDiaryEntry = createServerFn({ method: 'POST' })
 
     await db
       .update(diaryEntries)
-      .set({ markdown: data.markdown, title: data.title, updatedAt: new Date() })
+      .set({
+        entryDate: data.entryDate,
+        markdown: data.markdown,
+        title: data.title,
+        updatedAt: new Date(),
+      })
       .where(and(eq(diaryEntries.id, data.id), eq(diaryEntries.userId, session.user.id)));
   });
 

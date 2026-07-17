@@ -3,6 +3,7 @@ import { useNavigate, useRouter } from '@tanstack/react-router';
 import { Trash2Icon } from 'lucide-react';
 import { Card } from '@/components/card/Card';
 import { Btn } from '@/components/btn/Btn';
+import { DateInput } from '@/components/date-input/DateInput';
 import { SeamlessTextInput } from '@/components/seamless-text-input/SeamlessTextInput';
 import { SeamlessTextarea } from '@/components/seamless-textarea/SeamlessTextarea';
 import { useAutoSaveState } from '@/lib/hooks/useAutoSaveState';
@@ -11,9 +12,10 @@ import css from './DiaryEntryPage.module.css';
 
 type DiaryEntryPageProps = {
   entry: DiaryEntrySummary;
+  focusTitle?: boolean;
 };
 
-export function DiaryEntryPage({ entry }: DiaryEntryPageProps) {
+export function DiaryEntryPage({ entry, focusTitle = false }: DiaryEntryPageProps) {
   const navigate = useNavigate();
   const router = useRouter();
 
@@ -30,9 +32,17 @@ export function DiaryEntryPage({ entry }: DiaryEntryPageProps) {
   });
 
   const [draft, setDraft] = useAutoSaveState(
-    { id: entry.id, markdown: entry.markdown, title: entry.title },
+    {
+      entryDate: entry.entryDate,
+      id: entry.id,
+      markdown: entry.markdown,
+      title: entry.title,
+    },
     (nextDraft) => saveMutation.mutate({ data: nextDraft }),
-    { debounceMs: 400, deps: [entry.id, entry.markdown, entry.title] },
+    {
+      debounceMs: 400,
+      deps: [entry.entryDate, entry.id, entry.markdown, entry.title],
+    },
   );
 
   return (
@@ -40,14 +50,33 @@ export function DiaryEntryPage({ entry }: DiaryEntryPageProps) {
       <article>
         <header className={css.header}>
           <div className={css.headerActions}>
-            <time dateTime={entry.entryAt}>{formatDiaryDate(entry.entryAt)}</time>
+            <DateInput
+              aria-label='Diary entry date'
+              className={css.dateInput}
+              onChange={(event) => {
+                if (!event.target.value) {
+                  return;
+                }
+
+                setDraft((currentDraft) => ({
+                  ...currentDraft,
+                  entryDate: event.target.value,
+                }));
+              }}
+              required
+              value={draft.entryDate}
+            />
             <Btn
               aria-label='Delete diary entry'
               icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
               iconOnly
               loading={deleteMutation.isPending}
               onClick={() => {
-                if (window.confirm(`Delete “${draft.title}”? This cannot be undone.`)) {
+                if (
+                  window.confirm(
+                    `Delete “${draft.title || 'Untitled entry'}”? This cannot be undone.`,
+                  )
+                ) {
                   deleteMutation.mutate({ data: { id: entry.id } });
                 }
               }}
@@ -59,11 +88,13 @@ export function DiaryEntryPage({ entry }: DiaryEntryPageProps) {
           <h1>
             <SeamlessTextInput
               aria-label='Diary entry title'
+              autoFocus={focusTitle}
               className={css.titleInput}
               maxLength={160}
               onChange={(event) => {
                 setDraft((currentDraft) => ({ ...currentDraft, title: event.target.value }));
               }}
+              placeholder='Untitled entry'
               value={draft.title}
             />
           </h1>
@@ -89,11 +120,4 @@ export function DiaryEntryPage({ entry }: DiaryEntryPageProps) {
       </article>
     </main>
   );
-}
-
-function formatDiaryDate(value: string) {
-  return new Intl.DateTimeFormat('en', {
-    dateStyle: 'full',
-    timeStyle: 'short',
-  }).format(new Date(value));
 }

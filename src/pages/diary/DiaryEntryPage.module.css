@@ -12,12 +12,6 @@
   gap: var(--space-xs);
   margin-bottom: var(--space-lg);
 
-  & time {
-    color: var(--c-accent-strong);
-    font-size: var(--text-sm);
-    font-variant-numeric: tabular-nums;
-  }
-
   & h1 {
     text-wrap: balance;
   }
@@ -27,12 +21,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
 
-  & time {
-    color: var(--c-accent-strong);
-    font-size: var(--text-sm);
-    font-variant-numeric: tabular-nums;
-  }
+.dateInput {
+  width: auto;
+  min-height: 2.35rem;
+  color: var(--c-accent-strong);
+  font-size: var(--text-sm);
 }
 
 .titleInput {

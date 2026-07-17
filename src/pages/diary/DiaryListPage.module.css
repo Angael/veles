@@ -13,6 +13,12 @@
   font-size: var(--text-sm);
 }
 
+.createError {
+  color: var(--c-danger-text);
+  font-size: var(--text-sm);
+  text-wrap: pretty;
+}
+
 .list {
   display: grid;
   gap: var(--space-sm);

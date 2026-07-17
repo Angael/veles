@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { date, index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { users } from './auth.schema';
 
 export const diaryEntries = pgTable(
@@ -13,9 +13,9 @@ export const diaryEntries = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     title: text('title').notNull(),
     markdown: text('markdown').notNull(),
-    entryAt: timestamp('entry_at').notNull(),
+    entryDate: date('entry_date', { mode: 'string' }).notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
   },
-  (table) => [index('diary_entry_user_id_entry_at_idx').on(table.userId, table.entryAt)],
+  (table) => [index('diary_entry_user_id_entry_date_idx').on(table.userId, table.entryDate)],
 );
