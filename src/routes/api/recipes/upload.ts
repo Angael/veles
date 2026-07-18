@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { ArkErrors, type } from 'arktype';
+import { type } from 'arktype';
 import sharp from 'sharp';
 import { createFileRoute } from '@tanstack/react-router';
 import { db } from '@/db';
@@ -7,37 +7,14 @@ import { recipeImages, recipes, uploadObjects } from '@/db/schema';
 import { auth } from '@/lib/auth/auth';
 import { log } from '@/lib/logger';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
+import {
+  exceedsRecipeUploadRequestLimit,
+  parseRecipeUploadForm,
+  RECIPE_UPLOAD_MAX_PHOTO_BYTES,
+  RECIPE_UPLOAD_MAX_PHOTO_COUNT,
+} from '@/pages/recipes/recipeUploadInput';
 import { getStorageConfig } from '@/lib/storage/config';
 import { deleteFileByKey, uploadFileByKey } from '@/lib/storage/r2';
-
-export const RECIPE_UPLOAD_MAX_PHOTO_COUNT = 8;
-export const RECIPE_UPLOAD_MAX_PHOTO_BYTES = 10 * 1024 * 1024;
-
-const optionalNumericFormValueType = type('string.trim').pipe((value): number | null | ArkErrors =>
-  value === '' ? null : type('string.numeric.parse')(value),
-);
-
-const optionalRatingFormValueType = type('string.trim').pipe((value): number | null | ArkErrors =>
-  value === '' ? null : type('string.numeric.parse |> 1 <= number <= 5')(value),
-);
-
-const portionsFormValueType = type('string.trim').pipe((value): number | ArkErrors =>
-  type('string.numeric.parse |> number.integer >= 1')(value),
-);
-
-const uploadRecipeInputType = type({
-  carbs: optionalNumericFormValueType,
-  description: 'string.trim',
-  fats: optionalNumericFormValueType,
-  ingredients: 'string[]',
-  kcal: optionalNumericFormValueType,
-  name: 'string.trim |> string >= 1',
-  photos: 'File[]',
-  portions: portionsFormValueType,
-  protein: optionalNumericFormValueType,
-  rating: optionalRatingFormValueType,
-  tags: 'string[]',
-});
 
 export const Route = createFileRoute('/api/recipes/upload')({
   server: {
@@ -53,6 +30,10 @@ export const Route = createFileRoute('/api/recipes/upload')({
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
 
+          if (exceedsRecipeUploadRequestLimit(request.headers.get('content-length'))) {
+            return Response.json({ error: 'Upload request too large' }, { status: 413 });
+          }
+
           const formData = await request.formData();
           const files = formData
             .getAll('photos')
@@ -66,7 +47,7 @@ export const Route = createFileRoute('/api/recipes/upload')({
             return Response.json({ error: `File too large` }, { status: 400 });
           }
 
-          const validation = validateRecipeForm(formData, files);
+          const validation = parseRecipeUploadForm(formData, files);
 
           if (validation instanceof type.errors) {
             return Response.json(
@@ -163,37 +144,6 @@ export const Route = createFileRoute('/api/recipes/upload')({
     },
   },
 });
-
-function validateRecipeForm(formData: FormData, files: File[]) {
-  const ingredientsValue = formData.get('ingredients');
-  const tagsValue = formData.get('tags');
-
-  return uploadRecipeInputType({
-    carbs: formData.get('carbs'),
-    description: formData.get('description'),
-    fats: formData.get('fats'),
-    ingredients:
-      typeof ingredientsValue === 'string'
-        ? ingredientsValue
-            .split('\n')
-            .map((item) => item.trim())
-            .filter(Boolean)
-        : [],
-    kcal: formData.get('kcal'),
-    name: formData.get('name'),
-    photos: files,
-    portions: formData.get('portions'),
-    protein: formData.get('protein'),
-    rating: formData.get('rating'),
-    tags:
-      typeof tagsValue === 'string'
-        ? tagsValue
-            .split(',')
-            .map((item) => item.trim())
-            .filter(Boolean)
-        : [],
-  });
-}
 
 async function optimizeImage(file: File) {
   if (!file.type.startsWith('image/')) {

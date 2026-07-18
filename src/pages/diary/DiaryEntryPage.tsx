@@ -38,7 +38,7 @@ export function DiaryEntryPage({ entry, focusTitle = false }: DiaryEntryPageProp
       markdown: entry.markdown,
       title: entry.title,
     },
-    (nextDraft) => saveMutation.mutate({ data: nextDraft }),
+    (nextDraft) => saveMutation.mutateAsync({ data: nextDraft }),
     {
       debounceMs: 400,
       deps: [entry.entryDate, entry.id, entry.markdown, entry.title],

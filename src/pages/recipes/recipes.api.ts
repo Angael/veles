@@ -8,6 +8,7 @@ import { getSessionUserId, requireSession } from '@/lib/auth/getSession';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { storagePathToUrl } from '@/lib/storage/config';
+import { compareRecipeLibraryOrder } from './recipeLibraryOrder';
 
 type RecipeSelect = typeof recipes.$inferSelect;
 
@@ -65,7 +66,7 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
           updatedAt: recipe.updatedAt.toISOString(),
         }),
       )
-      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+      .sort(compareRecipeLibraryOrder);
   });
 
 const recipeByIdInputType = type({ id: 'string.uuid' });

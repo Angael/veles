@@ -19,5 +19,5 @@ export function storagePathToUrl(path: string | null | undefined) {
     return null;
   }
 
-  return `${publicUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
+  return `${publicUrl.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`;
 }

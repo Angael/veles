@@ -14,7 +14,7 @@ export function filterAndRankBySearch<T>(
   search: string,
   fields: RankedSearchFields<T>,
 ) {
-  const normalizedSearch = search.trim().toLowerCase();
+  const normalizedSearch = normalizeSearchValue(search.trim());
 
   if (!normalizedSearch) {
     return items;
@@ -27,7 +27,7 @@ export function filterAndRankBySearch<T>(
       const value = rank.getValue(item);
       const values = typeof value === 'string' ? [value] : value;
 
-      if (values.some((candidate) => candidate.toLowerCase().includes(normalizedSearch))) {
+      if (values.some((candidate) => normalizeSearchValue(candidate).includes(normalizedSearch))) {
         rank.matches.push(item);
         break;
       }
@@ -35,4 +35,8 @@ export function filterAndRankBySearch<T>(
   }
 
   return rankedMatches.flatMap((rank) => rank.matches);
+}
+
+function normalizeSearchValue(value: string) {
+  return value.normalize('NFC').toLowerCase();
 }

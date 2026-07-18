@@ -2,6 +2,7 @@ import { Avatar } from '@base-ui/react/avatar';
 import { useNavigate } from '@tanstack/react-router';
 import { type ReactNode, useState } from 'react';
 import { signOut, useSession } from '@/lib/auth/client';
+import { takeGraphemes } from '@/lib/text/takeGraphemes';
 import css from './NavMenu.module.css';
 
 type MobileAccountLink = '/account' | '/login';
@@ -184,7 +185,7 @@ function getInitials(value: string) {
   const parts = value.trim().split(/\s+/).filter(Boolean);
 
   if (parts.length > 1) {
-    return `${parts[0]?.slice(0, 1) ?? ''}${parts.at(-1)?.slice(0, 1) ?? ''}`.toUpperCase();
+    return `${takeGraphemes(parts[0] ?? '', 1)}${takeGraphemes(parts.at(-1) ?? '', 1)}`.toUpperCase();
   }
 
   const compact = parts[0] ?? value.trim();
@@ -194,8 +195,8 @@ function getInitials(value: string) {
   }
 
   if (compact.includes('@')) {
-    return compact.slice(0, 2).toUpperCase();
+    return takeGraphemes(compact, 2).toUpperCase();
   }
 
-  return compact.slice(0, 2).toUpperCase();
+  return takeGraphemes(compact, 2).toUpperCase();
 }

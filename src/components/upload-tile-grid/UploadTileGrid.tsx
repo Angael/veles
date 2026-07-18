@@ -3,6 +3,12 @@ import { UploadIcon } from 'lucide-react';
 import { type ChangeEvent, type DragEvent, useId, useRef, useState } from 'react';
 import css from './UploadTileGrid.module.css';
 import { UploadTile } from './UploadTile';
+import {
+  areUploadFilesEqual,
+  formatUploadFileMeta,
+  getUploadFileKey,
+  mergeUploadFiles,
+} from './uploadFileSelection';
 
 type UploadTileGridProps = {
   className?: string;
@@ -24,7 +30,7 @@ export function UploadTileGrid({
   const [isDragActive, setIsDragActive] = useState(false);
 
   function addFiles(incomingFiles: Iterable<File>) {
-    const nextFiles = mergeFiles({
+    const nextFiles = mergeUploadFiles({
       currentFiles: files,
       incomingFiles: Array.from(incomingFiles),
       maxItemSize,
@@ -37,7 +43,7 @@ export function UploadTileGrid({
       );
     }
 
-    if (!areFilesEqual(files, nextFiles.files)) {
+    if (!areUploadFilesEqual(files, nextFiles.files)) {
       onFilesChange(nextFiles.files);
     }
   }
@@ -96,16 +102,14 @@ export function UploadTileGrid({
       onDrop={handleDrop}
     >
       {files.map((file) => {
-        const fileKey = getFileKey(file);
+        const fileKey = getUploadFileKey(file);
 
         return (
           <UploadTile
             file={file}
             key={fileKey}
-            metaLabel={formatFileMeta(file)}
-            onRemove={() =>
-              onFilesChange(files.filter((currentFile) => getFileKey(currentFile) !== fileKey))
-            }
+            metaLabel={formatUploadFileMeta(file)}
+            onRemove={() => onFilesChange(files.filter((currentFile) => currentFile !== file))}
           />
         );
       })}
@@ -135,81 +139,4 @@ function preventDefaultFileDrag(event: DragEvent<HTMLDivElement>) {
 
   event.preventDefault();
   return true;
-}
-
-function mergeFiles({
-  currentFiles,
-  incomingFiles,
-  maxItemSize,
-  maxItems,
-}: {
-  currentFiles: File[];
-  incomingFiles: File[];
-  maxItemSize: number;
-  maxItems: number;
-}) {
-  const nextFiles = new Map(currentFiles.map((file) => [getFileKey(file), file]));
-  let rejectedCount = 0;
-
-  for (const file of incomingFiles) {
-    if (!isImageFile(file)) {
-      continue;
-    }
-
-    const fileKey = getFileKey(file);
-
-    if (nextFiles.has(fileKey)) {
-      continue;
-    }
-
-    if (file.size > maxItemSize) {
-      rejectedCount += 1;
-      continue;
-    }
-
-    if (nextFiles.size >= maxItems) {
-      rejectedCount += 1;
-      continue;
-    }
-
-    nextFiles.set(fileKey, file);
-  }
-
-  return {
-    files: Array.from(nextFiles.values()),
-    rejectedCount,
-  };
-}
-
-function areFilesEqual(left: File[], right: File[]) {
-  if (left.length !== right.length) {
-    return false;
-  }
-
-  return left.every((file, index) => getFileKey(file) === getFileKey(right[index]!));
-}
-
-function getFileKey(file: File) {
-  return `${file.name}-${file.size}-${file.lastModified}`;
-}
-
-function isImageFile(file: File) {
-  return file.type.startsWith('image/') || /\.(avif|gif|heic|jpeg|jpg|png|webp)$/i.test(file.name);
-}
-
-function formatFileMeta(file: File) {
-  const extension = file.name.split('.').pop()?.toUpperCase() ?? 'IMG';
-  return `${extension} • ${formatBytes(file.size)}`;
-}
-
-function formatBytes(bytes: number) {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-
-  if (bytes < 1024 * 1024) {
-    return `${(bytes / 1024).toFixed(1)} KB`;
-  }
-
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

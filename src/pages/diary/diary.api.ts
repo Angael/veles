@@ -8,6 +8,7 @@ import { diaryEntries } from '@/db/schema';
 import { requireSession } from '@/lib/auth/getSession';
 import { invariant } from '@/lib/invariant';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
+import { diaryEntryDateType } from './diaryEntryValidation';
 
 export type DiaryEntrySummary = {
   entryDate: string;
@@ -30,13 +31,12 @@ export const getDiaryEntries = createServerFn({ method: 'GET' })
       })
       .from(diaryEntries)
       .where(eq(diaryEntries.userId, session.user.id))
-      .orderBy(desc(diaryEntries.entryDate), desc(diaryEntries.createdAt));
+      .orderBy(desc(diaryEntries.entryDate), desc(diaryEntries.createdAt), desc(diaryEntries.id));
 
     return entries;
   });
 
 const idType = type({ id: 'string.uuid' });
-const diaryEntryDateType = type('string.date');
 const createDiaryEntryInputType = type({ entryDate: diaryEntryDateType });
 const updateDiaryEntryInputType = type({
   entryDate: diaryEntryDateType,

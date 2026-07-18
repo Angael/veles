@@ -47,4 +47,17 @@ describe('filterAndRankBySearch', () => {
     expect(filterAndRankBySearch(items, 'soup', fields).map((item) => item.id)).toEqual([1, 2, 3]);
     expect(items.map((item) => item.id)).toEqual([1, 2, 3, 4]);
   });
+
+  it('matches canonically equivalent Unicode without mutating candidate fields', () => {
+    const tags = ['Cafe\u0301'];
+    const items: Item[] = [{ description: '', id: 1, name: 'Other', tags }];
+
+    expect(filterAndRankBySearch(items, 'Café', fields).map((item) => item.id)).toEqual([1]);
+    expect(tags).toEqual(['Cafe\u0301']);
+  });
+
+  it('returns no items when no field matches', () => {
+    const items: Item[] = [{ description: '', id: 1, name: 'Pie', tags: [] }];
+    expect(filterAndRankBySearch(items, 'soup', fields)).toEqual([]);
+  });
 });

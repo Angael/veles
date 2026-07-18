@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import type { RecipeLibraryItem } from './recipes.api';
+import { getValidRecipeImageIndex } from './recipeImageIndex';
 import css from './RecipeViewPage.module.css';
 
 type RecipeImgSliderProps = {
@@ -8,16 +9,17 @@ type RecipeImgSliderProps = {
 };
 
 export function RecipeImgSlider({ images }: RecipeImgSliderProps) {
-  const [imageIndex, setImageIndex] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const imageIndex = getValidRecipeImageIndex(selectedImageIndex, images.length);
   const heroImage = images[imageIndex];
   const hasMultipleImages = images.length > 1;
 
   const showPreviousImage = () => {
-    setImageIndex((current) => (current === 0 ? images.length - 1 : current - 1));
+    setSelectedImageIndex(imageIndex === 0 ? images.length - 1 : imageIndex - 1);
   };
 
   const showNextImage = () => {
-    setImageIndex((current) => (current === images.length - 1 ? 0 : current + 1));
+    setSelectedImageIndex(imageIndex === images.length - 1 ? 0 : imageIndex + 1);
   };
 
   return (

@@ -2,9 +2,13 @@ const requiredServerEnv = ['DATABASE_URL', 'BETTER_AUTH_SECRET'] as const;
 
 export function getServerEnv() {
   for (const key of requiredServerEnv) {
-    if (!process.env[key]) {
+    if (!process.env[key]?.trim()) {
       throw new Error(`Missing required environment variable: ${key}`);
     }
+  }
+
+  if (process.env.BETTER_AUTH_SECRET!.length < 32) {
+    throw new Error('BETTER_AUTH_SECRET must be at least 32 characters');
   }
 
   return {

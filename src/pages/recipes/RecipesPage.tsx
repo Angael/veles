@@ -7,6 +7,7 @@ import { Card } from '@/components/card/Card';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { TextInput } from '@/components/text-input/TextInput';
 import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
+import { takeGraphemes } from '@/lib/text/takeGraphemes';
 import type { RecipeLibraryItem } from './recipes.api';
 import css from './RecipesPage.module.css';
 
@@ -85,7 +86,7 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
                 </div>
 
                 {recipe.description ? (
-                  <p className={css.description}>{recipe.description.slice(0, 280)}</p>
+                  <p className={css.description}>{takeGraphemes(recipe.description, 280)}</p>
                 ) : null}
 
                 <div className={css.recipeFooter}>
