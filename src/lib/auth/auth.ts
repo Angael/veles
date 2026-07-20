@@ -31,6 +31,7 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (user) => {
+          // Enforce the allowlist at the persistence boundary so every signup flow is covered.
           if (
             !canCreateAuthUser(
               { email: user.email, emailVerified: user.emailVerified },
@@ -58,6 +59,9 @@ export const auth = betterAuth({
       : {},
   rateLimit: {
     enabled: true,
+    // Better Auth defaults to 100 client requests per 60-second window.
+    // window: 60,
+    // max: 100,
   },
   session: {
     expiresIn: 60 * 60 * 24 * 30,
