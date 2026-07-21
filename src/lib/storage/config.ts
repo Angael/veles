@@ -8,7 +8,7 @@ export function getStorageConfig() {
     accessKeyId: env.r2AccessKeyId,
     secretAccessKey: env.r2SecretAccessKey,
     bucketName: env.r2BucketName,
-    publicUrl: env.r2PublicUrl || env.cdnUrl,
+    publicUrl: env.cdnUrl,
   };
 }
 

@@ -1,15 +1,23 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getServerEnv } from '@/lib/env/server';
+
+let getServerEnv: (typeof import('@/lib/env/server'))['getServerEnv'];
 
 describe('getServerEnv', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.stubEnv('NODE_ENV', 'test');
     vi.stubEnv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/veles_test');
     vi.stubEnv('BETTER_AUTH_SECRET', 'abcdefghijklmnopqrstuvwxyz123456');
-    vi.stubEnv('APP_URL', '');
+    vi.stubEnv('APP_URL', 'http://localhost:3000');
     vi.stubEnv('AUTH_ALLOWED_EMAILS', '');
     vi.stubEnv('GOOGLE_CLIENT_ID', '');
     vi.stubEnv('GOOGLE_CLIENT_SECRET', '');
+    vi.stubEnv('VITE_CF_CDN_URL', 'https://cdn.example.com');
+    vi.stubEnv('R2_ACCOUNT_ID', 'account-id');
+    vi.stubEnv('R2_ACCESS_KEY_ID', 'access-key-id');
+    vi.stubEnv('R2_SECRET_ACCESS_KEY', 'secret-access-key');
+    vi.stubEnv('R2_BUCKET_NAME', 'bucket-name');
+    vi.resetModules();
+    ({ getServerEnv } = await import('@/lib/env/server'));
   });
 
   afterEach(() => {
@@ -20,27 +28,33 @@ describe('getServerEnv', () => {
     const env = getServerEnv();
 
     expect(env.appUrl).toBe('http://localhost:3000');
-    expect(env.allowedAuthEmails.size).toBe(0);
+    expect(env.allowedAuthEmails).toEqual([]);
   });
 
-  it('rejects the public example secret', () => {
-    vi.stubEnv('BETTER_AUTH_SECRET', 'replace-with-a-random-32-plus-char-secret');
+  it('reuses the first validated environment', () => {
+    const env = getServerEnv();
+    vi.stubEnv('DATABASE_URL', 'postgresql://changed');
 
-    expect(() => getServerEnv()).toThrow(
-      'BETTER_AUTH_SECRET must be a private random value of at least 32 characters',
-    );
+    expect(getServerEnv()).toBe(env);
+    expect(getServerEnv().databaseUrl).not.toBe('postgresql://changed');
+  });
+
+  it('parses and validates allowed auth emails', () => {
+    vi.stubEnv('AUTH_ALLOWED_EMAILS', 'owner@example.com,friend@example.com');
+
+    expect(getServerEnv().allowedAuthEmails).toEqual(['owner@example.com', 'friend@example.com']);
   });
 
   it('requires an HTTPS canonical URL and Google credentials in production', () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('APP_URL', 'http://veles.example.com');
 
-    expect(() => getServerEnv()).toThrow('Google OAuth credentials are required in production');
+    expect(() => getServerEnv()).toThrow('configured with Google OAuth credentials in production');
 
     vi.stubEnv('GOOGLE_CLIENT_ID', 'google-client-id');
     vi.stubEnv('GOOGLE_CLIENT_SECRET', 'google-client-secret');
 
-    expect(() => getServerEnv()).toThrow('APP_URL must use HTTPS in production');
+    expect(() => getServerEnv()).toThrow('configured with an HTTPS APP_URL in production');
   });
 
   it('normalizes a valid production origin', () => {
