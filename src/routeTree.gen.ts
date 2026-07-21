@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WeightRouteImport } from './routes/weight'
-import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CaloriesRouteImport } from './routes/calories'
 import { Route as AccountRouteImport } from './routes/account'
@@ -36,11 +35,6 @@ import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ss
 const WeightRoute = WeightRouteImport.update({
   id: '/weight',
   path: '/weight',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -154,7 +148,6 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/calories': typeof CaloriesRoute
   '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
   '/weight': typeof WeightRoute
   '/demo/components': typeof DemoComponentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -179,7 +172,6 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/calories': typeof CaloriesRoute
   '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
   '/weight': typeof WeightRoute
   '/demo/components': typeof DemoComponentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -205,7 +197,6 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/calories': typeof CaloriesRoute
   '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
   '/weight': typeof WeightRoute
   '/demo/components': typeof DemoComponentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -232,7 +223,6 @@ export interface FileRouteTypes {
     | '/account'
     | '/calories'
     | '/login'
-    | '/signup'
     | '/weight'
     | '/demo/components'
     | '/demo/tanstack-query'
@@ -257,7 +247,6 @@ export interface FileRouteTypes {
     | '/account'
     | '/calories'
     | '/login'
-    | '/signup'
     | '/weight'
     | '/demo/components'
     | '/demo/tanstack-query'
@@ -282,7 +271,6 @@ export interface FileRouteTypes {
     | '/account'
     | '/calories'
     | '/login'
-    | '/signup'
     | '/weight'
     | '/demo/components'
     | '/demo/tanstack-query'
@@ -308,7 +296,6 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   CaloriesRoute: typeof CaloriesRoute
   LoginRoute: typeof LoginRoute
-  SignupRoute: typeof SignupRoute
   WeightRoute: typeof WeightRoute
   DemoComponentsRoute: typeof DemoComponentsRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
@@ -336,13 +323,6 @@ declare module '@tanstack/react-router' {
       path: '/weight'
       fullPath: '/weight'
       preLoaderRoute: typeof WeightRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -500,7 +480,6 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   CaloriesRoute: CaloriesRoute,
   LoginRoute: LoginRoute,
-  SignupRoute: SignupRoute,
   WeightRoute: WeightRoute,
   DemoComponentsRoute: DemoComponentsRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,

@@ -105,20 +105,13 @@ export function useDesktopNavMenu() {
     {
       key: 'account',
       label: accountLabel,
-      matchPrefixes: ['/login', '/signup', '/account'],
+      matchPrefixes: ['/login', '/account'],
       items: [
         {
           key: 'login',
           link: '/login',
           label: 'Login',
           description: 'Sign in to an existing account.',
-          shouldRender: !user,
-        },
-        {
-          key: 'signup',
-          link: '/signup',
-          label: 'Sign Up',
-          description: 'Create an account and get started.',
           shouldRender: !user,
         },
         {
@@ -173,7 +166,7 @@ export function useMobileNavMenu() {
     key: 'account',
     label: user ? 'Account' : 'Login',
     link: user ? '/account' : '/login',
-    matchPrefixes: user ? ['/account'] : ['/login', '/signup'],
+    matchPrefixes: user ? ['/account'] : ['/login'],
     user,
   };
 

@@ -12,6 +12,10 @@ import { deleteFileByKey, uploadFileByKey } from '@/lib/storage/r2';
 
 export const RECIPE_UPLOAD_MAX_PHOTO_COUNT = 8;
 export const RECIPE_UPLOAD_MAX_PHOTO_BYTES = 10 * 1024 * 1024;
+export const RECIPE_UPLOAD_MAX_REQUEST_BYTES = 85 * 1024 * 1024;
+const RECIPE_IMAGE_MAX_INPUT_PIXELS = 100_000_000;
+
+const contentLengthType = type('string.numeric.parse |> number.integer >= 0');
 
 const optionalNumericFormValueType = type('string.trim').pipe((value): number | null | ArkErrors =>
   value === '' ? null : type('string.numeric.parse')(value),
@@ -47,6 +51,16 @@ export const Route = createFileRoute('/api/recipes/upload')({
         const uploadedKeys: string[] = [];
 
         try {
+          const contentLength = request.headers.get('content-length');
+          const parsedContentLength = contentLengthType(contentLength ?? '0');
+
+          if (
+            !(parsedContentLength instanceof type.errors) &&
+            parsedContentLength > RECIPE_UPLOAD_MAX_REQUEST_BYTES
+          ) {
+            return Response.json({ error: 'Upload request is too large' }, { status: 413 });
+          }
+
           const session = await auth.api.getSession({ headers: request.headers });
 
           if (!session?.user.id) {
@@ -81,7 +95,7 @@ export const Route = createFileRoute('/api/recipes/upload')({
             const optimizedImage = await optimizeImage(file);
             const image = {
               id: randomUUID(),
-              key: `recipe-images/${session.user.id}/${randomUUID()}.webp`,
+              key: `recipe-images/${randomUUID()}.webp`,
               type: optimizedImage.type,
             };
 
@@ -197,13 +211,16 @@ function validateRecipeForm(formData: FormData, files: File[]) {
 
 async function optimizeImage(file: File) {
   if (!file.type.startsWith('image/')) {
-    throw new ImageOptimizationError(`Unsupported file type for ${file.name}`);
+    throw new ImageOptimizationError('Unsupported file type');
   }
 
   const input = Buffer.from(await file.arrayBuffer());
 
   try {
-    const buffer = await sharp(input, { failOn: 'none' })
+    const buffer = await sharp(input, {
+      failOn: 'none',
+      limitInputPixels: RECIPE_IMAGE_MAX_INPUT_PIXELS,
+    })
       .rotate()
       .resize({
         fit: 'inside',
@@ -216,13 +233,11 @@ async function optimizeImage(file: File) {
 
     return {
       buffer,
-      originalName: file.name,
       type: 'image/webp',
     };
   } catch (error) {
     log.error('Failed to optimize image', {
       errorMsg: error instanceof Error ? error.message : 'Unknown error',
-      fileName: file.name,
       stack: error instanceof Error ? error.stack?.split('\n') : undefined,
     });
 

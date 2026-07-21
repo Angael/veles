@@ -44,6 +44,7 @@ export const users = pgTable('user', {
 	id: text('id').primaryKey(),
 	name: text('name').notNull(),
 	email: text('email').notNull().unique(),
+	// Currently unused, because google login is the only auth
 	emailVerified: boolean('email_verified').notNull().default(false),
 	image: text('image'),
 	createdAt: timestamp('created_at').notNull().defaultNow(),
