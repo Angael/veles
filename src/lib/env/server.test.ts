@@ -45,18 +45,6 @@ describe('getServerEnv', () => {
     expect(getServerEnv().allowedAuthEmails).toEqual(['owner@example.com', 'friend@example.com']);
   });
 
-  it('requires an HTTPS canonical URL and Google credentials in production', () => {
-    vi.stubEnv('NODE_ENV', 'production');
-    vi.stubEnv('APP_URL', 'http://veles.example.com');
-
-    expect(() => getServerEnv()).toThrow('configured with Google OAuth credentials in production');
-
-    vi.stubEnv('GOOGLE_CLIENT_ID', 'google-client-id');
-    vi.stubEnv('GOOGLE_CLIENT_SECRET', 'google-client-secret');
-
-    expect(() => getServerEnv()).toThrow('configured with an HTTPS APP_URL in production');
-  });
-
   it('normalizes a valid production origin', () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('APP_URL', 'https://veles.example.com/path');

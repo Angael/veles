@@ -4,7 +4,6 @@ import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { db } from '@/db';
 import { accounts, sessions, users, verifications } from '@/db/schema';
 import { getServerEnv } from '@/lib/env/server';
-import { canCreateAuthUser } from '@/lib/auth/signupPolicy';
 
 const env = getServerEnv();
 
@@ -32,12 +31,7 @@ export const auth = betterAuth({
       create: {
         before: async (user) => {
           // Enforce the allowlist at the persistence boundary so every signup flow is covered.
-          if (
-            !canCreateAuthUser(
-              { email: user.email, emailVerified: user.emailVerified },
-              env.allowedAuthEmails,
-            )
-          ) {
+          if (!env.allowedAuthEmails.includes(user.email)) {
             throw new APIError('BAD_REQUEST', {
               message: 'This account is not authorized to use Veles',
             });
