@@ -2,7 +2,7 @@ import { createFileRoute, notFound } from '@tanstack/react-router';
 import { RecipeViewPage } from '@/pages/recipes/RecipeViewPage';
 import { getRecipeById } from '@/pages/recipes/recipes.api';
 
-export const Route = createFileRoute('/recipes/view/$id')({
+export const Route = createFileRoute('/_authenticated/recipes/view/$id')({
   loader: async ({ params }) => {
     const recipe = await getRecipeById({ data: { id: params.id } });
 

@@ -1,6 +1,8 @@
 import { AuthCard } from '@/components/auth-card/AuthCard';
 import { signIn } from '@/lib/auth/client';
+import { getSafeRedirectPath } from '@/lib/auth/getSafeRedirectPath';
 import { useAuthAction } from '@/lib/auth/useAuthAction';
+import { Route } from '@/routes/login';
 
 export function LoginPendingPage() {
   return (
@@ -14,6 +16,7 @@ export function LoginPendingPage() {
 }
 
 export function LoginPage() {
+  const { redirect } = Route.useSearch();
   const { busy, error, runAuthAction } = useAuthAction();
 
   return (
@@ -25,7 +28,7 @@ export function LoginPage() {
         await runAuthAction(async () => {
           await signIn.social({
             provider: 'google',
-            callbackURL: '/',
+            callbackURL: getSafeRedirectPath(redirect),
           });
         }, 'Google sign-in failed');
       }}

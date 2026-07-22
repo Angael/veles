@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { DiaryEntryPage } from '@/pages/diary/DiaryEntryPage';
 import { getDiaryEntryById } from '@/pages/diary/diary.api';
 
-export const Route = createFileRoute('/diary/$id')({
+export const Route = createFileRoute('/_authenticated/diary/$id')({
   validateSearch: type({ 'created?': "'1'" }),
   loader: async ({ params }) => {
     return getDiaryEntryById({ data: { id: params.id } });

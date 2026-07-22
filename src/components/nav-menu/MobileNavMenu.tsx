@@ -1,6 +1,7 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
 import { Link, useRouterState } from '@tanstack/react-router';
+import clsx from 'clsx';
 import {
   BookOpenIcon,
   FlameIcon,
@@ -10,7 +11,7 @@ import {
   UserIcon,
 } from 'lucide-react';
 import css from './MobileNavMenu.module.css';
-import { MOBILE_NAV_ITEMS, useMobileNavMenu } from './useNavMenuGroups';
+import { useMobileNavItems } from './useNavMenuGroups';
 
 const itemIcons = {
   account: UserIcon,
@@ -25,8 +26,7 @@ export function MobileNavMenu() {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
-  const mobileAccountItem = useMobileNavMenu();
-  const items = [...MOBILE_NAV_ITEMS, mobileAccountItem];
+  const items = useMobileNavItems();
   const activeValue = items.find((item) =>
     item.matchPrefixes.some((prefix) => pathname.startsWith(prefix)),
   )?.key;
@@ -35,7 +35,7 @@ export function MobileNavMenu() {
     <nav aria-label='Primary mobile navigation' className={css.wrapper}>
       <ToggleGroup
         aria-label='Primary mobile navigation'
-        className={css.group}
+        className={clsx(css.group, items.length === 1 && css.groupCompact)}
         value={activeValue ? [activeValue] : []}
       >
         {items.map((item) => {

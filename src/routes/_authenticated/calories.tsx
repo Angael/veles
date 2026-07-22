@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { PlaceholderPage } from '@/pages/placeholder/PlaceholderPage';
 
-export const Route = createFileRoute('/calories')({
+export const Route = createFileRoute('/_authenticated/calories')({
   component: CaloriesPage,
   head: () => ({ meta: [{ title: 'Calorie tracker' }] }),
   staticData: { navbar: { label: 'Calories', upTo: { to: '/' } } },
