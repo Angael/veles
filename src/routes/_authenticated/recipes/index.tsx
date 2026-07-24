@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { RecipesPage } from '@/pages/recipes/RecipesPage';
 import { getRecipeLibrary } from '@/pages/recipes/recipes.api';
 
-export const Route = createFileRoute('/recipes/')({
+export const Route = createFileRoute('/_authenticated/recipes/')({
   loader: () => getRecipeLibrary(),
   component: RouteComponent,
   head: () => ({ meta: [{ title: 'Recipes' }] }),

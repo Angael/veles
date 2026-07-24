@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { PlaceholderPage } from '@/pages/placeholder/PlaceholderPage';
 
-export const Route = createFileRoute('/account')({
+export const Route = createFileRoute('/_authenticated/account')({
   component: AccountPage,
   head: () => ({ meta: [{ title: 'Account' }] }),
   staticData: { navbar: { label: 'Account', upTo: { to: '/' } } },

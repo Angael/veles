@@ -81,6 +81,7 @@ export function useDesktopNavMenu() {
       key: 'trackers',
       label: 'Trackers',
       matchPrefixes: ['/weight', '/recipes', '/diary'],
+      shouldRender: Boolean(user),
       items: [
         {
           key: 'weight',
@@ -158,7 +159,7 @@ export const MOBILE_NAV_ITEMS = [
 
 export type MobileNavItem = (typeof MOBILE_NAV_ITEMS)[number];
 
-export function useMobileNavMenu() {
+export function useMobileNavItems() {
   const { data: session } = useSession();
   const user = session?.user;
 
@@ -170,7 +171,7 @@ export function useMobileNavMenu() {
     user,
   };
 
-  return mobileAccountItem;
+  return user ? [...MOBILE_NAV_ITEMS, mobileAccountItem] : [mobileAccountItem];
 }
 
 function getInitials(value: string) {

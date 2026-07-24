@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { DiaryListPage } from '@/pages/diary/DiaryListPage';
 import { getDiaryEntries } from '@/pages/diary/diary.api';
 
-export const Route = createFileRoute('/diary/')({
+export const Route = createFileRoute('/_authenticated/diary/')({
   loader: () => getDiaryEntries(),
   component: RouteComponent,
   head: () => ({ meta: [{ title: 'Diary' }] }),
