@@ -29,5 +29,5 @@ export const Route = createFileRoute('/_authenticated/recipes/view/$id_/edit')({
 function RouteComponent() {
   const recipe = Route.useLoaderData();
 
-  return <EditRecipePage recipe={recipe} />;
+  return <EditRecipePage key={recipe.id} recipe={recipe} />;
 }
