@@ -1,11 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
-import { useThrottledValue } from '@tanstack/react-pacer';
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
 import { PlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Card } from '@/components/card/Card';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { TextInput } from '@/components/text-input/TextInput';
+import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
 import { createDiaryEntry, type DiaryEntrySummary } from './diary.api';
 import css from './DiaryListPage.module.css';
 
@@ -13,12 +13,21 @@ type DiaryListPageProps = {
   entries: DiaryEntrySummary[];
 };
 
+const diarySearchFields = [
+  (entry) => entry.title,
+  (entry) => entry.markdown,
+] satisfies RankedSearchFields<DiaryEntrySummary>;
+
+const diaryDateFormatter = new Intl.DateTimeFormat('en', {
+  dateStyle: 'long',
+  timeZone: 'UTC',
+});
+
 export function DiaryListPage({ entries }: DiaryListPageProps) {
   const navigate = useNavigate();
   const router = useRouter();
   const [searchInputValue, setSearchInputValue] = useState('');
-  const [search] = useThrottledValue(searchInputValue, { wait: 200 });
-  const visibleEntries = rankDiaryEntriesBySearch(entries, search);
+  const visibleEntries = filterAndRankBySearch(entries, searchInputValue, diarySearchFields);
   const createMutation = useMutation({
     mutationFn: createDiaryEntry,
     onSuccess: async (entry) => {
@@ -100,37 +109,11 @@ export function DiaryListPage({ entries }: DiaryListPageProps) {
 }
 
 function formatDiaryDate(value: string) {
-  return new Intl.DateTimeFormat('en', { dateStyle: 'long', timeZone: 'UTC' }).format(
-    new Date(`${value}T00:00:00Z`),
-  );
+  return diaryDateFormatter.format(new Date(`${value}T00:00:00Z`));
 }
 
 function getLocalDate() {
   const now = new Date();
   const localNow = new Date(now.valueOf() - now.getTimezoneOffset() * 60_000);
   return localNow.toISOString().slice(0, 10);
-}
-
-/** Filters and sorts matching entries so title hits appear before entry-content hits. */
-function rankDiaryEntriesBySearch(entries: DiaryEntrySummary[], search: string) {
-  const normalizedSearch = search.trim().toLowerCase();
-
-  if (!normalizedSearch) {
-    return entries;
-  }
-
-  return entries
-    .flatMap((entry, index) => {
-      if (entry.title.toLowerCase().includes(normalizedSearch)) {
-        return [{ entry, index, rank: 0 }];
-      }
-
-      if (entry.markdown.toLowerCase().includes(normalizedSearch)) {
-        return [{ entry, index, rank: 1 }];
-      }
-
-      return [];
-    })
-    .sort((left, right) => left.rank - right.rank || left.index - right.index)
-    .map((result) => result.entry);
 }

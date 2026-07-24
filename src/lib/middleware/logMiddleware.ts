@@ -1,4 +1,5 @@
 import { createMiddleware } from '@tanstack/react-start';
+import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { log } from '@/lib/logger';
 
 export const logMiddleware = (name: string) =>
@@ -26,6 +27,18 @@ export const logMiddleware = (name: string) =>
 
       return result;
     } catch (error) {
+      if (error instanceof ClientSafeError) {
+        log.info(`${name} rejected`, {
+          timestamp: new Date().toISOString(),
+          method,
+          path,
+          durationMs: Date.now() - startedAt,
+          reason: error.message,
+        });
+
+        throw error;
+      }
+
       log.error(`${name} error`, {
         timestamp: new Date().toISOString(),
         method,

@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Card } from '@/components/card/Card';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { TextInput } from '@/components/text-input/TextInput';
+import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
 import type { RecipeLibraryItem } from './recipes.api';
 import css from './RecipesPage.module.css';
 
@@ -13,10 +14,16 @@ type RecipesPageProps = {
   recipes: RecipeLibraryItem[];
 };
 
+const recipeSearchFields = [
+  (recipe) => recipe.name,
+  (recipe) => recipe.tags,
+  (recipe) => recipe.description,
+] satisfies RankedSearchFields<RecipeLibraryItem>;
+
 export function RecipesPage({ recipes }: RecipesPageProps) {
   const [searchInputValue, setSearchInputValue] = useState('');
   const [search] = useThrottledValue(searchInputValue, { wait: 200 });
-  const visibleRecipes = rankRecipesBySearch(recipes, search);
+  const visibleRecipes = filterAndRankBySearch(recipes, search, recipeSearchFields);
 
   return (
     <main className={css.page}>
@@ -103,42 +110,6 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
       </FloatingButton>
     </main>
   );
-}
-
-/**
- * Filters and sorts matching recipes so name hits appear before tag hits, then description hits.
- */
-function rankRecipesBySearch(recipes: RecipeLibraryItem[], search: string) {
-  const normalizedSearch = search.trim().toLowerCase();
-
-  if (!normalizedSearch) {
-    return recipes;
-  }
-
-  return recipes
-    .flatMap((recipe, index) => {
-      const name = recipe.name.toLowerCase();
-      const hasMatchingTag = recipe.tags.some((tag) =>
-        tag.toLowerCase().includes(normalizedSearch),
-      );
-      const description = recipe.description.toLowerCase();
-
-      if (name.includes(normalizedSearch)) {
-        return [{ index, rank: 0, recipe }];
-      }
-
-      if (hasMatchingTag) {
-        return [{ index, rank: 1, recipe }];
-      }
-
-      if (description.includes(normalizedSearch)) {
-        return [{ index, rank: 2, recipe }];
-      }
-
-      return [];
-    })
-    .sort((left, right) => left.rank - right.rank || left.index - right.index)
-    .map((result) => result.recipe);
 }
 
 function getImageLayoutClass(imageCount: number) {

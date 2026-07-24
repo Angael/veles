@@ -11,10 +11,7 @@ import { ToastProvider } from '@/components/toast/ToastProvider';
 import { clientEnv } from '@/lib/env/client';
 import resetCss from '@/styles/reset.css?url';
 
-const isLocalhostApp =
-  import.meta.env.DEV ||
-  clientEnv.appUrl.includes('://localhost') ||
-  clientEnv.appUrl.includes('://127.0.0.1');
+const isLocalhostApp = import.meta.env.DEV;
 
 const faviconLinks = isLocalhostApp
   ? [

@@ -12,6 +12,12 @@ type WeightEntry = {
 
 const mockEntries = generateMockEntries();
 const latestEntry = mockEntries[mockEntries.length - 1]!;
+const longDateFormatter = new Intl.DateTimeFormat('en', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
 
 export function WeightPage() {
   const recentEntries = mockEntries.slice(-8).reverse();
@@ -147,12 +153,7 @@ function formatSignedWeight(value: number) {
 }
 
 function formatLongDate(value: string) {
-  return new Intl.DateTimeFormat('en', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(parseIsoDate(value));
+  return longDateFormatter.format(parseIsoDate(value));
 }
 
 function parseIsoDate(value: string) {

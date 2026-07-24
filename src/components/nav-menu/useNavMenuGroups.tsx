@@ -81,6 +81,7 @@ export function useDesktopNavMenu() {
       key: 'trackers',
       label: 'Trackers',
       matchPrefixes: ['/weight', '/recipes', '/diary'],
+      shouldRender: Boolean(user),
       items: [
         {
           key: 'weight',
@@ -105,20 +106,13 @@ export function useDesktopNavMenu() {
     {
       key: 'account',
       label: accountLabel,
-      matchPrefixes: ['/login', '/signup', '/account'],
+      matchPrefixes: ['/login', '/account'],
       items: [
         {
           key: 'login',
           link: '/login',
           label: 'Login',
           description: 'Sign in to an existing account.',
-          shouldRender: !user,
-        },
-        {
-          key: 'signup',
-          link: '/signup',
-          label: 'Sign Up',
-          description: 'Create an account and get started.',
           shouldRender: !user,
         },
         {
@@ -165,7 +159,7 @@ export const MOBILE_NAV_ITEMS = [
 
 export type MobileNavItem = (typeof MOBILE_NAV_ITEMS)[number];
 
-export function useMobileNavMenu() {
+export function useMobileNavItems() {
   const { data: session } = useSession();
   const user = session?.user;
 
@@ -173,11 +167,11 @@ export function useMobileNavMenu() {
     key: 'account',
     label: user ? 'Account' : 'Login',
     link: user ? '/account' : '/login',
-    matchPrefixes: user ? ['/account'] : ['/login', '/signup'],
+    matchPrefixes: user ? ['/account'] : ['/login'],
     user,
   };
 
-  return mobileAccountItem;
+  return user ? [...MOBILE_NAV_ITEMS, mobileAccountItem] : [mobileAccountItem];
 }
 
 function getInitials(value: string) {
