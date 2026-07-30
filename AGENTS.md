@@ -39,3 +39,17 @@
 ## TS
 - avoid `as any` `as unknown` `as never`, if you find yourself needing to use them - ask user for approval
 - Medium to longer functions that contain logic should have a tl;dr short JSDoc that explain what they do and why they are needed.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs are tracked in GitHub Issues for `Angael/veles`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Triage uses the canonical `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, and `wontfix` labels. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Domain documentation uses the single-context layout. See `docs/agents/domain.md`.
