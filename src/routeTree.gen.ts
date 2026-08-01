@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
+import { Route as DemoFileUploadRouteImport } from './routes/demo/file-upload'
 import { Route as DemoComponentsRouteImport } from './routes/demo/components'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
 import { Route as AuthenticatedCaloriesRouteImport } from './routes/_authenticated/calories'
@@ -50,6 +51,11 @@ const IndexRoute = IndexRouteImport.update({
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
   path: '/demo/tanstack-query',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoFileUploadRoute = DemoFileUploadRouteImport.update({
+  id: '/demo/file-upload',
+  path: '/demo/file-upload',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoComponentsRoute = DemoComponentsRouteImport.update({
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/calories': typeof AuthenticatedCaloriesRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/demo/components': typeof DemoComponentsRoute
+  '/demo/file-upload': typeof DemoFileUploadRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/calories': typeof AuthenticatedCaloriesRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/demo/components': typeof DemoComponentsRoute
+  '/demo/file-upload': typeof DemoFileUploadRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/_authenticated/calories': typeof AuthenticatedCaloriesRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/demo/components': typeof DemoComponentsRoute
+  '/demo/file-upload': typeof DemoFileUploadRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/_authenticated/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/_authenticated/recipes/add': typeof AuthenticatedRecipesAddRoute
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/calories'
     | '/weight'
     | '/demo/components'
+    | '/demo/file-upload'
     | '/demo/tanstack-query'
     | '/diary/$id'
     | '/recipes/add'
@@ -258,6 +268,7 @@ export interface FileRouteTypes {
     | '/calories'
     | '/weight'
     | '/demo/components'
+    | '/demo/file-upload'
     | '/demo/tanstack-query'
     | '/diary/$id'
     | '/recipes/add'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/_authenticated/calories'
     | '/_authenticated/weight'
     | '/demo/components'
+    | '/demo/file-upload'
     | '/demo/tanstack-query'
     | '/_authenticated/diary/$id'
     | '/_authenticated/recipes/add'
@@ -306,6 +318,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   DemoComponentsRoute: typeof DemoComponentsRoute
+  DemoFileUploadRoute: typeof DemoFileUploadRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDemoPingRoute: typeof ApiDemoPingRoute
@@ -346,6 +359,13 @@ declare module '@tanstack/react-router' {
       path: '/demo/tanstack-query'
       fullPath: '/demo/tanstack-query'
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/file-upload': {
+      id: '/demo/file-upload'
+      path: '/demo/file-upload'
+      fullPath: '/demo/file-upload'
+      preLoaderRoute: typeof DemoFileUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/components': {
@@ -517,6 +537,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   DemoComponentsRoute: DemoComponentsRoute,
+  DemoFileUploadRoute: DemoFileUploadRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDemoPingRoute: ApiDemoPingRoute,

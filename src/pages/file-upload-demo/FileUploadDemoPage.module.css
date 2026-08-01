@@ -1,0 +1,54 @@
+.page {
+  display: grid;
+  gap: var(--space-md);
+  max-width: 48rem;
+  padding: var(--space-lg);
+  margin: 0 auto;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+
+  & p,
+  & li {
+    color: var(--c-muted);
+  }
+
+  & form {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  & input,
+  & button {
+    min-height: var(--button-min-height);
+    padding: var(--space-sm);
+    border: 1px solid var(--c-border-strong);
+    border-radius: var(--radius-xs);
+    color: var(--c-text);
+    background: var(--c-surface-inset);
+  }
+
+  & button {
+    cursor: pointer;
+    background: var(--c-primary);
+  }
+
+  & button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+  }
+
+  & ul {
+    display: grid;
+    gap: var(--space-xs);
+    margin-top: var(--space-sm);
+  }
+
+  & code {
+    overflow-wrap: anywhere;
+  }
+}
+
+.error {
+  color: var(--c-danger-text) !important;
+}
