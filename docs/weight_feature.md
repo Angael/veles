@@ -27,7 +27,7 @@ Hide photos until intentionally revealed. Sharing and deletion must explain thei
 
 Deleting a photo or entry commits its database deletion and an `upload_object_deletion_job` containing the bucket and key together, then attempts R2 deletion. Success removes the job; failure leaves it for retry.
 
-This PR only creates and appends to the durable general-purpose queue. Processing pending jobs is deferred to another PR. A database cascade cannot delete R2 objects.
+This PR creates the durable general-purpose queue. Feature deletion paths must append jobs; processing them is deferred to another PR. A database cascade cannot delete R2 objects.
 
 ## Page experience
 
