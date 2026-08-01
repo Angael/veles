@@ -2,7 +2,7 @@
 
 ## Scope
 
-A **Weight Entry** is one user's weight on a calendar date. A sensitive **Progress Photo** belongs to exactly one Weight Entry. The feature supports creating, reviewing, comparing, editing, and deleting entries.
+A **Weight Entry** records one user's weight on a date. A sensitive **Progress Photo** belongs to exactly one entry.
 
 ## Weight rules
 
@@ -21,7 +21,7 @@ Use a distinct key namespace and at least 128 random bits. Keys must not contain
 
 Photos use public custom-domain URLs. Anyone with a URL can access or redistribute the image without a Veles session. CORS and obscurity are not access controls. Copy must describe bearer access and never promise retraction. Downloads and CDN caches may survive deletion.
 
-Hide photos by default until intentionally revealed. Sharing and deletion flows must clearly explain their privacy consequences. Do not add an adult-confirmation gate before upload.
+Hide photos until intentionally revealed. Sharing and deletion must explain their privacy consequences. Do not add an adult-confirmation gate.
 
 ## Deletion
 
