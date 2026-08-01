@@ -1,7 +1,9 @@
 import { CameraIcon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
+import { NumberInput } from '@/components/number-input/NumberInput';
 import css from './WeightPage.module.css';
+import { WeightTrendChart } from './WeightTrendChart';
 
 type WeightEntry = {
   date: string;
@@ -27,52 +29,57 @@ export function WeightPage() {
 
   return (
     <main className={css.page}>
-      <section className={css.summaryGrid}>
-        <Card as='article' className={css.summaryCard}>
-          <span className={css.statLabel}>Current kg</span>
-          <strong>{formatWeight(currentWeight)}</strong>
-          <p>{formatLongDate(latestEntry.date)}</p>
-        </Card>
-        <Card as='article' className={css.summaryCard}>
-          <span className={css.statLabel}>2 week change</span>
-          <strong className={twoWeekChange <= 0 ? css.deltaDown : css.deltaUp}>
-            {formatSignedWeight(twoWeekChange)}
-          </strong>
-          <p>Compared with {formatLongDate(shiftIsoDate(latestEntry.date, -14))}</p>
-        </Card>
-        <Card as='article' className={css.summaryCard}>
-          <span className={css.statLabel}>1 month change</span>
-          <strong className={oneMonthChange <= 0 ? css.deltaDown : css.deltaUp}>
-            {formatSignedWeight(oneMonthChange)}
-          </strong>
-          <p>Compared with {formatLongDate(shiftIsoDate(latestEntry.date, -30))}</p>
-        </Card>
-      </section>
+      <WeightTrendChart entries={mockEntries} />
+
+      <div className={css.summaryRail}>
+        <section aria-label='Weight summary' className={css.summaryGrid}>
+          <Card as='article' className={css.summaryCard}>
+            <span className={css.statLabel}>Current</span>
+            <strong>{formatWeight(currentWeight)}</strong>
+            <p>{formatLongDate(latestEntry.date)}</p>
+          </Card>
+          <Card as='article' className={css.summaryCard}>
+            <span className={css.statLabel}>2 week change</span>
+            <strong className={twoWeekChange <= 0 ? css.deltaDown : css.deltaUp}>
+              {formatSignedWeight(twoWeekChange)}
+            </strong>
+            <p>Since {formatLongDate(shiftIsoDate(latestEntry.date, -14))}</p>
+          </Card>
+          <Card as='article' className={css.summaryCard}>
+            <span className={css.statLabel}>1 month change</span>
+            <strong className={oneMonthChange <= 0 ? css.deltaDown : css.deltaUp}>
+              {formatSignedWeight(oneMonthChange)}
+            </strong>
+            <p>Since {formatLongDate(shiftIsoDate(latestEntry.date, -30))}</p>
+          </Card>
+        </section>
+      </div>
 
       <section className={css.grid}>
         <Card as='article' className={`${css.card} ${css.captureCard}`}>
-          <div className={css.cardHeader}>
-            <div>
-              <h2>Daily entry</h2>
-            </div>
-            <span className={css.mockBadge}>Mock only</span>
-          </div>
-
           <div className={css.capturePanel}>
             <label className={css.captureField}>
               <span>Weight in kg</span>
-              <div className={css.captureValue}>{formatWeight(latestEntry.weightKg)}</div>
+              <NumberInput
+                aria-label='Weight in kilograms'
+                className={css.weightInput}
+                defaultValue={latestEntry.weightKg}
+                inputClassName={css.weightInputField}
+                max={300}
+                min={30}
+                step={0.1}
+              />
             </label>
             <label className={css.captureField}>
               <span>Photo</span>
               <div className={css.photoPlaceholder}>
                 <CameraIcon aria-hidden='true' className={css.photoIcon} strokeWidth={1.5} />
                 <strong>Optional progress photo</strong>
-                <p>Kept private, attached only when it helps the trend tell the truth.</p>
+                <p>Attached to this entry when it helps document your progress.</p>
               </div>
             </label>
             <Btn radius='pill' type='button' variant='main'>
-              Save flow next
+              Save entry
             </Btn>
           </div>
         </Card>

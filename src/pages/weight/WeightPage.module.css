@@ -7,6 +7,14 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-lg);
+  min-width: 34rem;
+}
+
+.summaryRail {
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-border-strong) transparent;
 }
 
 .card {
@@ -21,6 +29,7 @@
 
 .summaryCard strong {
   font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-variant-numeric: tabular-nums;
 }
 
 .statLabel,
@@ -69,35 +78,17 @@
   gap: var(--space-xs);
 }
 
-.mockBadge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2rem;
-  padding: 0 0.75rem;
-  border: var(--border-width) solid var(--c-primary-border-soft);
-  border-radius: var(--radius-pill);
-  background: var(--c-primary-surface);
-  color: var(--c-accent);
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-}
-
 .capturePanel,
 .logList {
   display: grid;
   gap: var(--space-md);
-  margin-top: var(--space-md);
 }
 
-.captureValue {
-  display: inline-flex;
-  align-items: center;
-  min-height: 3.5rem;
-  padding: 0 1rem;
-  border: var(--border-width) solid var(--c-border-strong);
-  border-radius: var(--radius-xs);
-  background: rgba(2, 6, 23, 0.4);
+.weightInput {
+  margin-top: 0.1rem;
+}
+
+.weightInputField {
   font-size: 1.4rem;
   font-weight: var(--font-weight-semibold);
 }
@@ -143,13 +134,19 @@
 }
 
 @media (--phone) {
-  .summaryGrid,
   .grid {
     grid-template-columns: 1fr;
   }
 
-  .summaryCard,
   .card {
+    padding: var(--space-md);
+  }
+
+  .summaryGrid {
+    gap: var(--space-sm);
+  }
+
+  .summaryCard {
     padding: var(--space-md);
   }
 
