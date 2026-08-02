@@ -194,7 +194,7 @@ export function AddRecipePage() {
                 <span>Photos</span>
                 <UploadTileGrid
                   files={draft.selectedFiles}
-                  maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES * 100}
+                  maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES}
                   maxItems={RECIPE_UPLOAD_MAX_PHOTO_COUNT}
                   onFilesChange={(selectedFiles) =>
                     setDraft((current) => ({ ...current, selectedFiles }))
