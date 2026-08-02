@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useNavigate } from '@tanstack/react-router';
+import { useServerFn } from '@tanstack/react-start';
 import { SendHorizontalIcon } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
@@ -10,10 +11,11 @@ import { TextareaInput } from '@/components/textarea-input/TextareaInput';
 import { TextInput } from '@/components/text-input/TextInput';
 import { UploadTileGrid } from '@/components/upload-tile-grid/UploadTileGrid';
 import css from './AddRecipePage.module.css';
+import { createRecipe } from './recipeUpload.api';
 import {
   RECIPE_UPLOAD_MAX_PHOTO_BYTES,
   RECIPE_UPLOAD_MAX_PHOTO_COUNT,
-} from '@/routes/api/recipes/upload';
+} from './recipeUpload.constants';
 
 type AddRecipeDraft = {
   carbs: number | null;
@@ -45,6 +47,7 @@ const EMPTY_DRAFT: AddRecipeDraft = {
 
 export function AddRecipePage() {
   const navigate = useNavigate();
+  const uploadRecipe = useServerFn(createRecipe);
   const [draft, setDraft] = useState<AddRecipeDraft>(EMPTY_DRAFT);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,24 +72,7 @@ export function AddRecipePage() {
                   formData.append('photos', file);
                 }
 
-                const response = await fetch('/api/recipes/upload', {
-                  body: formData,
-                  method: 'POST',
-                });
-
-                if (!response.ok) {
-                  const result = (await response.json().catch(() => null)) as {
-                    error?: string;
-                  } | null;
-
-                  throw new Error(result?.error ?? 'Recipe upload failed');
-                }
-
-                const result = (await response.json()) as { id?: string };
-
-                if (!result.id) {
-                  throw new Error('Recipe upload failed');
-                }
+                const result = await uploadRecipe({ data: formData });
 
                 navigate({ params: { id: result.id }, to: '/recipes/view/$id' });
               } catch (submitError) {
@@ -208,7 +194,7 @@ export function AddRecipePage() {
                 <span>Photos</span>
                 <UploadTileGrid
                   files={draft.selectedFiles}
-                  maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES}
+                  maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES * 100}
                   maxItems={RECIPE_UPLOAD_MAX_PHOTO_COUNT}
                   onFilesChange={(selectedFiles) =>
                     setDraft((current) => ({ ...current, selectedFiles }))

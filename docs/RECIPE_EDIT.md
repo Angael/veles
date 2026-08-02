@@ -19,7 +19,7 @@ This document anchors the PR stack for recipe editing work. Each PR should refer
 ## Non-Goals
 
 - Editing, replacing, deleting, or reordering recipe photos.
-- Refactoring the existing atomic recipe upload route in this stack.
+- Further refactoring of recipe creation beyond its server-function upload flow.
 - Implementing recipe deletion unless explicitly pulled into a separate PR.
 - Adding GitHub Actions or CI/CD workflow changes.
 
@@ -39,16 +39,16 @@ This document anchors the PR stack for recipe editing work. Each PR should refer
 - Toast components, styling, and helpers should live under `src/components/toast`.
 - Use Base UI Toast from `@base-ui/react/toast`.
 - Prefer server functions for recipe metadata mutations.
-- Keep API routes only where they are clearly better, currently the atomic file upload path.
+- Use server functions for recipe mutations, including file uploads.
 
 ## Current Context
 
 - `src/pages/recipes/RecipeViewPage.tsx` renders the recipe detail page.
-- `src/pages/recipes/AddRecipePage.tsx` owns the current add form and posts to `/api/recipes/upload`.
+- `src/pages/recipes/AddRecipePage.tsx` owns the add form and calls the typed recipe upload server function.
 - `src/pages/recipes/EditRecipePage.tsx` exists but is currently a placeholder.
 - `src/routes/recipes/view.$id_.edit.tsx` already loads a recipe and renders `EditRecipePage`.
 - `src/pages/recipes/recipes.api.ts` already contains recipe read server functions.
-- `src/routes/api/recipes/upload.ts` performs atomic recipe creation with file upload.
+- `src/pages/recipes/recipeUpload.api.ts` performs atomic recipe creation with file upload.
 - The recipe schema already has `portions`, `rating`, and nutrition fields.
 
 ## Target UX
@@ -128,14 +128,14 @@ Add portion count support to recipe creation.
 Expected files:
 
 - `src/pages/recipes/AddRecipePage.tsx`
-- `src/routes/api/recipes/upload.ts`
+- `src/pages/recipes/recipeUpload.api.ts`
 
 Requirements:
 
 - Add `portions` to the add draft.
 - Default `portions` to `1`.
 - Render a positive whole-number portions input.
-- Validate `portions` in the upload API route before insert.
+- Validate `portions` in the upload server function before insert.
 - Insert `portions` into the recipe row.
 
 Implemented notes:

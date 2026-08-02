@@ -22,7 +22,6 @@ import { Route as AuthenticatedRecipesIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedDiaryIndexRouteImport } from './routes/_authenticated/diary/index'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
-import { Route as ApiRecipesUploadRouteImport } from './routes/api/recipes/upload'
 import { Route as ApiDemoPingRouteImport } from './routes/api/demo/ping'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthenticatedRecipesAddRouteImport } from './routes/_authenticated/recipes/add'
@@ -99,11 +98,6 @@ const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
   path: '/demo/start/api-request',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiRecipesUploadRoute = ApiRecipesUploadRouteImport.update({
-  id: '/api/recipes/upload',
-  path: '/api/recipes/upload',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiDemoPingRoute = ApiDemoPingRouteImport.update({
   id: '/api/demo/ping',
   path: '/api/demo/ping',
@@ -170,7 +164,6 @@ export interface FileRoutesByFullPath {
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
-  '/api/recipes/upload': typeof ApiRecipesUploadRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/diary/': typeof AuthenticatedDiaryIndexRoute
@@ -195,7 +188,6 @@ export interface FileRoutesByTo {
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
-  '/api/recipes/upload': typeof ApiRecipesUploadRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/diary': typeof AuthenticatedDiaryIndexRoute
@@ -222,7 +214,6 @@ export interface FileRoutesById {
   '/_authenticated/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
-  '/api/recipes/upload': typeof ApiRecipesUploadRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/_authenticated/diary/': typeof AuthenticatedDiaryIndexRoute
@@ -249,7 +240,6 @@ export interface FileRouteTypes {
     | '/recipes/add'
     | '/api/auth/$'
     | '/api/demo/ping'
-    | '/api/recipes/upload'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/diary/'
@@ -274,7 +264,6 @@ export interface FileRouteTypes {
     | '/recipes/add'
     | '/api/auth/$'
     | '/api/demo/ping'
-    | '/api/recipes/upload'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/diary'
@@ -300,7 +289,6 @@ export interface FileRouteTypes {
     | '/_authenticated/recipes/add'
     | '/api/auth/$'
     | '/api/demo/ping'
-    | '/api/recipes/upload'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/_authenticated/diary/'
@@ -322,7 +310,6 @@ export interface RootRouteChildren {
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDemoPingRoute: typeof ApiDemoPingRoute
-  ApiRecipesUploadRoute: typeof ApiRecipesUploadRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
@@ -422,13 +409,6 @@ declare module '@tanstack/react-router' {
       path: '/demo/start/api-request'
       fullPath: '/demo/start/api-request'
       preLoaderRoute: typeof DemoStartApiRequestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/recipes/upload': {
-      id: '/api/recipes/upload'
-      path: '/api/recipes/upload'
-      fullPath: '/api/recipes/upload'
-      preLoaderRoute: typeof ApiRecipesUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/demo/ping': {
@@ -541,7 +521,6 @@ const rootRouteChildren: RootRouteChildren = {
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDemoPingRoute: ApiDemoPingRoute,
-  ApiRecipesUploadRoute: ApiRecipesUploadRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
