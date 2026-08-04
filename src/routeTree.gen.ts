@@ -12,25 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
-import { Route as DemoFileUploadRouteImport } from './routes/demo/file-upload'
-import { Route as DemoComponentsRouteImport } from './routes/demo/components'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
 import { Route as AuthenticatedTodosRouteImport } from './routes/_authenticated/todos'
 import { Route as AuthenticatedCaloriesRouteImport } from './routes/_authenticated/calories'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedRecipesIndexRouteImport } from './routes/_authenticated/recipes/index'
 import { Route as AuthenticatedDiaryIndexRouteImport } from './routes/_authenticated/diary/index'
-import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
-import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as ApiDemoPingRouteImport } from './routes/api/demo/ping'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthenticatedRecipesAddRouteImport } from './routes/_authenticated/recipes/add'
 import { Route as AuthenticatedDiaryIdRouteImport } from './routes/_authenticated/diary/$id'
-import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
-import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
-import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
-import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
 import { Route as AuthenticatedRecipesViewIdRouteImport } from './routes/_authenticated/recipes/view.$id'
 import { Route as AuthenticatedRecipesViewIdEditRouteImport } from './routes/_authenticated/recipes/view.$id_.edit'
 
@@ -46,21 +37,6 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoFileUploadRoute = DemoFileUploadRouteImport.update({
-  id: '/demo/file-upload',
-  path: '/demo/file-upload',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoComponentsRoute = DemoComponentsRouteImport.update({
-  id: '/demo/components',
-  path: '/demo/components',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedWeightRoute = AuthenticatedWeightRouteImport.update({
@@ -94,16 +70,6 @@ const AuthenticatedDiaryIndexRoute = AuthenticatedDiaryIndexRouteImport.update({
   path: '/diary/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
-  id: '/demo/start/server-funcs',
-  path: '/demo/start/server-funcs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
-  id: '/demo/start/api-request',
-  path: '/demo/start/api-request',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiDemoPingRoute = ApiDemoPingRouteImport.update({
   id: '/api/demo/ping',
   path: '/api/demo/ping',
@@ -123,26 +89,6 @@ const AuthenticatedDiaryIdRoute = AuthenticatedDiaryIdRouteImport.update({
   id: '/diary/$id',
   path: '/diary/$id',
   getParentRoute: () => AuthenticatedRoute,
-} as any)
-const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
-  id: '/demo/start/ssr/',
-  path: '/demo/start/ssr/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStartSsrSpaModeRoute = DemoStartSsrSpaModeRouteImport.update({
-  id: '/demo/start/ssr/spa-mode',
-  path: '/demo/start/ssr/spa-mode',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStartSsrFullSsrRoute = DemoStartSsrFullSsrRouteImport.update({
-  id: '/demo/start/ssr/full-ssr',
-  path: '/demo/start/ssr/full-ssr',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
-  id: '/demo/start/ssr/data-only',
-  path: '/demo/start/ssr/data-only',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRecipesViewIdRoute =
   AuthenticatedRecipesViewIdRouteImport.update({
@@ -164,22 +110,13 @@ export interface FileRoutesByFullPath {
   '/calories': typeof AuthenticatedCaloriesRoute
   '/todos': typeof AuthenticatedTodosRoute
   '/weight': typeof AuthenticatedWeightRoute
-  '/demo/components': typeof DemoComponentsRoute
-  '/demo/file-upload': typeof DemoFileUploadRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/diary/': typeof AuthenticatedDiaryIndexRoute
   '/recipes/': typeof AuthenticatedRecipesIndexRoute
   '/recipes/view/$id': typeof AuthenticatedRecipesViewIdRoute
-  '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
-  '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
-  '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
-  '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
   '/recipes/view/$id/edit': typeof AuthenticatedRecipesViewIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -189,22 +126,13 @@ export interface FileRoutesByTo {
   '/calories': typeof AuthenticatedCaloriesRoute
   '/todos': typeof AuthenticatedTodosRoute
   '/weight': typeof AuthenticatedWeightRoute
-  '/demo/components': typeof DemoComponentsRoute
-  '/demo/file-upload': typeof DemoFileUploadRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/diary': typeof AuthenticatedDiaryIndexRoute
   '/recipes': typeof AuthenticatedRecipesIndexRoute
   '/recipes/view/$id': typeof AuthenticatedRecipesViewIdRoute
-  '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
-  '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
-  '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
-  '/demo/start/ssr': typeof DemoStartSsrIndexRoute
   '/recipes/view/$id/edit': typeof AuthenticatedRecipesViewIdEditRoute
 }
 export interface FileRoutesById {
@@ -216,22 +144,13 @@ export interface FileRoutesById {
   '/_authenticated/calories': typeof AuthenticatedCaloriesRoute
   '/_authenticated/todos': typeof AuthenticatedTodosRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
-  '/demo/components': typeof DemoComponentsRoute
-  '/demo/file-upload': typeof DemoFileUploadRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/_authenticated/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/_authenticated/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/_authenticated/diary/': typeof AuthenticatedDiaryIndexRoute
   '/_authenticated/recipes/': typeof AuthenticatedRecipesIndexRoute
   '/_authenticated/recipes/view/$id': typeof AuthenticatedRecipesViewIdRoute
-  '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
-  '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
-  '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
-  '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
   '/_authenticated/recipes/view/$id_/edit': typeof AuthenticatedRecipesViewIdEditRoute
 }
 export interface FileRouteTypes {
@@ -243,22 +162,13 @@ export interface FileRouteTypes {
     | '/calories'
     | '/todos'
     | '/weight'
-    | '/demo/components'
-    | '/demo/file-upload'
-    | '/demo/tanstack-query'
     | '/diary/$id'
     | '/recipes/add'
     | '/api/auth/$'
     | '/api/demo/ping'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
     | '/diary/'
     | '/recipes/'
     | '/recipes/view/$id'
-    | '/demo/start/ssr/data-only'
-    | '/demo/start/ssr/full-ssr'
-    | '/demo/start/ssr/spa-mode'
-    | '/demo/start/ssr/'
     | '/recipes/view/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -268,22 +178,13 @@ export interface FileRouteTypes {
     | '/calories'
     | '/todos'
     | '/weight'
-    | '/demo/components'
-    | '/demo/file-upload'
-    | '/demo/tanstack-query'
     | '/diary/$id'
     | '/recipes/add'
     | '/api/auth/$'
     | '/api/demo/ping'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
     | '/diary'
     | '/recipes'
     | '/recipes/view/$id'
-    | '/demo/start/ssr/data-only'
-    | '/demo/start/ssr/full-ssr'
-    | '/demo/start/ssr/spa-mode'
-    | '/demo/start/ssr'
     | '/recipes/view/$id/edit'
   id:
     | '__root__'
@@ -294,22 +195,13 @@ export interface FileRouteTypes {
     | '/_authenticated/calories'
     | '/_authenticated/todos'
     | '/_authenticated/weight'
-    | '/demo/components'
-    | '/demo/file-upload'
-    | '/demo/tanstack-query'
     | '/_authenticated/diary/$id'
     | '/_authenticated/recipes/add'
     | '/api/auth/$'
     | '/api/demo/ping'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
     | '/_authenticated/diary/'
     | '/_authenticated/recipes/'
     | '/_authenticated/recipes/view/$id'
-    | '/demo/start/ssr/data-only'
-    | '/demo/start/ssr/full-ssr'
-    | '/demo/start/ssr/spa-mode'
-    | '/demo/start/ssr/'
     | '/_authenticated/recipes/view/$id_/edit'
   fileRoutesById: FileRoutesById
 }
@@ -317,17 +209,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
-  DemoComponentsRoute: typeof DemoComponentsRoute
-  DemoFileUploadRoute: typeof DemoFileUploadRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDemoPingRoute: typeof ApiDemoPingRoute
-  DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
-  DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
-  DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
-  DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
-  DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
-  DemoStartSsrIndexRoute: typeof DemoStartSsrIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -351,27 +234,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/file-upload': {
-      id: '/demo/file-upload'
-      path: '/demo/file-upload'
-      fullPath: '/demo/file-upload'
-      preLoaderRoute: typeof DemoFileUploadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/components': {
-      id: '/demo/components'
-      path: '/demo/components'
-      fullPath: '/demo/components'
-      preLoaderRoute: typeof DemoComponentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/weight': {
@@ -416,20 +278,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDiaryIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/demo/start/server-funcs': {
-      id: '/demo/start/server-funcs'
-      path: '/demo/start/server-funcs'
-      fullPath: '/demo/start/server-funcs'
-      preLoaderRoute: typeof DemoStartServerFuncsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/api-request': {
-      id: '/demo/start/api-request'
-      path: '/demo/start/api-request'
-      fullPath: '/demo/start/api-request'
-      preLoaderRoute: typeof DemoStartApiRequestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/demo/ping': {
       id: '/api/demo/ping'
       path: '/api/demo/ping'
@@ -457,34 +305,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/diary/$id'
       preLoaderRoute: typeof AuthenticatedDiaryIdRouteImport
       parentRoute: typeof AuthenticatedRoute
-    }
-    '/demo/start/ssr/': {
-      id: '/demo/start/ssr/'
-      path: '/demo/start/ssr'
-      fullPath: '/demo/start/ssr/'
-      preLoaderRoute: typeof DemoStartSsrIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/ssr/spa-mode': {
-      id: '/demo/start/ssr/spa-mode'
-      path: '/demo/start/ssr/spa-mode'
-      fullPath: '/demo/start/ssr/spa-mode'
-      preLoaderRoute: typeof DemoStartSsrSpaModeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/ssr/full-ssr': {
-      id: '/demo/start/ssr/full-ssr'
-      path: '/demo/start/ssr/full-ssr'
-      fullPath: '/demo/start/ssr/full-ssr'
-      preLoaderRoute: typeof DemoStartSsrFullSsrRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/ssr/data-only': {
-      id: '/demo/start/ssr/data-only'
-      path: '/demo/start/ssr/data-only'
-      fullPath: '/demo/start/ssr/data-only'
-      preLoaderRoute: typeof DemoStartSsrDataOnlyRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/recipes/view/$id': {
       id: '/_authenticated/recipes/view/$id'
@@ -537,17 +357,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
-  DemoComponentsRoute: DemoComponentsRoute,
-  DemoFileUploadRoute: DemoFileUploadRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDemoPingRoute: ApiDemoPingRoute,
-  DemoStartApiRequestRoute: DemoStartApiRequestRoute,
-  DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
-  DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
-  DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
-  DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
-  DemoStartSsrIndexRoute: DemoStartSsrIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
