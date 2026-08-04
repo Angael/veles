@@ -11,11 +11,11 @@ import { TextareaInput } from '@/components/textarea-input/TextareaInput';
 import { TextInput } from '@/components/text-input/TextInput';
 import { UploadTileGrid } from '@/components/upload-tile-grid/UploadTileGrid';
 import css from './AddRecipePage.module.css';
-import { createRecipe } from './recipeUpload.api';
 import {
+  createRecipe,
   RECIPE_UPLOAD_MAX_PHOTO_BYTES,
   RECIPE_UPLOAD_MAX_PHOTO_COUNT,
-} from './recipeUpload.constants';
+} from './recipeUpload.api';
 
 type AddRecipeDraft = {
   carbs: number | null;

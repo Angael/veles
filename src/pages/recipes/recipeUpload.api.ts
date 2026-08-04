@@ -11,13 +11,13 @@ import { log } from '@/lib/logger';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { getStorageConfig } from '@/lib/storage/config';
 import { deleteFileByKey, uploadFileByKey } from '@/lib/storage/r2';
-import {
-  RECIPE_UPLOAD_MAX_PHOTO_BYTES,
-  RECIPE_UPLOAD_MAX_PHOTO_COUNT,
-} from './recipeUpload.constants';
-
+// Keep below nginx's client_max_body_size with enough headroom for multipart form overhead.
+// If this changes, update the corresponding limit in docker/nginx.conf.
 const RECIPE_UPLOAD_MAX_REQUEST_BYTES = 85 * 1024 * 1024;
 const RECIPE_IMAGE_MAX_INPUT_PIXELS = 100_000_000;
+
+export const RECIPE_UPLOAD_MAX_PHOTO_COUNT = 8;
+export const RECIPE_UPLOAD_MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 
 const contentLengthType = type('string.numeric.parse |> number.integer >= 0');
 const formDataType = type('FormData');
@@ -57,11 +57,7 @@ const uploadRecipeInputType = type({
 const limitRecipeUploadRequestMiddleware = createMiddleware().server(async ({ next, request }) => {
   const contentLength = contentLengthType(request.headers.get('content-length') ?? '');
 
-  if (contentLength instanceof type.errors) {
-    throw new ClientSafeError('Upload rejected: Content-Length is required.');
-  }
-
-  if (contentLength > RECIPE_UPLOAD_MAX_REQUEST_BYTES) {
+  if (contentLength instanceof type.errors || contentLength > RECIPE_UPLOAD_MAX_REQUEST_BYTES) {
     throw new ClientSafeError('Upload request is too large.');
   }
 
