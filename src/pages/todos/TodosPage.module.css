@@ -1,0 +1,86 @@
+.page {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+.header h1,
+.listCard h2 {
+  margin: 0;
+  text-wrap: balance;
+}
+
+.header p {
+  margin: var(--space-xs) 0 0;
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+
+.mockNote {
+  width: fit-content;
+  margin: 0;
+  padding: 0.35rem 0.65rem;
+  border: var(--border-width) solid var(--c-primary-border-soft);
+  border-radius: var(--radius-pill);
+  background: var(--c-primary-surface);
+  color: var(--c-accent-soft);
+  font-size: var(--text-xs);
+}
+
+.listGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+}
+
+.listCard {
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+}
+
+.items {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: var(--button-min-height);
+  padding: 0 var(--space-xs);
+  border-radius: var(--radius-xs);
+}
+
+.item input {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  accent-color: var(--c-primary);
+}
+
+.done {
+  color: var(--c-muted-strong);
+  text-decoration: line-through;
+}
+
+@media (--phone) {
+  .header,
+  .listGrid {
+    display: grid;
+  }
+
+  .listGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoComponentsRouteImport } from './routes/demo/components'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
+import { Route as AuthenticatedTodosRouteImport } from './routes/_authenticated/todos'
 import { Route as AuthenticatedCaloriesRouteImport } from './routes/_authenticated/calories'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedRecipesIndexRouteImport } from './routes/_authenticated/recipes/index'
@@ -60,6 +61,11 @@ const DemoComponentsRoute = DemoComponentsRouteImport.update({
 const AuthenticatedWeightRoute = AuthenticatedWeightRouteImport.update({
   id: '/weight',
   path: '/weight',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTodosRoute = AuthenticatedTodosRouteImport.update({
+  id: '/todos',
+  path: '/todos',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCaloriesRoute = AuthenticatedCaloriesRouteImport.update({
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/account': typeof AuthenticatedAccountRoute
   '/calories': typeof AuthenticatedCaloriesRoute
+  '/todos': typeof AuthenticatedTodosRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/demo/components': typeof DemoComponentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/account': typeof AuthenticatedAccountRoute
   '/calories': typeof AuthenticatedCaloriesRoute
+  '/todos': typeof AuthenticatedTodosRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/demo/components': typeof DemoComponentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/calories': typeof AuthenticatedCaloriesRoute
+  '/_authenticated/todos': typeof AuthenticatedTodosRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/demo/components': typeof DemoComponentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/account'
     | '/calories'
+    | '/todos'
     | '/weight'
     | '/demo/components'
     | '/demo/tanstack-query'
@@ -256,6 +266,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/account'
     | '/calories'
+    | '/todos'
     | '/weight'
     | '/demo/components'
     | '/demo/tanstack-query'
@@ -281,6 +292,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/account'
     | '/_authenticated/calories'
+    | '/_authenticated/todos'
     | '/_authenticated/weight'
     | '/demo/components'
     | '/demo/tanstack-query'
@@ -360,6 +372,13 @@ declare module '@tanstack/react-router' {
       path: '/weight'
       fullPath: '/weight'
       preLoaderRoute: typeof AuthenticatedWeightRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/todos': {
+      id: '/_authenticated/todos'
+      path: '/todos'
+      fullPath: '/todos'
+      preLoaderRoute: typeof AuthenticatedTodosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/calories': {
@@ -487,6 +506,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedCaloriesRoute: typeof AuthenticatedCaloriesRoute
+  AuthenticatedTodosRoute: typeof AuthenticatedTodosRoute
   AuthenticatedWeightRoute: typeof AuthenticatedWeightRoute
   AuthenticatedDiaryIdRoute: typeof AuthenticatedDiaryIdRoute
   AuthenticatedRecipesAddRoute: typeof AuthenticatedRecipesAddRoute
@@ -499,6 +519,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedCaloriesRoute: AuthenticatedCaloriesRoute,
+  AuthenticatedTodosRoute: AuthenticatedTodosRoute,
   AuthenticatedWeightRoute: AuthenticatedWeightRoute,
   AuthenticatedDiaryIdRoute: AuthenticatedDiaryIdRoute,
   AuthenticatedRecipesAddRoute: AuthenticatedRecipesAddRoute,
