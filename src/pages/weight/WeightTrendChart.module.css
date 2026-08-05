@@ -1,0 +1,39 @@
+.hero {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+
+  & > span {
+    color: var(--c-accent-soft);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
+}
+
+.chartFrame {
+  position: relative;
+  width: 100%;
+  min-height: clamp(11rem, 24vw, 16rem);
+
+  /* Recharts' generated SVG layers can receive click focus despite having no interaction. */
+  & svg:focus,
+  & svg *:focus {
+    outline: none;
+  }
+}
+
+.chartSkeleton {
+  position: absolute;
+  inset: 0;
+}
+
+@media (--phone) {
+  .chartFrame {
+    min-height: 10rem;
+  }
+}

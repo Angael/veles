@@ -1,15 +1,13 @@
 /// <reference types="vite/client" />
-import type { QueryClient } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import * as React from 'react';
 import { AppFrame } from '@/components/app-frame/AppFrame';
 import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
 import { NotFound } from '@/components/not-found/NotFound';
 import { ToastProvider } from '@/components/toast/ToastProvider';
 import { clientEnv } from '@/lib/env/client';
 import resetCss from '@/styles/reset.css?url';
+import type { QueryClient } from '@tanstack/react-query';
+import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
+import * as React from 'react';
 
 const isLocalhostApp = import.meta.env.DEV;
 
@@ -72,12 +70,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
-        {import.meta.env.DEV ? (
+        {/* {import.meta.env.DEV ? (
           <>
             <TanStackRouterDevtools position='bottom-right' />
             <ReactQueryDevtools buttonPosition='bottom-left' />
           </>
-        ) : null}
+        ) : null} */}
         <Scripts />
       </body>
     </html>

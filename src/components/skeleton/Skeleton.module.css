@@ -1,0 +1,35 @@
+.skeleton {
+  overflow: hidden;
+  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--c-surface-raised) 72%, transparent);
+
+  &::after {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      100deg,
+      transparent 20%,
+      color-mix(in srgb, var(--c-muted) 12%, transparent) 50%,
+      transparent 80%
+    );
+    animation: skeleton-shimmer 1.6s linear infinite;
+    content: '';
+  }
+}
+
+@keyframes skeleton-shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+}
