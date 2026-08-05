@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useNavigate } from '@tanstack/react-router';
+import { useServerFn } from '@tanstack/react-start';
 import { SendHorizontalIcon } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
@@ -9,9 +10,10 @@ import { UploadTileGrid } from '@/components/upload-tile-grid/UploadTileGrid';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import css from './AddRecipePage.module.css';
 import {
+  createRecipe,
   RECIPE_UPLOAD_MAX_PHOTO_BYTES,
   RECIPE_UPLOAD_MAX_PHOTO_COUNT,
-} from '@/routes/api/recipes/upload';
+} from './recipeUpload.api';
 
 type AddRecipeDraft = RecipeFormDraft & {
   selectedFiles: File[];
@@ -33,6 +35,7 @@ const EMPTY_DRAFT: AddRecipeDraft = {
 
 export function AddRecipePage() {
   const navigate = useNavigate();
+  const uploadRecipe = useServerFn(createRecipe);
   const [draft, setDraft] = useState<AddRecipeDraft>(EMPTY_DRAFT);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,24 +60,7 @@ export function AddRecipePage() {
                   formData.append('photos', file);
                 }
 
-                const response = await fetch('/api/recipes/upload', {
-                  body: formData,
-                  method: 'POST',
-                });
-
-                if (!response.ok) {
-                  const result = (await response.json().catch(() => null)) as {
-                    error?: string;
-                  } | null;
-
-                  throw new Error(result?.error ?? 'Recipe upload failed');
-                }
-
-                const result = (await response.json()) as { id?: string };
-
-                if (!result.id) {
-                  throw new Error('Recipe upload failed');
-                }
+                const result = await uploadRecipe({ data: formData });
 
                 navigate({ params: { id: result.id }, to: '/recipes/view/$id' });
               } catch (submitError) {

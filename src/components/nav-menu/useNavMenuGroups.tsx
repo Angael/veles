@@ -80,7 +80,7 @@ export function useDesktopNavMenu() {
     {
       key: 'trackers',
       label: 'Trackers',
-      matchPrefixes: ['/weight', '/recipes', '/diary'],
+      matchPrefixes: ['/weight', '/recipes', '/diary', '/todos'],
       shouldRender: Boolean(user),
       items: [
         {
@@ -100,6 +100,12 @@ export function useDesktopNavMenu() {
           link: '/diary',
           label: 'Diary',
           description: 'Private personal entries and imported journals.',
+        },
+        {
+          key: 'todos',
+          link: '/todos',
+          label: 'Todos',
+          description: 'Shared checklists for shopping and life goals.',
         },
       ],
     },
@@ -136,6 +142,12 @@ export const MOBILE_NAV_ITEMS = [
     label: 'Diary',
     link: '/diary',
     matchPrefixes: ['/diary'],
+  },
+  {
+    key: 'todos',
+    label: 'Todos',
+    link: '/todos',
+    matchPrefixes: ['/todos'],
   },
   {
     key: 'recipes',

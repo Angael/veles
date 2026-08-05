@@ -60,7 +60,7 @@
     "postcss": "8.5.15",
     "postcss-custom-media": "12.0.1",
     "stylelint": "16.26.0",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "vite": "8.1.5",
     "vitest": "4.1.7"
   },

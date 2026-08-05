@@ -6,7 +6,7 @@ Accepted.
 
 ## Context
 
-The recipe feature is currently mock-backed. `src/pages/recipes/recipes.data.ts` defines the list/detail shape, filtering, and last-viewed sort behavior. `src/pages/recipes/recipes.api.ts` exposes server functions that return mock data. `src/routes/api/recipes/upload.ts` validates the add form and optimizes images, but it only writes temporary files and does not persist recipes or upload metadata yet.
+The recipe feature is database-backed. `src/pages/recipes/recipes.api.ts` exposes recipe read and update server functions. `src/pages/recipes/recipeUpload.api.ts` validates the add form, optimizes images, uploads them, and persists recipes with their upload metadata.
 
 The existing database schema contains Better Auth tables and `upload_object`. User IDs and upload object IDs are text. Recipe tables will be the first app-domain tables. The app is a solo hobby app, so the initial schema should prefer low-friction persistence over premature normalization.
 
