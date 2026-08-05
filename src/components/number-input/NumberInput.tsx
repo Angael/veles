@@ -29,7 +29,28 @@ export function NumberInput({
           <MinusIcon aria-hidden='true' size={16} strokeWidth={1.8} />
         </NumberField.Decrement>
 
-        <NumberField.Input className={clsx(css.input, inputClassName)} placeholder={placeholder} />
+        <NumberField.Input
+          className={clsx(css.input, inputClassName)}
+          onChange={(event) => {
+            event.currentTarget.value = normalizeDecimalSeparator(event.currentTarget.value);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === ',') {
+              event.preventDefault();
+              insertText(event.currentTarget, '.');
+            }
+          }}
+          onPaste={(event) => {
+            const pastedText = event.clipboardData.getData('text/plain');
+            const normalizedText = normalizeDecimalSeparator(pastedText);
+
+            if (normalizedText !== pastedText) {
+              event.preventDefault();
+              insertText(event.currentTarget, normalizedText);
+            }
+          }}
+          placeholder={placeholder}
+        />
 
         <NumberField.Increment
           aria-label='Increase value'
@@ -39,5 +60,24 @@ export function NumberInput({
         </NumberField.Increment>
       </NumberField.Group>
     </NumberField.Root>
+  );
+}
+
+function normalizeDecimalSeparator(value: string) {
+  return value.replaceAll(',', '.');
+}
+
+/** Inserts normalized text at the caret and emits the input event Base UI uses to parse it. */
+function insertText(input: HTMLInputElement, text: string) {
+  const selectionStart = input.selectionStart ?? input.value.length;
+  const selectionEnd = input.selectionEnd ?? selectionStart;
+
+  input.setRangeText(text, selectionStart, selectionEnd, 'end');
+  input.dispatchEvent(
+    new InputEvent('input', {
+      bubbles: true,
+      data: text,
+      inputType: 'insertText',
+    }),
   );
 }
