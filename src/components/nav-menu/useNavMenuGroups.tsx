@@ -87,7 +87,7 @@ export function useDesktopNavMenu() {
           key: 'weight',
           link: '/weight',
           label: 'Weight',
-          description: 'Mock dashboard for body weight logging and trend review.',
+          description: 'Log body weight and review progress over time.',
         },
         {
           key: 'recipes',

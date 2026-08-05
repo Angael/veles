@@ -3,33 +3,76 @@
   gap: var(--space-lg);
 }
 
+.emptyState {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+}
+
+.emptyIcon {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: var(--border-width) solid var(--c-primary-border-soft);
+  border-radius: var(--radius-sm);
+  color: var(--c-accent);
+  background: var(--c-primary-surface);
+}
+
+.emptyCopy {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.emptyCopy h1 {
+  font-size: var(--text-xl-dynamic);
+  text-wrap: balance;
+}
+
+.emptyCopy p {
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+
+.emptyState .entryForm {
+  grid-column: 1 / -1;
+  width: 100%;
+  padding-top: var(--space-md);
+  padding-bottom: 0;
+  border-top: var(--border-width) solid var(--c-border);
+  border-bottom: 0;
+}
+
 .summaryGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-lg);
-  min-width: 34rem;
+  min-width: 0;
+  padding: 0;
 }
 
 .summaryRail {
   min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--c-border-strong) transparent;
 }
 
-.card {
+.summaryStat {
   display: grid;
   gap: 0.35rem;
+  min-width: 0;
+  padding: var(--space-lg);
+  border-right: var(--border-width) solid var(--c-border);
 }
 
-.summaryCard {
-  display: grid;
-  gap: 0.35rem;
+.summaryStat:last-child {
+  border-right: 0;
 }
 
-.summaryCard strong {
+.summaryStat strong {
   font-size: clamp(1.5rem, 3vw, 2.2rem);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .statLabel,
@@ -41,36 +84,27 @@
   color: var(--c-accent-strong);
 }
 
-.summaryCard p,
-.logRow p,
-.photoPlaceholder p {
-  margin: 0;
-  color: var(--c-muted);
-}
-
-.deltaDown {
+.deltaBetter {
   color: #86efac;
 }
 
-.deltaUp {
-  color: #fca5a5;
+.deltaNeutral {
+  color: var(--c-text);
 }
 
-.grid {
+.entriesCard {
   display: grid;
-  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
   gap: var(--space-lg);
 }
 
-.captureCard {
-  align-content: start;
-}
-
-.cardHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-md);
+.entryForm {
+  display: grid;
+  grid-template-columns: minmax(0, 18rem) auto;
+  align-items: end;
+  justify-content: start;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-lg);
+  border-bottom: var(--border-width) solid var(--c-border);
 }
 
 .captureField {
@@ -78,77 +112,78 @@
   gap: var(--space-xs);
 }
 
-.capturePanel,
-.logList {
-  display: grid;
-  gap: var(--space-md);
-}
-
-.weightInput {
-  margin-top: 0.1rem;
-}
-
 .weightInputField {
-  font-size: 1.4rem;
+  font-size: var(--text-md);
   font-weight: var(--font-weight-semibold);
 }
 
-.photoPlaceholder {
-  display: grid;
-  justify-items: start;
-  gap: var(--space-xs);
-  padding: var(--space-md);
-  border: 1px dashed var(--c-primary-border);
-  border-radius: var(--radius-xs);
-  background: rgba(37, 99, 235, 0.08);
-  opacity: 0.72;
+.tableFrame {
+  min-width: 0;
+  overflow-x: auto;
 }
 
-.photoIcon {
-  width: 1.8rem;
-  height: 1.8rem;
-  color: var(--c-accent-soft);
-  margin: auto;
-}
+.entriesTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
 
-.logRow {
-  display: grid;
-  grid-template-columns: minmax(0, 160px) minmax(0, 1fr);
-  gap: var(--space-md);
-  padding-bottom: var(--space-md);
-  border-bottom: var(--border-width) solid var(--c-border);
-}
+  & th,
+  & td {
+    padding: 0.75rem 0;
+    border-bottom: var(--border-width) solid var(--c-border);
+    text-align: right;
+    white-space: nowrap;
+  }
 
-.logRow:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
+  & th {
+    color: var(--c-muted);
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
 
-.logMeta {
-  display: grid;
-  gap: 0.2rem;
+  & th:first-child,
+  & td:first-child {
+    text-align: left;
+  }
+
+  & tbody tr:last-child td {
+    border-bottom: 0;
+  }
 }
 
 @media (--phone) {
-  .grid {
-    grid-template-columns: 1fr;
+  .emptyState {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-md);
+    padding: var(--space-lg) var(--space-md);
   }
 
-  .card {
+  .entriesCard {
     padding: var(--space-md);
   }
 
   .summaryGrid {
-    gap: var(--space-sm);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .summaryCard {
-    padding: var(--space-md);
+  .summaryStat {
+    gap: 0.2rem;
+    padding: var(--space-md) var(--space-sm);
   }
 
-  .cardHeader,
-  .logRow {
-    grid-template-columns: 1fr;
-    display: grid;
+  .summaryStat strong {
+    font-size: clamp(1rem, 5vw, 1.45rem);
+  }
+
+  .statLabel {
+    letter-spacing: 0.08em;
+    font-size: 0.65rem;
+  }
+
+  .entryForm {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-bottom: var(--space-md);
   }
 }
