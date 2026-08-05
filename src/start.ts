@@ -3,10 +3,7 @@ import { sanitizeServerFnErrorMiddleware } from '@/lib/middleware/sanitizeServer
 import { securityHeadersMiddleware } from '@/lib/middleware/securityHeadersMiddleware';
 
 const csrfMiddleware = createCsrfMiddleware({
-  filter: (context) =>
-    context.handlerType === 'serverFn' ||
-    (context.request.method === 'POST' &&
-      new URL(context.request.url).pathname === '/api/recipes/upload'),
+  filter: (context) => context.handlerType === 'serverFn',
 });
 
 export const startInstance = createStart(() => ({

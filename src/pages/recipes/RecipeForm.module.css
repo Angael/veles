@@ -1,0 +1,16 @@
+.fieldList {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.fieldGrid {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (--phone) {
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+}

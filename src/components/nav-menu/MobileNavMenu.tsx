@@ -7,6 +7,7 @@ import {
   FlameIcon,
   LogInIcon,
   NotebookPenIcon,
+  ListTodoIcon,
   ScaleIcon,
   UserIcon,
 } from 'lucide-react';
@@ -19,6 +20,7 @@ const itemIcons = {
   diary: NotebookPenIcon,
   login: LogInIcon,
   recipes: BookOpenIcon,
+  todos: ListTodoIcon,
   weight: ScaleIcon,
 } as const;
 

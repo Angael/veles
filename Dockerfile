@@ -20,13 +20,16 @@ RUN pnpm build
 FROM node:26.2.0-alpine AS runner
 
 ENV NODE_ENV=production
+ENV PORT=3001
 
 WORKDIR /app
 
-COPY --chown=node:node --from=builder /app/.output ./.output
+RUN apk add --no-cache nginx supervisor
 
-USER node
+COPY --chown=node:node --from=builder /app/.output ./.output
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/supervisord.conf /etc/supervisord.conf
 
 EXPOSE 3000
 
-CMD ["node", ".output/server/index.mjs"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
