@@ -1,6 +1,6 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
-import { Link, useRouterState } from '@tanstack/react-router';
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
 import clsx from 'clsx';
 import {
   BookOpenIcon,
@@ -25,6 +25,7 @@ const itemIcons = {
 } as const;
 
 export function MobileNavMenu() {
+  const navigate = useNavigate();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
@@ -49,7 +50,25 @@ export function MobileNavMenu() {
               aria-label={item.label}
               className={css.item}
               nativeButton={false}
-              render={<Link to={item.link} />}
+              render={
+                <Link
+                  onPointerDown={(event) => {
+                    if (
+                      event.button !== 0 ||
+                      event.metaKey ||
+                      event.ctrlKey ||
+                      event.shiftKey ||
+                      event.altKey
+                    ) {
+                      return;
+                    }
+
+                    event.preventDefault();
+                    void navigate({ to: item.link });
+                  }}
+                  to={item.link}
+                />
+              }
               value={item.key}
             >
               {item.key === 'account' && item.user?.image ? (
