@@ -23,14 +23,14 @@ const EMPTY_DRAFT: AddRecipeDraft = {
   carbs: null,
   description: '',
   fats: null,
-  ingredients: '',
+  ingredients: [],
   kcal: null,
   name: '',
   portions: 1,
   protein: null,
   rating: null,
   selectedFiles: [],
-  tags: '',
+  tags: [],
 };
 
 export function AddRecipePage() {

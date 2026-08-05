@@ -2,20 +2,10 @@ import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextareaInput } from '@/components/textarea-input/TextareaInput';
 import { TextInput } from '@/components/text-input/TextInput';
+import type { UpdateRecipeInput } from './recipes.api';
 import css from './RecipeForm.module.css';
 
-export type RecipeFormDraft = {
-  carbs: number | null;
-  description: string;
-  fats: number | null;
-  ingredients: string;
-  kcal: number | null;
-  name: string;
-  portions: number;
-  protein: number | null;
-  rating: number | null;
-  tags: string;
-};
+export type RecipeFormDraft = Omit<UpdateRecipeInput, 'id'>;
 
 type RecipeFormProps = {
   draft: RecipeFormDraft;
@@ -48,19 +38,24 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
       <Label text='Ingredients'>
         <TextareaInput
           name='ingredients'
-          onChange={(event) => onDraftChange({ ...draft, ingredients: event.currentTarget.value })}
+          onChange={(event) =>
+            onDraftChange({
+              ...draft,
+              ingredients: splitAndTrim(event.currentTarget.value, '\n'),
+            })
+          }
           placeholder='One ingredient per line'
           rows={6}
-          value={draft.ingredients}
+          value={draft.ingredients.join('\n')}
         />
       </Label>
 
       <Label text='Tags'>
         <TextInput
           name='tags'
-          onValueChange={(value) => onDraftChange({ ...draft, tags: value })}
+          onValueChange={(value) => onDraftChange({ ...draft, tags: splitAndTrim(value, ',') })}
           placeholder='dinner, chicken, high protein'
-          value={draft.tags}
+          value={draft.tags.join(', ')}
         />
       </Label>
 
@@ -130,4 +125,11 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
       </div>
     </div>
   );
+}
+
+function splitAndTrim(value: string, separator: string) {
+  return value
+    .split(separator)
+    .map((item) => item.trim())
+    .filter(Boolean);
 }

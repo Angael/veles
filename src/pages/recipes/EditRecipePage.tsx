@@ -35,12 +35,7 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
           onSubmit={(event: FormEvent<HTMLFormElement>) => {
             event.preventDefault();
             saveMutation.mutate({
-              data: {
-                ...draft,
-                id: recipe.id,
-                ingredients: splitLines(draft.ingredients),
-                tags: splitTags(draft.tags),
-              },
+              data: { ...draft, id: recipe.id },
             });
           }}
         >
@@ -82,26 +77,12 @@ function recipeToDraft(recipe: RecipeLibraryItem): RecipeFormDraft {
     carbs: recipe.carbs,
     description: recipe.description,
     fats: recipe.fats,
-    ingredients: recipe.ingredients.join('\n'),
+    ingredients: recipe.ingredients,
     kcal: recipe.kcal,
     name: recipe.name,
     portions: recipe.portions,
     protein: recipe.protein,
     rating: recipe.rating,
-    tags: recipe.tags.join(', '),
+    tags: recipe.tags,
   };
-}
-
-function splitLines(value: string) {
-  return value
-    .split('\n')
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function splitTags(value: string) {
-  return value
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean);
 }

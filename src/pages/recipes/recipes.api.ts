@@ -89,6 +89,8 @@ const updateRecipeInputType = type({
   tags: 'string[]',
 });
 
+export type UpdateRecipeInput = typeof updateRecipeInputType.infer;
+
 export const getRecipeById = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRecipeById')])
   .validator(arkTypeValidator(recipeByIdInputType))
