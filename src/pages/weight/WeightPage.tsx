@@ -8,7 +8,6 @@ import { WeightTrendChart } from './WeightTrendChart';
 type WeightEntry = {
   date: string;
   weightKg: number;
-  hasPhoto: boolean;
   note?: string;
 };
 
@@ -70,14 +69,15 @@ export function WeightPage() {
                 step={0.1}
               />
             </label>
-            <label className={css.captureField}>
+            {/* TODO: Add progress-photo upload when the weight flow supports photos. */}
+            <div className={css.captureField}>
               <span>Photo</span>
-              <div className={css.photoPlaceholder}>
+              <div aria-disabled='true' className={css.photoPlaceholder}>
                 <CameraIcon aria-hidden='true' className={css.photoIcon} strokeWidth={1.5} />
-                <strong>Optional progress photo</strong>
-                <p>Attached to this entry when it helps document your progress.</p>
+                <strong>Progress photos are coming later</strong>
+                <p>For now, entries only save your weight.</p>
               </div>
-            </label>
+            </div>
             <Btn radius='pill' type='button' variant='main'>
               Save entry
             </Btn>
@@ -99,7 +99,6 @@ export function WeightPage() {
                   <p>{formatLongDate(entry.date)}</p>
                 </div>
                 <div className={css.logMeta}>
-                  <span>{entry.hasPhoto ? 'Photo attached' : 'Weight only'}</span>
                   <p>{entry.note ?? 'Quiet consistency day.'}</p>
                 </div>
               </div>
@@ -139,11 +138,8 @@ function generateMockEntries() {
     const weightKg = roundToOneDecimal(
       longTrend + monthlyWave + weeklyWave + rebound + maintenance,
     );
-    const hasPhoto = index % 17 === 0 || index % 89 === 0;
-
     return {
       date,
-      hasPhoto,
       note: index % 4 === 0 ? notes[index % notes.length] : undefined,
       weightKg,
     };

@@ -101,6 +101,7 @@
   border: 1px dashed var(--c-primary-border);
   border-radius: var(--radius-xs);
   background: rgba(37, 99, 235, 0.08);
+  opacity: 0.72;
 }
 
 .photoIcon {
@@ -126,11 +127,6 @@
 .logMeta {
   display: grid;
   gap: 0.2rem;
-}
-
-.logMeta span {
-  color: var(--c-accent-soft);
-  font-size: var(--text-xs);
 }
 
 @media (--phone) {
