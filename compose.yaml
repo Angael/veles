@@ -6,8 +6,8 @@ services:
     depends_on:
       web:
         condition: service_healthy
-    ports:
-      - '${NGINX_PORT:-3000}:80'
+    expose:
+      - '80'
     restart: unless-stopped
     healthcheck:
       test: ['CMD', 'wget', '--quiet', '--spider', 'http://127.0.0.1/nginx-health']
