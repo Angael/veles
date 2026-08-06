@@ -9,7 +9,10 @@ services:
     expose:
       - '80'
     networks:
+      # Dokploy's proxy reaches nginx through this shared network.
       - dokploy-network
+      # nginx reaches only this deployment's web service through the private network.
+      - veles-internal
     restart: unless-stopped
     healthcheck:
       test: ['CMD', 'wget', '--quiet', '--spider', 'http://127.0.0.1/nginx-health']
@@ -39,7 +42,12 @@ services:
       R2_SECRET_ACCESS_KEY: '${R2_SECRET_ACCESS_KEY}'
       R2_BUCKET_NAME: '${R2_BUCKET_NAME}'
     networks:
-      - dokploy-network
+      # Gives web access to the separately managed Dokploy PostgreSQL service.
+      dokploy-network:
+      # Provides an unambiguous private hostname for nginx -> web traffic.
+      veles-internal:
+        aliases:
+          - veles-web
     restart: unless-stopped
     healthcheck:
       test:
@@ -61,9 +69,16 @@ services:
     environment:
       DATABASE_URL: '${DATABASE_URL}'
     networks:
+      # Gives the worker access to the separately managed Dokploy PostgreSQL service.
       - dokploy-network
     restart: unless-stopped
 
 networks:
+  # Created and managed by Dokploy outside this Compose project. It connects
+  # Dokploy's proxy and managed services such as PostgreSQL to this application.
   dokploy-network:
     external: true
+  # Created for this Compose project and reachable only by attached containers.
+  # It keeps nginx -> veles-web traffic private and isolated from other deployments.
+  veles-internal:
+    internal: true
