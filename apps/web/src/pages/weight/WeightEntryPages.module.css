@@ -1,0 +1,80 @@
+.page {
+  width: min(100%, 44rem);
+  margin-inline: auto;
+}
+
+.formCard,
+.importCard {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.intro {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.intro h1 {
+  font-size: var(--text-xl-dynamic);
+  text-wrap: balance;
+}
+
+.intro p,
+.promptBlock p {
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+
+.promptBlock {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: var(--border-width) solid var(--c-primary-border-soft);
+  border-radius: var(--radius-sm);
+  background: var(--c-primary-surface);
+}
+
+.promptBlock pre {
+  width: 100%;
+  padding: var(--space-sm);
+  overflow-x: auto;
+  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--c-surface-solid) 75%, transparent);
+  color: var(--c-text);
+  font: inherit;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.importInput {
+  min-height: 14rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.importStatus {
+  min-height: 1.25rem;
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+}
+
+@media (--phone) {
+  .formCard,
+  .importCard {
+    gap: var(--space-md);
+    padding: var(--space-md);
+  }
+}

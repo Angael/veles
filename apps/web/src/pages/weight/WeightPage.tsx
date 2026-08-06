@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
-import { useRouter } from '@tanstack/react-router';
-import { ScaleIcon } from 'lucide-react';
+import { Link, useRouter } from '@tanstack/react-router';
+import { CalendarPlusIcon, FileUpIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
@@ -51,23 +51,36 @@ export function WeightPage({ entries }: WeightPageProps) {
 
   return (
     <main className={css.page}>
-      {entries.length === 0 ? (
-        <Card as='section' className={css.emptyState}>
-          <div className={css.emptyIcon}>
-            <ScaleIcon aria-hidden='true' size={28} strokeWidth={1.7} />
-          </div>
-          <div className={css.emptyCopy}>
-            <h1>Start tracking your weight</h1>
-            <p>Add today&apos;s weight to begin building your trend and progress summary.</p>
-          </div>
-          <WeightForm
-            isSaving={saveMutation.isPending}
-            onChange={setWeightKg}
-            onSubmit={submitWeight}
-            value={weightKg}
-          />
-        </Card>
-      ) : (
+      <Card as='section' aria-label="Today's weight" className={css.captureCard}>
+        <WeightForm
+          isSaving={saveMutation.isPending}
+          onChange={setWeightKg}
+          onSubmit={submitWeight}
+          value={weightKg}
+        />
+        <div className={css.captureActions}>
+          <Btn
+            icon={<FileUpIcon aria-hidden='true' />}
+            isLink
+            render={<Link to='/weight/import' />}
+            size='sm'
+            variant='outlineMain'
+          >
+            Import
+          </Btn>
+          <Btn
+            icon={<CalendarPlusIcon aria-hidden='true' />}
+            isLink
+            render={<Link to='/weight/add' />}
+            size='sm'
+            variant='outlineMain'
+          >
+            Add for date
+          </Btn>
+        </div>
+      </Card>
+
+      {entries.length > 0 ? (
         <>
           <WeightTrendChart entries={entries} />
 
@@ -80,13 +93,6 @@ export function WeightPage({ entries }: WeightPageProps) {
           </div>
 
           <Card as='section' aria-label='Recent weight entries' className={css.entriesCard}>
-            <WeightForm
-              isSaving={saveMutation.isPending}
-              onChange={setWeightKg}
-              onSubmit={submitWeight}
-              value={weightKg}
-            />
-
             <div className={css.tableFrame}>
               <table className={css.entriesTable}>
                 <thead>
@@ -119,6 +125,11 @@ export function WeightPage({ entries }: WeightPageProps) {
             </div>
           </Card>
         </>
+      ) : (
+        <Card as='section' className={css.emptyState}>
+          <h1>Start tracking your weight</h1>
+          <p>Add today&apos;s weight or import your history to begin building your trend.</p>
+        </Card>
       )}
     </main>
   );

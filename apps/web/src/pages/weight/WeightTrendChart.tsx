@@ -61,6 +61,7 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
                 tickLine={false}
               />
               <YAxis
+                allowDecimals={false}
                 axisLine={false}
                 domain={domain}
                 tickFormatter={(value: number) => `${value} kg`}

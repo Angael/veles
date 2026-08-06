@@ -21,6 +21,8 @@ import { Route as AuthenticatedRecipesIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedDiaryIndexRouteImport } from './routes/_authenticated/diary/index'
 import { Route as ApiDemoPingRouteImport } from './routes/api/demo/ping'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AuthenticatedWeightImportRouteImport } from './routes/_authenticated/weight_.import'
+import { Route as AuthenticatedWeightAddRouteImport } from './routes/_authenticated/weight_.add'
 import { Route as AuthenticatedRecipesAddRouteImport } from './routes/_authenticated/recipes/add'
 import { Route as AuthenticatedDiaryIdRouteImport } from './routes/_authenticated/diary/$id'
 import { Route as AuthenticatedRecipesViewIdRouteImport } from './routes/_authenticated/recipes/view.$id'
@@ -86,6 +88,17 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedWeightImportRoute =
+  AuthenticatedWeightImportRouteImport.update({
+    id: '/weight_/import',
+    path: '/weight/import',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedWeightAddRoute = AuthenticatedWeightAddRouteImport.update({
+  id: '/weight_/add',
+  path: '/weight/add',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedRecipesAddRoute = AuthenticatedRecipesAddRouteImport.update({
   id: '/recipes/add',
   path: '/recipes/add',
@@ -119,6 +132,8 @@ export interface FileRoutesByFullPath {
   '/api/health': typeof ApiHealthRoute
   '/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
+  '/weight/add': typeof AuthenticatedWeightAddRoute
+  '/weight/import': typeof AuthenticatedWeightImportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
   '/diary/': typeof AuthenticatedDiaryIndexRoute
@@ -136,6 +151,8 @@ export interface FileRoutesByTo {
   '/api/health': typeof ApiHealthRoute
   '/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
+  '/weight/add': typeof AuthenticatedWeightAddRoute
+  '/weight/import': typeof AuthenticatedWeightImportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
   '/diary': typeof AuthenticatedDiaryIndexRoute
@@ -155,6 +172,8 @@ export interface FileRoutesById {
   '/api/health': typeof ApiHealthRoute
   '/_authenticated/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/_authenticated/recipes/add': typeof AuthenticatedRecipesAddRoute
+  '/_authenticated/weight_/add': typeof AuthenticatedWeightAddRoute
+  '/_authenticated/weight_/import': typeof AuthenticatedWeightImportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
   '/_authenticated/diary/': typeof AuthenticatedDiaryIndexRoute
@@ -174,6 +193,8 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/diary/$id'
     | '/recipes/add'
+    | '/weight/add'
+    | '/weight/import'
     | '/api/auth/$'
     | '/api/demo/ping'
     | '/diary/'
@@ -191,6 +212,8 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/diary/$id'
     | '/recipes/add'
+    | '/weight/add'
+    | '/weight/import'
     | '/api/auth/$'
     | '/api/demo/ping'
     | '/diary'
@@ -209,6 +232,8 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/_authenticated/diary/$id'
     | '/_authenticated/recipes/add'
+    | '/_authenticated/weight_/add'
+    | '/_authenticated/weight_/import'
     | '/api/auth/$'
     | '/api/demo/ping'
     | '/_authenticated/diary/'
@@ -312,6 +337,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/weight_/import': {
+      id: '/_authenticated/weight_/import'
+      path: '/weight/import'
+      fullPath: '/weight/import'
+      preLoaderRoute: typeof AuthenticatedWeightImportRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/weight_/add': {
+      id: '/_authenticated/weight_/add'
+      path: '/weight/add'
+      fullPath: '/weight/add'
+      preLoaderRoute: typeof AuthenticatedWeightAddRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/recipes/add': {
       id: '/_authenticated/recipes/add'
       path: '/recipes/add'
@@ -350,6 +389,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedWeightRoute: typeof AuthenticatedWeightRoute
   AuthenticatedDiaryIdRoute: typeof AuthenticatedDiaryIdRoute
   AuthenticatedRecipesAddRoute: typeof AuthenticatedRecipesAddRoute
+  AuthenticatedWeightAddRoute: typeof AuthenticatedWeightAddRoute
+  AuthenticatedWeightImportRoute: typeof AuthenticatedWeightImportRoute
   AuthenticatedDiaryIndexRoute: typeof AuthenticatedDiaryIndexRoute
   AuthenticatedRecipesIndexRoute: typeof AuthenticatedRecipesIndexRoute
   AuthenticatedRecipesViewIdRoute: typeof AuthenticatedRecipesViewIdRoute
@@ -363,6 +404,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedWeightRoute: AuthenticatedWeightRoute,
   AuthenticatedDiaryIdRoute: AuthenticatedDiaryIdRoute,
   AuthenticatedRecipesAddRoute: AuthenticatedRecipesAddRoute,
+  AuthenticatedWeightAddRoute: AuthenticatedWeightAddRoute,
+  AuthenticatedWeightImportRoute: AuthenticatedWeightImportRoute,
   AuthenticatedDiaryIndexRoute: AuthenticatedDiaryIndexRoute,
   AuthenticatedRecipesIndexRoute: AuthenticatedRecipesIndexRoute,
   AuthenticatedRecipesViewIdRoute: AuthenticatedRecipesViewIdRoute,
