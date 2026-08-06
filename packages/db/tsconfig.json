@@ -1,0 +1,14 @@
+{
+  "include": ["src/**/*.ts", "*.ts"],
+  "compilerOptions": {
+    "strict": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2024"],
+    "skipLibCheck": true,
+    "target": "ES2024",
+    "allowImportingTsExtensions": true,
+    "noUncheckedIndexedAccess": true,
+    "noEmit": true
+  }
+}

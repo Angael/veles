@@ -24,7 +24,7 @@ The current UI implies these concepts:
 
 ## Decision
 
-Create recipe-domain tables in `src/db/schema/recipes.schema.ts`:
+Create recipe-domain tables in `packages/db/src/schema/recipes.schema.ts`:
 
 - `recipe`
 - `recipe_image`

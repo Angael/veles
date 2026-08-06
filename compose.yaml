@@ -1,0 +1,78 @@
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: infra/nginx/Dockerfile
+    depends_on:
+      web:
+        condition: service_healthy
+    expose:
+      - '80'
+    networks:
+      # Dokploy's proxy reaches nginx through this shared network.
+      - dokploy-network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--spider', 'http://127.0.0.1/nginx-health']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_APP_NAME: '${VITE_APP_NAME:-Veles}'
+        VITE_CF_CDN_URL: '${VITE_CF_CDN_URL:-https://cdn.example.com}'
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: '${DATABASE_URL}'
+      BETTER_AUTH_SECRET: '${BETTER_AUTH_SECRET}'
+      AUTH_ALLOWED_EMAILS: '${AUTH_ALLOWED_EMAILS}'
+      APP_URL: '${APP_URL}'
+      GOOGLE_CLIENT_ID: '${GOOGLE_CLIENT_ID}'
+      GOOGLE_CLIENT_SECRET: '${GOOGLE_CLIENT_SECRET}'
+      VITE_CF_CDN_URL: '${VITE_CF_CDN_URL}'
+      R2_ACCOUNT_ID: '${R2_ACCOUNT_ID}'
+      R2_ACCESS_KEY_ID: '${R2_ACCESS_KEY_ID}'
+      R2_SECRET_ACCESS_KEY: '${R2_SECRET_ACCESS_KEY}'
+      R2_BUCKET_NAME: '${R2_BUCKET_NAME}'
+    networks:
+      # Connects web to nginx and the separately managed Dokploy PostgreSQL service.
+      # The unique alias avoids generic `web` hostname collisions on the shared network.
+      dokploy-network:
+        aliases:
+          - veles-web
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    environment:
+      DATABASE_URL: '${DATABASE_URL}'
+    networks:
+      # Gives the worker access to the separately managed Dokploy PostgreSQL service.
+      - dokploy-network
+    restart: unless-stopped
+
+networks:
+  # Created and managed by Dokploy outside this Compose project. It connects
+  # Dokploy's proxy, managed PostgreSQL, nginx, web, and worker. The unique
+  # `veles-web` alias identifies this deployment's web service on the shared network.
+  dokploy-network:
+    external: true
