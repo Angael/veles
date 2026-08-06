@@ -181,7 +181,7 @@ function getChangeFromDaysAgo(entries: WeightEntry[], days: number) {
   }
 
   const targetDate = shiftIsoDate(latestEntry.date, -days);
-  const previousEntry = entries.findLast((entry) => entry.date <= targetDate);
+  const previousEntry = entries.findLast((entry) => entry.date <= targetDate) ?? entries.at(0);
 
   return previousEntry
     ? roundToOneDecimal(latestEntry.weightKg - previousEntry.weightKg)
