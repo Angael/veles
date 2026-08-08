@@ -1,4 +1,5 @@
 import { ClientOnly } from '@tanstack/react-router';
+import { parseISO, subMonths } from 'date-fns';
 import { useState } from 'react';
 import {
   Area,
@@ -40,12 +41,51 @@ const longDateFormatter = new Intl.DateTimeFormat('en', {
   year: 'numeric',
 });
 
+const longRangeTickFormatter = new Intl.DateTimeFormat('en', {
+  month: 'short',
+  timeZone: 'UTC',
+  year: 'numeric',
+});
+
+const rangeMonths: Partial<Record<WeightChartRange, number>> = {
+  '1m': 1,
+  '3m': 3,
+  '6m': 6,
+  '1y': 12,
+};
+
+const DAY_IN_MS = 24 * 60 * 60 * 1_000;
+const YEAR_IN_MS = 365 * DAY_IN_MS;
+
 export function WeightTrendChart({ entries }: WeightTrendChartProps) {
   const [range, setRange] = useState<WeightChartRange>('1m');
   const visibleEntries = getWeightChartRange(entries, range);
+  const chartEntries = visibleEntries.map((entry) => ({
+    ...entry,
+    timestamp: parseISO(entry.date).getTime(),
+  }));
   const weights = visibleEntries.map((entry) => entry.weightKg);
   const domain = [Math.floor(Math.min(...weights)), Math.ceil(Math.max(...weights))];
   const rangeLabel = rangeOptions.find((option) => option.value === range)!.label;
+  const firstTimestamp = chartEntries.at(0)?.timestamp;
+  const lastTimestamp = chartEntries.at(-1)?.timestamp;
+  const months = rangeMonths[range];
+  const xDomain: [number, number] = (() => {
+    if (lastTimestamp === undefined) {
+      return [0, 1];
+    }
+
+    if (months !== undefined) {
+      return [subMonths(lastTimestamp, months).getTime(), lastTimestamp];
+    }
+
+    if (firstTimestamp === undefined || firstTimestamp === lastTimestamp) {
+      return [lastTimestamp - DAY_IN_MS, lastTimestamp + DAY_IN_MS];
+    }
+
+    return [firstTimestamp, lastTimestamp];
+  })();
+  const usesLongRangeTicks = xDomain[1] - xDomain[0] >= YEAR_IN_MS;
 
   return (
     <section aria-label={`Weight over ${rangeLabel.toLowerCase()}`} className={css.hero}>
@@ -64,7 +104,7 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
           <ResponsiveContainer height='100%' minWidth={0} width='100%'>
             <AreaChart
               accessibilityLayer={false}
-              data={visibleEntries}
+              data={chartEntries}
               margin={{ bottom: 0, left: 4, right: 18, top: 8 }}
             >
               <defs>
@@ -76,13 +116,15 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
               <CartesianGrid stroke='var(--c-border)' strokeDasharray='3 7' vertical={false} />
               <XAxis
                 axisLine={false}
-                dataKey='date'
+                dataKey='timestamp'
+                domain={xDomain}
                 minTickGap={28}
-                padding={{ left: 18, right: 18 }}
-                tickFormatter={(value: string) =>
-                  shortDateFormatter.format(new Date(`${value}T00:00:00Z`))
+                scale='time'
+                tickFormatter={(value: number) =>
+                  (usesLongRangeTicks ? longRangeTickFormatter : shortDateFormatter).format(value)
                 }
                 tickLine={false}
+                type='number'
               />
               <YAxis
                 allowDecimals={false}
@@ -99,9 +141,7 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
                   borderRadius: 'var(--radius-xs)',
                 }}
                 formatter={(value) => [`${Number(value).toFixed(1)} kg`, 'Weight']}
-                labelFormatter={(label) =>
-                  longDateFormatter.format(new Date(`${String(label)}T00:00:00Z`))
-                }
+                labelFormatter={(label) => longDateFormatter.format(Number(label))}
               />
               <Area
                 dataKey='weightKg'
