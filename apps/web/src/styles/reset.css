@@ -22,6 +22,11 @@ body,
   min-height: 100%;
 }
 
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
 body {
   min-width: 320px;
 }

@@ -1,4 +1,5 @@
 import { ClientOnly } from '@tanstack/react-router';
+import { useState } from 'react';
 import {
   Area,
   AreaChart,
@@ -9,16 +10,25 @@ import {
   YAxis,
 } from 'recharts';
 import { Skeleton } from '../../components/skeleton/Skeleton';
+import { SelectInput } from '../../components/select-input/SelectInput';
 import css from './WeightTrendChart.module.css';
-
-type ChartEntry = {
-  date: string;
-  weightKg: number;
-};
+import {
+  getWeightChartRange,
+  type WeightChartEntry,
+  type WeightChartRange,
+} from './getWeightChartRange';
 
 type WeightTrendChartProps = {
-  entries: ChartEntry[];
+  entries: WeightChartEntry[];
 };
+
+const rangeOptions = [
+  { label: '1 month', value: '1m' },
+  { label: '3 months', value: '3m' },
+  { label: '6 months', value: '6m' },
+  { label: '1 year', value: '1y' },
+  { label: 'All time', value: 'all' },
+] satisfies { label: string; value: WeightChartRange }[];
 
 const shortDateFormatter = new Intl.DateTimeFormat('en', {
   day: 'numeric',
@@ -27,14 +37,22 @@ const shortDateFormatter = new Intl.DateTimeFormat('en', {
 });
 
 export function WeightTrendChart({ entries }: WeightTrendChartProps) {
-  const visibleEntries = entries.slice(-30);
+  const [range, setRange] = useState<WeightChartRange>('1m');
+  const visibleEntries = getWeightChartRange(entries, range);
   const weights = visibleEntries.map((entry) => entry.weightKg);
   const domain = [Math.floor(Math.min(...weights)), Math.ceil(Math.max(...weights))];
+  const rangeLabel = rangeOptions.find((option) => option.value === range)!.label;
 
   return (
-    <section aria-label='Weight over the last month' className={css.hero}>
+    <section aria-label={`Weight over ${rangeLabel.toLowerCase()}`} className={css.hero}>
       <div className={css.header}>
-        <span>1 month</span>
+        <SelectInput
+          aria-label='Chart time range'
+          className={css.rangeSelect}
+          items={rangeOptions}
+          onValueChange={(value) => value && setRange(value)}
+          value={range}
+        />
       </div>
 
       <div className={css.chartFrame}>

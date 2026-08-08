@@ -20,8 +20,9 @@ pnpm dev:worker
 
 Local configuration has one source of truth: the repository-root `.env`. Vite is
 configured to load it for the web app, while the worker requires it through
-Node's env-file loader. Compose also uses the same file for variable interpolation; the
-app directories do not need their own copies.
+Node's env-file loader, and the Drizzle config loads it for database commands.
+Compose also uses the same file for variable interpolation; workspace directories do
+not need their own copies.
 
 Run repository-wide checks with:
 
