@@ -136,6 +136,7 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
                 tickFormatter={(value: number) =>
                   format(value, usesLongRangeTicks ? 'MM.yyyy' : 'dd.MM')
                 }
+                tickMargin={8}
                 tickLine={false}
                 ticks={xTicks}
                 type='number'
