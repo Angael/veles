@@ -1,19 +1,21 @@
 import { formatISO, parseISO, subDays, subMonths } from 'date-fns';
 import type { WeightEntry } from './weight.api';
 
-export type WeightChartRange = '1m' | '3m' | '6m' | '1y' | 'all';
+export type WeightChartRange = '1m' | '3m' | '6m' | '1y' | '2y' | '3y' | 'all';
 
-const RANGE_MONTHS: Partial<Record<WeightChartRange, number>> = {
+export const WEIGHT_CHART_RANGE_MONTHS: Partial<Record<WeightChartRange, number>> = {
   '1m': 1,
   '3m': 3,
   '6m': 6,
   '1y': 12,
+  '2y': 24,
+  '3y': 36,
 };
 
 /** Returns entries in the selected window, adding an interpolated value at its cutoff when possible. */
 export function getWeightChartRange(entries: WeightEntry[], range: WeightChartRange) {
   const latestEntry = entries.at(-1);
-  const months = RANGE_MONTHS[range];
+  const months = WEIGHT_CHART_RANGE_MONTHS[range];
 
   if (!latestEntry || months === undefined) {
     return entries;

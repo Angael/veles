@@ -13,7 +13,11 @@ import {
 import { Skeleton } from '../../components/skeleton/Skeleton';
 import { SelectInput } from '../../components/select-input/SelectInput';
 import css from './WeightTrendChart.module.css';
-import { getWeightChartRange, type WeightChartRange } from './weightCalculations';
+import {
+  getWeightChartRange,
+  WEIGHT_CHART_RANGE_MONTHS,
+  type WeightChartRange,
+} from './weightCalculations';
 import type { WeightEntry } from './weight.api';
 
 type WeightTrendChartProps = {
@@ -25,6 +29,8 @@ const rangeOptions = [
   { label: '3 months', value: '3m' },
   { label: '6 months', value: '6m' },
   { label: '1 year', value: '1y' },
+  { label: '2 years', value: '2y' },
+  { label: '3 years', value: '3y' },
   { label: 'All time', value: 'all' },
 ] satisfies { label: string; value: WeightChartRange }[];
 
@@ -47,13 +53,6 @@ const longRangeTickFormatter = new Intl.DateTimeFormat('en', {
   year: 'numeric',
 });
 
-const rangeMonths: Partial<Record<WeightChartRange, number>> = {
-  '1m': 1,
-  '3m': 3,
-  '6m': 6,
-  '1y': 12,
-};
-
 const DAY_IN_MS = 24 * 60 * 60 * 1_000;
 const YEAR_IN_MS = 365 * DAY_IN_MS;
 
@@ -69,7 +68,7 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
   const rangeLabel = rangeOptions.find((option) => option.value === range)!.label;
   const firstTimestamp = chartEntries.at(0)?.timestamp;
   const lastTimestamp = chartEntries.at(-1)?.timestamp;
-  const months = rangeMonths[range];
+  const months = WEIGHT_CHART_RANGE_MONTHS[range];
   const xDomain: [number, number] = (() => {
     if (lastTimestamp === undefined) {
       return [0, 1];
@@ -118,12 +117,14 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
                 axisLine={false}
                 dataKey='timestamp'
                 domain={xDomain}
+                interval='preserveStartEnd'
                 minTickGap={28}
                 scale='time'
                 tickFormatter={(value: number) =>
                   (usesLongRangeTicks ? longRangeTickFormatter : shortDateFormatter).format(value)
                 }
                 tickLine={false}
+                tickCount={range === '3m' ? 4 : undefined}
                 type='number'
               />
               <YAxis
