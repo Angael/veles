@@ -2,14 +2,15 @@ import { NavigationMenu } from '@base-ui/react/navigation-menu';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { ChevronDownIcon } from 'lucide-react';
 import { useState } from 'react';
+import type { SessionUser } from '@/lib/auth/session.api';
 import css from './NavMenu.module.css';
 import { useDesktopNavMenu } from './useNavMenuGroups';
 
-export function NavMenu() {
+export function NavMenu({ user }: { user: SessionUser | null }) {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
-  const groups = useDesktopNavMenu();
+  const groups = useDesktopNavMenu(user);
   const [value, setValue] = useState<string | null>(null);
 
   return (

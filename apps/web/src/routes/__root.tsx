@@ -3,6 +3,7 @@ import { AppFrame } from '@/components/app-frame/AppFrame';
 import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
 import { NotFound } from '@/components/not-found/NotFound';
 import { ToastProvider } from '@/components/toast/ToastProvider';
+import { getSessionUser } from '@/lib/auth/session.api';
 import { clientEnv } from '@/lib/env/client';
 import resetCss from '@/styles/reset.css?url';
 import type { QueryClient } from '@tanstack/react-query';
@@ -28,6 +29,7 @@ const faviconLinks = isLocalhostApp
     ];
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  beforeLoad: async () => ({ user: await getSessionUser() }),
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
@@ -54,10 +56,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootComponent() {
+  const { user } = Route.useRouteContext();
+
   return (
     <RootDocument>
       <ToastProvider>
-        <AppFrame />
+        <AppFrame user={user} />
       </ToastProvider>
     </RootDocument>
   );

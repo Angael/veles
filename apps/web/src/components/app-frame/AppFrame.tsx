@@ -5,10 +5,17 @@ import type { ReactNode } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { NavMenu } from '@/components/nav-menu/NavMenu';
 import { MobileNavMenu } from '@/components/nav-menu/MobileNavMenu';
+import type { SessionUser } from '@/lib/auth/session.api';
 import type { NavbarTarget } from '@/lib/routing/staticRouteData';
 import css from './AppFrame.module.css';
 
-export function AppFrame({ children }: { children?: ReactNode }) {
+export function AppFrame({
+  children,
+  user = null,
+}: {
+  children?: ReactNode;
+  user?: SessionUser | null;
+}) {
   const navbar = useRouterState({
     select: (state) => {
       const match = state.matches.at(-1);
@@ -33,10 +40,10 @@ export function AppFrame({ children }: { children?: ReactNode }) {
       <div className={css.shell}>
         <header className={clsx(css.header, !navbar && css.headerDefaultBrand)}>
           {navbar ? <RouteLabel label={navbar.label} upTo={navbar.upTo} /> : <div />}
-          <NavMenu />
+          <NavMenu user={user} />
         </header>
         {children === undefined ? <Outlet /> : children}
-        <MobileNavMenu />
+        <MobileNavMenu user={user} />
       </div>
     </div>
   );

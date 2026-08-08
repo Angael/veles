@@ -1,22 +1,18 @@
 import { Avatar } from '@base-ui/react/avatar';
 import { useNavigate } from '@tanstack/react-router';
 import { type ReactNode, useState } from 'react';
-import { signOut, useSession } from '@/lib/auth/client';
+import { signOut } from '@/lib/auth/client';
+import type { SessionUser } from '@/lib/auth/session.api';
 import css from './NavMenu.module.css';
 
 type MobileAccountLink = '/account' | '/login';
-type SessionUser = {
-  email?: string | null;
-  image?: string | null;
-  name?: string | null;
-};
 
 export type MobileAccountItem = {
   key: 'account';
   label: string;
   link: MobileAccountLink;
   matchPrefixes: string[];
-  user: SessionUser | null | undefined;
+  user: SessionUser | null;
 };
 
 export interface NavMenuGroup {
@@ -37,10 +33,8 @@ export interface NavMenuItem {
   disabled?: boolean;
 }
 
-export function useDesktopNavMenu() {
+export function useDesktopNavMenu(user: SessionUser | null) {
   const navigate = useNavigate();
-  const { data: session } = useSession();
-  const user = session?.user;
   const [logoutBusy, setLogoutBusy] = useState(false);
   const accountInitials = getInitials(user?.name ?? user?.email ?? 'Account');
 
@@ -171,10 +165,7 @@ export const MOBILE_NAV_ITEMS = [
 
 export type MobileNavItem = (typeof MOBILE_NAV_ITEMS)[number];
 
-export function useMobileNavItems() {
-  const { data: session } = useSession();
-  const user = session?.user;
-
+export function useMobileNavItems(user: SessionUser | null) {
   const mobileAccountItem: MobileAccountItem = {
     key: 'account',
     label: user ? 'Account' : 'Login',
