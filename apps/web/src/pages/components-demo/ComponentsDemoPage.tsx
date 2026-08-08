@@ -1,17 +1,26 @@
+// This component catalog may remain intentionally long; keep all component demos together rather than splitting it needlessly.
 import { PlusIcon, SearchIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Btn, type BtnSize, type BtnVariant } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
+import { DateInput } from '@/components/date-input/DateInput';
 import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
 import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
+import { Label } from '@/components/label/Label';
 import { NavMenu } from '@/components/nav-menu/NavMenu';
 import { NotFound } from '@/components/not-found/NotFound';
 import { NumberInput } from '@/components/number-input/NumberInput';
+import { SeamlessTextInput } from '@/components/seamless-text-input/SeamlessTextInput';
+import { SeamlessTextarea } from '@/components/seamless-textarea/SeamlessTextarea';
 import { SelectInput } from '@/components/select-input/SelectInput';
+import { Skeleton } from '@/components/skeleton/Skeleton';
+import { SliderInput } from '@/components/slider-input/SliderInput';
 import { TextInput } from '@/components/text-input/TextInput';
-import { AdditionalComponentsDemo } from './AdditionalComponentsDemo';
+import { TextareaInput } from '@/components/textarea-input/TextareaInput';
+import { toastManager } from '@/components/toast/toastManager';
+import { UploadTileGrid } from '@/components/upload-tile-grid/UploadTileGrid';
 import css from './ComponentsDemoPage.module.css';
 
 const SELECT_OPTIONS = [
@@ -46,6 +55,8 @@ export function ComponentsDemoPage() {
   const [numberValue, setNumberValue] = useState<number | null>(320);
   const [selectValue, setSelectValue] = useState<(typeof SELECT_OPTIONS)[number]['value']>('lte');
   const [btnLoading, setBtnLoading] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
+  const [sliderValue, setSliderValue] = useState(50);
 
   return (
     <main className={css.page}>
@@ -182,7 +193,76 @@ export function ComponentsDemoPage() {
         <p>This component stays fixed to the viewport and is rendered once for this demo.</p>
       </section>
 
-      <AdditionalComponentsDemo />
+      <section>
+        <h2>Labels and inputs</h2>
+        <div className={css.formGrid}>
+          <Label text='DateInput'>
+            <DateInput defaultValue='2026-08-08' />
+          </Label>
+          <Label text='TextareaInput'>
+            <TextareaInput defaultValue='A standard multiline field.' rows={3} />
+          </Label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Seamless fields</h2>
+        <Card className={css.seamlessCard}>
+          <SeamlessTextInput aria-label='Demo seamless title' defaultValue='Editable card title' />
+          <SeamlessTextarea
+            aria-label='Demo seamless description'
+            defaultValue='These controls inherit the surrounding surface instead of drawing their own.'
+            rows={3}
+          />
+        </Card>
+      </section>
+
+      <section>
+        <h2>Skeleton</h2>
+        <Card className={css.skeletonCard}>
+          <Skeleton className={css.skeletonTitle} />
+          <Skeleton className={css.skeletonLine} />
+          <Skeleton className={css.skeletonShortLine} />
+        </Card>
+      </section>
+
+      <section>
+        <h2>SliderInput</h2>
+        <SliderInput
+          label='Demo percentage'
+          max={100}
+          min={0}
+          onValueChange={setSliderValue}
+          value={sliderValue}
+        />
+      </section>
+
+      <section>
+        <h2>Toast</h2>
+        <Btn
+          onClick={() =>
+            toastManager.add({
+              description: 'The global provider renders this notification.',
+              title: 'Demo toast',
+              type: 'success',
+            })
+          }
+          type='button'
+          variant='outlineMain'
+        >
+          Show toast
+        </Btn>
+      </section>
+
+      <section>
+        <h2>UploadTileGrid</h2>
+        <UploadTileGrid
+          files={files}
+          maxItemSize={5 * 1024 * 1024}
+          maxItems={4}
+          onFilesChange={setFiles}
+        />
+      </section>
 
       <FloatingButton
         icon={<SearchIcon aria-hidden='true' size={18} strokeWidth={1.8} />}
