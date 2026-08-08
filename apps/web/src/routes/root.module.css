@@ -1,0 +1,36 @@
+.demoLink {
+  position: fixed;
+  z-index: 100;
+  top: var(--space-xs);
+  left: 50%;
+  padding: 0.25rem 0.625rem;
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  color: var(--c-muted-strong);
+  background: var(--c-surface);
+  font-size: var(--text-xs);
+  line-height: 1.25;
+  text-decoration: none;
+  transform: translateX(-50%);
+  transition:
+    color 140ms ease-out,
+    border-color 140ms ease-out,
+    background-color 140ms ease-out;
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      color: var(--c-text);
+      border-color: var(--c-primary);
+      background: var(--c-surface-strong);
+    }
+  }
+
+  @media (--phone) {
+    display: none;
+  }
+}
