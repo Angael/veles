@@ -1,8 +1,6 @@
 import { PlusIcon, SearchIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { AppFrame } from '@/components/app-frame/AppFrame';
-import { AuthCard } from '@/components/auth-card/AuthCard';
 import { Btn, type BtnSize, type BtnVariant } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
@@ -157,24 +155,8 @@ export function ComponentsDemoPage() {
       </section>
 
       <section>
-        <h2>AuthCard</h2>
-        <AuthCard
-          busy={false}
-          description='Continue with an invited Google account.'
-          error={null}
-          onGoogle={async () => {}}
-          title='Welcome back'
-        />
-      </section>
-
-      <section>
         <h2>NavMenu</h2>
         <NavMenu user={null} />
-      </section>
-
-      <section>
-        <h2>AppFrame</h2>
-        <AppFrame />
       </section>
 
       <section>
