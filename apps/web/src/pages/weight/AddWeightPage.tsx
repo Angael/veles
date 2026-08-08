@@ -14,7 +14,8 @@ import { saveWeight } from './weight.api';
 export function AddWeightPage() {
   const router = useRouter();
   const navigate = useNavigate();
-  const [date, setDate] = useState(getLocalDate());
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const [date, setDate] = useState(today);
   const [weightKg, setWeightKg] = useState<number | null>(null);
   const mutation = useMutation({
     mutationFn: saveWeight,
@@ -52,7 +53,7 @@ export function AddWeightPage() {
         >
           <Label text='Date'>
             <DateInput
-              max={getLocalDate()}
+              max={today}
               onChange={(event) => setDate(event.currentTarget.value)}
               required
               value={date}
@@ -86,8 +87,4 @@ export function AddWeightPage() {
       </Card>
     </main>
   );
-}
-
-function getLocalDate() {
-  return format(new Date(), 'yyyy-MM-dd');
 }

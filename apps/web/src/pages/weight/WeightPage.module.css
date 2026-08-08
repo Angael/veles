@@ -19,10 +19,11 @@
   text-wrap: pretty;
 }
 
-.captureCard {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+.captureContainer {
+  display: flex;
+  flex-wrap: wrap;
   align-items: end;
+  justify-content: space-between;
   gap: var(--space-lg);
 }
 
@@ -32,7 +33,7 @@
   gap: var(--space-xs);
 }
 
-.captureCard .entryForm {
+.captureContainer .entryForm {
   padding-bottom: 0;
   border-bottom: 0;
 }
@@ -149,10 +150,10 @@
     padding: var(--space-lg) var(--space-md);
   }
 
-  .captureCard {
-    grid-template-columns: 1fr;
+  .captureContainer {
+    align-items: stretch;
+    flex-direction: column;
     gap: var(--space-md);
-    padding: var(--space-md);
   }
 
   .captureActions > * {

@@ -12,14 +12,11 @@ import {
 import { Skeleton } from '../../components/skeleton/Skeleton';
 import { SelectInput } from '../../components/select-input/SelectInput';
 import css from './WeightTrendChart.module.css';
-import {
-  getWeightChartRange,
-  type WeightChartEntry,
-  type WeightChartRange,
-} from './getWeightChartRange';
+import { getWeightChartRange, type WeightChartRange } from './weightCalculations';
+import type { WeightEntry } from './weight.api';
 
 type WeightTrendChartProps = {
-  entries: WeightChartEntry[];
+  entries: WeightEntry[];
 };
 
 const rangeOptions = [
@@ -34,6 +31,13 @@ const shortDateFormatter = new Intl.DateTimeFormat('en', {
   day: 'numeric',
   month: 'short',
   timeZone: 'UTC',
+});
+
+const longDateFormatter = new Intl.DateTimeFormat('en', {
+  day: 'numeric',
+  month: 'long',
+  timeZone: 'UTC',
+  year: 'numeric',
 });
 
 export function WeightTrendChart({ entries }: WeightTrendChartProps) {
@@ -75,7 +79,9 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
                 dataKey='date'
                 minTickGap={28}
                 padding={{ left: 18, right: 18 }}
-                tickFormatter={formatShortDate}
+                tickFormatter={(value: string) =>
+                  shortDateFormatter.format(new Date(`${value}T00:00:00Z`))
+                }
                 tickLine={false}
               />
               <YAxis
@@ -92,8 +98,10 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
                   border: '1px solid var(--c-border-strong)',
                   borderRadius: 'var(--radius-xs)',
                 }}
-                formatter={(value) => [formatWeight(Number(value)), 'Weight']}
-                labelFormatter={(label) => formatLongDate(String(label))}
+                formatter={(value) => [`${Number(value).toFixed(1)} kg`, 'Weight']}
+                labelFormatter={(label) =>
+                  longDateFormatter.format(new Date(`${String(label)}T00:00:00Z`))
+                }
               />
               <Area
                 dataKey='weightKg'
@@ -110,21 +118,4 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
       </div>
     </section>
   );
-}
-
-function formatShortDate(value: string) {
-  return shortDateFormatter.format(new Date(`${value}T00:00:00Z`));
-}
-
-function formatLongDate(value: string) {
-  return new Intl.DateTimeFormat('en', {
-    day: 'numeric',
-    month: 'long',
-    timeZone: 'UTC',
-    year: 'numeric',
-  }).format(new Date(`${value}T00:00:00Z`));
-}
-
-function formatWeight(value: number) {
-  return `${value.toFixed(1)} kg`;
 }

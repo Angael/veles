@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getWeightChartRange } from './getWeightChartRange';
+import { getChangeFromDaysAgo, getWeightAtDate, getWeightChartRange } from './weightCalculations';
 
 const entries = [
   { date: '2026-04-15', weightKg: 80 },
@@ -32,5 +32,28 @@ describe('getWeightChartRange', () => {
     ];
 
     expect(getWeightChartRange(monthEndEntries, '1m').at(0)?.date).toBe('2026-02-28');
+  });
+});
+
+describe('getWeightAtDate', () => {
+  it('interpolates between measurements', () => {
+    expect(getWeightAtDate(entries, '2026-05-01')).toBe(85.33333333333333);
+  });
+
+  it('does not extrapolate outside the measured range', () => {
+    expect(getWeightAtDate(entries, '2026-04-01')).toBeUndefined();
+    expect(getWeightAtDate(entries, '2026-06-02')).toBeUndefined();
+  });
+});
+
+describe('getChangeFromDaysAgo', () => {
+  it('interpolates the target weight between sparse measurements', () => {
+    const sparseEntries = [
+      { date: '2026-02-01', weightKg: 75.4 },
+      { date: '2026-08-08', weightKg: 87.7 },
+    ];
+
+    expect(getChangeFromDaysAgo(sparseEntries, 14)).toBe(0.9);
+    expect(getChangeFromDaysAgo(sparseEntries, 30)).toBe(2);
   });
 });
