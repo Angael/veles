@@ -77,12 +77,12 @@ const updateRecipeRatingInputType = type({
 
 const updateRecipeInputType = type({
   carbs: 'number.integer >= 0 | null',
-  description: 'string.trim',
+  description: 'string',
   fats: 'number.integer >= 0 | null',
   id: 'string.uuid',
   ingredients: 'string[]',
   kcal: 'number.integer >= 0 | null',
-  name: 'string.trim |> string >= 1',
+  name: 'string >= 1',
   portions: 'number.integer >= 1',
   protein: 'number.integer >= 0 | null',
   rating: '1 <= number.integer <= 5 | null',

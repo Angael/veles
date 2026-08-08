@@ -42,11 +42,11 @@ const portionsFormValueType = type('string.trim').pipe((value): number | ArkErro
 
 const uploadRecipeInputType = type({
   carbs: optionalNumericFormValueType,
-  description: 'string.trim',
+  description: 'string',
   fats: optionalNumericFormValueType,
   ingredients: 'string[]',
   kcal: optionalNumericFormValueType,
-  name: 'string.trim |> string >= 1',
+  name: 'string >= 1',
   photos: 'File[]',
   portions: portionsFormValueType,
   protein: optionalNumericFormValueType,
@@ -179,13 +179,7 @@ function validateRecipeForm(formData: FormData) {
     carbs: formData.get('carbs'),
     description: formData.get('description'),
     fats: formData.get('fats'),
-    ingredients:
-      typeof ingredientsValue === 'string'
-        ? ingredientsValue
-            .split('\n')
-            .map((item) => item.trim())
-            .filter(Boolean)
-        : [],
+    ingredients: typeof ingredientsValue === 'string' ? ingredientsValue.split('\n') : [],
     kcal: formData.get('kcal'),
     name: formData.get('name'),
     photos: photoSizeValidation,
