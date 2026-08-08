@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
+import { format } from 'date-fns';
 import { useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
@@ -42,7 +43,11 @@ export function AddWeightPage() {
           className={css.form}
           onSubmit={(event) => {
             event.preventDefault();
-            if (weightKg !== null) mutation.mutate({ data: { date, weightKg } });
+            if (weightKg === null) {
+              return;
+            }
+
+            mutation.mutate({ data: { date, weightKg } });
           }}
         >
           <Label text='Date'>
@@ -84,6 +89,5 @@ export function AddWeightPage() {
 }
 
 function getLocalDate() {
-  const now = new Date();
-  return new Date(now.valueOf() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
+  return format(new Date(), 'yyyy-MM-dd');
 }
