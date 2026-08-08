@@ -6,6 +6,7 @@ const rootEnvFile = new URL('../../.env', import.meta.url);
 
 // Local commands share the root env; deployed commands keep using injected variables.
 if (existsSync(rootEnvFile)) {
+  console.log('Loading .env from repo root');
   loadEnvFile(rootEnvFile);
 }
 
