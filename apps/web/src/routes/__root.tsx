@@ -7,11 +7,11 @@ import { getSessionUser } from '@/lib/auth/session.api';
 import { clientEnv } from '@/lib/env/client';
 import resetCss from '@/styles/reset.css?url';
 import type { QueryClient } from '@tanstack/react-query';
-import { HeadContent, Link, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
+import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
 import * as React from 'react';
-import css from './root.module.css';
 
 const isLocalhostApp = import.meta.env.DEV;
+const ComponentsDemoLink = React.lazy(() => import('./-ComponentsDemoLink'));
 
 const faviconLinks = isLocalhostApp
   ? [
@@ -75,11 +75,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {isLocalhostApp ? (
-          <Link className={css.demoLink} to='/demo/components'>
-            Components demo
-          </Link>
-        ) : null}
+        {isLocalhostApp ? <ComponentsDemoLink /> : null}
         {children}
         {/* {import.meta.env.DEV ? (
           <>
