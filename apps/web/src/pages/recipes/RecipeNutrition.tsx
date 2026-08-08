@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Slider } from '@base-ui/react/slider';
 import clsx from 'clsx';
+import { SliderInput } from '../../components/slider-input/SliderInput';
 import type { RecipeLibraryItem } from './recipes.api';
 import css from './RecipeNutrition.module.css';
 
@@ -11,25 +11,15 @@ export function RecipeNutrition({ recipe }: { recipe: RecipeLibraryItem }) {
 
   return (
     <section className={css.nutrition} aria-label='Recipe nutrition and portions'>
-      <Slider.Root
+      <SliderInput
         className={css.portionSlider}
+        label='Portions'
         max={Math.max(8, basePortions)}
         min={0}
         onValueChange={setPortions}
         step={0.5}
         value={portions}
-      >
-        <div className={css.sliderHeader}>
-          <Slider.Label>Portions</Slider.Label>
-          <Slider.Value>{(formattedValues) => formattedValues[0] ?? ''}</Slider.Value>
-        </div>
-        <Slider.Control className={css.sliderControl}>
-          <Slider.Track className={css.sliderTrack}>
-            <Slider.Indicator className={css.sliderIndicator} />
-            <Slider.Thumb aria-label='Portions' className={css.sliderThumb} />
-          </Slider.Track>
-        </Slider.Control>
-      </Slider.Root>
+      />
 
       <div className={css.nutritionValues}>
         <dl>
