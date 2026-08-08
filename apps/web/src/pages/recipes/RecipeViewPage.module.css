@@ -6,14 +6,15 @@
 
 .heading {
   display: flex;
-  gap: var(--space-lg);
+  gap: var(--space-xl);
   align-items: end;
-  justify-content: space-between;
+  justify-content: stretch;
 }
 
 .identity {
   display: grid;
   min-width: 0;
+  flex: 1;
   gap: var(--space-xs);
 
   h1 {
@@ -51,20 +52,23 @@
 }
 
 .layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 17rem;
-  grid-template-areas:
-    'photo rail'
-    'description rail';
-  gap: var(--space-lg) var(--space-xl);
+  display: flex;
+  gap: var(--space-xl);
   align-items: start;
+}
+
+.content {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-lg);
 }
 
 .hero {
   position: relative;
   overflow: hidden;
   display: grid;
-  grid-area: photo;
   width: 100%;
   height: min(36vw, 22rem);
   min-height: 15rem;
@@ -96,21 +100,6 @@
   object-fit: cover;
   outline: 1px solid rgba(255, 255, 255, 0.08);
   outline-offset: -1px;
-}
-
-.heroFallback {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  width: 100%;
-  min-height: 9rem;
-  place-items: center;
-  color: var(--c-muted-strong);
-}
-
-.hero:has(.heroFallback) {
-  height: auto;
-  min-height: 0;
 }
 
 .carouselControls {
@@ -157,7 +146,8 @@
 
 .rail {
   display: grid;
-  grid-area: rail;
+  width: 17rem;
+  flex: 0 0 auto;
   gap: var(--space-md);
 }
 
@@ -188,7 +178,6 @@
 }
 
 .description {
-  grid-area: description;
   max-width: 62ch;
   overflow-wrap: anywhere;
   color: var(--c-muted-soft);
@@ -219,12 +208,13 @@
   }
 
   .layout {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      'photo'
-      'rail'
-      'description';
+    flex-direction: column;
     gap: var(--space-lg);
+  }
+
+  .content,
+  .rail {
+    width: 100%;
   }
 
   .hero {

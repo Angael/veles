@@ -60,7 +60,10 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
         </header>
 
         <div className={css.layout}>
-          <RecipeImgSlider images={recipe.images} />
+          <div className={css.content}>
+            {recipe.images.length > 0 ? <RecipeImgSlider images={recipe.images} /> : null}
+            {recipe.description ? <p className={css.description}>{recipe.description}</p> : null}
+          </div>
 
           <aside className={css.rail}>
             <section className={css.utilityGroup}>
@@ -75,8 +78,6 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
             </section>
             <RecipeRating rating={recipe.rating} recipeId={recipe.id} />
           </aside>
-
-          {recipe.description ? <p className={css.description}>{recipe.description}</p> : null}
         </div>
       </article>
     </main>
