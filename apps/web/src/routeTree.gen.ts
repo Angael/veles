@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DemoComponentsRouteImport } from './routes/demo.components'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
 import { Route as AuthenticatedTodosRouteImport } from './routes/_authenticated/todos'
@@ -40,6 +41,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoComponentsRoute = DemoComponentsRouteImport.update({
+  id: '/demo/components',
+  path: '/demo/components',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiHealthRoute = ApiHealthRouteImport.update({
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/todos': typeof AuthenticatedTodosRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/api/health': typeof ApiHealthRoute
+  '/demo/components': typeof DemoComponentsRoute
   '/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/weight/add': typeof AuthenticatedWeightAddRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/todos': typeof AuthenticatedTodosRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/api/health': typeof ApiHealthRoute
+  '/demo/components': typeof DemoComponentsRoute
   '/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/weight/add': typeof AuthenticatedWeightAddRoute
@@ -170,6 +178,7 @@ export interface FileRoutesById {
   '/_authenticated/todos': typeof AuthenticatedTodosRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/api/health': typeof ApiHealthRoute
+  '/demo/components': typeof DemoComponentsRoute
   '/_authenticated/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/_authenticated/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/_authenticated/weight_/add': typeof AuthenticatedWeightAddRoute
@@ -191,6 +200,7 @@ export interface FileRouteTypes {
     | '/todos'
     | '/weight'
     | '/api/health'
+    | '/demo/components'
     | '/diary/$id'
     | '/recipes/add'
     | '/weight/add'
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
     | '/todos'
     | '/weight'
     | '/api/health'
+    | '/demo/components'
     | '/diary/$id'
     | '/recipes/add'
     | '/weight/add'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/_authenticated/todos'
     | '/_authenticated/weight'
     | '/api/health'
+    | '/demo/components'
     | '/_authenticated/diary/$id'
     | '/_authenticated/recipes/add'
     | '/_authenticated/weight_/add'
@@ -247,6 +259,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   ApiHealthRoute: typeof ApiHealthRoute
+  DemoComponentsRoute: typeof DemoComponentsRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDemoPingRoute: typeof ApiDemoPingRoute
 }
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/components': {
+      id: '/demo/components'
+      path: '/demo/components'
+      fullPath: '/demo/components'
+      preLoaderRoute: typeof DemoComponentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/health': {
@@ -421,6 +441,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   ApiHealthRoute: ApiHealthRoute,
+  DemoComponentsRoute: DemoComponentsRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDemoPingRoute: ApiDemoPingRoute,
 }
