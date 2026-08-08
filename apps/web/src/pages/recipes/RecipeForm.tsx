@@ -41,7 +41,7 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
           onChange={(event) =>
             onDraftChange({
               ...draft,
-              ingredients: splitAndTrim(event.currentTarget.value, '\n'),
+              ingredients: event.currentTarget.value.split('\n'),
             })
           }
           placeholder='One ingredient per line'
@@ -53,7 +53,7 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
       <Label text='Tags'>
         <TextInput
           name='tags'
-          onValueChange={(value) => onDraftChange({ ...draft, tags: splitAndTrim(value, ',') })}
+          onValueChange={(value) => onDraftChange({ ...draft, tags: value.split(',') })}
           placeholder='dinner, chicken, high protein'
           value={draft.tags.join(', ')}
         />
@@ -125,11 +125,4 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
       </div>
     </div>
   );
-}
-
-function splitAndTrim(value: string, separator: string) {
-  return value
-    .split(separator)
-    .map((item) => item.trim())
-    .filter(Boolean);
 }
