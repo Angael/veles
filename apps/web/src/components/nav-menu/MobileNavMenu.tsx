@@ -11,6 +11,7 @@ import {
   ScaleIcon,
   UserIcon,
 } from 'lucide-react';
+import type { SessionUser } from '@/lib/auth/session.api';
 import css from './MobileNavMenu.module.css';
 import { useMobileNavItems } from './useNavMenuGroups';
 
@@ -24,12 +25,12 @@ const itemIcons = {
   weight: ScaleIcon,
 } as const;
 
-export function MobileNavMenu() {
+export function MobileNavMenu({ user }: { user: SessionUser | null }) {
   const navigate = useNavigate();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
-  const items = useMobileNavItems();
+  const items = useMobileNavItems(user);
   const activeValue = items.find((item) =>
     item.matchPrefixes.some((prefix) => pathname.startsWith(prefix)),
   )?.key;
