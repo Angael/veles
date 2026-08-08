@@ -11,6 +11,7 @@ import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/reac
 import * as React from 'react';
 
 const isLocalhostApp = import.meta.env.DEV;
+const ComponentsDemoLink = React.lazy(() => import('./-ComponentsDemoLink'));
 
 const faviconLinks = isLocalhostApp
   ? [
@@ -74,6 +75,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        {isLocalhostApp ? <ComponentsDemoLink /> : null}
         {children}
         {/* {import.meta.env.DEV ? (
           <>

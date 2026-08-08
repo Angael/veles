@@ -1,0 +1,82 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-lg);
+
+  & > h1 {
+    text-wrap: balance;
+  }
+
+  & > section {
+    display: grid;
+    width: 100%;
+    gap: var(--space-sm);
+  }
+}
+
+.loaderToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  width: fit-content;
+}
+
+.cardRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.tableScroller {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  display: grid;
+  align-items: center;
+  gap: var(--space-xs);
+  width: max-content;
+
+  & strong {
+    color: var(--c-muted-strong);
+  }
+}
+
+.tableRow {
+  display: contents;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: var(--space-md);
+}
+
+.seamlessCard {
+  display: grid;
+  max-width: 34rem;
+  gap: var(--space-xs);
+}
+
+.skeletonCard {
+  display: grid;
+  width: min(100%, 28rem);
+  gap: var(--space-sm);
+}
+
+.skeletonTitle {
+  width: 52%;
+  height: 1.5rem;
+}
+
+.skeletonLine {
+  width: 100%;
+  height: 0.875rem;
+}
+
+.skeletonShortLine {
+  width: 72%;
+  height: 0.875rem;
+}
