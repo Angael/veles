@@ -12,13 +12,15 @@ export type WeightEntry = {
   weightKg: number;
 };
 
+export const MAX_WEIGHT_IMPORT_ENTRIES = 3_000;
+
 const saveWeightInputType = type({
   date: 'string.date',
   weightKg: '30 <= number <= 300',
 });
 
 const saveWeightsInputType = type({
-  entries: saveWeightInputType.array().atLeastLength(1).atMostLength(1_000),
+  entries: saveWeightInputType.array().atLeastLength(1).atMostLength(MAX_WEIGHT_IMPORT_ENTRIES),
 });
 
 export const getWeightEntries = createServerFn({ method: 'GET' })

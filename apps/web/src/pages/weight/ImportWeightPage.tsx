@@ -9,7 +9,7 @@ import { TextareaInput } from '@/components/textarea-input/TextareaInput';
 import { toastManager } from '@/components/toast/toastManager';
 import css from './WeightEntryPages.module.css';
 import { parseWeightEntries } from './parseWeightEntries';
-import { saveWeights } from './weight.api';
+import { MAX_WEIGHT_IMPORT_ENTRIES, saveWeights } from './weight.api';
 
 const aiPrompt = `Convert my weight history to plain text with exactly one entry per line in this format:
 YYYY-MM-DD <weight>kg
@@ -22,6 +22,7 @@ export function ImportWeightPage() {
   const navigate = useNavigate();
   const [value, setValue] = useState('');
   const parsed = useMemo(() => parseWeightEntries(value), [value]);
+  const hasTooManyEntries = parsed.entries.length > MAX_WEIGHT_IMPORT_ENTRIES;
   const mutation = useMutation({
     mutationFn: saveWeights,
     onError: () => {
@@ -67,7 +68,7 @@ export function ImportWeightPage() {
           className={css.form}
           onSubmit={(event) => {
             event.preventDefault();
-            if (parsed.entries.length > 0 && parsed.errors.length === 0) {
+            if (parsed.entries.length > 0 && parsed.errors.length === 0 && !hasTooManyEntries) {
               mutation.mutate({ data: { entries: parsed.entries } });
             }
           }}
@@ -75,6 +76,7 @@ export function ImportWeightPage() {
           <Label text='Weight data'>
             <TextareaInput
               aria-describedby='weight-import-status'
+              aria-invalid={hasTooManyEntries}
               className={css.importInput}
               onChange={(event) => setValue(event.currentTarget.value)}
               placeholder={'2026-08-01 78.4kg\n2026-08-02 78.1kg'}
@@ -83,19 +85,28 @@ export function ImportWeightPage() {
               value={value}
             />
           </Label>
-          <div aria-live='polite' className={css.importStatus} id='weight-import-status'>
-            {parsed.errors.length > 0
-              ? parsed.errors.join(' ')
-              : parsed.entries.length > 0
-                ? `${parsed.entries.length} ${parsed.entries.length === 1 ? 'entry' : 'entries'} ready to import.`
-                : 'Format: YYYY-MM-DD 78.4kg'}
+          <div
+            aria-live='polite'
+            className={css.importStatus}
+            data-error={hasTooManyEntries ? '' : undefined}
+            id='weight-import-status'
+          >
+            {hasTooManyEntries
+              ? `You can import up to ${MAX_WEIGHT_IMPORT_ENTRIES.toLocaleString()} entries at once.`
+              : parsed.errors.length > 0
+                ? parsed.errors.join(' ')
+                : parsed.entries.length > 0
+                  ? `${parsed.entries.length} ${parsed.entries.length === 1 ? 'entry' : 'entries'} ready to import.`
+                  : 'Format: YYYY-MM-DD 78.4kg'}
           </div>
           <div className={css.formActions}>
             <Btn isLink render={<Link to='/weight' />} size='sm' variant='ghost'>
               Cancel
             </Btn>
             <Btn
-              disabled={parsed.entries.length === 0 || parsed.errors.length > 0}
+              disabled={
+                parsed.entries.length === 0 || parsed.errors.length > 0 || hasTooManyEntries
+              }
               loading={mutation.isPending}
               size='sm'
               type='submit'

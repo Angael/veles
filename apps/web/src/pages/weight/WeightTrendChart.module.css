@@ -34,6 +34,10 @@
   inset: 0;
 }
 
+.dateTick {
+  font-variant-numeric: tabular-nums;
+}
+
 @media (--phone) {
   .chartFrame {
     min-height: 10rem;

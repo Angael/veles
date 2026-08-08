@@ -69,6 +69,10 @@
   min-height: 1.25rem;
   color: var(--c-muted);
   font-size: var(--text-sm);
+
+  &[data-error] {
+    color: var(--c-danger-text);
+  }
 }
 
 @media (--phone) {

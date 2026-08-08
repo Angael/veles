@@ -1,5 +1,5 @@
 import { ClientOnly } from '@tanstack/react-router';
-import { parseISO, subMonths } from 'date-fns';
+import { format, parseISO, subMonths } from 'date-fns';
 import { useState } from 'react';
 import {
   Area,
@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { Skeleton } from '../../components/skeleton/Skeleton';
 import { SelectInput } from '../../components/select-input/SelectInput';
+import { useLocalStorageState } from '../../lib/hooks/useLocalStorageState';
 import css from './WeightTrendChart.module.css';
 import {
   getWeightChartRange,
@@ -34,12 +35,6 @@ const rangeOptions = [
   { label: 'All time', value: 'all' },
 ] satisfies { label: string; value: WeightChartRange }[];
 
-const shortDateFormatter = new Intl.DateTimeFormat('en', {
-  day: 'numeric',
-  month: 'short',
-  timeZone: 'UTC',
-});
-
 const longDateFormatter = new Intl.DateTimeFormat('en', {
   day: 'numeric',
   month: 'long',
@@ -47,17 +42,29 @@ const longDateFormatter = new Intl.DateTimeFormat('en', {
   year: 'numeric',
 });
 
-const longRangeTickFormatter = new Intl.DateTimeFormat('en', {
-  month: 'short',
-  timeZone: 'UTC',
-  year: 'numeric',
-});
-
 const DAY_IN_MS = 24 * 60 * 60 * 1_000;
 const YEAR_IN_MS = 365 * DAY_IN_MS;
+const MAX_X_TICKS = 6;
+const SHORT_TICK_SPACING = 64;
+const LONG_TICK_SPACING = 80;
+const X_AXIS_INSET = 80;
+
+/** Creates width-limited ticks instead of relying on Recharts' browser text measurement. */
+function getXAxisTicks(domain: [number, number], chartWidth: number, usesLongRangeTicks: boolean) {
+  const availableWidth = Math.max(0, chartWidth - X_AXIS_INSET);
+  const tickSpacing = usesLongRangeTicks ? LONG_TICK_SPACING : SHORT_TICK_SPACING;
+  const tickCount = Math.max(
+    2,
+    Math.min(MAX_X_TICKS, Math.floor(availableWidth / tickSpacing) + 1),
+  );
+  const step = (domain[1] - domain[0]) / (tickCount - 1);
+
+  return Array.from({ length: tickCount }, (_, index) => domain[0] + step * index);
+}
 
 export function WeightTrendChart({ entries }: WeightTrendChartProps) {
-  const [range, setRange] = useState<WeightChartRange>('1m');
+  const [range, setRange] = useLocalStorageState<WeightChartRange>('weight-chart-range', '1m');
+  const [chartWidth, setChartWidth] = useState(0);
   const visibleEntries = getWeightChartRange(entries, range);
   const chartEntries = visibleEntries.map((entry) => ({
     ...entry,
@@ -85,6 +92,7 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
     return [firstTimestamp, lastTimestamp];
   })();
   const usesLongRangeTicks = xDomain[1] - xDomain[0] >= YEAR_IN_MS;
+  const xTicks = getXAxisTicks(xDomain, chartWidth, usesLongRangeTicks);
 
   return (
     <section aria-label={`Weight over ${rangeLabel.toLowerCase()}`} className={css.hero}>
@@ -100,7 +108,12 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
 
       <div className={css.chartFrame}>
         <ClientOnly fallback={<Skeleton className={css.chartSkeleton} />}>
-          <ResponsiveContainer height='100%' minWidth={0} width='100%'>
+          <ResponsiveContainer
+            height='100%'
+            minWidth={0}
+            onResize={(width) => setChartWidth(width)}
+            width='100%'
+          >
             <AreaChart
               accessibilityLayer={false}
               data={chartEntries}
@@ -117,14 +130,14 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
                 axisLine={false}
                 dataKey='timestamp'
                 domain={xDomain}
-                interval='preserveStartEnd'
-                minTickGap={28}
+                interval={0}
                 scale='time'
+                tick={{ className: css.dateTick }}
                 tickFormatter={(value: number) =>
-                  (usesLongRangeTicks ? longRangeTickFormatter : shortDateFormatter).format(value)
+                  format(value, usesLongRangeTicks ? 'MM.yyyy' : 'dd.MM')
                 }
                 tickLine={false}
-                tickCount={range === '3m' ? 4 : undefined}
+                ticks={xTicks}
                 type='number'
               />
               <YAxis
