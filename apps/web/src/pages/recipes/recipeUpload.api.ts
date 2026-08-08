@@ -40,18 +40,20 @@ const portionsFormValueType = type('string.trim').pipe((value): number | ArkErro
   type('string.numeric.parse |> number.integer >= 1')(value),
 );
 
+const recipeTextListType = type('string.trim[]').pipe((values) => values.filter(Boolean));
+
 const uploadRecipeInputType = type({
   carbs: optionalNumericFormValueType,
-  description: 'string',
+  description: 'string.trim',
   fats: optionalNumericFormValueType,
-  ingredients: 'string[]',
+  ingredients: recipeTextListType,
   kcal: optionalNumericFormValueType,
-  name: 'string >= 1',
+  name: 'string.trim |> string >= 1',
   photos: 'File[]',
   portions: portionsFormValueType,
   protein: optionalNumericFormValueType,
   rating: optionalRatingFormValueType,
-  tags: 'string[]',
+  tags: recipeTextListType,
 });
 
 const limitRecipeUploadRequestMiddleware = createMiddleware().server(async ({ next, request }) => {
@@ -186,13 +188,7 @@ function validateRecipeForm(formData: FormData) {
     portions: formData.get('portions'),
     protein: formData.get('protein'),
     rating: formData.get('rating'),
-    tags:
-      typeof tagsValue === 'string'
-        ? tagsValue
-            .split(',')
-            .map((item) => item.trim())
-            .filter(Boolean)
-        : [],
+    tags: typeof tagsValue === 'string' ? tagsValue.split(',') : [],
   });
 
   if (validation instanceof type.errors) {

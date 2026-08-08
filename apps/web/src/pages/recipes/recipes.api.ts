@@ -75,18 +75,20 @@ const updateRecipeRatingInputType = type({
   rating: '1 <= number.integer <= 5',
 });
 
+const recipeTextListType = type('string.trim[]').pipe((values) => values.filter(Boolean));
+
 const updateRecipeInputType = type({
   carbs: 'number.integer >= 0 | null',
-  description: 'string',
+  description: 'string.trim',
   fats: 'number.integer >= 0 | null',
   id: 'string.uuid',
-  ingredients: 'string[]',
+  ingredients: recipeTextListType,
   kcal: 'number.integer >= 0 | null',
-  name: 'string >= 1',
+  name: 'string.trim |> string >= 1',
   portions: 'number.integer >= 1',
   protein: 'number.integer >= 0 | null',
   rating: '1 <= number.integer <= 5 | null',
-  tags: 'string[]',
+  tags: recipeTextListType,
 });
 
 export type UpdateRecipeInput = typeof updateRecipeInputType.infer;
