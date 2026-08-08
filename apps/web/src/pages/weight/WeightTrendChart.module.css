@@ -7,12 +7,14 @@
 .header {
   display: flex;
   justify-content: flex-end;
+}
 
-  & > span {
-    color: var(--c-accent-soft);
-    font-size: var(--text-sm);
-    white-space: nowrap;
-  }
+.rangeSelect {
+  width: auto;
+  min-width: 8.5rem;
+  min-height: 2.5rem;
+  color: var(--c-accent-soft);
+  font-size: var(--text-sm);
 }
 
 .chartFrame {
@@ -30,6 +32,10 @@
 .chartSkeleton {
   position: absolute;
   inset: 0;
+}
+
+.dateTick {
+  font-variant-numeric: tabular-nums;
 }
 
 @media (--phone) {

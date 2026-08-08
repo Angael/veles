@@ -17,6 +17,7 @@ export function NumberInput({
 }: NumberInputProps) {
   return (
     <NumberField.Root
+      allowWheelScrub
       className={clsx(css.root, className)}
       data-required={props.required ? '' : undefined}
       {...props}

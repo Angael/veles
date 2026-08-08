@@ -5,44 +5,36 @@
 
 .emptyState {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-xs);
   padding: var(--space-xl);
 }
 
-.emptyIcon {
-  display: grid;
-  place-items: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  border: var(--border-width) solid var(--c-primary-border-soft);
-  border-radius: var(--radius-sm);
-  color: var(--c-accent);
-  background: var(--c-primary-surface);
-}
-
-.emptyCopy {
-  display: grid;
-  gap: var(--space-xs);
-}
-
-.emptyCopy h1 {
+.emptyState h1 {
   font-size: var(--text-xl-dynamic);
   text-wrap: balance;
 }
 
-.emptyCopy p {
+.emptyState p {
   color: var(--c-muted);
   text-wrap: pretty;
 }
 
-.emptyState .entryForm {
-  grid-column: 1 / -1;
-  width: 100%;
-  padding-top: var(--space-md);
+.captureContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+.captureActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.captureContainer .entryForm {
   padding-bottom: 0;
-  border-top: var(--border-width) solid var(--c-border);
   border-bottom: 0;
 }
 
@@ -155,9 +147,17 @@
 
 @media (--phone) {
   .emptyState {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--space-md);
     padding: var(--space-lg) var(--space-md);
+  }
+
+  .captureContainer {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .captureActions > * {
+    flex: 1;
   }
 
   .entriesCard {

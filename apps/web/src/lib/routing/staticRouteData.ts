@@ -2,6 +2,7 @@ export type NavbarTarget =
   | { to: '/' }
   | { to: '/diary' }
   | { to: '/recipes' }
+  | { to: '/weight' }
   | { params: { id: string }; to: '/recipes/view/$id' };
 
 type NavbarData = {

@@ -1,13 +1,16 @@
 import { useMutation } from '@tanstack/react-query';
-import { useRouter } from '@tanstack/react-router';
-import { ScaleIcon } from 'lucide-react';
+import { Link, useRouter } from '@tanstack/react-router';
+import { format } from 'date-fns';
+import { CalendarPlusIcon, FileUpIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { toastManager } from '@/components/toast/toastManager';
+import { RecentWeightEntries } from './RecentWeightEntries';
 import css from './WeightPage.module.css';
 import { WeightTrendChart } from './WeightTrendChart';
+import { getChangeFromDaysAgo } from './weightCalculations';
 import { saveWeight, type WeightEntry } from './weight.api';
 
 type WeightPageProps = {
@@ -37,7 +40,6 @@ export function WeightPage({ entries }: WeightPageProps) {
     setWeightKg(latestEntry?.weightKg ?? null);
   }, [latestEntry?.weightKg]);
 
-  const recentEntries = entries.slice(-8).reverse();
   const twoWeekChange = getChangeFromDaysAgo(entries, 14);
   const oneMonthChange = getChangeFromDaysAgo(entries, 30);
 
@@ -46,79 +48,59 @@ export function WeightPage({ entries }: WeightPageProps) {
       return;
     }
 
-    saveMutation.mutate({ data: { date: getLocalDate(), weightKg } });
+    saveMutation.mutate({ data: { date: format(new Date(), 'yyyy-MM-dd'), weightKg } });
   }
 
   return (
     <main className={css.page}>
-      {entries.length === 0 ? (
-        <Card as='section' className={css.emptyState}>
-          <div className={css.emptyIcon}>
-            <ScaleIcon aria-hidden='true' size={28} strokeWidth={1.7} />
-          </div>
-          <div className={css.emptyCopy}>
-            <h1>Start tracking your weight</h1>
-            <p>Add today&apos;s weight to begin building your trend and progress summary.</p>
-          </div>
-          <WeightForm
-            isSaving={saveMutation.isPending}
-            onChange={setWeightKg}
-            onSubmit={submitWeight}
-            value={weightKg}
-          />
-        </Card>
-      ) : (
-        <>
-          <WeightTrendChart entries={entries} />
+      {entries.length > 0 && <WeightTrendChart entries={entries} />}
 
+      <section aria-label="Today's weight" className={css.captureContainer}>
+        <WeightForm
+          isSaving={saveMutation.isPending}
+          onChange={setWeightKg}
+          onSubmit={submitWeight}
+          value={weightKg}
+        />
+        <div className={css.captureActions}>
+          <Btn
+            icon={<FileUpIcon aria-hidden='true' />}
+            isLink
+            render={<Link to='/weight/import' />}
+            size='md'
+            variant='outlineMain'
+          >
+            Import
+          </Btn>
+          <Btn
+            icon={<CalendarPlusIcon aria-hidden='true' />}
+            isLink
+            render={<Link to='/weight/add' />}
+            size='md'
+            variant='outlineMain'
+          >
+            Add for date
+          </Btn>
+        </div>
+      </section>
+
+      {entries.length > 0 ? (
+        <>
           <div className={css.summaryRail}>
             <Card as='section' aria-label='Weight summary' className={css.summaryGrid}>
-              <SummaryStat label='Current' value={formatWeight(latestEntry!.weightKg)} />
+              <SummaryStat label='Current' value={`${latestEntry!.weightKg.toFixed(1)} kg`} />
               <SummaryStat label='2 weeks' value={formatChange(twoWeekChange)} />
               <SummaryStat label='1 month' value={formatChange(oneMonthChange)} />
             </Card>
           </div>
 
-          <Card as='section' aria-label='Recent weight entries' className={css.entriesCard}>
-            <WeightForm
-              isSaving={saveMutation.isPending}
-              onChange={setWeightKg}
-              onSubmit={submitWeight}
-              value={weightKg}
-            />
-
-            <div className={css.tableFrame}>
-              <table className={css.entriesTable}>
-                <thead>
-                  <tr>
-                    <th scope='col'>Date</th>
-                    <th scope='col'>Weight</th>
-                    <th scope='col'>Change</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentEntries.map((entry) => {
-                    const entryIndex = entries.indexOf(entry);
-                    const previousEntry = entries[entryIndex - 1];
-                    const change = previousEntry
-                      ? roundToOneDecimal(entry.weightKg - previousEntry.weightKg)
-                      : undefined;
-
-                    return (
-                      <tr key={entry.date}>
-                        <td>
-                          <time dateTime={entry.date}>{formatDate(entry.date)}</time>
-                        </td>
-                        <td>{formatWeight(entry.weightKg)}</td>
-                        <td className={getDeltaClassName(change)}>{formatChange(change)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </Card>
+          <RecentWeightEntries entries={entries} />
         </>
+      ) : (
+        <Card as='section' className={css.emptyState}>
+          <h1>Start tracking your weight</h1>
+          <p>Add today&apos;s weight or import your history to begin building your trend.</p>
+        </Card>
       )}
     </main>
   );
@@ -155,7 +137,7 @@ function WeightForm({ isSaving, onChange, onSubmit, value }: WeightFormProps) {
           value={value}
         />
       </label>
-      <Btn disabled={value === null} loading={isSaving} radius='pill' size='sm' type='submit'>
+      <Btn disabled={value === null} loading={isSaving} radius='pill' size='md' type='submit'>
         Save
       </Btn>
     </form>
@@ -173,38 +155,6 @@ function SummaryStat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function getChangeFromDaysAgo(entries: WeightEntry[], days: number) {
-  const latestEntry = entries.at(-1);
-
-  if (!latestEntry) {
-    return undefined;
-  }
-
-  const targetDate = shiftIsoDate(latestEntry.date, -days);
-  const previousEntry = entries.findLast((entry) => entry.date <= targetDate);
-
-  return previousEntry
-    ? roundToOneDecimal(latestEntry.weightKg - previousEntry.weightKg)
-    : undefined;
-}
-
-function getDeltaClassName(value: number | undefined) {
-  return value !== undefined && value < 0 ? css.deltaBetter : css.deltaNeutral;
-}
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('en', {
-    day: 'numeric',
-    month: 'short',
-    timeZone: 'UTC',
-    year: 'numeric',
-  }).format(new Date(`${value}T00:00:00Z`));
-}
-
-function formatWeight(value: number) {
-  return `${value.toFixed(1)} kg`;
-}
-
 function formatChange(value: number | undefined) {
   if (value === undefined) {
     return '—';
@@ -212,20 +162,4 @@ function formatChange(value: number | undefined) {
 
   const prefix = value > 0 ? '+' : '';
   return `${prefix}${value.toFixed(1)} kg`;
-}
-
-function shiftIsoDate(value: string, days: number) {
-  const nextDate = new Date(`${value}T00:00:00Z`);
-  nextDate.setUTCDate(nextDate.getUTCDate() + days);
-  return nextDate.toISOString().slice(0, 10);
-}
-
-function getLocalDate() {
-  const now = new Date();
-  const localNow = new Date(now.valueOf() - now.getTimezoneOffset() * 60_000);
-  return localNow.toISOString().slice(0, 10);
-}
-
-function roundToOneDecimal(value: number) {
-  return Math.round(value * 10) / 10;
 }
