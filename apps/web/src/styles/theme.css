@@ -74,6 +74,9 @@
   --c-accent: #7dd3fc;
   --c-accent-soft: #bfdbfe;
   --c-accent-strong: #c7d2fe;
+  --c-macro-protein: #7dd3fc;
+  --c-macro-fat: #fbbf7a;
+  --c-macro-carb: #a7e3a1;
 
   --c-primary: #2563eb;
   --c-primary-contrast: white;
