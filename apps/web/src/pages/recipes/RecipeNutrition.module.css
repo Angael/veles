@@ -1,0 +1,62 @@
+.nutrition {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-sm);
+}
+
+.nutritionValues {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.macros {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.nutritionItem {
+  display: inline-flex;
+  min-width: 0;
+  gap: 0.25em;
+  align-items: baseline;
+  white-space: nowrap;
+
+  dt {
+    order: 2;
+    overflow: hidden;
+    color: var(--c-muted-strong);
+    font-size: 0.6875rem;
+    text-overflow: ellipsis;
+  }
+
+  dd {
+    order: 1;
+    overflow: hidden;
+    max-width: 100%;
+    font-size: 0.8125rem;
+    font-weight: var(--font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+  }
+}
+
+.kcal dd {
+  color: var(--c-text-strong);
+  font-size: var(--text-lg);
+  letter-spacing: -0.04em;
+}
+
+.protein dd {
+  color: var(--c-macro-protein);
+}
+
+.fat dd {
+  color: var(--c-macro-fat);
+}
+
+.carb dd {
+  color: var(--c-macro-carb);
+}

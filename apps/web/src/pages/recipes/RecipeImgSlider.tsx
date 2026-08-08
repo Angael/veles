@@ -52,9 +52,7 @@ export function RecipeImgSlider({ images }: RecipeImgSliderProps) {
             </div>
           ) : null}
         </>
-      ) : (
-        <div className={css.heroFallback}>No photo yet</div>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -1,11 +1,8 @@
-import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { PencilIcon, Trash2Icon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
-import { Card } from '@/components/card/Card';
-import { Label } from '@/components/label/Label';
-import { NumberInput } from '@/components/number-input/NumberInput';
 import { RecipeImgSlider } from './RecipeImgSlider';
+import { RecipeNutrition } from './RecipeNutrition';
 import { RecipeRating } from './RecipeRating';
 import type { RecipeLibraryItem } from './recipes.api';
 import css from './RecipeViewPage.module.css';
@@ -16,136 +13,73 @@ type RecipeViewPageProps = {
 
 export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
   const canManageRecipe = true;
-  const basePortions = Math.max(1, recipe.portions);
-  const [portions, setPortions] = useState(basePortions);
-  const nutritionScale = portions / basePortions;
 
   return (
     <main className={css.page}>
       <article className={css.recipe}>
-        <RecipeImgSlider images={recipe.images} />
+        <header className={css.heading}>
+          <div className={css.identity}>
+            <h1>{recipe.name}</h1>
+            {recipe.tags.length > 0 ? (
+              <div className={css.tags} aria-label='Recipe tags'>
+                {recipe.tags.map((tag) => (
+                  <span className={css.tag} key={tag}>
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
 
-        <div className={css.recipeTextGrid}>
-          <Card as='section' className={css.descriptionCard}>
-            <div className={css.descriptionHeader}>
-              <h1>{recipe.name}</h1>
-
-              {recipe.tags.length > 0 ? (
-                <div className={css.tags} aria-label='Recipe tags'>
-                  {recipe.tags.map((tag) => (
-                    <span className={css.tag} key={tag}>
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
+          {canManageRecipe ? (
+            <div className={css.actions} aria-label='Recipe management actions' role='group'>
+              <Btn
+                className={css.actionButton}
+                icon={<PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
+                isLink
+                radius='pill'
+                render={<Link params={{ id: recipe.id }} to='/recipes/view/$id/edit' />}
+                size='sm'
+                variant='outlineMain'
+              >
+                Edit
+              </Btn>
+              <Btn
+                className={css.actionButton}
+                icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
+                onClick={() => window.confirm('Delete this recipe?')}
+                radius='pill'
+                size='sm'
+                type='button'
+                variant='outlineDanger'
+              >
+                Delete
+              </Btn>
             </div>
+          ) : null}
+        </header>
 
+        <div className={css.layout}>
+          <div className={css.content}>
+            {recipe.images.length > 0 ? <RecipeImgSlider images={recipe.images} /> : null}
             {recipe.description ? <p className={css.description}>{recipe.description}</p> : null}
-          </Card>
+          </div>
 
-          <Card as='aside' className={css.rightColumn}>
-            <RecipeRating rating={recipe.rating} recipeId={recipe.id} />
-
-            <section className={css.ingredients}>
-              <h2>Ingredients</h2>
+          <aside className={css.rail}>
+            <section className={css.utilityGroup}>
+              <RecipeNutrition recipe={recipe} />
+            </section>
+            <section className={css.utilityGroup} aria-label='Ingredients'>
               <ul className={css.ingredientList}>
-                {recipe.ingredients.map((ingredient) => (
-                  <li key={ingredient}>{ingredient}</li>
+                {recipe.ingredients.map((ingredient, index) => (
+                  <li key={`${index}-${ingredient}`}>{ingredient}</li>
                 ))}
               </ul>
             </section>
-
-            <section className={css.nutrition} aria-labelledby='nutrition-heading'>
-              <h2 id='nutrition-heading'>Nutrition</h2>
-              <Label text='Portions'>
-                <NumberInput
-                  className={css.portionsInput}
-                  min={0.5}
-                  step={0.5}
-                  onValueChange={(value) => setPortions(Math.max(0.5, value ?? 1))}
-                  value={portions}
-                />
-              </Label>
-              <dl className={css.nutritionGrid}>
-                <NutritionItem label='Kcal' value={scaleNutrition(recipe.kcal, nutritionScale)} />
-                <NutritionItem
-                  label='Protein'
-                  unit='g'
-                  value={scaleNutrition(recipe.protein, nutritionScale)}
-                />
-                <NutritionItem
-                  label='Carbs'
-                  unit='g'
-                  value={scaleNutrition(recipe.carbs, nutritionScale)}
-                />
-                <NutritionItem
-                  label='Fats'
-                  unit='g'
-                  value={scaleNutrition(recipe.fats, nutritionScale)}
-                />
-              </dl>
-            </section>
-
-            {canManageRecipe ? (
-              <div className={css.actions} aria-label='Recipe management actions'>
-                <Btn
-                  className={css.actionButton}
-                  icon={<PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
-                  isLink
-                  radius='pill'
-                  render={<Link params={{ id: recipe.id }} to='/recipes/view/$id/edit' />}
-                  size='sm'
-                  variant='outlineMain'
-                >
-                  Edit
-                </Btn>
-                <Btn
-                  className={css.actionButton}
-                  icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
-                  onClick={() => window.confirm('Delete this recipe?')}
-                  radius='pill'
-                  size='sm'
-                  type='button'
-                  variant='outlineDanger'
-                >
-                  Delete
-                </Btn>
-              </div>
-            ) : null}
-          </Card>
+            <RecipeRating rating={recipe.rating} recipeId={recipe.id} />
+          </aside>
         </div>
       </article>
     </main>
-  );
-}
-
-function scaleNutrition(value: number | null, scale: number) {
-  return value === null ? null : value * scale;
-}
-
-function NutritionItem({
-  label,
-  unit = '',
-  value,
-}: {
-  label: string;
-  unit?: string;
-  value: number | null;
-}) {
-  if (value === null) {
-    return null;
-  }
-
-  const formattedValue = Number.isInteger(value) ? value : Number(value.toFixed(1));
-
-  return (
-    <div className={css.nutritionItem}>
-      <dt>{label}</dt>
-      <dd>
-        {formattedValue}
-        {unit}
-      </dd>
-    </div>
   );
 }

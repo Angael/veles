@@ -48,19 +48,21 @@ export function RecipeRating({ rating, recipeId }: RecipeRatingProps) {
 
   return (
     <section className={css.rating} aria-label='Owner rating'>
-      <div className={css.stars}>
+      <div aria-label='Rating' className={css.stars} role='radiogroup'>
         {Array.from({ length: MAX_RATING }, (_, index) => {
           const ratingValue = index + 1;
           const isSelected = ratingValue <= visibleRating;
+          const isCurrentRating = ratingValue === visibleRating;
 
           return (
             <button
               aria-label={`Rate ${ratingValue} ${ratingValue === 1 ? 'star' : 'stars'}`}
-              aria-pressed={isSelected}
+              aria-checked={isCurrentRating}
               className={css.starButton}
               disabled={savingRating}
               key={ratingValue}
               onClick={() => void rateRecipe(ratingValue)}
+              role='radio'
               type='button'
             >
               <StarIcon
