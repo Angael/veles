@@ -63,7 +63,7 @@ export function WeightPage({ entries }: WeightPageProps) {
             icon={<FileUpIcon aria-hidden='true' />}
             isLink
             render={<Link to='/weight/import' />}
-            size='sm'
+            size='md'
             variant='outlineMain'
           >
             Import
@@ -72,7 +72,7 @@ export function WeightPage({ entries }: WeightPageProps) {
             icon={<CalendarPlusIcon aria-hidden='true' />}
             isLink
             render={<Link to='/weight/add' />}
-            size='sm'
+            size='md'
             variant='outlineMain'
           >
             Add for date
@@ -166,7 +166,7 @@ function WeightForm({ isSaving, onChange, onSubmit, value }: WeightFormProps) {
           value={value}
         />
       </label>
-      <Btn disabled={value === null} loading={isSaving} radius='pill' size='sm' type='submit'>
+      <Btn disabled={value === null} loading={isSaving} radius='pill' size='md' type='submit'>
         Save
       </Btn>
     </form>
