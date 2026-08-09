@@ -83,7 +83,7 @@ async function seedDatabase(connectionString) {
   try {
     await assertDevDatabase(client);
     await client.query('BEGIN');
-    await seedIdentity(client);
+    await seedFoodProducts(client);
     await seedRecipes(client, devUser.id);
     await seedDiaryEntries(client, devUser.id);
     await client.query('COMMIT');
@@ -138,6 +138,81 @@ async function seedIdentity(client) {
       devAccount.updatedAt,
     ],
   );
+}
+
+/** Seeds the shared staple catalog without assigning products to any user. */
+async function seedFoodProducts(client) {
+  const products = [
+    {
+      id: '01900000-0000-7000-8000-000000000201',
+      name: 'Banana',
+      kcalPer100gHundredths: 89,
+      proteinPer100gHundredths: 110,
+      carbsPer100gHundredths: 2280,
+      fatPer100gHundredths: 30,
+    },
+    {
+      id: '01900000-0000-7000-8000-000000000202',
+      name: 'Apple',
+      kcalPer100gHundredths: 52,
+      proteinPer100gHundredths: 30,
+      carbsPer100gHundredths: 1380,
+      fatPer100gHundredths: 20,
+    },
+    {
+      id: '01900000-0000-7000-8000-000000000203',
+      name: 'Orange',
+      kcalPer100gHundredths: 47,
+      proteinPer100gHundredths: 90,
+      carbsPer100gHundredths: 1180,
+      fatPer100gHundredths: 10,
+    },
+    {
+      id: '01900000-0000-7000-8000-000000000204',
+      name: 'White bread',
+      kcalPer100gHundredths: 266,
+      proteinPer100gHundredths: 890,
+      carbsPer100gHundredths: 4940,
+      fatPer100gHundredths: 320,
+    },
+    {
+      id: '01900000-0000-7000-8000-000000000205',
+      name: 'Whole-grain bread',
+      kcalPer100gHundredths: 247,
+      proteinPer100gHundredths: 1300,
+      carbsPer100gHundredths: 4140,
+      fatPer100gHundredths: 420,
+    },
+  ];
+
+  for (const product of products) {
+    await client.query(
+      `INSERT INTO food_product
+        (id, name, kcal_per_100g_hundredths, protein_per_100g_hundredths, carbs_per_100g_hundredths, fat_per_100g_hundredths, source)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (id) DO UPDATE SET
+         barcode = NULL,
+         name = EXCLUDED.name,
+         brand = NULL,
+         image_url = NULL,
+         serving_size = NULL,
+         kcal_per_100g_hundredths = EXCLUDED.kcal_per_100g_hundredths,
+         protein_per_100g_hundredths = EXCLUDED.protein_per_100g_hundredths,
+         carbs_per_100g_hundredths = EXCLUDED.carbs_per_100g_hundredths,
+         fat_per_100g_hundredths = EXCLUDED.fat_per_100g_hundredths,
+         source = EXCLUDED.source,
+         updated_at = now()`,
+      [
+        product.id,
+        product.name,
+        product.kcalPer100gHundredths,
+        product.proteinPer100gHundredths,
+        product.carbsPer100gHundredths,
+        product.fatPer100gHundredths,
+        'veles',
+      ],
+    );
+  }
 }
 
 async function seedRecipes(client, userId) {
