@@ -195,7 +195,7 @@ async function seedFoodProducts(client) {
          name = EXCLUDED.name,
          brand = NULL,
          image_url = NULL,
-         serving_size = NULL,
+         product_size_grams_hundredths = NULL,
          kcal_per_100g_hundredths = EXCLUDED.kcal_per_100g_hundredths,
          protein_per_100g_hundredths = EXCLUDED.protein_per_100g_hundredths,
          carbs_per_100g_hundredths = EXCLUDED.carbs_per_100g_hundredths,

@@ -1,120 +1,94 @@
-import type { CSSProperties } from 'react';
-import type { CalorieLog, CalorieTotals } from './calories.api';
 import { FlameIcon, UtensilsIcon } from 'lucide-react';
+import type { CalorieGoal, CalorieLog, CalorieTotals } from './calories.api';
 import { Card } from '@/components/card/Card';
 import css from './CaloriesPage.module.css';
 
-type CalorieOverviewProps = {
-  goalKcal: number | null;
-  logs: CalorieLog[];
-  totals: CalorieTotals;
-};
+type Props = { goal: CalorieGoal | null; logs: CalorieLog[]; totals: CalorieTotals };
 
-type ProgressStyle = CSSProperties & {
-  '--progress': string;
-};
-
-export function CalorieOverview({ goalKcal, logs, totals }: CalorieOverviewProps) {
-  const remaining = goalKcal === null ? null : goalKcal - totals.kcal;
-  const progress = goalKcal ? Math.min((totals.kcal / goalKcal) * 100, 100) : 0;
-  const progressStyle: ProgressStyle = { '--progress': `${progress}%` };
+export function CalorieOverview({ goal, logs, totals }: Props) {
+  const progress = goal ? Math.min((totals.kcal / goal.kcal) * 100, 100) : 0;
   return (
     <div className={css.overviewStack}>
       <Card as='section' className={css.hero}>
         <div className={css.heroCopy}>
-          <span className={css.sectionLabel}>Today</span>
+          <span className={css.sectionLabel}>Selected day</span>
           <div className={css.energyLine}>
             <strong>{formatNumber(totals.kcal)}</strong>
             <span>kcal logged</span>
           </div>
           <p>
-            {remaining === null
-              ? 'Set a daily goal to see your remaining energy.'
-              : remaining >= 0
-                ? `${formatNumber(remaining)} kcal remaining`
-                : `${formatNumber(Math.abs(remaining))} kcal over your goal`}
+            {goal
+              ? `${formatNumber(Math.abs(goal.kcal - totals.kcal))} kcal ${totals.kcal <= goal.kcal ? 'remaining' : 'over goal'}`
+              : 'Set a goal to see what remains.'}
           </p>
         </div>
         <div
-          aria-label={
-            goalKcal ? `${Math.round(progress)} percent of daily goal` : 'No daily goal set'
-          }
+          aria-label={goal ? `${Math.round(progress)} percent of goal` : 'No goal'}
           className={css.progress}
           role='img'
-          style={progressStyle}
         >
           <FlameIcon aria-hidden='true' />
-          <span>{goalKcal ? `${Math.round(progress)}%` : '—'}</span>
-        </div>
-        <div aria-hidden='true' className={css.progressTrack}>
-          <span style={{ width: `${progress}%` }} />
+          <span>{goal ? `${Math.round(progress)}%` : '—'}</span>
         </div>
       </Card>
-
       <div aria-label='Macronutrient totals' className={css.macroGrid}>
-        <MacroStat className={css.protein} label='Protein' value={totals.protein} />
-        <MacroStat className={css.carbs} label='Carbs' value={totals.carbs} />
-        <MacroStat className={css.fat} label='Fat' value={totals.fat} />
+        <Macro label='Protein' total={totals.protein} target={goal?.protein ?? null} />
+        <Macro label='Carbs' total={totals.carbs} target={goal?.carbs ?? null} />
+        <Macro label='Fat' total={totals.fat} target={goal?.fat ?? null} />
       </div>
-
       <Card as='section' className={css.logCard}>
         <div className={css.sectionHeading}>
           <div>
-            <h2>Today&apos;s log</h2>
+            <h2>Food log</h2>
             <p>
-              {logs.length === 0
-                ? 'Your day is ready for its first entry.'
-                : `${logs.length} ${logs.length === 1 ? 'entry' : 'entries'}`}
+              {logs.length
+                ? `${logs.length} ${logs.length === 1 ? 'entry' : 'entries'}`
+                : 'Nothing logged yet.'}
             </p>
           </div>
         </div>
-        {logs.length === 0 ? (
-          <div className={css.emptyLog}>
-            <UtensilsIcon aria-hidden='true' />
-            <strong>No food logged yet</strong>
-            <span>Scan a package or add calories with the tools alongside.</span>
-          </div>
-        ) : (
+        {logs.length ? (
           <ol className={css.logList}>
             {logs.map((entry) => (
               <li key={entry.id}>
                 <div>
                   <strong>{entry.name}</strong>
-                  <span>{formatEntryDetail(entry)}</span>
+                  <span>
+                    {entry.grams === null ? 'Quick entry' : `${formatNumber(entry.grams)} g`}
+                  </span>
                 </div>
                 <span className={css.logEnergy}>{formatNumber(entry.kcal)} kcal</span>
               </li>
             ))}
           </ol>
+        ) : (
+          <div className={css.emptyLog}>
+            <UtensilsIcon aria-hidden='true' />
+            <strong>Your diary is empty</strong>
+            <span>Choose an action above to add your first entry.</span>
+          </div>
         )}
       </Card>
     </div>
   );
 }
 
-function MacroStat({
-  className,
+function Macro({
   label,
-  value,
+  target,
+  total,
 }: {
-  className?: string;
   label: string;
-  value: number | null;
+  target: number | null;
+  total: number | null;
 }) {
   return (
-    <Card className={`${css.macroStat} ${className}`} shadow={false}>
+    <Card className={css.macroStat} shadow={false}>
       <span>{label}</span>
-      <strong>{value === null ? '—' : `${formatNumber(value)} g`}</strong>
+      <strong>{total === null ? 'Unknown' : `${formatNumber(total)} g`}</strong>
+      <small>{target === null ? 'No target' : `of ${formatNumber(target)} g`}</small>
     </Card>
   );
-}
-
-function formatEntryDetail(entry: CalorieLog) {
-  const time = new Date(entry.consumedAt).toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-  return entry.grams === null ? time : `${formatNumber(entry.grams)} g · ${time}`;
 }
 
 function formatNumber(value: number) {

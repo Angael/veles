@@ -85,11 +85,7 @@ export function BarcodeScanner({ onClose, onDetected }: BarcodeScannerProps) {
             try {
               const results = await detector.detect(video);
               const barcode = results.find((result) => result.rawValue.trim())?.rawValue.trim();
-              if (barcode && active) {
-                active = false;
-                callbackRef.current(barcode);
-                return;
-              }
+              if (barcode && active) callbackRef.current(barcode);
             } catch {
               if (active) setState('error');
               return;
