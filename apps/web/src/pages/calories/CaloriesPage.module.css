@@ -403,88 +403,115 @@ label small {
   }
 }
 
-.goalLink {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  color: inherit;
-  text-decoration: none;
-}
-.goalLink svg {
-  width: 1.1rem;
-}
 .dayStrip {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.35rem;
-  overflow-x: auto;
+  gap: 0.2rem;
+  width: 100%;
 }
-.day,
-.dayActive {
-  min-width: 54px;
-  min-height: 62px;
-  border: 1px solid var(--c-border);
-  border-radius: 0.75rem;
+.day {
+  min-width: 0;
+  min-height: 52px;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--c-muted);
   display: grid;
   place-items: center;
   align-content: center;
-  color: inherit;
-  text-decoration: none;
-  background: var(--c-surface);
+  font: inherit;
+  cursor: pointer;
 }
-.day span,
-.dayActive span {
-  color: var(--c-muted);
-  font-size: 0.72rem;
+.day[data-pressed] {
+  background: var(--c-primary-surface-strong);
+  color: var(--c-text-strong);
 }
-.dayActive {
-  border-color: var(--c-text);
-  background: var(--c-surface-raised, var(--c-surface));
+.day span {
+  font-size: var(--text-xs);
 }
-.entryActions {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.75rem;
+.compactDay {
+  display: none;
 }
-.entryActions a {
-  min-height: 76px;
-  border: 1px solid var(--c-border);
-  border-radius: 0.9rem;
-  color: inherit;
-  text-decoration: none;
-  padding: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  background: var(--c-surface);
-}
-.entryActions svg {
-  flex: 0 0 auto;
-  width: 1.3rem;
-}
-.entryActions strong,
-.entryActions small {
+.expandedDay {
   display: block;
 }
-.entryActions small {
-  color: var(--c-muted);
-  margin-top: 0.15rem;
+.entryActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
 }
-.macroStat small {
+.dailySummary {
+  display: grid;
+  grid-template-columns: minmax(13rem, 1fr) 2fr;
+  gap: var(--space-xl);
+  align-items: center;
+}
+.energySummary {
+  display: grid;
+  gap: 0.2rem;
+}
+.energySummary > span,
+.energySummary small,
+.summaryMacros span,
+.summaryMacros small {
   color: var(--c-muted);
+}
+.energySummary > strong {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.summaryMacros {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+}
+.summaryMacros > div {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+.summaryMacros strong {
+  font-variant-numeric: tabular-nums;
+}
+.logMain {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.logMain small {
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+.logActions {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
 }
 
-@media (--sm) {
-  .entryActions {
+@media (--phone) {
+  .compactDay {
+    display: block;
+  }
+  .expandedDay {
+    display: none;
+  }
+  .dailySummary {
     grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+  .summaryMacros {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .logList li {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .entryActions a:hover,
-  .day:hover,
-  .goalLink:hover {
-    border-color: var(--c-muted);
+  .day:hover {
+    background: var(--c-surface-raised);
+    color: var(--c-text);
   }
 }

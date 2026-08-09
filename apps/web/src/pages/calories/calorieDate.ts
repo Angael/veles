@@ -1,4 +1,4 @@
-import { format, isMatch, subDays } from 'date-fns';
+import { addDays, format, isMatch, parseISO, startOfWeek } from 'date-fns';
 
 export const CALORIE_DATE_FORMAT = 'yyyy-MM-dd';
 
@@ -10,9 +10,9 @@ export function normalizeCalorieDate(value: string | undefined) {
   return value && isMatch(value, CALORIE_DATE_FORMAT) ? value : todayLocalDate();
 }
 
-export function recentCalorieDates() {
-  const today = new Date();
+export function calorieWeekDates(selectedDate: string) {
+  const monday = startOfWeek(parseISO(selectedDate), { weekStartsOn: 1 });
   return Array.from({ length: 7 }, (_, index) =>
-    format(subDays(today, index), CALORIE_DATE_FORMAT),
+    format(addDays(monday, index), CALORIE_DATE_FORMAT),
   );
 }

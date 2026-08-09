@@ -39,23 +39,6 @@
   }
 }
 
-.guide {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: min(75%, 22rem);
-  aspect-ratio: 1.7;
-  border: 2px solid var(--c-accent);
-  border-radius: var(--radius-xs);
-  box-shadow: 0 0 0 999px rgba(2, 6, 23, 0.42);
-
-  & svg {
-    width: 2rem;
-    height: 2rem;
-    color: var(--c-accent);
-  }
-}
-
 .message {
   position: relative;
   z-index: 1;

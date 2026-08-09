@@ -2,7 +2,7 @@ import type {
   BarcodeDetector as PolyfillBarcodeDetector,
   BarcodeFormat,
 } from 'barcode-detector/pure';
-import { CameraIcon, CameraOffIcon, ScanBarcodeIcon, XIcon } from 'lucide-react';
+import { CameraIcon, CameraOffIcon, XIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import css from './BarcodeScanner.module.css';
@@ -38,6 +38,18 @@ async function createDetector(): Promise<BarcodeDetectorLike> {
   return new BarcodeDetector({ formats });
 }
 
+/** Requests continuous autofocus on browsers that expose the camera focus controls. */
+async function enableContinuousFocus(stream: MediaStream) {
+  const track = stream.getVideoTracks()[0];
+  if (!track) return;
+  const capabilities: MediaTrackCapabilities & { focusMode?: string[] } = track.getCapabilities();
+  if (!capabilities.focusMode?.includes('continuous')) return;
+  const constraints: MediaTrackConstraints & {
+    advanced: Array<MediaTrackConstraintSet & { focusMode: string }>;
+  } = { advanced: [{ focusMode: 'continuous' }] };
+  await track.applyConstraints(constraints);
+}
+
 export function BarcodeScanner({ onClose, onDetected }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const callbackRef = useRef(onDetected);
@@ -63,9 +75,14 @@ export function BarcodeScanner({ onClose, onDetected }: BarcodeScannerProps) {
           createDetector(),
           navigator.mediaDevices.getUserMedia({
             audio: false,
-            video: { facingMode: { ideal: 'environment' } },
+            video: {
+              facingMode: { ideal: 'environment' },
+              height: { ideal: 1080 },
+              width: { ideal: 1920 },
+            },
           }),
         ]);
+        await enableContinuousFocus(cameraStream).catch(() => undefined);
         stream = cameraStream;
         const video = videoRef.current;
         if (!active || !video) {
@@ -120,7 +137,7 @@ export function BarcodeScanner({ onClose, onDetected }: BarcodeScannerProps) {
       <div className={css.header}>
         <div>
           <h3>Scan a barcode</h3>
-          <p>Hold the package steady inside the frame.</p>
+          <p>Hold the package steady with the barcode visible.</p>
         </div>
         <Btn
           aria-label='Close camera'
@@ -133,11 +150,6 @@ export function BarcodeScanner({ onClose, onDetected }: BarcodeScannerProps) {
 
       <div className={css.viewport}>
         <video aria-label='Live camera preview' muted playsInline ref={videoRef} />
-        {state === 'scanning' ? (
-          <div aria-hidden='true' className={css.guide}>
-            <ScanBarcodeIcon />
-          </div>
-        ) : null}
         {state !== 'scanning' ? <ScannerMessage state={state} /> : null}
       </div>
       {state === 'scanning' ? (

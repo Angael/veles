@@ -111,6 +111,75 @@
   display: grid;
   gap: 1rem;
 }
+.scanViewport {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  background: #020617;
+  padding: var(--space-sm);
+}
+.scanViewport > section {
+  height: 100%;
+  grid-template-rows: auto 1fr auto;
+}
+.scanBottom {
+  position: absolute;
+  z-index: 3;
+  right: var(--space-md);
+  bottom: var(--space-md);
+  left: var(--space-md);
+  display: grid;
+  gap: var(--space-sm);
+}
+.barcodeInput,
+.missingProduct {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+  padding: var(--space-sm);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-solid);
+}
+.barcodeInput input {
+  min-width: 0;
+  min-height: 44px;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+.missingProduct {
+  align-items: stretch;
+  flex-direction: column;
+}
+.missingProduct a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--c-text);
+}
+.productSummary {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+}
+.productSummary img {
+  width: 7rem;
+  height: 7rem;
+  border-radius: var(--radius-xs);
+  object-fit: cover;
+}
+.productSummary span,
+.productSummary p {
+  display: block;
+  color: var(--c-muted);
+}
 @media (--sm) {
   .grid {
     grid-template-columns: 1fr;

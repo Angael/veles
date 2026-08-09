@@ -1,63 +1,56 @@
-import { Link } from '@tanstack/react-router';
-import { AppleIcon, ScanBarcodeIcon, SparklesIcon, TargetIcon } from 'lucide-react';
+import { Toggle } from '@base-ui/react/toggle';
+import { ToggleGroup } from '@base-ui/react/toggle-group';
+import { useNavigate } from '@tanstack/react-router';
 import type { CalorieDashboard } from './calories.api';
 import { CalorieOverview } from './CalorieOverview';
-import { recentCalorieDates } from './calorieDate';
+import { calorieWeekDates } from './calorieDate';
+import { Btn } from '@/components/btn/Btn';
 import css from './CaloriesPage.module.css';
 
 type CaloriesPageProps = { dashboard: CalorieDashboard; date: string };
 
 export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
+  const navigate = useNavigate();
+  const open = (to: '/calories/add' | '/calories/scan' | '/calories/quick-add') =>
+    void navigate({ to, search: { date } });
   return (
     <main className={css.page}>
-      <header className={css.pageHeader}>
-        <div>
-          <h1>Your food diary</h1>
-          <p>What you ate, how it adds up, and what is left today.</p>
-        </div>
-        <Link className={css.goalLink} to='/calories/goals'>
-          <TargetIcon aria-hidden='true' /> Goals
-        </Link>
-      </header>
-      <nav aria-label='Recent diary days' className={css.dayStrip}>
-        {recentCalorieDates().map((day) => (
-          <Link
-            className={day === date ? css.dayActive : css.day}
-            key={day}
-            search={{ date: day }}
-            to='/calories'
-          >
-            <span>
-              {new Date(`${day}T12:00:00`).toLocaleDateString(undefined, { weekday: 'short' })}
+      <ToggleGroup
+        aria-label='Diary week'
+        className={css.dayStrip}
+        onValueChange={(values) => {
+          const selected = values[0];
+          if (selected) void navigate({ to: '/calories', search: { date: selected } });
+        }}
+        value={[date]}
+      >
+        {calorieWeekDates(date).map((day) => (
+          <Toggle className={css.day} key={day} value={day}>
+            <span className={css.compactDay}>
+              {new Date(`${day}T12:00:00`).toLocaleDateString(undefined, { weekday: 'narrow' })}
             </span>
-            <strong>{new Date(`${day}T12:00:00`).getDate()}</strong>
-          </Link>
+            <span className={css.expandedDay}>
+              {new Date(`${day}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long' })}
+            </span>
+            <strong className={css.compactDay}>{new Date(`${day}T12:00:00`).getDate()}</strong>
+            <strong className={css.expandedDay}>
+              {new Date(`${day}T12:00:00`)
+                .toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })
+                .replace('/', '.')}
+            </strong>
+          </Toggle>
         ))}
-      </nav>
-      <section aria-label='Add to diary' className={css.entryActions}>
-        <Link search={{ date }} to='/calories/add'>
-          <AppleIcon aria-hidden='true' />
-          <span>
-            <strong>Add food</strong>
-            <small>Search or create</small>
-          </span>
-        </Link>
-        <Link search={{ date }} to='/calories/scan'>
-          <ScanBarcodeIcon aria-hidden='true' />
-          <span>
-            <strong>Scan barcode</strong>
-            <small>Use your camera</small>
-          </span>
-        </Link>
-        <Link search={{ date }} to='/calories/quick-add'>
-          <SparklesIcon aria-hidden='true' />
-          <span>
-            <strong>Quick add</strong>
-            <small>Calories and macros</small>
-          </span>
-        </Link>
-      </section>
+      </ToggleGroup>
       <CalorieOverview goal={dashboard.goal} logs={dashboard.logs} totals={dashboard.totals} />
+      <section aria-label='Add to diary' className={css.entryActions}>
+        <Btn onClick={() => open('/calories/add')}>Add food</Btn>
+        <Btn onClick={() => open('/calories/scan')} variant='outlineMain'>
+          Scan barcode
+        </Btn>
+        <Btn onClick={() => open('/calories/quick-add')} variant='ghost'>
+          Quick add
+        </Btn>
+      </section>
     </main>
   );
 }

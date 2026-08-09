@@ -1,45 +1,48 @@
-import { FlameIcon, UtensilsIcon } from 'lucide-react';
+import { useNavigate, useRouter } from '@tanstack/react-router';
 import type { CalorieGoal, CalorieLog, CalorieTotals } from './calories.api';
+import { deleteFoodLog } from './calories.api';
+import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import css from './CaloriesPage.module.css';
 
 type Props = { goal: CalorieGoal | null; logs: CalorieLog[]; totals: CalorieTotals };
 
 export function CalorieOverview({ goal, logs, totals }: Props) {
-  const progress = goal ? Math.min((totals.kcal / goal.kcal) * 100, 100) : 0;
+  const navigate = useNavigate();
+  const router = useRouter();
+  const remaining = goal ? goal.kcal - totals.kcal : null;
+  async function remove(id: string) {
+    await deleteFoodLog({ data: { id } });
+    await router.invalidate();
+  }
   return (
     <div className={css.overviewStack}>
-      <Card as='section' className={css.hero}>
-        <div className={css.heroCopy}>
-          <span className={css.sectionLabel}>Selected day</span>
-          <div className={css.energyLine}>
-            <strong>{formatNumber(totals.kcal)}</strong>
-            <span>kcal logged</span>
-          </div>
-          <p>
+      <Card as='section' className={css.dailySummary}>
+        <div className={css.energySummary}>
+          <span>
+            {remaining === null ? 'Daily energy' : remaining >= 0 ? 'Remaining' : 'Over goal'}
+          </span>
+          <strong>
+            {remaining === null
+              ? `${number(totals.kcal)} kcal`
+              : `${number(Math.abs(remaining))} kcal`}
+          </strong>
+          <small>
             {goal
-              ? `${formatNumber(Math.abs(goal.kcal - totals.kcal))} kcal ${totals.kcal <= goal.kcal ? 'remaining' : 'over goal'}`
-              : 'Set a goal to see what remains.'}
-          </p>
+              ? `${number(totals.kcal)} out of ${number(goal.kcal)} kcal`
+              : 'No calorie goal set'}
+          </small>
         </div>
-        <div
-          aria-label={goal ? `${Math.round(progress)} percent of goal` : 'No goal'}
-          className={css.progress}
-          role='img'
-        >
-          <FlameIcon aria-hidden='true' />
-          <span>{goal ? `${Math.round(progress)}%` : '—'}</span>
+        <div className={css.summaryMacros}>
+          <Macro label='Protein' total={totals.protein ?? 0} target={goal?.protein ?? null} />
+          <Macro label='Carbs' total={totals.carbs ?? 0} target={goal?.carbs ?? null} />
+          <Macro label='Fat' total={totals.fat ?? 0} target={goal?.fat ?? null} />
         </div>
       </Card>
-      <div aria-label='Macronutrient totals' className={css.macroGrid}>
-        <Macro label='Protein' total={totals.protein} target={goal?.protein ?? null} />
-        <Macro label='Carbs' total={totals.carbs} target={goal?.carbs ?? null} />
-        <Macro label='Fat' total={totals.fat} target={goal?.fat ?? null} />
-      </div>
       <Card as='section' className={css.logCard}>
         <div className={css.sectionHeading}>
           <div>
-            <h2>Food log</h2>
+            <h2>Logged products</h2>
             <p>
               {logs.length
                 ? `${logs.length} ${logs.length === 1 ? 'entry' : 'entries'}`
@@ -51,46 +54,46 @@ export function CalorieOverview({ goal, logs, totals }: Props) {
           <ol className={css.logList}>
             {logs.map((entry) => (
               <li key={entry.id}>
-                <div>
+                <div className={css.logMain}>
                   <strong>{entry.name}</strong>
-                  <span>
-                    {entry.grams === null ? 'Quick entry' : `${formatNumber(entry.grams)} g`}
-                  </span>
+                  <span>{entry.grams === null ? 'Custom entry' : `${number(entry.grams)} g`}</span>
+                  <small>
+                    {number(entry.kcal)} kcal · {number(entry.protein ?? 0)} g protein ·{' '}
+                    {number(entry.carbs ?? 0)} g carbs · {number(entry.fat ?? 0)} g fat
+                  </small>
                 </div>
-                <span className={css.logEnergy}>{formatNumber(entry.kcal)} kcal</span>
+                <div className={css.logActions}>
+                  <Btn
+                    onClick={() =>
+                      void navigate({ to: '/calories/logs/$logId', params: { logId: entry.id } })
+                    }
+                    variant='ghost'
+                  >
+                    Edit
+                  </Btn>
+                  <Btn onClick={() => void remove(entry.id)} variant='ghost'>
+                    Delete
+                  </Btn>
+                </div>
               </li>
             ))}
           </ol>
         ) : (
-          <div className={css.emptyLog}>
-            <UtensilsIcon aria-hidden='true' />
-            <strong>Your diary is empty</strong>
-            <span>Choose an action above to add your first entry.</span>
-          </div>
+          <p className={css.emptyLog}>Choose an action below to add your first entry.</p>
         )}
       </Card>
     </div>
   );
 }
-
-function Macro({
-  label,
-  target,
-  total,
-}: {
-  label: string;
-  target: number | null;
-  total: number | null;
-}) {
+function Macro({ label, target, total }: { label: string; target: number | null; total: number }) {
   return (
-    <Card className={css.macroStat} shadow={false}>
+    <div>
       <span>{label}</span>
-      <strong>{total === null ? 'Unknown' : `${formatNumber(total)} g`}</strong>
-      <small>{target === null ? 'No target' : `of ${formatNumber(target)} g`}</small>
-    </Card>
+      <strong>{number(total)} g</strong>
+      <small>{target === null ? null : ` / ${number(target)} g`}</small>
+    </div>
   );
 }
-
-function formatNumber(value: number) {
+function number(value: number) {
   return new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(value);
 }

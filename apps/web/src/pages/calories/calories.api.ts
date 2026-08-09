@@ -115,6 +115,17 @@ const setDailyCalorieGoalInputType = type({
 const searchFoodsInputType = type({ query: 'string.trim' });
 const foodIdInputType = type({ id: 'string.uuid' });
 const updateFoodProductInputType = createFoodProductInputType.merge(foodIdInputType);
+const foodLogIdInputType = type({ id: 'string.uuid' });
+const updateFoodLogInputType = type({
+  'carbs?': nonNegativeAmountType,
+  date: localDateType,
+  'fat?': nonNegativeAmountType,
+  'grams?': nonNegativeAmountType,
+  id: 'string.uuid',
+  kcal: nonNegativeAmountType,
+  name: nonEmptyTextType,
+  'protein?': nonNegativeAmountType,
+});
 
 type OpenFoodFactsNumber = number | string | null | undefined;
 
@@ -393,19 +404,12 @@ export const getCalorieDashboard = createServerFn({ method: 'GET' })
       .limit(20);
     const totals = logs.reduce(
       (result, log) => ({
-        carbs:
-          result.carbs === null || log.carbsHundredths === null
-            ? null
-            : result.carbs + log.carbsHundredths,
-        fat:
-          result.fat === null || log.fatHundredths === null ? null : result.fat + log.fatHundredths,
+        carbs: result.carbs + (log.carbsHundredths ?? 0),
+        fat: result.fat + (log.fatHundredths ?? 0),
         kcal: result.kcal + log.kcalHundredths,
-        protein:
-          result.protein === null || log.proteinHundredths === null
-            ? null
-            : result.protein + log.proteinHundredths,
+        protein: result.protein + (log.proteinHundredths ?? 0),
       }),
-      { carbs: 0 as number | null, fat: 0 as number | null, kcal: 0, protein: 0 as number | null },
+      { carbs: 0, fat: 0, kcal: 0, protein: 0 },
     );
 
     return {
@@ -554,6 +558,79 @@ export const recordCustomCalories = createServerFn({ method: 'POST' })
       .returning();
     if (!inserted) throw new Error('Food log could not be created.');
     return toCalorieLog(inserted);
+  });
+
+export const getFoodLog = createServerFn({ method: 'GET' })
+  .middleware([logMiddleware('getFoodLog')])
+  .validator(arkTypeValidator(foodLogIdInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    const [log] = await db
+      .select()
+      .from(foodLogs)
+      .where(and(eq(foodLogs.id, data.id), eq(foodLogs.userId, session.user.id)))
+      .limit(1);
+    if (!log) throw new ClientSafeError('Food log not found.');
+    return toCalorieLog(log);
+  });
+
+export const updateFoodLog = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('updateFoodLog')])
+  .validator(arkTypeValidator(updateFoodLogInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    const [existing] = await db
+      .select()
+      .from(foodLogs)
+      .where(and(eq(foodLogs.id, data.id), eq(foodLogs.userId, session.user.id)))
+      .limit(1);
+    if (!existing) throw new ClientSafeError('Food log not found.');
+    const nextGrams = optionalHundredths(data.grams);
+    const ratio =
+      existing.kind === 'product' && existing.gramsHundredths && nextGrams !== null
+        ? nextGrams / existing.gramsHundredths
+        : null;
+    const [updated] = await db
+      .update(foodLogs)
+      .set({
+        carbsHundredths:
+          ratio === null
+            ? optionalHundredths(data.carbs)
+            : existing.carbsHundredths === null
+              ? null
+              : Math.round(existing.carbsHundredths * ratio),
+        fatHundredths:
+          ratio === null
+            ? optionalHundredths(data.fat)
+            : existing.fatHundredths === null
+              ? null
+              : Math.round(existing.fatHundredths * ratio),
+        gramsHundredths: nextGrams,
+        kcalHundredths:
+          ratio === null ? toHundredths(data.kcal) : Math.round(existing.kcalHundredths * ratio),
+        logDate: data.date,
+        name: existing.kind === 'product' ? existing.name : data.name.trim(),
+        proteinHundredths:
+          ratio === null
+            ? optionalHundredths(data.protein)
+            : existing.proteinHundredths === null
+              ? null
+              : Math.round(existing.proteinHundredths * ratio),
+      })
+      .where(eq(foodLogs.id, existing.id))
+      .returning();
+    if (!updated) throw new Error('Food log could not be updated.');
+    return toCalorieLog(updated);
+  });
+
+export const deleteFoodLog = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('deleteFoodLog')])
+  .validator(arkTypeValidator(foodLogIdInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    await db
+      .delete(foodLogs)
+      .where(and(eq(foodLogs.id, data.id), eq(foodLogs.userId, session.user.id)));
   });
 
 export const setDailyCalorieGoal = createServerFn({ method: 'POST' })
