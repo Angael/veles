@@ -1,6 +1,10 @@
 import { type } from 'arktype';
-import { describe, expect, it } from 'vitest';
-import { diaryEntryDateType, formatDiaryDate } from './diaryDate';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/lib/auth/getSession', () => ({ requireSession: vi.fn() }));
+vi.mock('@/lib/db', () => ({ db: {} }));
+
+import { diaryEntryDateType, formatDiaryDate } from './diary.api';
 
 describe('diaryEntryDateType', () => {
   it('accepts a valid date-only value', () => {

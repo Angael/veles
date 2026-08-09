@@ -55,6 +55,8 @@ export function DiaryEntryPage({ entry, focusTitle = false }: DiaryEntryPageProp
               className={css.dateInput}
               max='9999-12-31'
               onChange={(event) => {
+                // Native constraint validation covers `required`, malformed dates, and the `max`
+                // year above, so oversized values never enter autosave state.
                 if (!event.currentTarget.validity.valid || !event.currentTarget.value) {
                   return;
                 }

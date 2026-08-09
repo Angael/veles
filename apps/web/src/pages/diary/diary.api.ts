@@ -3,12 +3,12 @@ import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { notFound } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { and, desc, eq } from 'drizzle-orm';
+import { format, isMatch, parseISO } from 'date-fns';
 import { diaryEntries } from '@veles/db/schema';
 import { db } from '@/lib/db';
 import { requireSession } from '@/lib/auth/getSession';
 import { invariant } from '@/lib/invariant';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
-import { diaryEntryDateType } from './diaryDate';
 
 export type DiaryEntrySummary = {
   entryDate: string;
@@ -37,6 +37,9 @@ export const getDiaryEntries = createServerFn({ method: 'GET' })
   });
 
 const idType = type({ id: 'string.uuid' });
+export const diaryEntryDateType = type('string.date.iso').narrow((value, ctx) =>
+  isMatch(value, 'yyyy-MM-dd') ? true : ctx.mustBe('a valid date in YYYY-MM-DD format'),
+);
 const createDiaryEntryInputType = type({ entryDate: diaryEntryDateType });
 const updateDiaryEntryInputType = type({
   entryDate: diaryEntryDateType,
@@ -44,6 +47,15 @@ const updateDiaryEntryInputType = type({
   markdown: 'string <= 16000',
   title: 'string <= 160',
 });
+
+/** Formats valid diary dates without letting legacy invalid data crash rendering. */
+export function formatDiaryDate(value: string) {
+  if (!isMatch(value, 'yyyy-MM-dd')) {
+    return 'Invalid date';
+  }
+
+  return format(parseISO(value), 'MMMM d, yyyy');
+}
 
 export const getDiaryEntryById = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getDiaryEntryById')])
