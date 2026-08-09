@@ -25,6 +25,7 @@
 - [x] Add dedicated quick-add route
 - [x] Add dedicated current-goals route
 - [x] Add dedicated global food edit route
+- [x] Allow first-party camera access through the response Permissions Policy
 - [ ] Verify the complete authenticated flow after the dev schema is pushed
 
 ## Verification
