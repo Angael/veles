@@ -7,6 +7,7 @@ import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { TextInput } from '@/components/text-input/TextInput';
 import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
 import { createDiaryEntry, type DiaryEntrySummary } from './diary.api';
+import { formatDiaryDate } from './diaryDate';
 import css from './DiaryListPage.module.css';
 
 type DiaryListPageProps = {
@@ -17,11 +18,6 @@ const diarySearchFields = [
   (entry) => entry.title,
   (entry) => entry.markdown,
 ] satisfies RankedSearchFields<DiaryEntrySummary>;
-
-const diaryDateFormatter = new Intl.DateTimeFormat('en', {
-  dateStyle: 'long',
-  timeZone: 'UTC',
-});
 
 export function DiaryListPage({ entries }: DiaryListPageProps) {
   const navigate = useNavigate();
@@ -106,10 +102,6 @@ export function DiaryListPage({ entries }: DiaryListPageProps) {
       </FloatingButton>
     </main>
   );
-}
-
-function formatDiaryDate(value: string) {
-  return diaryDateFormatter.format(new Date(`${value}T00:00:00Z`));
 }
 
 function getLocalDate() {

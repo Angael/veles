@@ -8,6 +8,7 @@ import { db } from '@/lib/db';
 import { requireSession } from '@/lib/auth/getSession';
 import { invariant } from '@/lib/invariant';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
+import { diaryEntryDateType } from './diaryDate';
 
 export type DiaryEntrySummary = {
   entryDate: string;
@@ -36,7 +37,6 @@ export const getDiaryEntries = createServerFn({ method: 'GET' })
   });
 
 const idType = type({ id: 'string.uuid' });
-const diaryEntryDateType = type('string.date');
 const createDiaryEntryInputType = type({ entryDate: diaryEntryDateType });
 const updateDiaryEntryInputType = type({
   entryDate: diaryEntryDateType,

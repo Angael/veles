@@ -53,8 +53,9 @@ export function DiaryEntryPage({ entry, focusTitle = false }: DiaryEntryPageProp
             <DateInput
               aria-label='Diary entry date'
               className={css.dateInput}
+              max='9999-12-31'
               onChange={(event) => {
-                if (!event.target.value) {
+                if (!event.currentTarget.validity.valid || !event.currentTarget.value) {
                   return;
                 }
 

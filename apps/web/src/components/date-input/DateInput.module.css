@@ -1,22 +1,5 @@
 .root {
-  position: relative;
-  display: inline-grid;
-  width: 100%;
-  min-height: var(--button-min-height);
-  border: var(--border-width) solid var(--c-border-strong);
-  border-radius: var(--radius-xs);
-  background: rgba(2, 6, 23, 0.4);
-  color: var(--c-text);
   font-variant-numeric: tabular-nums;
-  transition:
-    border-color 180ms var(--ease-out),
-    box-shadow 180ms var(--ease-out),
-    background-color 180ms var(--ease-out);
-
-  &:has(.input:focus) {
-    border-color: var(--c-primary-border);
-    box-shadow: 0 0 0 2px var(--c-primary-focus);
-  }
 }
 
 .display {
