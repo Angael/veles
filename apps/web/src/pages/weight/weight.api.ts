@@ -2,6 +2,7 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { asc, eq, sql } from 'drizzle-orm';
+import { dateOnlyType } from '@/lib/dateOnly';
 import { weightEntries } from '@veles/db/schema';
 import { db } from '@/lib/db';
 import { requireSession } from '@/lib/auth/getSession';
@@ -15,7 +16,7 @@ export type WeightEntry = {
 export const MAX_WEIGHT_IMPORT_ENTRIES = 3_000;
 
 const saveWeightInputType = type({
-  date: 'string.date',
+  date: dateOnlyType,
   weightKg: '30 <= number <= 300',
 });
 
@@ -36,10 +37,12 @@ export const getWeightEntries = createServerFn({ method: 'GET' })
       .where(eq(weightEntries.userId, session.user.id))
       .orderBy(asc(weightEntries.date));
 
-    return entries.map((entry) => ({
-      date: entry.date,
-      weightKg: entry.weightGrams / 1_000,
-    }));
+    return entries
+      .filter((entry) => dateOnlyType.allows(entry.date))
+      .map((entry) => ({
+        date: entry.date,
+        weightKg: entry.weightGrams / 1_000,
+      }));
   });
 
 export const saveWeight = createServerFn({ method: 'POST' })
