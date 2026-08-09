@@ -1,3 +1,4 @@
+import { dateOnlyType } from '@/lib/dateOnly';
 import type { WeightEntry } from './weight.api';
 
 /** Parses the documented line format and keeps the last value for duplicate dates. */
@@ -12,7 +13,7 @@ export function parseWeightEntries(value: string): { entries: WeightEntry[]; err
     const date = match?.[1];
     const weightKg = match?.[2] ? Number(match[2].replace(',', '.')) : Number.NaN;
 
-    if (!date || !isIsoDate(date) || weightKg < 30 || weightKg > 300) {
+    if (!date || !dateOnlyType.allows(date) || weightKg < 30 || weightKg > 300) {
       errors.push(`Line ${index + 1} is invalid.`);
       continue;
     }
@@ -23,9 +24,4 @@ export function parseWeightEntries(value: string): { entries: WeightEntry[]; err
     entries: [...entriesByDate.values()].sort((a, b) => a.date.localeCompare(b.date)),
     errors,
   };
-}
-
-function isIsoDate(value: string) {
-  const date = new Date(`${value}T00:00:00Z`);
-  return !Number.isNaN(date.valueOf()) && date.toISOString().slice(0, 10) === value;
 }

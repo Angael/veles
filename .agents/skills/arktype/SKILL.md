@@ -43,9 +43,25 @@ const optionalRatingFormValueType = type('string.trim').pipe(
 );
 ```
 
+### Strict date-only boundaries
+
+`string.date` is broad date parsing: it accepts expanded years such as `122324-02-12` and impossible calendar dates such as `2026-02-30`. For strict `YYYY-MM-DD` inputs in this repo, use the shared ArkType validator:
+
+```ts
+import { type } from 'arktype';
+import { dateOnlyType } from '@/lib/dateOnly';
+
+const inputType = type({ date: dateOnlyType });
+const standaloneDateType = type(dateOnlyType);
+```
+
+`dateOnlyType` combines `string.date.iso` with date-fns `isMatch`, so it enforces the exact four-digit shape and calendar validity. It is a normal composable ArkType `Type`; use it directly in ArkType definitions or call `dateOnlyType.allows(value)` when a boolean predicate is needed. Do not duplicate its narrowing logic at individual date boundaries.
+
+
 ## Use First
 
 - Keywords: `string.email`, `string.uuid`, `string.date.iso`, `string.numeric.parse`.
+- Strict date-only strings: shared `dateOnlyType` from `@/lib/dateOnly`.
 - Constraints: `1 <= number <= 5`, `string >= 1`, `string[] <= 8`.
 - Pipes: `string.trim |> string >= 1`, `string.numeric.parse |> number.integer >= 0`.
 - Unions: `string | null`, `'draft' | 'published'`, `number | undefined`.
@@ -84,6 +100,8 @@ type('string.base64');
 type('string.hex');
 
 // dates
+// preferred strict YYYY-MM-DD boundary in Veles
+type(dateOnlyType);
 type('string.date');
 type('string.date.parse');
 type('string.date.iso');

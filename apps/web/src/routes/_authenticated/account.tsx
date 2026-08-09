@@ -1,18 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PlaceholderPage } from '@/pages/placeholder/PlaceholderPage';
+import { AccountPage } from '@/pages/account/AccountPage';
 
 export const Route = createFileRoute('/_authenticated/account')({
-  component: AccountPage,
+  component: AccountPageRoute,
   head: () => ({ meta: [{ title: 'Account' }] }),
   staticData: { navbar: { label: 'Account', upTo: { to: '/' } } },
 });
 
-function AccountPage() {
-  return (
-    <PlaceholderPage
-      description='Placeholder route for account details and preferences.'
-      eyebrow='Profile'
-      title='Account'
-    />
-  );
+function AccountPageRoute() {
+  const { user } = Route.useRouteContext();
+
+  if (!user) {
+    return null;
+  }
+
+  return <AccountPage user={user} />;
 }

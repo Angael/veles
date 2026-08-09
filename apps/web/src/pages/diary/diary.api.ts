@@ -3,8 +3,10 @@ import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { notFound } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { and, desc, eq } from 'drizzle-orm';
+import { format, parseISO } from 'date-fns';
 import { diaryEntries } from '@veles/db/schema';
 import { db } from '@/lib/db';
+import { dateOnlyType } from '@/lib/dateOnly';
 import { requireSession } from '@/lib/auth/getSession';
 import { invariant } from '@/lib/invariant';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
@@ -32,18 +34,22 @@ export const getDiaryEntries = createServerFn({ method: 'GET' })
       .where(eq(diaryEntries.userId, session.user.id))
       .orderBy(desc(diaryEntries.entryDate), desc(diaryEntries.createdAt));
 
-    return entries;
+    return entries.filter((entry) => dateOnlyType.allows(entry.entryDate));
   });
 
 const idType = type({ id: 'string.uuid' });
-const diaryEntryDateType = type('string.date');
-const createDiaryEntryInputType = type({ entryDate: diaryEntryDateType });
+const createDiaryEntryInputType = type({ entryDate: dateOnlyType });
 const updateDiaryEntryInputType = type({
-  entryDate: diaryEntryDateType,
+  entryDate: dateOnlyType,
   id: 'string.uuid',
   markdown: 'string <= 16000',
   title: 'string <= 160',
 });
+
+/** Formats a server-validated diary date for display. */
+export function formatDiaryDate(value: string) {
+  return format(parseISO(value), 'MMMM d, yyyy');
+}
 
 export const getDiaryEntryById = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getDiaryEntryById')])
@@ -66,6 +72,10 @@ export const getDiaryEntryById = createServerFn({ method: 'GET' })
     invariant(entry, () => {
       throw notFound();
     });
+
+    if (!dateOnlyType.allows(entry.entryDate)) {
+      throw notFound();
+    }
 
     return {
       entryDate: entry.entryDate,
