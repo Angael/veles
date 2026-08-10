@@ -74,7 +74,7 @@ export function useDesktopNavMenu(user: SessionUser | null) {
     {
       key: 'trackers',
       label: 'Trackers',
-      matchPrefixes: ['/weight', '/recipes', '/diary', '/todos'],
+      matchPrefixes: ['/weight', '/recipes', '/diary', '/todos', '/calories'],
       shouldRender: Boolean(user),
       items: [
         {
@@ -100,6 +100,12 @@ export function useDesktopNavMenu(user: SessionUser | null) {
           link: '/todos',
           label: 'Todos',
           description: 'Shared checklists for shopping and life goals.',
+        },
+        {
+          key: 'calories',
+          link: '/calories',
+          label: 'Calories',
+          description: 'Log meals and track daily calorie intake.',
         },
       ],
     },

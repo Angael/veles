@@ -101,6 +101,7 @@
 .navPositioner {
   --duration: var(--duration-fast);
   --easing: var(--ease-out);
+  z-index: 10;
   width: var(--positioner-width);
   height: var(--positioner-height);
   max-width: min(var(--available-width), calc(100vw - 2rem));
