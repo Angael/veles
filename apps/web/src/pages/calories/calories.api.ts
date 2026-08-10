@@ -15,7 +15,7 @@ import {
   optionalHundredths,
   toCalorieGoal,
   toHundredths,
-} from './calorieValues';
+} from './calorieHelpers';
 
 const MAX_TEXT_LENGTH = 500;
 
