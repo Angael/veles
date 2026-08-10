@@ -42,3 +42,7 @@ The fourth PR adds quick entries for calories that do not need a catalog product
 ## Food catalog
 
 The fifth PR adds forms for creating and editing global food products. Products can store a name, brand, barcode, image, package size, calories, and optional protein, carbohydrate, and fat values per 100 grams. Catalog edits affect future selections only; existing diary snapshots keep their recorded values.
+
+## Logging catalog foods
+
+The sixth PR adds a searchable food picker. Selecting a product opens a serving form with quantity in grams and the diary date. Saving calculates calories and macronutrients from the product's per-100-gram values and stores the result as a new immutable diary snapshot.
