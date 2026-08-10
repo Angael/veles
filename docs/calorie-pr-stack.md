@@ -38,3 +38,7 @@ The third PR adds a focused goal form. A goal has an effective date and a daily 
 ## Custom calorie logs
 
 The fourth PR adds quick entries for calories that do not need a catalog product. A custom entry records a name, calories, and diary date. Every diary row can then be opened to change its name, date, quantity, or snapshotted nutrition values, or to delete it.
+
+## Food catalog
+
+The fifth PR adds forms for creating and editing global food products. Products can store a name, brand, barcode, image, package size, calories, and optional protein, carbohydrate, and fat values per 100 grams. Catalog edits affect future selections only; existing diary snapshots keep their recorded values.
