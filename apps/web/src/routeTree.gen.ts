@@ -30,6 +30,8 @@ import { Route as AuthenticatedDiaryIdRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedCaloriesQuickAddRouteImport } from './routes/_authenticated/calories_.quick-add'
 import { Route as AuthenticatedCaloriesGoalsRouteImport } from './routes/_authenticated/calories_.goals'
 import { Route as AuthenticatedCaloriesLogsLogIdRouteImport } from './routes/_authenticated/calories_.logs_.$logId'
+import { Route as AuthenticatedCaloriesFoodsNewRouteImport } from './routes/_authenticated/calories_.foods_.new'
+import { Route as AuthenticatedCaloriesFoodsFoodIdRouteImport } from './routes/_authenticated/calories_.foods_.$foodId'
 import { Route as AuthenticatedRecipesViewIdEditRouteImport } from './routes/_authenticated/recipes/view.$id_.edit'
 
 const LoginRoute = LoginRouteImport.update({
@@ -141,6 +143,18 @@ const AuthenticatedCaloriesLogsLogIdRoute =
     path: '/calories/logs/$logId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedCaloriesFoodsNewRoute =
+  AuthenticatedCaloriesFoodsNewRouteImport.update({
+    id: '/calories_/foods_/new',
+    path: '/calories/foods/new',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedCaloriesFoodsFoodIdRoute =
+  AuthenticatedCaloriesFoodsFoodIdRouteImport.update({
+    id: '/calories_/foods_/$foodId',
+    path: '/calories/foods/$foodId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedRecipesViewIdEditRoute =
   AuthenticatedRecipesViewIdEditRouteImport.update({
     id: '/recipes/view/$id_/edit',
@@ -168,6 +182,8 @@ export interface FileRoutesByFullPath {
   '/recipes/view/$id': typeof RecipesViewIdRoute
   '/diary/': typeof AuthenticatedDiaryIndexRoute
   '/recipes/': typeof AuthenticatedRecipesIndexRoute
+  '/calories/foods/$foodId': typeof AuthenticatedCaloriesFoodsFoodIdRoute
+  '/calories/foods/new': typeof AuthenticatedCaloriesFoodsNewRoute
   '/calories/logs/$logId': typeof AuthenticatedCaloriesLogsLogIdRoute
   '/recipes/view/$id/edit': typeof AuthenticatedRecipesViewIdEditRoute
 }
@@ -191,6 +207,8 @@ export interface FileRoutesByTo {
   '/recipes/view/$id': typeof RecipesViewIdRoute
   '/diary': typeof AuthenticatedDiaryIndexRoute
   '/recipes': typeof AuthenticatedRecipesIndexRoute
+  '/calories/foods/$foodId': typeof AuthenticatedCaloriesFoodsFoodIdRoute
+  '/calories/foods/new': typeof AuthenticatedCaloriesFoodsNewRoute
   '/calories/logs/$logId': typeof AuthenticatedCaloriesLogsLogIdRoute
   '/recipes/view/$id/edit': typeof AuthenticatedRecipesViewIdEditRoute
 }
@@ -216,6 +234,8 @@ export interface FileRoutesById {
   '/recipes/view/$id': typeof RecipesViewIdRoute
   '/_authenticated/diary/': typeof AuthenticatedDiaryIndexRoute
   '/_authenticated/recipes/': typeof AuthenticatedRecipesIndexRoute
+  '/_authenticated/calories_/foods_/$foodId': typeof AuthenticatedCaloriesFoodsFoodIdRoute
+  '/_authenticated/calories_/foods_/new': typeof AuthenticatedCaloriesFoodsNewRoute
   '/_authenticated/calories_/logs_/$logId': typeof AuthenticatedCaloriesLogsLogIdRoute
   '/_authenticated/recipes/view/$id_/edit': typeof AuthenticatedRecipesViewIdEditRoute
 }
@@ -241,6 +261,8 @@ export interface FileRouteTypes {
     | '/recipes/view/$id'
     | '/diary/'
     | '/recipes/'
+    | '/calories/foods/$foodId'
+    | '/calories/foods/new'
     | '/calories/logs/$logId'
     | '/recipes/view/$id/edit'
   fileRoutesByTo: FileRoutesByTo
@@ -264,6 +286,8 @@ export interface FileRouteTypes {
     | '/recipes/view/$id'
     | '/diary'
     | '/recipes'
+    | '/calories/foods/$foodId'
+    | '/calories/foods/new'
     | '/calories/logs/$logId'
     | '/recipes/view/$id/edit'
   id:
@@ -288,6 +312,8 @@ export interface FileRouteTypes {
     | '/recipes/view/$id'
     | '/_authenticated/diary/'
     | '/_authenticated/recipes/'
+    | '/_authenticated/calories_/foods_/$foodId'
+    | '/_authenticated/calories_/foods_/new'
     | '/_authenticated/calories_/logs_/$logId'
     | '/_authenticated/recipes/view/$id_/edit'
   fileRoutesById: FileRoutesById
@@ -452,6 +478,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaloriesLogsLogIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/calories_/foods_/new': {
+      id: '/_authenticated/calories_/foods_/new'
+      path: '/calories/foods/new'
+      fullPath: '/calories/foods/new'
+      preLoaderRoute: typeof AuthenticatedCaloriesFoodsNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/calories_/foods_/$foodId': {
+      id: '/_authenticated/calories_/foods_/$foodId'
+      path: '/calories/foods/$foodId'
+      fullPath: '/calories/foods/$foodId'
+      preLoaderRoute: typeof AuthenticatedCaloriesFoodsFoodIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/recipes/view/$id_/edit': {
       id: '/_authenticated/recipes/view/$id_/edit'
       path: '/recipes/view/$id/edit'
@@ -475,6 +515,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedWeightImportRoute: typeof AuthenticatedWeightImportRoute
   AuthenticatedDiaryIndexRoute: typeof AuthenticatedDiaryIndexRoute
   AuthenticatedRecipesIndexRoute: typeof AuthenticatedRecipesIndexRoute
+  AuthenticatedCaloriesFoodsFoodIdRoute: typeof AuthenticatedCaloriesFoodsFoodIdRoute
+  AuthenticatedCaloriesFoodsNewRoute: typeof AuthenticatedCaloriesFoodsNewRoute
   AuthenticatedCaloriesLogsLogIdRoute: typeof AuthenticatedCaloriesLogsLogIdRoute
   AuthenticatedRecipesViewIdEditRoute: typeof AuthenticatedRecipesViewIdEditRoute
 }
@@ -492,6 +534,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedWeightImportRoute: AuthenticatedWeightImportRoute,
   AuthenticatedDiaryIndexRoute: AuthenticatedDiaryIndexRoute,
   AuthenticatedRecipesIndexRoute: AuthenticatedRecipesIndexRoute,
+  AuthenticatedCaloriesFoodsFoodIdRoute: AuthenticatedCaloriesFoodsFoodIdRoute,
+  AuthenticatedCaloriesFoodsNewRoute: AuthenticatedCaloriesFoodsNewRoute,
   AuthenticatedCaloriesLogsLogIdRoute: AuthenticatedCaloriesLogsLogIdRoute,
   AuthenticatedRecipesViewIdEditRoute: AuthenticatedRecipesViewIdEditRoute,
 }
