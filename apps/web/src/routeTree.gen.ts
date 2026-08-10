@@ -27,6 +27,7 @@ import { Route as AuthenticatedWeightImportRouteImport } from './routes/_authent
 import { Route as AuthenticatedWeightAddRouteImport } from './routes/_authenticated/weight_.add'
 import { Route as AuthenticatedRecipesAddRouteImport } from './routes/_authenticated/recipes/add'
 import { Route as AuthenticatedDiaryIdRouteImport } from './routes/_authenticated/diary/$id'
+import { Route as AuthenticatedCaloriesScanRouteImport } from './routes/_authenticated/calories_.scan'
 import { Route as AuthenticatedCaloriesQuickAddRouteImport } from './routes/_authenticated/calories_.quick-add'
 import { Route as AuthenticatedCaloriesGoalsRouteImport } from './routes/_authenticated/calories_.goals'
 import { Route as AuthenticatedCaloriesAddRouteImport } from './routes/_authenticated/calories_.add'
@@ -126,6 +127,12 @@ const AuthenticatedDiaryIdRoute = AuthenticatedDiaryIdRouteImport.update({
   path: '/diary/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedCaloriesScanRoute =
+  AuthenticatedCaloriesScanRouteImport.update({
+    id: '/calories_/scan',
+    path: '/calories/scan',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedCaloriesQuickAddRoute =
   AuthenticatedCaloriesQuickAddRouteImport.update({
     id: '/calories_/quick-add',
@@ -181,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/calories/add': typeof AuthenticatedCaloriesAddRoute
   '/calories/goals': typeof AuthenticatedCaloriesGoalsRoute
   '/calories/quick-add': typeof AuthenticatedCaloriesQuickAddRoute
+  '/calories/scan': typeof AuthenticatedCaloriesScanRoute
   '/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/weight/add': typeof AuthenticatedWeightAddRoute
@@ -207,6 +215,7 @@ export interface FileRoutesByTo {
   '/calories/add': typeof AuthenticatedCaloriesAddRoute
   '/calories/goals': typeof AuthenticatedCaloriesGoalsRoute
   '/calories/quick-add': typeof AuthenticatedCaloriesQuickAddRoute
+  '/calories/scan': typeof AuthenticatedCaloriesScanRoute
   '/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/weight/add': typeof AuthenticatedWeightAddRoute
@@ -235,6 +244,7 @@ export interface FileRoutesById {
   '/_authenticated/calories_/add': typeof AuthenticatedCaloriesAddRoute
   '/_authenticated/calories_/goals': typeof AuthenticatedCaloriesGoalsRoute
   '/_authenticated/calories_/quick-add': typeof AuthenticatedCaloriesQuickAddRoute
+  '/_authenticated/calories_/scan': typeof AuthenticatedCaloriesScanRoute
   '/_authenticated/diary/$id': typeof AuthenticatedDiaryIdRoute
   '/_authenticated/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/_authenticated/weight_/add': typeof AuthenticatedWeightAddRoute
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/calories/add'
     | '/calories/goals'
     | '/calories/quick-add'
+    | '/calories/scan'
     | '/diary/$id'
     | '/recipes/add'
     | '/weight/add'
@@ -289,6 +300,7 @@ export interface FileRouteTypes {
     | '/calories/add'
     | '/calories/goals'
     | '/calories/quick-add'
+    | '/calories/scan'
     | '/diary/$id'
     | '/recipes/add'
     | '/weight/add'
@@ -316,6 +328,7 @@ export interface FileRouteTypes {
     | '/_authenticated/calories_/add'
     | '/_authenticated/calories_/goals'
     | '/_authenticated/calories_/quick-add'
+    | '/_authenticated/calories_/scan'
     | '/_authenticated/diary/$id'
     | '/_authenticated/recipes/add'
     | '/_authenticated/weight_/add'
@@ -470,6 +483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDiaryIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/calories_/scan': {
+      id: '/_authenticated/calories_/scan'
+      path: '/calories/scan'
+      fullPath: '/calories/scan'
+      preLoaderRoute: typeof AuthenticatedCaloriesScanRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/calories_/quick-add': {
       id: '/_authenticated/calories_/quick-add'
       path: '/calories/quick-add'
@@ -530,6 +550,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCaloriesAddRoute: typeof AuthenticatedCaloriesAddRoute
   AuthenticatedCaloriesGoalsRoute: typeof AuthenticatedCaloriesGoalsRoute
   AuthenticatedCaloriesQuickAddRoute: typeof AuthenticatedCaloriesQuickAddRoute
+  AuthenticatedCaloriesScanRoute: typeof AuthenticatedCaloriesScanRoute
   AuthenticatedDiaryIdRoute: typeof AuthenticatedDiaryIdRoute
   AuthenticatedRecipesAddRoute: typeof AuthenticatedRecipesAddRoute
   AuthenticatedWeightAddRoute: typeof AuthenticatedWeightAddRoute
@@ -550,6 +571,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCaloriesAddRoute: AuthenticatedCaloriesAddRoute,
   AuthenticatedCaloriesGoalsRoute: AuthenticatedCaloriesGoalsRoute,
   AuthenticatedCaloriesQuickAddRoute: AuthenticatedCaloriesQuickAddRoute,
+  AuthenticatedCaloriesScanRoute: AuthenticatedCaloriesScanRoute,
   AuthenticatedDiaryIdRoute: AuthenticatedDiaryIdRoute,
   AuthenticatedRecipesAddRoute: AuthenticatedRecipesAddRoute,
   AuthenticatedWeightAddRoute: AuthenticatedWeightAddRoute,
