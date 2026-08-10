@@ -26,6 +26,7 @@
     "@tanstack/react-start": "1.168.25",
     "@veles/db": "workspace:*",
     "arktype": "2.2.0",
+    "barcode-detector": "2.3.1",
     "better-auth": "1.6.23",
     "clsx": "2.1.1",
     "date-fns": "4.4.0",
