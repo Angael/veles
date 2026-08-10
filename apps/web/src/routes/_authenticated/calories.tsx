@@ -1,18 +1,19 @@
+import { type } from 'arktype';
 import { createFileRoute } from '@tanstack/react-router';
-import { PlaceholderPage } from '@/pages/placeholder/PlaceholderPage';
+import { CaloriesPage } from '@/pages/calories/CaloriesPage';
+import { getCalorieDashboard } from '@/pages/calories/calories.api';
+import { normalizeCalorieDate } from '@/pages/calories/calorieDate';
 
 export const Route = createFileRoute('/_authenticated/calories')({
-  component: CaloriesPage,
-  head: () => ({ meta: [{ title: 'Calorie tracker' }] }),
+  validateSearch: type({ 'date?': 'string' }),
+  loaderDeps: ({ search }) => ({ date: normalizeCalorieDate(search.date) }),
+  loader: ({ deps }) => getCalorieDashboard({ data: { date: deps.date } }),
+  component: RouteComponent,
+  head: () => ({ meta: [{ title: 'Food diary' }] }),
   staticData: { navbar: { label: 'Calories', upTo: { to: '/' } } },
 });
-
-function CaloriesPage() {
-  return (
-    <PlaceholderPage
-      description='Placeholder route for the future calorie tracker mobile entry point.'
-      eyebrow='Tracker'
-      title='Calorie tracker'
-    />
-  );
+function RouteComponent() {
+  const dashboard = Route.useLoaderData();
+  const { date } = Route.useLoaderDeps();
+  return <CaloriesPage dashboard={dashboard} date={date} />;
 }
