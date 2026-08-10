@@ -1,6 +1,7 @@
 # Rules
 - This is a solo hobby app; prefer low-friction solutions
 - Run `pnpm check:fix` before finishing
+- In code, objects, types, and UI, always order nutrition macros as: kcal, protein, fat, carbs.
 
 ## CI/CD
 - Avoid GitHub Actions and GitHub CI/CD for sensitive prod workflows; this repo is public
