@@ -50,3 +50,9 @@ The sixth PR adds a searchable food picker. Selecting a product opens a serving 
 ## Barcode lookup
 
 The seventh PR adds a manual barcode flow. A typed barcode first searches the Veles catalog, then requests and validates an Open Food Facts product when no local match exists. Valid external products are added to the shared catalog before logging. A missing product can be created manually with its barcode and diary date carried into the form.
+
+## Camera scanning
+
+The eighth PR upgrades barcode lookup with a camera-first scanner while keeping manual entry available. It requests the rear-facing camera, loads a `BarcodeDetector` polyfill only when the browser needs one, prevents duplicate detections, and releases the video stream when scanning stops. The permissions policy allows same-origin camera use, and the responsive full-screen scanner provides close, loading, unsupported-browser, permission-denied, and missing-product states.
+
+After detection, the flow uses the same catalog lookup and Open Food Facts import as manual entry. A matched product is confirmed with quantity and diary date before it becomes a snapshot in the daily log.
