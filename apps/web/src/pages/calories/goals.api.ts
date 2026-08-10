@@ -6,7 +6,7 @@ import { requireSession } from '@/lib/auth/getSession';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { db } from '@/lib/db';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
-import { optionalHundredths, toCalorieGoal, toHundredths } from './calorieValues';
+import { optionalHundredths, toCalorieGoal, toHundredths } from './calorieHelpers';
 
 const setDailyCalorieGoalInputType = type({
   kcal: type('number > 0'),
