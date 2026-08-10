@@ -26,3 +26,7 @@ The first PR adds three database concepts:
 Server functions validate their inputs, require an authenticated session, and cover dashboard reads, goals, food products, food logs, and Open Food Facts imports. Development reset data includes common foods for local iteration.
 
 Before this PR can merge, generate and review the Drizzle migration, then reset the development database and exercise the migrated schema. Drizzle commands remain human-run.
+
+## Daily dashboard
+
+The second PR makes calorie tracking visible at `/calories`. It adds local-date navigation, daily energy and macronutrient totals, calorie-goal progress, logged-food rows, and an empty state for days without entries. The authenticated application navigation links to the dashboard on both desktop and mobile layouts.
