@@ -30,3 +30,7 @@ Before this PR can merge, generate and review the Drizzle migration, then reset 
 ## Daily dashboard
 
 The second PR makes calorie tracking visible at `/calories`. It adds local-date navigation, daily energy and macronutrient totals, calorie-goal progress, logged-food rows, and an empty state for days without entries. The authenticated application navigation links to the dashboard on both desktop and mobile layouts.
+
+## Daily goals
+
+The third PR adds a focused goal form. A goal has an effective date and a daily calorie target; the dashboard uses the newest goal effective on or before the selected diary date. Saving a later goal therefore preserves the target shown for historical days.
