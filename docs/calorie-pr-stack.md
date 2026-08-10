@@ -46,3 +46,7 @@ The fifth PR adds forms for creating and editing global food products. Products 
 ## Logging catalog foods
 
 The sixth PR adds a searchable food picker. Selecting a product opens a serving form with quantity in grams and the diary date. Saving calculates calories and macronutrients from the product's per-100-gram values and stores the result as a new immutable diary snapshot.
+
+## Barcode lookup
+
+The seventh PR adds a manual barcode flow. A typed barcode first searches the Veles catalog, then requests and validates an Open Food Facts product when no local match exists. Valid external products are added to the shared catalog before logging. A missing product can be created manually with its barcode and diary date carried into the form.
