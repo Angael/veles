@@ -16,7 +16,7 @@ export const foodProductSources = ['veles', 'open_food_facts'] as const;
 
 export type FoodProductSource = (typeof foodProductSources)[number];
 
-/** Global catalog entries. Nutrition values are stored as non-negative hundredths. */
+/** Global catalog entries. Nutrition values are stored in hundredths. */
 export const foodProducts = pgTable(
   'food_product',
   {
@@ -42,19 +42,6 @@ export const foodProducts = pgTable(
     check(
       'food_product_size_positive_check',
       sql`${table.productSizeGramsHundredths} IS NULL OR ${table.productSizeGramsHundredths} > 0`,
-    ),
-    check('food_product_kcal_non_negative_check', sql`${table.kcalPer100gHundredths} >= 0`),
-    check(
-      'food_product_protein_non_negative_check',
-      sql`${table.proteinPer100gHundredths} IS NULL OR ${table.proteinPer100gHundredths} >= 0`,
-    ),
-    check(
-      'food_product_carbs_non_negative_check',
-      sql`${table.carbsPer100gHundredths} IS NULL OR ${table.carbsPer100gHundredths} >= 0`,
-    ),
-    check(
-      'food_product_fat_non_negative_check',
-      sql`${table.fatPer100gHundredths} IS NULL OR ${table.fatPer100gHundredths} >= 0`,
     ),
     check('food_product_source_check', sql`${table.source} IN ('veles', 'open_food_facts')`),
   ],
@@ -90,23 +77,6 @@ export const foodLogs = pgTable(
       'food_log_product_kind_check',
       sql`${table.kind} = 'custom' OR ${table.productId} IS NOT NULL`,
     ),
-    check(
-      'food_log_grams_non_negative_check',
-      sql`${table.gramsHundredths} IS NULL OR ${table.gramsHundredths} >= 0`,
-    ),
-    check('food_log_kcal_non_negative_check', sql`${table.kcalHundredths} >= 0`),
-    check(
-      'food_log_protein_non_negative_check',
-      sql`${table.proteinHundredths} IS NULL OR ${table.proteinHundredths} >= 0`,
-    ),
-    check(
-      'food_log_carbs_non_negative_check',
-      sql`${table.carbsHundredths} IS NULL OR ${table.carbsHundredths} >= 0`,
-    ),
-    check(
-      'food_log_fat_non_negative_check',
-      sql`${table.fatHundredths} IS NULL OR ${table.fatHundredths} >= 0`,
-    ),
   ],
 );
 
@@ -129,18 +99,5 @@ export const calorieGoals = pgTable(
   },
   (table) => [
     uniqueIndex('calorie_goal_user_id_effective_date_idx').on(table.userId, table.effectiveDate),
-    check('calorie_goal_kcal_limit_positive_check', sql`${table.kcalLimitHundredths} > 0`),
-    check(
-      'calorie_goal_protein_limit_positive_check',
-      sql`${table.proteinLimitHundredths} IS NULL OR ${table.proteinLimitHundredths} > 0`,
-    ),
-    check(
-      'calorie_goal_carbs_limit_positive_check',
-      sql`${table.carbsLimitHundredths} IS NULL OR ${table.carbsLimitHundredths} > 0`,
-    ),
-    check(
-      'calorie_goal_fat_limit_positive_check',
-      sql`${table.fatLimitHundredths} IS NULL OR ${table.fatLimitHundredths} > 0`,
-    ),
   ],
 );

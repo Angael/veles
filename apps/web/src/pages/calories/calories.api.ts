@@ -2,73 +2,16 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { and, desc, eq, ilike, lte } from 'drizzle-orm';
-import { isMatch } from 'date-fns';
+import { dateOnlyType } from '@/lib/dateOnly';
 import { calorieGoals, foodLogs, foodProducts, type FoodProductSource } from '@veles/db/schema';
 import { requireSession } from '@/lib/auth/getSession';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/lib/db';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
+import { getOpenFoodFactsProduct, type OpenFoodFactsProduct } from '@/lib/openFoodFacts';
 
 const HUNDREDTHS = 100;
 const MAX_TEXT_LENGTH = 500;
-
-export type CalorieFood = {
-  barcode: string | null;
-  brand: string | null;
-  carbsPer100g: number | null;
-  fatPer100g: number | null;
-  id: string;
-  imageUrl: string | null;
-  kcalPer100g: number;
-  name: string;
-  proteinPer100g: number | null;
-  productSizeGrams: number | null;
-  source: FoodProductSource;
-};
-
-export type CalorieLog = {
-  carbs: number | null;
-  consumedAt: string;
-  date: string;
-  fat: number | null;
-  grams: number | null;
-  id: string;
-  kcal: number;
-  kind: 'product' | 'custom';
-  name: string;
-  productId: string | null;
-  protein: number | null;
-};
-
-export type CalorieTotals = {
-  carbs: number | null;
-  fat: number | null;
-  kcal: number;
-  protein: number | null;
-};
-
-export type CalorieGoal = {
-  date: string;
-  id: string;
-  carbs: number | null;
-  fat: number | null;
-  kcal: number;
-  protein: number | null;
-};
-
-export type CalorieDashboard = {
-  date: string;
-  goal: CalorieGoal | null;
-  logs: CalorieLog[];
-  recentFoods: CalorieFood[];
-  totals: CalorieTotals;
-};
-
-export type BarcodeLookupResult = { food: CalorieFood; status: 'found' } | { status: 'notFound' };
-
-const localDateType = type('string.date.iso').narrow((value, ctx) =>
-  isMatch(value, 'yyyy-MM-dd') ? true : ctx.mustBe('a valid YYYY-MM-DD calendar date'),
-);
 
 const nonNegativeAmountType = type('number >= 0').narrow((value, ctx) =>
   Number.isFinite(value) && Number.isSafeInteger(Math.round(value * HUNDREDTHS))
@@ -78,7 +21,7 @@ const nonNegativeAmountType = type('number >= 0').narrow((value, ctx) =>
 
 const nonEmptyTextType = type(`string.trim |> 1 <= string <= ${MAX_TEXT_LENGTH}`);
 
-const dashboardInputType = type({ date: localDateType });
+const dashboardInputType = type({ date: dateOnlyType });
 const barcodeInputType = type({ barcode: nonEmptyTextType });
 const createFoodProductInputType = type({
   'barcode?': nonEmptyTextType,
@@ -92,13 +35,13 @@ const createFoodProductInputType = type({
   'productSizeGrams?': type('number > 0'),
 });
 const recordFoodInputType = type({
-  date: localDateType,
+  date: dateOnlyType,
   grams: nonNegativeAmountType,
   productId: 'string.uuid',
 });
 const recordCustomCaloriesInputType = type({
   'carbs?': nonNegativeAmountType,
-  date: localDateType,
+  date: dateOnlyType,
   'fat?': nonNegativeAmountType,
   'grams?': nonNegativeAmountType,
   kcal: nonNegativeAmountType,
@@ -107,7 +50,7 @@ const recordCustomCaloriesInputType = type({
 });
 const setDailyCalorieGoalInputType = type({
   'carbs?': type('number > 0'),
-  date: localDateType,
+  date: dateOnlyType,
   'fat?': type('number > 0'),
   kcal: type('number > 0'),
   'protein?': type('number > 0'),
@@ -118,7 +61,7 @@ const updateFoodProductInputType = createFoodProductInputType.merge(foodIdInputT
 const foodLogIdInputType = type({ id: 'string.uuid' });
 const updateFoodLogInputType = type({
   'carbs?': nonNegativeAmountType,
-  date: localDateType,
+  date: dateOnlyType,
   'fat?': nonNegativeAmountType,
   'grams?': nonNegativeAmountType,
   id: 'string.uuid',
@@ -126,51 +69,6 @@ const updateFoodLogInputType = type({
   name: nonEmptyTextType,
   'protein?': nonNegativeAmountType,
 });
-
-type OpenFoodFactsNumber = number | string | null | undefined;
-
-type OpenFoodFactsProduct = {
-  brands?: string | null;
-  image_url?: string | null;
-  nutriments?: {
-    carbohydrates_100g?: OpenFoodFactsNumber;
-    'energy-kcal_100g'?: OpenFoodFactsNumber;
-    fat_100g?: OpenFoodFactsNumber;
-    proteins_100g?: OpenFoodFactsNumber;
-  };
-  product_name?: string | null;
-  product_quantity?: string | null;
-  product_quantity_unit?: string | null;
-};
-
-const openFoodFactsNumberType = 'number | string | null';
-const openFoodFactsNutrimentsType = type({
-  'carbohydrates_100g?': openFoodFactsNumberType,
-  'energy-kcal_100g?': openFoodFactsNumberType,
-  'fat_100g?': openFoodFactsNumberType,
-  'proteins_100g?': openFoodFactsNumberType,
-});
-const openFoodFactsProductType = type({
-  'brands?': 'string | null',
-  'image_url?': 'string | null',
-  'nutriments?': openFoodFactsNutrimentsType,
-  'product_name?': 'string | null',
-  'product_quantity?': 'string | null',
-  'product_quantity_unit?': 'string | null',
-});
-const openFoodFactsResponseType = type({ product: openFoodFactsProductType });
-
-type ImportedFoodProduct = {
-  barcode: string;
-  brand: string | null;
-  carbsPer100g: number | null;
-  fatPer100g: number | null;
-  imageUrl: string | null;
-  kcalPer100g: number;
-  name: string;
-  proteinPer100g: number | null;
-  productSizeGrams: number | null;
-};
 
 function toHundredths(value: number): number {
   const scaled = Math.round(value * HUNDREDTHS);
@@ -188,11 +86,6 @@ function fromHundredths(value: number | null): number | null {
 
 function optionalHundredths(value: number | undefined): number | null {
   return value === undefined ? null : toHundredths(value);
-}
-
-function normalizeText(value: string | null | undefined): string | null {
-  const normalized = value?.trim();
-  return normalized ? normalized : null;
 }
 
 function productValues(data: typeof createFoodProductInputType.infer) {
@@ -221,132 +114,47 @@ function sourceFromDatabase(value: string): FoodProductSource {
   throw new Error(`Unsupported food product source: ${value}`);
 }
 
-function toFoodProduct(product: typeof foodProducts.$inferSelect): CalorieFood {
+function toFoodProduct(product: typeof foodProducts.$inferSelect) {
   return {
-    barcode: product.barcode,
+    id: product.id,
+    name: product.name,
     brand: product.brand,
+    barcode: product.barcode,
+    imageUrl: product.imageUrl,
+    productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
+    kcalPer100g: product.kcalPer100gHundredths / HUNDREDTHS,
+    proteinPer100g: fromHundredths(product.proteinPer100gHundredths),
     carbsPer100g: fromHundredths(product.carbsPer100gHundredths),
     fatPer100g: fromHundredths(product.fatPer100gHundredths),
-    id: product.id,
-    imageUrl: product.imageUrl,
-    kcalPer100g: product.kcalPer100gHundredths / HUNDREDTHS,
-    name: product.name,
-    proteinPer100g: fromHundredths(product.proteinPer100gHundredths),
-    productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
     source: sourceFromDatabase(product.source),
   };
 }
 
-function toCalorieLog(log: typeof foodLogs.$inferSelect): CalorieLog {
+function toCalorieLog(log: typeof foodLogs.$inferSelect) {
   return {
-    carbs: fromHundredths(log.carbsHundredths),
+    id: log.id,
+    name: log.name,
+    kind: log.kind === 'product' ? ('product' as const) : ('custom' as const),
+    productId: log.productId,
     date: log.logDate,
     consumedAt: log.consumedAt.toISOString(),
-    fat: fromHundredths(log.fatHundredths),
     grams: fromHundredths(log.gramsHundredths),
-    id: log.id,
     kcal: log.kcalHundredths / HUNDREDTHS,
-    kind: log.kind === 'product' ? 'product' : 'custom',
-    name: log.name,
-    productId: log.productId,
     protein: fromHundredths(log.proteinHundredths),
+    carbs: fromHundredths(log.carbsHundredths),
+    fat: fromHundredths(log.fatHundredths),
   };
 }
 
-function toCalorieGoal(goal: typeof calorieGoals.$inferSelect): CalorieGoal {
+function toCalorieGoal(goal: typeof calorieGoals.$inferSelect) {
   return {
-    date: goal.effectiveDate,
     id: goal.id,
-    carbs: fromHundredths(goal.carbsLimitHundredths),
-    fat: fromHundredths(goal.fatLimitHundredths),
+    date: goal.effectiveDate,
     kcal: goal.kcalLimitHundredths / HUNDREDTHS,
     protein: fromHundredths(goal.proteinLimitHundredths),
+    carbs: fromHundredths(goal.carbsLimitHundredths),
+    fat: fromHundredths(goal.fatLimitHundredths),
   };
-}
-
-function parseOpenFoodFactsNumber(value: OpenFoodFactsNumber): number | null {
-  if (typeof value === 'number') {
-    return Number.isFinite(value) && value >= 0 ? value : null;
-  }
-
-  if (typeof value === 'string' && value.trim()) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
-  }
-
-  return null;
-}
-
-function parseOpenFoodFactsProduct(
-  product: OpenFoodFactsProduct,
-  barcode: string,
-): ImportedFoodProduct | null {
-  const kcalPer100g = parseOpenFoodFactsNumber(product.nutriments?.['energy-kcal_100g']);
-  const name = normalizeText(product.product_name);
-
-  if (kcalPer100g === null || name === null) {
-    return null;
-  }
-
-  const quantityUnit = normalizeText(product.product_quantity_unit)?.toLowerCase();
-  const productSizeGrams =
-    quantityUnit === 'g' ? parseOpenFoodFactsNumber(product.product_quantity) : null;
-
-  return {
-    barcode,
-    brand: normalizeText(product.brands),
-    carbsPer100g: parseOpenFoodFactsNumber(product.nutriments?.carbohydrates_100g),
-    fatPer100g: parseOpenFoodFactsNumber(product.nutriments?.fat_100g),
-    imageUrl: normalizeText(product.image_url),
-    kcalPer100g,
-    name,
-    proteinPer100g: parseOpenFoodFactsNumber(product.nutriments?.proteins_100g),
-    productSizeGrams,
-  };
-}
-
-async function importOpenFoodFactsProduct(barcode: string) {
-  const requestedFields = [
-    'product_name',
-    'brands',
-    'nutriments',
-    'image_url',
-    'product_quantity',
-    'product_quantity_unit',
-  ].join(',');
-  const endpoints = [
-    `https://world.openfoodfacts.org/api/v3/product/${encodeURIComponent(barcode)}.json?fields=${requestedFields}`,
-    `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json?fields=${requestedFields}`,
-  ];
-
-  for (const endpoint of endpoints) {
-    let response: Response;
-
-    try {
-      response = await fetch(endpoint, { headers: { accept: 'application/json' } });
-    } catch {
-      continue;
-    }
-
-    if (!response.ok) {
-      continue;
-    }
-
-    const parsedJson = await response.json();
-    const parsedResponse = openFoodFactsResponseType(parsedJson);
-
-    if (parsedResponse instanceof type.errors) {
-      continue;
-    }
-
-    const parsedProduct = parseOpenFoodFactsProduct(parsedResponse.product, barcode);
-
-    if (parsedProduct !== null) {
-      return parsedProduct;
-    }
-  }
-
-  return null;
 }
 
 async function findFoodProductByBarcode(barcode: string) {
@@ -359,18 +167,19 @@ async function findFoodProductByBarcode(barcode: string) {
   return product;
 }
 
-async function insertImportedFoodProduct(product: ImportedFoodProduct) {
+async function insertImportedFoodProduct(product: OpenFoodFactsProduct) {
   const [inserted] = await db
     .insert(foodProducts)
     .values({
       barcode: product.barcode,
+      name: product.name,
       brand: product.brand,
+      imageUrl: product.imageUrl,
+      productSizeGramsHundredths: optionalHundredths(product.productSizeGrams ?? undefined),
+      kcalPer100gHundredths: toHundredths(product.kcalPer100g),
+      proteinPer100gHundredths: optionalHundredths(product.proteinPer100g ?? undefined),
       carbsPer100gHundredths: optionalHundredths(product.carbsPer100g ?? undefined),
       fatPer100gHundredths: optionalHundredths(product.fatPer100g ?? undefined),
-      imageUrl: product.imageUrl,
-      kcalPer100gHundredths: toHundredths(product.kcalPer100g),
-      name: product.name,
-      productSizeGramsHundredths: optionalHundredths(product.productSizeGrams ?? undefined),
       source: 'open_food_facts',
     })
     .onConflictDoNothing({ target: foodProducts.barcode })
@@ -418,12 +227,12 @@ export const getCalorieDashboard = createServerFn({ method: 'GET' })
       logs: logs.map(toCalorieLog),
       recentFoods: recentFoods.map(toFoodProduct),
       totals: {
-        carbs: fromHundredths(totals.carbs),
-        fat: fromHundredths(totals.fat),
         kcal: totals.kcal / HUNDREDTHS,
         protein: fromHundredths(totals.protein),
+        carbs: fromHundredths(totals.carbs),
+        fat: fromHundredths(totals.fat),
       },
-    } satisfies CalorieDashboard;
+    };
   });
 
 export const searchFoods = createServerFn({ method: 'GET' })
@@ -458,12 +267,12 @@ export const getFoodProduct = createServerFn({ method: 'GET' })
 export const lookupFoodByBarcode = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('lookupFoodByBarcode')])
   .validator(arkTypeValidator(barcodeInputType))
-  .handler(async ({ data }): Promise<BarcodeLookupResult> => {
+  .handler(async ({ data }) => {
     await requireSession();
     const barcode = data.barcode.trim();
     const existingProduct = await findFoodProductByBarcode(barcode);
     if (existingProduct) return { food: toFoodProduct(existingProduct), status: 'found' };
-    const importedProduct = await importOpenFoodFactsProduct(barcode);
+    const importedProduct = await getOpenFoodFactsProduct(barcode);
     if (importedProduct === null) return { status: 'notFound' };
     const product = await insertImportedFoodProduct(importedProduct);
     return product ? { food: toFoodProduct(product), status: 'found' } : { status: 'notFound' };
