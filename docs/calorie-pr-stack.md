@@ -34,3 +34,7 @@ The second PR makes calorie tracking visible at `/calories`. It adds local-date 
 ## Daily goals
 
 The third PR adds a focused goal form. A goal has an effective date and a daily calorie target; the dashboard uses the newest goal effective on or before the selected diary date. Saving a later goal therefore preserves the target shown for historical days.
+
+## Custom calorie logs
+
+The fourth PR adds quick entries for calories that do not need a catalog product. A custom entry records a name, calories, and diary date. Every diary row can then be opened to change its name, date, quantity, or snapshotted nutrition values, or to delete it.
