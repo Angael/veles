@@ -188,8 +188,8 @@ async function seedFoodProducts(client) {
   for (const product of products) {
     await client.query(
       `INSERT INTO food_product
-        (id, name, kcal_per_100g_hundredths, protein_per_100g_hundredths, carbs_per_100g_hundredths, fat_per_100g_hundredths, source)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+        (id, name, kcal_per_100g_hundredths, protein_per_100g_hundredths, carbs_per_100g_hundredths, fat_per_100g_hundredths)
+       VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (id) DO UPDATE SET
          barcode = NULL,
          name = EXCLUDED.name,
@@ -200,7 +200,6 @@ async function seedFoodProducts(client) {
          protein_per_100g_hundredths = EXCLUDED.protein_per_100g_hundredths,
          carbs_per_100g_hundredths = EXCLUDED.carbs_per_100g_hundredths,
          fat_per_100g_hundredths = EXCLUDED.fat_per_100g_hundredths,
-         source = EXCLUDED.source,
          updated_at = now()`,
       [
         product.id,
@@ -209,7 +208,6 @@ async function seedFoodProducts(client) {
         product.proteinPer100gHundredths,
         product.carbsPer100gHundredths,
         product.fatPer100gHundredths,
-        'veles',
       ],
     );
   }
