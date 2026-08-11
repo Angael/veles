@@ -3,7 +3,7 @@ import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { and, desc, eq, ilike, lte } from 'drizzle-orm';
 import { dateOnlyType } from '@/lib/dateOnly';
-import { calorieGoals, foodLogs, foodProducts, type FoodProductSource } from '@veles/db/schema';
+import { calorieGoals, foodLogs, foodProducts } from '@veles/db/schema';
 import { requireSession } from '@/lib/auth/getSession';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/lib/db';
@@ -56,18 +56,6 @@ function productValues(data: typeof createFoodProductInputType.infer) {
   };
 }
 
-function sourceFromDatabase(value: string): FoodProductSource {
-  if (value === 'open_food_facts') {
-    return value;
-  }
-
-  if (value === 'veles') {
-    return value;
-  }
-
-  throw new Error(`Unsupported food product source: ${value}`);
-}
-
 function toFoodProduct(product: typeof foodProducts.$inferSelect) {
   return {
     id: product.id,
@@ -80,7 +68,6 @@ function toFoodProduct(product: typeof foodProducts.$inferSelect) {
     proteinPer100g: fromHundredths(product.proteinPer100gHundredths),
     fatPer100g: fromHundredths(product.fatPer100gHundredths),
     carbsPer100g: fromHundredths(product.carbsPer100gHundredths),
-    source: sourceFromDatabase(product.source),
   };
 }
 
@@ -88,7 +75,6 @@ function toCalorieLog(log: typeof foodLogs.$inferSelect) {
   return {
     id: log.id,
     name: log.name,
-    kind: log.kind === 'product' ? ('product' as const) : ('custom' as const),
     productId: log.productId,
     date: log.logDate,
     consumedAt: log.consumedAt.toISOString(),
@@ -123,7 +109,6 @@ async function insertImportedFoodProduct(product: OpenFoodFactsProduct) {
       proteinPer100gHundredths: optionalHundredths(product.proteinPer100g ?? undefined),
       fatPer100gHundredths: optionalHundredths(product.fatPer100g ?? undefined),
       carbsPer100gHundredths: optionalHundredths(product.carbsPer100g ?? undefined),
-      source: 'open_food_facts',
     })
     .onConflictDoNothing({ target: foodProducts.barcode })
     .returning();
@@ -251,7 +236,7 @@ export const createFoodProduct = createServerFn({ method: 'POST' })
 
     const [inserted] = await db
       .insert(foodProducts)
-      .values({ ...values, source: 'veles' })
+      .values(values)
       .onConflictDoNothing({ target: foodProducts.barcode })
       .returning();
 
@@ -271,7 +256,7 @@ export const updateFoodProduct = createServerFn({ method: 'POST' })
 
     const [updated] = await db
       .update(foodProducts)
-      .set({ ...productValues(data), source: 'veles', updatedAt: new Date() })
+      .set({ ...productValues(data), updatedAt: new Date() })
       .where(eq(foodProducts.id, data.id))
       .returning();
 
@@ -308,7 +293,6 @@ export const recordFood = createServerFn({ method: 'POST' })
       .insert(foodLogs)
       .values({
         name: product.name,
-        kind: 'product',
         productId: product.id,
         gramsHundredths,
         kcalHundredths: scale(product.kcalPer100gHundredths) ?? 0,
@@ -346,7 +330,6 @@ export const recordCustomCalories = createServerFn({ method: 'POST' })
       .insert(foodLogs)
       .values({
         name: data.name.trim(),
-        kind: 'custom',
         productId: null,
         gramsHundredths: optionalHundredths(data.grams),
         kcalHundredths: toHundredths(data.kcal),
@@ -408,7 +391,7 @@ export const updateFoodLog = createServerFn({ method: 'POST' })
 
     const nextGrams = optionalHundredths(data.grams);
     const ratio =
-      existing.kind === 'product' && existing.gramsHundredths && nextGrams !== null
+      existing.productId !== null && existing.gramsHundredths && nextGrams !== null
         ? nextGrams / existing.gramsHundredths
         : null;
 
@@ -436,7 +419,7 @@ export const updateFoodLog = createServerFn({ method: 'POST' })
             : existing.carbsHundredths === null
               ? null
               : Math.round(existing.carbsHundredths * ratio),
-        name: existing.kind === 'product' ? existing.name : data.name.trim(),
+        name: existing.productId === null ? data.name.trim() : existing.name,
         logDate: data.date,
       })
       .where(eq(foodLogs.id, existing.id))
