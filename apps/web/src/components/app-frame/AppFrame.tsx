@@ -1,10 +1,9 @@
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
-import clsx from 'clsx';
 import { ChevronLeftIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Btn } from '@/components/btn/Btn';
-import { NavMenu } from '@/components/nav-menu/NavMenu';
-import { MobileNavMenu } from '@/components/nav-menu/MobileNavMenu';
+import { MobileNavbar } from '@/components/navbar/MobileNavbar';
+import { Navbar } from '@/components/navbar/Navbar';
 import type { SessionUser } from '@/lib/auth/session.api';
 import type { NavbarTarget } from '@/lib/routing/staticRouteData';
 import css from './AppFrame.module.css';
@@ -38,12 +37,12 @@ export function AppFrame({
   return (
     <div className={css.page}>
       <div className={css.shell}>
-        <header className={clsx(css.header, !navbar && css.headerDefaultBrand)}>
+        <header className={css.header}>
           {navbar ? <RouteLabel label={navbar.label} upTo={navbar.upTo} /> : <div />}
-          <NavMenu user={user} />
+          <Navbar user={user} />
         </header>
         {children === undefined ? <Outlet /> : children}
-        <MobileNavMenu user={user} />
+        <MobileNavbar user={user} />
       </div>
     </div>
   );

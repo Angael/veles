@@ -17,6 +17,8 @@ export type RecipeLibraryItem = Omit<RecipeSelect, 'createdAt' | 'updatedAt' | '
   updatedAt: string;
 };
 
+export type RecipeViewItem = RecipeLibraryItem & { canManage: boolean };
+
 export const getRecipeLibrary = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRecipeLibrary')])
   .handler(async () => {
@@ -99,15 +101,7 @@ export const getRecipeById = createServerFn({ method: 'GET' })
   .handler(async ({ data }) => {
     const userId = await getSessionUserId();
 
-    if (!userId) {
-      return null;
-    }
-
-    const recipeRows = await db
-      .select()
-      .from(recipes)
-      .where(and(eq(recipes.id, data.id), eq(recipes.userId, userId)))
-      .limit(1);
+    const recipeRows = await db.select().from(recipes).where(eq(recipes.id, data.id)).limit(1);
     const recipe = recipeRows[0];
 
     if (!recipe) {
@@ -117,21 +111,30 @@ export const getRecipeById = createServerFn({ method: 'GET' })
     const imagesByRecipeId = await getImagesByRecipeId([recipe.id]);
 
     return {
-      carbs: recipe.carbs,
-      createdAt: recipe.createdAt.toISOString(),
-      description: recipe.description,
-      fats: recipe.fats,
-      id: recipe.id,
-      images: imagesByRecipeId.get(recipe.id) ?? [],
-      ingredients: recipe.ingredients,
-      kcal: recipe.kcal,
-      name: recipe.name,
-      portions: recipe.portions,
-      protein: recipe.protein,
-      rating: recipe.rating,
-      tags: recipe.tags,
-      updatedAt: recipe.updatedAt.toISOString(),
-    } satisfies RecipeLibraryItem;
+      ...toRecipeLibraryItem(recipe, imagesByRecipeId),
+      canManage: recipe.userId === userId,
+    } satisfies RecipeViewItem;
+  });
+
+export const getOwnedRecipeById = createServerFn({ method: 'GET' })
+  .middleware([logMiddleware('getOwnedRecipeById')])
+  .validator(arkTypeValidator(recipeByIdInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    const recipeRows = await db
+      .select()
+      .from(recipes)
+      .where(and(eq(recipes.id, data.id), eq(recipes.userId, session.user.id)))
+      .limit(1);
+    const recipe = recipeRows[0];
+
+    if (!recipe) {
+      return null;
+    }
+
+    const imagesByRecipeId = await getImagesByRecipeId([recipe.id]);
+
+    return toRecipeLibraryItem(recipe, imagesByRecipeId);
   });
 
 export const updateRecipeRating = createServerFn({ method: 'POST' })
@@ -215,4 +218,26 @@ async function getImagesByRecipeId(recipeIds: string[]) {
   }
 
   return imagesByRecipeId;
+}
+
+function toRecipeLibraryItem(
+  recipe: RecipeSelect,
+  imagesByRecipeId: Map<string, Array<{ url: string }>>,
+): RecipeLibraryItem {
+  return {
+    carbs: recipe.carbs,
+    createdAt: recipe.createdAt.toISOString(),
+    description: recipe.description,
+    fats: recipe.fats,
+    id: recipe.id,
+    images: imagesByRecipeId.get(recipe.id) ?? [],
+    ingredients: recipe.ingredients,
+    kcal: recipe.kcal,
+    name: recipe.name,
+    portions: recipe.portions,
+    protein: recipe.protein,
+    rating: recipe.rating,
+    tags: recipe.tags,
+    updatedAt: recipe.updatedAt.toISOString(),
+  };
 }
