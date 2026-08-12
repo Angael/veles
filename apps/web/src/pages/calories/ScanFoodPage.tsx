@@ -88,8 +88,8 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
           <strong>{food.name}</strong>
           <span>{food.brand}</span>
           <p>
-            {food.kcalPer100g} kcal · {food.proteinPer100g ?? 0} g protein ·{' '}
-            {food.fatPer100g ?? 0} g fat · {food.carbsPer100g ?? 0} g carbs / 100 g
+            {food.kcalPer100g} kcal · {food.proteinPer100g ?? 0} g protein · {food.fatPer100g ?? 0}{' '}
+            g fat · {food.carbsPer100g ?? 0} g carbs / 100 g
           </p>
         </div>
       </section>
