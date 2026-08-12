@@ -11,6 +11,7 @@ import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { Label } from '@/components/label/Label';
 import { Navbar } from '@/components/navbar/Navbar';
 import { NotFound } from '@/components/not-found/NotFound';
+import { PillBtn } from '@/components/pill-btn/PillBtn';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { SeamlessTextInput } from '@/components/seamless-text-input/SeamlessTextInput';
 import { SeamlessTextarea } from '@/components/seamless-textarea/SeamlessTextarea';
@@ -100,6 +101,15 @@ export function ComponentsDemoPage() {
             />
           )}
           rows={BTN_VARIANTS}
+        />
+      </section>
+
+      <section>
+        <h2>PillBtn</h2>
+        <PillBtn
+          label='Add recipe'
+          to='/recipes/new'
+          visual={<PlusIcon size={16} strokeWidth={1.8} />}
         />
       </section>
 

@@ -1,7 +1,8 @@
 import { Avatar } from '@base-ui/react/avatar';
-import { Link, useRouterState } from '@tanstack/react-router';
+import { useRouterState } from '@tanstack/react-router';
 import { UserIcon } from 'lucide-react';
 import { useMemo } from 'react';
+import { PillBtn } from '@/components/pill-btn/PillBtn';
 import type { SessionUser } from '@/lib/auth/session.api';
 import { getInitials } from '@/lib/getInitials';
 import css from './Navbar.module.css';
@@ -26,36 +27,35 @@ export function Navbar({ user }: { user: SessionUser | null }) {
 
             return (
               <li key={item.key}>
-                <Link
-                  aria-label={item.label}
-                  aria-current={active ? 'page' : undefined}
-                  className={active ? css.navLinkActive : css.navLink}
+                <PillBtn
+                  active={active}
+                  collapseLabelAt='tablet'
+                  label={item.label}
                   to={item.link}
-                >
-                  <Icon aria-hidden='true' size={16} strokeWidth={1.9} />
-                  <span className={css.navLabel}>{item.label}</span>
-                </Link>
+                  visual={<Icon size={16} strokeWidth={1.9} />}
+                />
               </li>
             );
           })}
         </ul>
       ) : null}
 
-      <Link
-        aria-label='Account'
-        className={pathname.startsWith('/account') ? css.accountLinkActive : css.accountLink}
+      <PillBtn
+        active={pathname.startsWith('/account')}
+        collapseLabelAt='phone'
+        label='Account'
         to='/account'
-      >
-        <Avatar.Root aria-hidden='true' className={css.accountAvatar}>
-          {user?.image ? (
-            <Avatar.Image alt='' className={css.accountAvatarImage} src={user.image} />
-          ) : null}
-          <Avatar.Fallback className={css.accountAvatarFallback}>
-            {accountInitials || <UserIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
-          </Avatar.Fallback>
-        </Avatar.Root>
-        <span className={css.accountLabel}>Account</span>
-      </Link>
+        visual={
+          <Avatar.Root className={css.accountAvatar}>
+            {user?.image ? (
+              <Avatar.Image alt='' className={css.accountAvatarImage} src={user.image} />
+            ) : null}
+            <Avatar.Fallback className={css.accountAvatarFallback}>
+              {accountInitials || <UserIcon size={16} strokeWidth={1.9} />}
+            </Avatar.Fallback>
+          </Avatar.Root>
+        }
+      />
     </nav>
   );
 }
