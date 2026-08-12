@@ -9,7 +9,7 @@ import { DefaultCatchBoundary } from '@/components/default-catch-boundary/Defaul
 import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { Label } from '@/components/label/Label';
-import { NavMenu } from '@/components/nav-menu/NavMenu';
+import { Navbar } from '@/components/navbar/Navbar';
 import { NotFound } from '@/components/not-found/NotFound';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { SeamlessTextInput } from '@/components/seamless-text-input/SeamlessTextInput';
@@ -166,8 +166,8 @@ export function ComponentsDemoPage() {
       </section>
 
       <section>
-        <h2>NavMenu</h2>
-        <NavMenu user={null} />
+        <h2>Navbar</h2>
+        <Navbar user={null} />
       </section>
 
       <section>
