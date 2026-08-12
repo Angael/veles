@@ -118,14 +118,14 @@
 @media (--phone) {
   .accountLink,
   .accountLinkActive {
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 2.35rem;
+    height: 2.35rem;
     padding: 0;
   }
 
   .accountAvatar {
-    width: 2rem;
-    height: 2rem;
+    width: 1.75rem;
+    height: 1.75rem;
     margin: 0;
   }
 
