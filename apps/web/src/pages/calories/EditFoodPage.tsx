@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { CalorieFood } from './calories.api';
 import { updateFoodProduct } from './calories.api';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
+import { todayLocalDate } from './calorieDate';
 import css from './CalorieFlows.module.css';
 
 export function EditFoodPage({ food }: { food: CalorieFood }) {
@@ -14,10 +15,7 @@ export function EditFoodPage({ food }: { food: CalorieFood }) {
     setError('');
     try {
       await updateFoodProduct({ data: { ...value, id: food.id } });
-      await navigate({
-        to: '/calories/add',
-        search: { date: new Date().toLocaleDateString('sv-SE'), foodId: food.id },
-      });
+      await navigate({ to: '/calories', search: { date: todayLocalDate() } });
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not save food.');
     } finally {
@@ -26,12 +24,8 @@ export function EditFoodPage({ food }: { food: CalorieFood }) {
   }
   return (
     <main className={css.page}>
-      <Link
-        className={css.back}
-        search={{ date: new Date().toLocaleDateString('sv-SE'), foodId: food.id }}
-        to='/calories/add'
-      >
-        ← Back
+      <Link className={css.back} search={{ date: todayLocalDate() }} to='/calories'>
+        ← Diary
       </Link>
       <header className={css.header}>
         <div>

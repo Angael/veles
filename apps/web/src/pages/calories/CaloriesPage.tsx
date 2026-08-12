@@ -40,6 +40,13 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
         <Btn isLink render={<Link search={{ date }} to='/calories/quick-add' />}>
           Quick add
         </Btn>
+        <Btn
+          isLink
+          render={<Link search={{ date }} to='/calories/foods/new' />}
+          variant='outlineMain'
+        >
+          New food
+        </Btn>
         <Btn isLink render={<Link to='/calories/goals' />} variant='ghost'>
           Set daily goals
         </Btn>
