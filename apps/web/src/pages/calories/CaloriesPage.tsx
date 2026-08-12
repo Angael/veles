@@ -39,9 +39,12 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
       <section aria-label='Diary actions' className={css.entryActions}>
         <Btn onClick={() => void navigate({ to: '/calories/add', search: { date } })}>Add food</Btn>
         <Btn
-          onClick={() => void navigate({ to: '/calories/quick-add', search: { date } })}
+          onClick={() => void navigate({ to: '/calories/scan', search: { date } })}
           variant='outlineMain'
         >
+          Scan barcode
+        </Btn>
+        <Btn onClick={() => void navigate({ to: '/calories/quick-add', search: { date } })} variant='ghost'>
           Quick add
         </Btn>
         <Btn
