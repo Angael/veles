@@ -6,13 +6,13 @@ import css from './CalorieFlows.module.css';
 export type FoodEditorValue = {
   barcode?: string;
   brand?: string;
-  carbsPer100g?: number;
-  fatPer100g?: number;
   imageUrl?: string;
-  kcalPer100g: number;
   name: string;
   productSizeGrams?: number;
+  kcalPer100g: number;
   proteinPer100g?: number;
+  fatPer100g?: number;
+  carbsPer100g?: number;
 };
 
 type Props = {
@@ -42,13 +42,13 @@ export function FoodEditor({
     await onSubmit({
       barcode: String(data.get('barcode') ?? '').trim() || undefined,
       brand: String(data.get('brand') ?? '').trim() || undefined,
-      carbsPer100g: optionalNumber('carbs'),
-      fatPer100g: optionalNumber('fat'),
       imageUrl: String(data.get('imageUrl') ?? '').trim() || undefined,
-      kcalPer100g: Number(data.get('kcal')),
       name: String(data.get('name') ?? '').trim(),
       productSizeGrams: optionalNumber('size'),
+      kcalPer100g: Number(data.get('kcal')),
       proteinPer100g: optionalNumber('protein'),
+      fatPer100g: optionalNumber('fat'),
+      carbsPer100g: optionalNumber('carbs'),
     });
   }
   return (
@@ -92,18 +92,18 @@ export function FoodEditor({
           type='number'
         />
         <Field
-          defaultValue={food?.carbsPer100g ?? ''}
-          label='Carbs / 100 g'
-          min='0'
-          name='carbs'
-          step='0.01'
-          type='number'
-        />
-        <Field
           defaultValue={food?.fatPer100g ?? ''}
           label='Fat / 100 g'
           min='0'
           name='fat'
+          step='0.01'
+          type='number'
+        />
+        <Field
+          defaultValue={food?.carbsPer100g ?? ''}
+          label='Carbs / 100 g'
+          min='0'
+          name='carbs'
           step='0.01'
           type='number'
         />
