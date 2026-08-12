@@ -36,13 +36,17 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
         })}
       </ToggleGroup>
       <CalorieOverview goal={dashboard.goal} logs={dashboard.logs} totals={dashboard.totals} />
-      <section aria-label='Diary settings' className={css.entryActions}>
-        <Btn onClick={() => void navigate({ to: '/calories/quick-add', search: { date } })}>
+      <section aria-label='Diary actions' className={css.entryActions}>
+        <Btn onClick={() => void navigate({ to: '/calories/add', search: { date } })}>Add food</Btn>
+        <Btn
+          onClick={() => void navigate({ to: '/calories/quick-add', search: { date } })}
+          variant='outlineMain'
+        >
           Quick add
         </Btn>
         <Btn
           onClick={() => void navigate({ to: '/calories/foods/new', search: { date } })}
-          variant='outlineMain'
+          variant='ghost'
         >
           New food
         </Btn>
