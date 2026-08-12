@@ -4,16 +4,14 @@ import { Btn } from '@/components/btn/Btn';
 import { RecipeImgSlider } from './RecipeImgSlider';
 import { RecipeNutrition } from './RecipeNutrition';
 import { RecipeRating } from './RecipeRating';
-import type { RecipeLibraryItem } from './recipes.api';
+import type { RecipeViewItem } from './recipes.api';
 import css from './RecipeViewPage.module.css';
 
 type RecipeViewPageProps = {
-  recipe: RecipeLibraryItem;
+  recipe: RecipeViewItem;
 };
 
 export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
-  const canManageRecipe = true;
-
   return (
     <main className={css.page}>
       <article className={css.recipe}>
@@ -31,7 +29,7 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
             ) : null}
           </div>
 
-          {canManageRecipe ? (
+          {recipe.canManage ? (
             <div className={css.actions} aria-label='Recipe management actions' role='group'>
               <Btn
                 className={css.actionButton}
@@ -76,7 +74,7 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
                 ))}
               </ul>
             </section>
-            <RecipeRating rating={recipe.rating} recipeId={recipe.id} />
+            {recipe.canManage ? <RecipeRating rating={recipe.rating} recipeId={recipe.id} /> : null}
           </aside>
         </div>
       </article>
