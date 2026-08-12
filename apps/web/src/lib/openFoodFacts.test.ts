@@ -18,8 +18,8 @@ describe('getOpenFoodFactsProduct', () => {
           nutriments: {
             'energy-kcal_100g': '412.5',
             proteins_100g: '8.2',
-            carbohydrates_100g: '61',
             fat_100g: '14.25',
+            carbohydrates_100g: '61',
           },
         },
       }),
@@ -34,8 +34,8 @@ describe('getOpenFoodFactsProduct', () => {
       productSizeGrams: 45.5,
       kcalPer100g: 412.5,
       proteinPer100g: 8.2,
-      carbsPer100g: 61,
       fatPer100g: 14.25,
+      carbsPer100g: 61,
     });
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(fetchMock.mock.calls[0]?.[0]).toContain('/api/v3/product/123%20456.json');
@@ -56,8 +56,8 @@ describe('getOpenFoodFactsProduct', () => {
             nutriments: {
               'energy-kcal_100g': 64,
               proteins_100g: 3.4,
-              carbohydrates_100g: 4.8,
               fat_100g: 3.6,
+              carbohydrates_100g: 4.8,
             },
           },
         }),
@@ -72,8 +72,8 @@ describe('getOpenFoodFactsProduct', () => {
       productSizeGrams: null,
       kcalPer100g: 64,
       proteinPer100g: 3.4,
-      carbsPer100g: 4.8,
       fatPer100g: 3.6,
+      carbsPer100g: 4.8,
     });
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(fetchMock.mock.calls[1]?.[0]).toContain('/api/v2/product/987.json');
