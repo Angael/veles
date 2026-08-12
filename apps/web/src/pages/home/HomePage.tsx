@@ -8,12 +8,13 @@ import {
 } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
+import revealCss from '@/components/reveal/Reveal.module.css';
 import css from './HomePage.module.css';
 
 export function HomePage() {
   return (
     <main className={css.layout}>
-      <Card as='article' className={`${css.hero} ${css.reveal}`} variant='primary'>
+      <Card as='article' className={`${css.hero} ${revealCss.reveal}`} variant='primary'>
         <span aria-hidden='true' className={css.monogram}>
           V
         </span>
@@ -30,28 +31,23 @@ export function HomePage() {
           </p>
           <div className={css.buttonRow}>
             <Btn
-              icon={<ScaleIcon aria-hidden='true' size={18} />}
-              isLink
-              render={<Link to={'/weight'} />}
-              size='lg'
-              variant='main'
-            >
-              Preview weight tracker
-            </Btn>
-            <Btn
               icon={<ArrowUpRightIcon aria-hidden='true' size={18} />}
               isLink
               render={<Link to={'/login'} />}
               size='lg'
-              variant='outlineMain'
+              variant='main'
             >
-              Open login
+              Log in
             </Btn>
           </div>
         </div>
       </Card>
 
-      <Card as='article' className={`${css.workoutTile} ${css.reveal}`} shadow={false}>
+      <Card
+        as='article'
+        className={`${css.workoutTile} ${revealCss.reveal} ${revealCss.delay1}`}
+        shadow={false}
+      >
         <div className={css.tileHeading}>
           <DumbbellIcon aria-hidden='true' size={22} />
           <h2>Workouts</h2>
@@ -66,7 +62,7 @@ export function HomePage() {
         </div>
       </Card>
 
-      <Card as='article' className={`${css.weightTile} ${css.reveal}`}>
+      <Card as='article' className={`${css.weightTile} ${revealCss.reveal} ${revealCss.delay2}`}>
         <div className={css.weightCopy}>
           <div className={css.tileHeading}>
             <ScaleIcon aria-hidden='true' size={22} />
@@ -83,7 +79,11 @@ export function HomePage() {
         </div>
       </Card>
 
-      <Card as='article' className={`${css.foodTile} ${css.reveal}`} shadow={false}>
+      <Card
+        as='article'
+        className={`${css.foodTile} ${revealCss.reveal} ${revealCss.delay3}`}
+        shadow={false}
+      >
         <div className={css.tileHeading}>
           <UtensilsIcon aria-hidden='true' size={22} />
           <h2>Food logging</h2>
@@ -109,7 +109,7 @@ export function HomePage() {
         </dl>
       </Card>
 
-      <Card as='article' className={`${css.filesTile} ${css.reveal}`}>
+      <Card as='article' className={`${css.filesTile} ${revealCss.reveal} ${revealCss.delay4}`}>
         <div className={css.filesCopy}>
           <div className={css.tileHeading}>
             <FolderLockIcon aria-hidden='true' size={22} />

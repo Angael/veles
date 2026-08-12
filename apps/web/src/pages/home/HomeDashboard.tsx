@@ -1,27 +1,33 @@
 import { Link } from '@tanstack/react-router';
-import { format, parseISO } from 'date-fns';
+import { differenceInCalendarDays, format, parseISO } from 'date-fns';
 import {
   ArrowRightIcon,
+  BookOpenIcon,
+  CheckIcon,
   DumbbellIcon,
   FlameIcon,
-  PlusIcon,
   ScaleIcon,
   StarIcon,
+  UsersRoundIcon,
   UtensilsIcon,
 } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
-import type { SessionUser } from '@/lib/auth/session.api';
+import revealCss from '@/components/reveal/Reveal.module.css';
 import type { HomeDashboardData } from './home.api';
 import css from './HomeDashboard.module.css';
 
 type HomeDashboardProps = {
   data: HomeDashboardData;
-  user: SessionUser;
 };
 
-export function HomeDashboard({ data, user }: HomeDashboardProps) {
-  const firstName = user.name.trim().split(/\s+/)[0] || 'there';
+const todoPreview = [
+  { done: true, label: 'Coffee beans' },
+  { done: false, label: 'Plan the week' },
+  { done: false, label: 'Pick up groceries' },
+] as const;
+
+export function HomeDashboard({ data }: HomeDashboardProps) {
   const latestWeight = data.weightEntries.at(-1);
   const previousWeight = data.weightEntries.at(-2);
   const delta =
@@ -30,23 +36,8 @@ export function HomeDashboard({ data, user }: HomeDashboardProps) {
 
   return (
     <main className={css.page}>
-      <header className={css.intro}>
-        <div>
-          <h1>{firstName}&apos;s orbit</h1>
-          <p>Recent signals from the records that are live today.</p>
-        </div>
-        <Btn
-          icon={<PlusIcon aria-hidden='true' size={18} />}
-          isLink
-          render={<Link to='/weight/add' />}
-          variant='main'
-        >
-          Log weight
-        </Btn>
-      </header>
-
       <div className={css.grid}>
-        <Card as='article' className={`${css.weightTile} ${css.reveal}`} variant='primary'>
+        <Card as='article' className={`${css.weightTile} ${revealCss.reveal}`} variant='primary'>
           <div className={css.tileTop}>
             <span>Weight signal</span>
             <ScaleIcon aria-hidden='true' />
@@ -84,12 +75,14 @@ export function HomeDashboard({ data, user }: HomeDashboardProps) {
               <p>One entry is enough to light up this tile.</p>
             </div>
           )}
-          <Link className={css.tileLink} to='/weight'>
-            Open history <ArrowRightIcon aria-hidden='true' />
-          </Link>
+          <TileLink label='Go to Weight' to='/weight' />
         </Card>
 
-        <Card as='section' className={`${css.recipeTile} ${css.reveal}`} shadow={false}>
+        <Card
+          as='section'
+          className={`${css.recipeTile} ${revealCss.reveal} ${revealCss.delay1}`}
+          shadow={false}
+        >
           <div className={css.tileTop}>
             <span>Recently saved</span>
             <UtensilsIcon aria-hidden='true' />
@@ -129,12 +122,74 @@ export function HomeDashboard({ data, user }: HomeDashboardProps) {
               </div>
             )}
           </div>
-          <Link className={css.tileLink} to='/recipes'>
-            Full recipe book <ArrowRightIcon aria-hidden='true' />
-          </Link>
+          <TileLink label='Go to Recipes' to='/recipes' />
         </Card>
 
-        <Card as='article' className={`${css.foodTile} ${css.reveal}`} shadow={false}>
+        <Card
+          as='article'
+          className={`${css.todosTile} ${revealCss.reveal} ${revealCss.delay2}`}
+          shadow={false}
+        >
+          <div className={css.tileTop}>
+            <span>Preview</span>
+            <CheckIcon aria-hidden='true' />
+          </div>
+          <h2>Todos</h2>
+          <ul className={css.todoList}>
+            {todoPreview.map((todo) => (
+              <li key={todo.label} className={todo.done ? css.todoDone : undefined}>
+                <span aria-hidden='true'>{todo.done ? '✓' : ''}</span>
+                {todo.label}
+              </li>
+            ))}
+          </ul>
+          <TileLink label='Go to Todos' to='/todos' />
+        </Card>
+
+        <Card
+          as='article'
+          className={`${css.diaryTile} ${revealCss.reveal} ${revealCss.delay3}`}
+          shadow={false}
+        >
+          <div className={css.tileTop}>
+            <span>Private notes</span>
+            <BookOpenIcon aria-hidden='true' />
+          </div>
+          <div className={css.diaryReadout}>{formatDiaryDistance(data.lastDiaryEntryDate)}</div>
+          <div className={css.diaryLines} aria-hidden='true'>
+            <i />
+            <i />
+            <i />
+          </div>
+          <TileLink label='Go to Diary' to='/diary' />
+        </Card>
+
+        <Card
+          as='article'
+          className={`${css.familyTile} ${revealCss.reveal} ${revealCss.delay4}`}
+          shadow={false}
+        >
+          <div className={css.statusIcon}>
+            <UsersRoundIcon aria-hidden='true' />
+          </div>
+          <div>
+            <span className={css.status}>Planned</span>
+            <h2>Family and friends</h2>
+            <p>A shared corner for the people you choose. Nothing leaves your orbit by default.</p>
+          </div>
+          <div className={css.orbitPeople} aria-hidden='true'>
+            <i />
+            <i />
+            <i />
+            <i />
+          </div>
+        </Card>
+
+        <Card
+          as='article'
+          className={`${css.foodTile} ${revealCss.reveal} ${revealCss.delay5}`}
+          shadow={false}
+        >
           <div className={css.statusIcon}>
             <FlameIcon aria-hidden='true' />
           </div>
@@ -151,7 +206,11 @@ export function HomeDashboard({ data, user }: HomeDashboardProps) {
           </div>
         </Card>
 
-        <Card as='article' className={`${css.workoutTile} ${css.reveal}`} shadow={false}>
+        <Card
+          as='article'
+          className={`${css.workoutTile} ${revealCss.reveal} ${revealCss.delay6}`}
+          shadow={false}
+        >
           <div className={css.statusIcon}>
             <DumbbellIcon aria-hidden='true' />
           </div>
@@ -168,21 +227,23 @@ export function HomeDashboard({ data, user }: HomeDashboardProps) {
             <i />
           </div>
         </Card>
-
-        <Card as='aside' className={`${css.actionTile} ${css.reveal}`} shadow={false}>
-          <span>Next move</span>
-          <h2>Keep the record moving.</h2>
-          <div className={css.actionLinks}>
-            <Link to='/weight/add'>
-              Add measurement <ArrowRightIcon aria-hidden='true' />
-            </Link>
-            <Link to='/recipes/add'>
-              Add recipe <ArrowRightIcon aria-hidden='true' />
-            </Link>
-          </div>
-        </Card>
       </div>
     </main>
+  );
+}
+
+function TileLink({
+  label,
+  to,
+}: {
+  label: string;
+  to: '/diary' | '/recipes' | '/todos' | '/weight';
+}) {
+  return (
+    <Link className={css.tileLink} to={to}>
+      {label}
+      <ArrowRightIcon aria-hidden='true' />
+    </Link>
   );
 }
 
@@ -204,4 +265,13 @@ function formatDelta(delta: number | null) {
   if (delta === null) return 'First point';
   if (Math.abs(delta) < 0.05) return 'Steady';
   return `${delta > 0 ? '+' : ''}${delta.toFixed(1)} kg`;
+}
+
+/** Turns the latest diary date into a private, content-free activity signal. */
+function formatDiaryDistance(entryDate: string | null) {
+  if (!entryDate) return 'No notes yet';
+  const days = differenceInCalendarDays(new Date(), parseISO(entryDate));
+  if (days <= 0) return 'Today';
+  if (days === 1) return '1 day since last note';
+  return `${days} days since last note`;
 }

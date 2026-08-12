@@ -121,7 +121,6 @@
   background:
     linear-gradient(145deg, var(--c-primary-surface-strong), transparent 64%),
     var(--c-surface-strong);
-  animation-delay: 70ms;
 }
 
 .weightTile {
@@ -132,7 +131,6 @@
   gap: var(--space-lg);
   background:
     radial-gradient(circle at 90% 20%, var(--c-primary-surface), transparent 42%), var(--c-surface);
-  animation-delay: 120ms;
 }
 
 .foodTile {
@@ -146,7 +144,6 @@
       transparent 55%
     ),
     var(--c-surface-strong);
-  animation-delay: 170ms;
 }
 
 .filesTile {
@@ -157,7 +154,6 @@
   gap: var(--space-xl);
   background:
     linear-gradient(115deg, var(--c-surface-strong), var(--c-primary-surface)), var(--c-surface);
-  animation-delay: 220ms;
 }
 
 .tileHeading {
@@ -304,23 +300,6 @@
   margin-inline: var(--space-xl) calc(var(--space-xl) * -1);
 }
 
-.reveal {
-  opacity: 0;
-  animation: tile-in 420ms var(--ease-out) forwards;
-}
-
-@keyframes tile-in {
-  from {
-    opacity: 0;
-    transform: translateY(var(--space-sm));
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @media (--laptop) {
   .layout {
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -419,12 +398,5 @@
   .fileStack span:nth-child(2),
   .fileStack span:nth-child(3) {
     margin-inline: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1;
-    animation: none;
   }
 }

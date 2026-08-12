@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { desc, eq } from 'drizzle-orm';
-import { recipes, weightEntries } from '@veles/db/schema';
+import { diaryEntries, recipes, weightEntries } from '@veles/db/schema';
 import { requireSession } from '@/lib/auth/getSession';
 import { db } from '@/lib/db';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
@@ -18,6 +18,7 @@ export type HomeDashboardData = {
     fat: number | null;
     carbs: number | null;
   }>;
+  lastDiaryEntryDate: string | null;
   weightEntries: Array<{
     date: string;
     weightKg: number;
@@ -29,7 +30,7 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getHomeDashboard')])
   .handler(async (): Promise<HomeDashboardData> => {
     const session = await requireSession();
-    const [recipeRows, weightRows] = await Promise.all([
+    const [recipeRows, weightRows, diaryRows] = await Promise.all([
       db
         .select({
           carbs: recipes.carbs,
@@ -53,9 +54,16 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
         .where(eq(weightEntries.userId, session.user.id))
         .orderBy(desc(weightEntries.date))
         .limit(8),
+      db
+        .select({ entryDate: diaryEntries.entryDate })
+        .from(diaryEntries)
+        .where(eq(diaryEntries.userId, session.user.id))
+        .orderBy(desc(diaryEntries.entryDate), desc(diaryEntries.createdAt))
+        .limit(1),
     ]);
 
     return {
+      lastDiaryEntryDate: diaryRows[0]?.entryDate ?? null,
       recentRecipes: recipeRows.map((recipe) => ({
         ...recipe,
         updatedAt: recipe.updatedAt.toISOString(),
