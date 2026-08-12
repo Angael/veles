@@ -129,11 +129,11 @@ label > span {
 .protein {
   color: var(--c-macro-protein);
 }
-.carbs {
-  color: var(--c-macro-carb);
-}
 .fat {
   color: var(--c-macro-fat);
+}
+.carbs {
+  color: var(--c-macro-carb);
 }
 .logCard,
 .captureCard,
