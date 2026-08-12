@@ -1,11 +1,12 @@
 import { Avatar } from '@base-ui/react/avatar';
 import { useNavigate, useRouter } from '@tanstack/react-router';
 import { LogOutIcon, UserMinusIcon, UserPlusIcon, UsersIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { signOut } from '@/lib/auth/client';
 import type { SessionUser } from '@/lib/auth/session.api';
+import { getInitials } from '@/lib/getInitials';
 import css from './AccountPage.module.css';
 
 interface AccountPageProps {
@@ -37,6 +38,7 @@ export function AccountPage({ user }: AccountPageProps) {
   const router = useRouter();
   const [friendIds, setFriendIds] = useState(() => new Set(['friend-1', 'friend-3']));
   const [logoutBusy, setLogoutBusy] = useState(false);
+  const accountInitials = useMemo(() => getInitials(user.name) || 'A', [user.name]);
 
   async function handleLogout() {
     setLogoutBusy(true);
@@ -70,9 +72,7 @@ export function AccountPage({ user }: AccountPageProps) {
       <Card as='section' className={css.profileCard} variant='primary'>
         <Avatar.Root className={css.profileAvatar}>
           {user.image ? <Avatar.Image alt='' className={css.avatarImage} src={user.image} /> : null}
-          <Avatar.Fallback className={css.profileFallback}>
-            {getInitials(user.name)}
-          </Avatar.Fallback>
+          <Avatar.Fallback className={css.profileFallback}>{accountInitials}</Avatar.Fallback>
         </Avatar.Root>
         <div className={css.profileInfo}>
           <h1>{user.name}</h1>
@@ -140,13 +140,5 @@ export function AccountPage({ user }: AccountPageProps) {
         <p className={css.mockNote}>Friend changes are a preview and are not saved yet.</p>
       </Card>
     </main>
-  );
-}
-
-function getInitials(name: string) {
-  const parts = name.trim().split(/\s+/);
-  return (
-    `${parts[0]?.[0] ?? ''}${parts.length > 1 ? (parts.at(-1)?.[0] ?? '') : ''}`.toUpperCase() ||
-    'A'
   );
 }

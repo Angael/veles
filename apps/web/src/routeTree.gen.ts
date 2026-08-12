@@ -20,13 +20,13 @@ import { Route as AuthenticatedCaloriesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedRecipesIndexRouteImport } from './routes/_authenticated/recipes/index'
 import { Route as AuthenticatedDiaryIndexRouteImport } from './routes/_authenticated/diary/index'
+import { Route as RecipesViewIdRouteImport } from './routes/recipes.view.$id'
 import { Route as ApiDemoPingRouteImport } from './routes/api/demo/ping'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthenticatedWeightImportRouteImport } from './routes/_authenticated/weight_.import'
 import { Route as AuthenticatedWeightAddRouteImport } from './routes/_authenticated/weight_.add'
 import { Route as AuthenticatedRecipesAddRouteImport } from './routes/_authenticated/recipes/add'
 import { Route as AuthenticatedDiaryIdRouteImport } from './routes/_authenticated/diary/$id'
-import { Route as AuthenticatedRecipesViewIdRouteImport } from './routes/_authenticated/recipes/view.$id'
 import { Route as AuthenticatedRecipesViewIdEditRouteImport } from './routes/_authenticated/recipes/view.$id_.edit'
 
 const LoginRoute = LoginRouteImport.update({
@@ -84,6 +84,11 @@ const AuthenticatedDiaryIndexRoute = AuthenticatedDiaryIndexRouteImport.update({
   path: '/diary/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const RecipesViewIdRoute = RecipesViewIdRouteImport.update({
+  id: '/recipes/view/$id',
+  path: '/recipes/view/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiDemoPingRoute = ApiDemoPingRouteImport.update({
   id: '/api/demo/ping',
   path: '/api/demo/ping',
@@ -115,12 +120,6 @@ const AuthenticatedDiaryIdRoute = AuthenticatedDiaryIdRouteImport.update({
   path: '/diary/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedRecipesViewIdRoute =
-  AuthenticatedRecipesViewIdRouteImport.update({
-    id: '/recipes/view/$id',
-    path: '/recipes/view/$id',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedRecipesViewIdEditRoute =
   AuthenticatedRecipesViewIdEditRouteImport.update({
     id: '/recipes/view/$id_/edit',
@@ -143,9 +142,9 @@ export interface FileRoutesByFullPath {
   '/weight/import': typeof AuthenticatedWeightImportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
+  '/recipes/view/$id': typeof RecipesViewIdRoute
   '/diary/': typeof AuthenticatedDiaryIndexRoute
   '/recipes/': typeof AuthenticatedRecipesIndexRoute
-  '/recipes/view/$id': typeof AuthenticatedRecipesViewIdRoute
   '/recipes/view/$id/edit': typeof AuthenticatedRecipesViewIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -163,9 +162,9 @@ export interface FileRoutesByTo {
   '/weight/import': typeof AuthenticatedWeightImportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
+  '/recipes/view/$id': typeof RecipesViewIdRoute
   '/diary': typeof AuthenticatedDiaryIndexRoute
   '/recipes': typeof AuthenticatedRecipesIndexRoute
-  '/recipes/view/$id': typeof AuthenticatedRecipesViewIdRoute
   '/recipes/view/$id/edit': typeof AuthenticatedRecipesViewIdEditRoute
 }
 export interface FileRoutesById {
@@ -185,9 +184,9 @@ export interface FileRoutesById {
   '/_authenticated/weight_/import': typeof AuthenticatedWeightImportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
+  '/recipes/view/$id': typeof RecipesViewIdRoute
   '/_authenticated/diary/': typeof AuthenticatedDiaryIndexRoute
   '/_authenticated/recipes/': typeof AuthenticatedRecipesIndexRoute
-  '/_authenticated/recipes/view/$id': typeof AuthenticatedRecipesViewIdRoute
   '/_authenticated/recipes/view/$id_/edit': typeof AuthenticatedRecipesViewIdEditRoute
 }
 export interface FileRouteTypes {
@@ -207,9 +206,9 @@ export interface FileRouteTypes {
     | '/weight/import'
     | '/api/auth/$'
     | '/api/demo/ping'
+    | '/recipes/view/$id'
     | '/diary/'
     | '/recipes/'
-    | '/recipes/view/$id'
     | '/recipes/view/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -227,9 +226,9 @@ export interface FileRouteTypes {
     | '/weight/import'
     | '/api/auth/$'
     | '/api/demo/ping'
+    | '/recipes/view/$id'
     | '/diary'
     | '/recipes'
-    | '/recipes/view/$id'
     | '/recipes/view/$id/edit'
   id:
     | '__root__'
@@ -248,9 +247,9 @@ export interface FileRouteTypes {
     | '/_authenticated/weight_/import'
     | '/api/auth/$'
     | '/api/demo/ping'
+    | '/recipes/view/$id'
     | '/_authenticated/diary/'
     | '/_authenticated/recipes/'
-    | '/_authenticated/recipes/view/$id'
     | '/_authenticated/recipes/view/$id_/edit'
   fileRoutesById: FileRoutesById
 }
@@ -262,6 +261,7 @@ export interface RootRouteChildren {
   DemoComponentsRoute: typeof DemoComponentsRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDemoPingRoute: typeof ApiDemoPingRoute
+  RecipesViewIdRoute: typeof RecipesViewIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -343,6 +343,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDiaryIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/recipes/view/$id': {
+      id: '/recipes/view/$id'
+      path: '/recipes/view/$id'
+      fullPath: '/recipes/view/$id'
+      preLoaderRoute: typeof RecipesViewIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/demo/ping': {
       id: '/api/demo/ping'
       path: '/api/demo/ping'
@@ -385,13 +392,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDiaryIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/recipes/view/$id': {
-      id: '/_authenticated/recipes/view/$id'
-      path: '/recipes/view/$id'
-      fullPath: '/recipes/view/$id'
-      preLoaderRoute: typeof AuthenticatedRecipesViewIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/recipes/view/$id_/edit': {
       id: '/_authenticated/recipes/view/$id_/edit'
       path: '/recipes/view/$id/edit'
@@ -413,7 +413,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedWeightImportRoute: typeof AuthenticatedWeightImportRoute
   AuthenticatedDiaryIndexRoute: typeof AuthenticatedDiaryIndexRoute
   AuthenticatedRecipesIndexRoute: typeof AuthenticatedRecipesIndexRoute
-  AuthenticatedRecipesViewIdRoute: typeof AuthenticatedRecipesViewIdRoute
   AuthenticatedRecipesViewIdEditRoute: typeof AuthenticatedRecipesViewIdEditRoute
 }
 
@@ -428,7 +427,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedWeightImportRoute: AuthenticatedWeightImportRoute,
   AuthenticatedDiaryIndexRoute: AuthenticatedDiaryIndexRoute,
   AuthenticatedRecipesIndexRoute: AuthenticatedRecipesIndexRoute,
-  AuthenticatedRecipesViewIdRoute: AuthenticatedRecipesViewIdRoute,
   AuthenticatedRecipesViewIdEditRoute: AuthenticatedRecipesViewIdEditRoute,
 }
 
@@ -444,6 +442,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoComponentsRoute: DemoComponentsRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDemoPingRoute: ApiDemoPingRoute,
+  RecipesViewIdRoute: RecipesViewIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

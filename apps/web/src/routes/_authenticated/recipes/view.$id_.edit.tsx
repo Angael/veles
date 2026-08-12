@@ -1,10 +1,10 @@
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { EditRecipePage } from '@/pages/recipes/EditRecipePage';
-import { getRecipeById } from '@/pages/recipes/recipes.api';
+import { getOwnedRecipeById } from '@/pages/recipes/recipes.api';
 
 export const Route = createFileRoute('/_authenticated/recipes/view/$id_/edit')({
   loader: async ({ params }) => {
-    const recipe = await getRecipeById({ data: { id: params.id } });
+    const recipe = await getOwnedRecipeById({ data: { id: params.id } });
 
     if (!recipe) {
       throw notFound();
