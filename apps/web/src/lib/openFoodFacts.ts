@@ -31,7 +31,6 @@ export type OpenFoodFactsProduct = {
   carbsPer100g: number | null;
 };
 
-
 function normalizeText(value: string | null | undefined): string | null {
   const normalized = value?.trim();
   return normalized ? normalized : null;
@@ -99,4 +98,3 @@ export async function getOpenFoodFactsProduct(
 
   return null;
 }
-
