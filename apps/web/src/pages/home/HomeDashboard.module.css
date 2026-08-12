@@ -1,0 +1,533 @@
+.page {
+  display: grid;
+  gap: var(--space-lg);
+  padding-bottom: calc(var(--space-xl) * 2);
+}
+
+.intro {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-xl);
+  padding-block: var(--space-md) var(--space-lg);
+}
+
+.intro h1 {
+  margin: 0;
+  color: var(--c-text-strong);
+  font-size: clamp(2.5rem, 5vw, 4.4rem);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.06em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.intro p {
+  margin: var(--space-sm) 0 0;
+  color: var(--c-muted);
+  font-size: var(--text-lg-dynamic);
+  text-wrap: pretty;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: minmax(11rem, auto);
+  gap: var(--space-md);
+}
+
+.weightTile,
+.recipeTile,
+.foodTile,
+.workoutTile,
+.actionTile {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.weightTile {
+  display: grid;
+  grid-column: span 7;
+  grid-row: span 2;
+  grid-template-rows: auto 1fr auto auto;
+  min-height: 30rem;
+  background:
+    radial-gradient(circle at 85% 12%, var(--c-primary-surface-strong), transparent 32%),
+    color-mix(in srgb, var(--c-surface-solid) 82%, var(--c-primary-surface));
+}
+
+.weightTile::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--c-border) var(--border-width), transparent var(--border-width)),
+    linear-gradient(90deg, var(--c-border) var(--border-width), transparent var(--border-width));
+  background-size: var(--space-xl) var(--space-xl);
+  mask-image: linear-gradient(125deg, transparent 8%, black 85%);
+  content: '';
+  opacity: 0.28;
+}
+
+.tileTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  color: var(--c-accent);
+}
+
+.tileTop > span,
+.status,
+.actionTile > span {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tileTop svg {
+  width: var(--space-lg);
+  height: var(--space-lg);
+}
+
+.weightValue {
+  align-self: center;
+  margin-top: var(--space-xl);
+}
+
+.weightValue strong {
+  color: var(--c-text-strong);
+  font-family: var(--font-mono);
+  font-size: clamp(5rem, 13vw, 9.5rem);
+  font-weight: 650;
+  letter-spacing: -0.1em;
+  line-height: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+.weightValue span {
+  margin-left: var(--space-sm);
+  color: var(--c-muted);
+  font-size: var(--text-lg);
+}
+
+.chart {
+  min-width: 0;
+}
+
+.chart svg {
+  display: block;
+  width: 100%;
+  height: 8rem;
+  overflow: visible;
+}
+
+.chart polygon {
+  fill: url('#dashboard-weight-fill');
+}
+
+.chart polyline {
+  fill: none;
+  stroke: var(--c-accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.singlePoint {
+  height: var(--border-width);
+  margin-block: 4rem;
+  background: linear-gradient(90deg, transparent, var(--c-accent), transparent);
+}
+
+.weightMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-top: var(--space-sm);
+  border-top: var(--border-width) solid var(--c-primary-border-soft);
+  color: var(--c-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.emptyWeight {
+  align-self: center;
+}
+
+.emptyWeight strong {
+  color: var(--c-text-strong);
+  font-size: var(--text-xl);
+}
+
+.emptyWeight p {
+  margin: var(--space-xs) 0 0;
+  color: var(--c-muted);
+}
+
+.tileLink {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: var(--button-min-height);
+  gap: var(--space-xs);
+  color: var(--c-accent-soft);
+  font-weight: var(--font-weight-semibold);
+  text-decoration-color: transparent;
+  text-underline-offset: 0.3em;
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    text-decoration-color var(--duration-fast) var(--ease-out);
+}
+
+.tileLink svg,
+.actionLinks svg {
+  width: var(--text-lg);
+  height: var(--text-lg);
+}
+
+.recipeTile {
+  display: grid;
+  grid-column: span 5;
+  grid-row: span 2;
+  grid-template-rows: auto auto 1fr auto;
+  gap: var(--space-lg);
+  min-height: 30rem;
+  padding: var(--space-xl);
+  border-color: var(--c-primary-border-soft);
+  background:
+    linear-gradient(155deg, var(--c-primary-surface-strong), transparent 54%),
+    var(--c-surface-strong);
+  animation-delay: 60ms;
+}
+
+.recipeTile h2,
+.foodTile h2,
+.workoutTile h2,
+.actionTile h2 {
+  margin: 0;
+  color: var(--c-text-strong);
+  font-size: var(--text-xl-dynamic);
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.recipeStack {
+  display: grid;
+  align-content: center;
+}
+
+.recipe {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 5rem;
+  padding: var(--space-sm) 0;
+  border-bottom: var(--border-width) solid var(--c-border);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+.recipeNumber {
+  color: var(--c-macro-fat);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.recipe strong {
+  display: block;
+  overflow: hidden;
+  color: var(--c-text-strong);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recipe small {
+  display: flex;
+  align-items: center;
+  margin-top: 0.2rem;
+  color: var(--c-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.recipe small svg {
+  width: var(--text-xs);
+  height: var(--text-xs);
+  color: var(--c-macro-fat);
+  fill: currentColor;
+}
+
+.recipe > svg {
+  width: var(--text-lg);
+  color: var(--c-accent);
+}
+
+.emptyRecipes {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.emptyRecipes p {
+  margin: 0;
+  color: var(--c-muted);
+}
+
+.foodTile,
+.workoutTile,
+.actionTile {
+  display: grid;
+  grid-column: span 4;
+  gap: var(--space-md);
+  min-height: 14rem;
+  padding: var(--space-xl);
+}
+
+.foodTile {
+  border-color: color-mix(in srgb, var(--c-macro-fat) 40%, var(--c-border));
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--c-macro-fat) 10%, transparent),
+      transparent 60%
+    ),
+    var(--c-surface-strong);
+  animation-delay: 110ms;
+}
+
+.workoutTile {
+  border-color: var(--c-primary-border-soft);
+  background:
+    linear-gradient(145deg, var(--c-primary-surface-strong), transparent 60%),
+    var(--c-surface-strong);
+  animation-delay: 160ms;
+}
+
+.statusIcon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: var(--border-width) solid var(--c-primary-border-soft);
+  border-radius: var(--radius-pill);
+  color: var(--c-accent);
+}
+
+.statusIcon svg {
+  width: var(--space-lg);
+  height: var(--space-lg);
+}
+
+.status {
+  color: var(--c-macro-fat);
+}
+
+.foodTile h2,
+.workoutTile h2 {
+  margin-top: var(--space-xs);
+}
+
+.foodTile p,
+.workoutTile p {
+  margin: var(--space-sm) 0 0;
+  color: var(--c-muted);
+  font-size: var(--text-sm-dynamic);
+  text-wrap: pretty;
+}
+
+.macroPreview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-self: end;
+  gap: var(--space-xs);
+}
+
+.macroPreview span {
+  overflow: hidden;
+  padding-top: var(--space-xs);
+  border-top: 2px solid var(--c-border-strong);
+  color: var(--c-muted-strong);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-overflow: ellipsis;
+}
+
+.macroPreview span:nth-child(2) {
+  border-color: var(--c-macro-protein);
+}
+.macroPreview span:nth-child(3) {
+  border-color: var(--c-macro-fat);
+}
+.macroPreview span:nth-child(4) {
+  border-color: var(--c-macro-carb);
+}
+
+.repRail {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  align-self: end;
+  height: 2.5rem;
+  gap: var(--space-xs);
+}
+
+.repRail i {
+  width: 100%;
+  height: 35%;
+  border-top: 2px solid var(--c-accent);
+  background: var(--c-primary-surface);
+}
+
+.repRail i:nth-child(2) {
+  height: 55%;
+}
+.repRail i:nth-child(3) {
+  height: 85%;
+}
+.repRail i:nth-child(4) {
+  height: 62%;
+}
+.repRail i:nth-child(5) {
+  height: 100%;
+}
+
+.actionTile {
+  align-content: space-between;
+  border-color: var(--c-primary-border-soft);
+  background:
+    radial-gradient(circle at 100% 0, var(--c-primary-surface-strong), transparent 52%),
+    var(--c-surface-solid);
+  animation-delay: 210ms;
+}
+
+.actionTile > span {
+  color: var(--c-accent);
+}
+
+.actionLinks {
+  display: grid;
+}
+
+.actionLinks a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--button-min-height);
+  padding-block: var(--space-xs);
+  border-bottom: var(--border-width) solid var(--c-border);
+  color: var(--c-accent-soft);
+  text-decoration: none;
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+.recipe:focus-visible,
+.tileLink:focus-visible,
+.actionLinks a:focus-visible {
+  outline: 2px solid var(--c-primary-focus);
+  outline-offset: 3px;
+}
+
+.reveal {
+  opacity: 0;
+  animation: tile-in 360ms var(--ease-out) forwards;
+}
+
+@keyframes tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-xs));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tileLink:hover {
+    color: var(--c-text-strong);
+    text-decoration-color: currentColor;
+  }
+
+  .recipe:hover,
+  .actionLinks a:hover {
+    border-color: var(--c-primary-border-soft);
+    background: var(--c-primary-surface);
+    color: var(--c-text-strong);
+  }
+}
+
+@media (--laptop) {
+  .grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .weightTile,
+  .recipeTile {
+    grid-column: span 3;
+  }
+
+  .foodTile,
+  .workoutTile,
+  .actionTile {
+    grid-column: span 2;
+  }
+}
+
+@media (--phone) {
+  .intro {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .intro > :last-child {
+    width: 100%;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: auto;
+    gap: var(--space-sm);
+  }
+
+  .weightTile,
+  .recipeTile,
+  .foodTile,
+  .workoutTile,
+  .actionTile {
+    grid-column: 1;
+    grid-row: auto;
+    padding: var(--space-lg);
+  }
+
+  .weightTile,
+  .recipeTile {
+    min-height: 26rem;
+  }
+
+  .weightValue strong {
+    font-size: clamp(4.6rem, 24vw, 7rem);
+  }
+
+  .macroPreview {
+    margin-top: var(--space-md);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    animation: none;
+  }
+}
