@@ -44,7 +44,10 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
         >
           Scan barcode
         </Btn>
-        <Btn onClick={() => void navigate({ to: '/calories/quick-add', search: { date } })} variant='ghost'>
+        <Btn
+          onClick={() => void navigate({ to: '/calories/quick-add', search: { date } })}
+          variant='ghost'
+        >
           Quick add
         </Btn>
         <Btn
