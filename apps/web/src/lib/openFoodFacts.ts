@@ -12,13 +12,25 @@ const openFoodFactsProductType = type({
   'nutriments?': {
     'energy-kcal_100g?': openFoodFactsNumberType,
     'proteins_100g?': openFoodFactsNumberType,
-    'carbohydrates_100g?': openFoodFactsNumberType,
     'fat_100g?': openFoodFactsNumberType,
+    'carbohydrates_100g?': openFoodFactsNumberType,
   },
 });
 const openFoodFactsResponseType = type({ product: openFoodFactsProductType });
 
 type OpenFoodFactsApiProduct = typeof openFoodFactsProductType.infer;
+export type OpenFoodFactsProduct = {
+  barcode: string;
+  name: string;
+  brand: string | null;
+  imageUrl: string | null;
+  productSizeGrams: number | null;
+  kcalPer100g: number;
+  proteinPer100g: number | null;
+  fatPer100g: number | null;
+  carbsPer100g: number | null;
+};
+
 
 function normalizeText(value: string | null | undefined): string | null {
   const normalized = value?.trim();
@@ -26,7 +38,10 @@ function normalizeText(value: string | null | undefined): string | null {
 }
 
 /** Converts the subset of an Open Food Facts product that Veles stores. */
-function parseProduct(product: OpenFoodFactsApiProduct, barcode: string) {
+function parseProduct(
+  product: OpenFoodFactsApiProduct,
+  barcode: string,
+): OpenFoodFactsProduct | null {
   const name = normalizeText(product.product_name);
   const kcalPer100g = product.nutriments?.['energy-kcal_100g'] ?? null;
 
@@ -42,13 +57,15 @@ function parseProduct(product: OpenFoodFactsApiProduct, barcode: string) {
     productSizeGrams: quantityUnit === 'g' ? (product.product_quantity ?? null) : null,
     kcalPer100g,
     proteinPer100g: product.nutriments?.proteins_100g ?? null,
-    carbsPer100g: product.nutriments?.carbohydrates_100g ?? null,
     fatPer100g: product.nutriments?.fat_100g ?? null,
+    carbsPer100g: product.nutriments?.carbohydrates_100g ?? null,
   };
 }
 
 /** Looks up a barcode using Open Food Facts v3, falling back to v2. */
-export async function getOpenFoodFactsProduct(barcode: string) {
+export async function getOpenFoodFactsProduct(
+  barcode: string,
+): Promise<OpenFoodFactsProduct | null> {
   const requestedFields = [
     'product_name',
     'brands',
@@ -83,4 +100,3 @@ export async function getOpenFoodFactsProduct(barcode: string) {
   return null;
 }
 
-export type OpenFoodFactsProduct = NonNullable<Awaited<ReturnType<typeof getOpenFoodFactsProduct>>>;
