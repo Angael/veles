@@ -4,15 +4,12 @@ import { useNavigate } from '@tanstack/react-router';
 import type { CalorieDashboard } from './calories.api';
 import { CalorieOverview } from './CalorieOverview';
 import { calorieWeekDates } from './calorieDate';
-import { Btn } from '@/components/btn/Btn';
 import css from './CaloriesPage.module.css';
 
 type CaloriesPageProps = { dashboard: CalorieDashboard; date: string };
 
 export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
   const navigate = useNavigate();
-  const open = (to: '/calories/add' | '/calories/scan' | '/calories/quick-add') =>
-    void navigate({ to, search: { date } });
   return (
     <main className={css.page}>
       <ToggleGroup
@@ -42,15 +39,6 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
         ))}
       </ToggleGroup>
       <CalorieOverview goal={dashboard.goal} logs={dashboard.logs} totals={dashboard.totals} />
-      <section aria-label='Add to diary' className={css.entryActions}>
-        <Btn onClick={() => open('/calories/add')}>Add food</Btn>
-        <Btn onClick={() => open('/calories/scan')} variant='outlineMain'>
-          Scan barcode
-        </Btn>
-        <Btn onClick={() => open('/calories/quick-add')} variant='ghost'>
-          Quick add
-        </Btn>
-      </section>
     </main>
   );
 }

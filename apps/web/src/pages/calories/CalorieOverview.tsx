@@ -1,4 +1,4 @@
-import { useNavigate, useRouter } from '@tanstack/react-router';
+import { useRouter } from '@tanstack/react-router';
 import type { CalorieGoal, CalorieLog, CalorieTotals } from './calories.api';
 import { deleteFoodLog } from './calories.api';
 import { Btn } from '@/components/btn/Btn';
@@ -8,7 +8,6 @@ import css from './CaloriesPage.module.css';
 type Props = { goal: CalorieGoal | null; logs: CalorieLog[]; totals: CalorieTotals };
 
 export function CalorieOverview({ goal, logs, totals }: Props) {
-  const navigate = useNavigate();
   const router = useRouter();
   const remaining = goal ? goal.kcal - totals.kcal : null;
   async function remove(id: string) {
@@ -35,8 +34,8 @@ export function CalorieOverview({ goal, logs, totals }: Props) {
         </div>
         <div className={css.summaryMacros}>
           <Macro label='Protein' total={totals.protein ?? 0} target={goal?.protein ?? null} />
-          <Macro label='Carbs' total={totals.carbs ?? 0} target={goal?.carbs ?? null} />
           <Macro label='Fat' total={totals.fat ?? 0} target={goal?.fat ?? null} />
+          <Macro label='Carbs' total={totals.carbs ?? 0} target={goal?.carbs ?? null} />
         </div>
       </Card>
       <Card as='section' className={css.logCard}>
@@ -59,18 +58,10 @@ export function CalorieOverview({ goal, logs, totals }: Props) {
                   <span>{entry.grams === null ? 'Custom entry' : `${number(entry.grams)} g`}</span>
                   <small>
                     {number(entry.kcal)} kcal · {number(entry.protein ?? 0)} g protein ·{' '}
-                    {number(entry.carbs ?? 0)} g carbs · {number(entry.fat ?? 0)} g fat
+                    {number(entry.fat ?? 0)} g fat · {number(entry.carbs ?? 0)} g carbs
                   </small>
                 </div>
                 <div className={css.logActions}>
-                  <Btn
-                    onClick={() =>
-                      void navigate({ to: '/calories/logs/$logId', params: { logId: entry.id } })
-                    }
-                    variant='ghost'
-                  >
-                    Edit
-                  </Btn>
                   <Btn onClick={() => void remove(entry.id)} variant='ghost'>
                     Delete
                   </Btn>
@@ -79,7 +70,7 @@ export function CalorieOverview({ goal, logs, totals }: Props) {
             ))}
           </ol>
         ) : (
-          <p className={css.emptyLog}>Choose an action below to add your first entry.</p>
+          <p className={css.emptyLog}>Nothing logged for this day.</p>
         )}
       </Card>
     </div>

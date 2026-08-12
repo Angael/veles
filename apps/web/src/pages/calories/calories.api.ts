@@ -56,7 +56,7 @@ function productValues(data: typeof createFoodProductInputType.infer) {
   };
 }
 
-function toFoodProduct(product: typeof foodProducts.$inferSelect) {
+function toFoodProduct(product: typeof foodProducts.$inferSelect): CalorieFood {
   return {
     id: product.id,
     name: product.name,
@@ -71,7 +71,7 @@ function toFoodProduct(product: typeof foodProducts.$inferSelect) {
   };
 }
 
-function toCalorieLog(log: typeof foodLogs.$inferSelect) {
+function toCalorieLog(log: typeof foodLogs.$inferSelect): CalorieLog {
   return {
     id: log.id,
     name: log.name,
@@ -121,7 +121,7 @@ const dashboardInputType = type({ date: dateOnlyType });
 export const getCalorieDashboard = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getCalorieDashboard')])
   .validator(arkTypeValidator(dashboardInputType))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<CalorieDashboard> => {
     const session = await requireSession();
 
     const [goal] = await db
@@ -168,6 +168,56 @@ export const getCalorieDashboard = createServerFn({ method: 'GET' })
       },
     };
   });
+
+export type CalorieDashboard = {
+  date: string;
+  goal: CalorieGoal | null;
+  logs: CalorieLog[];
+  recentFoods: CalorieFood[];
+  totals: CalorieTotals;
+};
+
+export type CalorieFood = {
+  id: string;
+  name: string;
+  brand: string | null;
+  barcode: string | null;
+  imageUrl: string | null;
+  productSizeGrams: number | null;
+  kcalPer100g: number;
+  proteinPer100g: number | null;
+  fatPer100g: number | null;
+  carbsPer100g: number | null;
+};
+
+export type CalorieGoal = {
+  id: string;
+  date: string;
+  kcal: number;
+  protein: number | null;
+  fat: number | null;
+  carbs: number | null;
+};
+
+export type CalorieLog = {
+  id: string;
+  name: string;
+  productId: string | null;
+  date: string;
+  consumedAt: string;
+  grams: number | null;
+  kcal: number;
+  protein: number | null;
+  fat: number | null;
+  carbs: number | null;
+};
+
+export type CalorieTotals = {
+  kcal: number;
+  protein: number | null;
+  fat: number | null;
+  carbs: number | null;
+};
 
 const searchFoodsInputType = type({ query: 'string.trim' });
 
