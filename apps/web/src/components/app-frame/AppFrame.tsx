@@ -1,5 +1,4 @@
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
-import clsx from 'clsx';
 import { ChevronLeftIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Btn } from '@/components/btn/Btn';
@@ -38,7 +37,7 @@ export function AppFrame({
   return (
     <div className={css.page}>
       <div className={css.shell}>
-        <header className={clsx(css.header, !navbar && css.headerDefaultBrand)}>
+        <header className={css.header}>
           {navbar ? <RouteLabel label={navbar.label} upTo={navbar.upTo} /> : <div />}
           <NavMenu user={user} />
         </header>

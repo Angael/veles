@@ -1,25 +1,9 @@
-import { Avatar } from '@base-ui/react/avatar';
-import { useNavigate } from '@tanstack/react-router';
-import { type ReactNode, useState } from 'react';
-import { signOut } from '@/lib/auth/client';
-import type { SessionUser } from '@/lib/auth/session.api';
-import css from './NavMenu.module.css';
-
-type MobileAccountLink = '/account' | '/login';
-
-export type MobileAccountItem = {
-  key: 'account';
-  label: string;
-  link: MobileAccountLink;
-  matchPrefixes: string[];
-  user: SessionUser | null;
-};
+import type { ReactNode } from 'react';
 
 export interface NavMenuGroup {
   key: string;
   label: ReactNode;
   matchPrefixes: string[];
-  shouldRender?: boolean;
   items: NavMenuItem[];
 }
 
@@ -29,106 +13,42 @@ export interface NavMenuItem {
   description: string;
   link?: string;
   onClick?: () => void | Promise<void>;
-  shouldRender?: boolean;
   disabled?: boolean;
 }
 
-export function useDesktopNavMenu(user: SessionUser | null) {
-  const navigate = useNavigate();
-  const [logoutBusy, setLogoutBusy] = useState(false);
-  const accountInitials = getInitials(user?.name ?? user?.email ?? 'Account');
-
-  async function handleLogout() {
-    if (logoutBusy) {
-      return;
-    }
-
-    setLogoutBusy(true);
-    const result = await signOut();
-    setLogoutBusy(false);
-
-    if (result.error) {
-      return;
-    }
-
-    navigate({ to: '/login' });
-  }
-
-  const accountLabel = (
-    <>
-      <Avatar.Root className={css.accountAvatar}>
-        {user?.image ? (
-          <Avatar.Image
-            src={user.image}
-            alt={user.name ?? user.email ?? 'Account avatar'}
-            className={css.accountAvatarImage}
-          />
-        ) : null}
-        <Avatar.Fallback className={css.accountAvatarFallback}>{accountInitials}</Avatar.Fallback>
-      </Avatar.Root>
-      Account
-    </>
-  );
-
-  const groups: NavMenuGroup[] = [
-    {
-      key: 'trackers',
-      label: 'Trackers',
-      matchPrefixes: ['/weight', '/recipes', '/diary', '/todos'],
-      shouldRender: Boolean(user),
-      items: [
-        {
-          key: 'weight',
-          link: '/weight',
-          label: 'Weight',
-          description: 'Log body weight and review progress over time.',
-        },
-        {
-          key: 'recipes',
-          link: '/recipes',
-          label: 'Recipes',
-          description: 'Recipe notes and cooking references.',
-        },
-        {
-          key: 'diary',
-          link: '/diary',
-          label: 'Diary',
-          description: 'Private personal entries and imported journals.',
-        },
-        {
-          key: 'todos',
-          link: '/todos',
-          label: 'Todos',
-          description: 'Shared checklists for shopping and life goals.',
-        },
-      ],
-    },
-    {
-      key: 'account',
-      label: accountLabel,
-      matchPrefixes: ['/login', '/account'],
-      items: [
-        {
-          key: 'login',
-          link: '/login',
-          label: 'Login',
-          description: 'Sign in to an existing account.',
-          shouldRender: !user,
-        },
-        {
-          key: 'logout',
-          label: logoutBusy ? 'Logging out...' : 'Logout',
-          description: 'Sign out of the current account.',
-          onClick: handleLogout,
-          shouldRender: Boolean(user),
-          disabled: logoutBusy,
-        },
-      ],
-    },
-  ];
-
-  return groups;
-}
+export const DESKTOP_NAV_MENU_GROUPS: NavMenuGroup[] = [
+  {
+    key: 'trackers',
+    label: 'Trackers',
+    matchPrefixes: ['/weight', '/recipes', '/diary', '/todos'],
+    items: [
+      {
+        key: 'weight',
+        link: '/weight',
+        label: 'Weight',
+        description: 'Log body weight and review progress over time.',
+      },
+      {
+        key: 'recipes',
+        link: '/recipes',
+        label: 'Recipes',
+        description: 'Recipe notes and cooking references.',
+      },
+      {
+        key: 'diary',
+        link: '/diary',
+        label: 'Diary',
+        description: 'Private personal entries and imported journals.',
+      },
+      {
+        key: 'todos',
+        link: '/todos',
+        label: 'Todos',
+        description: 'Shared checklists for shopping and life goals.',
+      },
+    ],
+  },
+];
 
 export const MOBILE_NAV_ITEMS = [
   {
@@ -162,37 +82,3 @@ export const MOBILE_NAV_ITEMS = [
     matchPrefixes: ['/calories'],
   },
 ] as const;
-
-export type MobileNavItem = (typeof MOBILE_NAV_ITEMS)[number];
-
-export function useMobileNavItems(user: SessionUser | null) {
-  const mobileAccountItem: MobileAccountItem = {
-    key: 'account',
-    label: user ? 'Account' : 'Login',
-    link: user ? '/account' : '/login',
-    matchPrefixes: user ? ['/account'] : ['/login'],
-    user,
-  };
-
-  return user ? [...MOBILE_NAV_ITEMS, mobileAccountItem] : [mobileAccountItem];
-}
-
-function getInitials(value: string) {
-  const parts = value.trim().split(/\s+/).filter(Boolean);
-
-  if (parts.length > 1) {
-    return `${parts[0]?.slice(0, 1) ?? ''}${parts.at(-1)?.slice(0, 1) ?? ''}`.toUpperCase();
-  }
-
-  const compact = parts[0] ?? value.trim();
-
-  if (!compact) {
-    return 'A';
-  }
-
-  if (compact.includes('@')) {
-    return compact.slice(0, 2).toUpperCase();
-  }
-
-  return compact.slice(0, 2).toUpperCase();
-}

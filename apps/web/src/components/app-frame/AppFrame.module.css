@@ -29,12 +29,6 @@
   }
 }
 
-.headerDefaultBrand {
-  @media (--phone) {
-    display: none;
-  }
-}
-
 .brand {
   display: flex;
   align-items: center;

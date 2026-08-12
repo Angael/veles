@@ -9,7 +9,7 @@
 
 .group {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.25rem;
   padding: 0.3rem;
   border: 1px solid rgba(148, 163, 184, 0.26);
@@ -17,12 +17,6 @@
   background: rgba(15, 23, 42, 0.82);
   backdrop-filter: blur(22px);
   box-shadow: 0 18px 48px rgba(2, 6, 23, 0.42);
-}
-
-.groupCompact {
-  width: 3.5rem;
-  margin-inline: auto;
-  grid-template-columns: 1fr;
 }
 
 .item {
@@ -50,16 +44,6 @@
     color: var(--c-text-strong);
     background: rgba(148, 163, 184, 0.09);
   }
-}
-
-.avatar {
-  width: 1.15rem;
-  height: 1.15rem;
-  border-radius: 999px;
-  background-color: rgba(148, 163, 184, 0.18);
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
 }
 
 @media not (--phone) {
