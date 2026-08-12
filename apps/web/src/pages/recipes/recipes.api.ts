@@ -8,7 +8,6 @@ import { getSessionUserId, requireSession } from '@/lib/auth/getSession';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { storagePathToUrl } from '@/lib/storage/config';
-import { canManageRecipe } from './recipeAccess';
 
 type RecipeSelect = typeof recipes.$inferSelect;
 
@@ -113,7 +112,7 @@ export const getRecipeById = createServerFn({ method: 'GET' })
 
     return {
       ...toRecipeLibraryItem(recipe, imagesByRecipeId),
-      canManage: canManageRecipe(recipe.userId, userId),
+      canManage: recipe.userId === userId,
     } satisfies RecipeViewItem;
   });
 
