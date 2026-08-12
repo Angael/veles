@@ -13,8 +13,8 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
     setPending(true);
     setError('');
     try {
-      const food = await createFoodProduct({ data: value });
-      await navigate({ to: '/calories/add', search: { date, foodId: food.id } });
+      await createFoodProduct({ data: value });
+      await navigate({ to: '/calories', search: { date } });
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not create food.');
     } finally {
@@ -23,8 +23,8 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
   }
   return (
     <main className={css.page}>
-      <Link className={css.back} search={{ date }} to='/calories/add'>
-        ← Back to foods
+      <Link className={css.back} search={{ date }} to='/calories'>
+        ← Diary
       </Link>
       <header className={css.header}>
         <div>

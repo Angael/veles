@@ -125,6 +125,15 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             <Btn disabled={pending} onClick={() => void remove()} variant='ghost'>
               Delete entry
             </Btn>
+            {log.productId ? (
+              <Link
+                className={css.back}
+                params={{ foodId: log.productId }}
+                to='/calories/foods/$foodId'
+              >
+                Edit product itself
+              </Link>
+            ) : null}
           </div>
         </form>
       </section>
