@@ -5,6 +5,7 @@ import { format, parseISO } from 'date-fns';
 import type { CalorieDashboard } from './calories.api';
 import { CalorieOverview } from './CalorieOverview';
 import { calorieWeekDates } from './calorieDate';
+import { Btn } from '@/components/btn/Btn';
 import css from './CaloriesPage.module.css';
 
 type CaloriesPageProps = { dashboard: CalorieDashboard; date: string };
@@ -35,6 +36,11 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
         })}
       </ToggleGroup>
       <CalorieOverview goal={dashboard.goal} logs={dashboard.logs} totals={dashboard.totals} />
+      <section aria-label='Diary settings' className={css.entryActions}>
+        <Btn onClick={() => void navigate({ to: '/calories/goals' })} variant='ghost'>
+          Set daily goals
+        </Btn>
+      </section>
     </main>
   );
 }
