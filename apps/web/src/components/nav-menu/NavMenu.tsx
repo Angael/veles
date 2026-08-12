@@ -2,8 +2,9 @@ import { Avatar } from '@base-ui/react/avatar';
 import { NavigationMenu } from '@base-ui/react/navigation-menu';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { ChevronDownIcon, UserIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { SessionUser } from '@/lib/auth/session.api';
+import { getInitials } from '@/lib/getInitials';
 import css from './NavMenu.module.css';
 import { DESKTOP_NAV_MENU_GROUPS } from './useNavMenuGroups';
 
@@ -12,11 +13,10 @@ export function NavMenu({ user }: { user: SessionUser | null }) {
     select: (state) => state.location.pathname,
   });
   const [value, setValue] = useState<string | null>(null);
-  const accountName = user?.name ?? user?.email;
-  const accountNameParts = accountName?.trim().split(/\s+/) ?? [];
-  const accountInitials = `${accountNameParts[0]?.[0] ?? ''}${
-    accountNameParts.length > 1 ? (accountNameParts.at(-1)?.[0] ?? '') : ''
-  }`.toUpperCase();
+  const accountInitials = useMemo(
+    () => getInitials(user?.name ?? user?.email),
+    [user?.name, user?.email],
+  );
 
   return (
     <div className={css.navRoot}>
