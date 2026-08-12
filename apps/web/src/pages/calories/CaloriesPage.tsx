@@ -52,6 +52,9 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
           render={<Link search={{ date }} to='/calories/quick-add' />}
           variant='ghost'
         >
+          Scan barcode
+        </Btn>
+        <Btn onClick={() => void navigate({ to: '/calories/quick-add', search: { date } })} variant='ghost'>
           Quick add
         </Btn>
         <Btn
