@@ -5,14 +5,14 @@ import css from './CalorieFlows.module.css';
 import { todayLocalDate } from './calorieDate';
 import { lookupFoodByBarcode, recordFood, type CalorieFood } from './calories.api';
 
-export function ScanFoodPage() {
+export function ScanFoodPage({ initialDate }: { initialDate: string }) {
   const navigate = useNavigate();
   const lookingUp = useRef(false);
   const [barcode, setBarcode] = useState('');
   const [missing, setMissing] = useState('');
   const [food, setFood] = useState<CalorieFood | null>(null);
   const [grams, setGrams] = useState('100');
-  const [date, setDate] = useState(todayLocalDate());
+  const [date, setDate] = useState(initialDate);
 
   /** Looks up a typed barcode once and prepares the matching product for logging. */
   async function lookup() {
@@ -86,7 +86,7 @@ export function ScanFoodPage() {
               <span>{food.brand}</span>
               <p>
                 {food.kcalPer100g} kcal · {food.proteinPer100g ?? 0} g protein ·{' '}
-                {food.carbsPer100g ?? 0} g carbs · {food.fatPer100g ?? 0} g fat / 100 g
+                {food.fatPer100g ?? 0} g fat · {food.carbsPer100g ?? 0} g carbs / 100 g
               </p>
             </div>
           </section>
