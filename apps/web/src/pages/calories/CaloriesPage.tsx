@@ -37,6 +37,9 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
       </ToggleGroup>
       <CalorieOverview goal={dashboard.goal} logs={dashboard.logs} totals={dashboard.totals} />
       <section aria-label='Diary settings' className={css.entryActions}>
+        <Btn onClick={() => void navigate({ to: '/calories/quick-add', search: { date } })}>
+          Quick add
+        </Btn>
         <Btn onClick={() => void navigate({ to: '/calories/goals' })} variant='ghost'>
           Set daily goals
         </Btn>

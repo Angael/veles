@@ -19,12 +19,12 @@ export function QuickAddPage({ date }: { date: string }) {
     try {
       await recordCustomCalories({
         data: {
-          carbs: optional('carbs'),
           date,
-          fat: optional('fat'),
-          kcal: Number(data.get('kcal')),
           name: String(data.get('name') || 'Quick add'),
+          kcal: Number(data.get('kcal')),
           protein: optional('protein'),
+          fat: optional('fat'),
+          carbs: optional('carbs'),
         },
       });
       await navigate({ to: '/calories', search: { date } });
@@ -52,8 +52,8 @@ export function QuickAddPage({ date }: { date: string }) {
           <div className={css.grid}>
             <Field label='kcal' name='kcal' required />
             <Field label='Protein (g)' name='protein' />
-            <Field label='Carbs (g)' name='carbs' />
             <Field label='Fat (g)' name='fat' />
+            <Field label='Carbs (g)' name='carbs' />
           </div>
           <Btn disabled={pending} type='submit'>
             {pending ? 'Adding…' : 'Add to diary'}
