@@ -9,7 +9,7 @@ import css from './CalorieFlows.module.css';
 export function EditFoodLogPage({ log }: { log: CalorieLog }) {
   const navigate = useNavigate();
   const [pending, setPending] = useState(false);
-  const isProduct = log.kind === 'product';
+  const isProduct = log.productId !== null;
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
@@ -21,14 +21,14 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
     try {
       await updateFoodLog({
         data: {
-          carbs: optional('carbs'),
-          date: String(data.get('date')),
-          fat: optional('fat'),
-          grams: optional('grams'),
           id: log.id,
-          kcal: Number(data.get('kcal')),
+          date: String(data.get('date')),
           name: String(data.get('name')),
+          grams: optional('grams'),
+          kcal: Number(data.get('kcal')),
           protein: optional('protein'),
+          fat: optional('fat'),
+          carbs: optional('carbs'),
         },
       });
       await navigate({ to: '/calories', search: { date: String(data.get('date')) } });
@@ -78,17 +78,17 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
               type='number'
             />
             <Field
-              defaultValue={log.carbs ?? ''}
-              readOnly={isProduct}
-              label='Carbs (g)'
-              name='carbs'
-              type='number'
-            />
-            <Field
               defaultValue={log.fat ?? ''}
               readOnly={isProduct}
               label='Fat (g)'
               name='fat'
+              type='number'
+            />
+            <Field
+              defaultValue={log.carbs ?? ''}
+              readOnly={isProduct}
+              label='Carbs (g)'
+              name='carbs'
               type='number'
             />
           </div>
@@ -99,15 +99,6 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             <Btn disabled={pending} onClick={() => void remove()} variant='ghost'>
               Delete entry
             </Btn>
-            {log.productId ? (
-              <Link
-                className={css.back}
-                params={{ foodId: log.productId }}
-                to='/calories/foods/$foodId'
-              >
-                Edit product itself
-              </Link>
-            ) : null}
           </div>
         </form>
       </section>
