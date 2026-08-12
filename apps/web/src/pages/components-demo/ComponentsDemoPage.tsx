@@ -9,8 +9,9 @@ import { DefaultCatchBoundary } from '@/components/default-catch-boundary/Defaul
 import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { Label } from '@/components/label/Label';
-import { NavMenu } from '@/components/nav-menu/NavMenu';
+import { Navbar } from '@/components/navbar/Navbar';
 import { NotFound } from '@/components/not-found/NotFound';
+import { PillBtn } from '@/components/pill-btn/PillBtn';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { SeamlessTextInput } from '@/components/seamless-text-input/SeamlessTextInput';
 import { SeamlessTextarea } from '@/components/seamless-textarea/SeamlessTextarea';
@@ -104,6 +105,15 @@ export function ComponentsDemoPage() {
       </section>
 
       <section>
+        <h2>PillBtn</h2>
+        <PillBtn
+          label='Add recipe'
+          to='/recipes/new'
+          visual={<PlusIcon size={16} strokeWidth={1.8} />}
+        />
+      </section>
+
+      <section>
         <h2>Card</h2>
         <div className={css.cardRow}>
           <Card as='article'>Default card</Card>
@@ -166,8 +176,8 @@ export function ComponentsDemoPage() {
       </section>
 
       <section>
-        <h2>NavMenu</h2>
-        <NavMenu user={null} />
+        <h2>Navbar</h2>
+        <Navbar user={null} />
       </section>
 
       <section>
