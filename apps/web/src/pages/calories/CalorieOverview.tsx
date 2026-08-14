@@ -6,6 +6,7 @@ import { Card } from '@/components/card/Card';
 import css from './CaloriesPage.module.css';
 
 type Props = { goal: CalorieGoal | null; logs: CalorieLog[]; totals: CalorieTotals };
+const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
 
 export function CalorieOverview({ goal, logs, totals }: Props) {
   const router = useRouter();
@@ -86,5 +87,5 @@ function Macro({ label, target, total }: { label: string; target: number | null;
   );
 }
 function number(value: number) {
-  return new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(value);
+  return numberFormatter.format(value);
 }
