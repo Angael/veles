@@ -1,12 +1,14 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
+import { getCookie } from '@tanstack/react-start/server';
 import { asc, eq, sql } from 'drizzle-orm';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { weightEntries } from '@veles/db/schema';
 import { db } from '@/lib/db';
 import { requireSession } from '@/lib/auth/getSession';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
+import { parseWeightChartRange, WEIGHT_CHART_RANGE_COOKIE } from './weightChartRange';
 
 export type WeightEntry = {
   date: string;
@@ -44,6 +46,10 @@ export const getWeightEntries = createServerFn({ method: 'GET' })
         weightKg: entry.weightGrams / 1_000,
       }));
   });
+
+export const getWeightChartRange = createServerFn({ method: 'GET' })
+  .middleware([logMiddleware('getWeightChartRange')])
+  .handler(() => parseWeightChartRange(getCookie(WEIGHT_CHART_RANGE_COOKIE)));
 
 export const saveWeight = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('saveWeight')])

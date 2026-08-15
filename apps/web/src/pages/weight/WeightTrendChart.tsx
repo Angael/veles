@@ -12,17 +12,14 @@ import {
 } from 'recharts';
 import { Skeleton } from '../../components/skeleton/Skeleton';
 import { SelectInput } from '../../components/select-input/SelectInput';
-import { useLocalStorageState } from '../../lib/hooks/useLocalStorageState';
 import css from './WeightTrendChart.module.css';
-import {
-  getWeightChartRange,
-  WEIGHT_CHART_RANGE_MONTHS,
-  type WeightChartRange,
-} from './weightCalculations';
+import { getWeightChartRange, WEIGHT_CHART_RANGE_MONTHS } from './weightCalculations';
+import { persistWeightChartRange, type WeightChartRange } from './weightChartRange';
 import type { WeightEntry } from './weight.api';
 
 type WeightTrendChartProps = {
   entries: WeightEntry[];
+  initialRange: WeightChartRange;
 };
 
 const rangeOptions = [
@@ -62,8 +59,8 @@ function getXAxisTicks(domain: [number, number], chartWidth: number, usesLongRan
   return Array.from({ length: tickCount }, (_, index) => domain[0] + step * index);
 }
 
-export function WeightTrendChart({ entries }: WeightTrendChartProps) {
-  const [range, setRange] = useLocalStorageState<WeightChartRange>('weight-chart-range', '1m');
+export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProps) {
+  const [range, setRange] = useState(initialRange);
   const [chartWidth, setChartWidth] = useState(0);
   const visibleEntries = getWeightChartRange(entries, range);
   const chartEntries = visibleEntries.map((entry) => ({
@@ -101,7 +98,12 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
           aria-label='Chart time range'
           className={css.rangeSelect}
           items={rangeOptions}
-          onValueChange={(value) => value && setRange(value)}
+          onValueChange={(value) => {
+            if (value) {
+              setRange(value);
+              persistWeightChartRange(value);
+            }
+          }}
           value={range}
         />
       </div>
@@ -111,7 +113,7 @@ export function WeightTrendChart({ entries }: WeightTrendChartProps) {
           <ResponsiveContainer
             height='100%'
             minWidth={0}
-            onResize={(width) => setChartWidth(width)}
+            onResize={(width: number) => setChartWidth(width)}
             width='100%'
           >
             <AreaChart

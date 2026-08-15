@@ -1,7 +1,6 @@
 import { formatISO, parseISO, subDays, subMonths } from 'date-fns';
+import type { WeightChartRange } from './weightChartRange';
 import type { WeightEntry } from './weight.api';
-
-export type WeightChartRange = '1m' | '3m' | '6m' | '1y' | '2y' | '3y' | 'all';
 
 export const WEIGHT_CHART_RANGE_MONTHS: Partial<Record<WeightChartRange, number>> = {
   '1m': 1,

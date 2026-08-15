@@ -1,15 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { WeightPage } from '@/pages/weight/WeightPage';
-import { getWeightEntries } from '@/pages/weight/weight.api';
+import { getWeightChartRange, getWeightEntries } from '@/pages/weight/weight.api';
 
 export const Route = createFileRoute('/_authenticated/weight')({
-  loader: () => getWeightEntries(),
+  loader: async () => {
+    const [entries, initialChartRange] = await Promise.all([
+      getWeightEntries(),
+      getWeightChartRange(),
+    ]);
+
+    return { entries, initialChartRange };
+  },
   component: RouteComponent,
   staticData: { navbar: { label: 'Weight', upTo: { to: '/' } } },
 });
 
 function RouteComponent() {
-  const entries = Route.useLoaderData();
+  const { entries, initialChartRange } = Route.useLoaderData();
 
-  return <WeightPage entries={entries} />;
+  return <WeightPage entries={entries} initialChartRange={initialChartRange} />;
 }
