@@ -53,7 +53,10 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
             params={{ id: recipe.id }}
             to='/recipes/view/$id'
           >
-            <Card as='article' className={css.card}>
+            <Card
+              as='article'
+              className={clsx(css.card, recipe.images.length > 0 && css.cardWithImage)}
+            >
               {recipe.images.length > 0 ? (
                 <div className={clsx(css.imageLayout, getImageLayoutClass(recipe.images.length))}>
                   {recipe.images.slice(0, 3).map((image, index) => (

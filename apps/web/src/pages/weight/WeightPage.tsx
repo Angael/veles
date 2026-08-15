@@ -10,14 +10,15 @@ import { toastManager } from '@/components/toast/toastManager';
 import { RecentWeightEntries } from './RecentWeightEntries';
 import css from './WeightPage.module.css';
 import { WeightTrendChart } from './WeightTrendChart';
-import { getChangeFromDaysAgo } from './weightCalculations';
+import { getChangeFromDaysAgo, type WeightChartRange } from './weightCalculations';
 import { saveWeight, type WeightEntry } from './weight.api';
 
 type WeightPageProps = {
   entries: WeightEntry[];
+  initialChartRange: WeightChartRange;
 };
 
-export function WeightPage({ entries }: WeightPageProps) {
+export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
   const router = useRouter();
   const latestEntry = entries.at(-1);
   const [weightKg, setWeightKg] = useState<number | null>(latestEntry?.weightKg ?? null);
@@ -53,7 +54,9 @@ export function WeightPage({ entries }: WeightPageProps) {
 
   return (
     <main className={css.page}>
-      {entries.length > 0 && <WeightTrendChart entries={entries} />}
+      {entries.length > 0 && (
+        <WeightTrendChart entries={entries} initialRange={initialChartRange} />
+      )}
 
       <section aria-label="Today's weight" className={css.captureContainer}>
         <WeightForm

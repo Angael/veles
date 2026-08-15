@@ -9,6 +9,9 @@
 - Never run Drizzle commands yourself; leave them to the human user
 - DB migrations need to be run before pushing/merging to `main`
 
+## PR Stacks
+- Use the `pr-stack` skill when creating, updating, or restacking a PR stack.
+
 ## Structure
 - Avoid barrel `index.ts` files; prefer importing the concrete file by full path.
 - `src/components` is for reusable components only.
