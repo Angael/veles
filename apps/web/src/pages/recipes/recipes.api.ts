@@ -49,24 +49,22 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
 
     const imagesByRecipeId = await getImagesByRecipeId(recipeRows.map((recipe) => recipe.id));
     return recipeRows
-      .map(
-        (recipe): RecipeLibraryItem => ({
-          carbs: recipe.carbs,
-          createdAt: recipe.createdAt.toISOString(),
-          description: recipe.description,
-          fats: recipe.fats,
-          id: recipe.id,
-          images: imagesByRecipeId.get(recipe.id) ?? [],
-          ingredients: recipe.ingredients,
-          kcal: recipe.kcal,
-          name: recipe.name,
-          portions: recipe.portions,
-          protein: recipe.protein,
-          rating: recipe.rating,
-          tags: recipe.tags,
-          updatedAt: recipe.updatedAt.toISOString(),
-        }),
-      )
+      .map((recipe): RecipeLibraryItem => ({
+        carbs: recipe.carbs,
+        createdAt: recipe.createdAt.toISOString(),
+        description: recipe.description,
+        fats: recipe.fats,
+        id: recipe.id,
+        images: imagesByRecipeId.get(recipe.id) ?? [],
+        ingredients: recipe.ingredients,
+        kcal: recipe.kcal,
+        name: recipe.name,
+        portions: recipe.portions,
+        protein: recipe.protein,
+        rating: recipe.rating,
+        tags: recipe.tags,
+        updatedAt: recipe.updatedAt.toISOString(),
+      }))
       .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
   });
 
