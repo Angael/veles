@@ -1,6 +1,7 @@
 import { ClientOnly } from '@tanstack/react-router';
 import { format, parseISO, subMonths } from 'date-fns';
 import { useState } from 'react';
+import { useCookieState } from '@/lib/hooks/useCookieState';
 import {
   Area,
   AreaChart,
@@ -13,8 +14,12 @@ import {
 import { Skeleton } from '../../components/skeleton/Skeleton';
 import { SelectInput } from '../../components/select-input/SelectInput';
 import css from './WeightTrendChart.module.css';
-import { getWeightChartRange, WEIGHT_CHART_RANGE_MONTHS } from './weightCalculations';
-import { persistWeightChartRange, type WeightChartRange } from './weightChartRange';
+import {
+  getWeightChartRange,
+  WEIGHT_CHART_RANGE_COOKIE,
+  WEIGHT_CHART_RANGE_MONTHS,
+  type WeightChartRange,
+} from './weightCalculations';
 import type { WeightEntry } from './weight.api';
 
 type WeightTrendChartProps = {
@@ -60,7 +65,7 @@ function getXAxisTicks(domain: [number, number], chartWidth: number, usesLongRan
 }
 
 export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProps) {
-  const [range, setRange] = useState(initialRange);
+  const [range, setRange] = useCookieState(WEIGHT_CHART_RANGE_COOKIE, initialRange);
   const [chartWidth, setChartWidth] = useState(0);
   const visibleEntries = getWeightChartRange(entries, range);
   const chartEntries = visibleEntries.map((entry) => ({
@@ -101,7 +106,6 @@ export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProp
           onValueChange={(value) => {
             if (value) {
               setRange(value);
-              persistWeightChartRange(value);
             }
           }}
           value={range}

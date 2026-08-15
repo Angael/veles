@@ -8,7 +8,11 @@ import { weightEntries } from '@veles/db/schema';
 import { db } from '@/lib/db';
 import { requireSession } from '@/lib/auth/getSession';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
-import { parseWeightChartRange, WEIGHT_CHART_RANGE_COOKIE } from './weightChartRange';
+import {
+  DEFAULT_WEIGHT_CHART_RANGE,
+  WEIGHT_CHART_RANGE_COOKIE,
+  WEIGHT_CHART_RANGES,
+} from './weightCalculations';
 
 export type WeightEntry = {
   date: string;
@@ -49,7 +53,11 @@ export const getWeightEntries = createServerFn({ method: 'GET' })
 
 export const getWeightChartRange = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getWeightChartRange')])
-  .handler(() => parseWeightChartRange(getCookie(WEIGHT_CHART_RANGE_COOKIE)));
+  .handler(() => {
+    const cookieRange = getCookie(WEIGHT_CHART_RANGE_COOKIE);
+
+    return WEIGHT_CHART_RANGES.find((range) => range === cookieRange) ?? DEFAULT_WEIGHT_CHART_RANGE;
+  });
 
 export const saveWeight = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('saveWeight')])

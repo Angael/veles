@@ -1,6 +1,11 @@
 import { formatISO, parseISO, subDays, subMonths } from 'date-fns';
-import type { WeightChartRange } from './weightChartRange';
 import type { WeightEntry } from './weight.api';
+export const WEIGHT_CHART_RANGE_COOKIE = 'weight-chart-range';
+export const DEFAULT_WEIGHT_CHART_RANGE = '1m' as const;
+
+export const WEIGHT_CHART_RANGES = ['1m', '3m', '6m', '1y', '2y', '3y', 'all'] as const;
+
+export type WeightChartRange = (typeof WEIGHT_CHART_RANGES)[number];
 
 export const WEIGHT_CHART_RANGE_MONTHS: Partial<Record<WeightChartRange, number>> = {
   '1m': 1,

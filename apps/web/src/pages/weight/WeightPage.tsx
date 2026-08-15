@@ -10,8 +10,7 @@ import { toastManager } from '@/components/toast/toastManager';
 import { RecentWeightEntries } from './RecentWeightEntries';
 import css from './WeightPage.module.css';
 import { WeightTrendChart } from './WeightTrendChart';
-import type { WeightChartRange } from './weightChartRange';
-import { getChangeFromDaysAgo } from './weightCalculations';
+import { getChangeFromDaysAgo, type WeightChartRange } from './weightCalculations';
 import { saveWeight, type WeightEntry } from './weight.api';
 
 type WeightPageProps = {
