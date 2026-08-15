@@ -25,7 +25,7 @@
     "db:studio:prod": "pnpm --filter @veles/db db:studio:prod"
   },
   "devDependencies": {
-    "oxfmt": "0.51.0"
+    "oxfmt": "0.63.0"
   },
   "engines": {
     "node": ">=26.2.0"
