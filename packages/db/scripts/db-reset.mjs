@@ -116,11 +116,12 @@ if (process.env.PROD_DATABASE_URL && databaseUrl === process.env.PROD_DATABASE_U
 
 await resetDatabase(databaseUrl);
 
-/** Rebuilds the disposable dev database from migrations and fixed seed data. */
+/** Rebuilds the disposable dev database from migrations, current schema, and fixed seed data. */
 async function resetDatabase(connectionString) {
   await resetSchemas(connectionString);
 
   runPnpmScript('db:migrate');
+  runPnpmScript('db:push');
   await seedDatabase(connectionString);
 
   console.info(`Reset and seeded ${expectedDatabaseName}.`);
