@@ -1,6 +1,9 @@
 import type { FormEvent } from 'react';
 import type { CalorieFood } from './calories.api';
 import { Btn } from '@/components/btn/Btn';
+import { Label } from '@/components/label/Label';
+import { NumberInput } from '@/components/number-input/NumberInput';
+import { TextInput } from '@/components/text-input/TextInput';
 import css from './CalorieFlows.module.css';
 
 export type FoodEditorValue = {
@@ -54,74 +57,71 @@ export function FoodEditor({
   return (
     <form className={css.form} onSubmit={(event) => void handleSubmit(event)}>
       <div className={css.grid}>
-        <Field defaultValue={food?.name ?? initialName} label='Product name' name='name' required />
-        <Field defaultValue={food?.brand ?? ''} label='Brand' name='brand' />
+        <Label text='Product name'>
+          <TextInput defaultValue={food?.name ?? initialName} name='name' required />
+        </Label>
+        <Label text='Brand'>
+          <TextInput defaultValue={food?.brand ?? ''} name='brand' />
+        </Label>
       </div>
       <div className={css.grid}>
-        <Field
-          defaultValue={food?.barcode ?? initialBarcode}
-          inputMode='numeric'
-          label='Barcode'
-          name='barcode'
-        />
-        <Field
-          defaultValue={food?.productSizeGrams ?? ''}
-          label='Product size (g)'
-          min='0.01'
-          name='size'
-          step='0.01'
-          type='number'
-        />
+        <Label text='Barcode'>
+          <TextInput
+            defaultValue={food?.barcode ?? initialBarcode}
+            inputMode='numeric'
+            name='barcode'
+          />
+        </Label>
+        <Label text='Product size (g)'>
+          <NumberInput
+            defaultValue={food?.productSizeGrams ?? undefined}
+            min={0.01}
+            name='size'
+            step={0.01}
+          />
+        </Label>
       </div>
       <div className={css.grid}>
-        <Field
-          defaultValue={food?.kcalPer100g ?? ''}
-          label='kcal / 100 g'
-          min='0'
-          name='kcal'
-          required
-          step='0.01'
-          type='number'
-        />
-        <Field
-          defaultValue={food?.proteinPer100g ?? ''}
-          label='Protein / 100 g'
-          min='0'
-          name='protein'
-          step='0.01'
-          type='number'
-        />
-        <Field
-          defaultValue={food?.fatPer100g ?? ''}
-          label='Fat / 100 g'
-          min='0'
-          name='fat'
-          step='0.01'
-          type='number'
-        />
-        <Field
-          defaultValue={food?.carbsPer100g ?? ''}
-          label='Carbs / 100 g'
-          min='0'
-          name='carbs'
-          step='0.01'
-          type='number'
-        />
+        <Label text='kcal / 100 g'>
+          <NumberInput
+            defaultValue={food?.kcalPer100g ?? undefined}
+            min={0}
+            name='kcal'
+            required
+            step={0.01}
+          />
+        </Label>
+        <Label text='Protein / 100 g'>
+          <NumberInput
+            defaultValue={food?.proteinPer100g ?? undefined}
+            min={0}
+            name='protein'
+            step={0.01}
+          />
+        </Label>
+        <Label text='Fat / 100 g'>
+          <NumberInput
+            defaultValue={food?.fatPer100g ?? undefined}
+            min={0}
+            name='fat'
+            step={0.01}
+          />
+        </Label>
+        <Label text='Carbs / 100 g'>
+          <NumberInput
+            defaultValue={food?.carbsPer100g ?? undefined}
+            min={0}
+            name='carbs'
+            step={0.01}
+          />
+        </Label>
       </div>
-      <Field defaultValue={food?.imageUrl ?? ''} label='Image URL' name='imageUrl' type='url' />
+      <Label text='Image URL'>
+        <TextInput defaultValue={food?.imageUrl ?? ''} name='imageUrl' type='url' />
+      </Label>
       <Btn disabled={pending} type='submit'>
         {pending ? 'Saving…' : submitLabel}
       </Btn>
     </form>
-  );
-}
-
-function Field(props: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
-  const { label, ...inputProps } = props;
-  return (
-    <label className={css.field}>
-      <span>{label}</span>
-      <input {...inputProps} />
-    </label>
   );
 }
