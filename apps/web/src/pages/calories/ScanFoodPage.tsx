@@ -1,8 +1,11 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
+import { DateInput } from '@/components/date-input/DateInput';
+import { Label } from '@/components/label/Label';
+import { NumberInput } from '@/components/number-input/NumberInput';
+import { TextInput } from '@/components/text-input/TextInput';
 import css from './CalorieFlows.module.css';
-import { todayLocalDate } from './calorieDate';
 import { lookupFoodByBarcode, recordFood, type CalorieFood } from './calories.api';
 
 export function ScanFoodPage({ initialDate }: { initialDate: string }) {
@@ -11,7 +14,7 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
   const [barcode, setBarcode] = useState('');
   const [missing, setMissing] = useState('');
   const [food, setFood] = useState<CalorieFood | null>(null);
-  const [grams, setGrams] = useState('100');
+  const [grams, setGrams] = useState<number | null>(100);
   const [date, setDate] = useState(initialDate);
 
   /** Looks up a typed barcode once and prepares the matching product for logging. */
@@ -24,7 +27,7 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
       const result = await lookupFoodByBarcode({ data: { barcode: code } });
       if (result.status === 'found') {
         setFood(result.food);
-        setGrams(String(result.food.productSizeGrams ?? 100));
+        setGrams(result.food.productSizeGrams ?? 100);
       } else {
         setFood(null);
         setMissing(code);
@@ -36,15 +39,12 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
 
   async function add() {
     if (!food) return;
-    await recordFood({ data: { date, grams: Number(grams), productId: food.id } });
+    await recordFood({ data: { date, grams: grams ?? 0, productId: food.id } });
     await navigate({ to: '/calories', search: { date } });
   }
 
   return (
     <main className={css.page}>
-      <Link className={css.back} search={{ date }} to='/calories'>
-        ← Diary
-      </Link>
       <header className={css.header}>
         <div>
           <h1>Look up barcode</h1>
@@ -55,10 +55,10 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
       {!food ? (
         <section className={css.panel}>
           <div className={css.barcodeInput}>
-            <input
+            <TextInput
               aria-label='Enter barcode manually'
               inputMode='numeric'
-              onChange={(event) => setBarcode(event.target.value)}
+              onValueChange={setBarcode}
               placeholder='Enter barcode'
               value={barcode}
             />
@@ -70,9 +70,15 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
             <div className={css.missingProduct}>
               <strong>Barcode {missing} was not found</strong>
               <div className={css.actions}>
-                <Link search={{ barcode: missing, date }} to='/calories/foods/new'>
+                <Btn
+                  isLink
+                  render={
+                    <Link search={{ barcode: missing, date }} to='/calories/foods/new' />
+                  }
+                  variant='ghost'
+                >
                   Create product
-                </Link>
+                </Btn>
               </div>
             </div>
           ) : null}
@@ -92,20 +98,17 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
           </section>
           <section className={css.panel}>
             <div className={css.grid}>
-              <label className={css.field}>
-                <span>Quantity (g)</span>
-                <input
-                  min='0.01'
-                  onChange={(event) => setGrams(event.target.value)}
-                  step='0.01'
-                  type='number'
+              <Label text='Quantity (g)'>
+                <NumberInput
+                  min={0.01}
+                  onValueChange={setGrams}
+                  step={0.01}
                   value={grams}
                 />
-              </label>
-              <label className={css.field}>
-                <span>Date</span>
-                <input onChange={(event) => setDate(event.target.value)} type='date' value={date} />
-              </label>
+              </Label>
+              <Label text='Date'>
+                <DateInput onValueChange={setDate} value={date} />
+              </Label>
             </div>
             <div className={css.actions}>
               <Btn onClick={() => void add()}>Add to diary</Btn>
