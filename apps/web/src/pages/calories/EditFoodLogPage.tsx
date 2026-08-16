@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import type { CalorieLog } from './calories.api';
@@ -128,9 +128,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             {log.productId ? (
               <Btn
                 isLink
-                render={
-                  <Link params={{ foodId: log.productId }} to='/calories/foods/$foodId' />
-                }
+                render={<Link params={{ foodId: log.productId }} to='/calories/foods/$foodId' />}
                 variant='ghost'
               >
                 Edit product itself

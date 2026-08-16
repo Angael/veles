@@ -57,12 +57,7 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
             <p className={css.muted}>{selected.kcalPer100g} kcal / 100 g</p>
           </div>
           <Label text='Amount eaten (g)'>
-            <NumberInput
-              min={0.01}
-              onValueChange={setGrams}
-              step={0.01}
-              value={grams}
-            />
+            <NumberInput min={0.01} onValueChange={setGrams} step={0.01} value={grams} />
           </Label>
           <div className={css.actions}>
             <Btn disabled={pending} onClick={() => void add()}>

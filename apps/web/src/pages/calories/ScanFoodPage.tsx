@@ -10,7 +10,6 @@ import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
 import css from './CalorieFlows.module.css';
 
-
 export function ScanFoodPage({ initialDate }: { initialDate: string }) {
   const navigate = useNavigate();
   const lookingUp = useRef(false);
@@ -58,9 +57,7 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
               <div className={css.actions}>
                 <Btn
                   isLink
-                  render={
-                    <Link search={{ barcode: missing, date }} to='/calories/foods/new' />
-                  }
+                  render={<Link search={{ barcode: missing, date }} to='/calories/foods/new' />}
                   variant='ghost'
                 >
                   Create product
@@ -107,12 +104,7 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
       <section className={css.panel}>
         <div className={css.grid}>
           <Label text='Quantity (g)'>
-            <NumberInput
-              min={0.01}
-              onValueChange={setGrams}
-              step={0.01}
-              value={grams}
-            />
+            <NumberInput min={0.01} onValueChange={setGrams} step={0.01} value={grams} />
           </Label>
           <Label text='Date'>
             <DateInput onValueChange={setDate} value={date} />
