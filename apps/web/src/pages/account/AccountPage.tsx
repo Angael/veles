@@ -50,7 +50,7 @@ export function AccountPage({ user }: AccountPageProps) {
     }
 
     await router.invalidate();
-    await navigate({ to: '/login' });
+    await navigate({ to: '/' });
   }
 
   function toggleFriend(id: string) {
