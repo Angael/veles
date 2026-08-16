@@ -375,6 +375,15 @@ const updateFoodLogInputType = type({
   date: dateOnlyType,
 });
 
+function updateOptionalNutrient(
+  inputValue: number | undefined,
+  existingHundredths: number | null,
+  ratio: number | null,
+) {
+  if (ratio === null) return optionalHundredths(inputValue);
+  return existingHundredths === null ? null : Math.round(existingHundredths * ratio);
+}
+
 export const updateFoodLog = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateFoodLog')])
   .validator(arkTypeValidator(updateFoodLogInputType))
@@ -401,24 +410,9 @@ export const updateFoodLog = createServerFn({ method: 'POST' })
         gramsHundredths: nextGrams,
         kcalHundredths:
           ratio === null ? toHundredths(data.kcal) : Math.round(existing.kcalHundredths * ratio),
-        proteinHundredths:
-          ratio === null
-            ? optionalHundredths(data.protein)
-            : existing.proteinHundredths === null
-              ? null
-              : Math.round(existing.proteinHundredths * ratio),
-        fatHundredths:
-          ratio === null
-            ? optionalHundredths(data.fat)
-            : existing.fatHundredths === null
-              ? null
-              : Math.round(existing.fatHundredths * ratio),
-        carbsHundredths:
-          ratio === null
-            ? optionalHundredths(data.carbs)
-            : existing.carbsHundredths === null
-              ? null
-              : Math.round(existing.carbsHundredths * ratio),
+        proteinHundredths: updateOptionalNutrient(data.protein, existing.proteinHundredths, ratio),
+        fatHundredths: updateOptionalNutrient(data.fat, existing.fatHundredths, ratio),
+        carbsHundredths: updateOptionalNutrient(data.carbs, existing.carbsHundredths, ratio),
         name: existing.productId === null ? data.name.trim() : existing.name,
         logDate: data.date,
       })
