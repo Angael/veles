@@ -1,4 +1,4 @@
-import { Link, useNavigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { recordCustomCalories } from './calories.api';
@@ -40,9 +40,6 @@ export function QuickAddPage({ date }: { date: string }) {
 
   return (
     <main className={css.page}>
-      <Link className={css.back} search={{ date }} to='/calories'>
-        ← Diary
-      </Link>
       <header className={css.header}>
         <div>
           <h1>Quick add</h1>

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import type { CalorieGoal } from './calories.api';
@@ -37,9 +37,6 @@ export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
   }
   return (
     <main className={css.page}>
-      <Link className={css.back} search={{ date: todayLocalDate() }} to='/calories'>
-        ← Diary
-      </Link>
       <header className={css.header}>
         <div>
           <h1>Current goals</h1>
