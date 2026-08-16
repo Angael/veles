@@ -65,3 +65,51 @@ p {
   font-family: var(--font-sans);
   font-weight: var(--font-weight-regular);
 }
+
+[data-appear] {
+  opacity: 0;
+  animation: appear-in 360ms var(--ease-out) forwards;
+}
+
+[data-appear='1'] {
+  animation-delay: 60ms;
+}
+
+[data-appear='2'] {
+  animation-delay: 110ms;
+}
+
+[data-appear='3'] {
+  animation-delay: 160ms;
+}
+
+[data-appear='4'] {
+  animation-delay: 210ms;
+}
+
+[data-appear='5'] {
+  animation-delay: 260ms;
+}
+
+[data-appear='6'] {
+  animation-delay: 310ms;
+}
+
+@keyframes appear-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-xs));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-appear] {
+    opacity: 1;
+    animation: none;
+  }
+}
