@@ -1,6 +1,6 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { format, parseISO } from 'date-fns';
 import type { CalorieDashboard } from './calories.api';
 import { CalorieOverview } from './CalorieOverview';
@@ -37,10 +37,10 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
       </ToggleGroup>
       <CalorieOverview goal={dashboard.goal} logs={dashboard.logs} totals={dashboard.totals} />
       <section aria-label='Diary settings' className={css.entryActions}>
-        <Btn onClick={() => void navigate({ to: '/calories/quick-add', search: { date } })}>
+        <Btn isLink render={<Link search={{ date }} to='/calories/quick-add' />}>
           Quick add
         </Btn>
-        <Btn onClick={() => void navigate({ to: '/calories/goals' })} variant='ghost'>
+        <Btn isLink render={<Link to='/calories/goals' />} variant='ghost'>
           Set daily goals
         </Btn>
       </section>
