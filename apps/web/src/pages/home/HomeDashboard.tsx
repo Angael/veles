@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
-import revealCss from '@/components/reveal/Reveal.module.css';
 import type { HomeDashboardData } from './home.api';
 import css from './HomeDashboard.module.css';
 
@@ -37,7 +36,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
   return (
     <main className={css.page}>
       <div className={css.grid}>
-        <Card as='article' className={`${css.weightTile} ${revealCss.reveal}`} variant='primary'>
+        <Card as='article' className={css.weightTile} data-appear variant='primary'>
           <div className={css.tileTop}>
             <span>Weight signal</span>
             <ScaleIcon aria-hidden='true' />
@@ -78,11 +77,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           <TileLink label='Go to Weight' to='/weight' />
         </Card>
 
-        <Card
-          as='section'
-          className={`${css.recipeTile} ${revealCss.reveal} ${revealCss.delay1}`}
-          shadow={false}
-        >
+        <Card as='section' className={css.recipeTile} data-appear='1' shadow={false}>
           <div className={css.tileTop}>
             <span>Recently saved</span>
             <UtensilsIcon aria-hidden='true' />
@@ -125,11 +120,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           <TileLink label='Go to Recipes' to='/recipes' />
         </Card>
 
-        <Card
-          as='article'
-          className={`${css.todosTile} ${revealCss.reveal} ${revealCss.delay2}`}
-          shadow={false}
-        >
+        <Card as='article' className={css.todosTile} data-appear='2' shadow={false}>
           <div className={css.tileTop}>
             <span>Preview</span>
             <CheckIcon aria-hidden='true' />
@@ -146,11 +137,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           <TileLink label='Go to Todos' to='/todos' />
         </Card>
 
-        <Card
-          as='article'
-          className={`${css.diaryTile} ${revealCss.reveal} ${revealCss.delay3}`}
-          shadow={false}
-        >
+        <Card as='article' className={css.diaryTile} data-appear='3' shadow={false}>
           <div className={css.tileTop}>
             <span>Private notes</span>
             <BookOpenIcon aria-hidden='true' />
@@ -164,11 +151,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           <TileLink label='Go to Diary' to='/diary' />
         </Card>
 
-        <Card
-          as='article'
-          className={`${css.familyTile} ${revealCss.reveal} ${revealCss.delay4}`}
-          shadow={false}
-        >
+        <Card as='article' className={css.familyTile} data-appear='4' shadow={false}>
           <div className={css.statusIcon}>
             <UsersRoundIcon aria-hidden='true' />
           </div>
@@ -185,11 +168,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           </div>
         </Card>
 
-        <Card
-          as='article'
-          className={`${css.foodTile} ${revealCss.reveal} ${revealCss.delay5}`}
-          shadow={false}
-        >
+        <Card as='article' className={css.foodTile} data-appear='5' shadow={false}>
           <div className={css.statusIcon}>
             <FlameIcon aria-hidden='true' />
           </div>
@@ -206,11 +185,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           </div>
         </Card>
 
-        <Card
-          as='article'
-          className={`${css.workoutTile} ${revealCss.reveal} ${revealCss.delay6}`}
-          shadow={false}
-        >
+        <Card as='article' className={css.workoutTile} data-appear='6' shadow={false}>
           <div className={css.statusIcon}>
             <DumbbellIcon aria-hidden='true' />
           </div>

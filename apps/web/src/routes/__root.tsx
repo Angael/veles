@@ -5,7 +5,7 @@ import { NotFound } from '@/components/not-found/NotFound';
 import { ToastProvider } from '@/components/toast/ToastProvider';
 import { getSessionUser } from '@/lib/auth/session.api';
 import { clientEnv } from '@/lib/env/client';
-import resetCss from '@/styles/reset.css?url';
+import globalCss from '@/styles/global.css?url';
 import type { QueryClient } from '@tanstack/react-query';
 import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
 import * as React from 'react';
@@ -43,7 +43,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           'Private place for workouts, body weight, food logging, and shared personal files.',
       },
     ],
-    links: [{ rel: 'stylesheet', href: resetCss }, ...faviconLinks],
+    links: [{ rel: 'stylesheet', href: globalCss }, ...faviconLinks],
   }),
   errorComponent: (props) => (
     <RootDocument>

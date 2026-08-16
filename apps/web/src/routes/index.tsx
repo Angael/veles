@@ -12,5 +12,7 @@ function RouteComponent() {
   const { user } = Route.useRouteContext();
   const dashboard = Route.useLoaderData();
 
-  return user && dashboard ? <HomeDashboard data={dashboard} /> : <HomePage />;
+  if (user && dashboard) return <HomeDashboard data={dashboard} />;
+
+  return <HomePage />;
 }
