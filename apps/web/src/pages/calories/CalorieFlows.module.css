@@ -22,14 +22,6 @@
   color: var(--c-muted);
   text-wrap: pretty;
 }
-.back {
-  color: var(--c-muted);
-  text-decoration: none;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
 .panel {
   border: 1px solid var(--c-border);
   border-radius: 1rem;
@@ -191,8 +183,5 @@
 @media (hover: hover) and (pointer: fine) {
   .result:hover {
     border-color: var(--c-muted);
-  }
-  .back:hover {
-    color: inherit;
   }
 }
