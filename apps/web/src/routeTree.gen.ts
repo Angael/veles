@@ -9,65 +9,50 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoComponentsRouteImport } from './routes/demo.components'
-import { Route as ApiHealthRouteImport } from './routes/api/health'
-import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
-import { Route as AuthenticatedTodosRouteImport } from './routes/_authenticated/todos'
-import { Route as AuthenticatedCaloriesRouteImport } from './routes/_authenticated/calories'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
-import { Route as AuthenticatedRecipesIndexRouteImport } from './routes/_authenticated/recipes/index'
-import { Route as AuthenticatedDiaryIndexRouteImport } from './routes/_authenticated/diary/index'
-import { Route as RecipesViewIdRouteImport } from './routes/recipes.view.$id'
-import { Route as ApiDemoPingRouteImport } from './routes/api/demo/ping'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as AuthenticatedWeightImportRouteImport } from './routes/_authenticated/weight_.import'
-import { Route as AuthenticatedWeightAddRouteImport } from './routes/_authenticated/weight_.add'
-import { Route as AuthenticatedRecipesAddRouteImport } from './routes/_authenticated/recipes/add'
-import { Route as AuthenticatedDiaryIdRouteImport } from './routes/_authenticated/diary/$id'
-import { Route as AuthenticatedCaloriesScanRouteImport } from './routes/_authenticated/calories_.scan'
-import { Route as AuthenticatedCaloriesQuickAddRouteImport } from './routes/_authenticated/calories_.quick-add'
-import { Route as AuthenticatedCaloriesGoalsRouteImport } from './routes/_authenticated/calories_.goals'
+import { Route as AuthenticatedCaloriesRouteImport } from './routes/_authenticated/calories'
+import { Route as AuthenticatedTodosRouteImport } from './routes/_authenticated/todos'
+import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as DemoComponentsRouteImport } from './routes/demo.components'
 import { Route as AuthenticatedCaloriesAddRouteImport } from './routes/_authenticated/calories_.add'
-import { Route as AuthenticatedCaloriesLogsLogIdRouteImport } from './routes/_authenticated/calories_.logs_.$logId'
-import { Route as AuthenticatedCaloriesFoodsNewRouteImport } from './routes/_authenticated/calories_.foods_.new'
+import { Route as AuthenticatedCaloriesGoalsRouteImport } from './routes/_authenticated/calories_.goals'
+import { Route as AuthenticatedCaloriesQuickAddRouteImport } from './routes/_authenticated/calories_.quick-add'
+import { Route as AuthenticatedCaloriesScanRouteImport } from './routes/_authenticated/calories_.scan'
+import { Route as AuthenticatedDiaryIndexRouteImport } from './routes/_authenticated/diary/index'
+import { Route as AuthenticatedDiaryIdRouteImport } from './routes/_authenticated/diary/$id'
+import { Route as AuthenticatedRecipesIndexRouteImport } from './routes/_authenticated/recipes/index'
+import { Route as AuthenticatedRecipesAddRouteImport } from './routes/_authenticated/recipes/add'
+import { Route as AuthenticatedWeightAddRouteImport } from './routes/_authenticated/weight_.add'
+import { Route as AuthenticatedWeightImportRouteImport } from './routes/_authenticated/weight_.import'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiDemoPingRouteImport } from './routes/api/demo/ping'
+import { Route as RecipesViewIdRouteImport } from './routes/recipes.view.$id'
 import { Route as AuthenticatedCaloriesFoodsFoodIdRouteImport } from './routes/_authenticated/calories_.foods_.$foodId'
+import { Route as AuthenticatedCaloriesFoodsNewRouteImport } from './routes/_authenticated/calories_.foods_.new'
+import { Route as AuthenticatedCaloriesLogsLogIdRouteImport } from './routes/_authenticated/calories_.logs_.$logId'
 import { Route as AuthenticatedRecipesViewIdEditRouteImport } from './routes/_authenticated/recipes/view.$id_.edit'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoComponentsRoute = DemoComponentsRouteImport.update({
-  id: '/demo/components',
-  path: '/demo/components',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiHealthRoute = ApiHealthRouteImport.update({
-  id: '/api/health',
-  path: '/api/health',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedWeightRoute = AuthenticatedWeightRouteImport.update({
-  id: '/weight',
-  path: '/weight',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedTodosRoute = AuthenticatedTodosRouteImport.update({
-  id: '/todos',
-  path: '/todos',
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCaloriesRoute = AuthenticatedCaloriesRouteImport.update({
@@ -75,68 +60,30 @@ const AuthenticatedCaloriesRoute = AuthenticatedCaloriesRouteImport.update({
   path: '/calories',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
+const AuthenticatedTodosRoute = AuthenticatedTodosRouteImport.update({
+  id: '/todos',
+  path: '/todos',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedRecipesIndexRoute =
-  AuthenticatedRecipesIndexRouteImport.update({
-    id: '/recipes/',
-    path: '/recipes/',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDiaryIndexRoute = AuthenticatedDiaryIndexRouteImport.update({
-  id: '/diary/',
-  path: '/diary/',
+const AuthenticatedWeightRoute = AuthenticatedWeightRouteImport.update({
+  id: '/weight',
+  path: '/weight',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const RecipesViewIdRoute = RecipesViewIdRouteImport.update({
-  id: '/recipes/view/$id',
-  path: '/recipes/view/$id',
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiDemoPingRoute = ApiDemoPingRouteImport.update({
-  id: '/api/demo/ping',
-  path: '/api/demo/ping',
+const DemoComponentsRoute = DemoComponentsRouteImport.update({
+  id: '/demo/components',
+  path: '/demo/components',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedWeightImportRoute =
-  AuthenticatedWeightImportRouteImport.update({
-    id: '/weight_/import',
-    path: '/weight/import',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedWeightAddRoute = AuthenticatedWeightAddRouteImport.update({
-  id: '/weight_/add',
-  path: '/weight/add',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedRecipesAddRoute = AuthenticatedRecipesAddRouteImport.update({
-  id: '/recipes/add',
-  path: '/recipes/add',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDiaryIdRoute = AuthenticatedDiaryIdRouteImport.update({
-  id: '/diary/$id',
-  path: '/diary/$id',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedCaloriesScanRoute =
-  AuthenticatedCaloriesScanRouteImport.update({
-    id: '/calories_/scan',
-    path: '/calories/scan',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedCaloriesQuickAddRoute =
-  AuthenticatedCaloriesQuickAddRouteImport.update({
-    id: '/calories_/quick-add',
-    path: '/calories/quick-add',
+const AuthenticatedCaloriesAddRoute =
+  AuthenticatedCaloriesAddRouteImport.update({
+    id: '/calories_/add',
+    path: '/calories/add',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedCaloriesGoalsRoute =
@@ -145,16 +92,69 @@ const AuthenticatedCaloriesGoalsRoute =
     path: '/calories/goals',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedCaloriesAddRoute =
-  AuthenticatedCaloriesAddRouteImport.update({
-    id: '/calories_/add',
-    path: '/calories/add',
+const AuthenticatedCaloriesQuickAddRoute =
+  AuthenticatedCaloriesQuickAddRouteImport.update({
+    id: '/calories_/quick-add',
+    path: '/calories/quick-add',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedCaloriesLogsLogIdRoute =
-  AuthenticatedCaloriesLogsLogIdRouteImport.update({
-    id: '/calories_/logs_/$logId',
-    path: '/calories/logs/$logId',
+const AuthenticatedCaloriesScanRoute =
+  AuthenticatedCaloriesScanRouteImport.update({
+    id: '/calories_/scan',
+    path: '/calories/scan',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDiaryIndexRoute = AuthenticatedDiaryIndexRouteImport.update({
+  id: '/diary/',
+  path: '/diary/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDiaryIdRoute = AuthenticatedDiaryIdRouteImport.update({
+  id: '/diary/$id',
+  path: '/diary/$id',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedRecipesIndexRoute =
+  AuthenticatedRecipesIndexRouteImport.update({
+    id: '/recipes/',
+    path: '/recipes/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedRecipesAddRoute = AuthenticatedRecipesAddRouteImport.update({
+  id: '/recipes/add',
+  path: '/recipes/add',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedWeightAddRoute = AuthenticatedWeightAddRouteImport.update({
+  id: '/weight_/add',
+  path: '/weight/add',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedWeightImportRoute =
+  AuthenticatedWeightImportRouteImport.update({
+    id: '/weight_/import',
+    path: '/weight/import',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDemoPingRoute = ApiDemoPingRouteImport.update({
+  id: '/api/demo/ping',
+  path: '/api/demo/ping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecipesViewIdRoute = RecipesViewIdRouteImport.update({
+  id: '/recipes/view/$id',
+  path: '/recipes/view/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCaloriesFoodsFoodIdRoute =
+  AuthenticatedCaloriesFoodsFoodIdRouteImport.update({
+    id: '/calories_/foods_/$foodId',
+    path: '/calories/foods/$foodId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedCaloriesFoodsNewRoute =
@@ -163,10 +163,10 @@ const AuthenticatedCaloriesFoodsNewRoute =
     path: '/calories/foods/new',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedCaloriesFoodsFoodIdRoute =
-  AuthenticatedCaloriesFoodsFoodIdRouteImport.update({
-    id: '/calories_/foods_/$foodId',
-    path: '/calories/foods/$foodId',
+const AuthenticatedCaloriesLogsLogIdRoute =
+  AuthenticatedCaloriesLogsLogIdRouteImport.update({
+    id: '/calories_/logs_/$logId',
+    path: '/calories/logs/$logId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedRecipesViewIdEditRoute =
@@ -357,11 +357,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -371,39 +371,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/components': {
-      id: '/demo/components'
-      path: '/demo/components'
-      fullPath: '/demo/components'
-      preLoaderRoute: typeof DemoComponentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/health': {
-      id: '/api/health'
-      path: '/api/health'
-      fullPath: '/api/health'
-      preLoaderRoute: typeof ApiHealthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/weight': {
-      id: '/_authenticated/weight'
-      path: '/weight'
-      fullPath: '/weight'
-      preLoaderRoute: typeof AuthenticatedWeightRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/todos': {
-      id: '/_authenticated/todos'
-      path: '/todos'
-      fullPath: '/todos'
-      preLoaderRoute: typeof AuthenticatedTodosRouteImport
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/calories': {
@@ -413,88 +392,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaloriesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/account': {
-      id: '/_authenticated/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+    '/_authenticated/todos': {
+      id: '/_authenticated/todos'
+      path: '/todos'
+      fullPath: '/todos'
+      preLoaderRoute: typeof AuthenticatedTodosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/recipes/': {
-      id: '/_authenticated/recipes/'
-      path: '/recipes'
-      fullPath: '/recipes/'
-      preLoaderRoute: typeof AuthenticatedRecipesIndexRouteImport
+    '/_authenticated/weight': {
+      id: '/_authenticated/weight'
+      path: '/weight'
+      fullPath: '/weight'
+      preLoaderRoute: typeof AuthenticatedWeightRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/diary/': {
-      id: '/_authenticated/diary/'
-      path: '/diary'
-      fullPath: '/diary/'
-      preLoaderRoute: typeof AuthenticatedDiaryIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/recipes/view/$id': {
-      id: '/recipes/view/$id'
-      path: '/recipes/view/$id'
-      fullPath: '/recipes/view/$id'
-      preLoaderRoute: typeof RecipesViewIdRouteImport
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/demo/ping': {
-      id: '/api/demo/ping'
-      path: '/api/demo/ping'
-      fullPath: '/api/demo/ping'
-      preLoaderRoute: typeof ApiDemoPingRouteImport
+    '/demo/components': {
+      id: '/demo/components'
+      path: '/demo/components'
+      fullPath: '/demo/components'
+      preLoaderRoute: typeof DemoComponentsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/weight_/import': {
-      id: '/_authenticated/weight_/import'
-      path: '/weight/import'
-      fullPath: '/weight/import'
-      preLoaderRoute: typeof AuthenticatedWeightImportRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/weight_/add': {
-      id: '/_authenticated/weight_/add'
-      path: '/weight/add'
-      fullPath: '/weight/add'
-      preLoaderRoute: typeof AuthenticatedWeightAddRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/recipes/add': {
-      id: '/_authenticated/recipes/add'
-      path: '/recipes/add'
-      fullPath: '/recipes/add'
-      preLoaderRoute: typeof AuthenticatedRecipesAddRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/diary/$id': {
-      id: '/_authenticated/diary/$id'
-      path: '/diary/$id'
-      fullPath: '/diary/$id'
-      preLoaderRoute: typeof AuthenticatedDiaryIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/calories_/scan': {
-      id: '/_authenticated/calories_/scan'
-      path: '/calories/scan'
-      fullPath: '/calories/scan'
-      preLoaderRoute: typeof AuthenticatedCaloriesScanRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/calories_/quick-add': {
-      id: '/_authenticated/calories_/quick-add'
-      path: '/calories/quick-add'
-      fullPath: '/calories/quick-add'
-      preLoaderRoute: typeof AuthenticatedCaloriesQuickAddRouteImport
+    '/_authenticated/calories_/add': {
+      id: '/_authenticated/calories_/add'
+      path: '/calories/add'
+      fullPath: '/calories/add'
+      preLoaderRoute: typeof AuthenticatedCaloriesAddRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/calories_/goals': {
@@ -504,18 +434,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaloriesGoalsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/calories_/add': {
-      id: '/_authenticated/calories_/add'
-      path: '/calories/add'
-      fullPath: '/calories/add'
-      preLoaderRoute: typeof AuthenticatedCaloriesAddRouteImport
+    '/_authenticated/calories_/quick-add': {
+      id: '/_authenticated/calories_/quick-add'
+      path: '/calories/quick-add'
+      fullPath: '/calories/quick-add'
+      preLoaderRoute: typeof AuthenticatedCaloriesQuickAddRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/calories_/logs_/$logId': {
-      id: '/_authenticated/calories_/logs_/$logId'
-      path: '/calories/logs/$logId'
-      fullPath: '/calories/logs/$logId'
-      preLoaderRoute: typeof AuthenticatedCaloriesLogsLogIdRouteImport
+    '/_authenticated/calories_/scan': {
+      id: '/_authenticated/calories_/scan'
+      path: '/calories/scan'
+      fullPath: '/calories/scan'
+      preLoaderRoute: typeof AuthenticatedCaloriesScanRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/diary/': {
+      id: '/_authenticated/diary/'
+      path: '/diary'
+      fullPath: '/diary/'
+      preLoaderRoute: typeof AuthenticatedDiaryIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/diary/$id': {
+      id: '/_authenticated/diary/$id'
+      path: '/diary/$id'
+      fullPath: '/diary/$id'
+      preLoaderRoute: typeof AuthenticatedDiaryIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/recipes/': {
+      id: '/_authenticated/recipes/'
+      path: '/recipes'
+      fullPath: '/recipes/'
+      preLoaderRoute: typeof AuthenticatedRecipesIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/recipes/add': {
+      id: '/_authenticated/recipes/add'
+      path: '/recipes/add'
+      fullPath: '/recipes/add'
+      preLoaderRoute: typeof AuthenticatedRecipesAddRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/weight_/add': {
+      id: '/_authenticated/weight_/add'
+      path: '/weight/add'
+      fullPath: '/weight/add'
+      preLoaderRoute: typeof AuthenticatedWeightAddRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/weight_/import': {
+      id: '/_authenticated/weight_/import'
+      path: '/weight/import'
+      fullPath: '/weight/import'
+      preLoaderRoute: typeof AuthenticatedWeightImportRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/demo/ping': {
+      id: '/api/demo/ping'
+      path: '/api/demo/ping'
+      fullPath: '/api/demo/ping'
+      preLoaderRoute: typeof ApiDemoPingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recipes/view/$id': {
+      id: '/recipes/view/$id'
+      path: '/recipes/view/$id'
+      fullPath: '/recipes/view/$id'
+      preLoaderRoute: typeof RecipesViewIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/calories_/foods_/$foodId': {
+      id: '/_authenticated/calories_/foods_/$foodId'
+      path: '/calories/foods/$foodId'
+      fullPath: '/calories/foods/$foodId'
+      preLoaderRoute: typeof AuthenticatedCaloriesFoodsFoodIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/calories_/foods_/new': {
@@ -525,11 +525,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaloriesFoodsNewRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/calories_/foods_/$foodId': {
-      id: '/_authenticated/calories_/foods_/$foodId'
-      path: '/calories/foods/$foodId'
-      fullPath: '/calories/foods/$foodId'
-      preLoaderRoute: typeof AuthenticatedCaloriesFoodsFoodIdRouteImport
+    '/_authenticated/calories_/logs_/$logId': {
+      id: '/_authenticated/calories_/logs_/$logId'
+      path: '/calories/logs/$logId'
+      fullPath: '/calories/logs/$logId'
+      preLoaderRoute: typeof AuthenticatedCaloriesLogsLogIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/recipes/view/$id_/edit': {
