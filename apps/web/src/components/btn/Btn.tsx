@@ -11,7 +11,8 @@ export type BtnVariant =
   | 'outlineDanger'
   | 'white'
   | 'ghost'
-  | 'ghostDanger';
+  | 'ghostDanger'
+  | 'text';
 export type BtnSize = 'sm' | 'md' | 'lg';
 type BtnRadius = 'md' | 'pill';
 

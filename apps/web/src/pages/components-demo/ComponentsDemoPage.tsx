@@ -37,6 +37,7 @@ const BTN_VARIANTS = [
   { label: 'White', value: 'white' },
   { label: 'Ghost', value: 'ghost' },
   { label: 'Ghost danger', value: 'ghostDanger' },
+  { label: 'Text', value: 'text' },
 ] satisfies DemoProp<BtnVariant>[];
 
 const BTN_SIZES = [

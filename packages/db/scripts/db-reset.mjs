@@ -23,6 +23,12 @@ const devAccount = {
   createdAt: '2026-05-23T08:23:25.075Z',
   updatedAt: '2026-07-15T21:22:28.896Z',
 };
+const devCalorieGoal = {
+  kcal: 1_900,
+  protein: 160,
+  fat: 60,
+  carbs: 180,
+};
 const foodProducts = [
   {
     id: '01900000-0000-7000-8000-000000000201',
@@ -167,6 +173,7 @@ async function seedDatabase(connectionString) {
     await assertDevDatabase(client);
     await client.query('BEGIN');
     await seedIdentity(client);
+    await seedCalorieGoal(client, devUser.id);
     await seedFoodProducts(client);
     await seedFoodLogs(client, devUser.id);
     await seedRecipes(client, devUser.id);
@@ -221,6 +228,33 @@ async function seedIdentity(client) {
       devAccount.scope,
       devAccount.createdAt,
       devAccount.updatedAt,
+    ],
+  );
+}
+
+/** Seeds an 80 kg lifter's balanced cutting targets, effective across the dashboard history. */
+async function seedCalorieGoal(client, userId) {
+  const effectiveDate = new Date();
+  effectiveDate.setUTCHours(0, 0, 0, 0);
+  effectiveDate.setUTCDate(effectiveDate.getUTCDate() - 13);
+
+  await client.query(
+    `INSERT INTO calorie_goal (
+      user_id,
+      effective_date,
+      kcal_limit_hundredths,
+      protein_limit_hundredths,
+      fat_limit_hundredths,
+      carbs_limit_hundredths
+    )
+    VALUES ($1, $2, $3, $4, $5, $6)`,
+    [
+      userId,
+      effectiveDate.toISOString().slice(0, 10),
+      devCalorieGoal.kcal * 100,
+      devCalorieGoal.protein * 100,
+      devCalorieGoal.fat * 100,
+      devCalorieGoal.carbs * 100,
     ],
   );
 }
