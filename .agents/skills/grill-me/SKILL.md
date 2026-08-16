@@ -1,6 +1,6 @@
 ---
 name: grill-me
-description: Stress-test a plan or design in 1-3 focused batches of questions until the important decisions are resolved. Use when the user asks to be grilled, challenged, or interviewed about a plan.
+description: Use when the user asks to be grilled, challenged, or interviewed about a plan.
 ---
 
 # Grill Me

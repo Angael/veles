@@ -1,6 +1,8 @@
 # Rules
 - This is a solo hobby app; prefer low-friction solutions
 - Run `pnpm check:fix` before finishing
+- Always use pinned package versions, never ^ ~ or latest
+- skip "computer use"/"browser smoke tests" checks
 
 ## CI/CD
 - Avoid GitHub Actions and GitHub CI/CD for sensitive prod workflows; this repo is public
@@ -8,12 +10,9 @@
 - Never run Drizzle commands yourself; leave them to the human user
 - DB migrations need to be run before pushing/merging to `main`
 
-## PR Stacks
-- Use the `pr-stack` skill when creating, updating, or restacking a PR stack.
-
 ## Structure
 - Avoid barrel `index.ts` files; prefer importing the concrete file by full path.
-- `src/components` is for reusable components only.
+- `src/components` is for reusable components.
 - `src/pages` is for route-specific components and their logic.
 - `src/pages` components should accept mostly SSR-fetched data when data is needed.
 - `src/lib` is for code reusable across the codebase.
@@ -23,11 +22,8 @@
 - they should always use log middleware: `.middleware([logMiddleware('<name>')])`
 - If it accepts input, use `.validator(arkTypeValidator(...))` with `arktype` and `@tanstack/arktype-adapter`.
 
-# API Routes
-- If an API route accepts input, validate the parsed input with `arktype` before using it.
-
 ## UI
-- Prefer css modules to global css, prefer syntax `import css from ...`
+- Prefer css modules, prefer syntax `import css from ...`
 - In css modules, prefer nested selectors when it keeps related styles together.
 - This app uses css reset and theme.css
 - Shared responsive breakpoints live in `src/styles/breakpoints.css`; use its custom media names instead of repeating raw width queries.
