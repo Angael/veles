@@ -80,7 +80,23 @@ gh stack modify --abort
 gh stack submit            # after successful remote restructuring
 ```
 
-`modify` requires a clean, linear stack. Dropping a layer preserves its branch and PR. For a large rebuild, `gh stack unstack`, then `gh stack init <branches-bottom-to-top>` and `gh stack submit`; unstacking preserves PRs and branches.
+`modify` requires a clean, linear stack and is an interactive TUI; apply staged changes with `Ctrl+S`. Do not drive it through a supervised PTY that cannot reliably deliver control keys. If a watcher keeps regenerating files, stop it before stashing or restructuring rather than repeatedly stashing the same patch. Dropping a layer preserves its branch and PR.
+
+### Consolidate a stack into one PR
+
+Keep the top branch because it already contains every layer. For a non-interactive clean cutover:
+
+```sh
+gh stack unstack <stack-number>
+gh pr edit <top-pr> --base <trunk>
+gh pr close <superseded-pr> --comment "Combined into #<top-pr>."
+
+git fetch origin <trunk>
+git rebase origin/<trunk>
+git push --force-with-lease origin <top-branch>
+```
+
+Close every superseded PR, update the surviving PR's title and body to describe the complete change, then verify its live `baseRefName`, `headRefName`, `mergeable`, and `mergeStateStatus` with `gh pr view --json`. This preserves the full commit history without relying on `modify`. For a large rebuild that must remain a stack, use `gh stack unstack`, then `gh stack init <branches-bottom-to-top>` and `gh stack submit`.
 
 ## Check out and navigate
 
