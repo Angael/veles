@@ -1,4 +1,4 @@
-import { useNavigate, useRouter } from '@tanstack/react-router';
+import { Link, useRouter } from '@tanstack/react-router';
 import type { CalorieGoal, CalorieLog, CalorieTotals } from './calories.api';
 import { deleteFoodLog } from './calories.api';
 import { Btn } from '@/components/btn/Btn';
@@ -9,7 +9,6 @@ type Props = { goal: CalorieGoal | null; logs: CalorieLog[]; totals: CalorieTota
 const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
 
 export function CalorieOverview({ goal, logs, totals }: Props) {
-  const navigate = useNavigate();
   const router = useRouter();
   const remaining = goal ? goal.kcal - totals.kcal : null;
   async function remove(id: string) {
@@ -65,9 +64,8 @@ export function CalorieOverview({ goal, logs, totals }: Props) {
                 </div>
                 <div className={css.logActions}>
                   <Btn
-                    onClick={() =>
-                      void navigate({ to: '/calories/logs/$logId', params: { logId: entry.id } })
-                    }
+                    isLink
+                    render={<Link params={{ logId: entry.id }} to='/calories/logs/$logId' />}
                     variant='ghost'
                   >
                     Edit
