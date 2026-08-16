@@ -126,13 +126,15 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
               Delete entry
             </Btn>
             {log.productId ? (
-              <Link
-                className={css.back}
-                params={{ foodId: log.productId }}
-                to='/calories/foods/$foodId'
+              <Btn
+                isLink
+                render={
+                  <Link params={{ foodId: log.productId }} to='/calories/foods/$foodId' />
+                }
+                variant='ghost'
               >
                 Edit product itself
-              </Link>
+              </Btn>
             ) : null}
           </div>
         </form>

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import type { CalorieFood } from './calories.api';
 import { updateFoodProduct } from './calories.api';
@@ -24,9 +24,6 @@ export function EditFoodPage({ food }: { food: CalorieFood }) {
   }
   return (
     <main className={css.page}>
-      <Link className={css.back} search={{ date: todayLocalDate() }} to='/calories'>
-        ← Diary
-      </Link>
       <header className={css.header}>
         <div>
           <h1>Edit food</h1>
