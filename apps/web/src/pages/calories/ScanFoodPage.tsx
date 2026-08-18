@@ -104,7 +104,7 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
       <section className={css.panel}>
         <div className={css.grid}>
           <Label text='Quantity (g)'>
-            <NumberInput min={0.01} onValueChange={setGrams} step={0.01} value={grams} />
+            <NumberInput min={1} onValueChange={setGrams} step={1} value={grams} />
           </Label>
           <Label text='Date'>
             <DateInput onValueChange={setDate} value={date} />
