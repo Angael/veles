@@ -134,7 +134,7 @@
   text-decoration-color: currentColor;
 }
 
-.text .content svg {
+.text .content > svg {
   width: var(--text-lg);
   height: var(--text-lg);
 }
