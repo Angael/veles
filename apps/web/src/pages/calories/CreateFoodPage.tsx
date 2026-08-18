@@ -1,11 +1,14 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { createFoodProduct } from './calories.api';
+import { invalidateCalorieFoods } from './calorieQueries';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
 import css from './CalorieFlows.module.css';
 
 type Props = { barcode?: string; date: string; name?: string };
 export function CreateFoodPage({ barcode, date, name }: Props) {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
@@ -14,6 +17,7 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
     setError('');
     try {
       await createFoodProduct({ data: value });
+      await invalidateCalorieFoods(queryClient);
       await navigate({ to: '/calories', search: { date } });
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not create food.');

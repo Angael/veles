@@ -1,19 +1,28 @@
 import { type } from 'arktype';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { CaloriesPage } from '@/pages/calories/CaloriesPage';
-import { getCalorieDashboard } from '@/pages/calories/calories.api';
-import { normalizeCalorieDate } from '@/pages/calories/calorieDate';
+import { calorieDashboardQueryOptions } from '@/pages/calories/calorieQueries';
+import { calorieWeekStart, normalizeCalorieDate } from '@/pages/calories/calorieDate';
 
 export const Route = createFileRoute('/_authenticated/calories')({
   validateSearch: type({ 'date?': 'string' }),
-  loaderDeps: ({ search }) => ({ date: normalizeCalorieDate(search.date) }),
-  loader: ({ deps }) => getCalorieDashboard({ data: { date: deps.date } }),
+  loaderDeps: ({ search }) => ({
+    weekStart: calorieWeekStart(normalizeCalorieDate(search.date)),
+  }),
+  loader: ({ context, deps }) =>
+    context.queryClient.ensureQueryData({
+      ...calorieDashboardQueryOptions(deps.weekStart),
+      revalidateIfStale: true,
+    }),
   component: RouteComponent,
   head: () => ({ meta: [{ title: 'Food diary' }] }),
   staticData: { navbar: { label: 'Calories', upTo: { to: '/' } } },
 });
 function RouteComponent() {
-  const dashboard = Route.useLoaderData();
-  const { date } = Route.useLoaderDeps();
+  const search = Route.useSearch();
+  const date = normalizeCalorieDate(search.date);
+  const { data: dashboard } = useSuspenseQuery(calorieDashboardQueryOptions(date));
+
   return <CaloriesPage dashboard={dashboard} date={date} />;
 }

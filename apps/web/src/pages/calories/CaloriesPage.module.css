@@ -30,7 +30,11 @@
   align-items: start;
   gap: var(--space-lg);
 }
-.overviewStack,
+.overviewStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
 .tools,
 .controlPair {
   display: grid;
@@ -181,7 +185,7 @@ label > span {
   justify-content: space-between;
   gap: var(--space-md);
   min-height: var(--button-min-height);
-  padding: var(--space-sm) 0;
+  padding: var(--space-xs) 0;
   border-bottom: var(--border-width) solid var(--c-border);
 }
 .logList li:last-child {
@@ -310,58 +314,15 @@ label small {
   text-transform: lowercase;
   letter-spacing: 0;
 }
-.recentFoods {
-  display: grid;
-  gap: var(--space-sm);
-}
-.recentFoods h3 {
-  font-size: var(--text-md);
-}
-.recentFoods > div {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-xs);
-}
-.recentFood {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  min-height: var(--button-min-height);
-  padding: var(--space-xs) var(--space-sm);
-  border: var(--border-width) solid var(--c-border);
-  border-radius: var(--radius-xs);
-}
-.recentFood svg {
-  flex: none;
-  color: var(--c-muted);
-}
-.recentFood span {
-  display: grid;
-  min-width: 0;
-}
-.recentFood strong {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.recentFood small {
-  color: var(--c-muted);
-}
 @media (--laptop) {
   .layout {
     grid-template-columns: 1fr;
-  }
-  .overviewStack {
-    grid-template-columns: 1fr 1fr;
   }
   .hero {
     grid-column: 1 / -1;
   }
 }
 @media (--tablet) {
-  .overviewStack {
-    grid-template-columns: 1fr;
-  }
   .hero {
     grid-column: auto;
   }
@@ -389,9 +350,6 @@ label small {
   .gramsForm > button {
     width: 100%;
   }
-  .recentFoods > div {
-    grid-template-columns: 1fr;
-  }
   .progress {
     width: 5rem;
     height: 5rem;
@@ -405,11 +363,23 @@ label small {
 
 .dayStrip {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.2rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-xs);
   width: 100%;
 }
+.dayOptions {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.2rem;
+  min-width: 0;
+}
+.dayNav {
+  flex: none;
+  color: var(--c-muted);
+}
 .day {
+  position: relative;
   min-width: 0;
   min-height: 52px;
   border: 0;
@@ -422,9 +392,31 @@ label small {
   font: inherit;
   cursor: pointer;
 }
+.dayStatus {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  color: currentColor;
+  pointer-events: none;
+}
+.dayStatusGood {
+  color: var(--c-macro-carb);
+}
+.day.futureDay {
+  color: var(--c-placeholder);
+}
+.day.todayDay {
+  outline: 2px solid var(--c-primary-border-soft);
+  outline-offset: -2px;
+}
 .day[data-pressed] {
   background: var(--c-primary-surface-strong);
   color: var(--c-text-strong);
+}
+.day.futureDay[data-pressed] {
+  color: var(--c-placeholder);
 }
 .day span {
   font-size: var(--text-xs);
@@ -463,15 +455,28 @@ label small {
 }
 .summaryMacros {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-sm);
 }
 .summaryMacros > div {
   display: grid;
   gap: 0.2rem;
   min-width: 0;
+  padding: var(--space-sm);
+  border: var(--border-width) solid color-mix(in srgb, currentColor 38%, var(--c-border));
+  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+.summaryMacros > div span {
+  color: currentColor;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+.summaryMacros > div small {
+  color: var(--c-muted);
 }
 .summaryMacros strong {
+  color: currentColor;
   font-variant-numeric: tabular-nums;
 }
 .logMain {
@@ -485,8 +490,13 @@ label small {
 }
 .logActions {
   display: flex;
+  flex: none;
   gap: var(--space-xs);
   align-items: center;
+}
+.logAction {
+  --btn-height: 2.5rem;
+  --btn-icon-size: 1rem;
 }
 
 @media (--phone) {
@@ -503,15 +513,20 @@ label small {
   .summaryMacros {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .logList li {
-    align-items: flex-start;
-    flex-direction: column;
-  }
 }
-
 @media (hover: hover) and (pointer: fine) {
   .day:hover {
     background: var(--c-surface-raised);
     color: var(--c-text);
+  }
+  .day.futureDay:hover {
+    color: var(--c-placeholder);
+  }
+  .day[data-pressed]:hover {
+    background: var(--c-primary-surface-strong);
+    color: var(--c-text-strong);
+  }
+  .day.futureDay[data-pressed]:hover {
+    color: var(--c-placeholder);
   }
 }

@@ -1,7 +1,9 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import type { CalorieFood } from './calories.api';
 import { lookupFoodByBarcode, recordFood } from './calories.api';
+import { invalidateCalorieFoods, invalidateCalorieWeek } from './calorieQueries';
 import { BarcodeScanner } from './BarcodeScanner';
 import { Btn } from '@/components/btn/Btn';
 import { DateInput } from '@/components/date-input/DateInput';
@@ -11,6 +13,7 @@ import { TextInput } from '@/components/text-input/TextInput';
 import css from './CalorieFlows.module.css';
 
 export function ScanFoodPage({ initialDate }: { initialDate: string }) {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const lookingUp = useRef(false);
   const [barcode, setBarcode] = useState('');
@@ -25,6 +28,7 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
     setBarcode(code);
     try {
       const result = await lookupFoodByBarcode({ data: { barcode: code } });
+      await invalidateCalorieFoods(queryClient);
       if (result.status === 'found') {
         setFood(result.food);
         setGrams(result.food.productSizeGrams ?? 100);
@@ -40,6 +44,7 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
   async function add() {
     if (!food) return;
     await recordFood({ data: { date, grams: grams ?? 0, productId: food.id } });
+    await invalidateCalorieWeek(queryClient, date);
     await navigate({ to: '/calories', search: { date } });
   }
 

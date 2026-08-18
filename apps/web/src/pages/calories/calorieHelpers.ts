@@ -13,6 +13,10 @@ export function toHundredths(value: number): number {
   return scaled;
 }
 
+export function isWithinKcalGoal(kcalHundredths: number, goalKcalHundredths: number) {
+  return Math.abs(kcalHundredths - goalKcalHundredths) * 10 <= goalKcalHundredths;
+}
+
 export function fromHundredths(value: number | null): number | null {
   return value === null ? null : value / HUNDREDTHS;
 }

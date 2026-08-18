@@ -1,9 +1,11 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { EditFoodPage } from '@/pages/calories/EditFoodPage';
-import { getFoodProduct } from '@/pages/calories/calories.api';
+import { calorieFoodQueryOptions } from '@/pages/calories/calorieQueries';
 
 export const Route = createFileRoute('/_authenticated/calories_/foods_/$foodId')({
-  loader: ({ params }) => getFoodProduct({ data: { id: params.foodId } }),
+  loader: ({ context, params }) =>
+    context.queryClient.ensureQueryData(calorieFoodQueryOptions(params.foodId)),
   component: Component,
   staticData: {
     navbar: {
@@ -14,5 +16,8 @@ export const Route = createFileRoute('/_authenticated/calories_/foods_/$foodId')
 });
 
 function Component() {
-  return <EditFoodPage food={Route.useLoaderData()} />;
+  const { foodId } = Route.useParams();
+  const { data: food } = useSuspenseQuery(calorieFoodQueryOptions(foodId));
+
+  return <EditFoodPage food={food} />;
 }

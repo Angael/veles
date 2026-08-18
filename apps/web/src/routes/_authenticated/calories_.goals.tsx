@@ -1,10 +1,12 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { CalorieGoalsPage } from '@/pages/calories/CalorieGoalsPage';
-import { getCalorieDashboard } from '@/pages/calories/calories.api';
+import { calorieDashboardQueryOptions } from '@/pages/calories/calorieQueries';
 import { todayLocalDate } from '@/pages/calories/calorieDate';
 
 export const Route = createFileRoute('/_authenticated/calories_/goals')({
-  loader: () => getCalorieDashboard({ data: { date: todayLocalDate() } }),
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(calorieDashboardQueryOptions(todayLocalDate())),
   component: Component,
   staticData: {
     navbar: {
@@ -15,5 +17,9 @@ export const Route = createFileRoute('/_authenticated/calories_/goals')({
 });
 
 function Component() {
-  return <CalorieGoalsPage goal={Route.useLoaderData().goal} />;
+  const { data: dashboard } = useSuspenseQuery(calorieDashboardQueryOptions(todayLocalDate()));
+  const today = todayLocalDate();
+  const goal = dashboard.days.find((day) => day.date === today)?.goal ?? null;
+
+  return <CalorieGoalsPage goal={goal} />;
 }

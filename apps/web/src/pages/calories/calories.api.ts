@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { and, desc, eq, ilike, lte } from 'drizzle-orm';
+import { and, desc, eq, gte, ilike, lte } from 'drizzle-orm';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { calorieGoals, foodLogs, foodProducts } from '@veles/db/schema';
 import { requireSession } from '@/lib/auth/getSession';
@@ -12,10 +12,12 @@ import { getOpenFoodFactsProduct, type OpenFoodFactsProduct } from '@/lib/openFo
 import {
   fromHundredths,
   HUNDREDTHS,
+  isWithinKcalGoal,
   optionalHundredths,
   toCalorieGoal,
   toHundredths,
 } from './calorieHelpers';
+import { calorieWeekDates } from './calorieDate';
 
 const MAX_TEXT_LENGTH = 500;
 
@@ -86,6 +88,29 @@ function toCalorieLog(log: typeof foodLogs.$inferSelect): CalorieLog {
   };
 }
 
+function calorieTotalsForLogs(logs: (typeof foodLogs.$inferSelect)[]): CalorieTotals {
+  const totals = logs.reduce(
+    (result, log) => ({
+      kcal: result.kcal + log.kcalHundredths,
+      protein: result.protein + (log.proteinHundredths ?? 0),
+      fat: result.fat + (log.fatHundredths ?? 0),
+      carbs: result.carbs + (log.carbsHundredths ?? 0),
+    }),
+    { kcal: 0, protein: 0, fat: 0, carbs: 0 },
+  );
+
+  return {
+    kcal: totals.kcal / HUNDREDTHS,
+    protein: fromHundredths(totals.protein),
+    fat: fromHundredths(totals.fat),
+    carbs: fromHundredths(totals.carbs),
+  };
+}
+
+function latestGoalForDate(goals: (typeof calorieGoals.$inferSelect)[], date: string) {
+  return goals.find((goal) => goal.effectiveDate <= date);
+}
+
 async function findFoodProductByBarcode(barcode: string) {
   const [product] = await db
     .select()
@@ -123,58 +148,77 @@ export const getCalorieDashboard = createServerFn({ method: 'GET' })
   .validator(arkTypeValidator(dashboardInputType))
   .handler(async ({ data }): Promise<CalorieDashboard> => {
     const session = await requireSession();
+    const weekDates = calorieWeekDates(data.date);
+    const [weekStart, weekEnd] = [weekDates[0], weekDates.at(-1)];
 
-    const [goal] = await db
-      .select()
-      .from(calorieGoals)
-      .where(
-        and(eq(calorieGoals.userId, session.user.id), lte(calorieGoals.effectiveDate, data.date)),
-      )
-      .orderBy(desc(calorieGoals.effectiveDate))
-      .limit(1);
+    if (!weekStart || !weekEnd) {
+      throw new Error('A calorie week must contain at least one day.');
+    }
 
-    const logs = await db
-      .select()
-      .from(foodLogs)
-      .where(and(eq(foodLogs.userId, session.user.id), eq(foodLogs.logDate, data.date)))
-      .orderBy(desc(foodLogs.consumedAt));
+    const [goals, logs] = await Promise.all([
+      db
+        .select()
+        .from(calorieGoals)
+        .where(
+          and(eq(calorieGoals.userId, session.user.id), lte(calorieGoals.effectiveDate, weekEnd)),
+        )
+        .orderBy(desc(calorieGoals.effectiveDate)),
+      db
+        .select()
+        .from(foodLogs)
+        .where(
+          and(
+            eq(foodLogs.userId, session.user.id),
+            gte(foodLogs.logDate, weekStart),
+            lte(foodLogs.logDate, weekEnd),
+          ),
+        )
+        .orderBy(desc(foodLogs.consumedAt)),
+    ]);
 
-    const recentFoods = await db
-      .select()
-      .from(foodProducts)
-      .orderBy(desc(foodProducts.createdAt), desc(foodProducts.id))
-      .limit(20);
+    const logsByDate = new Map<string, (typeof foodLogs.$inferSelect)[]>();
+    for (const log of logs) {
+      const dayLogs = logsByDate.get(log.logDate);
+      if (dayLogs) {
+        dayLogs.push(log);
+      } else {
+        logsByDate.set(log.logDate, [log]);
+      }
+    }
 
-    const totals = logs.reduce(
-      (result, log) => ({
-        kcal: result.kcal + log.kcalHundredths,
-        protein: result.protein + (log.proteinHundredths ?? 0),
-        fat: result.fat + (log.fatHundredths ?? 0),
-        carbs: result.carbs + (log.carbsHundredths ?? 0),
-      }),
-      { kcal: 0, protein: 0, fat: 0, carbs: 0 },
-    );
+    const days = weekDates.map((date): CalorieDashboardDay => {
+      const dayLogs = logsByDate.get(date) ?? [];
+      const goal = latestGoalForDate(goals, date);
+      const kcalHundredths = dayLogs.reduce((total, log) => total + log.kcalHundredths, 0);
 
-    return {
-      date: data.date,
-      goal: goal ? toCalorieGoal(goal) : null,
-      logs: logs.map(toCalorieLog),
-      recentFoods: recentFoods.map(toFoodProduct),
-      totals: {
-        kcal: totals.kcal / HUNDREDTHS,
-        protein: fromHundredths(totals.protein),
-        fat: fromHundredths(totals.fat),
-        carbs: fromHundredths(totals.carbs),
-      },
-    };
+      return {
+        date,
+        goal: goal ? toCalorieGoal(goal) : null,
+        logs: dayLogs.map(toCalorieLog),
+        totals: calorieTotalsForLogs(dayLogs),
+        hasLogs: dayLogs.length > 0,
+        withinKcalGoal:
+          dayLogs.length > 0 && goal
+            ? isWithinKcalGoal(kcalHundredths, goal.kcalLimitHundredths)
+            : null,
+      };
+    });
+
+    return { days, weekStart };
   });
 
 export type CalorieDashboard = {
+  days: CalorieDashboardDay[];
+  weekStart: string;
+};
+
+export type CalorieDashboardDay = {
   date: string;
   goal: CalorieGoal | null;
   logs: CalorieLog[];
-  recentFoods: CalorieFood[];
   totals: CalorieTotals;
+  hasLogs: boolean;
+  withinKcalGoal: boolean | null;
 };
 
 export type CalorieFood = {

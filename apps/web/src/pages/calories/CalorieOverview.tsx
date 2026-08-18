@@ -1,19 +1,27 @@
-import { Link, useRouter } from '@tanstack/react-router';
+import { useQueryClient } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 import type { CalorieGoal, CalorieLog, CalorieTotals } from './calories.api';
 import { deleteFoodLog } from './calories.api';
+import { invalidateCalorieWeek } from './calorieQueries';
+import { PencilIcon, Trash2Icon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import css from './CaloriesPage.module.css';
 
-type Props = { goal: CalorieGoal | null; logs: CalorieLog[]; totals: CalorieTotals };
+type Props = {
+  date: string;
+  goal: CalorieGoal | null;
+  logs: CalorieLog[];
+  totals: CalorieTotals;
+};
 const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
 
-export function CalorieOverview({ goal, logs, totals }: Props) {
-  const router = useRouter();
+export function CalorieOverview({ date, goal, logs, totals }: Props) {
+  const queryClient = useQueryClient();
   const remaining = goal ? goal.kcal - totals.kcal : null;
   async function remove(id: string) {
     await deleteFoodLog({ data: { id } });
-    await router.invalidate();
+    await invalidateCalorieWeek(queryClient, date);
   }
   return (
     <div className={css.overviewStack}>
@@ -34,21 +42,24 @@ export function CalorieOverview({ goal, logs, totals }: Props) {
           </small>
         </div>
         <div className={css.summaryMacros}>
-          <Macro label='Protein' total={totals.protein ?? 0} target={goal?.protein ?? null} />
-          <Macro label='Fat' total={totals.fat ?? 0} target={goal?.fat ?? null} />
-          <Macro label='Carbs' total={totals.carbs ?? 0} target={goal?.carbs ?? null} />
+          <Macro
+            label='Protein'
+            tone='protein'
+            total={totals.protein ?? 0}
+            target={goal?.protein ?? null}
+          />
+          <Macro label='Fat' tone='fat' total={totals.fat ?? 0} target={goal?.fat ?? null} />
+          <Macro
+            label='Carbs'
+            tone='carbs'
+            total={totals.carbs ?? 0}
+            target={goal?.carbs ?? null}
+          />
         </div>
       </Card>
       <Card as='section' className={css.logCard}>
         <div className={css.sectionHeading}>
-          <div>
-            <h2>Logged products</h2>
-            <p>
-              {logs.length
-                ? `${logs.length} ${logs.length === 1 ? 'entry' : 'entries'}`
-                : 'Nothing logged yet.'}
-            </p>
-          </div>
+          <h2>Logged products</h2>
         </div>
         {logs.length ? (
           <ol className={css.logList}>
@@ -64,15 +75,24 @@ export function CalorieOverview({ goal, logs, totals }: Props) {
                 </div>
                 <div className={css.logActions}>
                   <Btn
+                    aria-label={`Edit ${entry.name}`}
+                    className={css.logAction}
+                    icon={<PencilIcon aria-hidden='true' />}
+                    iconOnly
                     isLink
                     render={<Link params={{ logId: entry.id }} to='/calories/logs/$logId' />}
+                    size='sm'
                     variant='ghost'
-                  >
-                    Edit
-                  </Btn>
-                  <Btn onClick={() => void remove(entry.id)} variant='ghost'>
-                    Delete
-                  </Btn>
+                  />
+                  <Btn
+                    aria-label={`Delete ${entry.name}`}
+                    className={css.logAction}
+                    icon={<Trash2Icon aria-hidden='true' />}
+                    iconOnly
+                    onClick={() => void remove(entry.id)}
+                    size='sm'
+                    variant='ghostDanger'
+                  />
                 </div>
               </li>
             ))}
@@ -84,9 +104,19 @@ export function CalorieOverview({ goal, logs, totals }: Props) {
     </div>
   );
 }
-function Macro({ label, target, total }: { label: string; target: number | null; total: number }) {
+function Macro({
+  label,
+  target,
+  tone,
+  total,
+}: {
+  label: string;
+  target: number | null;
+  tone: 'protein' | 'fat' | 'carbs';
+  total: number;
+}) {
   return (
-    <div>
+    <div className={css[tone]}>
       <span>{label}</span>
       <strong>{number(total)} g</strong>
       <small>{target === null ? null : ` / ${number(target)} g`}</small>

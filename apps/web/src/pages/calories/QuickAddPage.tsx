@@ -1,7 +1,9 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { recordCustomCalories } from './calories.api';
+import { invalidateCalorieWeek } from './calorieQueries';
 import { Btn } from '@/components/btn/Btn';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
@@ -9,6 +11,7 @@ import { TextInput } from '@/components/text-input/TextInput';
 import css from './CalorieFlows.module.css';
 
 export function QuickAddPage({ date }: { date: string }) {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [pending, setPending] = useState(false);
 
@@ -32,6 +35,7 @@ export function QuickAddPage({ date }: { date: string }) {
           carbs: optional('carbs'),
         },
       });
+      await invalidateCalorieWeek(queryClient, date);
       await navigate({ to: '/calories', search: { date } });
     } finally {
       setPending(false);

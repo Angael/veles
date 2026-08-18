@@ -1,8 +1,10 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import type { CalorieGoal } from './calories.api';
 import { setDailyCalorieGoal } from './goals.api';
+import { invalidateAllCalorieWeeks } from './calorieQueries';
 import { todayLocalDate } from './calorieDate';
 import { Btn } from '@/components/btn/Btn';
 import { Label } from '@/components/label/Label';
@@ -10,6 +12,7 @@ import { NumberInput } from '@/components/number-input/NumberInput';
 import css from './CalorieFlows.module.css';
 
 export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [pending, setPending] = useState(false);
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -30,6 +33,7 @@ export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
           carbs: optional('carbs'),
         },
       });
+      await invalidateAllCalorieWeeks(queryClient);
       await navigate({ to: '/calories', search: { date: todayLocalDate() } });
     } finally {
       setPending(false);
@@ -52,7 +56,7 @@ export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
                 min={0.01}
                 name='kcal'
                 required
-                step={0.01}
+                step={10}
               />
             </Label>
             <Label text='Protein (g)'>

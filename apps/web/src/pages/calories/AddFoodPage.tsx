@@ -1,7 +1,13 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import type { CalorieFood } from './calories.api';
-import { getFoodProduct, recordFood, searchFoods } from './calories.api';
+import { recordFood } from './calories.api';
+import {
+  calorieFoodQueryOptions,
+  calorieFoodSearchQueryOptions,
+  invalidateCalorieWeek,
+} from './calorieQueries';
 import { Btn } from '@/components/btn/Btn';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
@@ -10,36 +16,47 @@ import css from './CalorieFlows.module.css';
 
 type Props = { date: string; initialFoodId?: string };
 export function AddFoodPage({ date, initialFoodId }: Props) {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [foods, setFoods] = useState<CalorieFood[]>([]);
+  const [submittedQuery, setSubmittedQuery] = useState('');
+  const [searchEnabled, setSearchEnabled] = useState(initialFoodId === undefined);
   const [selected, setSelected] = useState<CalorieFood | null>(null);
   const [grams, setGrams] = useState<number | null>(100);
-  const [pending, setPending] = useState(false);
+  const [mutationPending, setMutationPending] = useState(false);
+  const foodQuery = useQuery({
+    ...calorieFoodQueryOptions(initialFoodId ?? ''),
+    enabled: initialFoodId !== undefined,
+  });
+  const searchQuery = useQuery({
+    ...calorieFoodSearchQueryOptions(submittedQuery),
+    enabled: searchEnabled,
+  });
+  const foods = searchQuery.data ?? [];
   useEffect(() => {
-    void (initialFoodId
-      ? getFoodProduct({ data: { id: initialFoodId } }).then((food) => {
-          setSelected(food);
-          setGrams(food.productSizeGrams ?? 100);
-        })
-      : searchFoods({ data: { query: '' } }).then(setFoods));
-  }, [initialFoodId]);
+    if (!foodQuery.data) return;
+
+    setSelected(foodQuery.data);
+    setGrams(foodQuery.data.productSizeGrams ?? 100);
+  }, [foodQuery.data]);
+
   async function runSearch() {
-    setPending(true);
-    try {
-      setFoods(await searchFoods({ data: { query } }));
-    } finally {
-      setPending(false);
+    const normalizedQuery = query.trim();
+    if (normalizedQuery === submittedQuery) {
+      await searchQuery.refetch();
+    } else {
+      setSubmittedQuery(normalizedQuery);
     }
   }
   async function add() {
     if (!selected) return;
-    setPending(true);
+    setMutationPending(true);
     try {
       await recordFood({ data: { date, grams: grams ?? 0, productId: selected.id } });
+      await invalidateCalorieWeek(queryClient, date);
       await navigate({ to: '/calories', search: { date } });
     } finally {
-      setPending(false);
+      setMutationPending(false);
     }
   }
   return (
@@ -60,10 +77,16 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
             <NumberInput min={0.01} onValueChange={setGrams} step={0.01} value={grams} />
           </Label>
           <div className={css.actions}>
-            <Btn disabled={pending} onClick={() => void add()}>
+            <Btn disabled={mutationPending} onClick={() => void add()}>
               Add to diary
             </Btn>
-            <Btn onClick={() => setSelected(null)} variant='ghost'>
+            <Btn
+              onClick={() => {
+                setSelected(null);
+                setSearchEnabled(true);
+              }}
+              variant='ghost'
+            >
               Choose another
             </Btn>
             <Btn
@@ -89,7 +112,7 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
                 value={query}
               />
             </Label>
-            <Btn disabled={pending} onClick={() => void runSearch()}>
+            <Btn disabled={searchQuery.isFetching} onClick={() => void runSearch()}>
               Search
             </Btn>
           </div>
