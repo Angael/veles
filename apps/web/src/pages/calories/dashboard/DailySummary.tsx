@@ -1,3 +1,6 @@
+import { Link } from '@tanstack/react-router';
+import { GoalIcon } from 'lucide-react';
+import { Btn } from '@/components/btn/Btn';
 import { useId, useState } from 'react';
 import type { CalorieGoal, CalorieTotals } from '../calories.api';
 import { formatNutritionNumber } from './nutritionFormat';
@@ -20,6 +23,16 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
     <section aria-label='Daily nutrition summary' className={css.summary} data-appear='1'>
       <div className={css.body}>
         <div className={css.energyPanel}>
+          <Btn
+            className={css.goalAction}
+            icon={<GoalIcon aria-hidden='true' />}
+            isLink
+            render={<Link to='/calories/goals' />}
+            size='sm'
+            variant='ghost'
+          >
+            {goal ? 'Edit goals' : 'Set goals'}
+          </Btn>
           <EnergyDial
             goal={goal?.kcal}
             progress={energyProgress}
