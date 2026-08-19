@@ -36,7 +36,7 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
   }
   return (
     <main className={css.page}>
-      <div className={css.dayStrip}>
+      <div className={css.dayStrip} data-appear>
         <Btn
           aria-label='Previous week'
           className={css.dayNav}
@@ -105,7 +105,7 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
         totals={selectedDay.totals}
       />
 
-      <section aria-label='Diary actions' className={css.entryActions}>
+      <section aria-label='Diary actions' className={css.entryActions} data-appear='3'>
         <Btn isLink render={<Link search={{ date }} to='/calories/add' />}>
           Add food
         </Btn>

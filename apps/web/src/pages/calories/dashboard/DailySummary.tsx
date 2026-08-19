@@ -16,7 +16,7 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
   const energyCaption = remaining === null ? 'kcal consumed' : 'kcal remaining';
 
   return (
-    <section aria-label='Daily nutrition summary' className={css.summary}>
+    <section aria-label='Daily nutrition summary' className={css.summary} data-appear='1'>
       <div className={css.body}>
         <div className={css.energyPanel}>
           <div
@@ -56,16 +56,18 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
             </div>
           </div>
 
-          <dl className={css.energyFacts}>
-            <div>
-              <dt>Consumed</dt>
-              <dd>{formatNutritionNumber(totals.kcal)} kcal</dd>
-            </div>
-            <div>
-              <dt>Daily goal</dt>
-              <dd>{goal ? `${formatNutritionNumber(goal.kcal)} kcal` : 'Not set'}</dd>
-            </div>
-          </dl>
+          <div className={css.energyRatio}>
+            <span>{formatNutritionNumber(totals.kcal)}</span>
+            {goal ? (
+              <>
+                <span>/</span>
+                <span>{formatNutritionNumber(goal.kcal)}</span>
+                <small>kcal</small>
+              </>
+            ) : (
+              <small>kcal consumed</small>
+            )}
+          </div>
         </div>
 
         <dl className={css.macros}>
@@ -94,15 +96,15 @@ function Macro({
 
   return (
     <div className={css[tone]}>
-      <dt>{label}</dt>
+      <dt>{label} consumed</dt>
       <dd className={css.macroValue}>
-        {formatNutritionNumber(remaining ?? value)}
+        {formatNutritionNumber(value)}
         <span> g</span>
       </dd>
       <dd className={css.macroGoal}>
         {goal === null || goal === undefined
-          ? 'consumed · no target'
-          : `remaining · ${formatNutritionNumber(goal)} g target`}
+          ? 'No daily goal'
+          : `${formatNutritionNumber(remaining ?? 0)} g remaining · ${formatNutritionNumber(goal)} g goal`}
       </dd>
       {progress === null ? null : (
         <dd aria-hidden='true' className={css.macroFill} style={{ width: `${progress}%` }} />

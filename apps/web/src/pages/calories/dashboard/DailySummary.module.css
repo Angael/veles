@@ -97,34 +97,34 @@
   }
 }
 
-.energyFacts {
-  display: grid;
-  align-content: center;
-  gap: var(--space-lg);
+.energyRatio {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.35rem;
   min-width: 0;
+  padding-left: var(--space-sm);
+  border-left: 2px solid rgba(125, 211, 252, 0.3);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
 
-  & > div {
-    display: grid;
-    gap: 0.15rem;
-    padding-left: var(--space-sm);
-    border-left: 2px solid rgba(125, 211, 252, 0.3);
+  & span {
+    color: var(--c-text-strong);
+    font-size: var(--text-lg-dynamic);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: -0.03em;
   }
 
-  & dt {
-    grid-row: 2;
+  & span:nth-child(2) {
+    color: var(--c-muted-strong);
+    font-weight: var(--font-weight-regular);
+  }
+
+  & small {
+    width: 100%;
     color: var(--c-muted);
     font-size: var(--text-xs);
-  }
-
-  & dd {
-    grid-row: 1;
-    overflow: hidden;
-    color: var(--c-text-strong);
-    font-size: var(--text-sm-dynamic);
-    font-weight: var(--font-weight-semibold);
-    font-variant-numeric: tabular-nums;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 }
 
@@ -238,20 +238,18 @@
 
 @media (--phone) {
   .energyPanel {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(8.5rem, 1fr) minmax(7.25rem, 0.72fr);
     min-height: auto;
     padding: var(--space-sm);
   }
 
   .energyDial,
   .energyDialOver {
-    width: min(11.5rem, 70vw);
+    width: min(9.5rem, 42vw);
   }
 
-  .energyFacts {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-sm);
-    width: 100%;
+  .energyRatio {
+    padding-left: var(--space-xs);
   }
 
   .macros {

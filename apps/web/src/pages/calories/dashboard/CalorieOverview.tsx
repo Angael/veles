@@ -15,7 +15,7 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
     <div className={css.overviewStack}>
       <DailySummary goal={goal} totals={totals} />
 
-      <section className={css.logSection}>
+      <section className={css.logSection} data-appear='2'>
         <div className={css.logHeading}>
           <h2>Logged products</h2>
           {logs.length ? (
