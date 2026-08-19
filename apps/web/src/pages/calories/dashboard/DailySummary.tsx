@@ -1,6 +1,6 @@
+import { useId } from 'react';
 import type { CalorieGoal, CalorieTotals } from '../calories.api';
 import { formatNutritionNumber } from './nutritionFormat';
-import { Card } from '@/components/card/Card';
 import css from './DailySummary.module.css';
 
 type DailySummaryProps = {
@@ -9,30 +9,14 @@ type DailySummaryProps = {
 };
 
 export function DailySummary({ goal, totals }: DailySummaryProps) {
+  const energyGradientId = useId();
   const remaining = goal ? goal.kcal - totals.kcal : null;
-  const energyValue = remaining === null ? totals.kcal : Math.abs(remaining);
+  const energyValue = remaining ?? totals.kcal;
   const energyProgress = progressFor(totals.kcal, goal?.kcal);
-  const energyCaption =
-    remaining === null ? 'kcal consumed' : remaining >= 0 ? 'kcal remaining' : 'kcal over goal';
-  const summary =
-    remaining === null
-      ? 'Your energy and macro totals at a glance.'
-      : remaining >= 0
-        ? `You’ve used ${formatNutritionNumber(energyProgress ?? 0)}% of your calorie goal.`
-        : `You’re ${formatNutritionNumber(Math.abs(remaining))} kcal beyond your calorie goal.`;
+  const energyCaption = remaining === null ? 'kcal consumed' : 'kcal remaining';
 
   return (
-    <Card aria-label='Daily nutrition summary' as='section' className={css.summary}>
-      <header className={css.header}>
-        <div>
-          <h2>Daily balance</h2>
-          <p>{summary}</p>
-        </div>
-        {goal ? (
-          <span className={css.goalBadge}>{formatNutritionNumber(energyProgress ?? 0)}% used</span>
-        ) : null}
-      </header>
-
+    <section aria-label='Daily nutrition summary' className={css.summary}>
       <div className={css.body}>
         <div className={css.energyPanel}>
           <div
@@ -40,6 +24,19 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
           >
             <svg aria-hidden='true' viewBox='0 0 160 160'>
               <circle className={css.dialTrack} cx='80' cy='80' pathLength='100' r='69' />
+              <defs>
+                <linearGradient
+                  gradientUnits='userSpaceOnUse'
+                  id={energyGradientId}
+                  x1='24'
+                  x2='136'
+                  y1='136'
+                  y2='24'
+                >
+                  <stop className={css.dialGradientStart} offset='0%' />
+                  <stop className={css.dialGradientEnd} offset='100%' />
+                </linearGradient>
+              </defs>
               {energyProgress !== null ? (
                 <circle
                   className={css.dialProgress}
@@ -47,6 +44,7 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
                   cy='80'
                   pathLength='100'
                   r='69'
+                  stroke={`url(#${energyGradientId})`}
                   strokeDasharray='100'
                   strokeDashoffset={100 - energyProgress}
                 />
@@ -76,7 +74,7 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
           <Macro goal={goal?.carbs} label='Carbs' tone='carbs' value={totals.carbs ?? 0} />
         </dl>
       </div>
-    </Card>
+    </section>
   );
 }
 
@@ -92,22 +90,23 @@ function Macro({
   value: number;
 }) {
   const progress = progressFor(value, goal);
+  const remaining = goal === null || goal === undefined ? null : goal - value;
 
   return (
     <div className={css[tone]}>
       <dt>{label}</dt>
       <dd className={css.macroValue}>
-        {formatNutritionNumber(value)}
+        {formatNutritionNumber(remaining ?? value)}
         <span> g</span>
       </dd>
       <dd className={css.macroGoal}>
         {goal === null || goal === undefined
-          ? 'No target'
-          : `${formatNutritionNumber(goal)} g target`}
+          ? 'consumed · no target'
+          : `remaining · ${formatNutritionNumber(goal)} g target`}
       </dd>
-      <dd aria-hidden='true' className={css.macroTrack}>
-        {progress === null ? null : <span style={{ width: `${progress}%` }} />}
-      </dd>
+      {progress === null ? null : (
+        <dd aria-hidden='true' className={css.macroFill} style={{ width: `${progress}%` }} />
+      )}
     </div>
   );
 }
