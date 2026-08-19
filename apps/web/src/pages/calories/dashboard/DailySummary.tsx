@@ -10,84 +10,110 @@ type DailySummaryProps = {
 
 export function DailySummary({ goal, totals }: DailySummaryProps) {
   const remaining = goal ? goal.kcal - totals.kcal : null;
-  const energyLabel = remaining === null ? 'Energy' : remaining >= 0 ? 'Remaining' : 'Over goal';
   const energyValue = remaining === null ? totals.kcal : Math.abs(remaining);
+  const energyProgress = progressFor(totals.kcal, goal?.kcal);
+  const energyCaption =
+    remaining === null ? 'kcal consumed' : remaining >= 0 ? 'kcal remaining' : 'kcal over goal';
+  const summary =
+    remaining === null
+      ? 'Your energy and macro totals at a glance.'
+      : remaining >= 0
+        ? `You’ve used ${formatNutritionNumber(energyProgress ?? 0)}% of your calorie goal.`
+        : `You’re ${formatNutritionNumber(Math.abs(remaining))} kcal beyond your calorie goal.`;
 
   return (
-    <Card aria-label='Daily nutrition summary' as='section'>
+    <Card aria-label='Daily nutrition summary' as='section' className={css.summary}>
+      <header className={css.header}>
+        <div>
+          <h2>Daily balance</h2>
+          <p>{summary}</p>
+        </div>
+        {goal ? (
+          <span className={css.goalBadge}>{formatNutritionNumber(energyProgress ?? 0)}% used</span>
+        ) : null}
+      </header>
+
       <div className={css.body}>
-        <dl className={css.nutrition}>
-          <Metric
-            detail={
-              goal
-                ? `${formatNutritionNumber(totals.kcal)} / ${formatNutritionNumber(goal.kcal)} kcal`
-                : 'No calorie goal'
-            }
-            label={energyLabel}
-            tone='energy'
-            unit='kcal'
-            value={energyValue}
-          />
-          <Metric
-            detail={
-              goal?.protein === null || goal?.protein === undefined
-                ? null
-                : `of ${formatNutritionNumber(goal.protein)} g`
-            }
-            label='Protein'
-            tone='protein'
-            unit='g'
-            value={totals.protein ?? 0}
-          />
-          <Metric
-            detail={
-              goal?.fat === null || goal?.fat === undefined
-                ? null
-                : `of ${formatNutritionNumber(goal.fat)} g`
-            }
-            label='Fat'
-            tone='fat'
-            unit='g'
-            value={totals.fat ?? 0}
-          />
-          <Metric
-            detail={
-              goal?.carbs === null || goal?.carbs === undefined
-                ? null
-                : `of ${formatNutritionNumber(goal.carbs)} g`
-            }
-            label='Carbs'
-            tone='carbs'
-            unit='g'
-            value={totals.carbs ?? 0}
-          />
+        <div className={css.energyPanel}>
+          <div
+            className={remaining !== null && remaining < 0 ? css.energyDialOver : css.energyDial}
+          >
+            <svg aria-hidden='true' viewBox='0 0 160 160'>
+              <circle className={css.dialTrack} cx='80' cy='80' pathLength='100' r='69' />
+              {energyProgress !== null ? (
+                <circle
+                  className={css.dialProgress}
+                  cx='80'
+                  cy='80'
+                  pathLength='100'
+                  r='69'
+                  strokeDasharray='100'
+                  strokeDashoffset={100 - energyProgress}
+                />
+              ) : null}
+            </svg>
+            <div className={css.energyValue}>
+              <strong>{formatNutritionNumber(energyValue)}</strong>
+              <span>{energyCaption}</span>
+            </div>
+          </div>
+
+          <dl className={css.energyFacts}>
+            <div>
+              <dt>Consumed</dt>
+              <dd>{formatNutritionNumber(totals.kcal)} kcal</dd>
+            </div>
+            <div>
+              <dt>Daily goal</dt>
+              <dd>{goal ? `${formatNutritionNumber(goal.kcal)} kcal` : 'Not set'}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <dl className={css.macros}>
+          <Macro goal={goal?.protein} label='Protein' tone='protein' value={totals.protein ?? 0} />
+          <Macro goal={goal?.fat} label='Fat' tone='fat' value={totals.fat ?? 0} />
+          <Macro goal={goal?.carbs} label='Carbs' tone='carbs' value={totals.carbs ?? 0} />
         </dl>
       </div>
     </Card>
   );
 }
 
-function Metric({
-  detail,
+function Macro({
+  goal,
   label,
   tone,
-  unit,
   value,
 }: {
-  detail: string | null;
+  goal: number | null | undefined;
   label: string;
-  tone: 'energy' | 'protein' | 'fat' | 'carbs';
-  unit: 'kcal' | 'g';
+  tone: 'protein' | 'fat' | 'carbs';
   value: number;
 }) {
+  const progress = progressFor(value, goal);
+
   return (
     <div className={css[tone]}>
       <dt>{label}</dt>
-      <dd className={css.value}>
+      <dd className={css.macroValue}>
         {formatNutritionNumber(value)}
-        <span> {unit}</span>
+        <span> g</span>
       </dd>
-      <dd className={css.detail}>{detail}</dd>
+      <dd className={css.macroGoal}>
+        {goal === null || goal === undefined
+          ? 'No target'
+          : `${formatNutritionNumber(goal)} g target`}
+      </dd>
+      <dd aria-hidden='true' className={css.macroTrack}>
+        {progress === null ? null : <span style={{ width: `${progress}%` }} />}
+      </dd>
     </div>
   );
+}
+
+function progressFor(value: number, goal: number | null | undefined) {
+  if (goal === null || goal === undefined) return null;
+  if (goal <= 0) return value > 0 ? 100 : 0;
+  return Math.min(Math.max((value / goal) * 100, 0), 100);
 }
