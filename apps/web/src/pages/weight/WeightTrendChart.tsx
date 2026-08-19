@@ -161,6 +161,7 @@ export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProp
                   border: '1px solid var(--c-border-strong)',
                   borderRadius: 'var(--radius-xs)',
                 }}
+                isAnimationActive={false}
                 formatter={(value) => [`${Number(value).toFixed(1)} kg`, 'Weight']}
                 labelFormatter={(label) => longDateFormatter.format(Number(label))}
               />

@@ -4,6 +4,7 @@ import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogMutation } from '../calorieQueries';
 import { formatNutritionNumber } from './nutritionFormat';
 import { Btn } from '@/components/btn/Btn';
+import { Card } from '@/components/card/Card';
 import css from './LoggedFood.module.css';
 
 type LoggedFoodProps = {
@@ -20,44 +21,36 @@ export function LoggedFood({ date, entry }: LoggedFoodProps) {
 
   return (
     <li className={css.item}>
-      <Link className={css.body} params={{ logId: entry.id }} to='/calories/logs/$logId'>
-        <div className={css.identity}>
-          <strong>{entry.name}</strong>
-          <span>
-            {entry.grams === null ? 'Custom entry' : `${formatNutritionNumber(entry.grams)} g`}
-          </span>
-        </div>
+      <Link className={css.cardLink} params={{ logId: entry.id }} to='/calories/logs/$logId'>
+        <Card as='article' className={css.card}>
+          <div className={css.identity}>
+            <strong>{entry.name}</strong>
+            <span>
+              {entry.grams === null ? 'Custom entry' : `${formatNutritionNumber(entry.grams)} g`}
+            </span>
+          </div>
 
-        <dl className={css.nutrition}>
-          <div className={css.energy}>
-            <dt>Energy</dt>
-            <dd>
-              {formatNutritionNumber(entry.kcal)}
-              <span> kcal</span>
-            </dd>
-          </div>
-          <div className={css.protein}>
-            <dt>Protein</dt>
-            <dd>
-              {formatNutritionNumber(entry.protein ?? 0)}
-              <span> g</span>
-            </dd>
-          </div>
-          <div className={css.fat}>
-            <dt>Fat</dt>
-            <dd>
-              {formatNutritionNumber(entry.fat ?? 0)}
-              <span> g</span>
-            </dd>
-          </div>
-          <div className={css.carbs}>
-            <dt>Carbs</dt>
-            <dd>
-              {formatNutritionNumber(entry.carbs ?? 0)}
-              <span> g</span>
-            </dd>
-          </div>
-        </dl>
+          <dl className={css.nutrition}>
+            <div>
+              <dt>Kcal</dt>
+              <dd className={css.energy}>{formatNutritionNumber(Math.round(entry.kcal))}</dd>
+            </div>
+            <div>
+              <dt>Protein</dt>
+              <dd className={css.protein}>
+                {formatNutritionNumber(Math.round(entry.protein ?? 0))} g
+              </dd>
+            </div>
+            <div>
+              <dt>Fat</dt>
+              <dd className={css.fat}>{formatNutritionNumber(Math.round(entry.fat ?? 0))} g</dd>
+            </div>
+            <div>
+              <dt>Carbs</dt>
+              <dd className={css.carbs}>{formatNutritionNumber(Math.round(entry.carbs ?? 0))} g</dd>
+            </div>
+          </dl>
+        </Card>
       </Link>
 
       <Btn

@@ -139,11 +139,34 @@ label > span {
 .carbs {
   color: var(--c-macro-carb);
 }
-.logCard,
 .captureCard,
 .compactCard {
   display: grid;
   gap: var(--space-lg);
+}
+.logSection {
+  display: grid;
+  gap: var(--space-sm);
+}
+.logHeading {
+  display: grid;
+  grid-template-columns: minmax(10rem, 1.5fr) minmax(16rem, 2.4fr);
+  align-items: end;
+  gap: var(--space-md);
+  padding: 0 calc(3.5rem + var(--space-lg)) 0 var(--space-lg);
+}
+.logHeading h2 {
+  font-size: var(--text-lg-dynamic);
+  text-wrap: balance;
+}
+.logColumns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(4rem, 1fr));
+  gap: var(--space-md);
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
 }
 .sectionHeading {
   display: flex;
@@ -177,6 +200,7 @@ label > span {
 }
 .logList {
   display: grid;
+  gap: var(--space-sm);
   list-style: none;
 }
 .controlPair {
@@ -401,6 +425,19 @@ label small {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
+}
+
+@media (--phone) {
+  .logHeading {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+    padding: 0 var(--space-sm);
+  }
+  .logColumns {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-xs);
+    font-size: var(--text-xs);
+  }
 }
 
 @media (--phone) {
