@@ -12,6 +12,8 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
   const remaining = goal ? goal.kcal - totals.kcal : null;
   const energyValue = remaining ?? totals.kcal;
   const energyProgress = progressFor(totals.kcal, goal?.kcal);
+  const energyOverProgress =
+    goal && totals.kcal > goal.kcal ? progressFor(totals.kcal - goal.kcal, goal.kcal) : null;
   const energyCaption = remaining === null ? 'kcal consumed' : 'kcal remaining';
 
   return (
@@ -21,6 +23,7 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
           <EnergyDial
             goal={goal?.kcal}
             progress={energyProgress}
+            overProgress={energyOverProgress}
             remaining={energyValue}
             total={totals.kcal}
           />
@@ -38,11 +41,13 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
 
 function EnergyDial({
   goal,
+  overProgress,
   progress,
   remaining,
   total,
 }: {
   goal: number | null | undefined;
+  overProgress: number | null;
   progress: number | null;
   remaining: number;
   total: number;
@@ -66,6 +71,17 @@ function EnergyDial({
             <stop className={css.dialGradientStart} offset='0%' />
             <stop className={css.dialGradientEnd} offset='100%' />
           </linearGradient>
+          <linearGradient
+            gradientUnits='userSpaceOnUse'
+            id={`${energyGradientId}-over`}
+            x1='24'
+            x2='136'
+            y1='136'
+            y2='24'
+          >
+            <stop className={css.dialOverGradientStart} offset='0%' />
+            <stop className={css.dialOverGradientEnd} offset='100%' />
+          </linearGradient>
         </defs>
         {progress === null ? null : (
           <circle
@@ -79,6 +95,18 @@ function EnergyDial({
             strokeDashoffset={100 - progress}
           />
         )}
+        {overProgress === null ? null : (
+          <circle
+            className={css.dialOverProgress}
+            cx='80'
+            cy='80'
+            pathLength='100'
+            r='69'
+            stroke={`url(#${energyGradientId}-over)`}
+            strokeDasharray='100'
+            strokeDashoffset={100 - overProgress}
+          />
+        )}
       </svg>
 
       <div className={css.energyValue}>
@@ -88,7 +116,7 @@ function EnergyDial({
               {formatNutritionNumber(total)}
               <small>kcal</small>
             </strong>
-            <span>/</span>
+            <span aria-hidden='true' className={css.fractionLine} />
             <strong>
               {formatNutritionNumber(goal)}
               <small>kcal</small>
@@ -108,7 +136,11 @@ function EnergyDial({
 
   return (
     <button
-      aria-label={showTotals ? 'Show calories remaining' : 'Show consumed calories and goal'}
+      aria-label={
+        showTotals
+          ? `${formatNutritionNumber(total)} kcal consumed out of ${formatNutritionNumber(goal)} kcal. Show calories remaining`
+          : `${formatNutritionNumber(remaining)} kcal remaining. Show consumed calories and goal`
+      }
       aria-pressed={showTotals}
       className={className}
       onClick={() => setShowTotals((current) => !current)}

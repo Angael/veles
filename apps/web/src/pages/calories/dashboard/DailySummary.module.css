@@ -73,9 +73,14 @@
   transition: stroke var(--duration-fast) ease-out;
 }
 
-.dialProgress {
+.dialProgress,
+.dialOverProgress {
   stroke-linecap: round;
   transition: stroke-dashoffset 500ms var(--ease-out);
+}
+
+.dialOverProgress {
+  filter: drop-shadow(0 0 0.2rem rgba(239, 68, 68, 0.42));
 }
 
 .dialGradientStart {
@@ -84,6 +89,13 @@
 
 .dialGradientEnd {
   stop-color: color-mix(in srgb, currentColor 52%, white);
+}
+.dialOverGradientStart {
+  stop-color: #fb7185;
+}
+
+.dialOverGradientEnd {
+  stop-color: #ef4444;
 }
 
 .energyValue {
@@ -119,9 +131,9 @@
   font-variant-numeric: tabular-nums;
 
   & strong {
-    font-size: clamp(1rem, 2.4vw, 1.3rem);
+    font-size: clamp(1.2rem, 3vw, 1.65rem);
     font-weight: var(--font-weight-semibold);
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
     line-height: 1;
   }
 
@@ -135,15 +147,20 @@
 
   & > span {
     color: var(--c-muted-strong);
-    font-size: var(--text-xs);
-    line-height: 1;
   }
+}
+
+.fractionLine {
+  width: 3.75rem;
+  height: 1px;
+  margin-block: 0.18rem;
+  background: color-mix(in srgb, var(--c-muted) 62%, transparent);
 }
 
 .macros {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-sm);
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: var(--space-xs);
   min-width: 0;
 }
 
@@ -154,12 +171,12 @@
 
   position: relative;
   display: grid;
-  grid-template-rows: auto auto;
-  align-content: start;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto;
+  align-items: center;
   min-width: 0;
-  min-height: 16rem;
   overflow: hidden;
-  padding: var(--space-lg) var(--space-md) var(--space-md);
+  padding: var(--space-md);
   border: var(--border-width) solid color-mix(in srgb, currentColor 18%, transparent);
   border-radius: var(--radius-sm);
   background:
@@ -177,8 +194,8 @@
   }
 
   & dt {
-    grid-row: 2;
-    margin-top: var(--space-sm);
+    grid-row: 1;
+    grid-column: 2;
     color: currentColor;
     font-size: var(--text-sm);
     font-weight: var(--font-weight-semibold);
@@ -272,33 +289,6 @@
   .energyDialOver {
     width: min(11.5rem, 70vw);
   }
-
-  .macros {
-    grid-template-columns: 1fr;
-    gap: var(--space-xs);
-  }
-
-  .protein,
-  .fat,
-  .carbs {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto;
-    align-items: end;
-    min-height: 0;
-    padding: var(--space-md);
-
-    & dt {
-      grid-row: 1;
-      grid-column: 2;
-      align-self: center;
-      margin: 0;
-    }
-  }
-
-  .macroValue {
-    grid-row: 1;
-    grid-column: 1;
-  }
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -310,6 +300,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .dialProgress,
+  .dialOverProgress,
   .macroFill {
     transition: none;
   }
