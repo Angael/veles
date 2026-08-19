@@ -13,7 +13,7 @@ Use this skill when building or reviewing frontend UI. Follow the existing visua
 - Use primitives from `@apps/web/src/components/` before creating controls or surfaces; import each primitive from its concrete file, not a barrel.
 - Prefer CSS modules (`import css from ...`) and nested selectors when they keep related states together; use `--phone`, `--tablet`, and `--laptop` from `apps/web/src/styles/breakpoints.css` instead of raw width queries.
 - Respect the global reset: text margins, font inheritance, and line-height already have defaults, so override them only for an intentional visual reason.
-- Keep hierarchy obvious through restrained type, spacing, contrast, and grouping; avoid decorative kicker or eyebrow text that merely repeats context.
+- Never use eyebrow or kicker styles, components, or text. Do not add small labels above headings or values—even when they provide new context; express that information in the heading, body copy, metadata, or accessible name instead.
 - Keep pointer targets stable: never lift, translate, float, resize, or scale interactive elements on hover or press, and never animate their shadows.
 - Express hover and press with `background-color`, `border-color`, `color`, underline, or opacity; gate hover-only behavior with `@media (hover: hover) and (pointer: fine)` when touch has no equivalent.
 - Never use `transition: all`; name only changed properties, usually for 100–250ms, and keep keyboard-triggered or high-frequency actions immediate.

@@ -3,6 +3,7 @@
 - Run `pnpm check:fix` before finishing
 - Always use pinned package versions, never ^ ~ or latest
 - skip "computer use"/"browser smoke tests" checks
+- In code, objects, types, and UI, always order nutrition macros as: kcal, protein, fat, carbs.
 
 ## CI/CD
 - Avoid GitHub Actions and GitHub CI/CD for sensitive prod workflows; this repo is public

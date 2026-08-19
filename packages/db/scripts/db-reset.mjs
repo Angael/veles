@@ -23,6 +23,94 @@ const devAccount = {
   createdAt: '2026-05-23T08:23:25.075Z',
   updatedAt: '2026-07-15T21:22:28.896Z',
 };
+const devCalorieGoal = {
+  kcal: 1_900,
+  protein: 160,
+  fat: 60,
+  carbs: 180,
+};
+const foodProducts = [
+  {
+    id: '01900000-0000-7000-8000-000000000201',
+    name: 'Banana',
+    kcalPer100gHundredths: 8_900,
+    proteinPer100gHundredths: 110,
+    fatPer100gHundredths: 30,
+    carbsPer100gHundredths: 2_280,
+  },
+  {
+    id: '01900000-0000-7000-8000-000000000202',
+    name: 'Apple',
+    kcalPer100gHundredths: 5_200,
+    proteinPer100gHundredths: 30,
+    fatPer100gHundredths: 20,
+    carbsPer100gHundredths: 1_380,
+  },
+  {
+    id: '01900000-0000-7000-8000-000000000203',
+    name: 'Orange',
+    kcalPer100gHundredths: 4_700,
+    proteinPer100gHundredths: 90,
+    fatPer100gHundredths: 10,
+    carbsPer100gHundredths: 1_180,
+  },
+  {
+    id: '01900000-0000-7000-8000-000000000204',
+    name: 'White bread',
+    kcalPer100gHundredths: 26_600,
+    proteinPer100gHundredths: 890,
+    fatPer100gHundredths: 320,
+    carbsPer100gHundredths: 4_940,
+  },
+  {
+    id: '01900000-0000-7000-8000-000000000205',
+    name: 'Whole-grain bread',
+    kcalPer100gHundredths: 24_700,
+    proteinPer100gHundredths: 1_300,
+    fatPer100gHundredths: 420,
+    carbsPer100gHundredths: 4_140,
+  },
+  {
+    id: '01900000-0000-7000-8000-000000000206',
+    name: 'Oatmeal with berries',
+    kcalPer100gHundredths: 13_500,
+    proteinPer100gHundredths: 450,
+    fatPer100gHundredths: 380,
+    carbsPer100gHundredths: 2_050,
+  },
+  {
+    id: '01900000-0000-7000-8000-000000000207',
+    name: 'Chicken rice bowl',
+    kcalPer100gHundredths: 16_500,
+    proteinPer100gHundredths: 1_350,
+    fatPer100gHundredths: 420,
+    carbsPer100gHundredths: 1_850,
+  },
+  {
+    id: '01900000-0000-7000-8000-000000000208',
+    name: 'Salmon with potatoes',
+    kcalPer100gHundredths: 17_800,
+    proteinPer100gHundredths: 1_120,
+    fatPer100gHundredths: 720,
+    carbsPer100gHundredths: 1_420,
+  },
+  {
+    id: '01900000-0000-7000-8000-000000000209',
+    name: 'Greek yogurt with granola',
+    kcalPer100gHundredths: 14_200,
+    proteinPer100gHundredths: 850,
+    fatPer100gHundredths: 480,
+    carbsPer100gHundredths: 1_620,
+  },
+  {
+    id: '01900000-0000-7000-8000-000000000210',
+    name: 'Pasta bolognese',
+    kcalPer100gHundredths: 15_700,
+    proteinPer100gHundredths: 820,
+    fatPer100gHundredths: 510,
+    carbsPer100gHundredths: 2_180,
+  },
+];
 
 if (!databaseUrl) {
   throw new Error('DATABASE_URL is required.');
@@ -34,11 +122,12 @@ if (process.env.PROD_DATABASE_URL && databaseUrl === process.env.PROD_DATABASE_U
 
 await resetDatabase(databaseUrl);
 
-/** Rebuilds the disposable dev database from migrations and fixed seed data. */
+/** Rebuilds the disposable dev database from migrations, current schema, and fixed seed data. */
 async function resetDatabase(connectionString) {
   await resetSchemas(connectionString);
 
   runPnpmScript('db:migrate');
+  runPnpmScript('db:push');
   await seedDatabase(connectionString);
 
   console.info(`Reset and seeded ${expectedDatabaseName}.`);
@@ -84,6 +173,9 @@ async function seedDatabase(connectionString) {
     await assertDevDatabase(client);
     await client.query('BEGIN');
     await seedIdentity(client);
+    await seedCalorieGoal(client, devUser.id);
+    await seedFoodProducts(client);
+    await seedFoodLogs(client, devUser.id);
     await seedRecipes(client, devUser.id);
     await seedDiaryEntries(client, devUser.id);
     await client.query('COMMIT');
@@ -138,6 +230,138 @@ async function seedIdentity(client) {
       devAccount.updatedAt,
     ],
   );
+}
+
+/** Seeds an 80 kg lifter's balanced cutting targets, effective across the dashboard history. */
+async function seedCalorieGoal(client, userId) {
+  const effectiveDate = new Date();
+  effectiveDate.setUTCHours(0, 0, 0, 0);
+  effectiveDate.setUTCDate(effectiveDate.getUTCDate() - 13);
+
+  await client.query(
+    `INSERT INTO calorie_goal (
+      user_id,
+      effective_date,
+      kcal_limit_hundredths,
+      protein_limit_hundredths,
+      fat_limit_hundredths,
+      carbs_limit_hundredths
+    )
+    VALUES ($1, $2, $3, $4, $5, $6)`,
+    [
+      userId,
+      effectiveDate.toISOString().slice(0, 10),
+      devCalorieGoal.kcal * 100,
+      devCalorieGoal.protein * 100,
+      devCalorieGoal.fat * 100,
+      devCalorieGoal.carbs * 100,
+    ],
+  );
+}
+
+/** Seeds the shared staple catalog without assigning products to any user. */
+async function seedFoodProducts(client) {
+  for (const product of foodProducts) {
+    await client.query(
+      `INSERT INTO food_product
+        (id, name, kcal_per_100g_hundredths, protein_per_100g_hundredths, fat_per_100g_hundredths, carbs_per_100g_hundredths)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       ON CONFLICT (id) DO UPDATE SET
+         barcode = NULL,
+         name = EXCLUDED.name,
+         brand = NULL,
+         image_url = NULL,
+         product_size_grams_hundredths = NULL,
+         kcal_per_100g_hundredths = EXCLUDED.kcal_per_100g_hundredths,
+         protein_per_100g_hundredths = EXCLUDED.protein_per_100g_hundredths,
+         fat_per_100g_hundredths = EXCLUDED.fat_per_100g_hundredths,
+         carbs_per_100g_hundredths = EXCLUDED.carbs_per_100g_hundredths,
+         updated_at = now()`,
+      [
+        product.id,
+        product.name,
+        product.kcalPer100gHundredths,
+        product.proteinPer100gHundredths,
+        product.fatPer100gHundredths,
+        product.carbsPer100gHundredths,
+      ],
+    );
+  }
+}
+
+/**
+ * Seeds a rolling two-week dashboard history with one deliberately unlogged day.
+ * Daily totals vary around a 1,900 kcal goal while meal size and timing remain plausible.
+ */
+async function seedFoodLogs(client, userId) {
+  const dailyKcalTargets = [
+    1_900,
+    2_500,
+    1_750,
+    2_050,
+    1_820,
+    2_200,
+    1_680,
+    null,
+    1_940,
+    2_350,
+    1_760,
+    2_100,
+    1_880,
+    1_900,
+  ];
+  const mealPlans = [
+    [foodProducts[5], foodProducts[6], foodProducts[8], foodProducts[7]],
+    [foodProducts[8], foodProducts[9], foodProducts[1], foodProducts[6]],
+    [foodProducts[5], foodProducts[7], foodProducts[0], foodProducts[9]],
+  ];
+  const mealShares = [0.22, 0.34, 0.1, 0.34];
+  const mealHours = [8, 13, 16, 19];
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
+  for (const [dayIndex, dailyKcal] of dailyKcalTargets.entries()) {
+    if (dailyKcal === null) continue;
+
+    const logDate = new Date(today);
+    logDate.setUTCDate(today.getUTCDate() - (dailyKcalTargets.length - dayIndex - 1));
+    const date = logDate.toISOString().slice(0, 10);
+    const mealPlan = mealPlans[dayIndex % mealPlans.length];
+    let assignedKcalHundredths = 0;
+
+    for (const [mealIndex, product] of mealPlan.entries()) {
+      const kcalHundredths =
+        mealIndex === mealPlan.length - 1
+          ? dailyKcal * 100 - assignedKcalHundredths
+          : Math.round(dailyKcal * 100 * mealShares[mealIndex]);
+      assignedKcalHundredths += kcalHundredths;
+      const gramsHundredths = Math.round(
+        (kcalHundredths * 100 * 100) / product.kcalPer100gHundredths,
+      );
+      const scaleMacro = (value) => Math.round((value * gramsHundredths) / (100 * 100));
+      const consumedAt = new Date(logDate);
+      consumedAt.setUTCHours(mealHours[mealIndex], 15 + ((dayIndex * 7 + mealIndex * 3) % 30));
+
+      await client.query(
+        `INSERT INTO food_log
+          (user_id, product_id, name, grams_hundredths, log_date, kcal_hundredths,
+           protein_hundredths, fat_hundredths, carbs_hundredths, consumed_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          userId,
+          product.id,
+          product.name,
+          gramsHundredths,
+          date,
+          kcalHundredths,
+          scaleMacro(product.proteinPer100gHundredths),
+          scaleMacro(product.fatPer100gHundredths),
+          scaleMacro(product.carbsPer100gHundredths),
+          consumedAt,
+        ],
+      );
+    }
+  }
 }
 
 async function seedRecipes(client, userId) {

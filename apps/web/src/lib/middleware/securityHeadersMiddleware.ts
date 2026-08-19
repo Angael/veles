@@ -10,8 +10,8 @@ export const securityHeadersMiddleware = createMiddleware({ type: 'request' }).s
       'Content-Security-Policy',
       "base-uri 'self'; frame-ancestors 'none'; object-src 'none'",
     );
-    // Disable sensitive browser capabilities that this app does not use.
-    setResponseHeader('Permissions-Policy', 'camera=(), geolocation=(), microphone=()');
+    // Camera access is required by the first-party barcode scanner; keep other sensitive APIs off.
+    setResponseHeader('Permissions-Policy', 'camera=(self), geolocation=(), microphone=()');
     // Avoid leaking full private URLs when navigating to another origin.
     setResponseHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     // Prevent content-type sniffing from turning non-script responses into executable content.
