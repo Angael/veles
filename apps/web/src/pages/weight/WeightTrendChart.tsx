@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
+  type TooltipContentProps,
   XAxis,
   YAxis,
 } from 'recharts';
@@ -37,13 +38,6 @@ const rangeOptions = [
   { label: 'All time', value: 'all' },
 ] satisfies { label: string; value: WeightChartRange }[];
 
-const longDateFormatter = new Intl.DateTimeFormat('en', {
-  day: 'numeric',
-  month: 'long',
-  timeZone: 'UTC',
-  year: 'numeric',
-});
-
 const DAY_IN_MS = 24 * 60 * 60 * 1_000;
 const YEAR_IN_MS = 365 * DAY_IN_MS;
 const MAX_X_TICKS = 6;
@@ -62,6 +56,16 @@ function getXAxisTicks(domain: [number, number], chartWidth: number, usesLongRan
   const step = (domain[1] - domain[0]) / (tickCount - 1);
 
   return Array.from({ length: tickCount }, (_, index) => domain[0] + step * index);
+}
+
+function WeightTooltip({ active, payload }: TooltipContentProps) {
+  const value = payload?.[0]?.value;
+
+  if (!active || value === undefined) {
+    return null;
+  }
+
+  return <div className={css.tooltip}>{Number(value).toFixed(1).replace(/\.0$/, '')}kg</div>;
 }
 
 export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProps) {
@@ -155,15 +159,7 @@ export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProp
                 tickLine={false}
                 width={58}
               />
-              <Tooltip
-                contentStyle={{
-                  background: 'var(--c-surface-solid)',
-                  border: '1px solid var(--c-border-strong)',
-                  borderRadius: 'var(--radius-xs)',
-                }}
-                formatter={(value) => [`${Number(value).toFixed(1)} kg`, 'Weight']}
-                labelFormatter={(label) => longDateFormatter.format(Number(label))}
-              />
+              <Tooltip content={WeightTooltip} />
               <Area
                 dataKey='weightKg'
                 dot={false}
