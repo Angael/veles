@@ -54,7 +54,7 @@ function EnergyDial({
 }) {
   const energyGradientId = useId();
   const [showTotals, setShowTotals] = useState(false);
-  const className = remaining < 0 ? css.energyDialOver : css.energyDial;
+  const className = css.energyDial;
   const content = (
     <>
       <svg aria-hidden='true' viewBox='0 0 160 160'>
@@ -164,6 +164,8 @@ function Macro({
 }) {
   const progress = progressFor(value, goal);
   const isOverGoal = goal !== null && goal !== undefined && value > goal;
+  const overProgress =
+    goal !== null && goal !== undefined && value > goal ? progressFor(value - goal, goal) : null;
 
   return (
     <div className={css[tone]}>
@@ -181,6 +183,13 @@ function Macro({
       </dd>
       {progress === null ? null : (
         <dd aria-hidden='true' className={css.macroFill} style={{ width: `${progress}%` }} />
+      )}
+      {overProgress === null ? null : (
+        <dd
+          aria-hidden='true'
+          className={css.macroOverFill}
+          style={{ width: `${overProgress}%` }}
+        />
       )}
     </div>
   );
