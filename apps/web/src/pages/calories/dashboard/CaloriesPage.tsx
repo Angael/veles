@@ -1,13 +1,14 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
 import { useQueryClient } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { addDays, format, isAfter, parseISO } from 'date-fns';
 import { CheckIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import type { CalorieDashboard } from '../calories.api';
 import { calorieDashboardQueryOptions } from '../calorieQueries';
 import { CalorieOverview } from './CalorieOverview';
+import { LogFoodMenu } from './LogFoodMenu';
 import { CALORIE_DATE_FORMAT, calorieWeekDates, todayLocalDate } from '../calorieHelpers';
 import { Btn } from '@/components/btn/Btn';
 import css from './CaloriesPage.module.css';
@@ -36,6 +37,10 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
   }
   return (
     <main className={css.page}>
+      <div className={css.pageToolbar} data-appear>
+        <LogFoodMenu date={date} />
+      </div>
+
       <div className={css.dayStrip} data-appear>
         <Btn
           aria-label='Previous week'
@@ -104,24 +109,6 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
         logs={selectedDay.logs}
         totals={selectedDay.totals}
       />
-
-      <section aria-label='Diary actions' className={css.entryActions} data-appear='3'>
-        <Btn isLink render={<Link search={{ date }} to='/calories/add' />}>
-          Add food
-        </Btn>
-        <Btn isLink render={<Link search={{ date }} to='/calories/scan' />} variant='outlineMain'>
-          Scan barcode
-        </Btn>
-        <Btn isLink render={<Link search={{ date }} to='/calories/quick-add' />} variant='ghost'>
-          Quick add
-        </Btn>
-        <Btn isLink render={<Link search={{ date }} to='/calories/foods/new' />} variant='ghost'>
-          New food
-        </Btn>
-        <Btn isLink render={<Link to='/calories/goals' />} variant='ghost'>
-          Set daily goals
-        </Btn>
-      </section>
     </main>
   );
 }

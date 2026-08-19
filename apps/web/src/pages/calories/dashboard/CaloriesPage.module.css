@@ -421,10 +421,10 @@ label small {
 .expandedDay {
   display: block;
 }
-.entryActions {
+.pageToolbar {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
+  justify-content: end;
+  margin-bottom: calc(-1 * var(--space-sm));
 }
 
 @media (--phone) {
