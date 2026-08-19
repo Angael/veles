@@ -26,6 +26,13 @@
     radial-gradient(circle at 100% 110%, rgba(167, 227, 161, 0.08), transparent 44%),
     linear-gradient(145deg, rgba(15, 23, 42, 0.7), var(--c-surface-inset));
 }
+.goalAction {
+  position: absolute;
+  top: var(--space-xs);
+  right: var(--space-xs);
+  z-index: 1;
+  color: var(--c-muted);
+}
 
 .energyDial {
   position: relative;
