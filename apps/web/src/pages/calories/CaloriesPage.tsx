@@ -97,12 +97,14 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
           variant='ghost'
         />
       </div>
+
       <CalorieOverview
         date={date}
         goal={selectedDay.goal}
         logs={selectedDay.logs}
         totals={selectedDay.totals}
       />
+
       <section aria-label='Diary actions' className={css.entryActions}>
         <Btn isLink render={<Link search={{ date }} to='/calories/add' />}>
           Add food

@@ -19,10 +19,12 @@ const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits
 export function CalorieOverview({ date, goal, logs, totals }: Props) {
   const queryClient = useQueryClient();
   const remaining = goal ? goal.kcal - totals.kcal : null;
+
   async function remove(id: string) {
     await deleteFoodLog({ data: { id } });
     await invalidateCalorieWeek(queryClient, date);
   }
+
   return (
     <div className={css.overviewStack}>
       <Card as='section' className={css.dailySummary}>
