@@ -2,21 +2,24 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import type { CalorieLog } from './calories.api';
-import { deleteFoodLog, updateFoodLog } from './calories.api';
-import { invalidateCalorieWeek } from './calorieQueries';
+import type { CalorieLog } from '../calories.api';
+import { updateFoodLog } from '../calories.api';
+import { useDeleteFoodLogMutation } from '../calorieQueries';
+import { invalidateCalorieWeek } from '../calorieQueries';
 import { Btn } from '@/components/btn/Btn';
 import { DateInput } from '@/components/date-input/DateInput';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
-import css from './CalorieFlows.module.css';
+import css from '../CalorieFlows.module.css';
 
 export function EditFoodLogPage({ log }: { log: CalorieLog }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const deleteMutation = useDeleteFoodLogMutation();
   const [pending, setPending] = useState(false);
   const isProduct = log.productId !== null;
+  const isPending = pending || deleteMutation.isPending;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -52,9 +55,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
   }
 
   async function remove() {
-    setPending(true);
-    await deleteFoodLog({ data: { id: log.id } });
-    await invalidateCalorieWeek(queryClient, log.date);
+    await deleteMutation.mutateAsync({ date: log.date, id: log.id });
     await navigate({ to: '/calories', search: { date: log.date } });
   }
 
@@ -128,10 +129,10 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
           </div>
 
           <div className={css.actions}>
-            <Btn disabled={pending} type='submit'>
+            <Btn disabled={isPending} type='submit'>
               Save entry
             </Btn>
-            <Btn disabled={pending} onClick={() => void remove()} variant='ghost'>
+            <Btn disabled={isPending} onClick={() => void remove()} variant='ghost'>
               Delete entry
             </Btn>
             {log.productId ? (

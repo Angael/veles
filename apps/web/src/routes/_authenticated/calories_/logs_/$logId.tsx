@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { EditFoodLogPage } from '@/pages/calories/EditFoodLogPage';
+import { EditFoodLogPage } from '@/pages/calories/logs/EditFoodLogPage';
 import { getFoodLog } from '@/pages/calories/calories.api';
 
 export const Route = createFileRoute('/_authenticated/calories_/logs_/$logId')({

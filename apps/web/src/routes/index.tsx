@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { HomeDashboard } from '@/pages/home/HomeDashboard';
 import { HomePage } from '@/pages/home/HomePage';
 import { getHomeDashboard } from '@/pages/home/home.api';
-import { todayLocalDate } from '@/pages/calories/calorieDate';
+import { todayLocalDate } from '@/pages/calories/calorieHelpers';
 
 export const Route = createFileRoute('/')({
   loaderDeps: () => ({ date: todayLocalDate() }),

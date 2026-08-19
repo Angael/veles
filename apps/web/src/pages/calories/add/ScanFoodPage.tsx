@@ -1,16 +1,16 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
-import type { CalorieFood } from './calories.api';
-import { lookupFoodByBarcode, recordFood } from './calories.api';
-import { invalidateCalorieFoods, invalidateCalorieWeek } from './calorieQueries';
+import type { CalorieFood } from '../calories.api';
+import { lookupFoodByBarcode, recordFood } from '../calories.api';
+import { invalidateCalorieFoods, invalidateCalorieWeek } from '../calorieQueries';
 import { BarcodeScanner } from './BarcodeScanner';
 import { Btn } from '@/components/btn/Btn';
 import { DateInput } from '@/components/date-input/DateInput';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
-import css from './CalorieFlows.module.css';
+import css from '../CalorieFlows.module.css';
 
 export function ScanFoodPage({ initialDate }: { initialDate: string }) {
   const queryClient = useQueryClient();

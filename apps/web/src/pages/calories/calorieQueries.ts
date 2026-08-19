@@ -1,10 +1,15 @@
-import { queryOptions, type QueryClient } from '@tanstack/react-query';
-import { getCalorieDashboard, getFoodProduct, searchFoods } from './calories.api';
-import { calorieWeekStart } from './calorieDate';
+import { queryOptions, type QueryClient, useMutation } from '@tanstack/react-query';
+import { deleteFoodLog, getCalorieDashboard, getFoodProduct, searchFoods } from './calories.api';
+import { calorieWeekStart } from './calorieHelpers';
 
 const calorieDashboardKey = ['calorie-dashboard'] as const;
 const calorieFoodKey = ['calorie-food'] as const;
 const calorieFoodSearchKey = ['calorie-food-search'] as const;
+
+type DeleteFoodLogVariables = {
+  date: string;
+  id: string;
+};
 
 export function calorieDashboardQueryOptions(date: string) {
   const weekStart = calorieWeekStart(date);
@@ -31,6 +36,16 @@ export function calorieFoodSearchQueryOptions(query: string) {
     queryKey: [...calorieFoodSearchKey, normalizedQuery],
     queryFn: () => searchFoods({ data: { query: normalizedQuery } }),
     staleTime: 30_000,
+  });
+}
+
+export function useDeleteFoodLogMutation() {
+  return useMutation({
+    mutationFn: ({ id }: DeleteFoodLogVariables) => deleteFoodLog({ data: { id } }),
+    onSuccess: (_data, { date }, _onMutateResult, context) =>
+      context.client.invalidateQueries({
+        queryKey: calorieDashboardQueryOptions(date).queryKey,
+      }),
   });
 }
 

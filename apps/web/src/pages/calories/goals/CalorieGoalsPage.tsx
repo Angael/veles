@@ -2,19 +2,19 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { recordCustomCalories } from './calories.api';
-import { invalidateCalorieWeek } from './calorieQueries';
+import type { CalorieGoal } from '../calories.api';
+import { setDailyCalorieGoal } from './goals.api';
+import { invalidateAllCalorieWeeks } from '../calorieQueries';
+import { todayLocalDate } from '../calorieHelpers';
 import { Btn } from '@/components/btn/Btn';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
-import { TextInput } from '@/components/text-input/TextInput';
-import css from './CalorieFlows.module.css';
+import css from '../CalorieFlows.module.css';
 
-export function QuickAddPage({ date }: { date: string }) {
+export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [pending, setPending] = useState(false);
-
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
@@ -23,59 +23,70 @@ export function QuickAddPage({ date }: { date: string }) {
       const value = String(data.get(key) ?? '').trim();
       return value ? Number(value) : undefined;
     };
-
     try {
-      await recordCustomCalories({
+      await setDailyCalorieGoal({
         data: {
-          date,
-          name: String(data.get('name') || 'Quick add'),
+          date: todayLocalDate(),
           kcal: Number(data.get('kcal')),
           protein: optional('protein'),
           fat: optional('fat'),
           carbs: optional('carbs'),
         },
       });
-      await invalidateCalorieWeek(queryClient, date);
-      await navigate({ to: '/calories', search: { date } });
+      await invalidateAllCalorieWeeks(queryClient);
+      await navigate({ to: '/calories', search: { date: todayLocalDate() } });
     } finally {
       setPending(false);
     }
   }
-
   return (
     <main className={css.page}>
       <header className={css.header}>
         <div>
-          <h1>Quick add</h1>
-          <p>Record energy now. Macros are optional.</p>
+          <h1>Current goals</h1>
+          <p>Changes start today. Earlier goals stay frozen.</p>
         </div>
       </header>
       <section className={css.panel}>
         <form className={css.form} onSubmit={(event) => void submit(event)}>
-          <Label text='Label'>
-            <TextInput defaultValue='Quick add' name='name' required />
-          </Label>
-
           <div className={css.grid}>
-            <Label text='kcal'>
-              <NumberInput min={0} name='kcal' required step={0.01} />
+            <Label text='Daily kcal'>
+              <NumberInput
+                defaultValue={goal?.kcal ?? undefined}
+                min={0.01}
+                name='kcal'
+                required
+                step={10}
+              />
             </Label>
-
             <Label text='Protein (g)'>
-              <NumberInput min={0} name='protein' step={0.01} />
+              <NumberInput
+                defaultValue={goal?.protein ?? undefined}
+                min={0.01}
+                name='protein'
+                step={0.01}
+              />
             </Label>
-
             <Label text='Fat (g)'>
-              <NumberInput min={0} name='fat' step={0.01} />
+              <NumberInput
+                defaultValue={goal?.fat ?? undefined}
+                min={0.01}
+                name='fat'
+                step={0.01}
+              />
             </Label>
-
             <Label text='Carbs (g)'>
-              <NumberInput min={0} name='carbs' step={0.01} />
+              <NumberInput
+                defaultValue={goal?.carbs ?? undefined}
+                min={0.01}
+                name='carbs'
+                step={0.01}
+              />
             </Label>
           </div>
 
           <Btn disabled={pending} type='submit'>
-            {pending ? 'Adding…' : 'Add to diary'}
+            {pending ? 'Saving…' : 'Save current goals'}
           </Btn>
         </form>
       </section>

@@ -5,10 +5,10 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { addDays, format, isAfter, parseISO } from 'date-fns';
 import { CheckIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import type { CalorieDashboard } from './calories.api';
-import { calorieDashboardQueryOptions } from './calorieQueries';
+import type { CalorieDashboard } from '../calories.api';
+import { calorieDashboardQueryOptions } from '../calorieQueries';
 import { CalorieOverview } from './CalorieOverview';
-import { CALORIE_DATE_FORMAT, calorieWeekDates, todayLocalDate } from './calorieDate';
+import { CALORIE_DATE_FORMAT, calorieWeekDates, todayLocalDate } from '../calorieHelpers';
 import { Btn } from '@/components/btn/Btn';
 import css from './CaloriesPage.module.css';
 

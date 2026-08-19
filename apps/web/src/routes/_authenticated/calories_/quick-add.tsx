@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 import { createFileRoute } from '@tanstack/react-router';
-import { QuickAddPage } from '@/pages/calories/QuickAddPage';
-import { normalizeCalorieDate } from '@/pages/calories/calorieDate';
+import { QuickAddPage } from '@/pages/calories/add/QuickAddPage';
+import { normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 
 export const Route = createFileRoute('/_authenticated/calories_/quick-add')({
   validateSearch: type({ 'date?': 'string' }),

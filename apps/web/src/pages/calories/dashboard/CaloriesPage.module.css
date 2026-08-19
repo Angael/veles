@@ -179,36 +179,6 @@ label > span {
   display: grid;
   list-style: none;
 }
-.logList li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
-  min-height: var(--button-min-height);
-  padding: var(--space-xs) 0;
-  border-bottom: var(--border-width) solid var(--c-border);
-}
-.logList li:last-child {
-  border-bottom: 0;
-}
-.logList li > div {
-  display: grid;
-  min-width: 0;
-}
-.logList li strong {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.logList li span {
-  color: var(--c-muted);
-  font-size: var(--text-sm);
-}
-.logEnergy {
-  flex: none;
-  color: var(--c-text-strong) !important;
-  font-variant-numeric: tabular-nums;
-}
 .controlPair {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -432,72 +402,6 @@ label small {
   flex-wrap: wrap;
   gap: var(--space-sm);
 }
-.dailySummary {
-  display: grid;
-  grid-template-columns: minmax(13rem, 1fr) 2fr;
-  gap: var(--space-xl);
-  align-items: center;
-}
-.energySummary {
-  display: grid;
-  gap: 0.2rem;
-}
-.energySummary > span,
-.energySummary small,
-.summaryMacros span,
-.summaryMacros small {
-  color: var(--c-muted);
-}
-.energySummary > strong {
-  font-size: clamp(2rem, 6vw, 3.5rem);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-.summaryMacros {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-sm);
-}
-.summaryMacros > div {
-  display: grid;
-  gap: 0.2rem;
-  min-width: 0;
-  padding: var(--space-sm);
-  border: var(--border-width) solid color-mix(in srgb, currentColor 38%, var(--c-border));
-  border-radius: var(--radius-xs);
-  background: color-mix(in srgb, currentColor 8%, transparent);
-}
-.summaryMacros > div span {
-  color: currentColor;
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
-}
-.summaryMacros > div small {
-  color: var(--c-muted);
-}
-.summaryMacros strong {
-  color: currentColor;
-  font-variant-numeric: tabular-nums;
-}
-.logMain {
-  display: grid;
-  gap: 0.15rem;
-  min-width: 0;
-}
-.logMain small {
-  color: var(--c-muted);
-  text-wrap: pretty;
-}
-.logActions {
-  display: flex;
-  flex: none;
-  gap: var(--space-xs);
-  align-items: center;
-}
-.logAction {
-  --btn-height: 2.5rem;
-  --btn-icon-size: 1rem;
-}
 
 @media (--phone) {
   .compactDay {
@@ -505,13 +409,6 @@ label small {
   }
   .expandedDay {
     display: none;
-  }
-  .dailySummary {
-    grid-template-columns: 1fr;
-    gap: var(--space-lg);
-  }
-  .summaryMacros {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 @media (hover: hover) and (pointer: fine) {

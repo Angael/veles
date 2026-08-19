@@ -1,12 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import type { CalorieFood } from './calories.api';
-import { updateFoodProduct } from './calories.api';
-import { invalidateCalorieFoods } from './calorieQueries';
+import type { CalorieFood } from '../calories.api';
+import { updateFoodProduct } from '../calories.api';
+import { invalidateCalorieFoods } from '../calorieQueries';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
-import { todayLocalDate } from './calorieDate';
-import css from './CalorieFlows.module.css';
+import { todayLocalDate } from '../calorieHelpers';
+import css from '../CalorieFlows.module.css';
 
 export function EditFoodPage({ food }: { food: CalorieFood }) {
   const queryClient = useQueryClient();

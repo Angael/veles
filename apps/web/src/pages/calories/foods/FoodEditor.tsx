@@ -1,10 +1,10 @@
 import type { FormEvent } from 'react';
-import type { CalorieFood } from './calories.api';
+import type { CalorieFood } from '../calories.api';
 import { Btn } from '@/components/btn/Btn';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
-import css from './CalorieFlows.module.css';
+import css from '../CalorieFlows.module.css';
 
 export type FoodEditorValue = {
   barcode?: string;

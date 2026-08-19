@@ -1,10 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { createFoodProduct } from './calories.api';
-import { invalidateCalorieFoods } from './calorieQueries';
+import { createFoodProduct } from '../calories.api';
+import { invalidateCalorieFoods } from '../calorieQueries';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
-import css from './CalorieFlows.module.css';
+import css from '../CalorieFlows.module.css';
 
 type Props = { barcode?: string; date: string; name?: string };
 export function CreateFoodPage({ barcode, date, name }: Props) {

@@ -1,18 +1,18 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import type { CalorieFood } from './calories.api';
-import { recordFood } from './calories.api';
+import type { CalorieFood } from '../calories.api';
+import { recordFood } from '../calories.api';
 import {
   calorieFoodQueryOptions,
   calorieFoodSearchQueryOptions,
   invalidateCalorieWeek,
-} from './calorieQueries';
+} from '../calorieQueries';
 import { Btn } from '@/components/btn/Btn';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
-import css from './CalorieFlows.module.css';
+import css from '../CalorieFlows.module.css';
 
 type Props = { date: string; initialFoodId?: string };
 export function AddFoodPage({ date, initialFoodId }: Props) {

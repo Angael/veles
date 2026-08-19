@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { EditFoodPage } from '@/pages/calories/EditFoodPage';
+import { EditFoodPage } from '@/pages/calories/foods/EditFoodPage';
 import { calorieFoodQueryOptions } from '@/pages/calories/calorieQueries';
 
 export const Route = createFileRoute('/_authenticated/calories_/foods_/$foodId')({

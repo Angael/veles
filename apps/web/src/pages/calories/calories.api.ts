@@ -17,7 +17,7 @@ import {
   toCalorieGoal,
   toHundredths,
 } from './calorieHelpers';
-import { calorieWeekDates } from './calorieDate';
+import { calorieWeekDates } from './calorieHelpers';
 
 const MAX_TEXT_LENGTH = 500;
 

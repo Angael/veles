@@ -1,11 +1,11 @@
 import { type } from 'arktype';
 import { createFileRoute } from '@tanstack/react-router';
-import { AddFoodPage } from '@/pages/calories/AddFoodPage';
+import { AddFoodPage } from '@/pages/calories/add/AddFoodPage';
 import {
   calorieFoodQueryOptions,
   calorieFoodSearchQueryOptions,
 } from '@/pages/calories/calorieQueries';
-import { normalizeCalorieDate } from '@/pages/calories/calorieDate';
+import { normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 
 export const Route = createFileRoute('/_authenticated/calories_/add')({
   validateSearch: type({ 'date?': 'string', 'foodId?': 'string' }),
