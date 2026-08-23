@@ -64,23 +64,18 @@ export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
                 defaultValue={goal?.protein ?? undefined}
                 min={0.01}
                 name='protein'
-                step={0.01}
+                step={1}
               />
             </Label>
             <Label text='Fat (g)'>
-              <NumberInput
-                defaultValue={goal?.fat ?? undefined}
-                min={0.01}
-                name='fat'
-                step={0.01}
-              />
+              <NumberInput defaultValue={goal?.fat ?? undefined} min={0.01} name='fat' step={1} />
             </Label>
             <Label text='Carbs (g)'>
               <NumberInput
                 defaultValue={goal?.carbs ?? undefined}
                 min={0.01}
                 name='carbs'
-                step={0.01}
+                step={1}
               />
             </Label>
           </div>

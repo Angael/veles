@@ -198,10 +198,20 @@
 }
 
 .empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-sm);
   padding: var(--space-xl) var(--space-md);
   color: var(--c-muted);
   text-align: center;
   text-wrap: pretty;
+}
+
+.emptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
 }
 
 @media (--phone) {

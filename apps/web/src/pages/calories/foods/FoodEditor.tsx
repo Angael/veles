@@ -77,7 +77,7 @@ export function FoodEditor({
             defaultValue={food?.productSizeGrams ?? undefined}
             min={0.01}
             name='size'
-            step={0.01}
+            step={1}
           />
         </Label>
       </div>
@@ -88,7 +88,7 @@ export function FoodEditor({
             min={0}
             name='kcal'
             required
-            step={0.01}
+            step={1}
           />
         </Label>
         <Label text='Protein / 100 g'>
@@ -96,23 +96,18 @@ export function FoodEditor({
             defaultValue={food?.proteinPer100g ?? undefined}
             min={0}
             name='protein'
-            step={0.01}
+            step={1}
           />
         </Label>
         <Label text='Fat / 100 g'>
-          <NumberInput
-            defaultValue={food?.fatPer100g ?? undefined}
-            min={0}
-            name='fat'
-            step={0.01}
-          />
+          <NumberInput defaultValue={food?.fatPer100g ?? undefined} min={0} name='fat' step={1} />
         </Label>
         <Label text='Carbs / 100 g'>
           <NumberInput
             defaultValue={food?.carbsPer100g ?? undefined}
             min={0}
             name='carbs'
-            step={0.01}
+            step={1}
           />
         </Label>
       </div>

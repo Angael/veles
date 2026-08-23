@@ -92,7 +92,7 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
           </div>
 
           <Label text='Amount eaten (g)'>
-            <NumberInput min={0.01} onValueChange={setGrams} step={0.01} value={grams} />
+            <NumberInput min={0.01} onValueChange={setGrams} step={1} value={grams} />
           </Label>
 
           <div className={css.selectedActions}>
@@ -174,8 +174,22 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
         })}
       </ul>
 
-      {!foodsQuery.isFetching && foods.length === 0 ? (
-        <p className={css.empty}>No foods match “{query.trim()}”.</p>
+      {!foodsQuery.isFetching && foods.length === 0 && query.trim() ? (
+        <div className={css.empty}>
+          <p>No foods match “{query.trim()}”.</p>
+          <div className={css.emptyActions}>
+            <Btn
+              isLink
+              render={<Link search={{ date, name: query.trim() }} to='/calories/foods/new' />}
+              variant='text'
+            >
+              Create the food
+            </Btn>
+            <Btn isLink render={<Link search={{ date }} to='/calories/scan' />} variant='text'>
+              Scan
+            </Btn>
+          </div>
+        </div>
       ) : null}
 
       <FloatingButton
