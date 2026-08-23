@@ -188,9 +188,11 @@
 .dotProtein {
   background: var(--c-macro-protein);
 }
+
 .dotFat {
   background: var(--c-macro-fat);
 }
+
 .dotCarbs {
   background: var(--c-macro-carb);
 }
@@ -211,16 +213,20 @@
   .energyTile {
     display: none;
   }
+
   .energyInline {
     display: flex;
   }
+
   .productName {
     font-size: var(--text-md-dynamic);
   }
+
   .grams,
   .energyInline span {
     font-size: var(--text-xs);
   }
+
   .energyInline strong {
     font-size: var(--text-md-dynamic);
   }

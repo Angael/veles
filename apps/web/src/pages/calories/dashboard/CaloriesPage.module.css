@@ -2,16 +2,19 @@
   display: grid;
   gap: var(--space-lg);
 }
+
 .pageHeader {
   display: flex;
   align-items: end;
   justify-content: space-between;
   gap: var(--space-lg);
 }
+
 .pageHeader h1 {
   font-size: var(--text-xl-dynamic);
   text-wrap: balance;
 }
+
 .pageHeader p,
 .sectionHeading p,
 .cardTitle p,
@@ -19,27 +22,32 @@
   color: var(--c-muted);
   text-wrap: pretty;
 }
+
 .pageHeader time {
   color: var(--c-muted);
   font-size: var(--text-sm);
   white-space: nowrap;
 }
+
 .layout {
   display: grid;
   grid-template-columns: minmax(18rem, 0.78fr) minmax(28rem, 1.22fr);
   align-items: start;
   gap: var(--space-lg);
 }
+
 .overviewStack {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
 }
+
 .tools,
 .controlPair {
   display: grid;
   gap: var(--space-lg);
 }
+
 .hero {
   position: relative;
   display: grid;
@@ -48,11 +56,13 @@
   overflow: hidden;
   padding: var(--space-xl);
 }
+
 .heroCopy {
   display: grid;
   align-content: start;
   gap: var(--space-xs);
 }
+
 .sectionLabel,
 label > span {
   color: var(--c-accent-strong);
@@ -61,21 +71,25 @@ label > span {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
 .energyLine {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
   gap: var(--space-xs);
 }
+
 .energyLine strong {
   font-size: clamp(2.4rem, 6vw, 4.2rem);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
+
 .energyLine span,
 .heroCopy p {
   color: var(--c-muted);
 }
+
 .progress {
   display: grid;
   place-content: center;
@@ -86,16 +100,19 @@ label > span {
   border-radius: var(--radius-pill);
   color: var(--c-accent);
 }
+
 .progress svg {
   width: 1.5rem;
   height: 1.5rem;
 }
+
 .progress span {
   color: var(--c-text-strong);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-semibold);
   font-variant-numeric: tabular-nums;
 }
+
 .progressTrack {
   grid-column: 1 / -1;
   height: 0.4rem;
@@ -103,6 +120,7 @@ label > span {
   border-radius: var(--radius-pill);
   background: var(--c-surface-inset);
 }
+
 .progressTrack span {
   display: block;
   height: 100%;
@@ -110,68 +128,83 @@ label > span {
   background: var(--c-accent);
   transition: width var(--duration-fast) var(--ease-out);
 }
+
 .macroGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-xs);
 }
+
 .macroStat {
   display: grid;
   gap: 0.25rem;
   padding: var(--space-md);
   border-top: 0.2rem solid currentColor;
 }
+
 .macroStat span {
   color: var(--c-muted);
   font-size: var(--text-xs);
 }
+
 .macroStat strong {
   color: var(--c-text-strong);
   font-size: var(--text-lg);
   font-variant-numeric: tabular-nums;
 }
+
 .protein {
   color: var(--c-macro-protein);
 }
+
 .fat {
   color: var(--c-macro-fat);
 }
+
 .carbs {
   color: var(--c-macro-carb);
 }
+
 .captureCard,
 .compactCard {
   display: grid;
   gap: var(--space-lg);
 }
+
 .logSection {
   display: grid;
   gap: var(--space-sm);
 }
+
 .logHeading {
   display: grid;
   align-items: end;
   gap: var(--space-md);
   padding: 0 var(--space-lg);
 }
+
 .logHeading h2 {
   font-size: var(--text-lg-dynamic);
   text-wrap: balance;
 }
+
 .sectionHeading {
   display: flex;
   justify-content: space-between;
   gap: var(--space-md);
 }
+
 .sectionHeading h2,
 .cardTitle h2 {
   font-size: var(--text-lg-dynamic);
 }
+
 .sectionHeading p,
 .cardTitle p,
 .createFood p {
   font-size: var(--text-sm);
 }
+
 .emptyLog {
   display: grid;
   justify-items: center;
@@ -181,25 +214,30 @@ label > span {
   border-radius: var(--radius-sm);
   text-align: center;
 }
+
 .emptyLog > div:first-child {
   display: grid;
   gap: var(--space-xs);
   max-width: 32rem;
 }
+
 .emptyLog strong {
   font-size: var(--text-lg);
 }
+
 .emptyLog span {
   color: var(--c-muted);
   font-size: var(--text-sm);
   text-wrap: pretty;
 }
+
 .emptyActions {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   gap: var(--space-xs);
 }
+
 .logList {
   display: grid;
   gap: var(--space-sm);
@@ -211,27 +249,33 @@ label > span {
     gap: var(--space-xs);
   }
 }
+
 .controlPair {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+
 .compactCard {
   padding: var(--space-lg);
 }
+
 .cardTitle {
   display: flex;
   align-items: start;
   gap: var(--space-sm);
 }
+
 .cardTitle > svg {
   flex: none;
   color: var(--c-accent);
 }
+
 .inlineForm,
 .quickForm,
 .createFood form {
   display: grid;
   gap: var(--space-md);
 }
+
 .inlineForm label,
 .quickForm label,
 .barcodeForm label,
@@ -241,6 +285,7 @@ label > span {
   display: grid;
   gap: var(--space-xs);
 }
+
 .buttonRow,
 .goalDisplay {
   display: flex;
@@ -248,16 +293,19 @@ label > span {
   justify-content: space-between;
   gap: var(--space-xs);
 }
+
 .goalDisplay strong {
   font-size: var(--text-xl);
   font-variant-numeric: tabular-nums;
 }
+
 .barcodeForm {
   display: grid;
   grid-template-columns: minmax(12rem, 1fr) auto auto;
   align-items: end;
   gap: var(--space-xs);
 }
+
 .foundFood,
 .createFood {
   display: grid;
@@ -267,49 +315,60 @@ label > span {
   border-radius: var(--radius-sm);
   background: var(--c-primary-surface);
 }
+
 .foodIdentity {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
 }
+
 .foodIdentity > svg {
   color: var(--c-accent);
 }
+
 .foodIdentity > div {
   display: grid;
 }
+
 .foodIdentity span {
   color: var(--c-muted);
   font-size: var(--text-sm);
 }
+
 .gramsForm {
   display: grid;
   grid-template-columns: minmax(10rem, 1fr) auto auto;
   align-items: end;
   gap: var(--space-sm);
 }
+
 .energyPreview {
   display: grid;
   min-height: var(--button-min-height);
   align-content: center;
 }
+
 .energyPreview span {
   color: var(--c-muted);
   font-size: var(--text-xs);
 }
+
 .energyPreview strong {
   font-variant-numeric: tabular-nums;
 }
+
 .foodDetails {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
   gap: var(--space-sm);
 }
+
 .nutritionGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-xs);
 }
+
 label small {
   color: var(--c-muted);
   font-size: inherit;
@@ -320,6 +379,7 @@ label small {
   .layout {
     grid-template-columns: 1fr;
   }
+
   .hero {
     grid-column: 1 / -1;
   }
@@ -328,6 +388,7 @@ label small {
   .hero {
     grid-column: auto;
   }
+
   .nutritionGrid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -338,20 +399,24 @@ label small {
     flex-direction: column;
     gap: var(--space-xs);
   }
+
   .hero,
   .captureCard {
     padding: var(--space-lg) var(--space-md);
   }
+
   .controlPair,
   .barcodeForm,
   .gramsForm,
   .foodDetails {
     grid-template-columns: 1fr;
   }
+
   .barcodeForm > button,
   .gramsForm > button {
     width: 100%;
   }
+
   .progress {
     width: 5rem;
     height: 5rem;
@@ -370,16 +435,19 @@ label small {
   gap: var(--space-xs);
   width: 100%;
 }
+
 .dayOptions {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 0.2rem;
   min-width: 0;
 }
+
 .dayNav {
   flex: none;
   color: var(--c-muted);
 }
+
 .day {
   position: relative;
   min-width: 0;
@@ -394,26 +462,26 @@ label small {
   font: inherit;
   cursor: pointer;
 }
+
 .day.futureDay {
   color: var(--c-placeholder);
 }
+
 .day.todayDay {
   outline: 2px solid var(--c-primary-border-soft);
   outline-offset: -2px;
 }
+
 .day span {
   font-size: var(--text-xs);
 }
+
 .compactDay {
   display: none;
 }
+
 .expandedDay {
   display: block;
-}
-.pageToolbar {
-  display: flex;
-  justify-content: end;
-  margin-bottom: calc(-1 * var(--space-sm));
 }
 
 @media (--phone) {
@@ -426,6 +494,7 @@ label small {
   .compactDay {
     display: block;
   }
+
   .expandedDay {
     display: none;
   }
@@ -435,13 +504,16 @@ label small {
     background: var(--c-surface-raised);
     color: var(--c-text);
   }
+
   .day.futureDay:hover {
     color: var(--c-placeholder);
   }
+
   .dayWithinGoal:hover,
   .dayLogged:hover {
     border-color: var(--c-primary-border);
   }
+
   .dayOverGoal:hover {
     border-color: rgb(248 113 113 / 55%);
   }
@@ -456,6 +528,7 @@ label small {
     var(--c-primary-surface);
   color: var(--c-text);
 }
+
 .dayWithinGoal {
   border-color: color-mix(in srgb, var(--c-macro-carb) 40%, transparent);
   background:
@@ -467,6 +540,7 @@ label small {
     color-mix(in srgb, var(--c-macro-carb) 9%, transparent);
   color: var(--c-text-strong);
 }
+
 .dayOverGoal {
   border-color: var(--c-danger-border);
   background:
@@ -474,19 +548,23 @@ label small {
     var(--c-danger-surface);
   color: var(--c-danger-text);
 }
+
 .day.futureDay.dayLogged,
 .day.futureDay.dayWithinGoal,
 .day.futureDay.dayOverGoal {
   opacity: 0.45;
 }
+
 .day[data-pressed] {
   border-color: transparent;
   background: var(--c-primary-surface-strong);
   color: var(--c-text-strong);
 }
+
 .day[data-pressed].dayWithinGoal {
   border-color: color-mix(in srgb, var(--c-macro-carb) 55%, transparent);
 }
+
 .day[data-pressed].dayOverGoal {
   border-color: rgb(248 113 113 / 60%);
 }

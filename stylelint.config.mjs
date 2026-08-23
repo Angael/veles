@@ -17,6 +17,7 @@ export default {
     'no-duplicate-selectors': true,
     'no-invalid-double-slash-comments': true,
     'property-no-unknown': true,
+    'rule-empty-line-before': ['always', { except: ['first-nested'], ignore: ['after-comment'] }],
     'selector-pseudo-class-no-unknown': true,
     'selector-pseudo-element-no-unknown': true,
     'unit-no-unknown': true,

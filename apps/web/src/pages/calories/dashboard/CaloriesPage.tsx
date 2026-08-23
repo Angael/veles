@@ -37,9 +37,7 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
   }
   return (
     <main className={css.page}>
-      <div className={css.pageToolbar} data-appear>
-        <LogFoodMenu date={date} />
-      </div>
+      <LogFoodMenu date={date} />
 
       <div className={css.dayStrip} data-appear>
         <Btn

@@ -9,6 +9,14 @@ import { DefaultCatchBoundary } from '@/components/default-catch-boundary/Defaul
 import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { Label } from '@/components/label/Label';
+import {
+  MenuBtn,
+  MenuBtnChevron,
+  MenuBtnDivider,
+  MenuBtnItem,
+  MenuBtnPopup,
+  MenuBtnRoot,
+} from '@/components/menu-btn/MenuBtn';
 import { Navbar } from '@/components/navbar/Navbar';
 import { NotFound } from '@/components/not-found/NotFound';
 import { PillBtn } from '@/components/pill-btn/PillBtn';
@@ -103,6 +111,33 @@ export function ComponentsDemoPage() {
           )}
           rows={BTN_VARIANTS}
         />
+      </section>
+
+      <section>
+        <h2>MenuBtn</h2>
+        <MenuBtnRoot>
+          <Btn icon={<PlusIcon aria-hidden='true' />} render={<MenuBtn />}>
+            Open menu
+            <MenuBtnChevron />
+          </Btn>
+          <MenuBtnPopup
+            aria-label='Demo menu'
+            description='Reusable popup parts composed with Btn.'
+            heading='Demo menu'
+          >
+            <MenuBtnItem
+              description='An item with supporting copy'
+              icon={<PlusIcon aria-hidden='true' />}
+              label='Primary action'
+            />
+            <MenuBtnDivider />
+            <MenuBtnItem
+              description='Items can be separated into groups'
+              icon={<SearchIcon aria-hidden='true' />}
+              label='Secondary action'
+            />
+          </MenuBtnPopup>
+        </MenuBtnRoot>
       </section>
 
       <section>
