@@ -29,7 +29,7 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
             isLink
             render={<Link to='/calories/goals' />}
             size='sm'
-            variant='ghost'
+            variant='text'
           >
             {goal ? 'Edit goals' : 'Set goals'}
           </Btn>
