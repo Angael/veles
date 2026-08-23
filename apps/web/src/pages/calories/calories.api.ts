@@ -28,17 +28,21 @@ const nonNegativeAmountType = type('number >= 0').narrow((value, ctx) =>
 );
 
 const nonEmptyTextType = type(`string.trim |> 1 <= string <= ${MAX_TEXT_LENGTH}`);
+const optionalNonEmptyTextType = nonEmptyTextType.or('undefined');
+const optionalImageUrlType = type('string.url | undefined');
+const optionalPositiveAmountType = type('number > 0 | undefined');
+const optionalNonNegativeAmountType = nonNegativeAmountType.or('undefined');
 
 const createFoodProductInputType = type({
   name: nonEmptyTextType,
-  'brand?': nonEmptyTextType,
-  'barcode?': nonEmptyTextType,
-  'imageUrl?': type('string.url'),
-  'productSizeGrams?': type('number > 0'),
+  'brand?': optionalNonEmptyTextType,
+  'barcode?': optionalNonEmptyTextType,
+  'imageUrl?': optionalImageUrlType,
+  'productSizeGrams?': optionalPositiveAmountType,
   kcalPer100g: nonNegativeAmountType,
-  'proteinPer100g?': nonNegativeAmountType,
-  'fatPer100g?': nonNegativeAmountType,
-  'carbsPer100g?': nonNegativeAmountType,
+  'proteinPer100g?': optionalNonNegativeAmountType,
+  'fatPer100g?': optionalNonNegativeAmountType,
+  'carbsPer100g?': optionalNonNegativeAmountType,
 });
 const foodIdInputType = type({ id: 'string.uuid' });
 const updateFoodProductInputType = createFoodProductInputType.merge(foodIdInputType);
@@ -399,11 +403,11 @@ export const recordFood = createServerFn({ method: 'POST' })
 
 const recordCustomCaloriesInputType = type({
   name: nonEmptyTextType,
-  'grams?': nonNegativeAmountType,
+  'grams?': optionalNonNegativeAmountType,
   kcal: nonNegativeAmountType,
-  'protein?': nonNegativeAmountType,
-  'fat?': nonNegativeAmountType,
-  'carbs?': nonNegativeAmountType,
+  'protein?': optionalNonNegativeAmountType,
+  'fat?': optionalNonNegativeAmountType,
+  'carbs?': optionalNonNegativeAmountType,
   date: dateOnlyType,
 });
 
@@ -454,11 +458,11 @@ export const getFoodLog = createServerFn({ method: 'GET' })
 const updateFoodLogInputType = type({
   id: 'string.uuid',
   name: nonEmptyTextType,
-  'grams?': nonNegativeAmountType,
+  'grams?': optionalNonNegativeAmountType,
   kcal: nonNegativeAmountType,
-  'protein?': nonNegativeAmountType,
-  'fat?': nonNegativeAmountType,
-  'carbs?': nonNegativeAmountType,
+  'protein?': optionalNonNegativeAmountType,
+  'fat?': optionalNonNegativeAmountType,
+  'carbs?': optionalNonNegativeAmountType,
   date: dateOnlyType,
 });
 

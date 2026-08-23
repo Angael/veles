@@ -8,11 +8,13 @@ import { db } from '@/lib/db';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { optionalHundredths, toCalorieGoal, toHundredths } from '../calorieHelpers';
 
+const optionalPositiveAmountType = type('number > 0 | undefined');
+
 const setDailyCalorieGoalInputType = type({
   kcal: type('number > 0'),
-  'protein?': type('number > 0'),
-  'fat?': type('number > 0'),
-  'carbs?': type('number > 0'),
+  'protein?': optionalPositiveAmountType,
+  'fat?': optionalPositiveAmountType,
+  'carbs?': optionalPositiveAmountType,
   date: dateOnlyType,
 });
 

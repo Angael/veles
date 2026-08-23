@@ -5,6 +5,7 @@ import type {
 import { CameraIcon, CameraOffIcon, SwitchCameraIcon, XIcon } from 'lucide-react';
 import { type ReactElement, useEffect, useRef, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
+import { useLocalStorageState } from '@/lib/hooks/useLocalStorageState';
 import css from './BarcodeScanner.module.css';
 
 type BarcodeDetectorLike = Pick<PolyfillBarcodeDetector, 'detect'>;
@@ -26,6 +27,7 @@ type BarcodeScannerProps = {
 };
 
 const formats: BarcodeFormat[] = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'];
+const preferredCameraStorageKey = 'barcodeScanner.preferredCameraId';
 
 /** Uses the native detector when available and only downloads the WASM-backed fallback when needed. */
 async function createDetector(): Promise<BarcodeDetectorLike> {
@@ -56,7 +58,10 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
   const [state, setState] = useState<ScannerState>('starting');
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState('');
-  const [requestedDeviceId, setRequestedDeviceId] = useState<string>();
+  const [preferredCameraId, setPreferredCameraId] = useLocalStorageState(
+    preferredCameraStorageKey,
+    '',
+  );
   callbackRef.current = onDetected;
 
   useEffect(() => {
@@ -66,7 +71,7 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
     let detecting = false;
     let lastDetection = 0;
 
-    /** Starts the preferred rear camera, or a specifically requested camera, and runs the scan loop. */
+    /** Starts the saved camera when available, otherwise the preferred rear camera, then scans. */
     async function startScanner() {
       if (!navigator.mediaDevices?.getUserMedia) {
         setState('unavailable');
@@ -78,9 +83,9 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
           createDetector(),
           navigator.mediaDevices.getUserMedia({
             audio: false,
-            video: requestedDeviceId
+            video: preferredCameraId
               ? {
-                  deviceId: { exact: requestedDeviceId },
+                  deviceId: { exact: preferredCameraId },
                   height: { ideal: 1080 },
                   width: { ideal: 1920 },
                 }
@@ -93,7 +98,11 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
         ]);
         await enableContinuousFocus(cameraStream).catch(() => undefined);
         const videoTrack = cameraStream.getVideoTracks()[0];
-        setCurrentDeviceId(videoTrack?.getSettings().deviceId ?? requestedDeviceId ?? '');
+        const activeDeviceId = videoTrack?.getSettings().deviceId ?? '';
+        setCurrentDeviceId(activeDeviceId);
+        if (activeDeviceId && activeDeviceId !== preferredCameraId) {
+          setPreferredCameraId(activeDeviceId);
+        }
         const availableCameras = (await navigator.mediaDevices.enumerateDevices()).filter(
           (device) => device.kind === 'videoinput',
         );
@@ -130,6 +139,14 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
         animationFrame = requestAnimationFrame(scan);
       } catch (error) {
         if (!active) return;
+        if (
+          preferredCameraId &&
+          error instanceof DOMException &&
+          (error.name === 'NotFoundError' || error.name === 'OverconstrainedError')
+        ) {
+          setPreferredCameraId('');
+          return;
+        }
         setState(
           error instanceof DOMException &&
             (error.name === 'NotAllowedError' || error.name === 'SecurityError')
@@ -145,14 +162,14 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
       cancelAnimationFrame(animationFrame);
       stream?.getTracks().forEach((track) => track.stop());
     };
-  }, [requestedDeviceId]);
+  }, [preferredCameraId]);
 
   function switchCamera() {
     if (cameras.length < 2) return;
     const currentIndex = cameras.findIndex((camera) => camera.deviceId === currentDeviceId);
     const nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % cameras.length;
     setState('starting');
-    setRequestedDeviceId(cameras[nextIndex]?.deviceId);
+    setPreferredCameraId(cameras[nextIndex]?.deviceId ?? '');
   }
 
   return (
