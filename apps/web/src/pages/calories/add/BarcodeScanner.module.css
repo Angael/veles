@@ -60,9 +60,9 @@
   font-size: var(--text-sm);
   transform: translateX(0.5rem);
   transition:
-    opacity 160ms ease-in,
-    transform 180ms ease-in-out,
-    visibility 0s linear 180ms;
+    opacity 120ms ease-in,
+    transform 140ms ease-in-out,
+    visibility 0s linear 140ms;
   backdrop-filter: blur(0.5rem);
   white-space: nowrap;
 

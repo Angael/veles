@@ -1,9 +1,7 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import type { CalorieFood } from '../calories.api';
-import { lookupFoodByBarcode } from '../calories.api';
-import { invalidateCalorieFoods } from '../calories.query';
+import { useLookupFoodByBarcodeMutation } from '../calories.query';
 import { BarcodeScanner } from './BarcodeScanner';
 import { SelectedFoodForm } from './SelectedFoodForm';
 import { Btn } from '@/components/btn/Btn';
@@ -11,8 +9,8 @@ import { TextInput } from '@/components/text-input/TextInput';
 import css from '../CalorieFlows.module.css';
 
 export function ScanFoodPage({ initialDate }: { initialDate: string }) {
-  const queryClient = useQueryClient();
   const lookingUp = useRef(false);
+  const lookupMutation = useLookupFoodByBarcodeMutation();
   const [barcode, setBarcode] = useState('');
   const [missing, setMissing] = useState('');
   const [food, setFood] = useState<CalorieFood | null>(null);
@@ -23,8 +21,7 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
     lookingUp.current = true;
     setBarcode(code);
     try {
-      const result = await lookupFoodByBarcode({ data: { barcode: code } });
-      await invalidateCalorieFoods(queryClient);
+      const result = await lookupMutation.mutateAsync({ data: { barcode: code } });
       if (result.status === 'found') {
         setFood(result.food);
       } else {

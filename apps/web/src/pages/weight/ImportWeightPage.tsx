@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
 import { ClipboardIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -9,7 +8,8 @@ import { TextareaInput } from '@/components/textarea-input/TextareaInput';
 import { toastManager } from '@/components/toast/toastManager';
 import css from './WeightEntryPages.module.css';
 import { parseWeightEntries } from './parseWeightEntries';
-import { MAX_WEIGHT_IMPORT_ENTRIES, saveWeights } from './weight.api';
+import { MAX_WEIGHT_IMPORT_ENTRIES } from './weight.api';
+import { useSaveWeightsMutation } from './weight.query';
 
 const aiPrompt = `Convert my weight history to plain text with exactly one entry per line in this format:
 YYYY-MM-DD <weight>kg
@@ -23,21 +23,7 @@ export function ImportWeightPage() {
   const [value, setValue] = useState('');
   const parsed = useMemo(() => parseWeightEntries(value), [value]);
   const hasTooManyEntries = parsed.entries.length > MAX_WEIGHT_IMPORT_ENTRIES;
-  const mutation = useMutation({
-    mutationFn: saveWeights,
-    onError: () => {
-      toastManager.add({
-        description: 'Your entries were not imported. Please try again.',
-        priority: 'high',
-        title: 'Could not import weights',
-        type: 'error',
-      });
-    },
-    onSuccess: async () => {
-      await router.invalidate();
-      await navigate({ to: '/weight' });
-    },
-  });
+  const mutation = useSaveWeightsMutation();
 
   return (
     <main className={css.page}>
@@ -69,7 +55,23 @@ export function ImportWeightPage() {
           onSubmit={(event) => {
             event.preventDefault();
             if (parsed.entries.length > 0 && parsed.errors.length === 0 && !hasTooManyEntries) {
-              mutation.mutate({ data: { entries: parsed.entries } });
+              mutation.mutate(
+                { data: { entries: parsed.entries } },
+                {
+                  onError: () => {
+                    toastManager.add({
+                      description: 'Your entries were not imported. Please try again.',
+                      priority: 'high',
+                      title: 'Could not import weights',
+                      type: 'error',
+                    });
+                  },
+                  onSuccess: async () => {
+                    await router.invalidate();
+                    await navigate({ to: '/weight' });
+                  },
+                },
+              );
             }
           }}
         >

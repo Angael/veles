@@ -61,9 +61,9 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
     cameras,
     cameraHintVisible,
     cameraNotice,
+    cameraNoticeVisible,
     cameraPreferenceReady,
     clearUnavailablePreference,
-    completeCameraSwitch,
     preferredCameraId,
     registerActiveCamera,
     selectNextCamera,
@@ -126,7 +126,6 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
         video.srcObject = cameraStream;
         await video.play();
         setState('scanning');
-        completeCameraSwitch();
 
         const scan = async (timestamp: number) => {
           if (!active) return;
@@ -203,7 +202,7 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
             <div
               aria-live='polite'
               className={css.cameraNotice}
-              data-visible={cameraNotice ? '' : undefined}
+              data-visible={cameraNoticeVisible ? '' : undefined}
             >
               {cameraNotice}
             </div>

@@ -1,11 +1,7 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import type { FormEvent } from 'react';
-import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
-import { updateFoodLog } from '../calories.api';
-import { useDeleteFoodLogMutation } from '../calories.query';
-import { invalidateCalorieWeek } from '../calories.query';
+import { useDeleteFoodLogMutation, useUpdateFoodLogMutation } from '../calories.query';
 import { Btn } from '@/components/btn/Btn';
 import { DateInput } from '@/components/date-input/DateInput';
 import { Label } from '@/components/label/Label';
@@ -14,16 +10,14 @@ import { TextInput } from '@/components/text-input/TextInput';
 import css from '../CalorieFlows.module.css';
 
 export function EditFoodLogPage({ log }: { log: CalorieLog }) {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const deleteMutation = useDeleteFoodLogMutation();
-  const [pending, setPending] = useState(false);
+  const updateMutation = useUpdateFoodLogMutation();
   const isProduct = log.productId !== null;
-  const isPending = pending || deleteMutation.isPending;
+  const isPending = updateMutation.isPending || deleteMutation.isPending;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setPending(true);
     const data = new FormData(event.currentTarget);
     const optional = (key: string) => {
       const value = String(data.get(key) ?? '').trim();
@@ -31,27 +25,18 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
     };
 
     const nextDate = String(data.get('date'));
-    try {
-      await updateFoodLog({
-        data: {
-          id: log.id,
-          date: nextDate,
-          name: String(data.get('name')),
-          grams: optional('grams'),
-          kcal: Number(data.get('kcal')),
-          protein: optional('protein'),
-          fat: optional('fat'),
-          carbs: optional('carbs'),
-        },
-      });
-      await Promise.all([
-        invalidateCalorieWeek(queryClient, log.date),
-        invalidateCalorieWeek(queryClient, nextDate),
-      ]);
-      await navigate({ to: '/calories', search: { date: nextDate } });
-    } finally {
-      setPending(false);
-    }
+    await updateMutation.mutateAsync({
+      id: log.id,
+      date: nextDate,
+      previousDate: log.date,
+      name: String(data.get('name')),
+      grams: optional('grams'),
+      kcal: Number(data.get('kcal')),
+      protein: optional('protein'),
+      fat: optional('fat'),
+      carbs: optional('carbs'),
+    });
+    await navigate({ to: '/calories', search: { date: nextDate } });
   }
 
   async function remove() {

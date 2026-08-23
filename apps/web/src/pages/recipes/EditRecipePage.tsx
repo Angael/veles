@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useRouter } from '@tanstack/react-router';
 import { SaveIcon } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
@@ -6,7 +5,8 @@ import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
-import { updateRecipe, type RecipeLibraryItem } from './recipes.api';
+import type { RecipeLibraryItem } from './recipes.api';
+import { useUpdateRecipeMutation } from './recipes.query';
 import css from './EditRecipePage.module.css';
 
 type EditRecipePageProps = {
@@ -17,13 +17,7 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
   const navigate = useNavigate();
   const router = useRouter();
   const [draft, setDraft] = useState<RecipeFormDraft>(() => recipeToDraft(recipe));
-  const saveMutation = useMutation({
-    mutationFn: updateRecipe,
-    onSuccess: async () => {
-      await navigate({ params: { id: recipe.id }, to: '/recipes/view/$id' });
-      await router.invalidate();
-    },
-  });
+  const saveMutation = useUpdateRecipeMutation();
 
   return (
     <main className={css.page}>
@@ -34,9 +28,15 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
           className={css.form}
           onSubmit={(event: FormEvent<HTMLFormElement>) => {
             event.preventDefault();
-            saveMutation.mutate({
-              data: { ...draft, id: recipe.id },
-            });
+            saveMutation.mutate(
+              { data: { ...draft, id: recipe.id } },
+              {
+                onSuccess: async () => {
+                  await navigate({ params: { id: recipe.id }, to: '/recipes/view/$id' });
+                  await router.invalidate();
+                },
+              },
+            );
           }}
         >
           <RecipeForm draft={draft} onDraftChange={setDraft} />

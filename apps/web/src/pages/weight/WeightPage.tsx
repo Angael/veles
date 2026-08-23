@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { CalendarPlusIcon, FileUpIcon } from 'lucide-react';
@@ -11,7 +10,8 @@ import { RecentWeightEntries } from './RecentWeightEntries';
 import css from './WeightPage.module.css';
 import { WeightTrendChart } from './WeightTrendChart';
 import { getChangeFromDaysAgo, type WeightChartRange } from './weightCalculations';
-import { saveWeight, type WeightEntry } from './weight.api';
+import type { WeightEntry } from './weight.api';
+import { useSaveWeightMutation } from './weight.query';
 
 type WeightPageProps = {
   entries: WeightEntry[];
@@ -22,20 +22,7 @@ export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
   const router = useRouter();
   const latestEntry = entries.at(-1);
   const [weightKg, setWeightKg] = useState<number | null>(latestEntry?.weightKg ?? null);
-  const saveMutation = useMutation({
-    mutationFn: saveWeight,
-    onError: () => {
-      toastManager.add({
-        description: 'Your weight was not changed. Please try again.',
-        priority: 'high',
-        title: 'Could not save weight',
-        type: 'error',
-      });
-    },
-    onSuccess: async () => {
-      await router.invalidate();
-    },
-  });
+  const saveMutation = useSaveWeightMutation();
 
   useEffect(() => {
     setWeightKg(latestEntry?.weightKg ?? null);
@@ -49,7 +36,22 @@ export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
       return;
     }
 
-    saveMutation.mutate({ data: { date: format(new Date(), 'yyyy-MM-dd'), weightKg } });
+    saveMutation.mutate(
+      { data: { date: format(new Date(), 'yyyy-MM-dd'), weightKg } },
+      {
+        onError: () => {
+          toastManager.add({
+            description: 'Your weight was not changed. Please try again.',
+            priority: 'high',
+            title: 'Could not save weight',
+            type: 'error',
+          });
+        },
+        onSuccess: async () => {
+          await router.invalidate();
+        },
+      },
+    );
   }
 
   return (

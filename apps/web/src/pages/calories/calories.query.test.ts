@@ -6,6 +6,10 @@ vi.mock('./calories.api', () => ({
   getFoodProducts: vi.fn(),
 }));
 
+vi.mock('./goals/goals.api', () => ({
+  setDailyCalorieGoal: vi.fn(),
+}));
+
 import { calorieDashboardQueryOptions, calorieFoodsQueryOptions } from './calories.query';
 
 describe('calorie query keys', () => {

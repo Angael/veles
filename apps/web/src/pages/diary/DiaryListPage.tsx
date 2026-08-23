@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
 import { PlusIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -6,7 +5,8 @@ import { Card } from '@/components/card/Card';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { TextInput } from '@/components/text-input/TextInput';
 import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
-import { createDiaryEntry, type DiaryEntrySummary, formatDiaryDate } from './diary.api';
+import { type DiaryEntrySummary, formatDiaryDate } from './diary.api';
+import { useCreateDiaryEntryMutation } from './diary.query';
 import css from './DiaryListPage.module.css';
 
 type DiaryListPageProps = {
@@ -23,17 +23,7 @@ export function DiaryListPage({ entries }: DiaryListPageProps) {
   const router = useRouter();
   const [searchInputValue, setSearchInputValue] = useState('');
   const visibleEntries = filterAndRankBySearch(entries, searchInputValue, diarySearchFields);
-  const createMutation = useMutation({
-    mutationFn: createDiaryEntry,
-    onSuccess: async (entry) => {
-      await navigate({
-        params: { id: entry.id },
-        search: { created: '1' },
-        to: '/diary/$id',
-      });
-      await router.invalidate();
-    },
-  });
+  const createMutation = useCreateDiaryEntryMutation();
 
   return (
     <main className={css.page}>
@@ -94,7 +84,19 @@ export function DiaryListPage({ entries }: DiaryListPageProps) {
         icon={<PlusIcon aria-hidden='true' />}
         loading={createMutation.isPending}
         onClick={() => {
-          createMutation.mutate({ data: { entryDate: getLocalDate() } });
+          createMutation.mutate(
+            { data: { entryDate: getLocalDate() } },
+            {
+              onSuccess: async (entry) => {
+                await navigate({
+                  params: { id: entry.id },
+                  search: { created: '1' },
+                  to: '/diary/$id',
+                });
+                await router.invalidate();
+              },
+            },
+          );
         }}
       >
         New entry

@@ -10,9 +10,9 @@ export function useCameraPreference() {
   const [currentDeviceId, setCurrentDeviceId] = useState('');
   const [cameraPreferenceReady, setCameraPreferenceReady] = useState(false);
   const [cameraNotice, setCameraNotice] = useState('');
+  const [cameraNoticeVisible, setCameraNoticeVisible] = useState(false);
   const [cameraHintVisible, setCameraHintVisible] = useState(false);
   const cameraNoticeTimeoutRef = useRef<number | undefined>(undefined);
-  const cameraSwitchPendingRef = useRef(false);
   const [preferredCameraId, setPreferredCameraId] = useLocalStorageState(
     preferredCameraStorageKey,
     '',
@@ -40,11 +40,12 @@ export function useCameraPreference() {
     return () => clearTimeout(timeout);
   }, [cameraHintDismissed, cameras]);
 
-  /** Shows camera feedback and keeps resetting its dismissal while the control is used repeatedly. */
+  /** Shows stable camera-position feedback and resets its short dismissal timer. */
   function showCameraNotice(message: string) {
     clearTimeout(cameraNoticeTimeoutRef.current);
     setCameraNotice(message);
-    cameraNoticeTimeoutRef.current = window.setTimeout(() => setCameraNotice(''), 1800);
+    setCameraNoticeVisible(true);
+    cameraNoticeTimeoutRef.current = window.setTimeout(() => setCameraNoticeVisible(false), 1200);
   }
 
   useEffect(
@@ -69,8 +70,7 @@ export function useCameraPreference() {
 
     setCurrentDeviceId(nextDeviceId);
     setPreferredCameraId(nextDeviceId);
-    cameraSwitchPendingRef.current = true;
-    showCameraNotice('Switching camera…');
+    showCameraNotice(`Using camera ${nextIndex + 1}/${cameras.length}`);
     return nextDeviceId;
   }
 
@@ -80,19 +80,13 @@ export function useCameraPreference() {
     return true;
   }
 
-  function completeCameraSwitch() {
-    if (!cameraSwitchPendingRef.current) return;
-    cameraSwitchPendingRef.current = false;
-    showCameraNotice('Camera switched');
-  }
-
   return {
     cameras,
     cameraHintVisible,
     cameraPreferenceReady,
     cameraNotice,
+    cameraNoticeVisible,
     clearUnavailablePreference,
-    completeCameraSwitch,
     preferredCameraId,
     registerActiveCamera,
     selectNextCamera,

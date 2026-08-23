@@ -1,10 +1,7 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import type { FormEvent } from 'react';
-import { useState } from 'react';
 import type { CalorieGoal } from '../calories.api';
-import { setDailyCalorieGoal } from './goals.api';
-import { invalidateAllCalorieWeeks } from '../calories.query';
+import { useSetDailyCalorieGoalMutation } from '../calories.query';
 import { todayLocalDate } from '../calorieHelpers';
 import { Btn } from '@/components/btn/Btn';
 import { Label } from '@/components/label/Label';
@@ -12,32 +9,24 @@ import { NumberInput } from '@/components/number-input/NumberInput';
 import css from '../CalorieFlows.module.css';
 
 export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [pending, setPending] = useState(false);
+  const goalMutation = useSetDailyCalorieGoalMutation();
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setPending(true);
     const data = new FormData(event.currentTarget);
     const optional = (key: string) => {
       const value = String(data.get(key) ?? '').trim();
       return value ? Number(value) : undefined;
     };
-    try {
-      await setDailyCalorieGoal({
-        data: {
-          date: todayLocalDate(),
-          kcal: Number(data.get('kcal')),
-          protein: optional('protein'),
-          fat: optional('fat'),
-          carbs: optional('carbs'),
-        },
-      });
-      await invalidateAllCalorieWeeks(queryClient);
-      await navigate({ to: '/calories', search: { date: todayLocalDate() } });
-    } finally {
-      setPending(false);
-    }
+    const date = todayLocalDate();
+    await goalMutation.mutateAsync({
+      date,
+      kcal: Number(data.get('kcal')),
+      protein: optional('protein'),
+      fat: optional('fat'),
+      carbs: optional('carbs'),
+    });
+    await navigate({ to: '/calories', search: { date } });
   }
   return (
     <main className={css.page}>
@@ -75,8 +64,8 @@ export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
             </Label>
           </div>
 
-          <Btn disabled={pending} type='submit'>
-            {pending ? 'Saving…' : 'Save current goals'}
+          <Btn loading={goalMutation.isPending} type='submit'>
+            Save current goals
           </Btn>
         </form>
       </section>

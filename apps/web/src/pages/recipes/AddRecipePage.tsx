@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { useNavigate } from '@tanstack/react-router';
-import { useServerFn } from '@tanstack/react-start';
 import { SendHorizontalIcon } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
@@ -9,11 +8,8 @@ import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { UploadTileGrid } from '@/components/upload-tile-grid/UploadTileGrid';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import css from './AddRecipePage.module.css';
-import {
-  createRecipe,
-  RECIPE_UPLOAD_MAX_PHOTO_BYTES,
-  RECIPE_UPLOAD_MAX_PHOTO_COUNT,
-} from './recipeUpload.api';
+import { RECIPE_UPLOAD_MAX_PHOTO_BYTES, RECIPE_UPLOAD_MAX_PHOTO_COUNT } from './recipeUpload.api';
+import { useCreateRecipeMutation } from './recipes.query';
 
 type AddRecipeDraft = RecipeFormDraft & {
   selectedFiles: File[];
@@ -35,9 +31,8 @@ const EMPTY_DRAFT: AddRecipeDraft = {
 
 export function AddRecipePage() {
   const navigate = useNavigate();
-  const uploadRecipe = useServerFn(createRecipe);
+  const createMutation = useCreateRecipeMutation();
   const [draft, setDraft] = useState<AddRecipeDraft>(EMPTY_DRAFT);
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   return (
@@ -50,7 +45,6 @@ export function AddRecipePage() {
             className={css.form}
             onSubmit={async (event: FormEvent<HTMLFormElement>) => {
               event.preventDefault();
-              setBusy(true);
               setError(null);
 
               try {
@@ -60,15 +54,13 @@ export function AddRecipePage() {
                   formData.append('photos', file);
                 }
 
-                const result = await uploadRecipe({ data: formData });
+                const result = await createMutation.mutateAsync({ data: formData });
 
                 navigate({ params: { id: result.id }, to: '/recipes/view/$id' });
               } catch (submitError) {
                 setError(
                   submitError instanceof Error ? submitError.message : 'Recipe upload failed',
                 );
-              } finally {
-                setBusy(false);
               }
             }}
           >
@@ -96,7 +88,7 @@ export function AddRecipePage() {
             <div className={css.actions}>
               <Btn
                 icon={<SendHorizontalIcon aria-hidden='true' size={18} />}
-                loading={busy}
+                loading={createMutation.isPending}
                 type='submit'
                 variant='main'
               >

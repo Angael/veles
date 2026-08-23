@@ -1,11 +1,17 @@
-import { queryOptions, type QueryClient, useMutation } from '@tanstack/react-query';
+import { queryOptions, useMutation } from '@tanstack/react-query';
 import {
+  createFoodProduct,
   deleteFoodLog,
   getCalorieDashboard,
   getFoodProduct,
   getFoodProducts,
+  lookupFoodByBarcode,
+  recordCustomCalories,
   recordFood,
+  updateFoodLog,
+  updateFoodProduct,
 } from './calories.api';
+import { setDailyCalorieGoal } from './goals/goals.api';
 import { calorieWeekStart } from './calorieHelpers';
 
 const calorieDashboardKey = ['calorie-dashboard'] as const;
@@ -15,6 +21,30 @@ const calorieFoodsKey = ['calorie-foods'] as const;
 type DeleteFoodLogVariables = {
   date: string;
   id: string;
+};
+
+type CalorieValues = {
+  kcal: number;
+  protein?: number;
+  fat?: number;
+  carbs?: number;
+};
+
+type RecordCustomCaloriesVariables = CalorieValues & {
+  date: string;
+  name: string;
+};
+
+type SetDailyCalorieGoalVariables = CalorieValues & {
+  date: string;
+};
+
+type UpdateFoodLogVariables = CalorieValues & {
+  date: string;
+  grams?: number;
+  id: string;
+  name: string;
+  previousDate: string;
 };
 
 type RecordFoodVariables = {
@@ -69,19 +99,71 @@ export function useRecordFoodMutation() {
   });
 }
 
-export function invalidateCalorieWeek(queryClient: QueryClient, date: string) {
-  return queryClient.invalidateQueries({
-    queryKey: calorieDashboardQueryOptions(date).queryKey,
+export function useCreateFoodProductMutation() {
+  return useMutation({
+    mutationFn: createFoodProduct,
+    onSuccess: (_data, _variables, _onMutateResult, context) =>
+      Promise.all([
+        context.client.invalidateQueries({ queryKey: calorieFoodKey }),
+        context.client.invalidateQueries({ queryKey: calorieFoodsKey }),
+      ]),
   });
 }
 
-export function invalidateAllCalorieWeeks(queryClient: QueryClient) {
-  return queryClient.invalidateQueries({ queryKey: calorieDashboardKey });
+export function useLookupFoodByBarcodeMutation() {
+  return useMutation({
+    mutationFn: lookupFoodByBarcode,
+    onSuccess: (_data, _variables, _onMutateResult, context) =>
+      Promise.all([
+        context.client.invalidateQueries({ queryKey: calorieFoodKey }),
+        context.client.invalidateQueries({ queryKey: calorieFoodsKey }),
+      ]),
+  });
 }
 
-export function invalidateCalorieFoods(queryClient: QueryClient) {
-  return Promise.all([
-    queryClient.invalidateQueries({ queryKey: calorieFoodKey }),
-    queryClient.invalidateQueries({ queryKey: calorieFoodsKey }),
-  ]);
+export function useRecordCustomCaloriesMutation() {
+  return useMutation({
+    mutationFn: (variables: RecordCustomCaloriesVariables) =>
+      recordCustomCalories({ data: variables }),
+    onSuccess: (_data, { date }, _onMutateResult, context) =>
+      context.client.invalidateQueries({
+        queryKey: calorieDashboardQueryOptions(date).queryKey,
+      }),
+  });
+}
+
+export function useSetDailyCalorieGoalMutation() {
+  return useMutation({
+    mutationFn: (variables: SetDailyCalorieGoalVariables) =>
+      setDailyCalorieGoal({ data: variables }),
+    onSuccess: (_data, _variables, _onMutateResult, context) =>
+      context.client.invalidateQueries({ queryKey: calorieDashboardKey }),
+  });
+}
+
+export function useUpdateFoodLogMutation() {
+  return useMutation({
+    mutationFn: ({ previousDate: _, ...variables }: UpdateFoodLogVariables) =>
+      updateFoodLog({ data: variables }),
+    onSuccess: (_data, { date, previousDate }, _onMutateResult, context) =>
+      Promise.all([
+        context.client.invalidateQueries({
+          queryKey: calorieDashboardQueryOptions(previousDate).queryKey,
+        }),
+        context.client.invalidateQueries({
+          queryKey: calorieDashboardQueryOptions(date).queryKey,
+        }),
+      ]),
+  });
+}
+
+export function useUpdateFoodProductMutation() {
+  return useMutation({
+    mutationFn: updateFoodProduct,
+    onSuccess: (_data, _variables, _onMutateResult, context) =>
+      Promise.all([
+        context.client.invalidateQueries({ queryKey: calorieFoodKey }),
+        context.client.invalidateQueries({ queryKey: calorieFoodsKey }),
+      ]),
+  });
 }

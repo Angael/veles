@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { useState } from 'react';
@@ -9,7 +8,7 @@ import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { toastManager } from '@/components/toast/toastManager';
 import css from './WeightEntryPages.module.css';
-import { saveWeight } from './weight.api';
+import { useSaveWeightMutation } from './weight.query';
 
 export function AddWeightPage() {
   const router = useRouter();
@@ -17,21 +16,7 @@ export function AddWeightPage() {
   const today = format(new Date(), 'yyyy-MM-dd');
   const [date, setDate] = useState(today);
   const [weightKg, setWeightKg] = useState<number | null>(null);
-  const mutation = useMutation({
-    mutationFn: saveWeight,
-    onError: () => {
-      toastManager.add({
-        description: 'Check the date and weight, then try again.',
-        priority: 'high',
-        title: 'Could not save weight',
-        type: 'error',
-      });
-    },
-    onSuccess: async () => {
-      await router.invalidate();
-      await navigate({ to: '/weight' });
-    },
-  });
+  const mutation = useSaveWeightMutation();
 
   return (
     <main className={css.page}>
@@ -48,7 +33,23 @@ export function AddWeightPage() {
               return;
             }
 
-            mutation.mutate({ data: { date, weightKg } });
+            mutation.mutate(
+              { data: { date, weightKg } },
+              {
+                onError: () => {
+                  toastManager.add({
+                    description: 'Check the date and weight, then try again.',
+                    priority: 'high',
+                    title: 'Could not save weight',
+                    type: 'error',
+                  });
+                },
+                onSuccess: async () => {
+                  await router.invalidate();
+                  await navigate({ to: '/weight' });
+                },
+              },
+            );
           }}
         >
           <Label text='Date'>
