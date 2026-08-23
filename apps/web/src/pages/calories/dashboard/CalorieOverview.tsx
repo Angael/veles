@@ -26,12 +26,7 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
             ))}
           </ol>
         ) : (
-          <div className={css.emptyLog}>
-            <div>
-              <strong>Nothing logged for this day</strong>
-              <span>Start with a saved food, scan a package, or enter the totals directly.</span>
-            </div>
-          </div>
+          <p className={css.emptyLog}>Nothing logged for this day</p>
         )}
       </section>
     </div>
