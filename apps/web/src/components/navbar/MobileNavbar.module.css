@@ -15,7 +15,7 @@
   border: 1px solid rgba(148, 163, 184, 0.26);
   border-radius: calc(var(--radius-pill) - 2px);
   background: rgba(15, 23, 42, 0.82);
-  backdrop-filter: var(--blur-navigation);
+  backdrop-filter: var(--blur-surface);
   box-shadow: 0 18px 48px rgba(2, 6, 23, 0.42);
 }
 

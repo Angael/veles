@@ -1,20 +1,17 @@
 import { Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { ChevronDownIcon } from 'lucide-react';
-import { forwardRef, type ComponentPropsWithoutRef, type ReactNode } from 'react';
+import type { ComponentPropsWithRef, ComponentPropsWithoutRef, ReactNode } from 'react';
 import css from './MenuBtn.module.css';
 
 export const MenuBtnRoot = Menu.Root;
 
-type MenuBtnProps = ComponentPropsWithoutRef<typeof Menu.Trigger>;
+type MenuBtnProps = ComponentPropsWithRef<typeof Menu.Trigger>;
 
 /** Composes Base UI's menu trigger into reusable buttons such as Btn and FloatingButton. */
-export const MenuBtn = forwardRef<HTMLButtonElement, MenuBtnProps>(function MenuBtn(
-  { className, ...props },
-  ref,
-) {
-  return <Menu.Trigger className={clsx(css.trigger, className)} ref={ref} {...props} />;
-});
+export function MenuBtn({ className, ...props }: MenuBtnProps) {
+  return <Menu.Trigger className={clsx(css.trigger, className)} {...props} />;
+}
 
 export function MenuBtnChevron({
   className,

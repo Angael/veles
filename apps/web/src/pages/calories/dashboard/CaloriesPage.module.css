@@ -231,13 +231,6 @@ label > span {
   text-wrap: pretty;
 }
 
-.emptyActions {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-}
-
 .logList {
   display: grid;
   gap: var(--space-sm);
