@@ -13,10 +13,15 @@
 
 .card {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'identity identity'
+    'energy macros';
   align-items: center;
-  gap: var(--space-lg);
-  padding: var(--space-md) calc(2.75rem + var(--space-lg)) var(--space-md) var(--space-md);
+  column-gap: var(--space-lg);
+  row-gap: 0.2rem;
+  padding: var(--space-md) calc(var(--btn-height, 2.75rem) + var(--space-lg)) var(--space-md)
+    var(--space-md);
   user-select: none;
   transition:
     border-color 180ms var(--ease-out),
@@ -33,35 +38,34 @@
 }
 
 .energyTile {
-  display: grid;
-  place-items: center;
-  gap: 0;
-  width: 4rem;
-  padding: 0.55rem 0.25rem;
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--c-accent) 12%, transparent);
-  color: var(--c-accent-strong);
+  grid-area: energy;
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
   font-variant-numeric: tabular-nums;
-  text-align: center;
 
   & strong {
     min-width: 4ch;
-    font-size: var(--text-lg);
-    font-weight: 700;
-    line-height: 1.1;
+    color: var(--c-accent-strong);
+    font-size: var(--text-md);
+    font-weight: var(--font-weight-semibold);
+    /* Digits have no descenders; tight line-height keeps the row compact. */
+    line-height: 1;
   }
 
   & span {
-    font-size: var(--text-xs);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    color: var(--c-muted);
+    font-size: var(--text-sm);
   }
 }
 
 .identity {
-  display: grid;
+  grid-area: identity;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
   min-width: 0;
-  gap: 0.3rem;
 
   & strong {
     overflow: hidden;
@@ -71,16 +75,22 @@
   }
 
   & span {
+    flex: none;
     color: var(--c-muted);
     font-size: var(--text-sm);
     font-variant-numeric: tabular-nums;
   }
 }
 
-/* Fixed-width columns keep each macro value aligned across all rows. */
+/* Fixed macro widths keep each value aligned across all list items. */
 .macros {
-  display: grid;
-  grid-template-columns: repeat(3, 4rem);
+  grid-area: macros;
+  display: flex;
+  gap: var(--space-xs);
+
+  & .macro {
+    width: 3.4rem;
+  }
 
   & dt {
     position: absolute;
@@ -97,7 +107,7 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: var(--text-md);
+  font-size: var(--text-sm);
   font-weight: var(--font-weight-semibold);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -145,71 +155,29 @@
 @media (--phone) {
   .card {
     /* First row matches the delete button's box so it sits centered on that row. */
-    grid-template-columns: auto minmax(0, 1fr);
     grid-template-rows: var(--btn-height, 2.75rem) auto;
-    grid-template-areas:
-      'identity identity'
-      'energy macros';
-    align-items: center;
     column-gap: var(--space-sm);
-    row-gap: 0.2rem;
     padding: var(--space-sm) calc(var(--btn-height, 2.75rem) + var(--space-sm)) var(--space-sm)
       var(--space-md);
   }
 
   .identity {
-    grid-area: identity;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-sm);
-    min-width: 0;
-
     & strong {
-      overflow: hidden;
       font-size: var(--text-md-dynamic);
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     & span {
-      flex: none;
       font-size: var(--text-xs);
     }
   }
 
   .energyTile {
-    grid-area: energy;
-    display: flex;
-    align-items: baseline;
-    gap: 0.3rem;
-    width: auto;
-    padding: 0;
-    background: none;
-
     & strong {
       font-size: var(--text-md-dynamic);
-      font-weight: var(--font-weight-semibold);
-      line-height: inherit;
     }
 
     & span {
       font-size: var(--text-xs);
-    }
-  }
-
-  /* Fixed macro widths keep values aligned across list items, like desktop. */
-  .macros {
-    grid-area: macros;
-    display: flex;
-    gap: var(--space-xs);
-
-    & .macro {
-      width: 3.4rem;
-    }
-
-    & dd {
-      font-size: var(--text-sm);
     }
   }
 
