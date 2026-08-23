@@ -177,13 +177,13 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
         {state !== 'scanning' ? <ScannerMessage state={state} /> : null}
         {state === 'scanning' && cameras.length > 1 ? (
           <Btn
+            aria-label='Switch camera'
             className={css.switchCamera}
             icon={<SwitchCameraIcon aria-hidden='true' />}
+            iconOnly
             onClick={switchCamera}
             variant='ghost'
-          >
-            Switch camera
-          </Btn>
+          />
         ) : null}
       </div>
       {state === 'scanning' ? (
