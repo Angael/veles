@@ -470,9 +470,12 @@ function updateOptionalNutrient(
   inputValue: number | undefined,
   existingHundredths: number | null,
   ratio: number | null,
+  isProduct: boolean,
 ) {
-  if (ratio === null) return optionalHundredths(inputValue);
-  return existingHundredths === null ? null : Math.round(existingHundredths * ratio);
+  if (!isProduct) return optionalHundredths(inputValue);
+  return existingHundredths === null || ratio === null
+    ? existingHundredths
+    : Math.round(existingHundredths * ratio);
 }
 
 export const updateFoodLog = createServerFn({ method: 'POST' })
@@ -490,8 +493,9 @@ export const updateFoodLog = createServerFn({ method: 'POST' })
     if (!existing) throw new ClientSafeError('Food log not found.');
 
     const nextGrams = optionalHundredths(data.grams);
+    const isProduct = existing.productId !== null;
     const ratio =
-      existing.productId !== null && existing.gramsHundredths && nextGrams !== null
+      isProduct && existing.gramsHundredths && nextGrams !== null
         ? nextGrams / existing.gramsHundredths
         : null;
 
@@ -499,12 +503,25 @@ export const updateFoodLog = createServerFn({ method: 'POST' })
       .update(foodLogs)
       .set({
         gramsHundredths: nextGrams,
-        kcalHundredths:
-          ratio === null ? toHundredths(data.kcal) : Math.round(existing.kcalHundredths * ratio),
-        proteinHundredths: updateOptionalNutrient(data.protein, existing.proteinHundredths, ratio),
-        fatHundredths: updateOptionalNutrient(data.fat, existing.fatHundredths, ratio),
-        carbsHundredths: updateOptionalNutrient(data.carbs, existing.carbsHundredths, ratio),
-        name: existing.productId === null ? data.name.trim() : existing.name,
+        kcalHundredths: isProduct
+          ? ratio === null
+            ? existing.kcalHundredths
+            : Math.round(existing.kcalHundredths * ratio)
+          : toHundredths(data.kcal),
+        proteinHundredths: updateOptionalNutrient(
+          data.protein,
+          existing.proteinHundredths,
+          ratio,
+          isProduct,
+        ),
+        fatHundredths: updateOptionalNutrient(data.fat, existing.fatHundredths, ratio, isProduct),
+        carbsHundredths: updateOptionalNutrient(
+          data.carbs,
+          existing.carbsHundredths,
+          ratio,
+          isProduct,
+        ),
+        name: isProduct ? existing.name : data.name.trim(),
         logDate: data.date,
       })
       .where(eq(foodLogs.id, existing.id))
