@@ -89,32 +89,16 @@ export function FoodEditor({
       </div>
       <div className={css.nutritionMacros}>
         <Label text='kcal / 100 g'>
-          <NumberInput
-            defaultValue={food?.kcalPer100g ?? undefined}
-            min={0}
-            name='kcal'
-            required
-            step={1}
-          />
+          <NumberInput defaultValue={food?.kcalPer100g ?? undefined} min={0} name='kcal' required />
         </Label>
         <Label text='Protein / 100 g'>
-          <NumberInput
-            defaultValue={food?.proteinPer100g ?? undefined}
-            min={0}
-            name='protein'
-            step={1}
-          />
+          <NumberInput defaultValue={food?.proteinPer100g ?? undefined} min={0} name='protein' />
         </Label>
         <Label text='Fat / 100 g'>
-          <NumberInput defaultValue={food?.fatPer100g ?? undefined} min={0} name='fat' step={1} />
+          <NumberInput defaultValue={food?.fatPer100g ?? undefined} min={0} name='fat' />
         </Label>
         <Label text='Carbs / 100 g'>
-          <NumberInput
-            defaultValue={food?.carbsPer100g ?? undefined}
-            min={0}
-            name='carbs'
-            step={1}
-          />
+          <NumberInput defaultValue={food?.carbsPer100g ?? undefined} min={0} name='carbs' />
         </Label>
       </div>
       <Label text='Image URL'>

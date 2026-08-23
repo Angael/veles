@@ -88,7 +88,6 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
             min={0}
             name='kcal'
             onValueChange={(value) => onDraftChange({ ...draft, kcal: value })}
-            step={1}
             value={draft.kcal}
           />
         </Label>
@@ -98,7 +97,6 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
             min={0}
             name='protein'
             onValueChange={(value) => onDraftChange({ ...draft, protein: value })}
-            step={1}
             value={draft.protein}
           />
         </Label>
@@ -108,7 +106,6 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
             min={0}
             name='fats'
             onValueChange={(value) => onDraftChange({ ...draft, fats: value })}
-            step={1}
             value={draft.fats}
           />
         </Label>
@@ -118,7 +115,6 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
             min={0}
             name='carbs'
             onValueChange={(value) => onDraftChange({ ...draft, carbs: value })}
-            step={1}
             value={draft.carbs}
           />
         </Label>

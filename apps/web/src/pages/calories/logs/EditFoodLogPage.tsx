@@ -51,7 +51,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
           <h1>Edit logged entry</h1>
           <p>
             {isProduct
-              ? 'Changing quantity recalculates the saved nutrition snapshot.'
+              ? 'Product details are saved as a snapshot. Edit the product, then delete and add this entry again to use the new details.'
               : 'Adjust the custom calories and macros.'}
           </p>
         </div>
@@ -80,7 +80,6 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
                 name='kcal'
                 readOnly={isProduct}
                 required
-                step={1}
               />
             </Label>
 
@@ -90,7 +89,6 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
                 min={0}
                 name='protein'
                 readOnly={isProduct}
-                step={1}
               />
             </Label>
 
@@ -100,7 +98,6 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
                 min={0}
                 name='fat'
                 readOnly={isProduct}
-                step={1}
               />
             </Label>
 
@@ -110,15 +107,11 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
                 min={0}
                 name='carbs'
                 readOnly={isProduct}
-                step={1}
               />
             </Label>
           </div>
 
           <div className={css.actions}>
-            <Btn disabled={isPending} type='submit'>
-              Save entry
-            </Btn>
             <Btn disabled={isPending} onClick={() => void remove()} variant='ghost'>
               Delete entry
             </Btn>
@@ -131,6 +124,9 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
                 Edit product itself
               </Btn>
             ) : null}
+            <Btn disabled={isPending} type='submit'>
+              Save entry
+            </Btn>
           </div>
         </form>
       </section>

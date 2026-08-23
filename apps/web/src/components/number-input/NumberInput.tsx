@@ -13,6 +13,7 @@ export function NumberInput({
   className,
   inputClassName,
   placeholder,
+  step = 'any',
   ...props
 }: NumberInputProps) {
   return (
@@ -20,6 +21,7 @@ export function NumberInput({
       allowWheelScrub
       className={clsx(css.root, className)}
       data-required={props.required ? '' : undefined}
+      step={step}
       {...props}
     >
       <NumberField.Group className={css.group}>
