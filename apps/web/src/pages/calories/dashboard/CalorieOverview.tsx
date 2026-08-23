@@ -26,7 +26,7 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
             ))}
           </ol>
         ) : (
-          <p className={css.emptyLog}>Nothing logged for this day.</p>
+          <p className={css.emptyLog}>Nothing logged for this day</p>
         )}
       </section>
     </div>

@@ -27,6 +27,14 @@
     linear-gradient(145deg, rgba(15, 23, 42, 0.7), var(--c-surface-inset));
 }
 
+.goalAction {
+  position: absolute;
+  top: var(--space-xs);
+  right: var(--space-xs);
+  z-index: 1;
+  color: var(--c-muted);
+}
+
 .energyDial {
   position: relative;
   display: grid;
@@ -50,6 +58,7 @@
     stroke-width: 8;
   }
 }
+
 .energyDial:is(button) {
   padding: 0;
   border: 0;
@@ -87,6 +96,7 @@
 .dialGradientEnd {
   stop-color: color-mix(in srgb, currentColor 52%, white);
 }
+
 .dialOverGradientStart {
   stop-color: #fb7185;
 }
@@ -211,6 +221,7 @@
 .carbs {
   color: var(--c-macro-carb);
 }
+
 .protein .macroConsumedOver {
   color: color-mix(in srgb, var(--c-text-strong) 72%, var(--c-macro-protein));
 }

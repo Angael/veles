@@ -126,7 +126,7 @@
   --shadow-card-danger: 0 24px 70px rgba(127, 29, 29, 0.28);
   --shadow-popup: 0 24px 60px rgba(2, 6, 23, 0.4);
   --shadow-image: drop-shadow(0 30px 60px rgba(15, 23, 42, 0.5));
-  --blur-surface: blur(16px);
+  --blur-surface: blur(8px);
 
   --duration-fast: 0.2s;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
