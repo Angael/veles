@@ -4,7 +4,7 @@ import type { FormEvent } from 'react';
 import { useState } from 'react';
 import type { CalorieGoal } from '../calories.api';
 import { setDailyCalorieGoal } from './goals.api';
-import { invalidateAllCalorieWeeks } from '../calorieQueries';
+import { invalidateAllCalorieWeeks } from '../calories.query';
 import { todayLocalDate } from '../calorieHelpers';
 import { Btn } from '@/components/btn/Btn';
 import { Label } from '@/components/label/Label';
@@ -62,21 +62,16 @@ export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
             <Label text='Protein (g)'>
               <NumberInput
                 defaultValue={goal?.protein ?? undefined}
-                min={0.01}
+                min={0}
                 name='protein'
                 step={1}
               />
             </Label>
             <Label text='Fat (g)'>
-              <NumberInput defaultValue={goal?.fat ?? undefined} min={0.01} name='fat' step={1} />
+              <NumberInput defaultValue={goal?.fat ?? undefined} min={0} name='fat' step={1} />
             </Label>
             <Label text='Carbs (g)'>
-              <NumberInput
-                defaultValue={goal?.carbs ?? undefined}
-                min={0.01}
-                name='carbs'
-                step={1}
-              />
+              <NumberInput defaultValue={goal?.carbs ?? undefined} min={0} name='carbs' step={1} />
             </Label>
           </div>
 

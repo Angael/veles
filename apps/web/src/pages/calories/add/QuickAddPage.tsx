@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { recordCustomCalories } from '../calories.api';
-import { invalidateCalorieWeek } from '../calorieQueries';
+import { invalidateCalorieWeek } from '../calories.query';
 import { Btn } from '@/components/btn/Btn';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
@@ -62,15 +62,15 @@ export function QuickAddPage({ date }: { date: string }) {
             </Label>
 
             <Label text='Protein (g)'>
-              <NumberInput min={0.01} name='protein' step={1} />
+              <NumberInput min={0} name='protein' step={1} />
             </Label>
 
             <Label text='Fat (g)'>
-              <NumberInput min={0.01} name='fat' step={1} />
+              <NumberInput min={0} name='fat' step={1} />
             </Label>
 
             <Label text='Carbs (g)'>
-              <NumberInput min={0.01} name='carbs' step={1} />
+              <NumberInput min={0} name='carbs' step={1} />
             </Label>
           </div>
 

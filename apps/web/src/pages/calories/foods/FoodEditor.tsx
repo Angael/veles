@@ -100,23 +100,18 @@ export function FoodEditor({
         <Label text='Protein / 100 g'>
           <NumberInput
             defaultValue={food?.proteinPer100g ?? undefined}
-            min={0.01}
+            min={0}
             name='protein'
             step={1}
           />
         </Label>
         <Label text='Fat / 100 g'>
-          <NumberInput
-            defaultValue={food?.fatPer100g ?? undefined}
-            min={0.01}
-            name='fat'
-            step={1}
-          />
+          <NumberInput defaultValue={food?.fatPer100g ?? undefined} min={0} name='fat' step={1} />
         </Label>
         <Label text='Carbs / 100 g'>
           <NumberInput
             defaultValue={food?.carbsPer100g ?? undefined}
-            min={0.01}
+            min={0}
             name='carbs'
             step={1}
           />

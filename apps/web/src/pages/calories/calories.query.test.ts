@@ -6,7 +6,7 @@ vi.mock('./calories.api', () => ({
   getFoodProducts: vi.fn(),
 }));
 
-import { calorieDashboardQueryOptions, calorieFoodsQueryOptions } from './calorieQueries';
+import { calorieDashboardQueryOptions, calorieFoodsQueryOptions } from './calories.query';
 
 describe('calorie query keys', () => {
   it('uses one dashboard cache entry for every date in the same week', () => {

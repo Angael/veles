@@ -4,6 +4,7 @@ import {
   getCalorieDashboard,
   getFoodProduct,
   getFoodProducts,
+  recordFood,
 } from './calories.api';
 import { calorieWeekStart } from './calorieHelpers';
 
@@ -14,6 +15,12 @@ const calorieFoodsKey = ['calorie-foods'] as const;
 type DeleteFoodLogVariables = {
   date: string;
   id: string;
+};
+
+type RecordFoodVariables = {
+  date: string;
+  grams: number;
+  productId: string;
 };
 
 export function calorieDashboardQueryOptions(date: string) {
@@ -45,6 +52,16 @@ export function calorieFoodsQueryOptions() {
 export function useDeleteFoodLogMutation() {
   return useMutation({
     mutationFn: ({ id }: DeleteFoodLogVariables) => deleteFoodLog({ data: { id } }),
+    onSuccess: (_data, { date }, _onMutateResult, context) =>
+      context.client.invalidateQueries({
+        queryKey: calorieDashboardQueryOptions(date).queryKey,
+      }),
+  });
+}
+
+export function useRecordFoodMutation() {
+  return useMutation({
+    mutationFn: (variables: RecordFoodVariables) => recordFood({ data: variables }),
     onSuccess: (_data, { date }, _onMutateResult, context) =>
       context.client.invalidateQueries({
         queryKey: calorieDashboardQueryOptions(date).queryKey,

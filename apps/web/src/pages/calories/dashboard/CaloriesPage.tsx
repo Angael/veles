@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import { addDays, format, isAfter, parseISO } from 'date-fns';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import type { CalorieDashboard } from '../calories.api';
-import { calorieDashboardQueryOptions } from '../calorieQueries';
+import { calorieDashboardQueryOptions } from '../calories.query';
 import { CalorieOverview } from './CalorieOverview';
 import { LogFoodMenu } from './LogFoodMenu';
 import { CALORIE_DATE_FORMAT, calorieWeekDates, todayLocalDate } from '../calorieHelpers';

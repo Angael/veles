@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { lookupFoodByBarcode } from '../calories.api';
-import { invalidateCalorieFoods } from '../calorieQueries';
+import { invalidateCalorieFoods } from '../calories.query';
 import { BarcodeScanner } from './BarcodeScanner';
 import { SelectedFoodForm } from './SelectedFoodForm';
 import { Btn } from '@/components/btn/Btn';

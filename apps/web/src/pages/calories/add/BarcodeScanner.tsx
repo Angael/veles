@@ -7,7 +7,7 @@ import { type ReactElement, useEffect, useRef, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import css from './BarcodeScanner.module.css';
-import { countBackwardFacingCameras, useCameraPreference } from './useCameraPreference';
+import { useCameraPreference } from './useCameraPreference';
 
 type BarcodeDetectorLike = Pick<PolyfillBarcodeDetector, 'detect'>;
 type BarcodeDetectorConstructor = new (options: {
@@ -59,16 +59,17 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
   const [state, setState] = useState<ScannerState>('starting');
   const {
     cameras,
-    cameraHintDismissed,
+    cameraHintVisible,
     cameraNotice,
+    cameraPreferenceReady,
     clearUnavailablePreference,
     completeCameraSwitch,
-    dismissCameraHint,
     preferredCameraId,
     registerActiveCamera,
     selectNextCamera,
   } = useCameraPreference();
   useEffect(() => {
+    if (!cameraPreferenceReady) return;
     let active = true;
     let animationFrame = 0;
     let stream: MediaStream | undefined;
@@ -170,7 +171,7 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
       cancelAnimationFrame(animationFrame);
       stream?.getTracks().forEach((track) => track.stop());
     };
-  }, [preferredCameraId]);
+  }, [cameraPreferenceReady, preferredCameraId]);
 
   function switchCamera() {
     if (!selectNextCamera()) return;
@@ -216,12 +217,9 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
             />
           </div>
         ) : null}
-        {state === 'scanning' && countBackwardFacingCameras(cameras) > 1 && !cameraHintDismissed ? (
+        {state === 'scanning' && cameraHintVisible ? (
           <Card className={css.cameraHint} shadow={false} variant='primary'>
-            <p>If the image looks blurry, try switching to another rear camera.</p>
-            <Btn onClick={dismissCameraHint} variant='ghost'>
-              Got it
-            </Btn>
+            If the image looks blurry, try switching to another rear camera.
           </Card>
         ) : null}
       </div>

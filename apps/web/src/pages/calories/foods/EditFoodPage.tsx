@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { updateFoodProduct } from '../calories.api';
-import { invalidateCalorieFoods } from '../calorieQueries';
+import { invalidateCalorieFoods } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
 import { todayLocalDate } from '../calorieHelpers';
 import css from '../CalorieFlows.module.css';

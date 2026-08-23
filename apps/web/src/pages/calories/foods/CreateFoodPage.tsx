@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { createFoodProduct } from '../calories.api';
-import { invalidateCalorieFoods } from '../calorieQueries';
+import { invalidateCalorieFoods } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
 import css from '../CalorieFlows.module.css';
 

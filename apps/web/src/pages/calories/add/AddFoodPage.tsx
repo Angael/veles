@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { PlusIcon } from 'lucide-react';
 import { useEffect, useState, useTransition } from 'react';
 import type { CalorieFood } from '../calories.api';
-import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '../calorieQueries';
+import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '../calories.query';
 import { formatNutritionNumber } from '../dashboard/nutritionFormat';
 import { SelectedFoodForm } from './SelectedFoodForm';
 import { filterFoods } from './filterFoods';

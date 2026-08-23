@@ -1,10 +1,9 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { PencilIcon } from 'lucide-react';
 import { useState } from 'react';
 import type { CalorieFood } from '../calories.api';
-import { recordFood } from '../calories.api';
-import { calorieDashboardQueryOptions, invalidateCalorieWeek } from '../calorieQueries';
+import { calorieDashboardQueryOptions, useRecordFoodMutation } from '../calories.query';
 import { formatNutritionNumber } from '../dashboard/nutritionFormat';
 import { Btn } from '@/components/btn/Btn';
 import { DateInput } from '@/components/date-input/DateInput';
@@ -25,11 +24,10 @@ function nutritionAtGrams(valuePer100g: number | null, grams: number) {
 
 /** Confirms a food log while keeping its nutrition preview and daily allowance in sync. */
 export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: Props) {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const recordFoodMutation = useRecordFoodMutation();
   const [date, setDate] = useState(initialDate);
   const [grams, setGrams] = useState<number | null>(food.productSizeGrams ?? 100);
-  const [mutationPending, setMutationPending] = useState(false);
   const dashboardQuery = useQuery(calorieDashboardQueryOptions(date));
   const day = dashboardQuery.data?.days.find((candidate) => candidate.date === date);
   const selectedGrams = grams ?? 0;
@@ -40,14 +38,12 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
   const remaining = day?.goal ? Math.round(day.goal.kcal - day.totals.kcal) : null;
 
   async function save() {
-    setMutationPending(true);
-    try {
-      await recordFood({ data: { date, grams: selectedGrams, productId: food.id } });
-      await invalidateCalorieWeek(queryClient, date);
-      await navigate({ to: '/calories', search: { date } });
-    } finally {
-      setMutationPending(false);
-    }
+    await recordFoodMutation.mutateAsync({
+      date,
+      grams: selectedGrams,
+      productId: food.id,
+    });
+    await navigate({ to: '/calories', search: { date } });
   }
 
   return (
@@ -111,7 +107,7 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
           <Btn onClick={onCancel} variant='ghost'>
             {cancelLabel}
           </Btn>
-          <Btn loading={mutationPending} onClick={() => void save()}>
+          <Btn loading={recordFoodMutation.isPending} onClick={() => void save()}>
             Save
           </Btn>
         </div>

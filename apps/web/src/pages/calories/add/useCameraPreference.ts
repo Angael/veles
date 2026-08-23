@@ -8,7 +8,9 @@ const cameraHintDismissedStorageKey = 'barcodeScanner.cameraHintDismissed';
 export function useCameraPreference() {
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState('');
+  const [cameraPreferenceReady, setCameraPreferenceReady] = useState(false);
   const [cameraNotice, setCameraNotice] = useState('');
+  const [cameraHintVisible, setCameraHintVisible] = useState(false);
   const cameraNoticeTimeoutRef = useRef<number | undefined>(undefined);
   const cameraSwitchPendingRef = useRef(false);
   const [preferredCameraId, setPreferredCameraId] = useLocalStorageState(
@@ -19,6 +21,24 @@ export function useCameraPreference() {
     cameraHintDismissedStorageKey,
     false,
   );
+
+  useEffect(() => {
+    setCameraPreferenceReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (cameraHintDismissed || countBackwardFacingCameras(cameras) < 2) {
+      setCameraHintVisible(false);
+      return;
+    }
+
+    setCameraHintVisible(true);
+    const timeout = window.setTimeout(() => {
+      setCameraHintVisible(false);
+      setCameraHintDismissed(true);
+    }, 6000);
+    return () => clearTimeout(timeout);
+  }, [cameraHintDismissed, cameras]);
 
   /** Shows camera feedback and keeps resetting its dismissal while the control is used repeatedly. */
   function showCameraNotice(message: string) {
@@ -68,11 +88,11 @@ export function useCameraPreference() {
 
   return {
     cameras,
+    cameraHintVisible,
+    cameraPreferenceReady,
     cameraNotice,
-    cameraHintDismissed,
     clearUnavailablePreference,
     completeCameraSwitch,
-    dismissCameraHint: () => setCameraHintDismissed(true),
     preferredCameraId,
     registerActiveCamera,
     selectNextCamera,

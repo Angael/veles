@@ -4,8 +4,8 @@ import type { FormEvent } from 'react';
 import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
 import { updateFoodLog } from '../calories.api';
-import { useDeleteFoodLogMutation } from '../calorieQueries';
-import { invalidateCalorieWeek } from '../calorieQueries';
+import { useDeleteFoodLogMutation } from '../calories.query';
+import { invalidateCalorieWeek } from '../calories.query';
 import { Btn } from '@/components/btn/Btn';
 import { DateInput } from '@/components/date-input/DateInput';
 import { Label } from '@/components/label/Label';
@@ -102,7 +102,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             <Label text='Protein (g)'>
               <NumberInput
                 defaultValue={log.protein ?? undefined}
-                min={0.01}
+                min={0}
                 name='protein'
                 readOnly={isProduct}
                 step={1}
@@ -112,7 +112,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             <Label text='Fat (g)'>
               <NumberInput
                 defaultValue={log.fat ?? undefined}
-                min={0.01}
+                min={0}
                 name='fat'
                 readOnly={isProduct}
                 step={1}
@@ -122,7 +122,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             <Label text='Carbs (g)'>
               <NumberInput
                 defaultValue={log.carbs ?? undefined}
-                min={0.01}
+                min={0}
                 name='carbs'
                 readOnly={isProduct}
                 step={1}

@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 import { createFileRoute } from '@tanstack/react-router';
 import { AddFoodPage } from '@/pages/calories/add/AddFoodPage';
-import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '@/pages/calories/calorieQueries';
+import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '@/pages/calories/calories.query';
 import { normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 
 export const Route = createFileRoute('/_authenticated/calories_/add')({

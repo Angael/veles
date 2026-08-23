@@ -2,7 +2,7 @@ import { type } from 'arktype';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { CaloriesPage } from '@/pages/calories/dashboard/CaloriesPage';
-import { calorieDashboardQueryOptions } from '@/pages/calories/calorieQueries';
+import { calorieDashboardQueryOptions } from '@/pages/calories/calories.query';
 import { calorieWeekStart, normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 
 export const Route = createFileRoute('/_authenticated/calories')({

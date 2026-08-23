@@ -23,6 +23,10 @@
 - they should always use log middleware: `.middleware([logMiddleware('<name>')])`
 - If it accepts input, use `.validator(arkTypeValidator(...))` with `arktype` and `@tanstack/arktype-adapter`.
 
+## Queries and Mutations
+- Keep TanStack Query options and mutation hooks in `*.query.ts` files near their usage.
+- Components should consume reusable `useQuery` options and `useMutation` hooks from those files instead of manually calling server functions, tracking pending state, or passing a `QueryClient` to invalidation helpers.
+
 ## UI
 - Prefer css modules, prefer syntax `import css from ...`
 - In css modules, prefer nested selectors when it keeps related styles together.

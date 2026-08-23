@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { CalorieGoalsPage } from '@/pages/calories/goals/CalorieGoalsPage';
-import { calorieDashboardQueryOptions } from '@/pages/calories/calorieQueries';
+import { calorieDashboardQueryOptions } from '@/pages/calories/calories.query';
 import { todayLocalDate } from '@/pages/calories/calorieHelpers';
 
 export const Route = createFileRoute('/_authenticated/calories_/goals')({

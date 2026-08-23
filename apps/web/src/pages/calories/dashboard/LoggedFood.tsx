@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Trash2Icon } from 'lucide-react';
 import type { CalorieLog } from '../calories.api';
-import { useDeleteFoodLogMutation } from '../calorieQueries';
+import { useDeleteFoodLogMutation } from '../calories.query';
 import { formatNutritionNumber } from './nutritionFormat';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
