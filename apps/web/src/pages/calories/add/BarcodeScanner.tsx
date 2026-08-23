@@ -5,8 +5,9 @@ import type {
 import { CameraIcon, CameraOffIcon, SwitchCameraIcon, XIcon } from 'lucide-react';
 import { type ReactElement, useEffect, useRef, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
-import { useLocalStorageState } from '@/lib/hooks/useLocalStorageState';
+import { Card } from '@/components/card/Card';
 import css from './BarcodeScanner.module.css';
+import { countBackwardFacingCameras, useCameraPreference } from './useCameraPreference';
 
 type BarcodeDetectorLike = Pick<PolyfillBarcodeDetector, 'detect'>;
 type BarcodeDetectorConstructor = new (options: {
@@ -27,7 +28,6 @@ type BarcodeScannerProps = {
 };
 
 const formats: BarcodeFormat[] = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'];
-const preferredCameraStorageKey = 'barcodeScanner.preferredCameraId';
 
 /** Uses the native detector when available and only downloads the WASM-backed fallback when needed. */
 async function createDetector(): Promise<BarcodeDetectorLike> {
@@ -55,15 +55,19 @@ async function enableContinuousFocus(stream: MediaStream) {
 export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const callbackRef = useRef(onDetected);
-  const [state, setState] = useState<ScannerState>('starting');
-  const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
-  const [currentDeviceId, setCurrentDeviceId] = useState('');
-  const [preferredCameraId, setPreferredCameraId] = useLocalStorageState(
-    preferredCameraStorageKey,
-    '',
-  );
   callbackRef.current = onDetected;
-
+  const [state, setState] = useState<ScannerState>('starting');
+  const {
+    cameras,
+    cameraHintDismissed,
+    cameraNotice,
+    clearUnavailablePreference,
+    completeCameraSwitch,
+    dismissCameraHint,
+    preferredCameraId,
+    registerActiveCamera,
+    selectNextCamera,
+  } = useCameraPreference();
   useEffect(() => {
     let active = true;
     let animationFrame = 0;
@@ -96,17 +100,21 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
                 },
           }),
         ]);
+        if (!active) {
+          cameraStream.getTracks().forEach((track) => track.stop());
+          return;
+        }
         await enableContinuousFocus(cameraStream).catch(() => undefined);
         const videoTrack = cameraStream.getVideoTracks()[0];
         const activeDeviceId = videoTrack?.getSettings().deviceId ?? '';
-        setCurrentDeviceId(activeDeviceId);
-        if (activeDeviceId && activeDeviceId !== preferredCameraId) {
-          setPreferredCameraId(activeDeviceId);
-        }
         const availableCameras = (await navigator.mediaDevices.enumerateDevices()).filter(
           (device) => device.kind === 'videoinput',
         );
-        if (active) setCameras(availableCameras);
+        if (!active) {
+          cameraStream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+        registerActiveCamera(activeDeviceId, availableCameras);
         stream = cameraStream;
         const video = videoRef.current;
         if (!active || !video) {
@@ -117,6 +125,7 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
         video.srcObject = cameraStream;
         await video.play();
         setState('scanning');
+        completeCameraSwitch();
 
         const scan = async (timestamp: number) => {
           if (!active) return;
@@ -140,11 +149,10 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
       } catch (error) {
         if (!active) return;
         if (
-          preferredCameraId &&
           error instanceof DOMException &&
-          (error.name === 'NotFoundError' || error.name === 'OverconstrainedError')
+          (error.name === 'NotFoundError' || error.name === 'OverconstrainedError') &&
+          clearUnavailablePreference()
         ) {
-          setPreferredCameraId('');
           return;
         }
         setState(
@@ -165,11 +173,8 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
   }, [preferredCameraId]);
 
   function switchCamera() {
-    if (cameras.length < 2) return;
-    const currentIndex = cameras.findIndex((camera) => camera.deviceId === currentDeviceId);
-    const nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % cameras.length;
+    if (!selectNextCamera()) return;
     setState('starting');
-    setPreferredCameraId(cameras[nextIndex]?.deviceId ?? '');
   }
 
   return (
@@ -192,15 +197,32 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
       <div className={css.viewport}>
         <video aria-label='Live camera preview' muted playsInline ref={videoRef} />
         {state !== 'scanning' ? <ScannerMessage state={state} /> : null}
-        {state === 'scanning' && cameras.length > 1 ? (
-          <Btn
-            aria-label='Switch camera'
-            className={css.switchCamera}
-            icon={<SwitchCameraIcon aria-hidden='true' />}
-            iconOnly
-            onClick={switchCamera}
-            variant='ghost'
-          />
+        {cameras.length > 1 ? (
+          <div className={css.cameraControls}>
+            <div
+              aria-live='polite'
+              className={css.cameraNotice}
+              data-visible={cameraNotice ? '' : undefined}
+            >
+              {cameraNotice}
+            </div>
+            <Btn
+              aria-label='Switch camera'
+              className={css.switchCamera}
+              icon={<SwitchCameraIcon aria-hidden='true' />}
+              iconOnly
+              onClick={switchCamera}
+              variant='ghost'
+            />
+          </div>
+        ) : null}
+        {state === 'scanning' && countBackwardFacingCameras(cameras) > 1 && !cameraHintDismissed ? (
+          <Card className={css.cameraHint} shadow={false} variant='primary'>
+            <p>If the image looks blurry, try switching to another rear camera.</p>
+            <Btn onClick={dismissCameraHint} variant='ghost'>
+              Got it
+            </Btn>
+          </Card>
         ) : null}
       </div>
       {state === 'scanning' ? (

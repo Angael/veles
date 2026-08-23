@@ -56,21 +56,21 @@ export function QuickAddPage({ date }: { date: string }) {
             <TextInput defaultValue='Quick add' name='name' required />
           </Label>
 
-          <div className={css.grid}>
+          <div className={css.nutritionMacros}>
             <Label text='kcal'>
               <NumberInput min={0} name='kcal' required step={1} />
             </Label>
 
             <Label text='Protein (g)'>
-              <NumberInput min={0} name='protein' step={1} />
+              <NumberInput min={0.01} name='protein' step={1} />
             </Label>
 
             <Label text='Fat (g)'>
-              <NumberInput min={0} name='fat' step={1} />
+              <NumberInput min={0.01} name='fat' step={1} />
             </Label>
 
             <Label text='Carbs (g)'>
-              <NumberInput min={0} name='carbs' step={1} />
+              <NumberInput min={0.01} name='carbs' step={1} />
             </Label>
           </div>
 

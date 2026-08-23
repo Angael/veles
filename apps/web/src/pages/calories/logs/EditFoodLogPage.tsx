@@ -85,7 +85,9 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             <Label text='Quantity (g)'>
               <NumberInput defaultValue={log.grams ?? undefined} min={0} name='grams' step={1} />
             </Label>
+          </div>
 
+          <div className={css.nutritionMacros}>
             <Label text='kcal'>
               <NumberInput
                 defaultValue={log.kcal}
@@ -100,7 +102,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             <Label text='Protein (g)'>
               <NumberInput
                 defaultValue={log.protein ?? undefined}
-                min={0}
+                min={0.01}
                 name='protein'
                 readOnly={isProduct}
                 step={1}
@@ -110,7 +112,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             <Label text='Fat (g)'>
               <NumberInput
                 defaultValue={log.fat ?? undefined}
-                min={0}
+                min={0.01}
                 name='fat'
                 readOnly={isProduct}
                 step={1}
@@ -120,7 +122,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             <Label text='Carbs (g)'>
               <NumberInput
                 defaultValue={log.carbs ?? undefined}
-                min={0}
+                min={0.01}
                 name='carbs'
                 readOnly={isProduct}
                 step={1}

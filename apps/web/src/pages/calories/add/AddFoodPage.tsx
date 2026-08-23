@@ -1,20 +1,15 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { PencilIcon, PlusIcon } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
+import { PlusIcon } from 'lucide-react';
 import { useEffect, useState, useTransition } from 'react';
 import type { CalorieFood } from '../calories.api';
-import { recordFood } from '../calories.api';
-import {
-  calorieFoodQueryOptions,
-  calorieFoodsQueryOptions,
-  invalidateCalorieWeek,
-} from '../calorieQueries';
+import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '../calorieQueries';
 import { formatNutritionNumber } from '../dashboard/nutritionFormat';
+import { SelectedFoodForm } from './SelectedFoodForm';
 import { filterFoods } from './filterFoods';
 import { Btn } from '@/components/btn/Btn';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { Label } from '@/components/label/Label';
-import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
 import css from './AddFoodPage.module.css';
 
@@ -23,20 +18,15 @@ type Props = { date: string; initialFoodId?: string };
 function shownGrams(food: CalorieFood) {
   return food.productSizeGrams ?? 100;
 }
-
 function nutritionAtGrams(valuePer100g: number | null, grams: number) {
   return Math.round(((valuePer100g ?? 0) * grams) / 100);
 }
 
 export function AddFoodPage({ date, initialFoodId }: Props) {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [filterQuery, setFilterQuery] = useState('');
   const [isFiltering, startFiltering] = useTransition();
   const [selected, setSelected] = useState<CalorieFood | null>(null);
-  const [grams, setGrams] = useState<number | null>(100);
-  const [mutationPending, setMutationPending] = useState(false);
   const foodQuery = useQuery({
     ...calorieFoodQueryOptions(initialFoodId ?? ''),
     enabled: initialFoodId !== undefined,
@@ -48,63 +38,20 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
     if (!foodQuery.data) return;
 
     setSelected(foodQuery.data);
-    setGrams(shownGrams(foodQuery.data));
   }, [foodQuery.data]);
-
-  async function add() {
-    if (!selected) return;
-    setMutationPending(true);
-    try {
-      await recordFood({ data: { date, grams: grams ?? 0, productId: selected.id } });
-      await invalidateCalorieWeek(queryClient, date);
-      await navigate({ to: '/calories', search: { date } });
-    } finally {
-      setMutationPending(false);
-    }
-  }
 
   function selectFood(food: CalorieFood) {
     setSelected(food);
-    setGrams(shownGrams(food));
   }
 
   if (selected) {
-    const selectedGrams = grams ?? 0;
-    const kcal = nutritionAtGrams(selected.kcalPer100g, selectedGrams);
-
     return (
-      <main className={css.page}>
-        <section className={css.panel}>
-          <div className={css.selectedSummary}>
-            <div>
-              <strong>{selected.name}</strong>
-              <span>{formatNutritionNumber(kcal)} kcal</span>
-            </div>
-            <Btn
-              aria-label={`Edit ${selected.name}`}
-              icon={<PencilIcon aria-hidden='true' />}
-              iconOnly
-              isLink
-              render={<Link params={{ foodId: selected.id }} to='/calories/foods/$foodId' />}
-              size='sm'
-              variant='ghost'
-            />
-          </div>
-
-          <Label text='Amount eaten (g)'>
-            <NumberInput min={0.01} onValueChange={setGrams} step={1} value={grams} />
-          </Label>
-
-          <div className={css.selectedActions}>
-            <Btn onClick={() => setSelected(null)} variant='ghost'>
-              Go back
-            </Btn>
-            <Btn loading={mutationPending} onClick={() => void add()}>
-              Save
-            </Btn>
-          </div>
-        </section>
-      </main>
+      <SelectedFoodForm
+        cancelLabel='Go back'
+        food={selected}
+        initialDate={date}
+        onCancel={() => setSelected(null)}
+      />
     );
   }
 

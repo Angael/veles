@@ -53,7 +53,7 @@ export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
             <Label text='Daily kcal'>
               <NumberInput
                 defaultValue={goal?.kcal ?? undefined}
-                min={0.01}
+                min={1}
                 name='kcal'
                 required
                 step={10}

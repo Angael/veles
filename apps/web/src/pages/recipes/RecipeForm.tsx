@@ -95,7 +95,7 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
 
         <Label text='Protein'>
           <NumberInput
-            min={0}
+            min={0.01}
             name='protein'
             onValueChange={(value) => onDraftChange({ ...draft, protein: value })}
             step={1}
@@ -105,7 +105,7 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
 
         <Label text='Fats'>
           <NumberInput
-            min={0}
+            min={0.01}
             name='fats'
             onValueChange={(value) => onDraftChange({ ...draft, fats: value })}
             step={1}
@@ -115,7 +115,7 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
 
         <Label text='Carbs'>
           <NumberInput
-            min={0}
+            min={0.01}
             name='carbs'
             onValueChange={(value) => onDraftChange({ ...draft, carbs: value })}
             step={1}

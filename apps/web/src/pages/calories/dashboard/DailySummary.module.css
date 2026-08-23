@@ -29,8 +29,8 @@
 
 .goalAction {
   position: absolute;
-  top: var(--space-xs);
-  right: var(--space-xs);
+  top: 0;
+  right: 0;
   z-index: 1;
   color: var(--c-muted);
 }

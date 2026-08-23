@@ -56,14 +56,20 @@ export function FoodEditor({
   }
   return (
     <form className={css.form} onSubmit={(event) => void handleSubmit(event)}>
-      <div className={css.grid}>
+      {food ? (
+        <div className={css.grid}>
+          <Label text='Product name'>
+            <TextInput defaultValue={food.name} name='name' required />
+          </Label>
+          <Label text='Brand'>
+            <TextInput defaultValue={food.brand ?? ''} name='brand' />
+          </Label>
+        </div>
+      ) : (
         <Label text='Product name'>
-          <TextInput defaultValue={food?.name ?? initialName} name='name' required />
+          <TextInput defaultValue={initialName} name='name' required />
         </Label>
-        <Label text='Brand'>
-          <TextInput defaultValue={food?.brand ?? ''} name='brand' />
-        </Label>
-      </div>
+      )}
       <div className={css.grid}>
         <Label text='Barcode'>
           <TextInput
@@ -75,13 +81,13 @@ export function FoodEditor({
         <Label text='Product size (g)'>
           <NumberInput
             defaultValue={food?.productSizeGrams ?? undefined}
-            min={0.01}
+            min={1}
             name='size'
             step={1}
           />
         </Label>
       </div>
-      <div className={css.grid}>
+      <div className={css.nutritionMacros}>
         <Label text='kcal / 100 g'>
           <NumberInput
             defaultValue={food?.kcalPer100g ?? undefined}
@@ -94,18 +100,23 @@ export function FoodEditor({
         <Label text='Protein / 100 g'>
           <NumberInput
             defaultValue={food?.proteinPer100g ?? undefined}
-            min={0}
+            min={0.01}
             name='protein'
             step={1}
           />
         </Label>
         <Label text='Fat / 100 g'>
-          <NumberInput defaultValue={food?.fatPer100g ?? undefined} min={0} name='fat' step={1} />
+          <NumberInput
+            defaultValue={food?.fatPer100g ?? undefined}
+            min={0.01}
+            name='fat'
+            step={1}
+          />
         </Label>
         <Label text='Carbs / 100 g'>
           <NumberInput
             defaultValue={food?.carbsPer100g ?? undefined}
-            min={0}
+            min={0.01}
             name='carbs'
             step={1}
           />

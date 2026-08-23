@@ -13,7 +13,7 @@ type DailySummaryProps = {
 
 export function DailySummary({ goal, totals }: DailySummaryProps) {
   const remaining = goal ? goal.kcal - totals.kcal : null;
-  const energyValue = remaining ?? totals.kcal;
+  const energyValue = Math.round(remaining ?? totals.kcal);
   const energyProgress = progressFor(totals.kcal, goal?.kcal);
   const energyOverProgress =
     goal && totals.kcal > goal.kcal ? progressFor(totals.kcal - goal.kcal, goal.kcal) : null;

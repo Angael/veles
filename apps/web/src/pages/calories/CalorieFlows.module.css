@@ -71,6 +71,12 @@
   gap: 0.8rem;
 }
 
+.nutritionMacros {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -200,6 +206,12 @@
   display: block;
   color: var(--c-muted);
 }
+@media (--phone) {
+  .nutritionMacros {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (--sm) {
   .grid {
     grid-template-columns: 1fr;

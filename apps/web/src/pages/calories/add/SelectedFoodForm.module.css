@@ -1,0 +1,138 @@
+@import '../../../styles/breakpoints.css';
+
+.page {
+  width: min(760px, 100%);
+  margin-inline: auto;
+  display: grid;
+  gap: var(--space-md);
+  padding-bottom: 5rem;
+}
+
+.product,
+.panel {
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+  padding: var(--space-md);
+}
+
+.product {
+  display: flex;
+  gap: var(--space-md);
+
+  & > img {
+    width: 7rem;
+    height: 7rem;
+    flex: none;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+  }
+}
+
+.productBody {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+  gap: var(--space-md);
+}
+
+.productHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+
+  & > div {
+    min-width: 0;
+    display: grid;
+    gap: var(--space-xs);
+  }
+
+  & strong {
+    font-size: var(--text-lg);
+    text-wrap: balance;
+  }
+
+  & span {
+    color: var(--c-muted);
+  }
+}
+
+.nutrition {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-sm);
+
+  & > div {
+    padding-left: var(--space-sm);
+    border-left: 3px solid var(--c-border-strong);
+  }
+
+  & dt {
+    color: var(--c-muted);
+    font-size: var(--text-xs);
+  }
+
+  & dd {
+    margin: 0;
+    font-weight: var(--font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+}
+
+.nutrition > .energy {
+  border-left-color: var(--c-accent);
+}
+
+.nutrition > .protein {
+  border-left-color: var(--c-macro-protein);
+}
+
+.nutrition > .fat {
+  border-left-color: var(--c-macro-fat);
+}
+
+.nutrition > .carbs {
+  border-left-color: var(--c-macro-carb);
+}
+
+.panel {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.remaining {
+  color: var(--c-muted);
+  font-variant-numeric: tabular-nums;
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}
+
+@media (--phone) {
+  .product {
+    & > img {
+      width: 4.5rem;
+      height: 4.5rem;
+    }
+  }
+
+  .nutrition {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fields {
+    grid-template-columns: 1fr;
+  }
+}
