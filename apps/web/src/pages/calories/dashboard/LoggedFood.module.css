@@ -1,51 +1,112 @@
 .item {
-  position: relative;
   min-width: 0;
-  /* Shared with .card so the phone grid's first row matches the button exactly. */
-  --btn-height: 2.75rem;
-}
-
-.cardLink {
-  display: block;
-  color: inherit;
-  text-decoration: none;
 }
 
 .card {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  grid-template-areas:
-    'identity identity'
-    'energy macros';
+  position: relative;
+  display: flex;
   align-items: center;
-  column-gap: var(--space-lg);
-  row-gap: 0.2rem;
-  padding: var(--space-md) calc(var(--btn-height, 2.75rem) + var(--space-lg)) var(--space-md)
-    var(--space-md);
+  gap: var(--space-lg);
+  padding: var(--space-md);
   user-select: none;
   transition:
     border-color 180ms var(--ease-out),
     background-color 180ms var(--ease-out);
 }
 
+/* The name link stretches its hit area over the whole card. */
+.cardLink {
+  flex: 1;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardLink::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
 .cardLink:focus-visible {
   outline: none;
 }
 
-.cardLink:focus-visible .card {
+.card:has(.cardLink:focus-visible) {
   outline: 2px solid var(--c-primary-focus);
   outline-offset: 2px;
 }
 
 .energyTile {
-  grid-area: energy;
+  flex: none;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  width: 4rem;
+  padding: 0.55rem 0.25rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--c-accent) 12%, transparent);
+  color: var(--c-accent-strong);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+
+  & strong {
+    min-width: 4ch;
+    font-size: var(--text-lg);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  & span {
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.name {
+  font-size: var(--text-lg);
+}
+
+.grams {
+  flex: none;
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.bottom {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* Fixed-width kcal group keeps the macros starting at the same x on every row. */
+.energyInline {
+  flex: none;
+  display: none;
+  width: 4.5rem;
   align-items: baseline;
   gap: 0.3rem;
   font-variant-numeric: tabular-nums;
 
   & strong {
-    min-width: 4ch;
     color: var(--c-accent-strong);
     font-size: var(--text-md);
     font-weight: var(--font-weight-semibold);
@@ -59,32 +120,8 @@
   }
 }
 
-.identity {
-  grid-area: identity;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-sm);
-  min-width: 0;
-
-  & strong {
-    overflow: hidden;
-    font-size: var(--text-lg);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  & span {
-    flex: none;
-    color: var(--c-muted);
-    font-size: var(--text-sm);
-    font-variant-numeric: tabular-nums;
-  }
-}
-
 /* Fixed macro widths keep each value aligned across all list items. */
 .macros {
-  grid-area: macros;
   display: flex;
   gap: var(--space-xs);
 
@@ -135,13 +172,10 @@
 }
 
 .deleteButton {
+  --btn-height: 2.75rem;
   --btn-icon-size: 1.05rem;
 
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  right: var(--space-sm);
-  transform: translateY(-50%);
+  flex: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -154,41 +188,34 @@
 
 @media (--phone) {
   .card {
-    /* First row matches the delete button's box so it sits centered on that row. */
-    grid-template-rows: var(--btn-height, 2.75rem) auto;
-    column-gap: var(--space-sm);
-    padding: var(--space-sm) calc(var(--btn-height, 2.75rem) + var(--space-sm)) var(--space-sm)
-      var(--space-md);
-  }
-
-  .identity {
-    & strong {
-      font-size: var(--text-md-dynamic);
-    }
-
-    & span {
-      font-size: var(--text-xs);
-    }
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
   }
 
   .energyTile {
-    & strong {
-      font-size: var(--text-md-dynamic);
-    }
-
-    & span {
-      font-size: var(--text-xs);
-    }
+    display: none;
   }
 
-  .deleteButton {
-    top: var(--space-sm);
-    transform: none;
+  .energyInline {
+    display: flex;
+  }
+
+  .name {
+    font-size: var(--text-md-dynamic);
+  }
+
+  .grams,
+  .energyInline span {
+    font-size: var(--text-xs);
+  }
+
+  .energyInline strong {
+    font-size: var(--text-md-dynamic);
   }
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .cardLink:hover .card {
+  .card:has(.cardLink:hover) {
     border-color: var(--c-primary-border);
     background: color-mix(in srgb, var(--c-surface) 88%, var(--c-primary) 12%);
   }
