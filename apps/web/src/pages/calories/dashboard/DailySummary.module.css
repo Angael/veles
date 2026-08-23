@@ -6,6 +6,7 @@
   display: grid;
   grid-template-columns: minmax(15rem, 18rem) minmax(18rem, 1fr);
   gap: var(--space-sm);
+  height: 12.5rem;
 }
 
 .energyPanel {
@@ -14,7 +15,7 @@
   place-items: center;
   width: 100%;
   min-width: 0;
-  aspect-ratio: 1;
+  height: 100%;
   align-self: start;
   overflow: hidden;
   padding: var(--space-md);
@@ -30,7 +31,7 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: min(100%, 12rem);
+  width: min(100%, 10.5rem);
   aspect-ratio: 1;
   margin-inline: auto;
   color: var(--c-accent);
@@ -158,6 +159,7 @@
   grid-template-rows: repeat(3, minmax(0, 1fr));
   gap: var(--space-xs);
   min-width: 0;
+  min-height: 0;
 }
 
 .protein,
@@ -319,17 +321,18 @@
 @media (--phone) {
   .body {
     grid-template-columns: 1fr;
+    height: auto;
   }
 
   .energyPanel {
     width: 100%;
-    min-height: 16rem;
-    aspect-ratio: auto;
+    height: 13.5rem;
+    min-height: 0;
     padding: var(--space-sm);
   }
 
   .energyDial {
-    width: min(11.5rem, 70vw);
+    width: min(10.5rem, 62vw);
   }
 }
 
