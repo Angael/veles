@@ -3,10 +3,10 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('./calories.api', () => ({
   getCalorieDashboard: vi.fn(),
   getFoodProduct: vi.fn(),
-  searchFoods: vi.fn(),
+  getFoodProducts: vi.fn(),
 }));
 
-import { calorieDashboardQueryOptions, calorieFoodSearchQueryOptions } from './calorieQueries';
+import { calorieDashboardQueryOptions, calorieFoodsQueryOptions } from './calorieQueries';
 
 describe('calorie query keys', () => {
   it('uses one dashboard cache entry for every date in the same week', () => {
@@ -18,9 +18,7 @@ describe('calorie query keys', () => {
     expect(nextMonday).not.toEqual(monday);
   });
 
-  it('normalizes food search whitespace before caching', () => {
-    expect(calorieFoodSearchQueryOptions('  banana  ').queryKey).toEqual(
-      calorieFoodSearchQueryOptions('banana').queryKey,
-    );
+  it('uses one cache entry for the client-side food catalog', () => {
+    expect(calorieFoodsQueryOptions().queryKey).toEqual(['calorie-foods']);
   });
 });

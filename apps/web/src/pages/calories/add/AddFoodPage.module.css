@@ -1,0 +1,242 @@
+@import '../../../styles/breakpoints.css';
+
+.page {
+  width: min(760px, 100%);
+  margin-inline: auto;
+  display: grid;
+  gap: var(--space-md);
+  padding-bottom: 5rem;
+}
+
+.search,
+.panel {
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+  padding: var(--space-md);
+}
+
+.panel {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.selectedSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+
+  & > div {
+    min-width: 0;
+    display: grid;
+    gap: var(--space-xs);
+  }
+
+  & strong {
+    font-size: var(--text-lg);
+    text-wrap: balance;
+  }
+
+  & span {
+    color: var(--c-accent-strong);
+    font-weight: var(--font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.selectedActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.results {
+  display: grid;
+  gap: var(--space-sm);
+  list-style: none;
+}
+
+.product {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+  color: inherit;
+  padding: var(--space-md);
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    border-color 180ms var(--ease-out),
+    background-color 180ms var(--ease-out);
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 2px;
+  }
+}
+
+.energyTile {
+  flex: none;
+  width: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  padding: 0.55rem 0.25rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--c-accent) 12%, transparent);
+  color: var(--c-accent-strong);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+
+  & strong {
+    min-width: 4ch;
+    font-size: var(--text-lg);
+    line-height: 1.1;
+  }
+
+  & span {
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+}
+
+.productBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.productTop,
+.productBottom {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.productName {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--text-lg);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grams {
+  flex: none;
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.energyInline {
+  flex: none;
+  display: none;
+  width: 4.5rem;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-variant-numeric: tabular-nums;
+
+  & strong {
+    color: var(--c-accent-strong);
+    font-size: var(--text-md);
+    line-height: 1;
+  }
+
+  & span {
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+  }
+}
+
+.macros {
+  display: flex;
+  gap: var(--space-xs);
+
+  & > span {
+    width: 3.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+}
+
+.dotProtein,
+.dotFat,
+.dotCarbs {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+}
+
+.dotProtein {
+  background: var(--c-macro-protein);
+}
+.dotFat {
+  background: var(--c-macro-fat);
+}
+.dotCarbs {
+  background: var(--c-macro-carb);
+}
+
+.empty {
+  padding: var(--space-xl) var(--space-md);
+  color: var(--c-muted);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+@media (--phone) {
+  .product {
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .energyTile {
+    display: none;
+  }
+  .energyInline {
+    display: flex;
+  }
+  .productName {
+    font-size: var(--text-md-dynamic);
+  }
+  .grams,
+  .energyInline span {
+    font-size: var(--text-xs);
+  }
+  .energyInline strong {
+    font-size: var(--text-md-dynamic);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .product:hover {
+    border-color: var(--c-primary-border);
+    background: color-mix(in srgb, var(--c-surface) 88%, var(--c-primary) 12%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product {
+    transition:
+      border-color 140ms ease,
+      background-color 140ms ease;
+  }
+}

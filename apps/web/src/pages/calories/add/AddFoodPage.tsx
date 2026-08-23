@@ -1,26 +1,39 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { PencilIcon, PlusIcon } from 'lucide-react';
+import { useEffect, useState, useTransition } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { recordFood } from '../calories.api';
 import {
   calorieFoodQueryOptions,
-  calorieFoodSearchQueryOptions,
+  calorieFoodsQueryOptions,
   invalidateCalorieWeek,
 } from '../calorieQueries';
+import { formatNutritionNumber } from '../dashboard/nutritionFormat';
+import { filterFoods } from './filterFoods';
 import { Btn } from '@/components/btn/Btn';
+import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
-import css from '../CalorieFlows.module.css';
+import css from './AddFoodPage.module.css';
 
 type Props = { date: string; initialFoodId?: string };
+
+function shownGrams(food: CalorieFood) {
+  return food.productSizeGrams ?? 100;
+}
+
+function nutritionAtGrams(valuePer100g: number | null, grams: number) {
+  return Math.round(((valuePer100g ?? 0) * grams) / 100);
+}
+
 export function AddFoodPage({ date, initialFoodId }: Props) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [submittedQuery, setSubmittedQuery] = useState('');
-  const [searchEnabled, setSearchEnabled] = useState(initialFoodId === undefined);
+  const [filterQuery, setFilterQuery] = useState('');
+  const [isFiltering, startFiltering] = useTransition();
   const [selected, setSelected] = useState<CalorieFood | null>(null);
   const [grams, setGrams] = useState<number | null>(100);
   const [mutationPending, setMutationPending] = useState(false);
@@ -28,26 +41,16 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
     ...calorieFoodQueryOptions(initialFoodId ?? ''),
     enabled: initialFoodId !== undefined,
   });
-  const searchQuery = useQuery({
-    ...calorieFoodSearchQueryOptions(submittedQuery),
-    enabled: searchEnabled,
-  });
-  const foods = searchQuery.data ?? [];
+  const foodsQuery = useQuery(calorieFoodsQueryOptions());
+  const foods = filterFoods(foodsQuery.data ?? [], filterQuery);
+
   useEffect(() => {
     if (!foodQuery.data) return;
 
     setSelected(foodQuery.data);
-    setGrams(foodQuery.data.productSizeGrams ?? 100);
+    setGrams(shownGrams(foodQuery.data));
   }, [foodQuery.data]);
 
-  async function runSearch() {
-    const normalizedQuery = query.trim();
-    if (normalizedQuery === submittedQuery) {
-      await searchQuery.refetch();
-    } else {
-      setSubmittedQuery(normalizedQuery);
-    }
-  }
   async function add() {
     if (!selected) return;
     setMutationPending(true);
@@ -59,92 +62,128 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
       setMutationPending(false);
     }
   }
-  return (
-    <main className={css.page}>
-      <header className={css.header}>
-        <div>
-          <h1>Add food</h1>
-          <p>Search the shared catalog or create something new.</p>
-        </div>
-      </header>
-      {selected ? (
+
+  function selectFood(food: CalorieFood) {
+    setSelected(food);
+    setGrams(shownGrams(food));
+  }
+
+  if (selected) {
+    const selectedGrams = grams ?? 0;
+    const kcal = nutritionAtGrams(selected.kcalPer100g, selectedGrams);
+
+    return (
+      <main className={css.page}>
         <section className={css.panel}>
-          <div>
-            <strong>{selected.name}</strong>
-            <p className={css.muted}>{selected.kcalPer100g} kcal / 100 g</p>
+          <div className={css.selectedSummary}>
+            <div>
+              <strong>{selected.name}</strong>
+              <span>{formatNutritionNumber(kcal)} kcal</span>
+            </div>
+            <Btn
+              aria-label={`Edit ${selected.name}`}
+              icon={<PencilIcon aria-hidden='true' />}
+              iconOnly
+              isLink
+              render={<Link params={{ foodId: selected.id }} to='/calories/foods/$foodId' />}
+              size='sm'
+              variant='ghost'
+            />
           </div>
+
           <Label text='Amount eaten (g)'>
             <NumberInput min={0.01} onValueChange={setGrams} step={0.01} value={grams} />
           </Label>
-          <div className={css.actions}>
-            <Btn disabled={mutationPending} onClick={() => void add()}>
-              Add to diary
+
+          <div className={css.selectedActions}>
+            <Btn onClick={() => setSelected(null)} variant='ghost'>
+              Go back
             </Btn>
-            <Btn
-              onClick={() => {
-                setSelected(null);
-                setSearchEnabled(true);
-              }}
-              variant='ghost'
-            >
-              Choose another
-            </Btn>
-            <Btn
-              isLink
-              render={<Link params={{ foodId: selected.id }} to='/calories/foods/$foodId' />}
-              variant='ghost'
-            >
-              Edit food
+            <Btn loading={mutationPending} onClick={() => void add()}>
+              Save
             </Btn>
           </div>
         </section>
-      ) : (
-        <section className={css.panel}>
-          <div className={css.actions}>
-            <Label text='Food name'>
-              <TextInput
-                autoFocus
-                onValueChange={setQuery}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') void runSearch();
-                }}
-                placeholder='Banana, bread, yoghurt…'
-                value={query}
-              />
-            </Label>
-            <Btn disabled={searchQuery.isFetching} onClick={() => void runSearch()}>
-              Search
-            </Btn>
-          </div>
-          <Btn
-            isLink
-            render={<Link search={{ date, name: query }} to='/calories/foods/new' />}
-            variant='ghost'
-          >
-            Create new food
-          </Btn>
-          <ul className={css.results}>
-            {foods.map((food) => (
-              <li key={food.id}>
-                <button
-                  className={css.result}
-                  onClick={() => {
-                    setSelected(food);
-                    setGrams(food.productSizeGrams ?? 100);
-                  }}
-                  type='button'
-                >
-                  <span>
-                    <strong>{food.name}</strong>
-                    <span>{food.brand ?? 'Shared food'}</span>
+      </main>
+    );
+  }
+
+  return (
+    <main className={css.page}>
+      <section className={css.search}>
+        <Label text='Food name'>
+          <TextInput
+            autoFocus
+            onValueChange={(value) => {
+              setQuery(value);
+              startFiltering(() => setFilterQuery(value));
+            }}
+            placeholder='Banana, bread, yoghurt…'
+            value={query}
+          />
+        </Label>
+      </section>
+
+      <ul aria-busy={foodsQuery.isFetching || isFiltering} className={css.results}>
+        {foods.map((food) => {
+          const productGrams = shownGrams(food);
+          const kcal = nutritionAtGrams(food.kcalPer100g, productGrams);
+
+          return (
+            <li key={food.id}>
+              <button className={css.product} onClick={() => selectFood(food)} type='button'>
+                <span aria-hidden='true' className={css.energyTile}>
+                  <strong>{formatNutritionNumber(kcal)}</strong>
+                  <span>kcal</span>
+                </span>
+                <span className={css.productBody}>
+                  <span className={css.productTop}>
+                    <strong className={css.productName}>{food.name}</strong>
+                    <span className={css.grams}>{formatNutritionNumber(productGrams)} g</span>
                   </span>
-                  <strong>{food.kcalPer100g} kcal</strong>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+                  <span className={css.productBottom}>
+                    <span aria-hidden='true' className={css.energyInline}>
+                      <strong>{formatNutritionNumber(kcal)}</strong>
+                      <span>kcal</span>
+                    </span>
+                    <span className={css.macros}>
+                      <span
+                        aria-label={`${nutritionAtGrams(food.proteinPer100g, productGrams)} grams protein`}
+                      >
+                        <i aria-hidden='true' className={css.dotProtein} />
+                        {nutritionAtGrams(food.proteinPer100g, productGrams)} g
+                      </span>
+                      <span
+                        aria-label={`${nutritionAtGrams(food.fatPer100g, productGrams)} grams fat`}
+                      >
+                        <i aria-hidden='true' className={css.dotFat} />
+                        {nutritionAtGrams(food.fatPer100g, productGrams)} g
+                      </span>
+                      <span
+                        aria-label={`${nutritionAtGrams(food.carbsPer100g, productGrams)} grams carbs`}
+                      >
+                        <i aria-hidden='true' className={css.dotCarbs} />
+                        {nutritionAtGrams(food.carbsPer100g, productGrams)} g
+                      </span>
+                    </span>
+                  </span>
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+
+      {!foodsQuery.isFetching && foods.length === 0 ? (
+        <p className={css.empty}>No foods match “{query.trim()}”.</p>
+      ) : null}
+
+      <FloatingButton
+        icon={<PlusIcon aria-hidden='true' />}
+        to={`/calories/foods/new?date=${encodeURIComponent(date)}&name=${encodeURIComponent(query)}`}
+      >
+        Create new food
+      </FloatingButton>
     </main>
   );
 }

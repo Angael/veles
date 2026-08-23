@@ -1,10 +1,7 @@
 import { type } from 'arktype';
 import { createFileRoute } from '@tanstack/react-router';
 import { AddFoodPage } from '@/pages/calories/add/AddFoodPage';
-import {
-  calorieFoodQueryOptions,
-  calorieFoodSearchQueryOptions,
-} from '@/pages/calories/calorieQueries';
+import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '@/pages/calories/calorieQueries';
 import { normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 
 export const Route = createFileRoute('/_authenticated/calories_/add')({
@@ -15,7 +12,7 @@ export const Route = createFileRoute('/_authenticated/calories_/add')({
       return context.queryClient.ensureQueryData(calorieFoodQueryOptions(deps.foodId));
     }
 
-    return context.queryClient.ensureQueryData(calorieFoodSearchQueryOptions(''));
+    return context.queryClient.ensureQueryData(calorieFoodsQueryOptions());
   },
   component: Component,
   staticData: {

@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { and, desc, eq, gte, ilike, lte } from 'drizzle-orm';
+import { and, desc, eq, gte, lte } from 'drizzle-orm';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { calorieGoals, foodLogs, foodProducts } from '@veles/db/schema';
 import { requireSession } from '@/lib/auth/getSession';
@@ -266,22 +266,12 @@ export type CalorieTotals = {
   carbs: number | null;
 };
 
-const searchFoodsInputType = type({ query: 'string.trim' });
-
-export const searchFoods = createServerFn({ method: 'GET' })
-  .middleware([logMiddleware('searchFoods')])
-  .validator(arkTypeValidator(searchFoodsInputType))
-  .handler(async ({ data }) => {
+export const getFoodProducts = createServerFn({ method: 'GET' })
+  .middleware([logMiddleware('getFoodProducts')])
+  .handler(async () => {
     await requireSession();
 
-    const query = data.query.trim();
-
-    const foods = await db
-      .select()
-      .from(foodProducts)
-      .where(query ? ilike(foodProducts.name, `%${query}%`) : undefined)
-      .orderBy(desc(foodProducts.updatedAt))
-      .limit(30);
+    const foods = await db.select().from(foodProducts).orderBy(desc(foodProducts.updatedAt));
 
     return foods.map(toFoodProduct);
   });
