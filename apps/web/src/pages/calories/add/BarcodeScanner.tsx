@@ -2,7 +2,7 @@ import type {
   BarcodeDetector as PolyfillBarcodeDetector,
   BarcodeFormat,
 } from 'barcode-detector/pure';
-import { CameraIcon, CameraOffIcon, XIcon } from 'lucide-react';
+import { CameraIcon, CameraOffIcon, SwitchCameraIcon, XIcon } from 'lucide-react';
 import { type ReactElement, useEffect, useRef, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import css from './BarcodeScanner.module.css';
@@ -54,6 +54,9 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
   const videoRef = useRef<HTMLVideoElement>(null);
   const callbackRef = useRef(onDetected);
   const [state, setState] = useState<ScannerState>('starting');
+  const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
+  const [currentDeviceId, setCurrentDeviceId] = useState('');
+  const [requestedDeviceId, setRequestedDeviceId] = useState<string>();
   callbackRef.current = onDetected;
 
   useEffect(() => {
@@ -63,7 +66,7 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
     let detecting = false;
     let lastDetection = 0;
 
-    /** Starts the rear-facing camera and runs a throttled scan loop without overlapping detection work. */
+    /** Starts the preferred rear camera, or a specifically requested camera, and runs the scan loop. */
     async function startScanner() {
       if (!navigator.mediaDevices?.getUserMedia) {
         setState('unavailable');
@@ -75,14 +78,26 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
           createDetector(),
           navigator.mediaDevices.getUserMedia({
             audio: false,
-            video: {
-              facingMode: { ideal: 'environment' },
-              height: { ideal: 1080 },
-              width: { ideal: 1920 },
-            },
+            video: requestedDeviceId
+              ? {
+                  deviceId: { exact: requestedDeviceId },
+                  height: { ideal: 1080 },
+                  width: { ideal: 1920 },
+                }
+              : {
+                  facingMode: { ideal: 'environment' },
+                  height: { ideal: 1080 },
+                  width: { ideal: 1920 },
+                },
           }),
         ]);
         await enableContinuousFocus(cameraStream).catch(() => undefined);
+        const videoTrack = cameraStream.getVideoTracks()[0];
+        setCurrentDeviceId(videoTrack?.getSettings().deviceId ?? requestedDeviceId ?? '');
+        const availableCameras = (await navigator.mediaDevices.enumerateDevices()).filter(
+          (device) => device.kind === 'videoinput',
+        );
+        if (active) setCameras(availableCameras);
         stream = cameraStream;
         const video = videoRef.current;
         if (!active || !video) {
@@ -130,7 +145,15 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
       cancelAnimationFrame(animationFrame);
       stream?.getTracks().forEach((track) => track.stop());
     };
-  }, []);
+  }, [requestedDeviceId]);
+
+  function switchCamera() {
+    if (cameras.length < 2) return;
+    const currentIndex = cameras.findIndex((camera) => camera.deviceId === currentDeviceId);
+    const nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % cameras.length;
+    setState('starting');
+    setRequestedDeviceId(cameras[nextIndex]?.deviceId);
+  }
 
   return (
     <section aria-label='Barcode camera scanner' className={css.scanner}>
@@ -152,6 +175,16 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
       <div className={css.viewport}>
         <video aria-label='Live camera preview' muted playsInline ref={videoRef} />
         {state !== 'scanning' ? <ScannerMessage state={state} /> : null}
+        {state === 'scanning' && cameras.length > 1 ? (
+          <Btn
+            className={css.switchCamera}
+            icon={<SwitchCameraIcon aria-hidden='true' />}
+            onClick={switchCamera}
+            variant='ghost'
+          >
+            Switch camera
+          </Btn>
+        ) : null}
       </div>
       {state === 'scanning' ? (
         <p aria-live='polite' className={css.status}>

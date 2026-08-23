@@ -124,7 +124,7 @@
 
 .scanViewport {
   position: fixed;
-  z-index: 20;
+  z-index: 30;
   inset: 0;
   background: #020617;
   padding: var(--space-sm);
@@ -139,7 +139,7 @@
   position: absolute;
   z-index: 3;
   right: var(--space-md);
-  bottom: var(--space-md);
+  bottom: max(var(--space-md), env(safe-area-inset-bottom, 0px));
   left: var(--space-md);
   display: grid;
   gap: var(--space-sm);

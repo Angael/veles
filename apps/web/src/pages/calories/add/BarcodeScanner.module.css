@@ -39,6 +39,17 @@
   }
 }
 
+.switchCamera {
+  position: absolute;
+  z-index: 2;
+  right: var(--space-sm);
+  top: var(--space-sm);
+  border-color: color-mix(in srgb, white 45%, transparent);
+  background: color-mix(in srgb, var(--c-surface-solid) 88%, transparent);
+  color: var(--c-text);
+  backdrop-filter: blur(0.5rem);
+}
+
 .message {
   position: relative;
   z-index: 1;
