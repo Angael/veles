@@ -69,7 +69,7 @@ export function AccountPage({ user }: AccountPageProps) {
 
   return (
     <main className={css.page}>
-      <Card as='section' className={css.profileCard} variant='primary'>
+      <Card as='section' className={css.profileCard} data-appear variant='primary'>
         <Avatar.Root className={css.profileAvatar}>
           {user.image ? <Avatar.Image alt='' className={css.avatarImage} src={user.image} /> : null}
           <Avatar.Fallback className={css.profileFallback}>{accountInitials}</Avatar.Fallback>
@@ -90,7 +90,7 @@ export function AccountPage({ user }: AccountPageProps) {
         </Btn>
       </Card>
 
-      <Card as='section' className={css.friendsCard}>
+      <Card as='section' className={css.friendsCard} data-appear='1'>
         <header className={css.sectionHeader}>
           <div>
             <h2>Friends</h2>
