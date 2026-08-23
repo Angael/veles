@@ -1,0 +1,99 @@
+@import '../../styles/breakpoints.css';
+
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.energy,
+.energyPhoneOnly {
+  flex: none;
+  display: flex;
+  width: 4.5rem;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-variant-numeric: tabular-nums;
+
+  & strong {
+    color: var(--c-accent-strong);
+    font-size: var(--text-md);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1;
+  }
+
+  & span {
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+  }
+}
+
+.macros {
+  display: flex;
+  gap: var(--space-xs);
+
+  & .macro {
+    width: 3.4rem;
+  }
+
+  & dt {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.macro dd {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dotProtein,
+.dotFat,
+.dotCarbs {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-pill);
+}
+
+.dotProtein {
+  background: var(--c-macro-protein);
+}
+
+.dotFat {
+  background: var(--c-macro-fat);
+}
+
+.dotCarbs {
+  background: var(--c-macro-carb);
+}
+
+.energyPhoneOnly {
+  display: none;
+}
+
+@media (--phone) {
+  .energyPhoneOnly {
+    display: flex;
+  }
+
+  .energy strong,
+  .energyPhoneOnly strong {
+    font-size: var(--text-md-dynamic);
+  }
+
+  .energy span,
+  .energyPhoneOnly span {
+    font-size: var(--text-xs);
+  }
+}

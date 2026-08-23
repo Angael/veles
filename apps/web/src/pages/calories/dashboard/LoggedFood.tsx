@@ -2,9 +2,10 @@ import { Link } from '@tanstack/react-router';
 import { Trash2Icon } from 'lucide-react';
 import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogMutation } from '../calories.query';
-import { formatNutritionNumber } from './nutritionFormat';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
+import { NutritionInline } from '@/components/nutrition-inline/NutritionInline';
+import { formatNutritionNumber } from '@/lib/nutritionFormat';
 import css from './LoggedFood.module.css';
 
 type LoggedFoodProps = {
@@ -49,36 +50,13 @@ export function LoggedFood({ date, entry }: LoggedFoodProps) {
             />
           </div>
 
-          <div className={css.bottom}>
-            <div aria-hidden='true' className={css.energyInline}>
-              <strong>{kcal}</strong>
-              <span>kcal</span>
-            </div>
-
-            <dl className={css.macros}>
-              <div className={css.macro}>
-                <dt>Protein</dt>
-                <dd>
-                  <i aria-hidden='true' className={css.dotProtein} />
-                  {formatNutritionNumber(Math.round(entry.protein ?? 0))} g
-                </dd>
-              </div>
-              <div className={css.macro}>
-                <dt>Fat</dt>
-                <dd>
-                  <i aria-hidden='true' className={css.dotFat} />
-                  {formatNutritionNumber(Math.round(entry.fat ?? 0))} g
-                </dd>
-              </div>
-              <div className={css.macro}>
-                <dt>Carbs</dt>
-                <dd>
-                  <i aria-hidden='true' className={css.dotCarbs} />
-                  {formatNutritionNumber(Math.round(entry.carbs ?? 0))} g
-                </dd>
-              </div>
-            </dl>
-          </div>
+          <NutritionInline
+            carbs={entry.carbs ?? 0}
+            energyDisplay='phone'
+            fat={entry.fat ?? 0}
+            kcal={entry.kcal}
+            protein={entry.protein ?? 0}
+          />
         </div>
       </Card>
     </li>

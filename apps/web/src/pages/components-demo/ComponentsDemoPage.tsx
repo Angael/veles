@@ -21,6 +21,7 @@ import { Navbar } from '@/components/navbar/Navbar';
 import { NotFound } from '@/components/not-found/NotFound';
 import { PillBtn } from '@/components/pill-btn/PillBtn';
 import { NumberInput } from '@/components/number-input/NumberInput';
+import { NutritionInline } from '@/components/nutrition-inline/NutritionInline';
 import { SeamlessTextInput } from '@/components/seamless-text-input/SeamlessTextInput';
 import { SeamlessTextarea } from '@/components/seamless-textarea/SeamlessTextarea';
 import { SelectInput } from '@/components/select-input/SelectInput';
@@ -195,6 +196,11 @@ export function ComponentsDemoPage() {
           step={10}
           value={numberValue}
         />
+      </section>
+
+      <section>
+        <h2>NutritionInline</h2>
+        <NutritionInline carbs={48} fat={14} kcal={420} protein={32} />
       </section>
 
       <section>

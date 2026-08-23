@@ -4,13 +4,13 @@ import { PlusIcon } from 'lucide-react';
 import { useEffect, useState, useTransition } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '../calories.query';
-import { formatNutritionNumber } from '../dashboard/nutritionFormat';
 import { SelectedFoodForm } from './SelectedFoodForm';
 import { filterFoods } from './filterFoods';
 import { Btn } from '@/components/btn/Btn';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { Label } from '@/components/label/Label';
 import { TextInput } from '@/components/text-input/TextInput';
+import { formatNutritionNumber } from '@/lib/nutritionFormat';
 import css from './AddFoodPage.module.css';
 
 type Props = { date: string; initialFoodId?: string };

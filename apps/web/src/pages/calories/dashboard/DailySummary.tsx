@@ -3,7 +3,7 @@ import { GoalIcon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { useId, useState } from 'react';
 import type { CalorieGoal, CalorieTotals } from '../calories.api';
-import { formatNutritionNumber } from './nutritionFormat';
+import { formatNutritionNumber } from '@/lib/nutritionFormat';
 import css from './DailySummary.module.css';
 
 type DailySummaryProps = {

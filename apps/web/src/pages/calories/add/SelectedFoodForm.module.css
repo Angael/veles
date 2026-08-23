@@ -58,45 +58,6 @@
   }
 }
 
-.nutrition {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-sm);
-
-  & > div {
-    padding-left: var(--space-sm);
-    border-left: 3px solid var(--c-border-strong);
-  }
-
-  & dt {
-    color: var(--c-muted);
-    font-size: var(--text-xs);
-  }
-
-  & dd {
-    margin: 0;
-    font-weight: var(--font-weight-semibold);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-}
-
-.nutrition > .energy {
-  border-left-color: var(--c-accent);
-}
-
-.nutrition > .protein {
-  border-left-color: var(--c-macro-protein);
-}
-
-.nutrition > .fat {
-  border-left-color: var(--c-macro-fat);
-}
-
-.nutrition > .carbs {
-  border-left-color: var(--c-macro-carb);
-}
-
 .panel {
   display: grid;
   gap: var(--space-md);
@@ -108,10 +69,91 @@
   gap: var(--space-sm);
 }
 
-.remaining {
-  color: var(--c-muted);
+.goalPreview {
+  display: grid;
+  gap: var(--space-xs);
   font-variant-numeric: tabular-nums;
+}
+
+.goalMessage,
+.goalResult,
+.goalResultOver {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
   text-wrap: pretty;
+}
+
+.goalCaption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+
+  & span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+  }
+
+  & strong {
+    color: var(--c-text-strong);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  & .goalAmount {
+    margin-left: auto;
+  }
+}
+
+.dotConsumed,
+.dotAdded,
+.dotAddedOver {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-pill);
+}
+
+.dotConsumed,
+.consumedBar {
+  background: var(--c-accent);
+}
+
+.dotAdded,
+.addedBar {
+  background: var(--c-macro-carb);
+}
+
+.dotAddedOver,
+.addedBarOver {
+  background: var(--c-danger-text);
+}
+
+.goalTrack {
+  display: flex;
+  width: 100%;
+  height: 0.55rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--c-surface-inset);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-border) 60%, transparent);
+
+  & > span {
+    display: block;
+    height: 100%;
+    transition: width var(--duration-fast) var(--ease-out);
+  }
+}
+
+.goalResult,
+.goalResultOver {
+  justify-self: end;
+}
+
+.goalResultOver {
+  color: var(--c-danger-text);
 }
 
 .actions {
@@ -128,8 +170,16 @@
     }
   }
 
-  .nutrition {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .goalCaption {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-xs) var(--space-sm);
+
+    & .goalAmount {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      margin-left: 0;
+    }
   }
 
   .fields {

@@ -91,86 +91,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.bottom {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-/* Fixed-width kcal group keeps the macros starting at the same x on every row. */
-.energyInline {
-  flex: none;
-  display: none;
-  width: 4.5rem;
-  align-items: baseline;
-  gap: 0.3rem;
-  font-variant-numeric: tabular-nums;
-
-  & strong {
-    color: var(--c-accent-strong);
-    font-size: var(--text-md);
-    font-weight: var(--font-weight-semibold);
-    /* Digits have no descenders; tight line-height keeps the row compact. */
-    line-height: 1;
-  }
-
-  & span {
-    color: var(--c-muted);
-    font-size: var(--text-sm);
-  }
-}
-
-/* Fixed macro widths keep each value aligned across all list items. */
-.macros {
-  display: flex;
-  gap: var(--space-xs);
-
-  & .macro {
-    width: 3.4rem;
-  }
-
-  & dt {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-}
-
-.macro dd {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.dotProtein,
-.dotFat,
-.dotCarbs {
-  flex: none;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 999px;
-}
-
-.dotProtein {
-  background: var(--c-macro-protein);
-}
-
-.dotFat {
-  background: var(--c-macro-fat);
-}
-
-.dotCarbs {
-  background: var(--c-macro-carb);
-}
-
 .deleteButton {
   --btn-height: 2.75rem;
   --btn-icon-size: 1.05rem;
@@ -196,21 +116,12 @@
     display: none;
   }
 
-  .energyInline {
-    display: flex;
-  }
-
   .name {
     font-size: var(--text-md-dynamic);
   }
 
-  .grams,
-  .energyInline span {
+  .grams {
     font-size: var(--text-xs);
-  }
-
-  .energyInline strong {
-    font-size: var(--text-md-dynamic);
   }
 }
 

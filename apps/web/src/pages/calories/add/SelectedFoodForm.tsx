@@ -4,11 +4,12 @@ import { PencilIcon } from 'lucide-react';
 import { useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { calorieDashboardQueryOptions, useRecordFoodMutation } from '../calories.query';
-import { formatNutritionNumber } from '../dashboard/nutritionFormat';
 import { Btn } from '@/components/btn/Btn';
 import { DateInput } from '@/components/date-input/DateInput';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
+import { NutritionInline } from '@/components/nutrition-inline/NutritionInline';
+import { formatNutritionNumber } from '@/lib/nutritionFormat';
 import css from './SelectedFoodForm.module.css';
 
 type Props = {
@@ -35,7 +36,13 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
   const protein = nutritionAtGrams(food.proteinPer100g, selectedGrams);
   const fat = nutritionAtGrams(food.fatPer100g, selectedGrams);
   const carbs = nutritionAtGrams(food.carbsPer100g, selectedGrams);
-  const remaining = day?.goal ? Math.round(day.goal.kcal - day.totals.kcal) : null;
+  const goalKcal = day?.goal?.kcal ?? null;
+  const consumedKcal = Math.max(0, day?.totals.kcal ?? 0);
+  const projectedKcal = consumedKcal + kcal;
+  const wouldExceedGoal = goalKcal !== null && projectedKcal > goalKcal;
+  const consumedPercent = goalKcal === null ? 0 : Math.min(100, (consumedKcal / goalKcal) * 100);
+  const addedPercent =
+    goalKcal === null ? 0 : Math.min(100 - consumedPercent, (Math.max(0, kcal) / goalKcal) * 100);
 
   async function save() {
     await recordFoodMutation.mutateAsync({
@@ -66,24 +73,7 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
               variant='ghost'
             />
           </div>
-          <dl className={css.nutrition}>
-            <div className={css.energy}>
-              <dt>Calories</dt>
-              <dd>{formatNutritionNumber(kcal)} kcal</dd>
-            </div>
-            <div className={css.protein}>
-              <dt>Protein</dt>
-              <dd>{formatNutritionNumber(protein)} g</dd>
-            </div>
-            <div className={css.fat}>
-              <dt>Fat</dt>
-              <dd>{formatNutritionNumber(fat)} g</dd>
-            </div>
-            <div className={css.carbs}>
-              <dt>Carbs</dt>
-              <dd>{formatNutritionNumber(carbs)} g</dd>
-            </div>
-          </dl>
+          <NutritionInline carbs={carbs} fat={fat} kcal={kcal} protein={protein} />
         </div>
       </section>
 
@@ -96,13 +86,51 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
             <DateInput onValueChange={setDate} value={date} />
           </Label>
         </div>
-        <p aria-live='polite' className={css.remaining}>
-          {dashboardQuery.isPending
-            ? 'Checking daily calories…'
-            : remaining === null
-              ? 'Set a calorie goal to see your daily remainder.'
-              : `${formatNutritionNumber(remaining)} kcal remaining for this day`}
-        </p>
+        <div aria-live='polite' className={css.goalPreview}>
+          {dashboardQuery.isPending ? (
+            <p className={css.goalMessage}>Checking daily calories…</p>
+          ) : goalKcal === null ? (
+            <p className={css.goalMessage}>Set a calorie goal to preview this day.</p>
+          ) : (
+            <>
+              <div className={css.goalCaption}>
+                <span>
+                  <i aria-hidden='true' className={css.dotConsumed} />
+                  <strong>{formatNutritionNumber(Math.round(consumedKcal))}</strong> eaten
+                </span>
+                <span>
+                  <i
+                    aria-hidden='true'
+                    className={wouldExceedGoal ? css.dotAddedOver : css.dotAdded}
+                  />
+                  <strong>+{formatNutritionNumber(kcal)}</strong> this food
+                </span>
+                <span className={css.goalAmount}>
+                  {formatNutritionNumber(Math.round(goalKcal))} goal
+                </span>
+              </div>
+              <div
+                aria-label={`${formatNutritionNumber(Math.round(projectedKcal))} of ${formatNutritionNumber(Math.round(goalKcal))} kcal after adding this food${wouldExceedGoal ? ', over goal' : ''}`}
+                aria-valuemax={goalKcal}
+                aria-valuemin={0}
+                aria-valuenow={Math.min(projectedKcal, goalKcal)}
+                className={css.goalTrack}
+                role='progressbar'
+              >
+                <span className={css.consumedBar} style={{ width: `${consumedPercent}%` }} />
+                <span
+                  className={wouldExceedGoal ? css.addedBarOver : css.addedBar}
+                  style={{ width: `${addedPercent}%` }}
+                />
+              </div>
+              <p className={wouldExceedGoal ? css.goalResultOver : css.goalResult}>
+                {wouldExceedGoal
+                  ? `${formatNutritionNumber(Math.round(projectedKcal - goalKcal))} kcal over goal`
+                  : `${formatNutritionNumber(Math.round(goalKcal - projectedKcal))} kcal left after saving`}
+              </p>
+            </>
+          )}
+        </div>
         <div className={css.actions}>
           <Btn onClick={onCancel} variant='ghost'>
             {cancelLabel}
