@@ -28,7 +28,7 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
   return (
     <main className={css.page}>
       <title>Recipes</title>
-      <section className={css.controls}>
+      <section className={css.controls} data-appear>
         <div className={css.toolbar}>
           <label className={css.searchField}>
             <TextInput
@@ -45,7 +45,7 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
         </div>
       </section>
 
-      <section className={css.grid}>
+      <section className={css.grid} data-appear='1'>
         {visibleRecipes.map((recipe) => (
           <Link
             className={css.cardLink}

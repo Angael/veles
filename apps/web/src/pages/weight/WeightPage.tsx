@@ -55,10 +55,12 @@ export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
   return (
     <main className={css.page}>
       {entries.length > 0 && (
-        <WeightTrendChart entries={entries} initialRange={initialChartRange} />
+        <div data-appear>
+          <WeightTrendChart entries={entries} initialRange={initialChartRange} />
+        </div>
       )}
 
-      <section aria-label="Today's weight" className={css.captureContainer}>
+      <section aria-label="Today's weight" className={css.captureContainer} data-appear='1'>
         <WeightForm
           isSaving={saveMutation.isPending}
           onChange={setWeightKg}
@@ -89,7 +91,7 @@ export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
 
       {entries.length > 0 ? (
         <>
-          <div className={css.summaryRail}>
+          <div className={css.summaryRail} data-appear='2'>
             <Card as='section' aria-label='Weight summary' className={css.summaryGrid}>
               <SummaryStat label='Current' value={`${latestEntry!.weightKg.toFixed(1)} kg`} />
               <SummaryStat label='2 weeks' value={formatChange(twoWeekChange)} />
@@ -97,10 +99,12 @@ export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
             </Card>
           </div>
 
-          <RecentWeightEntries entries={entries} />
+          <div data-appear='3'>
+            <RecentWeightEntries entries={entries} />
+          </div>
         </>
       ) : (
-        <Card as='section' className={css.emptyState}>
+        <Card as='section' className={css.emptyState} data-appear='2'>
           <h1>Start tracking your weight</h1>
           <p>Add today&apos;s weight or import your history to begin building your trend.</p>
         </Card>

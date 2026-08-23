@@ -26,7 +26,7 @@ const todoLists = [
 export function TodosPage() {
   return (
     <main className={css.page}>
-      <header className={css.header}>
+      <header className={css.header} data-appear>
         <div>
           <h1>Todos</h1>
           <p>Simple checklists for your shopping cart and life goals.</p>
@@ -42,9 +42,11 @@ export function TodosPage() {
         </Btn>
       </header>
 
-      <p className={css.mockNote}>Mock only — editing and sharing are coming next.</p>
+      <p className={css.mockNote} data-appear='1'>
+        Mock only — editing and sharing are coming next.
+      </p>
 
-      <section aria-label='Example todo lists' className={css.listGrid}>
+      <section aria-label='Example todo lists' className={css.listGrid} data-appear='2'>
         {todoLists.map((list) => (
           <Card as='article' className={css.listCard} key={list.title}>
             <h2>{list.title}</h2>

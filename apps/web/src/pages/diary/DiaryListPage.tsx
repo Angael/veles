@@ -44,12 +44,12 @@ export function DiaryListPage({ entries }: DiaryListPageProps) {
       ) : null}
 
       {entries.length === 0 ? (
-        <Card as='section' className={css.emptyState}>
+        <Card as='section' className={css.emptyState} data-appear>
           <h1>No diary entries yet</h1>
         </Card>
       ) : (
         <>
-          <label className={css.searchField}>
+          <label className={css.searchField} data-appear>
             <span className={css.searchLabel}>Search entries</span>
             <TextInput
               aria-label='Search diary entries'
@@ -63,12 +63,12 @@ export function DiaryListPage({ entries }: DiaryListPageProps) {
           </label>
 
           {visibleEntries.length === 0 ? (
-            <Card as='section' className={css.emptyState}>
+            <Card as='section' className={css.emptyState} data-appear='1'>
               <h1>No matching entries</h1>
               <p>Try a different title or phrase from an entry.</p>
             </Card>
           ) : (
-            <section aria-label='Diary entries' className={css.list}>
+            <section aria-label='Diary entries' className={css.list} data-appear='1'>
               {visibleEntries.map((entry) => (
                 <Link
                   className={css.entryLink}
