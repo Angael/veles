@@ -150,23 +150,13 @@ label > span {
 }
 .logHeading {
   display: grid;
-  grid-template-columns: minmax(10rem, 1.5fr) minmax(16rem, 2.4fr);
   align-items: end;
   gap: var(--space-md);
-  padding: 0 calc(3.5rem + var(--space-lg)) 0 var(--space-lg);
+  padding: 0 var(--space-lg);
 }
 .logHeading h2 {
   font-size: var(--text-lg-dynamic);
   text-wrap: balance;
-}
-.logColumns {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(4rem, 1fr));
-  gap: var(--space-md);
-  color: var(--c-muted);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
-  text-align: center;
 }
 .sectionHeading {
   display: flex;
@@ -202,6 +192,12 @@ label > span {
   display: grid;
   gap: var(--space-sm);
   list-style: none;
+}
+
+@media (--phone) {
+  .logList {
+    gap: var(--space-xs);
+  }
 }
 .controlPair {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -376,7 +372,7 @@ label small {
   position: relative;
   min-width: 0;
   min-height: 52px;
-  border: 0;
+  border: var(--border-width) solid transparent;
   border-radius: var(--radius-xs);
   background: transparent;
   color: var(--c-muted);
@@ -386,31 +382,12 @@ label small {
   font: inherit;
   cursor: pointer;
 }
-.dayStatus {
-  position: absolute;
-  top: 0.35rem;
-  right: 0.35rem;
-  width: 0.8rem;
-  height: 0.8rem;
-  color: currentColor;
-  pointer-events: none;
-}
-.dayStatusGood {
-  color: var(--c-macro-carb);
-}
 .day.futureDay {
   color: var(--c-placeholder);
 }
 .day.todayDay {
   outline: 2px solid var(--c-primary-border-soft);
   outline-offset: -2px;
-}
-.day[data-pressed] {
-  background: var(--c-primary-surface-strong);
-  color: var(--c-text-strong);
-}
-.day.futureDay[data-pressed] {
-  color: var(--c-placeholder);
 }
 .day span {
   font-size: var(--text-xs);
@@ -429,14 +406,7 @@ label small {
 
 @media (--phone) {
   .logHeading {
-    grid-template-columns: 1fr;
-    gap: var(--space-sm);
     padding: 0 var(--space-sm);
-  }
-  .logColumns {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--space-xs);
-    font-size: var(--text-xs);
   }
 }
 
@@ -456,11 +426,55 @@ label small {
   .day.futureDay:hover {
     color: var(--c-placeholder);
   }
-  .day[data-pressed]:hover {
-    background: var(--c-primary-surface-strong);
-    color: var(--c-text-strong);
+  .dayWithinGoal:hover,
+  .dayLogged:hover {
+    border-color: var(--c-primary-border);
   }
-  .day.futureDay[data-pressed]:hover {
-    color: var(--c-placeholder);
+  .dayOverGoal:hover {
+    border-color: rgb(248 113 113 / 55%);
   }
+}
+
+/* Logged-day tints: success when within the kcal goal, danger when over it,
+   primary while something is logged but the goal state is undecided. */
+.dayLogged {
+  border-color: var(--c-primary-border-soft);
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgb(96 165 250 / 14%), transparent 74%),
+    var(--c-primary-surface);
+  color: var(--c-text);
+}
+.dayWithinGoal {
+  border-color: color-mix(in srgb, var(--c-macro-carb) 40%, transparent);
+  background:
+    radial-gradient(
+      120% 100% at 50% 0%,
+      color-mix(in srgb, var(--c-macro-carb) 20%, transparent),
+      transparent 74%
+    ),
+    color-mix(in srgb, var(--c-macro-carb) 9%, transparent);
+  color: var(--c-text-strong);
+}
+.dayOverGoal {
+  border-color: var(--c-danger-border);
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgb(248 113 113 / 16%), transparent 74%),
+    var(--c-danger-surface);
+  color: var(--c-danger-text);
+}
+.day.futureDay.dayLogged,
+.day.futureDay.dayWithinGoal,
+.day.futureDay.dayOverGoal {
+  opacity: 0.45;
+}
+.day[data-pressed] {
+  border-color: transparent;
+  background: var(--c-primary-surface-strong);
+  color: var(--c-text-strong);
+}
+.day[data-pressed].dayWithinGoal {
+  border-color: color-mix(in srgb, var(--c-macro-carb) 55%, transparent);
+}
+.day[data-pressed].dayOverGoal {
+  border-color: rgb(248 113 113 / 60%);
 }

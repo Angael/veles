@@ -201,6 +201,8 @@ export const getCalorieDashboard = createServerFn({ method: 'GET' })
           dayLogs.length > 0 && goal
             ? isWithinKcalGoal(kcalHundredths, goal.kcalLimitHundredths)
             : null,
+        overKcalGoal:
+          dayLogs.length > 0 && goal ? kcalHundredths > goal.kcalLimitHundredths : false,
       };
     });
 
@@ -219,6 +221,7 @@ export type CalorieDashboardDay = {
   totals: CalorieTotals;
   hasLogs: boolean;
   withinKcalGoal: boolean | null;
+  overKcalGoal: boolean;
 };
 
 export type CalorieFood = {

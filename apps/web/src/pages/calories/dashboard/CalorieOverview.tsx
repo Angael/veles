@@ -18,14 +18,6 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
       <section className={css.logSection} data-appear='2'>
         <div className={css.logHeading}>
           <h2>Logged products</h2>
-          {logs.length ? (
-            <div aria-hidden='true' className={css.logColumns}>
-              <span>Kcal</span>
-              <span>Protein</span>
-              <span>Fat</span>
-              <span>Carbs</span>
-            </div>
-          ) : null}
         </div>
         {logs.length ? (
           <ol className={css.logList}>

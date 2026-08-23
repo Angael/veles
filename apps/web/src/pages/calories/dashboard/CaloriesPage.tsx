@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { addDays, format, isAfter, parseISO } from 'date-fns';
-import { CheckIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import type { CalorieDashboard } from '../calories.api';
 import { calorieDashboardQueryOptions } from '../calorieQueries';
 import { CalorieOverview } from './CalorieOverview';
@@ -63,10 +63,25 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
             const dayStatus = dashboard.days.find((status) => status.date === day);
             const isFuture = isAfter(parsedDay, today);
             const isToday = day === todayDate;
+            const statusClass =
+              dayStatus?.hasLogs && dayStatus.withinKcalGoal !== null
+                ? dayStatus.withinKcalGoal
+                  ? css.dayWithinGoal
+                  : dayStatus.overKcalGoal
+                    ? css.dayOverGoal
+                    : css.dayLogged
+                : dayStatus?.hasLogs
+                  ? css.dayLogged
+                  : undefined;
 
             return (
               <Toggle
-                className={clsx(css.day, isFuture && css.futureDay, isToday && css.todayDay)}
+                className={clsx(
+                  css.day,
+                  isFuture && css.futureDay,
+                  isToday && css.todayDay,
+                  statusClass,
+                )}
                 key={day}
                 value={day}
               >
@@ -74,12 +89,6 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
                 <span className={css.expandedDay}>{format(parsedDay, 'EEEE')}</span>
                 <strong className={css.compactDay}>{format(parsedDay, 'd')}</strong>
                 <strong className={css.expandedDay}>{format(parsedDay, 'dd.MM')}</strong>
-                {dayStatus?.hasLogs ? (
-                  <CheckIcon
-                    aria-hidden='true'
-                    className={clsx(css.dayStatus, dayStatus.withinKcalGoal && css.dayStatusGood)}
-                  />
-                ) : null}
               </Toggle>
             );
           })}
