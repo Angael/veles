@@ -1,6 +1,8 @@
 .item {
   position: relative;
   min-width: 0;
+  /* Shared with .card so the phone grid's first row matches the button exactly. */
+  --btn-height: 2.75rem;
 }
 
 .cardLink {
@@ -11,11 +13,10 @@
 
 .card {
   display: grid;
-  grid-template-columns: minmax(10rem, 1.5fr) repeat(4, minmax(4rem, 0.6fr));
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  min-height: 6.25rem;
-  gap: var(--space-md);
-  padding-right: calc(3.5rem + var(--space-lg));
+  gap: var(--space-lg);
+  padding: var(--space-md) calc(2.75rem + var(--space-lg)) var(--space-md) var(--space-md);
   user-select: none;
   transition:
     border-color 180ms var(--ease-out),
@@ -31,16 +32,42 @@
   outline-offset: 2px;
 }
 
+.energyTile {
+  display: grid;
+  place-items: center;
+  gap: 0;
+  width: 4rem;
+  padding: 0.55rem 0.25rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--c-accent) 12%, transparent);
+  color: var(--c-accent-strong);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+
+  & strong {
+    min-width: 4ch;
+    font-size: var(--text-lg);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  & span {
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+}
+
 .identity {
   display: grid;
   min-width: 0;
-  gap: 0.25rem;
+  gap: 0.3rem;
 
   & strong {
     overflow: hidden;
     font-size: var(--text-lg);
     text-overflow: ellipsis;
-    text-wrap: balance;
+    white-space: nowrap;
   }
 
   & span {
@@ -50,13 +77,10 @@
   }
 }
 
-.nutrition {
-  display: contents;
-
-  & > div {
-    min-width: 0;
-    text-align: center;
-  }
+/* Fixed-width columns keep each macro value aligned across all rows. */
+.macros {
+  display: grid;
+  grid-template-columns: repeat(3, 4rem);
 
   & dt {
     position: absolute;
@@ -67,41 +91,47 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
-
-  & dd {
-    overflow: hidden;
-    font-size: clamp(var(--text-lg), 2.2vw, var(--text-xl));
-    font-weight: var(--font-weight-semibold);
-    font-variant-numeric: tabular-nums;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 }
 
-.energy {
-  color: var(--c-accent-strong);
+.macro dd {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--text-md);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
-.protein {
-  color: var(--c-macro-protein);
+.dotProtein,
+.dotFat,
+.dotCarbs {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
 }
 
-.fat {
-  color: var(--c-macro-fat);
+.dotProtein {
+  background: var(--c-macro-protein);
 }
 
-.carbs {
-  color: var(--c-macro-carb);
+.dotFat {
+  background: var(--c-macro-fat);
+}
+
+.dotCarbs {
+  background: var(--c-macro-carb);
 }
 
 .deleteButton {
-  --btn-height: 2.75rem;
   --btn-icon-size: 1.05rem;
 
   position: absolute;
   z-index: 1;
-  top: var(--space-sm);
+  top: 50%;
   right: var(--space-sm);
+  transform: translateY(-50%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -114,25 +144,78 @@
 
 @media (--phone) {
   .card {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--space-sm) var(--space-xs);
-    padding-right: var(--space-sm);
+    /* First row matches the delete button's box so it sits centered on that row. */
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: var(--btn-height, 2.75rem) auto;
+    grid-template-areas:
+      'identity identity'
+      'energy macros';
+    align-items: center;
+    column-gap: var(--space-sm);
+    row-gap: 0.2rem;
+    padding: var(--space-sm) calc(var(--btn-height, 2.75rem) + var(--space-sm)) var(--space-sm)
+      var(--space-md);
   }
 
   .identity {
-    grid-column: 1 / -1;
-    min-height: 2.75rem;
-    padding-right: 3rem;
+    grid-area: identity;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    min-width: 0;
 
     & strong {
-      font-size: var(--text-md);
+      overflow: hidden;
+      font-size: var(--text-md-dynamic);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    & span {
+      flex: none;
+      font-size: var(--text-xs);
     }
   }
 
-  .nutrition {
-    & dd {
-      font-size: var(--text-md);
+  .energyTile {
+    grid-area: energy;
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    width: auto;
+    padding: 0;
+    background: none;
+
+    & strong {
+      font-size: var(--text-md-dynamic);
+      font-weight: var(--font-weight-semibold);
+      line-height: inherit;
     }
+
+    & span {
+      font-size: var(--text-xs);
+    }
+  }
+
+  /* Fixed macro widths keep values aligned across list items, like desktop. */
+  .macros {
+    grid-area: macros;
+    display: flex;
+    gap: var(--space-xs);
+
+    & .macro {
+      width: 3.4rem;
+    }
+
+    & dd {
+      font-size: var(--text-sm);
+    }
+  }
+
+  .deleteButton {
+    top: var(--space-sm);
+    transform: none;
   }
 }
 

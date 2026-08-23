@@ -23,6 +23,11 @@ export function LoggedFood({ date, entry }: LoggedFoodProps) {
     <li className={css.item}>
       <Link className={css.cardLink} params={{ logId: entry.id }} to='/calories/logs/$logId'>
         <Card as='article' className={css.card}>
+          <div aria-hidden='true' className={css.energyTile}>
+            <strong>{formatNutritionNumber(Math.round(entry.kcal))}</strong>
+            <span>kcal</span>
+          </div>
+
           <div className={css.identity}>
             <strong>{entry.name}</strong>
             <span>
@@ -30,24 +35,27 @@ export function LoggedFood({ date, entry }: LoggedFoodProps) {
             </span>
           </div>
 
-          <dl className={css.nutrition}>
-            <div>
-              <dt>Kcal</dt>
-              <dd className={css.energy}>{formatNutritionNumber(Math.round(entry.kcal))}</dd>
-            </div>
-            <div>
+          <dl className={css.macros}>
+            <div className={css.macro}>
               <dt>Protein</dt>
-              <dd className={css.protein}>
+              <dd>
+                <i aria-hidden='true' className={css.dotProtein} />
                 {formatNutritionNumber(Math.round(entry.protein ?? 0))} g
               </dd>
             </div>
-            <div>
+            <div className={css.macro}>
               <dt>Fat</dt>
-              <dd className={css.fat}>{formatNutritionNumber(Math.round(entry.fat ?? 0))} g</dd>
+              <dd>
+                <i aria-hidden='true' className={css.dotFat} />
+                {formatNutritionNumber(Math.round(entry.fat ?? 0))} g
+              </dd>
             </div>
-            <div>
+            <div className={css.macro}>
               <dt>Carbs</dt>
-              <dd className={css.carbs}>{formatNutritionNumber(Math.round(entry.carbs ?? 0))} g</dd>
+              <dd>
+                <i aria-hidden='true' className={css.dotCarbs} />
+                {formatNutritionNumber(Math.round(entry.carbs ?? 0))} g
+              </dd>
             </div>
           </dl>
         </Card>
