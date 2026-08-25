@@ -344,6 +344,22 @@
   .energyDial {
     width: min(10.5rem, 62vw);
   }
+
+  .protein,
+  .fat,
+  .carbs {
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  .macroConsumed,
+  .macroConsumedOver {
+    font-size: var(--text-lg);
+  }
+
+  .macroSeparator,
+  .macroTarget {
+    font-size: var(--text-sm);
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {
