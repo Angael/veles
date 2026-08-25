@@ -31,7 +31,7 @@ export const foodProducts = pgTable(
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
   },
   (table) => [
-    uniqueIndex('food_product_barcode_idx').on(table.barcode),
+    index('food_product_barcode_idx').on(table.barcode),
     index('food_product_name_idx').on(table.name),
   ],
 );

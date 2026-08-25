@@ -63,10 +63,44 @@
   gap: var(--space-md);
 }
 
-.fields {
+.fields,
+.amountField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.fields > *,
+.amountField > * {
+  width: 100%;
+}
+
+.packageShortcuts {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-sm);
+  gap: var(--space-xs);
+}
+
+.packageLabel {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+}
+
+.packageButtons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+
+  & > * {
+    width: 100%;
+    min-width: 0;
+    border-radius: 0;
+
+    & + * {
+      border-left: var(--border-width) solid var(--c-border);
+    }
+  }
 }
 
 .goalPreview {
@@ -170,9 +204,5 @@
 
   .goalCaption {
     gap: var(--space-xs) var(--space-sm);
-  }
-
-  .fields {
-    grid-template-columns: 1fr;
   }
 }

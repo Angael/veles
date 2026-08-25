@@ -76,6 +76,13 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
     let detecting = false;
     let lastDetection = 0;
 
+    const stopCamera = () => {
+      cancelAnimationFrame(animationFrame);
+      stream?.getTracks().forEach((track) => track.stop());
+      stream = undefined;
+      if (videoRef.current) videoRef.current.srcObject = null;
+    };
+
     /** Starts the saved camera when available, otherwise the preferred rear camera, then scans. */
     async function startScanner() {
       if (!navigator.mediaDevices?.getUserMedia) {
@@ -84,27 +91,28 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
       }
 
       try {
-        const [detector, cameraStream] = await Promise.all([
-          createDetector(),
-          navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: preferredCameraId
-              ? {
-                  deviceId: { exact: preferredCameraId },
-                  height: { ideal: 1080 },
-                  width: { ideal: 1920 },
-                }
-              : {
-                  facingMode: { ideal: 'environment' },
-                  height: { ideal: 1080 },
-                  width: { ideal: 1920 },
-                },
-          }),
-        ]);
+        const cameraStream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: preferredCameraId
+            ? {
+                deviceId: { exact: preferredCameraId },
+                height: { ideal: 1080 },
+                width: { ideal: 1920 },
+              }
+            : {
+                facingMode: { ideal: 'environment' },
+                height: { ideal: 1080 },
+                width: { ideal: 1920 },
+              },
+        });
+        stream = cameraStream;
+
+        const detector = await createDetector();
         if (!active) {
-          cameraStream.getTracks().forEach((track) => track.stop());
+          stopCamera();
           return;
         }
+
         await enableContinuousFocus(cameraStream).catch(() => undefined);
         const videoTrack = cameraStream.getVideoTracks()[0];
         const activeDeviceId = videoTrack?.getSettings().deviceId ?? '';
@@ -112,14 +120,13 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
           (device) => device.kind === 'videoinput',
         );
         if (!active) {
-          cameraStream.getTracks().forEach((track) => track.stop());
+          stopCamera();
           return;
         }
         registerActiveCamera(activeDeviceId, availableCameras);
-        stream = cameraStream;
         const video = videoRef.current;
-        if (!active || !video) {
-          cameraStream.getTracks().forEach((track) => track.stop());
+        if (!video) {
+          stopCamera();
           return;
         }
 
@@ -137,6 +144,7 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
               const barcode = results.find((result) => result.rawValue.trim())?.rawValue.trim();
               if (barcode && active) callbackRef.current(barcode);
             } catch {
+              stopCamera();
               if (active) setState('error');
               return;
             } finally {
@@ -147,6 +155,7 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
         };
         animationFrame = requestAnimationFrame(scan);
       } catch (error) {
+        stopCamera();
         if (!active) return;
         if (
           error instanceof DOMException &&
@@ -167,8 +176,7 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
     void startScanner();
     return () => {
       active = false;
-      cancelAnimationFrame(animationFrame);
-      stream?.getTracks().forEach((track) => track.stop());
+      stopCamera();
     };
   }, [cameraPreferenceReady, preferredCameraId]);
 

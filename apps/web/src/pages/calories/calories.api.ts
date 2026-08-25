@@ -125,22 +125,38 @@ async function findFoodProductByBarcode(barcode: string) {
   return product;
 }
 
+/** Nulls any existing product's barcode so a new product can claim it (fake unique constraint). */
+async function clearBarcodeFromFoodProducts(
+  executor: typeof db | Parameters<Parameters<typeof db.transaction>[0]>[0],
+  barcode: string,
+) {
+  await executor
+    .update(foodProducts)
+    .set({ barcode: null, updatedAt: new Date() })
+    .where(eq(foodProducts.barcode, barcode));
+}
+
 async function insertImportedFoodProduct(product: OpenFoodFactsProduct) {
-  const [inserted] = await db
-    .insert(foodProducts)
-    .values({
-      name: product.name,
-      brand: product.brand,
-      barcode: product.barcode,
-      imageUrl: product.imageUrl,
-      productSizeGramsHundredths: optionalHundredths(product.productSizeGrams ?? undefined),
-      kcalPer100gHundredths: toHundredths(product.kcalPer100g),
-      proteinPer100gHundredths: optionalHundredths(product.proteinPer100g ?? undefined),
-      fatPer100gHundredths: optionalHundredths(product.fatPer100g ?? undefined),
-      carbsPer100gHundredths: optionalHundredths(product.carbsPer100g ?? undefined),
-    })
-    .onConflictDoNothing({ target: foodProducts.barcode })
-    .returning();
+  const inserted = await db.transaction(async (transaction) => {
+    await clearBarcodeFromFoodProducts(transaction, product.barcode);
+
+    const [created] = await transaction
+      .insert(foodProducts)
+      .values({
+        name: product.name,
+        brand: product.brand,
+        barcode: product.barcode,
+        imageUrl: product.imageUrl,
+        productSizeGramsHundredths: optionalHundredths(product.productSizeGrams ?? undefined),
+        kcalPer100gHundredths: toHundredths(product.kcalPer100g),
+        proteinPer100gHundredths: optionalHundredths(product.proteinPer100g ?? undefined),
+        fatPer100gHundredths: optionalHundredths(product.fatPer100g ?? undefined),
+        carbsPer100gHundredths: optionalHundredths(product.carbsPer100g ?? undefined),
+      })
+      .returning();
+
+    return created;
+  });
 
   return inserted ?? (await findFoodProductByBarcode(product.barcode));
 }
@@ -324,17 +340,16 @@ export const createFoodProduct = createServerFn({ method: 'POST' })
     await requireSession();
 
     const values = productValues(data);
+    const product = await db.transaction(async (transaction) => {
+      if (values.barcode !== null) {
+        await clearBarcodeFromFoodProducts(transaction, values.barcode);
+      }
 
-    const [inserted] = await db
-      .insert(foodProducts)
-      .values(values)
-      .onConflictDoNothing({ target: foodProducts.barcode })
-      .returning();
+      const [inserted] = await transaction.insert(foodProducts).values(values).returning();
+      return inserted;
+    });
 
-    const product =
-      inserted ??
-      (values.barcode === null ? undefined : await findFoodProductByBarcode(values.barcode));
-    if (!product) throw new ClientSafeError('A food product with this barcode already exists.');
+    if (!product) throw new Error('A food product could not be created.');
 
     return toFoodProduct(product);
   });
@@ -345,13 +360,22 @@ export const updateFoodProduct = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     await requireSession();
 
-    const [updated] = await db
-      .update(foodProducts)
-      .set({ ...productValues(data), updatedAt: new Date() })
-      .where(eq(foodProducts.id, data.id))
-      .returning();
+    const values = productValues(data);
+    const updated = await db.transaction(async (transaction) => {
+      if (values.barcode !== null) {
+        await clearBarcodeFromFoodProducts(transaction, values.barcode);
+      }
 
-    if (!updated) throw new ClientSafeError('Food product not found.');
+      const [product] = await transaction
+        .update(foodProducts)
+        .set({ ...values, updatedAt: new Date() })
+        .where(eq(foodProducts.id, data.id))
+        .returning();
+
+      if (!product) throw new ClientSafeError('Food product not found.');
+
+      return product;
+    });
 
     return toFoodProduct(updated);
   });

@@ -59,7 +59,7 @@ export function calorieDashboardQueryOptions(date: string) {
   return queryOptions({
     queryKey: [...calorieDashboardKey, weekStart],
     queryFn: () => getCalorieDashboard({ data: { date: weekStart } }),
-    staleTime: 0,
+    staleTime: 30_000,
   });
 }
 

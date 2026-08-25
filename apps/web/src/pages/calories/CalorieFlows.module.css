@@ -213,7 +213,7 @@
   }
 }
 
-@media (--sm) {
+@media (--phone) {
   .grid {
     grid-template-columns: 1fr;
   }

@@ -4,13 +4,14 @@ import { PencilIcon } from 'lucide-react';
 import { useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { calorieDashboardQueryOptions, useRecordFoodMutation } from '../calories.query';
+import { GoalPreview } from './GoalPreview';
 import { Btn } from '@/components/btn/Btn';
 import { DateInput } from '@/components/date-input/DateInput';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { NutritionInline } from '@/components/nutrition-inline/NutritionInline';
+import { formatNutritionNumber } from '@/lib/nutritionFormat';
 import css from './SelectedFoodForm.module.css';
-import { GoalPreview } from './GoalPreview';
 
 type Props = {
   cancelLabel: string;
@@ -29,6 +30,7 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
   const recordFoodMutation = useRecordFoodMutation();
   const [date, setDate] = useState(initialDate);
   const [grams, setGrams] = useState<number | null>(food.productSizeGrams ?? 100);
+  const packageSizeGrams = food.productSizeGrams;
   const dashboardQuery = useQuery(calorieDashboardQueryOptions(date));
   const day = dashboardQuery.data?.days.find((candidate) => candidate.date === date);
   const selectedGrams = grams ?? 0;
@@ -77,9 +79,48 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
           <Label text='Date'>
             <DateInput onValueChange={setDate} value={date} />
           </Label>
-          <Label text='Amount eaten (g)'>
-            <NumberInput min={1} onValueChange={setGrams} step={1} value={grams} />
-          </Label>
+          <div className={css.amountField}>
+            <Label text='Amount eaten (g)'>
+              <NumberInput min={1} onValueChange={setGrams} step={1} value={grams} />
+            </Label>
+            {packageSizeGrams !== null && packageSizeGrams > 0 ? (
+              <div
+                aria-label='Package amount shortcuts'
+                className={css.packageShortcuts}
+                role='group'
+              >
+                <span className={css.packageLabel}>
+                  1 package ({formatNutritionNumber(packageSizeGrams)} g)
+                </span>
+                <div className={css.packageButtons}>
+                  <Btn
+                    onClick={() => setGrams(packageSizeGrams / 2)}
+                    size='sm'
+                    type='button'
+                    variant='ghost'
+                  >
+                    ½ package
+                  </Btn>
+                  <Btn
+                    onClick={() => setGrams(packageSizeGrams)}
+                    size='sm'
+                    type='button'
+                    variant='ghost'
+                  >
+                    1 package
+                  </Btn>
+                  <Btn
+                    onClick={() => setGrams(packageSizeGrams * 2)}
+                    size='sm'
+                    type='button'
+                    variant='ghost'
+                  >
+                    2 packages
+                  </Btn>
+                </div>
+              </div>
+            ) : null}
+          </div>
         </div>
         <GoalPreview
           consumedKcal={consumedKcal}
