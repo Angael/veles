@@ -42,12 +42,12 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
   const consumedKcal = Math.max(0, day?.totals.kcal ?? 0);
 
   async function save() {
-    await recordFoodMutation.mutateAsync({
+    recordFoodMutation.mutateAsync({
       date,
       grams: selectedGrams,
       productId: food.id,
     });
-    await navigate({ to: '/calories', search: { date } });
+    navigate({ to: '/calories', search: { date } });
   }
 
   return (
