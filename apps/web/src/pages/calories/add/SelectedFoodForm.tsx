@@ -47,6 +47,7 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
       grams: selectedGrams,
       productId: food.id,
     });
+    // Navigation kinda masks the mutation duration
     navigate({ to: '/calories', search: { date } });
   }
 
