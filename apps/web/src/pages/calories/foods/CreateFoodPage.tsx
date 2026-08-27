@@ -23,7 +23,7 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
       <header className={css.header}>
         <div>
           <h1>Create food</h1>
-          <p>Add it once, then everyone can find and improve it.</p>
+          <p>Add it once for everyone</p>
         </div>
       </header>
       <section className={css.panel}>
