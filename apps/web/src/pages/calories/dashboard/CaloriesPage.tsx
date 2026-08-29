@@ -42,6 +42,7 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
       <div className={css.dateControls} data-appear>
         <Btn
           className={css.todayButton}
+          disabled={date === todayDate}
           icon={<CalendarDaysIcon aria-hidden='true' />}
           onClick={() => void navigate({ to: '/calories', search: {} })}
           size='sm'
