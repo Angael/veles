@@ -78,4 +78,62 @@ describe('getOpenFoodFactsProduct', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(fetchMock.mock.calls[1]?.[0]).toContain('/api/v2/product/987.json');
   });
+  it('falls back to v2 when v3 returns invalid JSON', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response('<html>temporarily unavailable</html>', { status: 200 }))
+      .mockResolvedValueOnce(
+        Response.json({
+          product: {
+            product_name: 'Fallback food',
+            nutriments: {
+              'energy-kcal_100g': 123,
+            },
+          },
+        }),
+      );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(getOpenFoodFactsProduct('654')).resolves.toEqual({
+      barcode: '654',
+      name: 'Fallback food',
+      brand: null,
+      imageUrl: null,
+      productSizeGrams: null,
+      kcalPer100g: 123,
+      proteinPer100g: null,
+      fatPer100g: null,
+      carbsPer100g: null,
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[1]?.[0]).toContain('/api/v2/product/654.json');
+  });
+
+  it('normalizes an invalid image URL to null', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      Response.json({
+        product: {
+          product_name: 'Broken image',
+          image_url: 'not a URL',
+          nutriments: {
+            'energy-kcal_100g': 20,
+          },
+        },
+      }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(getOpenFoodFactsProduct('321')).resolves.toEqual({
+      barcode: '321',
+      name: 'Broken image',
+      brand: null,
+      imageUrl: null,
+      productSizeGrams: null,
+      kcalPer100g: 20,
+      proteinPer100g: null,
+      fatPer100g: null,
+      carbsPer100g: null,
+    });
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
 });

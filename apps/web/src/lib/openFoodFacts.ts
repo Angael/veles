@@ -3,10 +3,16 @@ import { type } from 'arktype';
 const openFoodFactsNumberType = type('number | string.numeric.parse | null').pipe((value) =>
   value !== null && Number.isFinite(value) && value >= 0 ? value : null,
 );
+const urlType = type('string.url');
+const openFoodFactsImageUrlType = type('string | null').pipe((value) => {
+  if (value === null) return null;
+  const normalized = value.trim();
+  return normalized && urlType.allows(normalized) ? normalized : null;
+});
 const openFoodFactsProductType = type({
   'product_name?': 'string | null',
   'brands?': 'string | null',
-  'image_url?': 'string | null',
+  'image_url?': openFoodFactsImageUrlType,
   'product_quantity?': openFoodFactsNumberType,
   'product_quantity_unit?': 'string | null',
   'nutriments?': {
@@ -79,21 +85,18 @@ export async function getOpenFoodFactsProduct(
   ];
 
   for (const endpoint of endpoints) {
-    let response: Response;
-
     try {
-      response = await fetch(endpoint, { headers: { accept: 'application/json' } });
+      const response = await fetch(endpoint, { headers: { accept: 'application/json' } });
+      if (!response.ok) continue;
+
+      const parsedResponse = openFoodFactsResponseType(await response.json());
+      if (parsedResponse instanceof type.errors) continue;
+
+      const product = parseProduct(parsedResponse.product, barcode);
+      if (product !== null) return product;
     } catch {
       continue;
     }
-
-    if (!response.ok) continue;
-
-    const parsedResponse = openFoodFactsResponseType(await response.json());
-    if (parsedResponse instanceof type.errors) continue;
-
-    const product = parseProduct(parsedResponse.product, barcode);
-    if (product !== null) return product;
   }
 
   return null;
