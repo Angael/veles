@@ -5,7 +5,6 @@ import { useDeleteFoodLogMutation } from '../calories.query';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { NutritionInline } from '@/components/nutrition-inline/NutritionInline';
-import { formatNutritionNumber } from '@/lib/nutritionFormat';
 import css from './LoggedFood.module.css';
 
 type LoggedFoodProps = {
@@ -15,7 +14,7 @@ type LoggedFoodProps = {
 
 export function LoggedFood({ date, entry }: LoggedFoodProps) {
   const deleteMutation = useDeleteFoodLogMutation();
-  const kcal = formatNutritionNumber(Math.round(entry.kcal));
+  const kcal = Math.round(entry.kcal);
 
   function remove() {
     deleteMutation.mutate({ date, id: entry.id });
@@ -36,7 +35,7 @@ export function LoggedFood({ date, entry }: LoggedFoodProps) {
               <strong className={css.name}>{entry.name}</strong>
             </Link>
             <span className={css.grams}>
-              {entry.grams === null ? 'Custom entry' : `${formatNutritionNumber(entry.grams)} g`}
+              {entry.grams === null ? 'Custom entry' : `${Math.round(entry.grams)} g`}
             </span>
             <Btn
               aria-label={`Delete ${entry.name}`}

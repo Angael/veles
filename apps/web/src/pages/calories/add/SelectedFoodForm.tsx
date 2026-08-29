@@ -10,7 +10,6 @@ import { DateInput } from '@/components/date-input/DateInput';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { NutritionInline } from '@/components/nutrition-inline/NutritionInline';
-import { formatNutritionNumber } from '@/lib/nutritionFormat';
 import css from './SelectedFoodForm.module.css';
 
 type Props = {
@@ -91,7 +90,7 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
                 role='group'
               >
                 <span className={css.packageLabel}>
-                  1 package ({formatNutritionNumber(packageSizeGrams)} g)
+                  1 package ({Math.round(packageSizeGrams)} g)
                 </span>
                 <div className={css.packageButtons}>
                   <Btn

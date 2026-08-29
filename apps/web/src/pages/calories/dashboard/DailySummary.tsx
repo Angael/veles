@@ -3,7 +3,6 @@ import { GoalIcon } from 'lucide-react';
 import { Btn } from '@/components/btn/Btn';
 import { useId, useState } from 'react';
 import type { CalorieGoal, CalorieTotals } from '../calories.api';
-import { formatNutritionNumber } from '@/lib/nutritionFormat';
 import css from './DailySummary.module.css';
 
 type DailySummaryProps = {
@@ -126,18 +125,18 @@ function EnergyDial({
         {showTotals && goal !== null && goal !== undefined ? (
           <div className={css.energyStack}>
             <strong>
-              {formatNutritionNumber(total)}
+              {Math.round(total)}
               <small>kcal</small>
             </strong>
             <span aria-hidden='true' className={css.fractionLine} />
             <strong>
-              {formatNutritionNumber(goal)}
+              {Math.round(goal)}
               <small>kcal</small>
             </strong>
           </div>
         ) : (
           <>
-            <strong>{formatNutritionNumber(remaining)}</strong>
+            <strong>{Math.round(remaining)}</strong>
             <span>{goal === null || goal === undefined ? 'kcal consumed' : 'kcal remaining'}</span>
           </>
         )}
@@ -151,8 +150,8 @@ function EnergyDial({
     <button
       aria-label={
         showTotals
-          ? `${formatNutritionNumber(total)} kcal consumed out of ${formatNutritionNumber(goal)} kcal. Show calories remaining`
-          : `${formatNutritionNumber(remaining)} kcal remaining. Show consumed calories and goal`
+          ? `${Math.round(total)} kcal consumed out of ${Math.round(goal)} kcal. Show calories remaining`
+          : `${Math.round(remaining)} kcal remaining. Show consumed calories and goal`
       }
       aria-pressed={showTotals}
       className={className}
@@ -185,12 +184,12 @@ function Macro({
       <dt>{label}</dt>
       <dd className={css.macroValue}>
         <span className={isOverGoal ? css.macroConsumedOver : css.macroConsumed}>
-          {formatNutritionNumber(value)}g
+          {Math.round(value)}g
         </span>
         {goal === null || goal === undefined ? null : (
           <>
             <span className={css.macroSeparator}>/</span>
-            <span className={css.macroTarget}>{formatNutritionNumber(goal)}g</span>
+            <span className={css.macroTarget}>{Math.round(goal)}g</span>
           </>
         )}
       </dd>

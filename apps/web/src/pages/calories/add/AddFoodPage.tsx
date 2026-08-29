@@ -10,7 +10,6 @@ import { Btn } from '@/components/btn/Btn';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
 import { Label } from '@/components/label/Label';
 import { TextInput } from '@/components/text-input/TextInput';
-import { formatNutritionNumber } from '@/lib/nutritionFormat';
 import css from './AddFoodPage.module.css';
 
 type Props = { date: string; initialFoodId?: string };
@@ -80,17 +79,17 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
             <li key={food.id}>
               <button className={css.product} onClick={() => selectFood(food)} type='button'>
                 <span aria-hidden='true' className={css.energyTile}>
-                  <strong>{formatNutritionNumber(kcal)}</strong>
+                  <strong>{Math.round(kcal)}</strong>
                   <span>kcal</span>
                 </span>
                 <span className={css.productBody}>
                   <span className={css.productTop}>
                     <strong className={css.productName}>{food.name}</strong>
-                    <span className={css.grams}>{formatNutritionNumber(productGrams)} g</span>
+                    <span className={css.grams}>{Math.round(productGrams)} g</span>
                   </span>
                   <span className={css.productBottom}>
                     <span aria-hidden='true' className={css.energyInline}>
-                      <strong>{formatNutritionNumber(kcal)}</strong>
+                      <strong>{Math.round(kcal)}</strong>
                       <span>kcal</span>
                     </span>
                     <span className={css.macros}>
