@@ -94,6 +94,8 @@
   --c-surface-inset: rgba(2, 6, 23, 0.5);
 
   --c-border: rgba(148, 163, 184, 0.2);
+  /* Reserved theme token for upcoming hover treatments. */
+  --c-border-hover: rgba(148, 163, 184, 0.22);
   --c-border-strong: rgba(148, 163, 184, 0.24);
   --c-border-popup: rgba(148, 163, 184, 0.28);
 
@@ -104,6 +106,9 @@
   --gradient-page:
     radial-gradient(circle at top, rgba(96, 165, 250, 0.18), transparent 28%),
     linear-gradient(180deg, #060816 0%, #0f172a 48%, #111827 100%);
+
+  /* Reserved theme token for upcoming primary gradient treatments. */
+  --gradient-primary: linear-gradient(135deg, var(--c-primary) 0%, #7c3aed 100%);
 
   --space-xs: 0.5rem;
   --space-sm: 0.75rem;
