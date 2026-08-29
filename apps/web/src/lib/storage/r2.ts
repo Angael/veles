@@ -1,9 +1,4 @@
-import {
-  DeleteObjectCommand,
-  GetObjectCommand,
-  PutObjectCommand,
-  S3Client,
-} from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getStorageConfig } from './config';
 
 type UploadFileByKeyInput = {
@@ -25,12 +20,6 @@ export async function uploadFileByKey({ body, contentType, key }: UploadFileByKe
       Key: key,
     }),
   );
-}
-
-export async function getFileByKey(key: string) {
-  const { bucketName } = getRequiredStorageConfig();
-
-  return getR2Client().send(new GetObjectCommand({ Bucket: bucketName, Key: key }));
 }
 
 export async function deleteFileByKey(key: string) {

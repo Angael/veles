@@ -16,7 +16,6 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
   const energyProgress = progressFor(totals.kcal, goal?.kcal);
   const energyOverProgress =
     goal && totals.kcal > goal.kcal ? progressFor(totals.kcal - goal.kcal, goal.kcal) : null;
-  const energyCaption = remaining === null ? 'kcal consumed' : 'kcal remaining';
 
   return (
     <section aria-label='Daily nutrition summary' className={css.summary} data-appear='1'>

@@ -94,7 +94,7 @@ export function useCameraPreference() {
 }
 
 /** Counts cameras that identify themselves as rear-facing through capabilities or their label. */
-export function countBackwardFacingCameras(cameras: MediaDeviceInfo[]) {
+function countBackwardFacingCameras(cameras: MediaDeviceInfo[]) {
   return cameras.filter((camera) => {
     if (typeof InputDeviceInfo !== 'undefined' && camera instanceof InputDeviceInfo) {
       const facingModes = camera.getCapabilities().facingMode;

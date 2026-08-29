@@ -20,8 +20,7 @@
   text-wrap: balance;
 }
 
-.header p,
-.muted {
+.header p {
   color: var(--c-muted);
   text-wrap: pretty;
 }
@@ -40,31 +39,6 @@
   gap: 1rem;
 }
 
-.field {
-  display: grid;
-  gap: 0.35rem;
-  font-weight: 600;
-}
-
-.field span {
-  font-size: 0.875rem;
-}
-
-.field input {
-  min-height: 44px;
-  border: 1px solid var(--c-border);
-  border-radius: 0.7rem;
-  background: var(--c-surface-input);
-  color: inherit;
-  padding: 0.7rem 0.8rem;
-  font: inherit;
-}
-
-.field input:focus-visible {
-  outline: 2px solid var(--c-primary-focus);
-  outline-offset: 2px;
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -78,49 +52,8 @@
   justify-content: flex-end;
 }
 
-.results {
-  display: grid;
-  gap: 0.6rem;
-  list-style: none;
-}
-
-.result {
-  width: 100%;
-  min-height: 56px;
-  border: 1px solid var(--c-border);
-  border-radius: 0.8rem;
-  background: var(--c-surface-input);
-  color: inherit;
-  padding: 0.75rem;
-  text-align: left;
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: center;
-  cursor: pointer;
-}
-
-.result strong,
-.result span {
-  display: block;
-}
-
-.result span {
-  color: var(--c-muted);
-  font-size: 0.875rem;
-}
-
 .error {
   color: var(--c-danger-text, #b42318);
-}
-
-.success {
-  color: var(--c-macro-carb, #087443);
-}
-
-.scanner {
-  display: grid;
-  gap: 1rem;
 }
 
 .scanViewport {
@@ -179,29 +112,6 @@
   color: var(--c-text);
 }
 
-.productSummary {
-  display: grid;
-  grid-template-columns: 7rem 1fr;
-  gap: var(--space-md);
-  padding: var(--space-md);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-sm);
-  background: var(--c-surface);
-}
-
-.productSummary img {
-  width: 7rem;
-  height: 7rem;
-  border-radius: var(--radius-xs);
-  object-fit: cover;
-}
-
-.productSummary span,
-.productSummary p {
-  display: block;
-  color: var(--c-muted);
-}
-
 @media (--phone) {
   .grid {
     grid-template-columns: 1fr;
@@ -209,10 +119,5 @@
 
   .header {
     display: grid;
-  }
-}
-@media (hover: hover) and (pointer: fine) {
-  .result:hover {
-    border-color: var(--c-muted);
   }
 }

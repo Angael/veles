@@ -61,5 +61,3 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 30,
   },
 });
-
-export type AuthInstance = typeof auth;

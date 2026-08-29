@@ -1,6 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
 import type { FormEvent } from 'react';
-import { useState } from 'react';
 import { useRecordCustomCaloriesMutation } from '../calories.query';
 import { Btn } from '@/components/btn/Btn';
 import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';

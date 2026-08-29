@@ -143,8 +143,10 @@ export function useSetDailyCalorieGoalMutation() {
 
 export function useUpdateFoodLogMutation() {
   return useMutation({
-    mutationFn: ({ previousDate: _, ...variables }: UpdateFoodLogVariables) =>
-      updateFoodLog({ data: variables }),
+    mutationFn: ({ id, name, grams, kcal, protein, fat, carbs, date }: UpdateFoodLogVariables) =>
+      updateFoodLog({
+        data: { id, name, grams, kcal, protein, fat, carbs, date },
+      }),
     onSuccess: (_data, { date, previousDate }, _onMutateResult, context) =>
       Promise.all([
         context.client.invalidateQueries({
