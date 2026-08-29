@@ -4,8 +4,7 @@ import type { CalorieGoal } from '../calories.api';
 import { useSetDailyCalorieGoalMutation } from '../calories.query';
 import { todayLocalDate } from '../calorieHelpers';
 import { Btn } from '@/components/btn/Btn';
-import { Label } from '@/components/label/Label';
-import { NumberInput } from '@/components/number-input/NumberInput';
+import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import css from '../CalorieFlows.module.css';
 
 export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
@@ -38,26 +37,15 @@ export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
       </header>
       <section className={css.panel}>
         <form className={css.form} onSubmit={(event) => void submit(event)}>
-          <div className={css.grid}>
-            <Label text='Daily kcal'>
-              <NumberInput
-                defaultValue={goal?.kcal ?? undefined}
-                min={1}
-                name='kcal'
-                required
-                step={10}
-              />
-            </Label>
-            <Label text='Protein (g)'>
-              <NumberInput defaultValue={goal?.protein ?? undefined} min={0} name='protein' />
-            </Label>
-            <Label text='Fat (g)'>
-              <NumberInput defaultValue={goal?.fat ?? undefined} min={0} name='fat' />
-            </Label>
-            <Label text='Carbs (g)'>
-              <NumberInput defaultValue={goal?.carbs ?? undefined} min={0} name='carbs' />
-            </Label>
-          </div>
+          <KcalMacrosForm
+            defaultValues={{
+              kcal: goal?.kcal,
+              protein: goal?.protein,
+              fat: goal?.fat,
+              carbs: goal?.carbs,
+            }}
+            kcalInput={{ min: 1, step: 10 }}
+          />
 
           <Btn loading={goalMutation.isPending} type='submit'>
             Save current goals

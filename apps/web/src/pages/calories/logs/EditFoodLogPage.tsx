@@ -4,6 +4,7 @@ import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogMutation, useUpdateFoodLogMutation } from '../calories.query';
 import { Btn } from '@/components/btn/Btn';
 import { DateInput } from '@/components/date-input/DateInput';
+import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
@@ -72,44 +73,15 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             </Label>
           </div>
 
-          <div className={css.nutritionMacros}>
-            <Label text='kcal'>
-              <NumberInput
-                defaultValue={log.kcal}
-                min={0}
-                name='kcal'
-                readOnly={isProduct}
-                required
-              />
-            </Label>
-
-            <Label text='Protein (g)'>
-              <NumberInput
-                defaultValue={log.protein ?? undefined}
-                min={0}
-                name='protein'
-                readOnly={isProduct}
-              />
-            </Label>
-
-            <Label text='Fat (g)'>
-              <NumberInput
-                defaultValue={log.fat ?? undefined}
-                min={0}
-                name='fat'
-                readOnly={isProduct}
-              />
-            </Label>
-
-            <Label text='Carbs (g)'>
-              <NumberInput
-                defaultValue={log.carbs ?? undefined}
-                min={0}
-                name='carbs'
-                readOnly={isProduct}
-              />
-            </Label>
-          </div>
+          <KcalMacrosForm
+            defaultValues={{
+              kcal: log.kcal,
+              protein: log.protein,
+              fat: log.fat,
+              carbs: log.carbs,
+            }}
+            readOnly={isProduct}
+          />
 
           <div className={css.actions}>
             <Btn disabled={isPending} onClick={() => void remove()} variant='ghost'>

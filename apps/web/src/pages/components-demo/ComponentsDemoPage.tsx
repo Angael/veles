@@ -8,6 +8,7 @@ import { DateInput } from '@/components/date-input/DateInput';
 import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
 import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
+import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
 import {
   MenuBtn,
@@ -196,6 +197,11 @@ export function ComponentsDemoPage() {
           step={10}
           value={numberValue}
         />
+      </section>
+
+      <section>
+        <h2>KcalMacrosForm</h2>
+        <KcalMacrosForm defaultValues={{ kcal: 420, protein: 32, fat: 14, carbs: 48 }} />
       </section>
 
       <section>

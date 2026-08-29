@@ -1,6 +1,7 @@
 import type { FormEvent } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { Btn } from '@/components/btn/Btn';
+import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
@@ -87,20 +88,15 @@ export function FoodEditor({
           />
         </Label>
       </div>
-      <div className={css.nutritionMacros}>
-        <Label text='kcal / 100 g'>
-          <NumberInput defaultValue={food?.kcalPer100g ?? undefined} min={0} name='kcal' required />
-        </Label>
-        <Label text='Protein / 100 g'>
-          <NumberInput defaultValue={food?.proteinPer100g ?? undefined} min={0} name='protein' />
-        </Label>
-        <Label text='Fat / 100 g'>
-          <NumberInput defaultValue={food?.fatPer100g ?? undefined} min={0} name='fat' />
-        </Label>
-        <Label text='Carbs / 100 g'>
-          <NumberInput defaultValue={food?.carbsPer100g ?? undefined} min={0} name='carbs' />
-        </Label>
-      </div>
+      <KcalMacrosForm
+        defaultValues={{
+          kcal: food?.kcalPer100g,
+          protein: food?.proteinPer100g,
+          fat: food?.fatPer100g,
+          carbs: food?.carbsPer100g,
+        }}
+        isPer100
+      />
       <Label text='Image URL'>
         <TextInput defaultValue={food?.imageUrl ?? ''} name='imageUrl' type='url' />
       </Label>

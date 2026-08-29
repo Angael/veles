@@ -1,3 +1,4 @@
+import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextareaInput } from '@/components/textarea-input/TextareaInput';
@@ -82,43 +83,23 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
             value={draft.portions}
           />
         </Label>
-
-        <Label text='Kcal'>
-          <NumberInput
-            min={0}
-            name='kcal'
-            onValueChange={(value) => onDraftChange({ ...draft, kcal: value })}
-            value={draft.kcal}
-          />
-        </Label>
-
-        <Label text='Protein'>
-          <NumberInput
-            min={0}
-            name='protein'
-            onValueChange={(value) => onDraftChange({ ...draft, protein: value })}
-            value={draft.protein}
-          />
-        </Label>
-
-        <Label text='Fats'>
-          <NumberInput
-            min={0}
-            name='fats'
-            onValueChange={(value) => onDraftChange({ ...draft, fats: value })}
-            value={draft.fats}
-          />
-        </Label>
-
-        <Label text='Carbs'>
-          <NumberInput
-            min={0}
-            name='carbs'
-            onValueChange={(value) => onDraftChange({ ...draft, carbs: value })}
-            value={draft.carbs}
-          />
-        </Label>
       </div>
+
+      <KcalMacrosForm
+        fatName='fats'
+        onValueChange={(field, value) =>
+          onDraftChange({
+            ...draft,
+            [field === 'fat' ? 'fats' : field]: value,
+          })
+        }
+        values={{
+          kcal: draft.kcal,
+          protein: draft.protein,
+          fat: draft.fats,
+          carbs: draft.carbs,
+        }}
+      />
     </div>
   );
 }

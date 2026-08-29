@@ -3,8 +3,8 @@ import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useRecordCustomCaloriesMutation } from '../calories.query';
 import { Btn } from '@/components/btn/Btn';
+import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
-import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
 import css from '../CalorieFlows.module.css';
 
@@ -45,23 +45,7 @@ export function QuickAddPage({ date }: { date: string }) {
             <TextInput defaultValue='Quick add' name='name' required />
           </Label>
 
-          <div className={css.nutritionMacros}>
-            <Label text='kcal'>
-              <NumberInput min={0} name='kcal' required />
-            </Label>
-
-            <Label text='Protein (g)'>
-              <NumberInput min={0} name='protein' />
-            </Label>
-
-            <Label text='Fat (g)'>
-              <NumberInput min={0} name='fat' />
-            </Label>
-
-            <Label text='Carbs (g)'>
-              <NumberInput min={0} name='carbs' />
-            </Label>
-          </div>
+          <KcalMacrosForm />
 
           <Btn loading={recordMutation.isPending} type='submit'>
             Add to diary
