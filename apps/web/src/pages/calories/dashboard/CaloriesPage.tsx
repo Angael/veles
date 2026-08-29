@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { addDays, format, isAfter, parseISO } from 'date-fns';
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { CalendarDaysIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import type { CalorieDashboard } from '../calories.api';
 import { calorieDashboardQueryOptions } from '../calories.query';
 import { CalorieOverview } from './CalorieOverview';
@@ -39,75 +39,87 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
     <main className={css.page}>
       <LogFoodMenu date={date} />
 
-      <div className={css.dayStrip} data-appear>
+      <div className={css.dateControls} data-appear>
         <Btn
-          aria-label='Previous week'
-          className={css.dayNav}
-          icon={<ChevronLeftIcon aria-hidden='true' />}
-          iconOnly
-          onClick={() => shiftWeek(-1)}
-          onFocus={() => prefetchWeek(-1)}
-          onPointerEnter={() => prefetchWeek(-1)}
-          onTouchStart={() => prefetchWeek(-1)}
+          className={css.todayButton}
+          icon={<CalendarDaysIcon aria-hidden='true' />}
+          onClick={() => void navigate({ to: '/calories', search: {} })}
           size='sm'
-          variant='ghost'
-        />
-        <ToggleGroup
-          aria-label='Diary week'
-          className={css.dayOptions}
-          onValueChange={(values) => {
-            const selected = values[0];
-            if (selected) void navigate({ to: '/calories', search: { date: selected } });
-          }}
-          value={[date]}
+          variant='outlineMain'
         >
-          {calorieWeekDates(date).map((day) => {
-            const parsedDay = parseISO(day);
-            const dayStatus = dashboard.days.find((status) => status.date === day);
-            const isFuture = isAfter(parsedDay, today);
-            const isToday = day === todayDate;
-            const statusClass =
-              dayStatus?.hasLogs && dayStatus.withinKcalGoal !== null
-                ? dayStatus.withinKcalGoal
-                  ? css.dayWithinGoal
-                  : dayStatus.overKcalGoal
-                    ? css.dayOverGoal
-                    : css.dayLogged
-                : dayStatus?.hasLogs
-                  ? css.dayLogged
-                  : undefined;
+          Today
+        </Btn>
 
-            return (
-              <Toggle
-                className={clsx(
-                  css.day,
-                  isFuture && css.futureDay,
-                  isToday && css.todayDay,
-                  statusClass,
-                )}
-                key={day}
-                value={day}
-              >
-                <span className={css.compactDay}>{format(parsedDay, 'EEEEE')}</span>
-                <span className={css.expandedDay}>{format(parsedDay, 'EEEE')}</span>
-                <strong className={css.compactDay}>{format(parsedDay, 'd')}</strong>
-                <strong className={css.expandedDay}>{format(parsedDay, 'dd.MM')}</strong>
-              </Toggle>
-            );
-          })}
-        </ToggleGroup>
-        <Btn
-          aria-label='Next week'
-          className={css.dayNav}
-          icon={<ChevronRightIcon aria-hidden='true' />}
-          iconOnly
-          onClick={() => shiftWeek(1)}
-          onFocus={() => prefetchWeek(1)}
-          onPointerEnter={() => prefetchWeek(1)}
-          onTouchStart={() => prefetchWeek(1)}
-          size='sm'
-          variant='ghost'
-        />
+        <div className={css.dayStrip}>
+          <Btn
+            aria-label='Previous week'
+            className={css.dayNav}
+            icon={<ChevronLeftIcon aria-hidden='true' />}
+            iconOnly
+            onClick={() => shiftWeek(-1)}
+            onFocus={() => prefetchWeek(-1)}
+            onPointerEnter={() => prefetchWeek(-1)}
+            onTouchStart={() => prefetchWeek(-1)}
+            size='sm'
+            variant='ghost'
+          />
+          <ToggleGroup
+            aria-label='Diary week'
+            className={css.dayOptions}
+            onValueChange={(values) => {
+              const selected = values[0];
+              if (selected) void navigate({ to: '/calories', search: { date: selected } });
+            }}
+            value={[date]}
+          >
+            {calorieWeekDates(date).map((day) => {
+              const parsedDay = parseISO(day);
+              const dayStatus = dashboard.days.find((status) => status.date === day);
+              const isFuture = isAfter(parsedDay, today);
+              const isToday = day === todayDate;
+              const statusClass =
+                dayStatus?.hasLogs && dayStatus.withinKcalGoal !== null
+                  ? dayStatus.withinKcalGoal
+                    ? css.dayWithinGoal
+                    : dayStatus.overKcalGoal
+                      ? css.dayOverGoal
+                      : css.dayLogged
+                  : dayStatus?.hasLogs
+                    ? css.dayLogged
+                    : undefined;
+
+              return (
+                <Toggle
+                  className={clsx(
+                    css.day,
+                    isFuture && css.futureDay,
+                    isToday && css.todayDay,
+                    statusClass,
+                  )}
+                  key={day}
+                  value={day}
+                >
+                  <span className={css.compactDay}>{format(parsedDay, 'EEEEE')}</span>
+                  <span className={css.expandedDay}>{format(parsedDay, 'EEEE')}</span>
+                  <strong className={css.compactDay}>{format(parsedDay, 'd')}</strong>
+                  <strong className={css.expandedDay}>{format(parsedDay, 'dd.MM')}</strong>
+                </Toggle>
+              );
+            })}
+          </ToggleGroup>
+          <Btn
+            aria-label='Next week'
+            className={css.dayNav}
+            icon={<ChevronRightIcon aria-hidden='true' />}
+            iconOnly
+            onClick={() => shiftWeek(1)}
+            onFocus={() => prefetchWeek(1)}
+            onPointerEnter={() => prefetchWeek(1)}
+            onTouchStart={() => prefetchWeek(1)}
+            size='sm'
+            variant='ghost'
+          />
+        </div>
       </div>
 
       <CalorieOverview

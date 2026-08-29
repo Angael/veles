@@ -31,6 +31,7 @@ const faviconLinks = isLocalhostApp
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: async ({ context }) => ({
+    // Before this was a simple `user: await getSessionUser()` but it fetched for any redirect even when very fresh
     user: await context.queryClient.fetchQuery(sessionUserQueryOptions()),
   }),
   head: () => ({

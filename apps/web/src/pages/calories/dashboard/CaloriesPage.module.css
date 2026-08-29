@@ -403,12 +403,39 @@ label small {
   }
 }
 
+.dateControls {
+  display: grid;
+  grid-template-areas: 'strip today';
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.todayButton {
+  grid-area: today;
+}
+
+@media (--phone) {
+  .dateControls {
+    grid-template-areas:
+      'today'
+      'strip';
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xs);
+  }
+
+  .todayButton {
+    justify-self: end;
+  }
+}
+
 .dayStrip {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-xs);
   width: 100%;
+  grid-area: strip;
 }
 
 .dayOptions {
