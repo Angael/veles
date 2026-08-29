@@ -3,7 +3,7 @@ import { AppFrame } from '@/components/app-frame/AppFrame';
 import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
 import { NotFound } from '@/components/not-found/NotFound';
 import { ToastProvider } from '@/components/toast/ToastProvider';
-import { getSessionUser } from '@/lib/auth/session.api';
+import { sessionUserQueryOptions } from '@/lib/auth/session.query';
 import { clientEnv } from '@/lib/env/client';
 import globalCss from '@/styles/global.css?url';
 import type { QueryClient } from '@tanstack/react-query';
@@ -30,7 +30,9 @@ const faviconLinks = isLocalhostApp
     ];
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  beforeLoad: async () => ({ user: await getSessionUser() }),
+  beforeLoad: async ({ context }) => ({
+    user: await context.queryClient.fetchQuery(sessionUserQueryOptions()),
+  }),
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
