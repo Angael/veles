@@ -10,7 +10,8 @@ export interface SessionUser {
 }
 
 export const getSessionUser = createServerFn({ method: 'GET' })
-  .middleware([logMiddleware('getSessionUser')])
+  // Omitted from logging middleware, since it would spam on every page view a lot
+  // .middleware([logMiddleware('getSessionUser')])
   .handler(async (): Promise<SessionUser | null> => {
     const session = await getSession();
 
