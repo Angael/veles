@@ -3,9 +3,9 @@ import { ToggleGroup } from '@base-ui/react/toggle-group';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { addDays, format, isAfter, parseISO } from 'date-fns';
+import { addDays, format, isAfter, isBefore, parseISO } from 'date-fns';
 import { CalendarDaysIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import type { CalorieDashboard } from '../calories.api';
+import type { CalorieDashboard, CalorieDashboardDay } from '../calories.api';
 import { calorieDashboardQueryOptions } from '../calories.query';
 import { CalorieOverview } from './CalorieOverview';
 import { LogFoodMenu } from './LogFoodMenu';
@@ -78,16 +78,15 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
               const dayStatus = dashboard.days.find((status) => status.date === day);
               const isFuture = isAfter(parsedDay, today);
               const isToday = day === todayDate;
+              const isPast = isBefore(parsedDay, today);
               const statusClass =
-                dayStatus?.hasLogs && dayStatus.withinKcalGoal !== null
-                  ? dayStatus.withinKcalGoal
+                isPast && dayStatus?.hasLogs
+                  ? dayStatus.withinKcalGoal === true
                     ? css.dayWithinGoal
                     : dayStatus.overKcalGoal
                       ? css.dayOverGoal
                       : css.dayLogged
-                  : dayStatus?.hasLogs
-                    ? css.dayLogged
-                    : undefined;
+                  : undefined;
 
               return (
                 <Toggle
@@ -104,6 +103,12 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
                   <span className={css.expandedDay}>{format(parsedDay, 'EEEE')}</span>
                   <strong className={css.compactDay}>{format(parsedDay, 'd')}</strong>
                   <strong className={css.expandedDay}>{format(parsedDay, 'dd.MM')}</strong>
+                  <DayProgress
+                    dayStatus={dayStatus}
+                    isFuture={isFuture}
+                    isPast={isPast}
+                    isToday={isToday}
+                  />
                 </Toggle>
               );
             })}
@@ -131,4 +136,61 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
       />
     </main>
   );
+}
+
+/** Shows kcal goal progress while keeping today's state neutral. */
+function DayProgress({
+  dayStatus,
+  isFuture,
+  isPast,
+  isToday,
+}: {
+  dayStatus: CalorieDashboardDay | undefined;
+  isFuture: boolean;
+  isPast: boolean;
+  isToday: boolean;
+}) {
+  if (!dayStatus?.goal) return null;
+
+  const goalKcal = dayStatus.goal.kcal;
+  const consumedKcal = dayStatus.totals.kcal;
+  const progress = progressFor(consumedKcal, goalKcal);
+  const overProgress =
+    isPast && consumedKcal > goalKcal ? progressFor(consumedKcal - goalKcal, goalKcal) : null;
+  const fillClass = isToday
+    ? css.dayProgressToday
+    : isFuture
+      ? css.dayProgressFuture
+      : dayStatus.withinKcalGoal
+        ? css.dayProgressSuccess
+        : css.dayProgressFill;
+
+  return (
+    <span
+      aria-label={`${Math.round(consumedKcal)} of ${Math.round(goalKcal)} kcal`}
+      aria-valuemax={goalKcal}
+      aria-valuemin={0}
+      aria-valuenow={Math.min(consumedKcal, goalKcal)}
+      className={css.dayProgress}
+      role='progressbar'
+    >
+      <span
+        aria-hidden='true'
+        className={clsx(css.dayProgressFill, fillClass)}
+        style={{ width: `${progress}%` }}
+      />
+      {overProgress === null ? null : (
+        <span
+          aria-hidden='true'
+          className={css.dayProgressOver}
+          style={{ width: `${overProgress}%` }}
+        />
+      )}
+    </span>
+  );
+}
+
+function progressFor(value: number, goal: number) {
+  if (goal <= 0) return value > 0 ? 100 : 0;
+  return Math.min(Math.max((value / goal) * 100, 0), 100);
 }

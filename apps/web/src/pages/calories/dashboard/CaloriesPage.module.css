@@ -430,18 +430,22 @@ label small {
 }
 
 .dayStrip {
+  grid-area: strip;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 0.25rem;
   width: 100%;
-  grid-area: strip;
+  padding: 0.25rem;
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-inset);
 }
 
 .dayOptions {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.2rem;
+  gap: 0.25rem;
   min-width: 0;
 }
 
@@ -452,30 +456,121 @@ label small {
 
 .day {
   position: relative;
+  display: grid;
   min-width: 0;
-  min-height: 52px;
+  min-height: 3.75rem;
+  padding: 0.35rem 0.2rem 0.5rem;
+  place-items: center;
+  align-content: center;
+  overflow: hidden;
   border: var(--border-width) solid transparent;
   border-radius: var(--radius-xs);
   background: transparent;
   color: var(--c-muted);
-  display: grid;
-  place-items: center;
-  align-content: center;
   font: inherit;
   cursor: pointer;
-}
-
-.day.futureDay {
-  color: var(--c-placeholder);
-}
-
-.day.todayDay {
-  outline: 2px solid var(--c-primary-border-soft);
-  outline-offset: -2px;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
 }
 
 .day span {
   font-size: var(--text-xs);
+  line-height: 1.15;
+}
+
+.day strong {
+  color: var(--c-text);
+  font-size: var(--text-md);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.dayProgress {
+  position: absolute;
+  right: 0.45rem;
+  bottom: 0.3rem;
+  left: 0.45rem;
+  height: 0.25rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--c-surface-input);
+  box-shadow: inset 0 0 0 1px var(--c-border);
+  pointer-events: none;
+}
+
+.dayProgressFill,
+.dayProgressOver {
+  position: absolute;
+  inset-block: 0;
+  margin: 0;
+  transition: width var(--duration-fast) var(--ease-out);
+}
+
+.dayProgressFill {
+  inset-inline-start: 0;
+  background: var(--c-accent);
+}
+
+.dayProgressSuccess {
+  background: var(--c-macro-carb);
+}
+
+.dayProgressToday {
+  background: var(--c-muted-soft);
+}
+
+.dayProgressFuture {
+  background: var(--c-muted-strong);
+}
+
+.dayProgressOver {
+  z-index: 1;
+  inset-inline-end: 0;
+  background: rgb(248 113 113 / 88%);
+  box-shadow: 0 0 0.35rem rgb(248 113 113 / 35%);
+}
+
+.dayLogged {
+  color: var(--c-accent-soft);
+}
+
+.dayWithinGoal {
+  color: var(--c-macro-carb);
+}
+
+.dayOverGoal {
+  color: var(--c-text);
+}
+
+.day.todayDay {
+  background: var(--c-surface-raised);
+  color: var(--c-text-strong);
+}
+
+.day.todayDay strong {
+  color: var(--c-text-strong);
+}
+
+.day.futureDay {
+  opacity: 0.48;
+  color: var(--c-placeholder);
+}
+
+.day.futureDay strong {
+  color: var(--c-muted-strong);
+}
+
+.day[data-pressed] {
+  border-color: var(--c-text-strong);
+  background: var(--c-surface-raised);
+}
+
+.day:focus-visible {
+  outline: 2px solid var(--c-primary-focus);
+  outline-offset: 2px;
 }
 
 .compactDay {
@@ -490,9 +585,7 @@ label small {
   .logHeading {
     padding: 0 var(--space-sm);
   }
-}
 
-@media (--phone) {
   .compactDay {
     display: block;
   }
@@ -500,73 +593,43 @@ label small {
   .expandedDay {
     display: none;
   }
+
+  .day {
+    min-height: 3.5rem;
+  }
 }
+
 @media (hover: hover) and (pointer: fine) {
   .day:hover {
-    background: var(--c-surface-raised);
+    background-color: var(--c-surface-raised);
     color: var(--c-text);
   }
 
-  .day.futureDay:hover {
-    color: var(--c-placeholder);
-  }
-
-  .dayWithinGoal:hover,
-  .dayLogged:hover {
-    border-color: var(--c-primary-border);
+  .dayWithinGoal:hover {
+    background-color: color-mix(in srgb, var(--c-macro-carb) 12%, transparent);
+    color: var(--c-macro-carb);
   }
 
   .dayOverGoal:hover {
-    border-color: rgb(248 113 113 / 55%);
+    background-color: var(--c-surface-raised);
+    color: var(--c-text-strong);
+  }
+
+  .day.todayDay:hover {
+    background-color: var(--c-surface-raised);
+    color: var(--c-text-strong);
+  }
+
+  .day.futureDay:hover {
+    opacity: 0.65;
+    color: var(--c-placeholder);
   }
 }
 
-/* Logged-day tints: success when within the kcal goal, danger when over it,
-   primary while something is logged but the goal state is undecided. */
-.dayLogged {
-  border-color: var(--c-primary-border-soft);
-  background:
-    radial-gradient(120% 100% at 50% 0%, rgb(96 165 250 / 14%), transparent 74%),
-    var(--c-primary-surface);
-  color: var(--c-text);
-}
-
-.dayWithinGoal {
-  border-color: color-mix(in srgb, var(--c-macro-carb) 40%, transparent);
-  background:
-    radial-gradient(
-      120% 100% at 50% 0%,
-      color-mix(in srgb, var(--c-macro-carb) 20%, transparent),
-      transparent 74%
-    ),
-    color-mix(in srgb, var(--c-macro-carb) 9%, transparent);
-  color: var(--c-text-strong);
-}
-
-.dayOverGoal {
-  border-color: var(--c-danger-border);
-  background:
-    radial-gradient(120% 100% at 50% 0%, rgb(248 113 113 / 16%), transparent 74%),
-    var(--c-danger-surface);
-  color: var(--c-danger-text);
-}
-
-.day.futureDay.dayLogged,
-.day.futureDay.dayWithinGoal,
-.day.futureDay.dayOverGoal {
-  opacity: 0.45;
-}
-
-.day[data-pressed] {
-  border-color: transparent;
-  background: var(--c-primary-surface-strong);
-  color: var(--c-text-strong);
-}
-
-.day[data-pressed].dayWithinGoal {
-  border-color: color-mix(in srgb, var(--c-macro-carb) 55%, transparent);
-}
-
-.day[data-pressed].dayOverGoal {
-  border-color: rgb(248 113 113 / 60%);
+@media (prefers-reduced-motion: reduce) {
+  .day,
+  .dayProgressFill,
+  .dayProgressOver {
+    transition: none;
+  }
 }
