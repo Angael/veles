@@ -1,6 +1,7 @@
 import { glob, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import process from 'node:process';
+import { invariant } from '@/lib/invariant';
 import { describe, expect, it } from 'vitest';
 
 describe('theme tokens', () => {
@@ -29,7 +30,8 @@ describe('theme tokens', () => {
       const matches = source.matchAll(/var\((--[a-z0-9-]+)/g);
 
       for (const match of matches) {
-        const token = match[1]!;
+        const token = match[1];
+        invariant(token, `Expected a CSS variable token capture in ${relativePath}.`);
 
         if (
           declaredTokens.has(token) ||

@@ -8,7 +8,7 @@ type RecentWeightEntriesProps = {
 };
 
 export function RecentWeightEntries({ entries }: RecentWeightEntriesProps) {
-  const recentEntries = entries.slice(-8).reverse();
+  const recentEntries = entries.slice(-8).toReversed();
 
   return (
     <Card as='section' aria-label='Recent weight entries' className={css.entriesCard}>

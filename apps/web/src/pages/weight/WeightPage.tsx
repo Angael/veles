@@ -95,6 +95,7 @@ export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
         <>
           <div className={css.summaryRail} data-appear='2'>
             <Card as='section' aria-label='Weight summary' className={css.summaryGrid}>
+              {/* oxlint-disable-next-line typescript/no-non-null-assertion -- entries.length > 0 guarantees a latest entry. */}
               <SummaryStat label='Current' value={`${latestEntry!.weightKg.toFixed(1)} kg`} />
               <SummaryStat label='2 weeks' value={formatChange(twoWeekChange)} />
               <SummaryStat label='1 month' value={formatChange(oneMonthChange)} />

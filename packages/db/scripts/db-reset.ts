@@ -123,7 +123,7 @@ if (process.env.PROD_DATABASE_URL && databaseUrl === process.env.PROD_DATABASE_U
 await resetDatabase(databaseUrl);
 
 /** Rebuilds the disposable dev database from migrations, current schema, and fixed seed data. */
-async function resetDatabase(connectionString) {
+async function resetDatabase(connectionString: string) {
   await resetSchemas(connectionString);
 
   runPnpmScript('db:migrate');
@@ -133,7 +133,7 @@ async function resetDatabase(connectionString) {
   console.info(`Reset and seeded ${expectedDatabaseName}.`);
 }
 
-async function resetSchemas(connectionString) {
+async function resetSchemas(connectionString: string) {
   const client = new Client({ connectionString });
   await client.connect();
 
@@ -153,8 +153,8 @@ async function resetSchemas(connectionString) {
   }
 }
 
-async function assertDevDatabase(client) {
-  const result = await client.query('SELECT current_database() AS name');
+async function assertDevDatabase(client: Client) {
+  const result = await client.query<{ name: string }>('SELECT current_database() AS name');
   const databaseName = result.rows[0]?.name;
 
   if (databaseName !== expectedDatabaseName) {
@@ -165,7 +165,7 @@ async function assertDevDatabase(client) {
 }
 
 /** Seeds the fixed dev identity and deterministic application fixtures. */
-async function seedDatabase(connectionString) {
+async function seedDatabase(connectionString: string) {
   const client = new Client({ connectionString });
   await client.connect();
 
@@ -187,7 +187,7 @@ async function seedDatabase(connectionString) {
   }
 }
 
-async function seedIdentity(client) {
+async function seedIdentity(client: Client) {
   await client.query(
     `INSERT INTO "user"
       (id, name, email, email_verified, image, created_at, updated_at)
@@ -233,7 +233,7 @@ async function seedIdentity(client) {
 }
 
 /** Seeds an 80 kg lifter's balanced cutting targets, effective across the dashboard history. */
-async function seedCalorieGoal(client, userId) {
+async function seedCalorieGoal(client: Client, userId: string) {
   const effectiveDate = new Date();
   effectiveDate.setUTCHours(0, 0, 0, 0);
   effectiveDate.setUTCDate(effectiveDate.getUTCDate() - 13);
@@ -260,7 +260,7 @@ async function seedCalorieGoal(client, userId) {
 }
 
 /** Seeds the shared staple catalog without assigning products to any user. */
-async function seedFoodProducts(client) {
+async function seedFoodProducts(client: Client) {
   for (const product of foodProducts) {
     await client.query(
       `INSERT INTO food_product
@@ -293,7 +293,7 @@ async function seedFoodProducts(client) {
  * Seeds a rolling two-week dashboard history with one deliberately unlogged day.
  * Daily totals vary around a 1,900 kcal goal while meal size and timing remain plausible.
  */
-async function seedFoodLogs(client, userId) {
+async function seedFoodLogs(client: Client, userId: string) {
   const dailyKcalTargets = [
     1_900,
     2_500,
@@ -327,20 +327,32 @@ async function seedFoodLogs(client, userId) {
     logDate.setUTCDate(today.getUTCDate() - (dailyKcalTargets.length - dayIndex - 1));
     const date = logDate.toISOString().slice(0, 10);
     const mealPlan = mealPlans[dayIndex % mealPlans.length];
+
+    if (!mealPlan) {
+      throw new Error(`Missing meal plan for day ${dayIndex}.`);
+    }
+
     let assignedKcalHundredths = 0;
 
     for (const [mealIndex, product] of mealPlan.entries()) {
+      const mealShare = mealShares[mealIndex];
+      const mealHour = mealHours[mealIndex];
+
+      if (!product || mealShare === undefined || mealHour === undefined) {
+        throw new Error(`Incomplete meal fixture at day ${dayIndex}, meal ${mealIndex}.`);
+      }
+
       const kcalHundredths =
         mealIndex === mealPlan.length - 1
           ? dailyKcal * 100 - assignedKcalHundredths
-          : Math.round(dailyKcal * 100 * mealShares[mealIndex]);
+          : Math.round(dailyKcal * 100 * mealShare);
       assignedKcalHundredths += kcalHundredths;
       const gramsHundredths = Math.round(
         (kcalHundredths * 100 * 100) / product.kcalPer100gHundredths,
       );
-      const scaleMacro = (value) => Math.round((value * gramsHundredths) / (100 * 100));
+      const scaleMacro = (value: number) => Math.round((value * gramsHundredths) / (100 * 100));
       const consumedAt = new Date(logDate);
-      consumedAt.setUTCHours(mealHours[mealIndex], 15 + ((dayIndex * 7 + mealIndex * 3) % 30));
+      consumedAt.setUTCHours(mealHour, 15 + ((dayIndex * 7 + mealIndex * 3) % 30));
 
       await client.query(
         `INSERT INTO food_log
@@ -364,7 +376,7 @@ async function seedFoodLogs(client, userId) {
   }
 }
 
-async function seedRecipes(client, userId) {
+async function seedRecipes(client: Client, userId: string) {
   const recipes = [
     {
       id: '01900000-0000-7000-8000-000000000001',
@@ -376,8 +388,8 @@ async function seedRecipes(client, userId) {
       rating: 4,
       kcal: 620,
       protein: 20,
+      fat: 16,
       carbs: 98,
-      fats: 16,
     },
     {
       id: '01900000-0000-7000-8000-000000000002',
@@ -389,15 +401,15 @@ async function seedRecipes(client, userId) {
       rating: 5,
       kcal: 480,
       protein: 18,
+      fat: 12,
       carbs: 72,
-      fats: 12,
     },
   ];
 
   for (const recipe of recipes) {
     await client.query(
       `INSERT INTO recipe
-        (id, user_id, name, description, ingredients, tags, portions, rating, kcal, protein, carbs, fats)
+        (id, user_id, name, description, ingredients, tags, portions, rating, kcal, protein, fats, carbs)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        ON CONFLICT (id) DO UPDATE SET
          user_id = EXCLUDED.user_id,
@@ -409,8 +421,8 @@ async function seedRecipes(client, userId) {
          rating = EXCLUDED.rating,
          kcal = EXCLUDED.kcal,
          protein = EXCLUDED.protein,
-         carbs = EXCLUDED.carbs,
          fats = EXCLUDED.fats,
+         carbs = EXCLUDED.carbs,
          updated_at = now()`,
       [
         recipe.id,
@@ -423,14 +435,14 @@ async function seedRecipes(client, userId) {
         recipe.rating,
         recipe.kcal,
         recipe.protein,
+        recipe.fat,
         recipe.carbs,
-        recipe.fats,
       ],
     );
   }
 }
 
-async function seedDiaryEntries(client, userId) {
+async function seedDiaryEntries(client: Client, userId: string) {
   const entries = [
     {
       id: '01900000-0000-7000-8000-000000000101',
@@ -461,7 +473,7 @@ async function seedDiaryEntries(client, userId) {
   }
 }
 
-function runPnpmScript(script) {
+function runPnpmScript(script: string) {
   const command = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
   const result = spawnSync(command, [script], { env: process.env, stdio: 'inherit' });
 

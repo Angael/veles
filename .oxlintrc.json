@@ -3,12 +3,16 @@
   "categories": {
     "correctness": "error"
   },
+  "options": {
+    "typeAware": true
+  },
   "ignorePatterns": [
     ".agents/**",
     "apps/web/src/routeTree.gen.ts",
     "node_modules/**",
     "**/.output/**"
   ],
+  "plugins": ["typescript", "unicorn", "oxc", "react"],
   "jsPlugins": ["@tanstack/eslint-plugin-query", "@tanstack/eslint-plugin-router"],
   "rules": {
     "@tanstack/query/exhaustive-deps": "warn",
@@ -19,6 +23,28 @@
     "@tanstack/query/mutation-property-order": "warn",
     "@tanstack/router/create-route-property-order": "warn",
     "@tanstack/router/route-param-names": "warn",
+    "eqeqeq": "error",
+    "no-shadow": "error",
+    "no-useless-assignment": "error",
+    "react/exhaustive-deps": "off",
+    "react/refs": "off",
+    "react/rules-of-hooks": "error",
+    "react/set-state-in-effect": "off",
+    "typescript/ban-ts-comment": "error",
+    "typescript/no-confusing-non-null-assertion": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-extra-non-null-assertion": "error",
+    "typescript/no-floating-promises": "error",
+    "typescript/no-misused-promises": "error",
+    "typescript/no-non-null-assertion": "error",
+    "typescript/no-unnecessary-condition": "error",
+    "typescript/no-unsafe-argument": "error",
+    "typescript/no-unsafe-assignment": "error",
+    "typescript/no-unsafe-call": "error",
+    "typescript/no-unsafe-member-access": "error",
+    "typescript/no-unsafe-return": "error",
+    "unicorn/no-array-reverse": "error",
+    "unicorn/no-array-sort": "error",
     "no-unused-vars": [
       "error",
       {

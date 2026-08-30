@@ -255,9 +255,9 @@ function getDailyRecommendations(recipes: HomeDashboardData['recipes'], date: st
   if (!recipes.length) return [];
   const ordered = recipes
     .map((recipe) => ({ recipe, score: hashString(recipe.id) }))
-    .sort((a, b) => a.score - b.score || a.recipe.id.localeCompare(b.recipe.id))
+    .toSorted((a, b) => a.score - b.score || a.recipe.id.localeCompare(b.recipe.id))
     .map(({ recipe }) => recipe);
-  const day = differenceInCalendarDays(parseISO(date), parseISO('2000-01-01'));
+  const day = hashString(date);
   const startIndex = Math.abs(day) % ordered.length;
 
   return [...ordered.slice(startIndex), ...ordered.slice(0, startIndex)].slice(0, 3);

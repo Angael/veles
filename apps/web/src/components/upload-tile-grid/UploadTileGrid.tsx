@@ -186,6 +186,7 @@ function areFilesEqual(left: File[], right: File[]) {
     return false;
   }
 
+  // oxlint-disable-next-line typescript/no-non-null-assertion -- arrays have equal lengths after the guard above.
   return left.every((file, index) => getFileKey(file) === getFileKey(right[index]!));
 }
 

@@ -21,7 +21,7 @@ export function parseWeightEntries(value: string): { entries: WeightEntry[]; err
   }
 
   return {
-    entries: [...entriesByDate.values()].sort((a, b) => a.date.localeCompare(b.date)),
+    entries: [...entriesByDate.values()].toSorted((a, b) => a.date.localeCompare(b.date)),
     errors,
   };
 }

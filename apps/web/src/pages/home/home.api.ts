@@ -128,6 +128,6 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
       lastDiaryEntryDate: diaryRows[0]?.entryDate ?? null,
       weightEntries: weightRows
         .map((entry) => ({ date: entry.date, weightKg: entry.weightGrams / 1_000 }))
-        .reverse(),
+        .toReversed(),
     };
   });

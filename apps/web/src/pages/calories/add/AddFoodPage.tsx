@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { PlusIcon } from 'lucide-react';
-import { useEffect, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '../calories.query';
 import { SelectedFoodForm } from './SelectedFoodForm';
@@ -25,22 +25,23 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
   const [query, setQuery] = useState('');
   const [filterQuery, setFilterQuery] = useState('');
   const [isFiltering, startFiltering] = useTransition();
-  const [selected, setSelected] = useState<CalorieFood | null>(null);
+  const [selectedFood, setSelectedFood] = useState<CalorieFood | null>(null);
+  const [selectionDismissed, setSelectionDismissed] = useState(false);
   const foodQuery = useQuery({
     ...calorieFoodQueryOptions(initialFoodId ?? ''),
     enabled: initialFoodId !== undefined,
   });
   const foodsQuery = useQuery(calorieFoodsQueryOptions());
   const foods = filterFoods(foodsQuery.data ?? [], filterQuery);
-
-  useEffect(() => {
-    if (!foodQuery.data) return;
-
-    setSelected(foodQuery.data);
-  }, [foodQuery.data]);
+  const selected = selectedFood ?? (!selectionDismissed ? (foodQuery.data ?? null) : null);
 
   function selectFood(food: CalorieFood) {
-    setSelected(food);
+    setSelectedFood(food);
+  }
+
+  function cancelSelection() {
+    setSelectedFood(null);
+    setSelectionDismissed(true);
   }
 
   if (selected) {
@@ -49,7 +50,7 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
         cancelLabel='Go back'
         food={selected}
         initialDate={date}
-        onCancel={() => setSelected(null)}
+        onCancel={cancelSelection}
       />
     );
   }

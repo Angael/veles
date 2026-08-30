@@ -32,7 +32,7 @@ export function filterFoods(foods: CalorieFood[], query: string) {
       return { food, score: scores.reduce<number>((total, score) => total + (score ?? 0), 0) };
     })
     .filter((result): result is { food: CalorieFood; score: number } => result !== null)
-    .sort(
+    .toSorted(
       (left, right) => left.score - right.score || left.food.name.localeCompare(right.food.name),
     )
     .map(({ food }) => food);
