@@ -8,6 +8,7 @@ export const Route = createFileRoute('/login')({
   ssr: false,
   beforeLoad: ({ context, search }) => {
     if (context.user) {
+      // oxlint-disable-next-line typescript/only-throw-error -- Router control flow intentionally throws this object.
       throw redirect({ to: getSafeRedirectPath(search.redirect) });
     }
   },
