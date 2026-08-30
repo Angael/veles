@@ -5,6 +5,7 @@ import { getSafeRedirectPath } from '@/lib/auth/getSafeRedirectPath';
 
 export const Route = createFileRoute('/login')({
   validateSearch: type({ 'redirect?': 'string' }),
+  ssr: false,
   beforeLoad: ({ context, search }) => {
     if (context.user) {
       throw redirect({ to: getSafeRedirectPath(search.redirect) });
@@ -12,5 +13,4 @@ export const Route = createFileRoute('/login')({
   },
   component: LoginPage,
   pendingComponent: LoginPendingPage,
-  ssr: false,
 });

@@ -9,7 +9,16 @@
     "node_modules/**",
     "**/.output/**"
   ],
+  "jsPlugins": ["@tanstack/eslint-plugin-query", "@tanstack/eslint-plugin-router"],
   "rules": {
+    "@tanstack/query/exhaustive-deps": "warn",
+    "@tanstack/query/stable-query-client": "warn",
+    "@tanstack/query/no-unstable-deps": "warn",
+    "@tanstack/query/infinite-query-property-order": "warn",
+    "@tanstack/query/no-void-query-fn": "warn",
+    "@tanstack/query/mutation-property-order": "warn",
+    "@tanstack/router/create-route-property-order": "warn",
+    "@tanstack/router/route-param-names": "warn",
     "no-unused-vars": [
       "error",
       {
