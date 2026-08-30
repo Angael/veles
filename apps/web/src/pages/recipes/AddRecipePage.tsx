@@ -35,6 +35,26 @@ export function AddRecipePage() {
   const [draft, setDraft] = useState<AddRecipeDraft>(EMPTY_DRAFT);
   const [error, setError] = useState<string | null>(null);
 
+  /** Submits the recipe form and reports upload or navigation failures inline. */
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+
+    try {
+      const formData = new FormData(event.currentTarget);
+
+      for (const file of draft.selectedFiles) {
+        formData.append('photos', file);
+      }
+
+      const result = await createMutation.mutateAsync({ data: formData });
+
+      await navigate({ params: { id: result.id }, to: '/recipes/view/$id' });
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Recipe upload failed');
+    }
+  }
+
   return (
     <main className={css.page}>
       <section className={css.content}>
@@ -43,25 +63,8 @@ export function AddRecipePage() {
 
           <form
             className={css.form}
-            onSubmit={async (event: FormEvent<HTMLFormElement>) => {
-              event.preventDefault();
-              setError(null);
-
-              try {
-                const formData = new FormData(event.currentTarget);
-
-                for (const file of draft.selectedFiles) {
-                  formData.append('photos', file);
-                }
-
-                const result = await createMutation.mutateAsync({ data: formData });
-
-                navigate({ params: { id: result.id }, to: '/recipes/view/$id' });
-              } catch (submitError) {
-                setError(
-                  submitError instanceof Error ? submitError.message : 'Recipe upload failed',
-                );
-              }
+            onSubmit={(event) => {
+              void handleSubmit(event);
             }}
           >
             <div className={css.formBody}>

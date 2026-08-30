@@ -192,7 +192,7 @@ function validateRecipeForm(formData: FormData) {
   });
 
   if (validation instanceof type.errors) {
-    throw new ClientSafeError(validation.summary ?? 'Invalid recipe details.');
+    throw new ClientSafeError(validation.summary);
   }
 
   return validation;

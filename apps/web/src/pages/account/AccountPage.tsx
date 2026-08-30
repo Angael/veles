@@ -80,7 +80,9 @@ export function AccountPage({ user }: AccountPageProps) {
         <Btn
           icon={<LogOutIcon aria-hidden='true' />}
           loading={signOutMutation.isPending}
-          onClick={handleLogout}
+          onClick={() => {
+            void handleLogout().catch(() => undefined);
+          }}
           size='sm'
           variant='outlineDanger'
         >

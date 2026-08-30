@@ -44,9 +44,11 @@ export function AddWeightPage() {
                     type: 'error',
                   });
                 },
-                onSuccess: async () => {
-                  await router.invalidate();
-                  await navigate({ to: '/weight' });
+                onSuccess: () => {
+                  void router
+                    .invalidate()
+                    .then(() => navigate({ to: '/weight' }))
+                    .catch(() => undefined);
                 },
               },
             );

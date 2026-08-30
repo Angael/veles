@@ -85,6 +85,8 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
 
     /** Starts the saved camera when available, otherwise the preferred rear camera, then scans. */
     async function startScanner() {
+      // Browser APIs may be absent at runtime despite the DOM typings requiring them.
+      // oxlint-disable-next-line typescript/no-unnecessary-condition -- Older or restricted browsers may not expose mediaDevices or getUserMedia.
       if (!navigator.mediaDevices?.getUserMedia) {
         setState('unavailable');
         return;
@@ -119,6 +121,8 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
         const availableCameras = (await navigator.mediaDevices.enumerateDevices()).filter(
           (device) => device.kind === 'videoinput',
         );
+        // Effect cleanup can flip this flag while enumerateDevices is awaiting the browser.
+        // oxlint-disable-next-line typescript/no-unnecessary-condition -- The async browser boundary can invalidate the scanner after the earlier check.
         if (!active) {
           stopCamera();
           return;
@@ -142,18 +146,33 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
             try {
               const results = await detector.detect(video);
               const barcode = results.find((result) => result.rawValue.trim())?.rawValue.trim();
+              // Effect cleanup can flip this flag while detector.detect is awaiting the browser.
+              // oxlint-disable-next-line typescript/no-unnecessary-condition -- Avoid invoking the callback after scanner unmount.
               if (barcode && active) callbackRef.current(barcode);
             } catch {
               stopCamera();
+              // Effect cleanup can flip this flag while detector.detect is awaiting the browser.
+              // oxlint-disable-next-line typescript/no-unnecessary-condition -- Avoid setting state after scanner unmount.
               if (active) setState('error');
               return;
             } finally {
               detecting = false;
             }
           }
-          animationFrame = requestAnimationFrame(scan);
+          // requestAnimationFrame requires a synchronous callback; handle scan rejections here.
+          animationFrame = requestAnimationFrame((nextTimestamp) => {
+            void scan(nextTimestamp).catch(() => {
+              stopCamera();
+              if (active) setState('error');
+            });
+          });
         };
-        animationFrame = requestAnimationFrame(scan);
+        animationFrame = requestAnimationFrame((nextTimestamp) => {
+          void scan(nextTimestamp).catch(() => {
+            stopCamera();
+            if (active) setState('error');
+          });
+        });
       } catch (error) {
         stopCamera();
         if (!active) return;

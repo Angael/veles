@@ -41,7 +41,9 @@ export function ImportWeightPage() {
           <pre>{aiPrompt}</pre>
           <Btn
             icon={<ClipboardIcon aria-hidden='true' />}
-            onClick={() => copyPrompt(aiPrompt)}
+            onClick={() => {
+              void copyPrompt(aiPrompt);
+            }}
             size='sm'
             type='button'
             variant='outlineMain'
@@ -66,9 +68,11 @@ export function ImportWeightPage() {
                       type: 'error',
                     });
                   },
-                  onSuccess: async () => {
-                    await router.invalidate();
-                    await navigate({ to: '/weight' });
+                  onSuccess: () => {
+                    void router
+                      .invalidate()
+                      .then(() => navigate({ to: '/weight' }))
+                      .catch(() => undefined);
                   },
                 },
               );

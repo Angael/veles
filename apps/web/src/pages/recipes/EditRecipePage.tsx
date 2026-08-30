@@ -31,9 +31,10 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
             saveMutation.mutate(
               { data: { ...draft, id: recipe.id } },
               {
-                onSuccess: async () => {
-                  await navigate({ params: { id: recipe.id }, to: '/recipes/view/$id' });
-                  await router.invalidate();
+                onSuccess: () => {
+                  void navigate({ params: { id: recipe.id }, to: '/recipes/view/$id' })
+                    .then(() => router.invalidate())
+                    .catch(() => undefined);
                 },
               },
             );

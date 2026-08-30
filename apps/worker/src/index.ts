@@ -31,7 +31,9 @@ async function checkDatabase() {
   }
 
   if (!isStopping) {
-    nextCheck = setTimeout(checkDatabase, checkIntervalMs);
+    nextCheck = setTimeout(() => {
+      void checkDatabase();
+    }, checkIntervalMs);
   }
 }
 
@@ -45,8 +47,19 @@ async function shutdown(signal: NodeJS.Signals) {
   await connection.close();
 }
 
-process.once('SIGINT', () => void shutdown('SIGINT'));
-process.once('SIGTERM', () => void shutdown('SIGTERM'));
+function reportShutdownFailure(error: unknown) {
+  console.error('worker shutdown failed', {
+    error: error instanceof Error ? error.message : 'Unknown error',
+  });
+  process.exitCode = 1;
+}
+
+function requestShutdown(signal: NodeJS.Signals) {
+  void shutdown(signal).catch(reportShutdownFailure);
+}
+
+process.once('SIGINT', () => requestShutdown('SIGINT'));
+process.once('SIGTERM', () => requestShutdown('SIGTERM'));
 
 console.info('worker started', { checkIntervalMs });
 await checkDatabase();

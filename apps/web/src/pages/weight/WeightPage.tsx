@@ -47,8 +47,8 @@ export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
             type: 'error',
           });
         },
-        onSuccess: async () => {
-          await router.invalidate();
+        onSuccess: () => {
+          void router.invalidate().catch(() => undefined);
         },
       },
     );

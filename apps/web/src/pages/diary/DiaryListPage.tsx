@@ -87,13 +87,14 @@ export function DiaryListPage({ entries }: DiaryListPageProps) {
           createMutation.mutate(
             { data: { entryDate: getLocalDate() } },
             {
-              onSuccess: async (entry) => {
-                await navigate({
+              onSuccess: (entry) => {
+                void navigate({
                   params: { id: entry.id },
                   search: { created: '1' },
                   to: '/diary/$id',
-                });
-                await router.invalidate();
+                })
+                  .then(() => router.invalidate())
+                  .catch(() => undefined);
               },
             },
           );

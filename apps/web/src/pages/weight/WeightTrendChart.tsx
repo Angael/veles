@@ -59,7 +59,7 @@ function getXAxisTicks(domain: [number, number], chartWidth: number, usesLongRan
 }
 
 function WeightTooltip({ active, payload }: TooltipContentProps) {
-  const value = payload?.[0]?.value;
+  const value = payload[0]?.value;
 
   if (!active || value === undefined) {
     return null;

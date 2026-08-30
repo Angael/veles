@@ -74,9 +74,10 @@ export function DiaryEntryPage({ entry, focusTitle = false }: DiaryEntryPageProp
                   deleteMutation.mutate(
                     { data: { id: entry.id } },
                     {
-                      onSuccess: async () => {
-                        await navigate({ to: '/diary' });
-                        await router.invalidate();
+                      onSuccess: () => {
+                        void navigate({ to: '/diary' })
+                          .then(() => router.invalidate())
+                          .catch(() => undefined);
                       },
                     },
                   );
