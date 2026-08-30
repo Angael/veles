@@ -8,7 +8,7 @@ import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
-import { getFormNumber, getFormString, getOptionalFormNumber } from '@/lib/formData';
+import { TypedFormData } from '@/lib/formData';
 import css from '../CalorieFlows.module.css';
 
 export function EditFoodLogPage({ log }: { log: CalorieLog }) {
@@ -20,19 +20,19 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const formData = new TypedFormData(event.currentTarget);
 
-    const nextDate = getFormString(data, 'date');
+    const nextDate = formData.string('date');
     await updateMutation.mutateAsync({
       id: log.id,
       date: nextDate,
       previousDate: log.date,
-      name: getFormString(data, 'name'),
-      grams: getOptionalFormNumber(data, 'grams'),
-      kcal: getFormNumber(data, 'kcal'),
-      protein: getOptionalFormNumber(data, 'protein'),
-      fat: getOptionalFormNumber(data, 'fat'),
-      carbs: getOptionalFormNumber(data, 'carbs'),
+      name: formData.string('name'),
+      grams: formData.optionalNumber('grams'),
+      kcal: formData.number('kcal'),
+      protein: formData.optionalNumber('protein'),
+      fat: formData.optionalNumber('fat'),
+      carbs: formData.optionalNumber('carbs'),
     });
     await navigate({ to: '/calories', search: { date: nextDate } });
   }
