@@ -1,6 +1,7 @@
 .page {
   display: grid;
   gap: var(--space-lg);
+  touch-action: pan-y;
 }
 
 .overviewStack {
