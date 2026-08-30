@@ -5,6 +5,7 @@ import { useSetDailyCalorieGoalMutation } from '../calories.query';
 import { todayLocalDate } from '../calorieHelpers';
 import { Btn } from '@/components/btn/Btn';
 import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
+import { getFormNumber, getOptionalFormNumber } from '@/lib/formData';
 import css from '../CalorieFlows.module.css';
 
 export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
@@ -13,17 +14,13 @@ export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const optional = (key: string) => {
-      const value = String(data.get(key) ?? '').trim();
-      return value ? Number(value) : undefined;
-    };
     const date = todayLocalDate();
     await goalMutation.mutateAsync({
       date,
-      kcal: Number(data.get('kcal')),
-      protein: optional('protein'),
-      fat: optional('fat'),
-      carbs: optional('carbs'),
+      kcal: getFormNumber(data, 'kcal'),
+      protein: getOptionalFormNumber(data, 'protein'),
+      fat: getOptionalFormNumber(data, 'fat'),
+      carbs: getOptionalFormNumber(data, 'carbs'),
     });
     await navigate({ to: '/calories', search: { date } });
   }

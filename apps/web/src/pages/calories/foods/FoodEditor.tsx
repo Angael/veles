@@ -5,6 +5,7 @@ import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
+import { getFormNumber, getFormString, getOptionalFormNumber } from '@/lib/formData';
 import css from '../CalorieFlows.module.css';
 
 export type FoodEditorValue = {
@@ -39,20 +40,16 @@ export function FoodEditor({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const optionalNumber = (name: string) => {
-      const value = String(data.get(name) ?? '').trim();
-      return value ? Number(value) : undefined;
-    };
     await onSubmit({
-      barcode: String(data.get('barcode') ?? '').trim() || undefined,
-      brand: String(data.get('brand') ?? '').trim() || undefined,
-      imageUrl: String(data.get('imageUrl') ?? '').trim() || undefined,
-      name: String(data.get('name') ?? '').trim(),
-      productSizeGrams: optionalNumber('size'),
-      kcalPer100g: Number(data.get('kcal')),
-      proteinPer100g: optionalNumber('protein'),
-      fatPer100g: optionalNumber('fat'),
-      carbsPer100g: optionalNumber('carbs'),
+      barcode: getFormString(data, 'barcode') || undefined,
+      brand: getFormString(data, 'brand') || undefined,
+      imageUrl: getFormString(data, 'imageUrl') || undefined,
+      name: getFormString(data, 'name'),
+      productSizeGrams: getOptionalFormNumber(data, 'size'),
+      kcalPer100g: getFormNumber(data, 'kcal'),
+      proteinPer100g: getOptionalFormNumber(data, 'protein'),
+      fatPer100g: getOptionalFormNumber(data, 'fat'),
+      carbsPer100g: getOptionalFormNumber(data, 'carbs'),
     });
   }
   return (

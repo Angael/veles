@@ -5,6 +5,7 @@ import { Btn } from '@/components/btn/Btn';
 import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
 import { TextInput } from '@/components/text-input/TextInput';
+import { getFormNumber, getFormString, getOptionalFormNumber } from '@/lib/formData';
 import css from '../CalorieFlows.module.css';
 
 export function QuickAddPage({ date }: { date: string }) {
@@ -14,18 +15,14 @@ export function QuickAddPage({ date }: { date: string }) {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const optional = (key: string) => {
-      const value = String(data.get(key) ?? '').trim();
-      return value ? Number(value) : undefined;
-    };
 
     await recordMutation.mutateAsync({
       date,
-      name: String(data.get('name') || 'Quick add'),
-      kcal: Number(data.get('kcal')),
-      protein: optional('protein'),
-      fat: optional('fat'),
-      carbs: optional('carbs'),
+      name: getFormString(data, 'name') || 'Quick add',
+      kcal: getFormNumber(data, 'kcal'),
+      protein: getOptionalFormNumber(data, 'protein'),
+      fat: getOptionalFormNumber(data, 'fat'),
+      carbs: getOptionalFormNumber(data, 'carbs'),
     });
     await navigate({ to: '/calories', search: { date } });
   }

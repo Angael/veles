@@ -40,14 +40,14 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
   const goalKcal = day?.goal?.kcal ?? null;
   const consumedKcal = Math.max(0, day?.totals.kcal ?? 0);
 
-  async function save() {
-    recordFoodMutation.mutateAsync({
+  function save() {
+    recordFoodMutation.mutate({
       date,
       grams: selectedGrams,
       productId: food.id,
     });
-    // Navigation kinda masks the mutation duration
-    navigate({ to: '/calories', search: { date } });
+    // Navigation intentionally starts immediately after recording the mutation.
+    void navigate({ to: '/calories', search: { date } }).catch(() => undefined);
   }
 
   return (
@@ -132,7 +132,7 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
           <Btn onClick={onCancel} variant='ghost'>
             {cancelLabel}
           </Btn>
-          <Btn loading={recordFoodMutation.isPending} onClick={() => void save()}>
+          <Btn loading={recordFoodMutation.isPending} onClick={save}>
             Save
           </Btn>
         </div>
