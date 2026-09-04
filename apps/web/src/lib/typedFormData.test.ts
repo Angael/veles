@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TypedFormData } from './formData';
+import { TypedFormData } from './typedFormData';
 
 describe('TypedFormData', () => {
   it('trims required string values', () => {
@@ -24,6 +24,15 @@ describe('TypedFormData', () => {
 
     expect(form.optionalNumber('blank')).toBeUndefined();
     expect(form.optionalNumber('protein')).toBe(22.5);
+  });
+  it('exposes the original FormData instance and its mutations', () => {
+    const data = new FormData();
+    const form = new TypedFormData(data);
+
+    expect(form.raw()).toBe(data);
+
+    form.raw().append('name', 'Breakfast');
+    expect(form.string('name')).toBe('Breakfast');
   });
 
   it('rejects missing fields instead of treating them as text', () => {

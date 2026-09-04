@@ -1,5 +1,4 @@
-import { Link, useNavigate } from '@tanstack/react-router';
-import type { FormEvent } from 'react';
+import { Link, useNavigate, type UseNavigateResult } from '@tanstack/react-router';
 import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogMutation, useUpdateFoodLogMutation } from '../calories.query';
 import { Btn } from '@/components/btn/Btn';
@@ -8,7 +7,8 @@ import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
-import { TypedFormData } from '@/lib/formData';
+import { TypedForm } from '@/components/typed-form/TypedForm';
+import { TypedFormData } from '@/lib/typedFormData';
 import css from '../CalorieFlows.module.css';
 
 export function EditFoodLogPage({ log }: { log: CalorieLog }) {
@@ -18,10 +18,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
   const isProduct = log.productId !== null;
   const isPending = updateMutation.isPending || deleteMutation.isPending;
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new TypedFormData(event.currentTarget);
-
+  async function submit(formData: TypedFormData, submitNavigate: UseNavigateResult<string>) {
     const nextDate = formData.string('date');
     await updateMutation.mutateAsync({
       id: log.id,
@@ -34,7 +31,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
       fat: formData.optionalNumber('fat'),
       carbs: formData.optionalNumber('carbs'),
     });
-    await navigate({ to: '/calories', search: { date: nextDate } });
+    await submitNavigate({ to: '/calories', search: { date: nextDate } });
   }
 
   async function remove() {
@@ -55,7 +52,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
         </div>
       </header>
       <section className={css.panel}>
-        <form className={css.form} onSubmit={(event) => void submit(event)}>
+        <TypedForm className={css.form} onSubmit={submit}>
           <div className={css.grid}>
             <Label text='Name'>
               <TextInput defaultValue={log.name} name='name' readOnly={isProduct} required />
@@ -97,7 +94,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
               Save entry
             </Btn>
           </div>
-        </form>
+        </TypedForm>
       </section>
     </main>
   );

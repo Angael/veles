@@ -1,11 +1,11 @@
-import type { FormEvent } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { Btn } from '@/components/btn/Btn';
 import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { TextInput } from '@/components/text-input/TextInput';
-import { TypedFormData } from '@/lib/formData';
+import { TypedForm } from '@/components/typed-form/TypedForm';
+import { TypedFormData } from '@/lib/typedFormData';
 import css from '../CalorieFlows.module.css';
 
 export type FoodEditorValue = {
@@ -37,9 +37,7 @@ export function FoodEditor({
   pending,
   submitLabel,
 }: Props) {
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new TypedFormData(event.currentTarget);
+  async function handleSubmit(formData: TypedFormData) {
     await onSubmit({
       barcode: formData.string('barcode') || undefined,
       brand: formData.string('brand') || undefined,
@@ -53,7 +51,7 @@ export function FoodEditor({
     });
   }
   return (
-    <form className={css.form} onSubmit={(event) => void handleSubmit(event)}>
+    <TypedForm className={css.form} onSubmit={handleSubmit}>
       {food ? (
         <div className={css.grid}>
           <Label text='Product name'>
@@ -100,6 +98,6 @@ export function FoodEditor({
       <Btn disabled={pending} type='submit'>
         {pending ? 'Saving…' : submitLabel}
       </Btn>
-    </form>
+    </TypedForm>
   );
 }

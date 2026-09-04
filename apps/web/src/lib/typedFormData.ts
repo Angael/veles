@@ -4,6 +4,10 @@ export class TypedFormData {
   constructor(source: HTMLFormElement | FormData) {
     this.data = source instanceof FormData ? source : new FormData(source);
   }
+  /** Returns the wrapped FormData instance for multipart mutation and submission. */
+  raw(): FormData {
+    return this.data;
+  }
 
   /**
    * Reads a required text field and trims its value.

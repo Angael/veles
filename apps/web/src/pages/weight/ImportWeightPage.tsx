@@ -6,6 +6,7 @@ import { Card } from '@/components/card/Card';
 import { Label } from '@/components/label/Label';
 import { TextareaInput } from '@/components/textarea-input/TextareaInput';
 import { toastManager } from '@/components/toast/toastManager';
+import { TypedForm } from '@/components/typed-form/TypedForm';
 import css from './WeightEntryPages.module.css';
 import { parseWeightEntries } from './parseWeightEntries';
 import { MAX_WEIGHT_IMPORT_ENTRIES } from './weight.api';
@@ -52,10 +53,9 @@ export function ImportWeightPage() {
           </Btn>
         </div>
 
-        <form
+        <TypedForm
           className={css.form}
-          onSubmit={(event) => {
-            event.preventDefault();
+          onSubmit={() => {
             if (parsed.entries.length > 0 && parsed.errors.length === 0 && !hasTooManyEntries) {
               mutation.mutate(
                 { data: { entries: parsed.entries } },
@@ -120,7 +120,7 @@ export function ImportWeightPage() {
               Import {parsed.entries.length || ''}
             </Btn>
           </div>
-        </form>
+        </TypedForm>
       </Card>
     </main>
   );

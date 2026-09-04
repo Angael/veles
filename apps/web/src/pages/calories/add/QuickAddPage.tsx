@@ -1,21 +1,17 @@
-import { useNavigate } from '@tanstack/react-router';
-import type { FormEvent } from 'react';
+import type { UseNavigateResult } from '@tanstack/react-router';
 import { useRecordCustomCaloriesMutation } from '../calories.query';
 import { Btn } from '@/components/btn/Btn';
 import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
 import { TextInput } from '@/components/text-input/TextInput';
-import { TypedFormData } from '@/lib/formData';
+import { TypedForm } from '@/components/typed-form/TypedForm';
+import { TypedFormData } from '@/lib/typedFormData';
 import css from '../CalorieFlows.module.css';
 
 export function QuickAddPage({ date }: { date: string }) {
-  const navigate = useNavigate();
   const recordMutation = useRecordCustomCaloriesMutation();
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new TypedFormData(event.currentTarget);
-
+  async function submit(formData: TypedFormData, navigate: UseNavigateResult<string>) {
     await recordMutation.mutateAsync({
       date,
       name: formData.string('name') || 'Quick add',
@@ -36,7 +32,7 @@ export function QuickAddPage({ date }: { date: string }) {
         </div>
       </header>
       <section className={css.panel}>
-        <form className={css.form} onSubmit={(event) => void submit(event)}>
+        <TypedForm className={css.form} onSubmit={submit}>
           <Label text='Label'>
             <TextInput defaultValue='Quick add' name='name' required />
           </Label>
@@ -46,7 +42,7 @@ export function QuickAddPage({ date }: { date: string }) {
           <Btn loading={recordMutation.isPending} type='submit'>
             Add to diary
           </Btn>
-        </form>
+        </TypedForm>
       </section>
     </main>
   );

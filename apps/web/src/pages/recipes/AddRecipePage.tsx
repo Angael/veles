@@ -1,11 +1,13 @@
+import type { UseNavigateResult } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { useNavigate } from '@tanstack/react-router';
 import { SendHorizontalIcon } from 'lucide-react';
-import { type FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { UploadTileGrid } from '@/components/upload-tile-grid/UploadTileGrid';
+import { TypedForm } from '@/components/typed-form/TypedForm';
+import { TypedFormData } from '@/lib/typedFormData';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import css from './AddRecipePage.module.css';
 import { RECIPE_UPLOAD_MAX_PHOTO_BYTES, RECIPE_UPLOAD_MAX_PHOTO_COUNT } from './recipeUpload.api';
@@ -30,18 +32,16 @@ const EMPTY_DRAFT: AddRecipeDraft = {
 };
 
 export function AddRecipePage() {
-  const navigate = useNavigate();
   const createMutation = useCreateRecipeMutation();
   const [draft, setDraft] = useState<AddRecipeDraft>(EMPTY_DRAFT);
   const [error, setError] = useState<string | null>(null);
 
   /** Submits the recipe form and reports upload or navigation failures inline. */
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function handleSubmit(data: TypedFormData, navigate: UseNavigateResult<string>) {
     setError(null);
 
     try {
-      const formData = new FormData(event.currentTarget);
+      const formData = data.raw();
 
       for (const file of draft.selectedFiles) {
         formData.append('photos', file);
@@ -61,12 +61,7 @@ export function AddRecipePage() {
         <Card as='section' className={css.formCard}>
           <h1>Add recipe</h1>
 
-          <form
-            className={css.form}
-            onSubmit={(event) => {
-              void handleSubmit(event);
-            }}
-          >
+          <TypedForm className={css.form} onSubmit={handleSubmit}>
             <div className={css.formBody}>
               <RecipeForm
                 draft={draft}
@@ -98,7 +93,7 @@ export function AddRecipePage() {
                 Save recipe
               </Btn>
             </div>
-          </form>
+          </TypedForm>
         </Card>
       </section>
     </main>

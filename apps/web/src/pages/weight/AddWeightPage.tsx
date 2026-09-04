@@ -7,6 +7,7 @@ import { DateInput } from '@/components/date-input/DateInput';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { toastManager } from '@/components/toast/toastManager';
+import { TypedForm } from '@/components/typed-form/TypedForm';
 import css from './WeightEntryPages.module.css';
 import { useSaveWeightMutation } from './weight.query';
 
@@ -25,10 +26,9 @@ export function AddWeightPage() {
           <h1>Add weight for a date</h1>
           <p>Use this when filling a gap or entering a measurement from another day.</p>
         </div>
-        <form
+        <TypedForm
           className={css.form}
-          onSubmit={(event) => {
-            event.preventDefault();
+          onSubmit={() => {
             if (weightKg === null) {
               return;
             }
@@ -86,7 +86,7 @@ export function AddWeightPage() {
               Save entry
             </Btn>
           </div>
-        </form>
+        </TypedForm>
       </Card>
     </main>
   );

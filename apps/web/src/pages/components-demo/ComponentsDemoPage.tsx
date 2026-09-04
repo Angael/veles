@@ -31,6 +31,7 @@ import { SliderInput } from '@/components/slider-input/SliderInput';
 import { TextInput } from '@/components/text-input/TextInput';
 import { TextareaInput } from '@/components/textarea-input/TextareaInput';
 import { toastManager } from '@/components/toast/toastManager';
+import { TypedForm } from '@/components/typed-form/TypedForm';
 import { UploadTileGrid } from '@/components/upload-tile-grid/UploadTileGrid';
 import css from './ComponentsDemoPage.module.css';
 
@@ -184,6 +185,21 @@ export function ComponentsDemoPage() {
           type='search'
           value={textValue}
         />
+      </section>
+
+      <section>
+        <h2>TypedForm</h2>
+        <TypedForm
+          className={css.formGrid}
+          onSubmit={(data) => {
+            data.string('typedFormDemo');
+          }}
+        >
+          <Label text='Demo field'>
+            <TextInput defaultValue='Breakfast' name='typedFormDemo' required />
+          </Label>
+          <Btn type='submit'>Submit demo</Btn>
+        </TypedForm>
       </section>
 
       <section>

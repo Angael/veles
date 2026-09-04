@@ -1,9 +1,10 @@
 import { useNavigate, useRouter } from '@tanstack/react-router';
 import { SaveIcon } from 'lucide-react';
-import { type FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { ErrorCard } from '@/components/error-card/ErrorCard';
+import { TypedForm } from '@/components/typed-form/TypedForm';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import type { RecipeLibraryItem } from './recipes.api';
 import { useUpdateRecipeMutation } from './recipes.query';
@@ -24,10 +25,9 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
       <Card as='section' className={css.card}>
         <h1>Edit {recipe.name}</h1>
 
-        <form
+        <TypedForm
           className={css.form}
-          onSubmit={(event: FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
+          onSubmit={() => {
             saveMutation.mutate(
               { data: { ...draft, id: recipe.id } },
               {
@@ -67,7 +67,7 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
               Save changes
             </Btn>
           </div>
-        </form>
+        </TypedForm>
       </Card>
     </main>
   );

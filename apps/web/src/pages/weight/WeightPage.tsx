@@ -6,6 +6,7 @@ import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { toastManager } from '@/components/toast/toastManager';
+import { TypedForm } from '@/components/typed-form/TypedForm';
 import { RecentWeightEntries } from './RecentWeightEntries';
 import css from './WeightPage.module.css';
 import { WeightTrendChart } from './WeightTrendChart';
@@ -125,13 +126,7 @@ type WeightFormProps = {
 
 function WeightForm({ isSaving, onChange, onSubmit, value }: WeightFormProps) {
   return (
-    <form
-      className={css.entryForm}
-      onSubmit={(event) => {
-        event.preventDefault();
-        onSubmit();
-      }}
-    >
+    <TypedForm className={css.entryForm} onSubmit={onSubmit}>
       <label className={css.captureField}>
         <span>Today&apos;s weight</span>
         <NumberInput
@@ -150,7 +145,7 @@ function WeightForm({ isSaving, onChange, onSubmit, value }: WeightFormProps) {
       <Btn disabled={value === null} loading={isSaving} radius='pill' size='md' type='submit'>
         Save
       </Btn>
-    </form>
+    </TypedForm>
   );
 }
 

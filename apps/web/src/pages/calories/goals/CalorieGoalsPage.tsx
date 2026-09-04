@@ -1,19 +1,16 @@
-import { useNavigate } from '@tanstack/react-router';
-import type { FormEvent } from 'react';
+import type { UseNavigateResult } from '@tanstack/react-router';
 import type { CalorieGoal } from '../calories.api';
 import { useSetDailyCalorieGoalMutation } from '../calories.query';
 import { todayLocalDate } from '../calorieHelpers';
 import { Btn } from '@/components/btn/Btn';
 import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
-import { TypedFormData } from '@/lib/formData';
+import { TypedForm } from '@/components/typed-form/TypedForm';
+import { TypedFormData } from '@/lib/typedFormData';
 import css from '../CalorieFlows.module.css';
 
 export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
-  const navigate = useNavigate();
   const goalMutation = useSetDailyCalorieGoalMutation();
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new TypedFormData(event.currentTarget);
+  async function submit(formData: TypedFormData, navigate: UseNavigateResult<string>) {
     const date = todayLocalDate();
     await goalMutation.mutateAsync({
       date,
@@ -33,7 +30,7 @@ export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
         </div>
       </header>
       <section className={css.panel}>
-        <form className={css.form} onSubmit={(event) => void submit(event)}>
+        <TypedForm className={css.form} onSubmit={submit}>
           <KcalMacrosForm
             defaultValues={{
               kcal: goal?.kcal,
@@ -47,7 +44,7 @@ export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
           <Btn loading={goalMutation.isPending} type='submit'>
             Save current goals
           </Btn>
-        </form>
+        </TypedForm>
       </section>
     </main>
   );

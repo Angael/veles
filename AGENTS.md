@@ -43,4 +43,4 @@
 ## TS
 - avoid `as any` `as unknown` `as never`, if you find yourself needing to use them - ask user for approval
 - Medium to longer functions that contain logic should have a tl;dr short JSDoc that explain what they do and why they are needed.
-- Use `TypedFormData` from `apps/web/src/lib/formData.ts` instead of reading raw `FormData` values.
+- Use `TypedFormData` from `apps/web/src/lib/typedFormData.ts` instead of reading raw `FormData` values.
