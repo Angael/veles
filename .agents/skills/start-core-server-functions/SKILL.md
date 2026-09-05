@@ -1,5 +1,5 @@
 ---
-name: start-core/server-functions
+name: start-core-server-functions
 description: >-
   createServerFn (GET/POST), validator (Zod or function),
   useServerFn hook, server context utilities (getRequest,
@@ -19,7 +19,7 @@ sources:
 
 Server functions are type-safe RPCs created with `createServerFn`. They run exclusively on the server but can be called from anywhere — loaders, components, hooks, event handlers, or other server functions.
 
-> **CRITICAL**: Server functions are API endpoints. They are reachable independently of whichever route renders the calling UI. **Auth must be enforced inside the handler (or via middleware) for any server function that touches private data.** Route `beforeLoad` is UX, not the data boundary. See [start-core/auth-server-primitives](../auth-server-primitives/SKILL.md) for the session/middleware pattern.
+> **CRITICAL**: Server functions are API endpoints. They are reachable independently of whichever route renders the calling UI. **Auth must be enforced inside the handler (or via middleware) for any server function that touches private data.** Route `beforeLoad` is UX, not the data boundary. See [start-core-auth-server-primitives](skill://start-core-auth-server-primitives) for the session/middleware pattern.
 > **CRITICAL**: Loaders are ISOMORPHIC — they run on BOTH client and server. Database queries, file system access, and secret API keys MUST go inside `createServerFn`, NOT in loaders directly.
 > **CRITICAL**: Do not use `"use server"` directives, `getServerSideProps`, or any Next.js/Remix server patterns. TanStack Start uses `createServerFn` exclusively.
 
@@ -292,7 +292,7 @@ const getMyOrders = createServerFn({ method: 'GET' })
   })
 ```
 
-Apply `authMiddleware` (or an equivalent in-handler check) to **every** `createServerFn` that needs auth. See [start-core/auth-server-primitives](../auth-server-primitives/SKILL.md) for the full session/middleware pattern and [start-core/middleware](../middleware/SKILL.md) for composing the factory.
+Apply `authMiddleware` (or an equivalent in-handler check) to **every** `createServerFn` that needs auth. See [start-core-auth-server-primitives](skill://start-core-auth-server-primitives) for the full session/middleware pattern and [start-core-middleware](skill://start-core-middleware) for composing the factory.
 
 ### 2. CRITICAL: Putting server-only code in loaders
 
@@ -407,7 +407,7 @@ const getMyOrders = createServerFn({ method: 'GET' }).handler(async () => {
 setResponseHeaders({ 'Cache-Control': 'no-store' })
 ```
 
-Rule of thumb: if the handler reads a session/cookie/auth header or branches on identity, the response is **not** `public`. Default to `private` (or `no-store` for sensitive data); reach for `public` only on responses that are byte-for-byte identical regardless of who asks. See also [start-core/deployment](../deployment/SKILL.md) for ISR/Cache-Control on full pages.
+Rule of thumb: if the handler reads a session/cookie/auth header or branches on identity, the response is **not** `public`. Default to `private` (or `no-store` for sensitive data); reach for `public` only on responses that are byte-for-byte identical regardless of who asks. See also [start-core-deployment](skill://start-core-deployment) for ISR/Cache-Control on full pages.
 
 ### 7. MEDIUM: When to wrap with `useServerFn`
 
@@ -427,7 +427,7 @@ If in doubt: wrap with `useServerFn`. It's a no-op for plain-data functions and 
 
 ## Cross-References
 
-- [start-core/execution-model](../execution-model/SKILL.md) — understanding where code runs
-- [start-core/middleware](../middleware/SKILL.md) — composing server functions with middleware
-- [start-core/auth-server-primitives](../auth-server-primitives/SKILL.md) — sessions, cookies, OAuth, CSRF, rate limiting (the server-side half of auth; `getCurrentUser`/`useSession`-style helpers belong here, not at module scope)
-- [router-core/auth-and-guards](../../../../router-core/skills/router-core/auth-and-guards/SKILL.md) — routing-side UX guards; data auth belongs in the server function, server route, or API endpoint handler/middleware
+- [start-core-execution-model](skill://start-core-execution-model) — understanding where code runs
+- [start-core-middleware](skill://start-core-middleware) — composing server functions with middleware
+- [start-core-auth-server-primitives](skill://start-core-auth-server-primitives) — sessions, cookies, OAuth, CSRF, rate limiting (the server-side half of auth; `getCurrentUser`/`useSession`-style helpers belong here, not at module scope)
+- [router-core-auth-and-guards](skill://router-core-auth-and-guards) — routing-side UX guards; data auth belongs in the server function, server route, or API endpoint handler/middleware

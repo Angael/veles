@@ -1,5 +1,5 @@
 ---
-name: router-core/auth-and-guards
+name: router-core-auth-and-guards
 description: >-
   Route protection with beforeLoad, redirect()/throw redirect(),
   isRedirect helper, authenticated layout routes (_authenticated),
@@ -11,7 +11,7 @@ library: tanstack-router
 library_version: '1.166.2'
 requires:
   - router-core
-  - router-core/data-loading
+  - router-core-data-loading
 sources:
   - TanStack/router:docs/router/guide/authenticated-routes.md
   - TanStack/router:docs/router/how-to/setup-authentication.md
@@ -21,7 +21,7 @@ sources:
 
 # Auth and Guards
 
-> **This skill covers the routing side of auth.** Route guards are UX and navigation control; the data/API boundary still belongs in the server function, server route, or API endpoint that reads or mutates private data. For the **server-side primitives** — session cookies (`HttpOnly`/`Secure`/`SameSite`), `useSession`-style helpers, OAuth `state` + PKCE, password-reset enumeration defense, CSRF, rate limiting — see [start-core/auth-server-primitives](../../../../start-client-core/skills/start-core/auth-server-primitives/SKILL.md).
+> **This skill covers the routing side of auth.** Route guards are UX and navigation control; the data/API boundary still belongs in the server function, server route, or API endpoint that reads or mutates private data. For the **server-side primitives** — session cookies (`HttpOnly`/`Secure`/`SameSite`), `useSession`-style helpers, OAuth `state` + PKCE, password-reset enumeration defense, CSRF, rate limiting — see [start-core-auth-server-primitives](skill://start-core-auth-server-primitives).
 >
 > **CRITICAL**: A route guard (`beforeLoad`) does NOT protect a `createServerFn` declared on that route. Server functions are API endpoints reachable independently of the route that calls them. See "Route guards do not protect server functions" below.
 
@@ -408,7 +408,7 @@ const getMyOrders = createServerFn({ method: 'GET' })
   })
 ```
 
-Rule of thumb: every `createServerFn`, server route, or API endpoint that touches user data needs `authMiddleware` (or an equivalent in-handler check). The route guard is for the page experience; the endpoint guard is for the data. See [start-core/auth-server-primitives](../../../../start-client-core/skills/start-core/auth-server-primitives/SKILL.md) for the full session/middleware pattern.
+Rule of thumb: every `createServerFn`, server route, or API endpoint that touches user data needs `authMiddleware` (or an equivalent in-handler check). The route guard is for the page experience; the endpoint guard is for the data. See [start-core-auth-server-primitives](skill://start-core-auth-server-primitives) for the full session/middleware pattern.
 
 ### HIGH: Auth check in component instead of beforeLoad
 
@@ -494,6 +494,6 @@ Place protected routes as children of the `_authenticated` layout route. Public 
 
 ## Cross-References
 
-- See also: **router-core/data-loading/SKILL.md** — `beforeLoad` runs before `loader`; auth context flows into loader via route context
-- See also: **start-core/auth-server-primitives/SKILL.md** — server-side session cookies, OAuth state + PKCE, CSRF, password-reset hardening, rate limiting (the server half of authentication)
-- See also: **start-core/middleware/SKILL.md** — `authMiddleware` factory pattern for protecting individual `createServerFn` calls
+- See also: **router-core-data-loading/SKILL.md** — `beforeLoad` runs before `loader`; auth context flows into loader via route context
+- See also: **start-core-auth-server-primitives/SKILL.md** — server-side session cookies, OAuth state + PKCE, CSRF, password-reset hardening, rate limiting (the server half of authentication)
+- See also: **start-core-middleware/SKILL.md** — `authMiddleware` factory pattern for protecting individual `createServerFn` calls

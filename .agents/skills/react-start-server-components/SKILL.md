@@ -1,5 +1,5 @@
 ---
-name: react-start/server-components
+name: react-start-server-components
 description: >-
   Implement, review, debug, and refactor TanStack Start React Server
   Components in React 19 apps. Use when tasks mention
@@ -17,8 +17,8 @@ library: tanstack-start
 library_version: '1.166.2'
 requires:
   - react-start
-  - start-core/server-functions
-  - start-core/execution-model
+  - start-core-server-functions
+  - start-core-execution-model
 sources:
   - TanStack/router:docs/start/framework/react/guide/server-components.md
   - TanStack/router:docs/start/framework/react/guide/server-functions.md
