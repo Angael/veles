@@ -18,6 +18,6 @@ describe('FoodEditor', () => {
     );
 
     expect(markup).toContain('name="name"');
-    expect(markup).toContain('name="brand"');
+    expect(markup).not.toContain('name="brand"');
   });
 });

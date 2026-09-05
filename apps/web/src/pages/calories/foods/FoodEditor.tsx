@@ -10,7 +10,6 @@ import css from '../CalorieFlows.module.css';
 
 export type FoodEditorValue = {
   barcode?: string;
-  brand?: string;
   imageUrl?: string;
   name: string;
   productSizeGrams?: number;
@@ -40,7 +39,6 @@ export function FoodEditor({
   async function handleSubmit(formData: TypedFormData) {
     await onSubmit({
       barcode: formData.string('barcode') || undefined,
-      brand: formData.string('brand') || undefined,
       imageUrl: formData.string('imageUrl') || undefined,
       name: formData.string('name'),
       productSizeGrams: formData.optionalNumber('size'),
@@ -52,14 +50,9 @@ export function FoodEditor({
   }
   return (
     <TypedForm className={css.form} onSubmit={handleSubmit}>
-      <div className={css.grid}>
-        <Label text='Product name'>
-          <TextInput defaultValue={food?.name ?? initialName} name='name' required />
-        </Label>
-        <Label text='Brand'>
-          <TextInput defaultValue={food?.brand ?? ''} name='brand' />
-        </Label>
-      </div>
+      <Label text='Food name'>
+        <TextInput defaultValue={food?.name ?? initialName} name='name' required />
+      </Label>
       <div className={css.grid}>
         <Label text='Barcode'>
           <TextInput

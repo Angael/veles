@@ -58,7 +58,6 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
           <div className={css.productHeading}>
             <div>
               <strong>{food.name}</strong>
-              {food.brand ? <span>{food.brand}</span> : null}
             </div>
             <Btn
               aria-label={`Edit ${food.name}`}

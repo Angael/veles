@@ -269,7 +269,6 @@ async function seedFoodProducts(client: Client) {
        ON CONFLICT (id) DO UPDATE SET
          barcode = NULL,
          name = EXCLUDED.name,
-         brand = NULL,
          image_url = NULL,
          product_size_grams_hundredths = NULL,
          kcal_per_100g_hundredths = EXCLUDED.kcal_per_100g_hundredths,

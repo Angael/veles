@@ -28,7 +28,6 @@ type OpenFoodFactsApiProduct = typeof openFoodFactsProductType.infer;
 export type OpenFoodFactsProduct = {
   barcode: string;
   name: string;
-  brand: string | null;
   imageUrl: string | null;
   productSizeGrams: number | null;
   kcalPer100g: number;
@@ -36,6 +35,11 @@ export type OpenFoodFactsProduct = {
   fatPer100g: number | null;
   carbsPer100g: number | null;
 };
+
+function withBrand(name: string, brand: string | null | undefined) {
+  const normalizedBrand = normalizeText(brand);
+  return normalizedBrand ? `${name} (${normalizedBrand})` : name;
+}
 
 function normalizeText(value: string | null | undefined): string | null {
   const normalized = value?.trim();
@@ -56,8 +60,7 @@ function parseProduct(
 
   return {
     barcode,
-    name,
-    brand: normalizeText(product.brands),
+    name: withBrand(name, product.brands),
     imageUrl: normalizeText(product.image_url),
     productSizeGrams: quantityUnit === 'g' ? (product.product_quantity ?? null) : null,
     kcalPer100g,

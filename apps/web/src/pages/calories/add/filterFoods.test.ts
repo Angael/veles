@@ -5,8 +5,7 @@ import { filterFoods } from './filterFoods';
 const foods: CalorieFood[] = [
   {
     id: '1',
-    name: 'Oat milk',
-    brand: 'Oatly',
+    name: 'Oat milk (Oatly)',
     barcode: null,
     imageUrl: null,
     productSizeGrams: 250,
@@ -18,7 +17,6 @@ const foods: CalorieFood[] = [
   {
     id: '2',
     name: 'Banana',
-    brand: null,
     barcode: null,
     imageUrl: null,
     productSizeGrams: null,
@@ -30,7 +28,7 @@ const foods: CalorieFood[] = [
 ];
 
 describe('filterFoods', () => {
-  it('matches case-insensitive substrings across product names and brands', () => {
+  it('matches case-insensitive substrings in collapsed product names', () => {
     expect(filterFoods(foods, 'OAT').map((food) => food.id)).toEqual(['1']);
     expect(filterFoods(foods, 'oatly').map((food) => food.id)).toEqual(['1']);
   });

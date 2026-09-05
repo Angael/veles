@@ -20,7 +20,6 @@ export const foodProducts = pgTable(
       .default(sql`uuidv7()`),
     barcode: text('barcode'),
     name: text('name').notNull(),
-    brand: text('brand'),
     imageUrl: text('image_url'),
     productSizeGramsHundredths: integer('product_size_grams_hundredths'),
     kcalPer100gHundredths: integer('kcal_per_100g_hundredths').notNull(),

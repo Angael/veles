@@ -28,8 +28,7 @@ describe('getOpenFoodFactsProduct', () => {
 
     await expect(getOpenFoodFactsProduct('123 456')).resolves.toEqual({
       barcode: '123 456',
-      name: 'Oat bar',
-      brand: 'Example Foods',
+      name: 'Oat bar (Example Foods)',
       imageUrl: 'https://images.example/oat-bar.jpg',
       productSizeGrams: 45.5,
       kcalPer100g: 412.5,
@@ -67,7 +66,6 @@ describe('getOpenFoodFactsProduct', () => {
     await expect(getOpenFoodFactsProduct('987')).resolves.toEqual({
       barcode: '987',
       name: 'Milk',
-      brand: null,
       imageUrl: null,
       productSizeGrams: null,
       kcalPer100g: 64,
@@ -97,7 +95,6 @@ describe('getOpenFoodFactsProduct', () => {
     await expect(getOpenFoodFactsProduct('654')).resolves.toEqual({
       barcode: '654',
       name: 'Fallback food',
-      brand: null,
       imageUrl: null,
       productSizeGrams: null,
       kcalPer100g: 123,
@@ -126,7 +123,6 @@ describe('getOpenFoodFactsProduct', () => {
     await expect(getOpenFoodFactsProduct('321')).resolves.toEqual({
       barcode: '321',
       name: 'Broken image',
-      brand: null,
       imageUrl: null,
       productSizeGrams: null,
       kcalPer100g: 20,

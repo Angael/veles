@@ -25,7 +25,7 @@ export function filterFoods(foods: CalorieFood[], query: string) {
 
   return foods
     .map((food) => {
-      const value = `${food.name} ${food.brand ?? ''}`.toLocaleLowerCase();
+      const value = food.name.toLocaleLowerCase();
       const scores = terms.map((term) => fuzzyTermScore(value, term));
       if (scores.some((score) => score === null)) return null;
 

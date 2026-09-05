@@ -35,7 +35,6 @@ const optionalNonNegativeAmountType = nonNegativeAmountType.or('undefined');
 
 const createFoodProductInputType = type({
   name: nonEmptyTextType,
-  'brand?': optionalNonEmptyTextType,
   'barcode?': optionalNonEmptyTextType,
   'imageUrl?': optionalImageUrlType,
   'productSizeGrams?': optionalPositiveAmountType,
@@ -51,7 +50,6 @@ const foodLogIdInputType = type({ id: 'string.uuid' });
 function productValues(data: typeof createFoodProductInputType.infer) {
   return {
     name: data.name.trim(),
-    brand: data.brand?.trim() ?? null,
     barcode: data.barcode?.trim() ?? null,
     imageUrl: data.imageUrl ?? null,
     productSizeGramsHundredths: optionalHundredths(data.productSizeGrams),
@@ -66,7 +64,6 @@ function toFoodProduct(product: typeof foodProducts.$inferSelect): CalorieFood {
   return {
     id: product.id,
     name: product.name,
-    brand: product.brand,
     barcode: product.barcode,
     imageUrl: product.imageUrl,
     productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
@@ -149,7 +146,6 @@ async function insertImportedFoodProduct(product: OpenFoodFactsProduct) {
     .insert(foodProducts)
     .values({
       name: product.name,
-      brand: product.brand,
       barcode: product.barcode,
       imageUrl: product.imageUrl,
       productSizeGramsHundredths: optionalHundredths(product.productSizeGrams ?? undefined),
@@ -250,7 +246,6 @@ export type CalorieDashboardDay = {
 export type CalorieFood = {
   id: string;
   name: string;
-  brand: string | null;
   barcode: string | null;
   imageUrl: string | null;
   productSizeGrams: number | null;
