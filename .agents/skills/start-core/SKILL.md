@@ -26,33 +26,33 @@ TanStack Start is a full-stack React framework built on TanStack Router and Vite
 
 | Task                                             | Sub-Skill                                                                       |
 | ------------------------------------------------ | ------------------------------------------------------------------------------- |
-| Type-safe RPCs, data fetching, mutations         | [start-core/server-functions/SKILL.md](./server-functions/SKILL.md)             |
-| Request/function middleware, context, auth       | [start-core/middleware/SKILL.md](./middleware/SKILL.md)                         |
-| Server-side auth: sessions, cookies, OAuth, CSRF | [start-core/auth-server-primitives/SKILL.md](./auth-server-primitives/SKILL.md) |
-| Isomorphic execution, environment boundaries     | [start-core/execution-model/SKILL.md](./execution-model/SKILL.md)               |
-| REST API endpoints alongside app routes          | [start-core/server-routes/SKILL.md](./server-routes/SKILL.md)                   |
-| Hosting, SSR modes, prerendering, SEO            | [start-core/deployment/SKILL.md](./deployment/SKILL.md)                         |
+| Type-safe RPCs, data fetching, mutations         | [start-core-server-functions](skill://start-core-server-functions)             |
+| Request/function middleware, context, auth       | [start-core-middleware](skill://start-core-middleware)                         |
+| Server-side auth: sessions, cookies, OAuth, CSRF | [start-core-auth-server-primitives](skill://start-core-auth-server-primitives) |
+| Isomorphic execution, environment boundaries     | [start-core-execution-model](skill://start-core-execution-model)               |
+| REST API endpoints alongside app routes          | [start-core-server-routes](skill://start-core-server-routes)                   |
+| Hosting, SSR modes, prerendering, SEO            | [start-core-deployment](skill://start-core-deployment)                         |
 
 ## Quick Decision Tree
 
 ```text
 Need to run code exclusively on the server (DB, secrets)?
-  → start-core/server-functions
+  → start-core-server-functions
 
 Need auth checks, logging, or shared logic across server functions?
-  → start-core/middleware
+  → start-core-middleware
 
 Need to add login, sessions, OAuth, CSRF, password reset?
-  → start-core/auth-server-primitives
+  → start-core-auth-server-primitives
 
 Need to understand where code runs (server vs client)?
-  → start-core/execution-model
+  → start-core-execution-model
 
 Need a REST API endpoint (GET/POST/PUT/DELETE)?
-  → start-core/server-routes
+  → start-core-server-routes
 
 Need to deploy, configure SSR, or prerender?
-  → start-core/deployment
+  → start-core-deployment
 ```
 
 ## Project Setup

@@ -1,5 +1,5 @@
 ---
-name: router-core/type-safety
+name: router-core-type-safety
 description: >-
   Full type inference philosophy (never cast, never annotate inferred
   values), Register module declaration, from narrowing on hooks and
@@ -489,4 +489,4 @@ const search = Route.useSearch()
 
 If a build error mentions `react-router-dom`, `next/`, `pages/_app`, or duplicate `/` routes, fix the import — don't paper over with type assertions.
 
-See also: router-core (Register setup), router-core/navigation (from narrowing), router-core/code-splitting (getRouteApi).
+See also: router-core (Register setup), router-core-navigation (from narrowing), router-core-code-splitting (getRouteApi).

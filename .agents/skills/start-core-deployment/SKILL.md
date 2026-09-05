@@ -1,5 +1,5 @@
 ---
-name: start-core/deployment
+name: start-core-deployment
 description: >-
   Deploy to Cloudflare Workers, Netlify, Vercel, Node.js/Docker,
   Bun, Railway. Selective SSR (ssr option per route), SPA mode,
@@ -64,7 +64,7 @@ Deploy: `npx wrangler login && pnpm run deploy`
 > const apiHost = env.API_HOST
 > ```
 >
-> Or read `process.env.X` per-request inside `.handler()` / middleware `.server()`. See [Cloudflare's environment-variables docs](https://developers.cloudflare.com/workers/configuration/environment-variables/) and [start-core/execution-model](../execution-model/SKILL.md).
+> Or read `process.env.X` per-request inside `.handler()` / middleware `.server()`. See [Cloudflare's environment-variables docs](https://developers.cloudflare.com/workers/configuration/environment-variables/) and [start-core-execution-model](skill://start-core-execution-model).
 
 ### Netlify
 
@@ -311,5 +311,5 @@ const childRoute = createFileRoute('/dashboard/stats')({
 
 ## Cross-References
 
-- [start-core/server-routes](../server-routes/SKILL.md) — API endpoints for sitemaps, robots.txt
-- [start-core/execution-model](../execution-model/SKILL.md) — SSR affects where code runs
+- [start-core-server-routes](skill://start-core-server-routes) — API endpoints for sitemaps, robots.txt
+- [start-core-execution-model](skill://start-core-execution-model) — SSR affects where code runs
