@@ -1,0 +1,2 @@
+export const IMAGE_MAX_INPUT_BYTES = 10 * 1024 * 1024;
+export const IMAGE_MAX_INPUT_PIXELS = 100_000_000;

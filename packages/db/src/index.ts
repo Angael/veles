@@ -2,8 +2,6 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from './schema/index.ts';
 
-export type DatabaseConnection = ReturnType<typeof createDatabaseConnection>;
-
 type DatabaseConnectionOptions = {
   connectionString: string;
   maxConnections?: number;

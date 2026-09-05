@@ -1,5 +1,5 @@
 ---
-name: start-core/server-routes
+name: start-core-server-routes
 description: >-
   Server-side API endpoints using the server property on
   createFileRoute, HTTP method handlers (GET, POST, PUT, DELETE),
@@ -276,5 +276,5 @@ const body = await request.json()
 
 ## Cross-References
 
-- [start-core/middleware](../middleware/SKILL.md) — middleware for server routes
-- [start-core/server-functions](../server-functions/SKILL.md) — alternative for RPC-style calls
+- [start-core-middleware](skill://start-core-middleware) — middleware for server routes
+- [start-core-server-functions](skill://start-core-server-functions) — alternative for RPC-style calls

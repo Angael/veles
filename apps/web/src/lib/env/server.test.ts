@@ -9,8 +9,8 @@ describe('getServerEnv', () => {
     vi.stubEnv('BETTER_AUTH_SECRET', 'abcdefghijklmnopqrstuvwxyz123456');
     vi.stubEnv('APP_URL', 'http://localhost:3000');
     vi.stubEnv('AUTH_ALLOWED_EMAILS', '');
-    vi.stubEnv('GOOGLE_CLIENT_ID', '');
-    vi.stubEnv('GOOGLE_CLIENT_SECRET', '');
+    vi.stubEnv('GOOGLE_CLIENT_ID', 'google-client-id');
+    vi.stubEnv('GOOGLE_CLIENT_SECRET', 'google-client-secret');
     vi.stubEnv('VITE_CF_CDN_URL', 'https://cdn.example.com');
     vi.stubEnv('R2_ACCOUNT_ID', 'account-id');
     vi.stubEnv('R2_ACCESS_KEY_ID', 'access-key-id');

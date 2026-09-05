@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import css from './FloatingButton.module.css';
 
@@ -7,8 +7,14 @@ type FloatingButtonProps = {
   children: ReactNode;
   icon?: ReactNode;
 } & (
-  | { loading?: never; onClick?: never; to: string }
-  | { loading?: boolean; onClick: () => void; to?: never }
+  | { loading?: never; onClick?: never; render?: never; to: string }
+  | { loading?: boolean; onClick: () => void; render?: never; to?: never }
+  | {
+      loading?: boolean;
+      onClick?: never;
+      render: ComponentProps<typeof Btn>['render'];
+      to?: never;
+    }
 );
 
 export function FloatingButton(props: FloatingButtonProps) {
@@ -22,6 +28,23 @@ export function FloatingButton(props: FloatingButtonProps) {
         isLink
         radius='pill'
         render={<Link to={props.to} />}
+        size='md'
+        variant='main'
+      >
+        {props.children}
+      </Btn>
+    );
+  }
+
+  if (props.render) {
+    return (
+      <Btn
+        aria-label={typeof props.children === 'string' ? props.children : undefined}
+        className={css.button}
+        icon={props.icon}
+        loading={props.loading}
+        radius='pill'
+        render={props.render}
         size='md'
         variant='main'
       >

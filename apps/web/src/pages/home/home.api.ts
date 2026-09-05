@@ -1,23 +1,38 @@
+import { type } from 'arktype';
+import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { desc, eq } from 'drizzle-orm';
-import { diaryEntries, recipes, weightEntries } from '@veles/db/schema';
+import { and, desc, eq, lte } from 'drizzle-orm';
+import { calorieGoals, diaryEntries, foodLogs, recipes, weightEntries } from '@veles/db/schema';
+import { dateOnlyType } from '@/lib/dateOnly';
+import { fromHundredths, HUNDREDTHS, toCalorieGoal } from '@/pages/calories/calorieHelpers';
 import { requireSession } from '@/lib/auth/getSession';
 import { db } from '@/lib/db';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 
 export type HomeDashboardData = {
-  recentRecipes: Array<{
+  date: string;
+  recipes: Array<{
     id: string;
     name: string;
-    description: string;
-    rating: number | null;
-    tags: string[];
-    updatedAt: string;
     kcal: number | null;
     protein: number | null;
     fat: number | null;
     carbs: number | null;
   }>;
+  nutrition: {
+    goal: {
+      kcal: number;
+      protein: number | null;
+      fat: number | null;
+      carbs: number | null;
+    } | null;
+    totals: {
+      kcal: number;
+      protein: number;
+      fat: number;
+      carbs: number;
+    };
+  };
   lastDiaryEntryDate: string | null;
   weightEntries: Array<{
     date: string;
@@ -25,29 +40,26 @@ export type HomeDashboardData = {
   }>;
 };
 
-/** Loads only the compact, recent records needed by the authenticated home dashboard. */
+const homeDashboardInputType = type({ date: dateOnlyType });
+
+/** Loads the records needed to render today's authenticated home dashboard. */
 export const getHomeDashboard = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getHomeDashboard')])
-  .handler(async (): Promise<HomeDashboardData> => {
+  .validator(arkTypeValidator(homeDashboardInputType))
+  .handler(async ({ data }): Promise<HomeDashboardData> => {
     const session = await requireSession();
-    const [recipeRows, weightRows, diaryRows] = await Promise.all([
+    const [recipeRows, weightRows, diaryRows, foodLogRows, goalRows] = await Promise.all([
       db
         .select({
-          carbs: recipes.carbs,
-          description: recipes.description,
-          fat: recipes.fats,
-          id: recipes.id,
           kcal: recipes.kcal,
-          name: recipes.name,
           protein: recipes.protein,
-          rating: recipes.rating,
-          tags: recipes.tags,
-          updatedAt: recipes.updatedAt,
+          fat: recipes.fats,
+          carbs: recipes.carbs,
+          id: recipes.id,
+          name: recipes.name,
         })
         .from(recipes)
-        .where(eq(recipes.userId, session.user.id))
-        .orderBy(desc(recipes.updatedAt))
-        .limit(3),
+        .where(eq(recipes.userId, session.user.id)),
       db
         .select({ date: weightEntries.date, weightGrams: weightEntries.weightGrams })
         .from(weightEntries)
@@ -60,16 +72,62 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
         .where(eq(diaryEntries.userId, session.user.id))
         .orderBy(desc(diaryEntries.entryDate), desc(diaryEntries.createdAt))
         .limit(1),
+      db
+        .select({
+          kcal: foodLogs.kcalHundredths,
+          protein: foodLogs.proteinHundredths,
+          fat: foodLogs.fatHundredths,
+          carbs: foodLogs.carbsHundredths,
+        })
+        .from(foodLogs)
+        .where(and(eq(foodLogs.userId, session.user.id), eq(foodLogs.logDate, data.date))),
+      db
+        .select()
+        .from(calorieGoals)
+        .where(
+          and(eq(calorieGoals.userId, session.user.id), lte(calorieGoals.effectiveDate, data.date)),
+        )
+        .orderBy(desc(calorieGoals.effectiveDate))
+        .limit(1),
     ]);
+    const totals = foodLogRows.reduce<{
+      kcal: number;
+      protein: number;
+      fat: number;
+      carbs: number;
+    }>(
+      (result, log) => ({
+        kcal: result.kcal + log.kcal,
+        protein: result.protein + (log.protein ?? 0),
+        fat: result.fat + (log.fat ?? 0),
+        carbs: result.carbs + (log.carbs ?? 0),
+      }),
+      { kcal: 0, protein: 0, fat: 0, carbs: 0 },
+    );
+    const goal = goalRows[0] ? toCalorieGoal(goalRows[0]) : null;
 
     return {
+      date: data.date,
+      recipes: recipeRows,
+      nutrition: {
+        goal: goal
+          ? {
+              kcal: goal.kcal,
+              protein: goal.protein,
+              fat: goal.fat,
+              carbs: goal.carbs,
+            }
+          : null,
+        totals: {
+          kcal: totals.kcal / HUNDREDTHS,
+          protein: fromHundredths(totals.protein) ?? 0,
+          fat: fromHundredths(totals.fat) ?? 0,
+          carbs: fromHundredths(totals.carbs) ?? 0,
+        },
+      },
       lastDiaryEntryDate: diaryRows[0]?.entryDate ?? null,
-      recentRecipes: recipeRows.map((recipe) => ({
-        ...recipe,
-        updatedAt: recipe.updatedAt.toISOString(),
-      })),
       weightEntries: weightRows
         .map((entry) => ({ date: entry.date, weightKg: entry.weightGrams / 1_000 }))
-        .reverse(),
+        .toReversed(),
     };
   });

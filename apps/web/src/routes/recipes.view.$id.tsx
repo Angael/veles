@@ -7,6 +7,7 @@ export const Route = createFileRoute('/recipes/view/$id')({
     const recipe = await getRecipeById({ data: { id: params.id } });
 
     if (!recipe) {
+      // oxlint-disable-next-line typescript/only-throw-error -- Router control flow intentionally throws this object.
       throw notFound();
     }
 

@@ -12,6 +12,7 @@ export function getRouter() {
     routeTree,
     context: { queryClient },
     defaultPreload: 'intent',
+    defaultPreloadStaleTime: 0, // Let TanStack Query control data freshness instead of Router's preload cache.
     defaultErrorComponent: DefaultCatchBoundary,
     defaultNotFoundComponent: () => <NotFound />,
     scrollRestoration: true,

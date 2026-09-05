@@ -1,0 +1,119 @@
+import { Link, useNavigate, type UseNavigateResult } from '@tanstack/react-router';
+import { useState } from 'react';
+import type { CalorieLog } from '../calories.api';
+import { useDeleteFoodLogMutation, useUpdateFoodLogMutation } from '../calories.query';
+import { Btn } from '@/components/btn/Btn';
+import { DateInput } from '@/components/date-input/DateInput';
+import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
+import { Label } from '@/components/label/Label';
+import { NumberInput } from '@/components/number-input/NumberInput';
+import { PhotoPicker, type PhotoPickerValue } from '@/components/photo-picker/PhotoPicker';
+import { TextInput } from '@/components/text-input/TextInput';
+import { TypedForm } from '@/components/typed-form/TypedForm';
+import { TypedFormData } from '@/lib/typedFormData';
+import css from '../CalorieFlows.module.css';
+
+export function EditFoodLogPage({ log }: { log: CalorieLog }) {
+  const navigate = useNavigate();
+  const deleteMutation = useDeleteFoodLogMutation();
+  const updateMutation = useUpdateFoodLogMutation();
+  const isProduct = log.productId !== null;
+  const isPending = updateMutation.isPending || deleteMutation.isPending;
+  const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
+  const error = updateMutation.error?.message ?? deleteMutation.error?.message ?? '';
+
+  async function submit(formData: TypedFormData, _navigate: UseNavigateResult<string>) {
+    const nextDate = formData.string('date');
+    await updateMutation.mutateAsync({
+      id: log.id,
+      date: nextDate,
+      previousDate: log.date,
+      name: formData.string('name'),
+      grams: formData.optionalNumber('grams'),
+      kcal: formData.number('kcal'),
+      protein: formData.optionalNumber('protein'),
+      fat: formData.optionalNumber('fat'),
+      carbs: formData.optionalNumber('carbs'),
+      ...(isProduct ? {} : { imageAction: photo.imageAction, photo: photo.photo }),
+    });
+    await _navigate({ to: '/calories', search: { date: nextDate } });
+  }
+
+  async function remove() {
+    await deleteMutation.mutateAsync({ date: log.date, id: log.id });
+    await navigate({ to: '/calories', search: { date: log.date } });
+  }
+
+  return (
+    <main className={css.page}>
+      <header className={css.header}>
+        <div>
+          <h1>Edit logged entry</h1>
+          <p>
+            {isProduct
+              ? 'Product details are saved as a snapshot. Edit the product, then delete and add this entry again to use the new details.'
+              : 'Adjust the custom calories and macros.'}
+          </p>
+        </div>
+      </header>
+      <section className={css.panel}>
+        {error ? (
+          <p className={css.error} role='alert'>
+            {error}
+          </p>
+        ) : null}
+        <TypedForm className={css.form} onSubmit={submit}>
+          <div className={css.grid}>
+            <Label text='Name'>
+              <TextInput defaultValue={log.name} name='name' readOnly={isProduct} required />
+            </Label>
+
+            <Label text='Date'>
+              <DateInput defaultValue={log.date} name='date' required />
+            </Label>
+
+            <Label text='Quantity (g)'>
+              <NumberInput defaultValue={log.grams ?? undefined} min={0} name='grams' />
+            </Label>
+          </div>
+
+          <KcalMacrosForm
+            defaultValues={{
+              kcal: log.kcal,
+              protein: log.protein,
+              fat: log.fat,
+              carbs: log.carbs,
+            }}
+            readOnly={isProduct}
+          />
+          {!isProduct ? (
+            <PhotoPicker
+              disabled={isPending}
+              existingUrl={log.imageUrl}
+              onChange={setPhoto}
+              value={photo}
+            />
+          ) : null}
+
+          <div className={css.actions}>
+            <Btn disabled={isPending} onClick={() => void remove()} variant='ghost'>
+              Delete entry
+            </Btn>
+            {log.productId ? (
+              <Btn
+                isLink
+                render={<Link params={{ foodId: log.productId }} to='/calories/foods/$foodId' />}
+                variant='ghost'
+              >
+                Edit product itself
+              </Btn>
+            ) : null}
+            <Btn disabled={isPending} type='submit'>
+              Save entry
+            </Btn>
+          </div>
+        </TypedForm>
+      </section>
+    </main>
+  );
+}

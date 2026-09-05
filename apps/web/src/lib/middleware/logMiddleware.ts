@@ -9,12 +9,6 @@ export const logMiddleware = (name: string) =>
     const _path = new URL(request.url).pathname;
     const path = _path.startsWith('/_serverFn/') ? undefined : _path;
 
-    log.info(`${name} start`, {
-      timestamp: new Date().toISOString(),
-      method,
-      path,
-    });
-
     try {
       const result = await next();
 

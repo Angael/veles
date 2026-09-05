@@ -1,0 +1,378 @@
+.summary {
+  min-width: 0;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(15rem, 18rem) minmax(18rem, 1fr);
+  gap: var(--space-sm);
+  height: 12.5rem;
+}
+
+.energyPanel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  align-self: start;
+  overflow: hidden;
+  padding: var(--space-md);
+  border: var(--border-width) solid rgba(125, 211, 252, 0.16);
+  border-radius: var(--radius-sm);
+  background:
+    radial-gradient(circle at 8% 12%, rgba(125, 211, 252, 0.14), transparent 52%),
+    radial-gradient(circle at 100% 110%, rgba(167, 227, 161, 0.08), transparent 44%),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.7), var(--c-surface-inset));
+}
+
+.goalAction {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  color: var(--c-muted);
+}
+
+.energyDial {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 10.5rem);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  color: var(--c-accent);
+
+  & svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    transform: rotate(-90deg);
+  }
+
+  & circle {
+    fill: none;
+    stroke-width: 8;
+  }
+}
+
+.energyDial:is(button) {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.energyDial:is(button):focus-visible {
+  border-radius: var(--radius-pill);
+  outline: 2px solid var(--c-primary-focus);
+  outline-offset: 3px;
+}
+
+.dialTrack {
+  stroke: rgba(148, 163, 184, 0.13);
+  transition: stroke var(--duration-fast) ease-out;
+}
+
+.dialProgress,
+.dialOverProgress {
+  stroke-linecap: round;
+  transition: stroke-dashoffset 500ms var(--ease-out);
+}
+
+.dialOverProgress {
+  filter: drop-shadow(0 0 0.2rem rgba(239, 68, 68, 0.42));
+  animation: draw-over-ring 650ms var(--ease-out) both;
+}
+
+.dialGradientStart {
+  stop-color: currentColor;
+}
+
+.dialGradientEnd {
+  stop-color: color-mix(in srgb, currentColor 52%, white);
+}
+
+.dialOverGradientStart {
+  stop-color: #fb7185;
+}
+
+.dialOverGradientEnd {
+  stop-color: #ef4444;
+}
+
+.energyValue {
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+  max-width: 75%;
+  text-align: center;
+
+  & > strong {
+    color: var(--c-text-strong);
+    font-size: 2.5rem;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.065em;
+    line-height: 0.92;
+  }
+
+  & span {
+    color: var(--c-muted);
+    font-size: var(--text-xs);
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+}
+
+.energyStack {
+  display: grid;
+  justify-items: center;
+  gap: 0.05rem;
+  color: var(--c-text-strong);
+  font-variant-numeric: tabular-nums;
+
+  & strong {
+    font-size: clamp(1.2rem, 3vw, 1.65rem);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  & small {
+    margin-left: 0.15rem;
+    color: var(--c-muted);
+    font-size: 0.55em;
+    font-weight: var(--font-weight-regular);
+    letter-spacing: 0;
+  }
+
+  & > span {
+    color: var(--c-muted-strong);
+  }
+}
+
+.fractionLine {
+  width: 3.75rem;
+  height: 1px;
+  margin-block: 0.18rem;
+  background: color-mix(in srgb, var(--c-muted) 62%, transparent);
+}
+
+.macros {
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: var(--space-xs);
+  min-width: 0;
+  min-height: 0;
+}
+
+.protein,
+.fat,
+.carbs {
+  color: var(--c-text);
+
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+  background:
+    radial-gradient(
+      circle at 12% 0%,
+      color-mix(in srgb, currentColor 15%, transparent),
+      transparent 58%
+    ),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.64), rgba(2, 6, 23, 0.36));
+
+  & dt,
+  & dd:not(.macroFill):not(.macroOverFill) {
+    position: relative;
+    z-index: 1;
+  }
+
+  & dt {
+    grid-row: 1;
+    grid-column: 2;
+    color: currentColor;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+  }
+}
+
+.protein {
+  color: var(--c-macro-protein);
+}
+
+.fat {
+  color: var(--c-macro-fat);
+}
+
+.carbs {
+  color: var(--c-macro-carb);
+}
+
+.protein .macroConsumedOver {
+  color: color-mix(in srgb, var(--c-text-strong) 72%, var(--c-macro-protein));
+}
+
+.fat .macroConsumedOver {
+  color: color-mix(in srgb, var(--c-text-strong) 72%, var(--c-macro-fat));
+}
+
+.carbs .macroConsumedOver {
+  color: color-mix(in srgb, var(--c-text-strong) 72%, var(--c-macro-carb));
+}
+
+.macroValue {
+  grid-row: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.28rem;
+  min-width: 0;
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.macroConsumed,
+.macroConsumedOver {
+  overflow: hidden;
+  color: var(--c-text-strong);
+  font-size: clamp(1.45rem, 2.4vw, 2.1rem);
+  font-weight: 650;
+  text-overflow: ellipsis;
+}
+
+.macroSeparator,
+.macroTarget {
+  color: var(--c-muted);
+  font-size: clamp(1rem, 1.6vw, 1.35rem);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: -0.03em;
+}
+
+.macroFill,
+.macroOverFill {
+  position: absolute;
+  z-index: 0;
+  inset: 0 auto 0 0;
+  margin: 0;
+  pointer-events: none;
+  transition: width 500ms var(--ease-out);
+}
+
+.macroFill {
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, currentColor 30%, transparent),
+    color-mix(in srgb, currentColor 14%, transparent)
+  );
+}
+
+.macroOverFill {
+  background:
+    linear-gradient(90deg, rgba(127, 29, 29, 0.12), transparent 42%),
+    linear-gradient(
+      110deg,
+      color-mix(in srgb, #b94f5d 58%, transparent),
+      color-mix(in srgb, #923c49 44%, transparent)
+    );
+  box-shadow:
+    inset -1px 0 rgba(248, 113, 113, 0.2),
+    0 0 1rem rgba(127, 29, 29, 0.12);
+  animation: reveal-over-fill 650ms var(--ease-out) both;
+
+  &::after {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 1.5rem;
+    background: linear-gradient(90deg, transparent, rgba(248, 113, 113, 0.08));
+    content: '';
+  }
+}
+
+@keyframes draw-over-ring {
+  from {
+    opacity: 0.35;
+    stroke-dashoffset: 100;
+  }
+}
+
+@keyframes reveal-over-fill {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.35;
+  }
+
+  to {
+    clip-path: inset(0);
+    opacity: 1;
+  }
+}
+
+@media (--tablet) {
+  .energyPanel {
+    padding-inline: var(--space-xl);
+  }
+}
+
+@media (--phone) {
+  .body {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .energyPanel {
+    width: 100%;
+    height: 13.5rem;
+    min-height: 0;
+    padding: var(--space-sm);
+  }
+
+  .energyDial {
+    width: min(10.5rem, 62vw);
+  }
+
+  .protein,
+  .fat,
+  .carbs {
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  .macroConsumed,
+  .macroConsumedOver {
+    font-size: var(--text-lg);
+  }
+
+  .macroSeparator,
+  .macroTarget {
+    font-size: var(--text-sm);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .energyDial:is(button):hover .dialTrack {
+    stroke: rgba(148, 163, 184, 0.24);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dialProgress,
+  .dialOverProgress,
+  .macroFill,
+  .macroOverFill {
+    transition: none;
+    animation: none;
+  }
+}

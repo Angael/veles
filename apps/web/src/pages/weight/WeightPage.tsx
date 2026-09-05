@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { CalendarPlusIcon, FileUpIcon } from 'lucide-react';
@@ -7,11 +6,13 @@ import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { toastManager } from '@/components/toast/toastManager';
+import { TypedForm } from '@/components/typed-form/TypedForm';
 import { RecentWeightEntries } from './RecentWeightEntries';
 import css from './WeightPage.module.css';
 import { WeightTrendChart } from './WeightTrendChart';
 import { getChangeFromDaysAgo, type WeightChartRange } from './weightCalculations';
-import { saveWeight, type WeightEntry } from './weight.api';
+import type { WeightEntry } from './weight.api';
+import { useSaveWeightMutation } from './weight.query';
 
 type WeightPageProps = {
   entries: WeightEntry[];
@@ -22,20 +23,7 @@ export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
   const router = useRouter();
   const latestEntry = entries.at(-1);
   const [weightKg, setWeightKg] = useState<number | null>(latestEntry?.weightKg ?? null);
-  const saveMutation = useMutation({
-    mutationFn: saveWeight,
-    onError: () => {
-      toastManager.add({
-        description: 'Your weight was not changed. Please try again.',
-        priority: 'high',
-        title: 'Could not save weight',
-        type: 'error',
-      });
-    },
-    onSuccess: async () => {
-      await router.invalidate();
-    },
-  });
+  const saveMutation = useSaveWeightMutation();
 
   useEffect(() => {
     setWeightKg(latestEntry?.weightKg ?? null);
@@ -49,7 +37,22 @@ export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
       return;
     }
 
-    saveMutation.mutate({ data: { date: format(new Date(), 'yyyy-MM-dd'), weightKg } });
+    saveMutation.mutate(
+      { data: { date: format(new Date(), 'yyyy-MM-dd'), weightKg } },
+      {
+        onError: () => {
+          toastManager.add({
+            description: 'Your weight was not changed. Please try again.',
+            priority: 'high',
+            title: 'Could not save weight',
+            type: 'error',
+          });
+        },
+        onSuccess: () => {
+          void router.invalidate().catch(() => undefined);
+        },
+      },
+    );
   }
 
   return (
@@ -93,6 +96,7 @@ export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
         <>
           <div className={css.summaryRail} data-appear='2'>
             <Card as='section' aria-label='Weight summary' className={css.summaryGrid}>
+              {/* oxlint-disable-next-line typescript/no-non-null-assertion -- entries.length > 0 guarantees a latest entry. */}
               <SummaryStat label='Current' value={`${latestEntry!.weightKg.toFixed(1)} kg`} />
               <SummaryStat label='2 weeks' value={formatChange(twoWeekChange)} />
               <SummaryStat label='1 month' value={formatChange(oneMonthChange)} />
@@ -122,13 +126,7 @@ type WeightFormProps = {
 
 function WeightForm({ isSaving, onChange, onSubmit, value }: WeightFormProps) {
   return (
-    <form
-      className={css.entryForm}
-      onSubmit={(event) => {
-        event.preventDefault();
-        onSubmit();
-      }}
-    >
+    <TypedForm className={css.entryForm} onSubmit={onSubmit}>
       <label className={css.captureField}>
         <span>Today&apos;s weight</span>
         <NumberInput
@@ -140,14 +138,13 @@ function WeightForm({ isSaving, onChange, onSubmit, value }: WeightFormProps) {
           onValueChange={onChange}
           placeholder='kg'
           required
-          step={0.1}
           value={value}
         />
       </label>
       <Btn disabled={value === null} loading={isSaving} radius='pill' size='md' type='submit'>
         Save
       </Btn>
-    </form>
+    </TypedForm>
   );
 }
 

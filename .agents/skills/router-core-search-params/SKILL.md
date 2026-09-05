@@ -1,5 +1,5 @@
 ---
-name: router-core/search-params
+name: router-core-search-params
 description: >-
   validateSearch, search param validation with Zod/Valibot/ArkType adapters,
   fallback(), search middlewares (retainSearchParams, stripSearchParams),
@@ -346,4 +346,4 @@ export const Route = createRootRoute({
 
 ## References
 
-- [Validation Patterns Reference](./references/validation-patterns.md) — comprehensive patterns for all validation libraries
+- [Validation Patterns Reference](skill://router-core-search-params/references/validation-patterns.md) — comprehensive patterns for all validation libraries

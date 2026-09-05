@@ -94,6 +94,7 @@
   --c-surface-inset: rgba(2, 6, 23, 0.5);
 
   --c-border: rgba(148, 163, 184, 0.2);
+  /* Reserved theme token for upcoming hover treatments. */
   --c-border-hover: rgba(148, 163, 184, 0.22);
   --c-border-strong: rgba(148, 163, 184, 0.24);
   --c-border-popup: rgba(148, 163, 184, 0.28);
@@ -105,6 +106,8 @@
   --gradient-page:
     radial-gradient(circle at top, rgba(96, 165, 250, 0.18), transparent 28%),
     linear-gradient(180deg, #060816 0%, #0f172a 48%, #111827 100%);
+
+  /* Reserved theme token for upcoming primary gradient treatments. */
   --gradient-primary: linear-gradient(135deg, var(--c-primary) 0%, #7c3aed 100%);
 
   --space-xs: 0.5rem;
@@ -125,8 +128,7 @@
   --shadow-card-primary: 0 24px 70px rgba(37, 99, 235, 0.2);
   --shadow-card-danger: 0 24px 70px rgba(127, 29, 29, 0.28);
   --shadow-popup: 0 24px 60px rgba(2, 6, 23, 0.4);
-  --shadow-image: drop-shadow(0 30px 60px rgba(15, 23, 42, 0.5));
-  --blur-surface: blur(16px);
+  --blur-surface: blur(8px);
 
   --duration-fast: 0.2s;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);

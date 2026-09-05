@@ -2,9 +2,12 @@ import { createFileRoute } from '@tanstack/react-router';
 import { HomeDashboard } from '@/pages/home/HomeDashboard';
 import { HomePage } from '@/pages/home/HomePage';
 import { getHomeDashboard } from '@/pages/home/home.api';
+import { todayLocalDate } from '@/pages/calories/calorieHelpers';
 
 export const Route = createFileRoute('/')({
-  loader: ({ context }) => (context.user ? getHomeDashboard() : null),
+  loaderDeps: () => ({ date: todayLocalDate() }),
+  loader: ({ context, deps }) =>
+    context.user ? getHomeDashboard({ data: { date: deps.date } }) : null,
   component: RouteComponent,
 });
 

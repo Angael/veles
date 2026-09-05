@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start';
+// eslint-disable-next-line no-unused-vars
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { getSession } from './getSession';
 
@@ -10,7 +11,7 @@ export interface SessionUser {
 }
 
 export const getSessionUser = createServerFn({ method: 'GET' })
-  // Logging middleware deliberately skipped here, as it would just spam on every page view
+  // Omitted from logging middleware, since it would spam on every page view a lot
   // .middleware([logMiddleware('getSessionUser')])
   .handler(async (): Promise<SessionUser | null> => {
     const session = await getSession();

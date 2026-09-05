@@ -65,7 +65,7 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
         tags: recipe.tags,
         updatedAt: recipe.updatedAt.toISOString(),
       }))
-      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+      .toSorted((left, right) => right.updatedAt.localeCompare(left.updatedAt));
   });
 
 const recipeByIdInputType = type({ id: 'string.uuid' });

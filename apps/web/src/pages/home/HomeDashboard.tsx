@@ -7,7 +7,6 @@ import {
   DumbbellIcon,
   FlameIcon,
   ScaleIcon,
-  StarIcon,
   UsersRoundIcon,
   UtensilsIcon,
 } from 'lucide-react';
@@ -32,13 +31,14 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
   const delta =
     latestWeight && previousWeight ? latestWeight.weightKg - previousWeight.weightKg : null;
   const chartPoints = getChartPoints(data.weightEntries);
+  const recommendedRecipes = getDailyRecommendations(data.recipes, data.date);
 
   return (
     <main className={css.page}>
       <div className={css.grid}>
         <Card as='article' className={css.weightTile} data-appear variant='primary'>
-          <div className={css.tileTop}>
-            <span>Weight signal</span>
+          <div className={css.tileHeading}>
+            <h2>Weight</h2>
             <ScaleIcon aria-hidden='true' />
           </div>
           {latestWeight ? (
@@ -70,62 +70,94 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
             </>
           ) : (
             <div className={css.emptyWeight}>
-              <strong>No weight signal yet</strong>
-              <p>One entry is enough to light up this tile.</p>
+              <strong>Ready when you are.</strong>
+              <p>Log your first weight to begin a trend built around you.</p>
             </div>
           )}
-          <TileLink label='Go to Weight' to='/weight' />
+          <Btn className={css.tileAction} isLink render={<Link to='/weight' />} variant='text'>
+            {latestWeight ? 'Go to Weight' : 'Log first weight'}
+            <ArrowRightIcon aria-hidden='true' />
+          </Btn>
         </Card>
 
-        <Card as='section' className={css.recipeTile} data-appear='1' shadow={false}>
-          <div className={css.tileTop}>
-            <span>Recently saved</span>
+        <Card as='article' className={css.foodTile} data-appear='1' shadow={false}>
+          <div className={css.tileHeading}>
+            <h2>Today’s food</h2>
+            <FlameIcon aria-hidden='true' />
+          </div>
+          <div className={css.macroBars}>
+            <MacroProgress
+              label='kcal'
+              total={data.nutrition.totals.kcal}
+              goal={data.nutrition.goal?.kcal ?? null}
+            />
+            <MacroProgress
+              label='protein'
+              total={data.nutrition.totals.protein}
+              goal={data.nutrition.goal?.protein ?? null}
+              unit='g'
+            />
+            <MacroProgress
+              label='fat'
+              total={data.nutrition.totals.fat}
+              goal={data.nutrition.goal?.fat ?? null}
+              unit='g'
+            />
+            <MacroProgress
+              label='carbs'
+              total={data.nutrition.totals.carbs}
+              goal={data.nutrition.goal?.carbs ?? null}
+              unit='g'
+            />
+          </div>
+          <Btn className={css.tileAction} isLink render={<Link to='/calories' />} variant='text'>
+            Log food
+            <ArrowRightIcon aria-hidden='true' />
+          </Btn>
+        </Card>
+
+        <Card as='section' className={css.recipeTile} data-appear='2' shadow={false}>
+          <div className={css.tileHeading}>
+            <h2>Recommended recipes for today</h2>
             <UtensilsIcon aria-hidden='true' />
           </div>
-          <h2>Recipe stack</h2>
           <div className={css.recipeStack}>
-            {data.recentRecipes.length ? (
-              data.recentRecipes.map((recipe, index) => (
+            {recommendedRecipes.length ? (
+              recommendedRecipes.map((recipe) => (
                 <Link
                   className={css.recipe}
                   key={recipe.id}
                   params={{ id: recipe.id }}
                   to='/recipes/view/$id'
                 >
-                  <span className={css.recipeNumber}>0{index + 1}</span>
                   <div>
                     <strong>{recipe.name}</strong>
                     <small>
                       {recipe.kcal === null ? 'Nutrition not set' : `${recipe.kcal} kcal`}
-                      {recipe.rating ? (
-                        <>
-                          {' '}
-                          · <StarIcon aria-hidden='true' /> {recipe.rating}
-                        </>
-                      ) : null}
                     </small>
                   </div>
-                  <ArrowRightIcon aria-hidden='true' />
                 </Link>
               ))
             ) : (
               <div className={css.emptyRecipes}>
-                <p>No saved recipes yet.</p>
+                <p>Save a recipe to get a fresh daily selection here.</p>
                 <Btn isLink render={<Link to='/recipes/add' />} variant='outlineMain'>
                   Add the first
                 </Btn>
               </div>
             )}
           </div>
-          <TileLink label='Go to Recipes' to='/recipes' />
+          <Btn className={css.tileAction} isLink render={<Link to='/recipes' />} variant='text'>
+            Browse all recipes
+            <ArrowRightIcon aria-hidden='true' />
+          </Btn>
         </Card>
 
-        <Card as='article' className={css.todosTile} data-appear='2' shadow={false}>
-          <div className={css.tileTop}>
-            <span>Preview</span>
+        <Card as='article' className={css.todosTile} data-appear='3' shadow={false}>
+          <div className={css.tileHeading}>
+            <h2>Todos</h2>
             <CheckIcon aria-hidden='true' />
           </div>
-          <h2>Todos</h2>
           <ul className={css.todoList}>
             {todoPreview.map((todo) => (
               <li key={todo.label} className={todo.done ? css.todoDone : undefined}>
@@ -134,12 +166,15 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
               </li>
             ))}
           </ul>
-          <TileLink label='Go to Todos' to='/todos' />
+          <Btn className={css.tileAction} isLink render={<Link to='/todos' />} variant='text'>
+            Go to Todos
+            <ArrowRightIcon aria-hidden='true' />
+          </Btn>
         </Card>
 
-        <Card as='article' className={css.diaryTile} data-appear='3' shadow={false}>
-          <div className={css.tileTop}>
-            <span>Private notes</span>
+        <Card as='article' className={css.diaryTile} data-appear='4' shadow={false}>
+          <div className={css.tileHeading}>
+            <h2>Diary</h2>
             <BookOpenIcon aria-hidden='true' />
           </div>
           <div className={css.diaryReadout}>{formatDiaryDistance(data.lastDiaryEntryDate)}</div>
@@ -148,18 +183,18 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
             <i />
             <i />
           </div>
-          <TileLink label='Go to Diary' to='/diary' />
+          <Btn className={css.tileAction} isLink render={<Link to='/diary' />} variant='text'>
+            Go to Diary
+            <ArrowRightIcon aria-hidden='true' />
+          </Btn>
         </Card>
 
-        <Card as='article' className={css.familyTile} data-appear='4' shadow={false}>
-          <div className={css.statusIcon}>
+        <Card as='article' className={css.familyTile} data-appear='5' shadow={false}>
+          <div className={css.tileHeading}>
+            <h2>Family and friends</h2>
             <UsersRoundIcon aria-hidden='true' />
           </div>
-          <div>
-            <span className={css.status}>Planned</span>
-            <h2>Family and friends</h2>
-            <p>A shared corner for the people you choose. Nothing leaves your orbit by default.</p>
-          </div>
+          <p>A shared corner for the people you choose. Nothing leaves your orbit by default.</p>
           <div className={css.orbitPeople} aria-hidden='true'>
             <i />
             <i />
@@ -168,32 +203,12 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           </div>
         </Card>
 
-        <Card as='article' className={css.foodTile} data-appear='5' shadow={false}>
-          <div className={css.statusIcon}>
-            <FlameIcon aria-hidden='true' />
-          </div>
-          <div>
-            <span className={css.status}>In progress</span>
-            <h2>Food logging</h2>
-            <p>Daily calories and macros will take this space when the tracker is ready.</p>
-          </div>
-          <div className={css.macroPreview} aria-hidden='true'>
-            <span>kcal</span>
-            <span>protein</span>
-            <span>fat</span>
-            <span>carbs</span>
-          </div>
-        </Card>
-
         <Card as='article' className={css.workoutTile} data-appear='6' shadow={false}>
-          <div className={css.statusIcon}>
+          <div className={css.tileHeading}>
+            <h2>Workout log</h2>
             <DumbbellIcon aria-hidden='true' />
           </div>
-          <div>
-            <span className={css.status}>Planned</span>
-            <h2>Workout log</h2>
-            <p>Last sessions and training notes will slot into this rhythm later.</p>
-          </div>
+          <p>Last sessions and training notes will slot into this rhythm later.</p>
           <div className={css.repRail} aria-hidden='true'>
             <i />
             <i />
@@ -207,19 +222,54 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
   );
 }
 
-function TileLink({
+function MacroProgress({
   label,
-  to,
+  total,
+  goal,
+  unit = '',
 }: {
-  label: string;
-  to: '/diary' | '/recipes' | '/todos' | '/weight';
+  label: 'kcal' | 'protein' | 'fat' | 'carbs';
+  total: number;
+  goal: number | null;
+  unit?: string;
 }) {
+  const maximum = goal ?? Math.max(total, 1);
+
   return (
-    <Link className={css.tileLink} to={to}>
-      {label}
-      <ArrowRightIcon aria-hidden='true' />
-    </Link>
+    <div className={css.macroProgress}>
+      <div>
+        <span>{label}</span>
+        <strong>
+          {Math.round(total)}
+          {unit}
+          <small>{goal === null ? 'No goal' : ` / ${Math.round(goal)}${unit}`}</small>
+        </strong>
+      </div>
+      <progress aria-label={`${label} progress`} max={maximum} value={Math.min(total, maximum)} />
+    </div>
   );
+}
+
+/** Rotates through a stable pseudo-random order so the selection changes with each local date. */
+function getDailyRecommendations(recipes: HomeDashboardData['recipes'], date: string) {
+  if (!recipes.length) return [];
+  const ordered = recipes
+    .map((recipe) => ({ recipe, score: hashString(recipe.id) }))
+    .toSorted((a, b) => a.score - b.score || a.recipe.id.localeCompare(b.recipe.id))
+    .map(({ recipe }) => recipe);
+  const day = hashString(date);
+  const startIndex = Math.abs(day) % ordered.length;
+
+  return [...ordered.slice(startIndex), ...ordered.slice(0, startIndex)].slice(0, 3);
+}
+
+function hashString(value: string) {
+  let hash = 2_166_136_261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16_777_619);
+  }
+  return hash >>> 0;
 }
 
 /** Maps the recent series into points for the fixed bento sparkline view box. */

@@ -3,6 +3,7 @@
 - Run `pnpm check:fix` before finishing
 - Always use pinned package versions, never ^ ~ or latest
 - skip "computer use"/"browser smoke tests" checks
+- In code, objects, types, and UI, always order nutrition macros as: kcal, protein, fat, carbs.
 
 ## CI/CD
 - Avoid GitHub Actions and GitHub CI/CD for sensitive prod workflows; this repo is public
@@ -22,6 +23,10 @@
 - they should always use log middleware: `.middleware([logMiddleware('<name>')])`
 - If it accepts input, use `.validator(arkTypeValidator(...))` with `arktype` and `@tanstack/arktype-adapter`.
 
+## Queries and Mutations
+- Keep TanStack Query options and mutation hooks in `*.query.ts` files near their usage.
+- Components should consume reusable `useQuery` options and `useMutation` hooks from those files instead of manually calling server functions, tracking pending state, or passing a `QueryClient` to invalidation helpers.
+
 ## UI
 - Prefer css modules, prefer syntax `import css from ...`
 - In css modules, prefer nested selectors when it keeps related styles together.
@@ -38,3 +43,4 @@
 ## TS
 - avoid `as any` `as unknown` `as never`, if you find yourself needing to use them - ask user for approval
 - Medium to longer functions that contain logic should have a tl;dr short JSDoc that explain what they do and why they are needed.
+- Use `TypedFormData` from `apps/web/src/lib/typedFormData.ts` instead of reading raw `FormData` values.

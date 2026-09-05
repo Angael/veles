@@ -1,23 +1,22 @@
 import { randomUUID } from 'node:crypto';
 import { ArkErrors, type } from 'arktype';
-import sharp from 'sharp';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createMiddleware, createServerFn } from '@tanstack/react-start';
 import { recipeImages, recipes, uploadObjects } from '@veles/db/schema';
 import { db } from '@/lib/db';
 import { requireSession } from '@/lib/auth/getSession';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
-import { log } from '@/lib/logger';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { getStorageConfig } from '@/lib/storage/config';
+import { optimizeImage } from '@/lib/storage/image';
+import { IMAGE_MAX_INPUT_BYTES } from '@/lib/storage/imageLimits';
 import { deleteFileByKey, uploadFileByKey } from '@/lib/storage/r2';
 // Keep below nginx's client_max_body_size with enough headroom for multipart form overhead.
 // If this changes, update the corresponding limit in infra/nginx/nginx.conf.
 const RECIPE_UPLOAD_MAX_REQUEST_BYTES = 85 * 1024 * 1024;
-const RECIPE_IMAGE_MAX_INPUT_PIXELS = 100_000_000;
 
 export const RECIPE_UPLOAD_MAX_PHOTO_COUNT = 8;
-export const RECIPE_UPLOAD_MAX_PHOTO_BYTES = 10 * 1024 * 1024;
+export const RECIPE_UPLOAD_MAX_PHOTO_BYTES = IMAGE_MAX_INPUT_BYTES;
 
 const contentLengthType = type('string.numeric.parse |> number.integer >= 0');
 const formDataType = type('FormData');
@@ -94,16 +93,13 @@ async function persistRecipeUpload(formData: FormData, userId: string) {
         body: optimizedImage.buffer,
         contentType: optimizedImage.type,
         key: image.key,
+        bucket: 'public',
       });
       uploadedKeys.push(image.key);
       optimizedImages.push(image);
     }
 
     const { bucketName } = getStorageConfig();
-
-    if (!bucketName) {
-      throw new Error('R2 bucket is not configured');
-    }
 
     const recipeId = await db.transaction(async (tx) => {
       const insertedRecipes = await tx
@@ -153,7 +149,7 @@ async function persistRecipeUpload(formData: FormData, userId: string) {
 
     return { id: recipeId };
   } catch (error) {
-    await Promise.allSettled(uploadedKeys.map((key) => deleteFileByKey(key)));
+    await Promise.allSettled(uploadedKeys.map((key) => deleteFileByKey(key, 'public')));
     throw error;
   }
 }
@@ -192,42 +188,8 @@ function validateRecipeForm(formData: FormData) {
   });
 
   if (validation instanceof type.errors) {
-    throw new ClientSafeError(validation.summary ?? 'Invalid recipe details.');
+    throw new ClientSafeError(validation.summary);
   }
 
   return validation;
-}
-
-/** Converts an uploaded image to a bounded, rotated WebP suitable for recipe display. */
-async function optimizeImage(file: File) {
-  if (!file.type.startsWith('image/')) {
-    throw new ClientSafeError('Only image files can be uploaded.');
-  }
-
-  const input = Buffer.from(await file.arrayBuffer());
-
-  try {
-    const buffer = await sharp(input, {
-      failOn: 'none',
-      limitInputPixels: RECIPE_IMAGE_MAX_INPUT_PIXELS,
-    })
-      .rotate()
-      .resize({
-        fit: 'inside',
-        height: 720,
-        width: 720,
-        withoutEnlargement: true,
-      })
-      .webp({ quality: 82 })
-      .toBuffer();
-
-    return { buffer, type: 'image/webp' };
-  } catch (error) {
-    log.error('Failed to optimize recipe image', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack?.split('\n') : undefined,
-    });
-
-    throw new ClientSafeError('A photo could not be processed.');
-  }
 }

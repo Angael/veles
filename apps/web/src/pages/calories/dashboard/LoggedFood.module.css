@@ -1,0 +1,159 @@
+@import '../../../styles/breakpoints.css';
+
+.item {
+  min-width: 0;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-md);
+  user-select: none;
+  transition:
+    border-color 180ms var(--ease-out),
+    background-color 180ms var(--ease-out);
+}
+
+.card > :not(.photoWash) {
+  position: relative;
+  z-index: 1;
+}
+
+/* The name link stretches its hit area over the whole card. */
+.cardLink {
+  flex: 1;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardLink::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.cardLink:focus-visible {
+  outline: none;
+}
+
+.card:has(.cardLink:focus-visible) {
+  outline: 2px solid var(--c-primary-focus);
+  outline-offset: 2px;
+}
+
+.energyTile {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  width: 4rem;
+  padding: 0.55rem 0.25rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--c-accent) 12%, transparent);
+  color: var(--c-accent-strong);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+
+  & strong {
+    min-width: 4ch;
+    font-size: var(--text-lg);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  & span {
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+}
+
+.photoWash {
+  position: absolute;
+  z-index: 0;
+  inset: 0 auto 0 0;
+  width: min(58%, 32rem);
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  object-position: left center;
+  filter: saturate(0.65) contrast(0.85);
+  mask-image: linear-gradient(to right, black 0%, rgb(0 0 0 / 78%) 30%, transparent 100%);
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.name {
+  font-size: var(--text-lg);
+}
+
+.grams {
+  flex: none;
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.deleteButton {
+  --btn-height: 2.75rem;
+  --btn-icon-size: 1.05rem;
+
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition:
+      border-color 140ms ease,
+      background-color 140ms ease;
+  }
+}
+
+@media (--phone) {
+  .card {
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .energyTile {
+    display: none;
+  }
+
+  .photoWash {
+    width: 82%;
+  }
+
+  .name {
+    font-size: var(--text-md-dynamic);
+  }
+
+  .grams {
+    font-size: var(--text-xs);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:has(.cardLink:hover) {
+    border-color: var(--c-primary-border);
+    background: color-mix(in srgb, var(--c-surface) 88%, var(--c-primary) 12%);
+  }
+}

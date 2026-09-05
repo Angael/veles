@@ -70,10 +70,12 @@ export const getDiaryEntryById = createServerFn({ method: 'GET' })
     const entry = entries[0];
 
     invariant(entry, () => {
+      // oxlint-disable-next-line typescript/only-throw-error -- Router control flow intentionally throws this object.
       throw notFound();
     });
 
     if (!dateOnlyType.allows(entry.entryDate)) {
+      // oxlint-disable-next-line typescript/only-throw-error -- Router control flow intentionally throws this object.
       throw notFound();
     }
 

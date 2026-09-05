@@ -4,5 +4,6 @@
   "editor.formatOnSave": true,
   "[typescript]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
-  }
+  },
+  "bun.test.enable": false
 }

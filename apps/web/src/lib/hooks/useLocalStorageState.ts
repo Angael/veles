@@ -10,6 +10,8 @@ export function useLocalStorageState<State>(key: string, initialState: State) {
       const storedState = localStorage.getItem(key);
 
       if (storedState !== null) {
+        // State is serialized and deserialized by this hook; malformed JSON is handled below.
+        // oxlint-disable-next-line typescript/no-unsafe-assignment -- JSON.parse has no generic return type, and this hook owns the State boundary.
         const parsedState: State = JSON.parse(storedState);
         latestStateRef.current = parsedState;
         setState(parsedState);

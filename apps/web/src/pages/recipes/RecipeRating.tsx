@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import { StarIcon } from 'lucide-react';
 import { toastManager } from '@/components/toast/toastManager';
-import { updateRecipeRating } from './recipes.api';
 import css from './RecipeRating.module.css';
+import { useUpdateRecipeRatingMutation } from './recipes.query';
 
 type RecipeRatingProps = {
   rating: number | null;
@@ -15,23 +15,22 @@ const MAX_RATING = 5;
 export function RecipeRating({ rating, recipeId }: RecipeRatingProps) {
   const router = useRouter();
   const [visibleRating, setVisibleRating] = useState(rating ?? 0);
-  const [savingRating, setSavingRating] = useState(false);
+  const ratingMutation = useUpdateRecipeRatingMutation();
 
   useEffect(() => {
     setVisibleRating(rating ?? 0);
   }, [rating]);
 
   async function rateRecipe(nextRating: number) {
-    if (savingRating || nextRating === visibleRating) {
+    if (ratingMutation.isPending || nextRating === visibleRating) {
       return;
     }
 
     const previousRating = visibleRating;
     setVisibleRating(nextRating);
-    setSavingRating(true);
 
     try {
-      await updateRecipeRating({ data: { id: recipeId, rating: nextRating } });
+      await ratingMutation.mutateAsync({ data: { id: recipeId, rating: nextRating } });
       await router.invalidate();
     } catch {
       setVisibleRating(previousRating);
@@ -41,8 +40,6 @@ export function RecipeRating({ rating, recipeId }: RecipeRatingProps) {
         title: 'Could not save rating',
         type: 'error',
       });
-    } finally {
-      setSavingRating(false);
     }
   }
 
@@ -59,7 +56,7 @@ export function RecipeRating({ rating, recipeId }: RecipeRatingProps) {
               aria-label={`Rate ${ratingValue} ${ratingValue === 1 ? 'star' : 'stars'}`}
               aria-checked={isCurrentRating}
               className={css.starButton}
-              disabled={savingRating}
+              disabled={ratingMutation.isPending}
               key={ratingValue}
               onClick={() => void rateRecipe(ratingValue)}
               role='radio'

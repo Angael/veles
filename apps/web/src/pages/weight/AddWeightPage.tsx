@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { useState } from 'react';
@@ -8,8 +7,9 @@ import { DateInput } from '@/components/date-input/DateInput';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { toastManager } from '@/components/toast/toastManager';
+import { TypedForm } from '@/components/typed-form/TypedForm';
 import css from './WeightEntryPages.module.css';
-import { saveWeight } from './weight.api';
+import { useSaveWeightMutation } from './weight.query';
 
 export function AddWeightPage() {
   const router = useRouter();
@@ -17,21 +17,7 @@ export function AddWeightPage() {
   const today = format(new Date(), 'yyyy-MM-dd');
   const [date, setDate] = useState(today);
   const [weightKg, setWeightKg] = useState<number | null>(null);
-  const mutation = useMutation({
-    mutationFn: saveWeight,
-    onError: () => {
-      toastManager.add({
-        description: 'Check the date and weight, then try again.',
-        priority: 'high',
-        title: 'Could not save weight',
-        type: 'error',
-      });
-    },
-    onSuccess: async () => {
-      await router.invalidate();
-      await navigate({ to: '/weight' });
-    },
-  });
+  const mutation = useSaveWeightMutation();
 
   return (
     <main className={css.page}>
@@ -40,15 +26,32 @@ export function AddWeightPage() {
           <h1>Add weight for a date</h1>
           <p>Use this when filling a gap or entering a measurement from another day.</p>
         </div>
-        <form
+        <TypedForm
           className={css.form}
-          onSubmit={(event) => {
-            event.preventDefault();
+          onSubmit={() => {
             if (weightKg === null) {
               return;
             }
 
-            mutation.mutate({ data: { date, weightKg } });
+            mutation.mutate(
+              { data: { date, weightKg } },
+              {
+                onError: () => {
+                  toastManager.add({
+                    description: 'Check the date and weight, then try again.',
+                    priority: 'high',
+                    title: 'Could not save weight',
+                    type: 'error',
+                  });
+                },
+                onSuccess: () => {
+                  void router
+                    .invalidate()
+                    .then(() => navigate({ to: '/weight' }))
+                    .catch(() => undefined);
+                },
+              },
+            );
           }}
         >
           <Label text='Date'>
@@ -66,7 +69,6 @@ export function AddWeightPage() {
               onValueChange={setWeightKg}
               placeholder='e.g. 78.4'
               required
-              step={0.1}
               value={weightKg}
             />
           </Label>
@@ -83,7 +85,7 @@ export function AddWeightPage() {
               Save entry
             </Btn>
           </div>
-        </form>
+        </TypedForm>
       </Card>
     </main>
   );

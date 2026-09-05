@@ -8,11 +8,22 @@ import { DateInput } from '@/components/date-input/DateInput';
 import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
 import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { FloatingButton } from '@/components/floating-button/FloatingButton';
+import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
+import {
+  MenuBtn,
+  MenuBtnChevron,
+  MenuBtnDivider,
+  MenuBtnItem,
+  MenuBtnPopup,
+  MenuBtnRoot,
+} from '@/components/menu-btn/MenuBtn';
 import { Navbar } from '@/components/navbar/Navbar';
 import { NotFound } from '@/components/not-found/NotFound';
+import { PhotoPicker, type PhotoPickerValue } from '@/components/photo-picker/PhotoPicker';
 import { PillBtn } from '@/components/pill-btn/PillBtn';
 import { NumberInput } from '@/components/number-input/NumberInput';
+import { NutritionInline } from '@/components/nutrition-inline/NutritionInline';
 import { SeamlessTextInput } from '@/components/seamless-text-input/SeamlessTextInput';
 import { SeamlessTextarea } from '@/components/seamless-textarea/SeamlessTextarea';
 import { SelectInput } from '@/components/select-input/SelectInput';
@@ -21,6 +32,7 @@ import { SliderInput } from '@/components/slider-input/SliderInput';
 import { TextInput } from '@/components/text-input/TextInput';
 import { TextareaInput } from '@/components/textarea-input/TextareaInput';
 import { toastManager } from '@/components/toast/toastManager';
+import { TypedForm } from '@/components/typed-form/TypedForm';
 import { UploadTileGrid } from '@/components/upload-tile-grid/UploadTileGrid';
 import css from './ComponentsDemoPage.module.css';
 
@@ -37,6 +49,7 @@ const BTN_VARIANTS = [
   { label: 'White', value: 'white' },
   { label: 'Ghost', value: 'ghost' },
   { label: 'Ghost danger', value: 'ghostDanger' },
+  { label: 'Text', value: 'text' },
 ] satisfies DemoProp<BtnVariant>[];
 
 const BTN_SIZES = [
@@ -57,6 +70,7 @@ export function ComponentsDemoPage() {
   const [selectValue, setSelectValue] = useState<(typeof SELECT_OPTIONS)[number]['value']>('lte');
   const [btnLoading, setBtnLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
   const [sliderValue, setSliderValue] = useState(50);
 
   return (
@@ -105,6 +119,33 @@ export function ComponentsDemoPage() {
       </section>
 
       <section>
+        <h2>MenuBtn</h2>
+        <MenuBtnRoot>
+          <Btn icon={<PlusIcon aria-hidden='true' />} render={<MenuBtn />}>
+            Open menu
+            <MenuBtnChevron />
+          </Btn>
+          <MenuBtnPopup
+            aria-label='Demo menu'
+            description='Reusable popup parts composed with Btn.'
+            heading='Demo menu'
+          >
+            <MenuBtnItem
+              description='An item with supporting copy'
+              icon={<PlusIcon aria-hidden='true' />}
+              label='Primary action'
+            />
+            <MenuBtnDivider />
+            <MenuBtnItem
+              description='Items can be separated into groups'
+              icon={<SearchIcon aria-hidden='true' />}
+              label='Secondary action'
+            />
+          </MenuBtnPopup>
+        </MenuBtnRoot>
+      </section>
+
+      <section>
         <h2>PillBtn</h2>
         <PillBtn
           label='Add recipe'
@@ -138,6 +179,10 @@ export function ComponentsDemoPage() {
       </section>
 
       <section>
+        <h2>PhotoPicker</h2>
+        <PhotoPicker onChange={setPhoto} value={photo} />
+      </section>
+      <section>
         <h2>TextInput</h2>
         <TextInput
           aria-label='Demo text input'
@@ -149,6 +194,21 @@ export function ComponentsDemoPage() {
       </section>
 
       <section>
+        <h2>TypedForm</h2>
+        <TypedForm
+          className={css.formGrid}
+          onSubmit={(data) => {
+            data.string('typedFormDemo');
+          }}
+        >
+          <Label text='Demo field'>
+            <TextInput defaultValue='Breakfast' name='typedFormDemo' required />
+          </Label>
+          <Btn type='submit'>Submit demo</Btn>
+        </TypedForm>
+      </section>
+
+      <section>
         <h2>NumberInput</h2>
         <NumberInput
           aria-label='Demo number input'
@@ -156,9 +216,18 @@ export function ComponentsDemoPage() {
           min={0}
           onValueChange={setNumberValue}
           placeholder='Calories'
-          step={10}
           value={numberValue}
         />
+      </section>
+
+      <section>
+        <h2>KcalMacrosForm</h2>
+        <KcalMacrosForm defaultValues={{ kcal: 420, protein: 32, fat: 14, carbs: 48 }} />
+      </section>
+
+      <section>
+        <h2>NutritionInline</h2>
+        <NutritionInline carbs={48} fat={14} kcal={420} protein={32} />
       </section>
 
       <section>
