@@ -38,6 +38,7 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
       <main className={css.scanViewport}>
         <BarcodeScanner
           closeRender={<Link search={{ date }} to='/calories' />}
+          enabled={!lookupMutation.isPending && !missing}
           onDetected={(code) => void lookup(code)}
         />
         <div className={css.scanBottom}>

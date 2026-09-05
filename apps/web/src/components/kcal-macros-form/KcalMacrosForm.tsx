@@ -11,6 +11,7 @@ type KcalMacrosFormProps = {
   defaultValues?: NutritionValues;
   fatName?: 'fat' | 'fats';
   isPer100?: boolean;
+  kcalRequired?: boolean;
   kcalInput?: KcalInputProps;
   onValueChange?: (field: NutritionField, value: number | null) => void;
   readOnly?: boolean;
@@ -22,6 +23,7 @@ export function KcalMacrosForm({
   defaultValues,
   fatName = 'fat',
   isPer100 = false,
+  kcalRequired = true,
   kcalInput,
   onValueChange,
   readOnly,
@@ -35,7 +37,7 @@ export function KcalMacrosForm({
       ? (value: number | null) => onValueChange(field, value)
       : undefined,
     readOnly,
-    required: field === 'kcal',
+    required: field === 'kcal' && kcalRequired,
     ...(field === 'kcal' ? kcalInput : {}),
   });
 

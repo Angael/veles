@@ -87,6 +87,7 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
 
       <KcalMacrosForm
         fatName='fats'
+        kcalRequired={false}
         onValueChange={(field, value) =>
           onDraftChange({
             ...draft,

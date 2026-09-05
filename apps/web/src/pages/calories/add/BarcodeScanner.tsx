@@ -24,6 +24,7 @@ type ScannerState = 'starting' | 'scanning' | 'permissionDenied' | 'unavailable'
 
 type BarcodeScannerProps = {
   closeRender: ReactElement;
+  enabled: boolean;
   onDetected: (barcode: string) => void;
 };
 
@@ -52,7 +53,7 @@ async function enableContinuousFocus(stream: MediaStream) {
   await track.applyConstraints(constraints);
 }
 
-export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps) {
+export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const callbackRef = useRef(onDetected);
   callbackRef.current = onDetected;
@@ -69,6 +70,10 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
     selectNextCamera,
   } = useCameraPreference();
   useEffect(() => {
+    if (!enabled) {
+      setState('starting');
+      return;
+    }
     if (!cameraPreferenceReady) return;
     let active = true;
     let animationFrame = 0;
@@ -148,7 +153,11 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
               const barcode = results.find((result) => result.rawValue.trim())?.rawValue.trim();
               // Effect cleanup can flip this flag while detector.detect is awaiting the browser.
               // oxlint-disable-next-line typescript/no-unnecessary-condition -- Avoid invoking the callback after scanner unmount.
-              if (barcode && active) callbackRef.current(barcode);
+              if (barcode && active) {
+                stopCamera();
+                callbackRef.current(barcode);
+                return;
+              }
             } catch {
               stopCamera();
               // Effect cleanup can flip this flag while detector.detect is awaiting the browser.
@@ -197,7 +206,7 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
       active = false;
       stopCamera();
     };
-  }, [cameraPreferenceReady, preferredCameraId]);
+  }, [cameraPreferenceReady, enabled, preferredCameraId]);
 
   function switchCamera() {
     if (!selectNextCamera()) return;

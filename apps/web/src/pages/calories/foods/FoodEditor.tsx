@@ -52,20 +52,14 @@ export function FoodEditor({
   }
   return (
     <TypedForm className={css.form} onSubmit={handleSubmit}>
-      {food ? (
-        <div className={css.grid}>
-          <Label text='Product name'>
-            <TextInput defaultValue={food.name} name='name' required />
-          </Label>
-          <Label text='Brand'>
-            <TextInput defaultValue={food.brand ?? ''} name='brand' />
-          </Label>
-        </div>
-      ) : (
+      <div className={css.grid}>
         <Label text='Product name'>
-          <TextInput defaultValue={initialName} name='name' required />
+          <TextInput defaultValue={food?.name ?? initialName} name='name' required />
         </Label>
-      )}
+        <Label text='Brand'>
+          <TextInput defaultValue={food?.brand ?? ''} name='brand' />
+        </Label>
+      </div>
       <div className={css.grid}>
         <Label text='Barcode'>
           <TextInput
