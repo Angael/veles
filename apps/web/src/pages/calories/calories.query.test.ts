@@ -10,7 +10,7 @@ vi.mock('./goals/goals.api', () => ({
   setDailyCalorieGoal: vi.fn(),
 }));
 
-import { calorieDashboardQueryOptions, calorieFoodsQueryOptions } from './calories.query';
+import { calorieDashboardQueryOptions } from './calories.query';
 
 describe('calorie query keys', () => {
   it('uses one dashboard cache entry for every date in the same week', () => {
@@ -20,9 +20,5 @@ describe('calorie query keys', () => {
 
     expect(wednesday).toEqual(monday);
     expect(nextMonday).not.toEqual(monday);
-  });
-
-  it('uses one cache entry for the client-side food catalog', () => {
-    expect(calorieFoodsQueryOptions().queryKey).toEqual(['calorie-foods']);
   });
 });

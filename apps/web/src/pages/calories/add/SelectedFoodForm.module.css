@@ -194,6 +194,10 @@
   gap: var(--space-sm);
 }
 
+.error {
+  color: var(--c-danger-text);
+}
+
 @media (--phone) {
   .product {
     & > img {

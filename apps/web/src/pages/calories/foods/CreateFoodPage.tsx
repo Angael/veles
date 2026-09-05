@@ -12,7 +12,7 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
   async function save(value: FoodEditorValue) {
     setError('');
     try {
-      const product = await createMutation.mutateAsync({ data: value });
+      const product = await createMutation.mutateAsync(value);
       await navigate({ to: '/calories/add', search: { date, foodId: product.id } });
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not create food.');

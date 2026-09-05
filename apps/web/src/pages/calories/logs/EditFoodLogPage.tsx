@@ -1,4 +1,5 @@
 import { Link, useNavigate, type UseNavigateResult } from '@tanstack/react-router';
+import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogMutation, useUpdateFoodLogMutation } from '../calories.query';
 import { Btn } from '@/components/btn/Btn';
@@ -6,6 +7,7 @@ import { DateInput } from '@/components/date-input/DateInput';
 import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
+import { PhotoPicker, type PhotoPickerValue } from '@/components/photo-picker/PhotoPicker';
 import { TextInput } from '@/components/text-input/TextInput';
 import { TypedForm } from '@/components/typed-form/TypedForm';
 import { TypedFormData } from '@/lib/typedFormData';
@@ -17,8 +19,10 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
   const updateMutation = useUpdateFoodLogMutation();
   const isProduct = log.productId !== null;
   const isPending = updateMutation.isPending || deleteMutation.isPending;
+  const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
+  const error = updateMutation.error?.message ?? deleteMutation.error?.message ?? '';
 
-  async function submit(formData: TypedFormData, submitNavigate: UseNavigateResult<string>) {
+  async function submit(formData: TypedFormData, _navigate: UseNavigateResult<string>) {
     const nextDate = formData.string('date');
     await updateMutation.mutateAsync({
       id: log.id,
@@ -30,8 +34,9 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
       protein: formData.optionalNumber('protein'),
       fat: formData.optionalNumber('fat'),
       carbs: formData.optionalNumber('carbs'),
+      ...(isProduct ? {} : { imageAction: photo.imageAction, photo: photo.photo }),
     });
-    await submitNavigate({ to: '/calories', search: { date: nextDate } });
+    await _navigate({ to: '/calories', search: { date: nextDate } });
   }
 
   async function remove() {
@@ -52,6 +57,11 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
         </div>
       </header>
       <section className={css.panel}>
+        {error ? (
+          <p className={css.error} role='alert'>
+            {error}
+          </p>
+        ) : null}
         <TypedForm className={css.form} onSubmit={submit}>
           <div className={css.grid}>
             <Label text='Name'>
@@ -63,7 +73,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             </Label>
 
             <Label text='Quantity (g)'>
-              <NumberInput defaultValue={log.grams ?? undefined} min={0} name='grams' step={1} />
+              <NumberInput defaultValue={log.grams ?? undefined} min={0} name='grams' />
             </Label>
           </div>
 
@@ -76,6 +86,14 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             }}
             readOnly={isProduct}
           />
+          {!isProduct ? (
+            <PhotoPicker
+              disabled={isPending}
+              existingUrl={log.imageUrl}
+              onChange={setPhoto}
+              value={photo}
+            />
+          ) : null}
 
           <div className={css.actions}>
             <Btn disabled={isPending} onClick={() => void remove()} variant='ghost'>

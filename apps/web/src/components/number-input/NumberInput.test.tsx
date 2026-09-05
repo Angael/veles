@@ -3,10 +3,10 @@ import { describe, expect, it } from 'vitest';
 import { NumberInput } from './NumberInput';
 
 describe('NumberInput', () => {
-  it('allows fractional values by default', () => {
-    const markup = renderToStaticMarkup(<NumberInput defaultValue={1.4} min={0} />);
+  it('allows hundredth precision without native step validation', () => {
+    const markup = renderToStaticMarkup(<NumberInput defaultValue={365.38} min={0} />);
 
     expect(markup).toContain('step="any"');
-    expect(markup).toContain('value="1.4"');
+    expect(markup).toContain('value="365.38"');
   });
 });

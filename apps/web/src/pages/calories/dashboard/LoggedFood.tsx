@@ -23,6 +23,15 @@ export function LoggedFood({ date, entry }: LoggedFoodProps) {
   return (
     <li className={css.item}>
       <Card as='article' className={css.card}>
+        {entry.imageUrl ? (
+          <img
+            alt=''
+            aria-hidden='true'
+            className={css.photoWash}
+            loading='lazy'
+            src={entry.imageUrl}
+          />
+        ) : null}
         <div aria-hidden='true' className={css.energyTile}>
           <strong>{kcal}</strong>
           <span>kcal</span>

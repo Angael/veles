@@ -10,6 +10,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 import { users } from './auth.schema.ts';
+import { uploadObjects } from './uploads.schema.ts';
 
 /** Global catalog entries. Nutrition values are stored in hundredths. */
 export const foodProducts = pgTable(
@@ -20,7 +21,9 @@ export const foodProducts = pgTable(
       .default(sql`uuidv7()`),
     barcode: text('barcode'),
     name: text('name').notNull(),
-    imageUrl: text('image_url'),
+    imageUploadObjectId: text('image_upload_object_id').references(() => uploadObjects.id, {
+      onDelete: 'restrict',
+    }),
     productSizeGramsHundredths: integer('product_size_grams_hundredths'),
     kcalPer100gHundredths: integer('kcal_per_100g_hundredths').notNull(),
     proteinPer100gHundredths: integer('protein_per_100g_hundredths'),
@@ -32,6 +35,7 @@ export const foodProducts = pgTable(
   (table) => [
     uniqueIndex('food_product_barcode_idx').on(table.barcode),
     index('food_product_name_idx').on(table.name),
+    index('food_product_image_upload_object_id_idx').on(table.imageUploadObjectId),
   ],
 );
 
@@ -46,6 +50,9 @@ export const foodLogs = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     productId: uuid('product_id').references(() => foodProducts.id, { onDelete: 'set null' }),
+    imageUploadObjectId: text('image_upload_object_id').references(() => uploadObjects.id, {
+      onDelete: 'restrict',
+    }),
     name: text('name').notNull(),
     gramsHundredths: integer('grams_hundredths'),
     logDate: date('log_date', { mode: 'string' }).notNull(),
@@ -59,6 +66,7 @@ export const foodLogs = pgTable(
   (table) => [
     index('food_log_user_id_log_date_idx').on(table.userId, table.logDate),
     index('food_log_product_id_idx').on(table.productId),
+    index('food_log_image_upload_object_id_idx').on(table.imageUploadObjectId),
   ],
 );
 

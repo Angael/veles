@@ -1,5 +1,6 @@
 import { createDatabaseConnection } from '@veles/db';
-import { sql } from 'drizzle-orm';
+import { foodLogs, foodProducts, recipeImages, uploadObjects } from '@veles/db/schema';
+import { and, count, eq, notExists, sql } from 'drizzle-orm';
 
 const checkIntervalMs = 10_000;
 const databaseUrl = process.env.DATABASE_URL;
@@ -16,13 +17,48 @@ const connection = createDatabaseConnection({
 let isStopping = false;
 let nextCheck: NodeJS.Timeout | undefined;
 
+/** Counts upload rows that no current feature references. */
+async function countUnusedUploads() {
+  const [result] = await connection.db
+    .select({ count: count() })
+    .from(uploadObjects)
+    .where(
+      and(
+        notExists(
+          connection.db
+            .select({ id: foodProducts.id })
+            .from(foodProducts)
+            .where(eq(foodProducts.imageUploadObjectId, uploadObjects.id)),
+        ),
+        notExists(
+          connection.db
+            .select({ id: foodLogs.id })
+            .from(foodLogs)
+            .where(eq(foodLogs.imageUploadObjectId, uploadObjects.id)),
+        ),
+        notExists(
+          connection.db
+            .select({ id: recipeImages.id })
+            .from(recipeImages)
+            .where(eq(recipeImages.uploadObjectId, uploadObjects.id)),
+        ),
+      ),
+    );
+
+  return result?.count ?? 0;
+}
 /** Verifies that the worker can reach PostgreSQL without overlapping checks. */
 async function checkDatabase() {
   const startedAt = Date.now();
 
   try {
     await connection.db.execute(sql`select 1`);
-    console.info('database check succeeded', { durationMs: Date.now() - startedAt });
+    const unusedUploads = await countUnusedUploads();
+    // TODO: Unused uploads should be deleted later.
+    console.info('database check succeeded', {
+      durationMs: Date.now() - startedAt,
+      unusedUploads,
+    });
   } catch (error) {
     console.error('database check failed', {
       durationMs: Date.now() - startedAt,

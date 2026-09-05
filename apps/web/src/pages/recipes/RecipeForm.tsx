@@ -68,7 +68,6 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
             name='rating'
             onValueChange={(value) => onDraftChange({ ...draft, rating: value })}
             placeholder='1-5'
-            step={1}
             value={draft.rating}
           />
         </Label>
@@ -79,7 +78,6 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
             name='portions'
             onValueChange={(value) => onDraftChange({ ...draft, portions: value ?? 1 })}
             required
-            step={1}
             value={draft.portions}
           />
         </Label>

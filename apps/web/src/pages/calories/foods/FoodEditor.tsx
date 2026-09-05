@@ -1,23 +1,25 @@
 import type { CalorieFood } from '../calories.api';
+import type { ImageFields } from '../calories.query';
 import { Btn } from '@/components/btn/Btn';
 import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
+import { PhotoPicker, type PhotoPickerValue } from '@/components/photo-picker/PhotoPicker';
 import { TextInput } from '@/components/text-input/TextInput';
 import { TypedForm } from '@/components/typed-form/TypedForm';
 import { TypedFormData } from '@/lib/typedFormData';
+import { useState } from 'react';
 import css from '../CalorieFlows.module.css';
 
 export type FoodEditorValue = {
   barcode?: string;
-  imageUrl?: string;
   name: string;
   productSizeGrams?: number;
   kcalPer100g: number;
   proteinPer100g?: number;
   fatPer100g?: number;
   carbsPer100g?: number;
-};
+} & ImageFields;
 
 type Props = {
   food?: CalorieFood;
@@ -36,16 +38,19 @@ export function FoodEditor({
   pending,
   submitLabel,
 }: Props) {
+  const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
+
   async function handleSubmit(formData: TypedFormData) {
     await onSubmit({
       barcode: formData.string('barcode') || undefined,
-      imageUrl: formData.string('imageUrl') || undefined,
       name: formData.string('name'),
       productSizeGrams: formData.optionalNumber('size'),
       kcalPer100g: formData.number('kcal'),
       proteinPer100g: formData.optionalNumber('protein'),
       fatPer100g: formData.optionalNumber('fat'),
       carbsPer100g: formData.optionalNumber('carbs'),
+      imageAction: photo.imageAction,
+      ...(photo.photo ? { photo: photo.photo } : {}),
     });
   }
   return (
@@ -62,12 +67,7 @@ export function FoodEditor({
           />
         </Label>
         <Label text='Product size (g)'>
-          <NumberInput
-            defaultValue={food?.productSizeGrams ?? undefined}
-            min={1}
-            name='size'
-            step={1}
-          />
+          <NumberInput defaultValue={food?.productSizeGrams ?? undefined} min={1} name='size' />
         </Label>
       </div>
       <KcalMacrosForm
@@ -79,9 +79,14 @@ export function FoodEditor({
         }}
         isPer100
       />
-      <Label text='Image URL'>
-        <TextInput defaultValue={food?.imageUrl ?? ''} name='imageUrl' type='url' />
-      </Label>
+      <PhotoPicker
+        allowUpload={!food?.imageUrl}
+        disabled={pending}
+        existingUrl={food?.imageUrl}
+        onChange={setPhoto}
+        value={photo}
+      />
+      <p>This changes the shared catalog photo for everyone.</p>
       <Btn disabled={pending} type='submit'>
         {pending ? 'Saving…' : submitLabel}
       </Btn>

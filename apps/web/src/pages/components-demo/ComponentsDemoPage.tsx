@@ -20,6 +20,7 @@ import {
 } from '@/components/menu-btn/MenuBtn';
 import { Navbar } from '@/components/navbar/Navbar';
 import { NotFound } from '@/components/not-found/NotFound';
+import { PhotoPicker, type PhotoPickerValue } from '@/components/photo-picker/PhotoPicker';
 import { PillBtn } from '@/components/pill-btn/PillBtn';
 import { NumberInput } from '@/components/number-input/NumberInput';
 import { NutritionInline } from '@/components/nutrition-inline/NutritionInline';
@@ -69,6 +70,7 @@ export function ComponentsDemoPage() {
   const [selectValue, setSelectValue] = useState<(typeof SELECT_OPTIONS)[number]['value']>('lte');
   const [btnLoading, setBtnLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
   const [sliderValue, setSliderValue] = useState(50);
 
   return (
@@ -177,6 +179,10 @@ export function ComponentsDemoPage() {
       </section>
 
       <section>
+        <h2>PhotoPicker</h2>
+        <PhotoPicker onChange={setPhoto} value={photo} />
+      </section>
+      <section>
         <h2>TextInput</h2>
         <TextInput
           aria-label='Demo text input'
@@ -210,7 +216,6 @@ export function ComponentsDemoPage() {
           min={0}
           onValueChange={setNumberValue}
           placeholder='Calories'
-          step={10}
           value={numberValue}
         />
       </section>

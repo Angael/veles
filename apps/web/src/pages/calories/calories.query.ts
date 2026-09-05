@@ -23,6 +23,13 @@ type DeleteFoodLogVariables = {
   id: string;
 };
 
+export type ImageAction = 'keep' | 'replace' | 'remove';
+
+export type ImageFields = {
+  imageAction?: ImageAction;
+  photo?: File;
+};
+
 type CalorieValues = {
   kcal: number;
   protein?: number;
@@ -30,22 +37,24 @@ type CalorieValues = {
   carbs?: number;
 };
 
-type RecordCustomCaloriesVariables = CalorieValues & {
-  date: string;
-  name: string;
-};
+type RecordCustomCaloriesVariables = CalorieValues &
+  ImageFields & {
+    date: string;
+    name: string;
+  };
 
 type SetDailyCalorieGoalVariables = CalorieValues & {
   date: string;
 };
 
-type UpdateFoodLogVariables = CalorieValues & {
-  date: string;
-  grams?: number;
-  id: string;
-  name: string;
-  previousDate: string;
-};
+type UpdateFoodLogVariables = CalorieValues &
+  ImageFields & {
+    date: string;
+    grams?: number;
+    id: string;
+    name: string;
+    previousDate: string;
+  };
 
 type RecordFoodVariables = {
   date: string;
@@ -53,6 +62,33 @@ type RecordFoodVariables = {
   productId: string;
 };
 
+type FoodProductVariables = ImageFields & {
+  barcode?: string;
+  name: string;
+  productSizeGrams?: number;
+  kcalPer100g: number;
+  proteinPer100g?: number;
+  fatPer100g?: number;
+  carbsPer100g?: number;
+};
+
+type UpdateFoodProductVariables = FoodProductVariables & {
+  id: string;
+};
+
+function toMultipartFormData<T extends object>(values: T & ImageFields) {
+  const { photo, ...serializedValues } = values;
+  const formData = new FormData();
+  formData.set(
+    'values',
+    JSON.stringify({
+      ...serializedValues,
+      imageAction: serializedValues.imageAction ?? 'keep',
+    }),
+  );
+  if (photo) formData.set('photo', photo, photo.name);
+  return formData;
+}
 export function calorieDashboardQueryOptions(date: string) {
   const weekStart = calorieWeekStart(date);
 
@@ -88,10 +124,10 @@ export function useDeleteFoodLogMutation() {
       }),
   });
 }
-
 export function useRecordFoodMutation() {
   return useMutation({
-    mutationFn: (variables: RecordFoodVariables) => recordFood({ data: variables }),
+    mutationFn: (variables: RecordFoodVariables) =>
+      recordFood({ data: toMultipartFormData({ ...variables }) }),
     onSuccess: (_data, { date }, _onMutateResult, context) =>
       context.client.invalidateQueries({
         queryKey: calorieDashboardQueryOptions(date).queryKey,
@@ -101,7 +137,8 @@ export function useRecordFoodMutation() {
 
 export function useCreateFoodProductMutation() {
   return useMutation({
-    mutationFn: createFoodProduct,
+    mutationFn: (variables: FoodProductVariables) =>
+      createFoodProduct({ data: toMultipartFormData(variables) }),
     onSuccess: (_data, _variables, _onMutateResult, context) =>
       Promise.all([
         context.client.invalidateQueries({ queryKey: calorieFoodKey }),
@@ -124,7 +161,7 @@ export function useLookupFoodByBarcodeMutation() {
 export function useRecordCustomCaloriesMutation() {
   return useMutation({
     mutationFn: (variables: RecordCustomCaloriesVariables) =>
-      recordCustomCalories({ data: variables }),
+      recordCustomCalories({ data: toMultipartFormData(variables) }),
     onSuccess: (_data, { date }, _onMutateResult, context) =>
       context.client.invalidateQueries({
         queryKey: calorieDashboardQueryOptions(date).queryKey,
@@ -143,10 +180,8 @@ export function useSetDailyCalorieGoalMutation() {
 
 export function useUpdateFoodLogMutation() {
   return useMutation({
-    mutationFn: ({ id, name, grams, kcal, protein, fat, carbs, date }: UpdateFoodLogVariables) =>
-      updateFoodLog({
-        data: { id, name, grams, kcal, protein, fat, carbs, date },
-      }),
+    mutationFn: ({ previousDate: _previousDate, ...variables }: UpdateFoodLogVariables) =>
+      updateFoodLog({ data: toMultipartFormData(variables) }),
     onSuccess: (_data, { date, previousDate }, _onMutateResult, context) =>
       Promise.all([
         context.client.invalidateQueries({
@@ -161,7 +196,8 @@ export function useUpdateFoodLogMutation() {
 
 export function useUpdateFoodProductMutation() {
   return useMutation({
-    mutationFn: updateFoodProduct,
+    mutationFn: (variables: UpdateFoodProductVariables) =>
+      updateFoodProduct({ data: toMultipartFormData(variables) }),
     onSuccess: (_data, _variables, _onMutateResult, context) =>
       Promise.all([
         context.client.invalidateQueries({ queryKey: calorieFoodKey }),

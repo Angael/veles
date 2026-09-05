@@ -13,7 +13,7 @@ export function EditFoodPage({ food }: { food: CalorieFood }) {
   async function save(value: FoodEditorValue) {
     setError('');
     try {
-      await updateMutation.mutateAsync({ data: { ...value, id: food.id } });
+      await updateMutation.mutateAsync({ ...value, id: food.id });
       await navigate({ to: '/calories', search: { date: todayLocalDate() } });
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not save food.');
@@ -28,7 +28,11 @@ export function EditFoodPage({ food }: { food: CalorieFood }) {
         </div>
       </header>
       <section className={css.panel}>
-        {error ? <p className={css.error}>{error}</p> : null}
+        {error ? (
+          <p className={css.error} role='alert'>
+            {error}
+          </p>
+        ) : null}
         <FoodEditor
           food={food}
           onSubmit={save}

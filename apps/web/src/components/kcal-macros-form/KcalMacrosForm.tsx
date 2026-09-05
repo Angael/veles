@@ -5,7 +5,7 @@ import css from './KcalMacrosForm.module.css';
 
 type NutritionField = 'kcal' | 'protein' | 'fat' | 'carbs';
 type NutritionValues = Partial<Record<NutritionField, number | null>>;
-type KcalInputProps = Pick<ComponentProps<typeof NumberInput>, 'min' | 'step'>;
+type KcalInputProps = Pick<ComponentProps<typeof NumberInput>, 'min'>;
 
 type KcalMacrosFormProps = {
   defaultValues?: NutritionValues;

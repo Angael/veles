@@ -38,7 +38,7 @@ export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {
               fat: goal?.fat,
               carbs: goal?.carbs,
             }}
-            kcalInput={{ min: 1, step: 10 }}
+            kcalInput={{ min: 1 }}
           />
 
           <Btn loading={goalMutation.isPending} type='submit'>

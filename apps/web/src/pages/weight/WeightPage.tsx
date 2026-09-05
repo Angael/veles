@@ -138,7 +138,6 @@ function WeightForm({ isSaving, onChange, onSubmit, value }: WeightFormProps) {
           onValueChange={onChange}
           placeholder='kg'
           required
-          step={0.1}
           value={value}
         />
       </label>

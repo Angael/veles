@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { MinusIcon, PlusIcon } from 'lucide-react';
 import css from './NumberInput.module.css';
 
-type NumberInputProps = Omit<NumberFieldRootProps, 'className'> & {
+type NumberInputProps = Omit<NumberFieldRootProps, 'className' | 'step'> & {
   className?: string;
   inputClassName?: string;
   placeholder?: string;
@@ -13,7 +13,6 @@ export function NumberInput({
   className,
   inputClassName,
   placeholder,
-  step = 'any',
   ...props
 }: NumberInputProps) {
   return (
@@ -21,7 +20,7 @@ export function NumberInput({
       allowWheelScrub
       className={clsx(css.root, className)}
       data-required={props.required ? '' : undefined}
-      step={step}
+      step='any'
       {...props}
     >
       <NumberField.Group className={css.group}>

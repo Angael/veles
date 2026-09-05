@@ -40,20 +40,19 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
   const goalKcal = day?.goal?.kcal ?? null;
   const consumedKcal = Math.max(0, day?.totals.kcal ?? 0);
 
-  function save() {
-    recordFoodMutation.mutate({
+  async function save() {
+    await recordFoodMutation.mutateAsync({
       date,
       grams: selectedGrams,
       productId: food.id,
     });
-    // Navigation intentionally starts immediately after recording the mutation.
-    void navigate({ to: '/calories', search: { date } }).catch(() => undefined);
+    await navigate({ to: '/calories', search: { date } });
   }
 
   return (
     <main className={css.page}>
       <section className={css.product}>
-        {food.imageUrl ? <img alt='' src={food.imageUrl} /> : null}
+        {food.imageUrl ? <img alt='' className={css.productImage} src={food.imageUrl} /> : null}
         <div className={css.productBody}>
           <div className={css.productHeading}>
             <div>
@@ -74,13 +73,19 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
       </section>
 
       <section className={css.panel}>
+        {recordFoodMutation.error ? (
+          <p className={css.error} role='alert'>
+            {recordFoodMutation.error.toString()}
+          </p>
+        ) : null}
+
         <div className={css.fields}>
           <Label text='Date'>
             <DateInput onValueChange={setDate} value={date} />
           </Label>
           <div className={css.amountField}>
             <Label text='Amount eaten (g)'>
-              <NumberInput min={1} onValueChange={setGrams} step={1} value={grams} />
+              <NumberInput min={1} onValueChange={setGrams} value={grams} />
             </Label>
             {packageSizeGrams !== null && packageSizeGrams > 0 ? (
               <div
@@ -128,10 +133,15 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
           pending={dashboardQuery.isPending}
         />
         <div className={css.actions}>
-          <Btn onClick={onCancel} variant='ghost'>
+          <Btn disabled={recordFoodMutation.isPending} onClick={onCancel} variant='ghost'>
             {cancelLabel}
           </Btn>
-          <Btn loading={recordFoodMutation.isPending} onClick={save}>
+          <Btn
+            loading={recordFoodMutation.isPending}
+            onClick={() => {
+              void save();
+            }}
+          >
             Save
           </Btn>
         </div>
