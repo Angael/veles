@@ -1,11 +1,11 @@
 ---
 name: ui-style
-description: Repo UI styling polish rules
+description: Use this skill when building or reviewing frontend UI
 ---
 
 # UI Polish
 
-Use this skill when building or reviewing frontend UI. Follow the existing visual language before introducing a new pattern.
+Follow the existing visual language before introducing a new pattern.
 
 ## Rules
 
