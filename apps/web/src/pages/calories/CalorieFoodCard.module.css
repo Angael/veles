@@ -1,4 +1,4 @@
-@import '../../../styles/breakpoints.css';
+@import '../../styles/breakpoints.css';
 
 .item {
   min-width: 0;
@@ -14,34 +14,31 @@
   transition:
     border-color 180ms var(--ease-out),
     background-color 180ms var(--ease-out);
+
+  & > :not(.photoWash) {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:has(.primaryAction > :is(a, button):focus-visible) {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 2px;
+  }
 }
 
-.card > :not(.photoWash) {
-  position: relative;
-  z-index: 1;
-}
-
-/* The name link stretches its hit area over the whole card. */
-.cardLink {
-  flex: 1;
-  min-width: 0;
-  color: inherit;
-  text-decoration: none;
-}
-
-.cardLink::after {
-  content: '';
+.photoWash {
   position: absolute;
-  inset: 0;
-}
-
-.cardLink:focus-visible {
-  outline: none;
-}
-
-.card:has(.cardLink:focus-visible) {
-  outline: 2px solid var(--c-primary-focus);
-  outline-offset: 2px;
+  z-index: 0;
+  inset: 0 auto 0 0;
+  width: min(58%, 32rem);
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  object-position: left center;
+  filter: saturate(0.65) contrast(0.85);
+  mask-image: linear-gradient(to right, black 0%, rgb(0 0 0 / 78%) 30%, transparent 100%);
+  opacity: 0.2;
+  pointer-events: none;
 }
 
 .energyTile {
@@ -73,21 +70,6 @@
   }
 }
 
-.photoWash {
-  position: absolute;
-  z-index: 0;
-  inset: 0 auto 0 0;
-  width: min(58%, 32rem);
-  height: 100%;
-  border-radius: inherit;
-  object-fit: cover;
-  object-position: left center;
-  filter: saturate(0.65) contrast(0.85);
-  mask-image: linear-gradient(to right, black 0%, rgb(0 0 0 / 78%) 30%, transparent 100%);
-  opacity: 0.2;
-  pointer-events: none;
-}
-
 .body {
   flex: 1;
   min-width: 0;
@@ -102,8 +84,37 @@
   gap: var(--space-sm);
 }
 
-.name {
-  font-size: var(--text-lg);
+.primaryAction {
+  flex: 1;
+  min-width: 0;
+
+  & > :is(a, button) {
+    width: 100%;
+    display: block;
+    overflow: hidden;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: var(--text-lg);
+    font-weight: 700;
+    text-align: left;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  & > :is(a, button)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  & > :is(a, button):focus-visible {
+    outline: none;
+  }
 }
 
 .grams {
@@ -113,19 +124,13 @@
   font-variant-numeric: tabular-nums;
 }
 
-.deleteButton {
+.action {
   --btn-height: 2.75rem;
   --btn-icon-size: 1.05rem;
 
+  position: relative;
+  z-index: 1;
   flex: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .card {
-    transition:
-      border-color 140ms ease,
-      background-color 140ms ease;
-  }
 }
 
 @media (--phone) {
@@ -134,15 +139,15 @@
     padding: var(--space-sm) var(--space-md);
   }
 
-  .energyTile {
-    display: none;
-  }
-
   .photoWash {
     width: 82%;
   }
 
-  .name {
+  .energyTile {
+    display: none;
+  }
+
+  .primaryAction > :is(a, button) {
     font-size: var(--text-md-dynamic);
   }
 
@@ -152,8 +157,16 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .card:has(.cardLink:hover) {
+  .card:has(.primaryAction > :is(a, button):hover) {
     border-color: var(--c-primary-border);
     background: color-mix(in srgb, var(--c-surface) 88%, var(--c-primary) 12%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition:
+      border-color 140ms ease,
+      background-color 140ms ease;
   }
 }

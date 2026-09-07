@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { PlusIcon } from 'lucide-react';
 import { useState, useTransition } from 'react';
+import { CalorieFoodCard } from '../CalorieFoodCard';
 import type { CalorieFood } from '../calories.api';
 import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '../calories.query';
 import { SelectedFoodForm } from './SelectedFoodForm';
@@ -77,46 +78,19 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
           const kcal = nutritionAtGrams(food.kcalPer100g, productGrams);
 
           return (
-            <li key={food.id}>
-              <button className={css.product} onClick={() => selectFood(food)} type='button'>
-                <span aria-hidden='true' className={css.energyTile}>
-                  <strong>{Math.round(kcal)}</strong>
-                  <span>kcal</span>
-                </span>
-                <span className={css.productBody}>
-                  <span className={css.productTop}>
-                    <strong className={css.productName}>{food.name}</strong>
-                    <span className={css.grams}>{Math.round(productGrams)} g</span>
-                  </span>
-                  <span className={css.productBottom}>
-                    <span aria-hidden='true' className={css.energyInline}>
-                      <strong>{Math.round(kcal)}</strong>
-                      <span>kcal</span>
-                    </span>
-                    <span className={css.macros}>
-                      <span
-                        aria-label={`${nutritionAtGrams(food.proteinPer100g, productGrams)} grams protein`}
-                      >
-                        <i aria-hidden='true' className={css.dotProtein} />
-                        {nutritionAtGrams(food.proteinPer100g, productGrams)} g
-                      </span>
-                      <span
-                        aria-label={`${nutritionAtGrams(food.fatPer100g, productGrams)} grams fat`}
-                      >
-                        <i aria-hidden='true' className={css.dotFat} />
-                        {nutritionAtGrams(food.fatPer100g, productGrams)} g
-                      </span>
-                      <span
-                        aria-label={`${nutritionAtGrams(food.carbsPer100g, productGrams)} grams carbs`}
-                      >
-                        <i aria-hidden='true' className={css.dotCarbs} />
-                        {nutritionAtGrams(food.carbsPer100g, productGrams)} g
-                      </span>
-                    </span>
-                  </span>
-                </span>
+            <CalorieFoodCard
+              gramsLabel={`${Math.round(productGrams)} g`}
+              imageUrl={food.imageUrl}
+              kcal={kcal}
+              protein={nutritionAtGrams(food.proteinPer100g, productGrams)}
+              fat={nutritionAtGrams(food.fatPer100g, productGrams)}
+              carbs={nutritionAtGrams(food.carbsPer100g, productGrams)}
+              key={food.id}
+            >
+              <button onClick={() => selectFood(food)} type='button'>
+                {food.name}
               </button>
-            </li>
+            </CalorieFoodCard>
           );
         })}
       </ul>
