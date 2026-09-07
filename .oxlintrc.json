@@ -9,7 +9,6 @@
   "ignorePatterns": [
     ".agents/**",
     "apps/web/src/routeTree.gen.ts",
-    "packages/db/scripts/db-reset.mjs",
     "node_modules/**",
     "**/.output/**"
   ],

@@ -35,7 +35,7 @@ if (process.env.PROD_DATABASE_URL && databaseUrl === process.env.PROD_DATABASE_U
 await resetDatabase(databaseUrl);
 
 /** Rebuilds the disposable dev database from migrations and fixed seed data. */
-async function resetDatabase(connectionString) {
+async function resetDatabase(connectionString: string) {
   await resetSchemas(connectionString);
 
   runPnpmScript('db:migrate');
@@ -44,7 +44,7 @@ async function resetDatabase(connectionString) {
   console.info(`Reset and seeded ${expectedDatabaseName}.`);
 }
 
-async function resetSchemas(connectionString) {
+async function resetSchemas(connectionString: string) {
   const client = new Client({ connectionString });
   await client.connect();
 
@@ -64,8 +64,8 @@ async function resetSchemas(connectionString) {
   }
 }
 
-async function assertDevDatabase(client) {
-  const result = await client.query('SELECT current_database() AS name');
+async function assertDevDatabase(client: Client) {
+  const result = await client.query<{ name: string }>('SELECT current_database() AS name');
   const databaseName = result.rows[0]?.name;
 
   if (databaseName !== expectedDatabaseName) {
@@ -76,7 +76,7 @@ async function assertDevDatabase(client) {
 }
 
 /** Seeds the fixed dev identity and deterministic application fixtures. */
-async function seedDatabase(connectionString) {
+async function seedDatabase(connectionString: string) {
   const client = new Client({ connectionString });
   await client.connect();
 
@@ -95,7 +95,7 @@ async function seedDatabase(connectionString) {
   }
 }
 
-async function seedIdentity(client) {
+async function seedIdentity(client: Client) {
   await client.query(
     `INSERT INTO "user"
       (id, name, email, email_verified, image, created_at, updated_at)
@@ -140,7 +140,7 @@ async function seedIdentity(client) {
   );
 }
 
-async function seedRecipes(client, userId) {
+async function seedRecipes(client: Client, userId: string) {
   const recipes = [
     {
       id: '01900000-0000-7000-8000-000000000001',
@@ -152,8 +152,8 @@ async function seedRecipes(client, userId) {
       rating: 4,
       kcal: 620,
       protein: 20,
-      carbs: 98,
       fats: 16,
+      carbs: 98,
     },
     {
       id: '01900000-0000-7000-8000-000000000002',
@@ -165,15 +165,15 @@ async function seedRecipes(client, userId) {
       rating: 5,
       kcal: 480,
       protein: 18,
-      carbs: 72,
       fats: 12,
+      carbs: 72,
     },
   ];
 
   for (const recipe of recipes) {
     await client.query(
       `INSERT INTO recipe
-        (id, user_id, name, description, ingredients, tags, portions, rating, kcal, protein, carbs, fats)
+        (id, user_id, name, description, ingredients, tags, portions, rating, kcal, protein, fats, carbs)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        ON CONFLICT (id) DO UPDATE SET
          user_id = EXCLUDED.user_id,
@@ -185,8 +185,8 @@ async function seedRecipes(client, userId) {
          rating = EXCLUDED.rating,
          kcal = EXCLUDED.kcal,
          protein = EXCLUDED.protein,
-         carbs = EXCLUDED.carbs,
          fats = EXCLUDED.fats,
+         carbs = EXCLUDED.carbs,
          updated_at = now()`,
       [
         recipe.id,
@@ -199,14 +199,14 @@ async function seedRecipes(client, userId) {
         recipe.rating,
         recipe.kcal,
         recipe.protein,
-        recipe.carbs,
         recipe.fats,
+        recipe.carbs,
       ],
     );
   }
 }
 
-async function seedDiaryEntries(client, userId) {
+async function seedDiaryEntries(client: Client, userId: string) {
   const entries = [
     {
       id: '01900000-0000-7000-8000-000000000101',
@@ -237,7 +237,7 @@ async function seedDiaryEntries(client, userId) {
   }
 }
 
-function runPnpmScript(script) {
+function runPnpmScript(script: string) {
   const command = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
   const result = spawnSync(command, [script], { env: process.env, stdio: 'inherit' });
 
