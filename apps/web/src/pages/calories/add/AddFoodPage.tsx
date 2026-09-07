@@ -14,6 +14,7 @@ import { TextInput } from '@/components/text-input/TextInput';
 import css from './AddFoodPage.module.css';
 
 type Props = { date: string; initialFoodId?: string };
+const MAX_VISIBLE_FOODS = 10;
 
 function shownGrams(food: CalorieFood) {
   return food.productSizeGrams ?? 100;
@@ -33,7 +34,7 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
     enabled: initialFoodId !== undefined,
   });
   const foodsQuery = useQuery(calorieFoodsQueryOptions());
-  const foods = filterFoods(foodsQuery.data ?? [], filterQuery);
+  const foods = filterFoods(foodsQuery.data ?? [], filterQuery, MAX_VISIBLE_FOODS);
   const selected = selectedFood ?? (!selectionDismissed ? (foodQuery.data ?? null) : null);
 
   function selectFood(food: CalorieFood) {
