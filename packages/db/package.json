@@ -15,7 +15,8 @@
     "db:push": "drizzle-kit push",
     "db:reset": "node --env-file=../../.env scripts/db-reset.ts",
     "db:studio": "drizzle-kit studio",
-    "db:studio:prod": "drizzle-kit studio --config=drizzle-prod.config.ts"
+    "db:studio:prod": "drizzle-kit studio --config=drizzle-prod.config.ts",
+    "db:seed:prod": "node --env-file=../../.env scripts/seed-prod.ts"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",
