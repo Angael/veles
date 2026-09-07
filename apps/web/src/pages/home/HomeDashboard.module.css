@@ -344,6 +344,7 @@
 .diaryLines i:nth-child(2) {
   width: 78%;
 }
+
 .diaryLines i:nth-child(3) {
   width: 48%;
 }
@@ -423,12 +424,15 @@
 .orbitPeople i:nth-child(1) {
   left: 0;
 }
+
 .orbitPeople i:nth-child(2) {
   left: 26%;
 }
+
 .orbitPeople i:nth-child(3) {
   right: 26%;
 }
+
 .orbitPeople i:nth-child(4) {
   right: 0;
   border-color: var(--c-macro-fat);
@@ -481,9 +485,11 @@
 .macroPreview span:nth-child(2) {
   border-color: var(--c-macro-protein);
 }
+
 .macroPreview span:nth-child(3) {
   border-color: var(--c-macro-fat);
 }
+
 .macroPreview span:nth-child(4) {
   border-color: var(--c-macro-carb);
 }
@@ -507,12 +513,15 @@
 .repRail i:nth-child(2) {
   height: 55%;
 }
+
 .repRail i:nth-child(3) {
   height: 85%;
 }
+
 .repRail i:nth-child(4) {
   height: 62%;
 }
+
 .repRail i:nth-child(5) {
   height: 100%;
 }

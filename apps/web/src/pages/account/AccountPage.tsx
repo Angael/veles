@@ -82,7 +82,9 @@ export function AccountPage({ user }: AccountPageProps) {
         <Btn
           icon={<LogOutIcon aria-hidden='true' />}
           loading={logoutBusy}
-          onClick={handleLogout}
+          onClick={() => {
+            void handleLogout();
+          }}
           size='sm'
           variant='outlineDanger'
         >

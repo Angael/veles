@@ -19,7 +19,10 @@ describe('components demo', () => {
     const demoSource = demoSources.join('\n');
 
     for await (const componentFile of glob('src/components/*/*.tsx', { cwd: root })) {
-      const componentDirectory = componentFile.split('/').at(-2)!;
+      const componentDirectory = componentFile.split('/').at(-2);
+      if (componentDirectory === undefined) {
+        throw new Error(`Expected component glob path to include a directory: ${componentFile}`);
+      }
 
       if (SKIPPED_COMPONENTS.has(componentDirectory)) {
         continue;
@@ -30,6 +33,6 @@ describe('components demo', () => {
       }
     }
 
-    expect([...new Set(missingComponents)].sort()).toEqual([]);
+    expect([...new Set(missingComponents)].toSorted()).toEqual([]);
   });
 });

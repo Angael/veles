@@ -59,7 +59,7 @@ function getXAxisTicks(domain: [number, number], chartWidth: number, usesLongRan
 }
 
 function WeightTooltip({ active, payload }: TooltipContentProps) {
-  const value = payload?.[0]?.value;
+  const value = payload[0]?.value;
 
   if (!active || value === undefined) {
     return null;
@@ -78,6 +78,7 @@ export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProp
   }));
   const weights = visibleEntries.map((entry) => entry.weightKg);
   const domain = [Math.floor(Math.min(...weights)), Math.ceil(Math.max(...weights))];
+  // oxlint-disable-next-line typescript/no-non-null-assertion -- every WeightChartRange has a chart option.
   const rangeLabel = rangeOptions.find((option) => option.value === range)!.label;
   const firstTimestamp = chartEntries.at(0)?.timestamp;
   const lastTimestamp = chartEntries.at(-1)?.timestamp;

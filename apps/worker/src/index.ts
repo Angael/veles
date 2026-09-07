@@ -31,7 +31,9 @@ async function checkDatabase() {
   }
 
   if (!isStopping) {
-    nextCheck = setTimeout(checkDatabase, checkIntervalMs);
+    nextCheck = setTimeout(() => {
+      void checkDatabase();
+    }, checkIntervalMs);
   }
 }
 

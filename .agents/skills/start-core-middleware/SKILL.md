@@ -1,5 +1,5 @@
 ---
-name: start-core/middleware
+name: start-core-middleware
 description: >-
   createMiddleware, request middleware (.server only), server function
   middleware (.client + .server), context passing via next({ context }),
@@ -11,7 +11,7 @@ library: tanstack-start
 library_version: '1.166.2'
 requires:
   - start-core
-  - start-core/server-functions
+  - start-core-server-functions
 sources:
   - TanStack/router:docs/start/framework/react/guide/middleware.md
 ---
@@ -243,7 +243,7 @@ const authMiddleware = createMiddleware().server(async ({ next, request }) => {
 })
 ```
 
-> **Attach `authMiddleware` to every `createServerFn` that needs auth.** Server functions are API endpoints; a route `beforeLoad` does not protect their data, only the route's UI. Protect the endpoint that reads or mutates private data. See [router-core/auth-and-guards](../../../../router-core/skills/router-core/auth-and-guards/SKILL.md) and [start-core/auth-server-primitives](../auth-server-primitives/SKILL.md).
+> **Attach `authMiddleware` to every `createServerFn` that needs auth.** Server functions are API endpoints; a route `beforeLoad` does not protect their data, only the route's UI. Protect the endpoint that reads or mutates private data. See [router-core-auth-and-guards](skill://router-core-auth-and-guards) and [start-core-auth-server-primitives](skill://start-core-auth-server-primitives).
 
 ```tsx
 type Permissions = Record<string, string[]>
@@ -345,7 +345,7 @@ Fetch precedence (highest to lowest): call site → later middleware → earlier
 })
 ```
 
-The session itself must come from a server-trusted source (the cookie + DB lookup in `authMiddleware`), never from `sendContext` — anything the client can send, the client can lie about. See [start-core/auth-server-primitives](../auth-server-primitives/SKILL.md).
+The session itself must come from a server-trusted source (the cookie + DB lookup in `authMiddleware`), never from `sendContext` — anything the client can send, the client can lie about. See [start-core-auth-server-primitives](skill://start-core-auth-server-primitives).
 
 ### 2. MEDIUM: Confusing request vs server function middleware
 
@@ -392,7 +392,7 @@ createMiddleware({ type: 'function' })
 
 ## Cross-References
 
-- [start-core/server-functions](../server-functions/SKILL.md) — what middleware wraps
-- [start-core/server-routes](../server-routes/SKILL.md) — middleware on API endpoints
-- [start-core/auth-server-primitives](../auth-server-primitives/SKILL.md) — building the `authMiddleware` factory itself: session cookie reads, OAuth state, CSRF
-- [router-core/auth-and-guards](../../../../router-core/skills/router-core/auth-and-guards/SKILL.md) — routing-side UX guards; data auth belongs in the server function, server route, or API endpoint handler/middleware
+- [start-core-server-functions](skill://start-core-server-functions) — what middleware wraps
+- [start-core-server-routes](skill://start-core-server-routes) — middleware on API endpoints
+- [start-core-auth-server-primitives](skill://start-core-auth-server-primitives) — building the `authMiddleware` factory itself: session cookie reads, OAuth state, CSRF
+- [router-core-auth-and-guards](skill://router-core-auth-and-guards) — routing-side UX guards; data auth belongs in the server function, server route, or API endpoint handler/middleware
