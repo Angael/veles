@@ -8,17 +8,15 @@ import { requireSession } from '@/lib/auth/getSession';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/lib/db';
 import { downloadFile } from '@/lib/download/downloadFile';
+import { storagePathToUrl } from '@/lib/storage/config';
 import { log } from '@/lib/logger';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { getOpenFoodFactsProduct, type OpenFoodFactsProduct } from '@/lib/openFoodFacts';
-import { getStorageConfig } from '@/lib/storage/config';
 import { TypedFormData } from '@/lib/typedFormData';
 import {
   deletePreparedFoodImage,
-  foodImageUrl,
   getFoodImageAssets,
   prepareFoodImage,
-  type FoodImageAsset,
   type PreparedFoodImage,
 } from './foodImages.server';
 import {
@@ -119,22 +117,15 @@ function productValues(data: CreateFoodProductValues) {
   };
 }
 
-function isPublicProductAsset(asset: FoodImageAsset | undefined) {
-  if (!asset) return false;
-  const { bucketName } = getStorageConfig();
-  return Boolean(bucketName && asset.bucket === bucketName);
-}
-
 function toFoodProduct(
   product: typeof foodProducts.$inferSelect,
-  asset: FoodImageAsset | undefined,
+  asset: typeof uploadObjects.$inferSelect | undefined,
 ): CalorieFood {
-  const publicAsset = isPublicProductAsset(asset) ? asset : undefined;
   return {
     id: product.id,
     name: product.name,
     barcode: product.barcode,
-    imageUrl: foodImageUrl(publicAsset),
+    imageUrl: asset ? storagePathToUrl(asset.key) : null,
     productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
     kcalPer100g: product.kcalPer100gHundredths / HUNDREDTHS,
     proteinPer100g: fromHundredths(product.proteinPer100gHundredths),
@@ -145,9 +136,11 @@ function toFoodProduct(
 
 function toCalorieLog(
   logEntry: typeof foodLogs.$inferSelect,
-  logAsset: FoodImageAsset | undefined,
-  productAsset?: FoodImageAsset,
+  logAsset: typeof uploadObjects.$inferSelect | undefined,
+  productAsset?: typeof uploadObjects.$inferSelect,
 ): CalorieLog {
+  const asset = logAsset ?? productAsset;
+
   return {
     id: logEntry.id,
     name: logEntry.name,
@@ -159,7 +152,7 @@ function toCalorieLog(
     protein: fromHundredths(logEntry.proteinHundredths),
     fat: fromHundredths(logEntry.fatHundredths),
     carbs: fromHundredths(logEntry.carbsHundredths),
-    imageUrl: foodImageUrl(logAsset ?? productAsset),
+    imageUrl: asset ? storagePathToUrl(asset.key) : null,
   };
 }
 
@@ -562,8 +555,7 @@ export const recordFood = createServerFn({ method: 'POST' })
 
     const productAssets = await getFoodImageAssets([product.imageUploadObjectId]);
     const productAsset = productAssets.get(product.imageUploadObjectId ?? '');
-    const imageUploadObjectId =
-      productAsset && isPublicProductAsset(productAsset) ? productAsset.id : null;
+    const imageUploadObjectId = productAsset?.id ?? null;
 
     const gramsHundredths = toHundredths(values.grams);
     const scale = (value: number | null) =>

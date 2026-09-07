@@ -2,13 +2,11 @@ import { randomUUID } from 'node:crypto';
 import { inArray } from 'drizzle-orm';
 import { uploadObjects } from '@veles/db/schema';
 import { db } from '@/lib/db';
-import { getStorageConfig, storagePathToUrl } from '@/lib/storage/config';
+import { getStorageConfig } from '@/lib/storage/config';
 import { optimizeImage } from '@/lib/storage/image';
 import { deleteFileByKey, uploadFileByKey } from '@/lib/storage/r2';
 
 export const FOOD_IMAGE_MAX_BYTES = 10 * 1024 * 1024;
-
-export type FoodImageAsset = typeof uploadObjects.$inferSelect;
 
 export type PreparedFoodImage = {
   asset: typeof uploadObjects.$inferInsert;
@@ -16,18 +14,10 @@ export type PreparedFoodImage = {
   bucket: string;
 };
 
-/** Builds a CDN URL for an image stored in the configured public bucket. */
-export function foodImageUrl(asset: FoodImageAsset | undefined): string | null {
-  if (!asset) return null;
-
-  const { bucketName } = getStorageConfig();
-  return bucketName && asset.bucket === bucketName ? storagePathToUrl(asset.key) : null;
-}
-
 /** Loads all referenced assets in one query, preserving missing IDs as absent map entries. */
 export async function getFoodImageAssets(ids: Array<string | null | undefined>) {
   const uniqueIds = [...new Set(ids.filter((id): id is string => Boolean(id)))];
-  const assetsById = new Map<string, FoodImageAsset>();
+  const assetsById = new Map<string, typeof uploadObjects.$inferSelect>();
 
   if (uniqueIds.length === 0) return assetsById;
 
