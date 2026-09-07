@@ -9,6 +9,7 @@ import type { CalorieDashboard, CalorieDashboardDay } from '../calories.api';
 import { calorieDashboardQueryOptions } from '../calories.query';
 import { CalorieOverview } from './CalorieOverview';
 import { LogFoodMenu } from './LogFoodMenu';
+import { useWeekSwipe } from './useWeekSwipe';
 import { CALORIE_DATE_FORMAT, calorieWeekDates, todayLocalDate } from '../calorieHelpers';
 import { Btn } from '@/components/btn/Btn';
 import css from './CaloriesPage.module.css';
@@ -35,8 +36,11 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
     const nextDate = format(addDays(parseISO(date), amount * 7), CALORIE_DATE_FORMAT);
     void navigate({ to: '/calories', search: { date: nextDate } });
   }
+
+  const weekSwipe = useWeekSwipe({ onSwipe: shiftWeek });
+
   return (
-    <main className={css.page}>
+    <main className={css.page} {...weekSwipe}>
       <LogFoodMenu date={date} />
 
       <div className={css.dateControls} data-appear>
