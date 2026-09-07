@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TypedFormData } from './typedFormData';
+import { TypedFormData } from './TypedFormData';
 
 describe('TypedFormData', () => {
   it('trims required string values', () => {

@@ -5,7 +5,7 @@ import { todayLocalDate } from '../calorieHelpers';
 import { Btn } from '@/components/btn/Btn';
 import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
 import { TypedForm } from '@/components/typed-form/TypedForm';
-import { TypedFormData } from '@/lib/typedFormData';
+import { TypedFormData } from '@/components/typed-form/TypedFormData';
 import css from '../CalorieFlows.module.css';
 
 export function CalorieGoalsPage({ goal }: { goal: CalorieGoal | null }) {

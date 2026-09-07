@@ -1,6 +1,6 @@
 import { useNavigate, type UseNavigateResult } from '@tanstack/react-router';
 import type { ComponentPropsWithoutRef } from 'react';
-import { TypedFormData } from '@/lib/typedFormData';
+import { TypedFormData } from './TypedFormData';
 
 type TypedFormProps = Omit<ComponentPropsWithoutRef<'form'>, 'onSubmit'> & {
   onSubmit: (data: TypedFormData, navigate: UseNavigateResult<string>) => void | Promise<void>;

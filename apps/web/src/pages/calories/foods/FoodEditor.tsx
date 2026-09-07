@@ -7,7 +7,7 @@ import { NumberInput } from '@/components/number-input/NumberInput';
 import { PhotoPicker, type PhotoPickerValue } from '@/components/photo-picker/PhotoPicker';
 import { TextInput } from '@/components/text-input/TextInput';
 import { TypedForm } from '@/components/typed-form/TypedForm';
-import { TypedFormData } from '@/lib/typedFormData';
+import { TypedFormData } from '@/components/typed-form/TypedFormData';
 import { useState } from 'react';
 import css from '../CalorieFlows.module.css';
 

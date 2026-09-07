@@ -12,7 +12,7 @@ import { storagePathToUrl } from '@/lib/storage/config';
 import { log } from '@/lib/logger';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { getOpenFoodFactsProduct, type OpenFoodFactsProduct } from '@/lib/openFoodFacts';
-import { TypedFormData } from '@/lib/typedFormData';
+import { TypedFormData } from '@/components/typed-form/TypedFormData';
 import {
   deletePreparedFoodImage,
   getFoodImageAssets,

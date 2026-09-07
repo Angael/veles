@@ -7,7 +7,7 @@ import { Label } from '@/components/label/Label';
 import { PhotoPicker, type PhotoPickerValue } from '@/components/photo-picker/PhotoPicker';
 import { TextInput } from '@/components/text-input/TextInput';
 import { TypedForm } from '@/components/typed-form/TypedForm';
-import { TypedFormData } from '@/lib/typedFormData';
+import { TypedFormData } from '@/components/typed-form/TypedFormData';
 import css from '../CalorieFlows.module.css';
 export function QuickAddPage({ date }: { date: string }) {
   const recordMutation = useRecordCustomCaloriesMutation();

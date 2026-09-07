@@ -7,7 +7,7 @@ import { Card } from '@/components/card/Card';
 import { ErrorCard } from '@/components/error-card/ErrorCard';
 import { UploadTileGrid } from '@/components/upload-tile-grid/UploadTileGrid';
 import { TypedForm } from '@/components/typed-form/TypedForm';
-import { TypedFormData } from '@/lib/typedFormData';
+import { TypedFormData } from '@/components/typed-form/TypedFormData';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import css from './AddRecipePage.module.css';
 import { RECIPE_UPLOAD_MAX_PHOTO_BYTES, RECIPE_UPLOAD_MAX_PHOTO_COUNT } from './recipeUpload.api';
