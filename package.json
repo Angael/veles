@@ -11,11 +11,12 @@
     "test": "pnpm --recursive test",
     "lint:css": "pnpm --filter @veles/web lint:css",
     "lint:css:fix": "pnpm --filter @veles/web lint:css:fix",
+    "lint": "oxlint --config .oxlintrc.json .",
     "typecheck": "pnpm --recursive typecheck",
     "fmt": "oxfmt --write .",
     "fmt:check": "oxfmt --check .",
-    "check": "pnpm fmt:check && pnpm lint:css && pnpm typecheck && pnpm test",
-    "check:fix": "pnpm fmt && pnpm lint:css:fix && pnpm typecheck && pnpm test",
+    "check": "pnpm fmt:check && pnpm lint && pnpm lint:css && pnpm typecheck && pnpm test",
+    "check:fix": "pnpm fmt && pnpm lint && pnpm lint:css:fix && pnpm typecheck && pnpm test",
     "db:generate": "pnpm --filter @veles/db db:generate",
     "db:migrate": "pnpm --filter @veles/db db:migrate",
     "db:migrate:prod": "pnpm --filter @veles/db db:migrate:prod",
@@ -25,7 +26,11 @@
     "db:studio:prod": "pnpm --filter @veles/db db:studio:prod"
   },
   "devDependencies": {
-    "oxfmt": "0.63.0"
+    "@tanstack/eslint-plugin-query": "5.102.8",
+    "@tanstack/eslint-plugin-router": "1.162.0",
+    "oxfmt": "0.63.0",
+    "oxlint": "1.80.0",
+    "oxlint-tsgolint": "7.0.2001"
   },
   "engines": {
     "node": ">=26.2.0"

@@ -1,5 +1,5 @@
 ---
-name: start-core/execution-model
+name: start-core-execution-model
 description: >-
   Isomorphic-by-default principle, environment boundary functions
   (createServerFn, createServerOnlyFn, createClientOnlyFn,
@@ -347,5 +347,5 @@ function CurrentTime() {
 
 ## Cross-References
 
-- [start-core/server-functions](../server-functions/SKILL.md) — the primary server boundary
-- [start-core/deployment](../deployment/SKILL.md) — deployment target affects execution
+- [start-core-server-functions](skill://start-core-server-functions) — the primary server boundary
+- [start-core-deployment](skill://start-core-deployment) — deployment target affects execution

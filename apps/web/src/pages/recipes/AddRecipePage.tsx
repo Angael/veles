@@ -48,28 +48,29 @@ export function AddRecipePage() {
 
           <form
             className={css.form}
-            onSubmit={async (event: FormEvent<HTMLFormElement>) => {
+            onSubmit={(event: FormEvent<HTMLFormElement>) => {
               event.preventDefault();
-              setBusy(true);
-              setError(null);
+              void (async () => {
+                setBusy(true);
+                setError(null);
 
-              try {
-                const formData = new FormData(event.currentTarget);
+                try {
+                  const formData = new FormData(event.currentTarget);
 
-                for (const file of draft.selectedFiles) {
-                  formData.append('photos', file);
+                  for (const file of draft.selectedFiles) {
+                    formData.append('photos', file);
+                  }
+
+                  const result = await uploadRecipe({ data: formData });
+                  await navigate({ params: { id: result.id }, to: '/recipes/view/$id' });
+                } catch (submitError) {
+                  setError(
+                    submitError instanceof Error ? submitError.message : 'Recipe upload failed',
+                  );
+                } finally {
+                  setBusy(false);
                 }
-
-                const result = await uploadRecipe({ data: formData });
-
-                navigate({ params: { id: result.id }, to: '/recipes/view/$id' });
-              } catch (submitError) {
-                setError(
-                  submitError instanceof Error ? submitError.message : 'Recipe upload failed',
-                );
-              } finally {
-                setBusy(false);
-              }
+              })();
             }}
           >
             <div className={css.formBody}>

@@ -70,6 +70,6 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
       })),
       weightEntries: weightRows
         .map((entry) => ({ date: entry.date, weightKg: entry.weightGrams / 1_000 }))
-        .reverse(),
+        .toReversed(),
     };
   });

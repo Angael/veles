@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start';
+// eslint-disable-next-line no-unused-vars
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { getSession } from './getSession';
 

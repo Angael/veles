@@ -55,7 +55,9 @@ export function ImportWeightPage() {
           <pre>{aiPrompt}</pre>
           <Btn
             icon={<ClipboardIcon aria-hidden='true' />}
-            onClick={() => copyPrompt(aiPrompt)}
+            onClick={() => {
+              void copyPrompt(aiPrompt);
+            }}
             size='sm'
             type='button'
             variant='outlineMain'
