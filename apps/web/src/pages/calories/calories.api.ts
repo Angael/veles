@@ -1,4 +1,4 @@
-import { ArkErrors, type } from 'arktype';
+import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createMiddleware, createServerFn } from '@tanstack/react-start';
 import { and, desc, eq, gte, inArray, lte } from 'drizzle-orm';
@@ -12,7 +12,7 @@ import { storagePathToUrl } from '@/lib/storage/config';
 import { log } from '@/lib/logger';
 import { logMiddleware } from '@/lib/middleware/logMiddleware';
 import { getOpenFoodFactsProduct, type OpenFoodFactsProduct } from '@/lib/openFoodFacts';
-import { TypedFormData } from '@/components/typed-form/TypedFormData';
+
 import {
   deletePreparedFoodImage,
   getFoodImageAssets,
@@ -43,7 +43,9 @@ const optionalNonEmptyTextType = nonEmptyTextType.or('null').or('undefined');
 const optionalPositiveAmountType = type('number > 0 | null | undefined');
 const optionalNonNegativeAmountType = nonNegativeAmountType.or('null').or('undefined');
 const imageActionType = type("'keep' | 'replace' | 'remove'");
-const formDataType = type('FormData');
+const nonEmptyPhotoType = type('File').narrow((photo, ctx) =>
+  photo.size > 0 ? true : ctx.mustBe('a non-empty file'),
+);
 
 const createFoodProductValuesType = type({
   name: nonEmptyTextType,
@@ -55,7 +57,6 @@ const createFoodProductValuesType = type({
   'carbsPer100g?': optionalNonNegativeAmountType,
   'imageAction?': imageActionType,
 });
-const updateFoodProductValuesType = createFoodProductValuesType.merge({ id: 'string.uuid' });
 const foodLogIdInputType = type({ id: 'string.uuid' });
 
 type CreateFoodProductValues = typeof createFoodProductValuesType.infer;
@@ -70,40 +71,6 @@ const limitFoodUploadRequestMiddleware = createMiddleware().server(async ({ next
   }
   return next();
 });
-
-/** Validates the scalar payload and single photo before decoding or storing any bytes. */
-function parseMultipartValues<T>(
-  formData: FormData,
-  valuesType: (input: unknown) => T | ArkErrors,
-): { values: T; photo: File | null } {
-  const typedFormData = new TypedFormData(formData);
-  let encodedValues: string;
-  try {
-    encodedValues = typedFormData.string('values');
-  } catch {
-    throw new ClientSafeError('The food form is invalid.');
-  }
-
-  let decodedValues: unknown;
-  try {
-    decodedValues = JSON.parse(encodedValues);
-  } catch {
-    throw new ClientSafeError('The food form is invalid.');
-  }
-
-  const validation = valuesType(decodedValues);
-  if (validation instanceof type.errors) {
-    throw new ClientSafeError(validation.summary);
-  }
-
-  const photoValue = typedFormData.raw().get('photo');
-  if (photoValue === null) return { photo: null, values: validation };
-  if (!(photoValue instanceof File) || photoValue.size <= 0) {
-    throw new ClientSafeError('The selected photo is invalid.');
-  }
-
-  return { photo: photoValue, values: validation };
-}
 
 function productValues(data: CreateFoodProductValues) {
   return {
@@ -450,12 +417,18 @@ export const lookupFoodByBarcode = createServerFn({ method: 'POST' })
     };
   });
 
+const createFoodProductMultipartType = type('FormData.parse').to({
+  values: type('string.json.parse').to(createFoodProductValuesType),
+  'photo?': nonEmptyPhotoType,
+});
+
 export const createFoodProduct = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('createFoodProduct'), limitFoodUploadRequestMiddleware])
-  .validator(arkTypeValidator(formDataType))
+  .validator(arkTypeValidator(createFoodProductMultipartType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const { values, photo } = parseMultipartValues(data, createFoodProductValuesType);
+    const { values } = data;
+    const photo = data.photo ?? null;
     if (values.barcode && (await findFoodProductByBarcode(values.barcode))) {
       throw new ClientSafeError('A food product with this barcode already exists.');
     }
@@ -483,12 +456,19 @@ export const createFoodProduct = createServerFn({ method: 'POST' })
     }
   });
 
+const updateFoodProductValuesType = createFoodProductValuesType.merge({ id: 'string.uuid' });
+const updateFoodProductMultipartType = type('FormData.parse').to({
+  values: type('string.json.parse').to(updateFoodProductValuesType),
+  'photo?': nonEmptyPhotoType,
+});
+
 export const updateFoodProduct = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateFoodProduct'), limitFoodUploadRequestMiddleware])
-  .validator(arkTypeValidator(formDataType))
+  .validator(arkTypeValidator(updateFoodProductMultipartType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const { values, photo } = parseMultipartValues(data, updateFoodProductValuesType);
+    const { values } = data;
+    const photo = data.photo ?? null;
     const [existing] = await db
       .select()
       .from(foodProducts)
@@ -537,13 +517,18 @@ const recordFoodValuesType = type({
   grams: nonNegativeAmountType,
   productId: 'string.uuid',
 });
+const recordFoodMultipartType = type('FormData.parse').to({
+  values: type('string.json.parse').to(recordFoodValuesType),
+  'photo?': nonEmptyPhotoType,
+});
 
 export const recordFood = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('recordFood'), limitFoodUploadRequestMiddleware])
-  .validator(arkTypeValidator(formDataType))
+  .validator(arkTypeValidator(recordFoodMultipartType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const { values, photo } = parseMultipartValues(data, recordFoodValuesType);
+    const { values } = data;
+    const photo = data.photo ?? null;
     if (photo) throw new ClientSafeError('Product-backed entries use the product photo.');
 
     const [product] = await db
@@ -593,13 +578,18 @@ const recordCustomCaloriesValuesType = type({
   date: dateOnlyType,
   'imageAction?': imageActionType,
 });
+const recordCustomCaloriesMultipartType = type('FormData.parse').to({
+  values: type('string.json.parse').to(recordCustomCaloriesValuesType),
+  'photo?': nonEmptyPhotoType,
+});
 
 export const recordCustomCalories = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('recordCustomCalories'), limitFoodUploadRequestMiddleware])
-  .validator(arkTypeValidator(formDataType))
+  .validator(arkTypeValidator(recordCustomCaloriesMultipartType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const { values, photo } = parseMultipartValues(data, recordCustomCaloriesValuesType);
+    const { values } = data;
+    const photo = data.photo ?? null;
     const action = values.imageAction ?? 'keep';
     const image = await prepareImageAction(action, photo, session.user.id);
 
@@ -666,6 +656,10 @@ const updateFoodLogValuesType = type({
   date: dateOnlyType,
   'imageAction?': imageActionType,
 });
+const updateFoodLogMultipartType = type('FormData.parse').to({
+  values: type('string.json.parse').to(updateFoodLogValuesType),
+  'photo?': nonEmptyPhotoType,
+});
 
 function updateOptionalNutrient(
   inputValue: number | null | undefined,
@@ -681,10 +675,11 @@ function updateOptionalNutrient(
 
 export const updateFoodLog = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateFoodLog'), limitFoodUploadRequestMiddleware])
-  .validator(arkTypeValidator(formDataType))
+  .validator(arkTypeValidator(updateFoodLogMultipartType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const { values, photo } = parseMultipartValues(data, updateFoodLogValuesType);
+    const { values } = data;
+    const photo = data.photo ?? null;
 
     const [existing] = await db
       .select()
