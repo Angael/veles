@@ -192,6 +192,20 @@ export function ComponentsDemoPage() {
           value={textValue}
         />
       </section>
+      <section>
+        <h2>TypedForm</h2>
+        <TypedForm
+          className={css.formGrid}
+          onSubmit={(data) => {
+            data.string('typedFormDemo');
+          }}
+        >
+          <Label text='Demo field'>
+            <TextInput defaultValue='Breakfast' name='typedFormDemo' required />
+          </Label>
+          <Btn type='submit'>Submit demo</Btn>
+        </TypedForm>
+      </section>
 
       <section>
         <h2>TypedForm</h2>

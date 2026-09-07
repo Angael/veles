@@ -373,7 +373,6 @@ async function seedFoodLogs(client: Client, userId: string) {
     }
   }
 }
-
 async function seedRecipes(client: Client, userId: string) {
   const recipes = [
     {
