@@ -6,7 +6,6 @@ import { Card } from '@/components/card/Card';
 import { DateInput } from '@/components/date-input/DateInput';
 import { Label } from '@/components/label/Label';
 import { NumberInput } from '@/components/number-input/NumberInput';
-import { toastManager } from '@/components/toast/toastManager';
 import { TypedForm } from '@/components/typed-form/TypedForm';
 import css from './WeightEntryPages.module.css';
 import { useSaveWeightMutation } from './weight.query';
@@ -36,14 +35,6 @@ export function AddWeightPage() {
             mutation.mutate(
               { data: { date, weightKg } },
               {
-                onError: () => {
-                  toastManager.add({
-                    description: 'Check the date and weight, then try again.',
-                    priority: 'high',
-                    title: 'Could not save weight',
-                    type: 'error',
-                  });
-                },
                 onSuccess: () => {
                   void router
                     .invalidate()

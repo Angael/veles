@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { Btn } from '@/components/btn/Btn';
 import { Card } from '@/components/card/Card';
 import { NumberInput } from '@/components/number-input/NumberInput';
-import { toastManager } from '@/components/toast/toastManager';
 import { TypedForm } from '@/components/typed-form/TypedForm';
 import { RecentWeightEntries } from './RecentWeightEntries';
 import css from './WeightPage.module.css';
@@ -40,14 +39,6 @@ export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
     saveMutation.mutate(
       { data: { date: format(new Date(), 'yyyy-MM-dd'), weightKg } },
       {
-        onError: () => {
-          toastManager.add({
-            description: 'Your weight was not changed. Please try again.',
-            priority: 'high',
-            title: 'Could not save weight',
-            type: 'error',
-          });
-        },
         onSuccess: () => {
           void router.invalidate().catch(() => undefined);
         },

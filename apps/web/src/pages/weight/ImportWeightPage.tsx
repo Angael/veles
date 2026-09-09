@@ -60,14 +60,6 @@ export function ImportWeightPage() {
               mutation.mutate(
                 { data: { entries: parsed.entries } },
                 {
-                  onError: () => {
-                    toastManager.add({
-                      description: 'Your entries were not imported. Please try again.',
-                      priority: 'high',
-                      title: 'Could not import weights',
-                      type: 'error',
-                    });
-                  },
                   onSuccess: () => {
                     void router
                       .invalidate()

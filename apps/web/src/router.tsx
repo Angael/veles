@@ -1,12 +1,12 @@
-import { QueryClient } from '@tanstack/react-query';
 import { createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
 import { NotFound } from '@/components/not-found/NotFound';
+import { createQueryClient } from '@/lib/queryClient';
 import { routeTree } from './routeTree.gen';
 
 export function getRouter() {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const queryClient = createQueryClient();
 
   const router = createRouter({
     routeTree,
