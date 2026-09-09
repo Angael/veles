@@ -27,7 +27,7 @@
 - Keep TanStack Query options and mutation hooks in `*.query.ts` files near their usage.
 - Components should consume reusable `useQuery` options and `useMutation` hooks from those files instead of manually calling server functions, tracking pending state, or passing a `QueryClient` to invalidation helpers.
 - For toast notifications after mutation, prefer `useMutation` `meta`
-- For query invalidation after mutation, prefer `useMutation` `meta.invalidateQueryKey`
+- For simple static query invalidation after mutation, prefer `useMutation` `meta.invalidateQueryKey`
 
 ## UI
 - Prefer css modules, prefer syntax `import css from ...`

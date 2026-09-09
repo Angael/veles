@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import { StarIcon } from 'lucide-react';
-import { toastManager } from '@/components/toast/toastManager';
 import css from './RecipeRating.module.css';
 import { useUpdateRecipeRatingMutation } from './recipes.query';
 
@@ -34,12 +33,6 @@ export function RecipeRating({ rating, recipeId }: RecipeRatingProps) {
       await router.invalidate();
     } catch {
       setVisibleRating(previousRating);
-      toastManager.add({
-        description: 'Your previous rating was restored. Please try again.',
-        priority: 'high',
-        title: 'Could not save rating',
-        type: 'error',
-      });
     }
   }
 

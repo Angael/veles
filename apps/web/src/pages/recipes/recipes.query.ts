@@ -9,7 +9,16 @@ export function useCreateRecipeMutation() {
 }
 
 export function useUpdateRecipeRatingMutation() {
-  return useMutation({ mutationFn: updateRecipeRating });
+  return useMutation({
+    meta: {
+      error: {
+        message: 'Your previous rating was restored. Please try again.',
+        priority: 'high',
+        title: 'Could not save rating',
+      },
+    },
+    mutationFn: updateRecipeRating,
+  });
 }
 
 export function useUpdateRecipeMutation() {
