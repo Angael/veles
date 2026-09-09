@@ -142,6 +142,7 @@ export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProp
                 dataKey='timestamp'
                 domain={xDomain}
                 interval={0}
+                padding={{ right: 24 }}
                 scale='time'
                 tick={{ className: css.dateTick }}
                 tickFormatter={(value: number) =>

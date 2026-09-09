@@ -52,5 +52,8 @@
 @media (--phone) {
   .chartFrame {
     min-height: 10rem;
+
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
   }
 }
