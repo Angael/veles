@@ -1,16 +1,16 @@
 /// <reference types="vite/client" />
-import { AppFrame } from '@/components/app-frame/AppFrame';
-import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
-import { NotFound } from '@/components/not-found/NotFound';
-import { ToastProvider } from '@/components/toast/ToastProvider';
+import { AppFrame } from '@/components/app/app-frame/AppFrame';
+import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
+import { NotFound } from '@/components/app/not-found/NotFound';
+import { ToastProvider } from '@/components/ui/toast/ToastProvider';
 import { sessionUserQueryOptions } from '@/lib/auth/session.query';
-import { clientEnv } from '@/lib/env/client';
 import globalCss from '@/styles/global.css?url';
 import type { QueryClient } from '@tanstack/react-query';
 import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
 import * as React from 'react';
 
 const isLocalhostApp = import.meta.env.DEV;
+const appName = (import.meta.env.VITE_APP_NAME as string) || 'Veles';
 const ComponentsDemoLink = React.lazy(() => import('./-ComponentsDemoLink'));
 
 const faviconLinks = isLocalhostApp
@@ -39,7 +39,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { name: 'theme-color', content: '#060816' },
-      { title: clientEnv.appName },
+      { title: appName },
       {
         name: 'description',
         content:

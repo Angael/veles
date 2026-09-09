@@ -6,13 +6,17 @@ import { getSafeRedirectPath } from '@/lib/auth/getSafeRedirectPath';
 export const Route = createFileRoute('/login')({
   validateSearch: type({ 'redirect?': 'string' }),
   ssr: false,
-
   beforeLoad: ({ context, search }) => {
     if (context.user) {
       // oxlint-disable-next-line typescript/only-throw-error -- Router control flow intentionally throws this object.
       throw redirect({ to: getSafeRedirectPath(search.redirect) });
     }
   },
-  component: LoginPage,
+  component: RouteComponent,
   pendingComponent: LoginPendingPage,
 });
+
+function RouteComponent() {
+  const { redirect: redirectPath } = Route.useSearch();
+  return <LoginPage redirect={redirectPath} />;
+}

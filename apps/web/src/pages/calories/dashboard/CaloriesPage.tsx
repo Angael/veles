@@ -9,8 +9,9 @@ import type { CalorieDashboard, CalorieDashboardDay } from '../calories.api';
 import { calorieDashboardQueryOptions } from '../calories.query';
 import { CalorieOverview } from './CalorieOverview';
 import { LogFoodMenu } from './LogFoodMenu';
-import { CALORIE_DATE_FORMAT, calorieWeekDates, todayLocalDate } from '../calorieHelpers';
-import { Btn } from '@/components/btn/Btn';
+import { CALORIE_DATE_FORMAT, calorieWeekDates } from '../calorieHelpers';
+import { todayLocalDate } from '@/lib/dateOnly';
+import { Btn } from '@/components/ui/btn/Btn';
 import css from './CaloriesPage.module.css';
 
 type CaloriesPageProps = { dashboard: CalorieDashboard; date: string };

@@ -3,7 +3,7 @@ import { Trash2Icon } from 'lucide-react';
 import { CalorieFoodCard } from '../CalorieFoodCard';
 import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogMutation } from '../calories.query';
-import { Btn } from '@/components/btn/Btn';
+import { Btn } from '@/components/ui/btn/Btn';
 
 type LoggedFoodProps = {
   date: string;

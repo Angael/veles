@@ -1,5 +1,5 @@
 import { createFileRoute, notFound } from '@tanstack/react-router';
-import { RecipeViewPage } from '@/pages/recipes/RecipeViewPage';
+import { RecipeViewPage } from '@/pages/recipes/detail/RecipeViewPage';
 import { getRecipeById } from '@/pages/recipes/recipes.api';
 
 export const Route = createFileRoute('/recipes/view/$id')({

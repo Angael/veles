@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { inArray } from 'drizzle-orm';
 import { uploadObjects } from '@veles/db/schema';
-import { db } from '@/lib/db';
-import { getStorageConfig } from '@/lib/storage/config';
-import { optimizeImage } from '@/lib/storage/image';
-import { deleteFileByKey, uploadFileByKey } from '@/lib/storage/r2';
+import { db } from '@/server/db.server';
+import { getStorageConfig } from '@/server/storage/config.server';
+import { optimizeImage } from '@/server/storage/image.server';
+import { deleteFileByKey, uploadFileByKey } from '@/server/storage/r2.server';
 
 export const FOOD_IMAGE_MAX_BYTES = 10 * 1024 * 1024;
 

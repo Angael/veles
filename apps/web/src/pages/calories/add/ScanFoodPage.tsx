@@ -4,8 +4,8 @@ import type { CalorieFood } from '../calories.api';
 import { useLookupFoodByBarcodeMutation } from '../calories.query';
 import { BarcodeScanner } from './BarcodeScanner';
 import { SelectedFoodForm } from './SelectedFoodForm';
-import { Btn } from '@/components/btn/Btn';
-import { TextInput } from '@/components/text-input/TextInput';
+import { Btn } from '@/components/ui/btn/Btn';
+import { TextInput } from '@/components/ui/text-input/TextInput';
 import css from '../CalorieFlows.module.css';
 
 export function ScanFoodPage({ initialDate }: { initialDate: string }) {

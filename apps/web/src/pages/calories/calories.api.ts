@@ -4,14 +4,14 @@ import { createMiddleware, createServerFn } from '@tanstack/react-start';
 import { and, desc, eq, gte, inArray, lte } from 'drizzle-orm';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { calorieGoals, foodLogs, foodProducts, uploadObjects } from '@veles/db/schema';
-import { requireSession } from '@/lib/auth/getSession';
+import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
-import { db } from '@/lib/db';
-import { downloadFile } from '@/lib/download/downloadFile';
-import { storagePathToUrl } from '@/lib/storage/config';
-import { log } from '@/lib/logger';
-import { logMiddleware } from '@/lib/middleware/logMiddleware';
-import { getOpenFoodFactsProduct, type OpenFoodFactsProduct } from '@/lib/openFoodFacts';
+import { db } from '@/server/db.server';
+import { downloadFile } from './downloadFile';
+import { storagePathToUrl } from '@/server/storage/config.server';
+import { log } from '@/server/logger.server';
+import { logMiddleware } from '@/server/middleware/logMiddleware';
+import { getOpenFoodFactsProduct, type OpenFoodFactsProduct } from './openFoodFacts';
 
 import {
   deletePreparedFoodImage,
@@ -22,12 +22,11 @@ import {
 import {
   fromHundredths,
   HUNDREDTHS,
-  isWithinKcalGoal,
   optionalHundredths,
   toCalorieGoal,
   toHundredths,
-} from './calorieHelpers';
-import { calorieWeekDates } from './calorieHelpers';
+} from '@/lib/nutrition';
+import { calorieWeekDates, isWithinKcalGoal } from './calorieHelpers';
 
 const MAX_TEXT_LENGTH = 500;
 const FOOD_UPLOAD_MAX_REQUEST_BYTES = 12 * 1024 * 1024;

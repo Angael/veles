@@ -1,6 +1,6 @@
-import { Btn } from '@/components/btn/Btn';
-import { Label } from '@/components/label/Label';
-import { NumberInput } from '@/components/number-input/NumberInput';
+import { Btn } from '@/components/ui/btn/Btn';
+import { Label } from '@/components/ui/label/Label';
+import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { macroPercentageTotal, type MacroPercentages } from './calorieGoalCalculator';
 import css from './CalorieGoalsPage.module.css';
 

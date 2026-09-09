@@ -4,8 +4,8 @@ import type {
 } from 'barcode-detector/pure';
 import { CameraIcon, CameraOffIcon, SwitchCameraIcon, XIcon } from 'lucide-react';
 import { type ReactElement, useEffect, useRef, useState } from 'react';
-import { Btn } from '@/components/btn/Btn';
-import { Card } from '@/components/card/Card';
+import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
 import css from './BarcodeScanner.module.css';
 import { useCameraPreference } from './useCameraPreference';
 

@@ -4,10 +4,10 @@ import { createServerFn } from '@tanstack/react-start';
 import { and, desc, eq, lte } from 'drizzle-orm';
 import { calorieGoals, diaryEntries, foodLogs, recipes, weightEntries } from '@veles/db/schema';
 import { dateOnlyType } from '@/lib/dateOnly';
-import { fromHundredths, HUNDREDTHS, toCalorieGoal } from '@/pages/calories/calorieHelpers';
-import { requireSession } from '@/lib/auth/getSession';
-import { db } from '@/lib/db';
-import { logMiddleware } from '@/lib/middleware/logMiddleware';
+import { fromHundredths, HUNDREDTHS, toCalorieGoal } from '@/lib/nutrition';
+import { requireSession } from '@/server/getSession.server';
+import { db } from '@/server/db.server';
+import { logMiddleware } from '@/server/middleware/logMiddleware';
 
 export type HomeDashboardData = {
   date: string;

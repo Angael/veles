@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { Card } from '@/components/card/Card';
-import { NutritionInline } from '@/components/nutrition-inline/NutritionInline';
+import { Card } from '@/components/ui/card/Card';
+import { NutritionInline } from './NutritionInline';
 import css from './CalorieFoodCard.module.css';
 
 type CalorieFoodCardProps = {

@@ -2,7 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import type { CalorieFood } from '../calories.api';
 import { useUpdateFoodProductMutation } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
-import { todayLocalDate } from '../calorieHelpers';
+import { todayLocalDate } from '@/lib/dateOnly';
 import css from '../CalorieFlows.module.css';
 
 export function EditFoodPage({ food }: { food: CalorieFood }) {

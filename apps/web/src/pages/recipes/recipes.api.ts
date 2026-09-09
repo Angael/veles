@@ -3,11 +3,11 @@ import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { and, eq, inArray } from 'drizzle-orm';
 import { recipeImages, recipes, uploadObjects } from '@veles/db/schema';
-import { db } from '@/lib/db';
-import { getSessionUserId, requireSession } from '@/lib/auth/getSession';
+import { db } from '@/server/db.server';
+import { getSessionUserId, requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
-import { logMiddleware } from '@/lib/middleware/logMiddleware';
-import { storagePathToUrl } from '@/lib/storage/config';
+import { logMiddleware } from '@/server/middleware/logMiddleware';
+import { storagePathToUrl } from '@/server/storage/config.server';
 
 type RecipeSelect = typeof recipes.$inferSelect;
 

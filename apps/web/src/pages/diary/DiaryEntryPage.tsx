@@ -1,11 +1,11 @@
 import { useNavigate, useRouter } from '@tanstack/react-router';
 import { Trash2Icon } from 'lucide-react';
-import { Card } from '@/components/card/Card';
-import { Btn } from '@/components/btn/Btn';
-import { DateInput } from '@/components/date-input/DateInput';
-import { SeamlessTextInput } from '@/components/seamless-text-input/SeamlessTextInput';
-import { SeamlessTextarea } from '@/components/seamless-textarea/SeamlessTextarea';
-import { useAutoSaveState } from '@/lib/hooks/useAutoSaveState';
+import { Card } from '@/components/ui/card/Card';
+import { Btn } from '@/components/ui/btn/Btn';
+import { DateInput } from '@/components/ui/date-input/DateInput';
+import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
+import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
+import { useAutoSaveState } from './useAutoSaveState';
 import type { DiaryEntrySummary } from './diary.api';
 import { useDeleteDiaryEntryMutation, useUpdateDiaryEntryMutation } from './diary.query';
 import css from './DiaryEntryPage.module.css';

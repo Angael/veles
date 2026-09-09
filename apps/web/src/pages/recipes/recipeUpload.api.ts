@@ -3,14 +3,14 @@ import { ArkErrors, type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createMiddleware, createServerFn } from '@tanstack/react-start';
 import { recipeImages, recipes, uploadObjects } from '@veles/db/schema';
-import { db } from '@/lib/db';
-import { requireSession } from '@/lib/auth/getSession';
+import { db } from '@/server/db.server';
+import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
-import { logMiddleware } from '@/lib/middleware/logMiddleware';
-import { getStorageConfig } from '@/lib/storage/config';
-import { optimizeImage } from '@/lib/storage/image';
+import { logMiddleware } from '@/server/middleware/logMiddleware';
+import { getStorageConfig } from '@/server/storage/config.server';
+import { optimizeImage } from '@/server/storage/image.server';
 import { IMAGE_MAX_INPUT_BYTES } from '@/lib/storage/imageLimits';
-import { deleteFileByKey, uploadFileByKey } from '@/lib/storage/r2';
+import { deleteFileByKey, uploadFileByKey } from '@/server/storage/r2.server';
 // Keep below nginx's client_max_body_size with enough headroom for multipart form overhead.
 // If this changes, update the corresponding limit in infra/nginx/nginx.conf.
 const RECIPE_UPLOAD_MAX_REQUEST_BYTES = 85 * 1024 * 1024;

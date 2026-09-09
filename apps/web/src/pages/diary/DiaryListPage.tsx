@@ -1,9 +1,9 @@
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
 import { PlusIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Card } from '@/components/card/Card';
-import { FloatingButton } from '@/components/floating-button/FloatingButton';
-import { TextInput } from '@/components/text-input/TextInput';
+import { Card } from '@/components/ui/card/Card';
+import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
+import { TextInput } from '@/components/ui/text-input/TextInput';
 import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
 import { type DiaryEntrySummary, formatDiaryDate } from './diary.api';
 import { useCreateDiaryEntryMutation } from './diary.query';

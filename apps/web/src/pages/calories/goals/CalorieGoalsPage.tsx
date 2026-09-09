@@ -2,11 +2,11 @@ import type { UseNavigateResult } from '@tanstack/react-router';
 import { useState } from 'react';
 import type { CalorieGoal } from '../calories.api';
 import { useSetDailyCalorieGoalMutation } from '../calories.query';
-import { todayLocalDate } from '../calorieHelpers';
-import { Btn } from '@/components/btn/Btn';
-import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
-import { TypedForm } from '@/components/typed-form/TypedForm';
-import { TypedFormData } from '@/components/typed-form/TypedFormData';
+import { todayLocalDate } from '@/lib/dateOnly';
+import { Btn } from '@/components/ui/btn/Btn';
+import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
+import { TypedForm } from '@/components/ui/typed-form/TypedForm';
+import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import { CalorieGoalCalculator } from './CalorieGoalCalculator';
 import {
   DEFAULT_MACRO_PERCENTAGES,

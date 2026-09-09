@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Btn } from '@/components/btn/Btn';
-import { Label } from '@/components/label/Label';
-import { NumberInput } from '@/components/number-input/NumberInput';
-import { SelectInput } from '@/components/select-input/SelectInput';
+import { Btn } from '@/components/ui/btn/Btn';
+import { Label } from '@/components/ui/label/Label';
+import { NumberInput } from '@/components/ui/number-input/NumberInput';
+import { SelectInput } from '@/components/ui/select-input/SelectInput';
 import {
   estimateMaintenanceKcal,
   macrosFromPercentages,

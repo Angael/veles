@@ -2,15 +2,15 @@ import { Link, useNavigate, type UseNavigateResult } from '@tanstack/react-route
 import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogMutation, useUpdateFoodLogMutation } from '../calories.query';
-import { Btn } from '@/components/btn/Btn';
-import { DateInput } from '@/components/date-input/DateInput';
-import { KcalMacrosForm } from '@/components/kcal-macros-form/KcalMacrosForm';
-import { Label } from '@/components/label/Label';
-import { NumberInput } from '@/components/number-input/NumberInput';
-import { PhotoPicker, type PhotoPickerValue } from '@/components/photo-picker/PhotoPicker';
-import { TextInput } from '@/components/text-input/TextInput';
-import { TypedForm } from '@/components/typed-form/TypedForm';
-import { TypedFormData } from '@/components/typed-form/TypedFormData';
+import { Btn } from '@/components/ui/btn/Btn';
+import { DateInput } from '@/components/ui/date-input/DateInput';
+import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
+import { Label } from '@/components/ui/label/Label';
+import { NumberInput } from '@/components/ui/number-input/NumberInput';
+import { PhotoPicker, type PhotoPickerValue } from '../PhotoPicker';
+import { TextInput } from '@/components/ui/text-input/TextInput';
+import { TypedForm } from '@/components/ui/typed-form/TypedForm';
+import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import css from '../CalorieFlows.module.css';
 
 export function EditFoodLogPage({ log }: { log: CalorieLog }) {

@@ -1,5 +1,5 @@
 import { createFileRoute, notFound } from '@tanstack/react-router';
-import { EditRecipePage } from '@/pages/recipes/EditRecipePage';
+import { EditRecipePage } from '@/pages/recipes/editor/EditRecipePage';
 import { getOwnedRecipeById } from '@/pages/recipes/recipes.api';
 
 export const Route = createFileRoute('/_authenticated/recipes/view/$id_/edit')({
