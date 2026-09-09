@@ -1,5 +1,4 @@
 import { useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
 import { useCreateFoodProductMutation } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
 import css from '../CalorieFlows.module.css';
@@ -8,16 +7,13 @@ type Props = { barcode?: string; date: string; name?: string };
 export function CreateFoodPage({ barcode, date, name }: Props) {
   const navigate = useNavigate();
   const createMutation = useCreateFoodProductMutation();
-  const [error, setError] = useState('');
+  const error = createMutation.error?.message ?? '';
+
   async function save(value: FoodEditorValue) {
-    setError('');
-    try {
-      const product = await createMutation.mutateAsync(value);
-      await navigate({ to: '/calories/add', search: { date, foodId: product.id } });
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not create food.');
-    }
+    const product = await createMutation.mutateAsync(value);
+    await navigate({ to: '/calories/add', search: { date, foodId: product.id } });
   }
+
   return (
     <main className={css.page}>
       <header className={css.header}>
