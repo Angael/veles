@@ -69,6 +69,7 @@ export function AddWeightPage() {
               onValueChange={setWeightKg}
               placeholder='e.g. 78.4'
               required
+              stepperStep={0.1}
               value={weightKg}
             />
           </Label>
