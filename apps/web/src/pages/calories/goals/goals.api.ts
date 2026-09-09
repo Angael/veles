@@ -1,7 +1,8 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { calorieGoals } from '@veles/db/schema';
+import { desc, eq } from 'drizzle-orm';
+import { calorieGoals, weightEntries } from '@veles/db/schema';
 import { requireSession } from '@/server/getSession.server';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { db } from '@/server/db.server';
@@ -17,6 +18,20 @@ const setDailyCalorieGoalInputType = type({
   'carbs?': optionalPositiveAmountType,
   date: dateOnlyType,
 });
+
+export const getLatestWeightKg = createServerFn({ method: 'GET' })
+  .middleware([logMiddleware('getLatestWeightKg')])
+  .handler(async () => {
+    const session = await requireSession();
+    const [latestWeight] = await db
+      .select({ weightGrams: weightEntries.weightGrams })
+      .from(weightEntries)
+      .where(eq(weightEntries.userId, session.user.id))
+      .orderBy(desc(weightEntries.date))
+      .limit(1);
+
+    return latestWeight ? latestWeight.weightGrams / 1_000 : null;
+  });
 
 export const setDailyCalorieGoal = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('setDailyCalorieGoal')])
