@@ -160,7 +160,7 @@ export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProp
                 tickLine={false}
                 width={58}
               />
-              <Tooltip content={WeightTooltip} />
+              <Tooltip animationDuration={0} content={WeightTooltip} />
               <Area
                 dataKey='weightKg'
                 dot={false}
