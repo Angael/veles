@@ -3,10 +3,17 @@ import { createFileRoute } from '@tanstack/react-router';
 import { CalorieGoalsPage } from '@/pages/calories/goals/CalorieGoalsPage';
 import { calorieDashboardQueryOptions } from '@/pages/calories/calories.query';
 import { todayLocalDate } from '@/pages/calories/calorieHelpers';
+import { getLatestWeightKg } from '@/pages/calories/goals/goals.api';
 
 export const Route = createFileRoute('/_authenticated/calories_/goals')({
-  loader: ({ context }) =>
-    context.queryClient.ensureQueryData(calorieDashboardQueryOptions(todayLocalDate())),
+  loader: async ({ context }) => {
+    const [, latestWeightKg] = await Promise.all([
+      context.queryClient.ensureQueryData(calorieDashboardQueryOptions(todayLocalDate())),
+      getLatestWeightKg(),
+    ]);
+
+    return { latestWeightKg };
+  },
   component: Component,
   staticData: {
     navbar: {
@@ -18,8 +25,9 @@ export const Route = createFileRoute('/_authenticated/calories_/goals')({
 
 function Component() {
   const { data: dashboard } = useSuspenseQuery(calorieDashboardQueryOptions(todayLocalDate()));
+  const { latestWeightKg } = Route.useLoaderData();
   const today = todayLocalDate();
   const goal = dashboard.days.find((day) => day.date === today)?.goal ?? null;
 
-  return <CalorieGoalsPage goal={goal} />;
+  return <CalorieGoalsPage goal={goal} latestWeightKg={latestWeightKg} />;
 }
