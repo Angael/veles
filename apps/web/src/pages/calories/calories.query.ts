@@ -117,21 +117,15 @@ export function calorieFoodsQueryOptions() {
 
 export function useDeleteFoodLogMutation() {
   return useMutation({
+    meta: { invalidateQueryKey: calorieDashboardKey },
     mutationFn: ({ id }: DeleteFoodLogVariables) => deleteFoodLog({ data: { id } }),
-    onSuccess: (_data, { date }, _onMutateResult, context) =>
-      context.client.invalidateQueries({
-        queryKey: calorieDashboardQueryOptions(date).queryKey,
-      }),
   });
 }
 export function useRecordFoodMutation() {
   return useMutation({
+    meta: { invalidateQueryKey: calorieDashboardKey },
     mutationFn: (variables: RecordFoodVariables) =>
       recordFood({ data: toMultipartFormData({ ...variables }) }),
-    onSuccess: (_data, { date }, _onMutateResult, context) =>
-      context.client.invalidateQueries({
-        queryKey: calorieDashboardQueryOptions(date).queryKey,
-      }),
   });
 }
 
@@ -160,37 +154,25 @@ export function useLookupFoodByBarcodeMutation() {
 
 export function useRecordCustomCaloriesMutation() {
   return useMutation({
+    meta: { invalidateQueryKey: calorieDashboardKey },
     mutationFn: (variables: RecordCustomCaloriesVariables) =>
       recordCustomCalories({ data: toMultipartFormData(variables) }),
-    onSuccess: (_data, { date }, _onMutateResult, context) =>
-      context.client.invalidateQueries({
-        queryKey: calorieDashboardQueryOptions(date).queryKey,
-      }),
   });
 }
 
 export function useSetDailyCalorieGoalMutation() {
   return useMutation({
+    meta: { invalidateQueryKey: calorieDashboardKey },
     mutationFn: (variables: SetDailyCalorieGoalVariables) =>
       setDailyCalorieGoal({ data: variables }),
-    onSuccess: (_data, _variables, _onMutateResult, context) =>
-      context.client.invalidateQueries({ queryKey: calorieDashboardKey }),
   });
 }
 
 export function useUpdateFoodLogMutation() {
   return useMutation({
+    meta: { invalidateQueryKey: calorieDashboardKey },
     mutationFn: ({ previousDate: _previousDate, ...variables }: UpdateFoodLogVariables) =>
       updateFoodLog({ data: toMultipartFormData(variables) }),
-    onSuccess: (_data, { date, previousDate }, _onMutateResult, context) =>
-      Promise.all([
-        context.client.invalidateQueries({
-          queryKey: calorieDashboardQueryOptions(previousDate).queryKey,
-        }),
-        context.client.invalidateQueries({
-          queryKey: calorieDashboardQueryOptions(date).queryKey,
-        }),
-      ]),
   });
 }
 
