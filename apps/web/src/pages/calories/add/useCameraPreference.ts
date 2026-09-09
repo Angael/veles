@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocalStorageState } from '@/lib/hooks/useLocalStorageState';
+import { useLocalStorageState } from './useLocalStorageState';
 
 const preferredCameraStorageKey = 'barcodeScanner.preferredCameraId';
 const cameraHintDismissedStorageKey = 'barcodeScanner.cameraHintDismissed';

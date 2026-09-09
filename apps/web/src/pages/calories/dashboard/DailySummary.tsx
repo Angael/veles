@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { GoalIcon } from 'lucide-react';
-import { Btn } from '@/components/btn/Btn';
+import { Btn } from '@/components/ui/btn/Btn';
 import { useId, useState } from 'react';
 import type { CalorieGoal, CalorieTotals } from '../calories.api';
 import css from './DailySummary.module.css';

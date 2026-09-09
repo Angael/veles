@@ -10,8 +10,8 @@ import {
   UsersRoundIcon,
   UtensilsIcon,
 } from 'lucide-react';
-import { Btn } from '@/components/btn/Btn';
-import { Card } from '@/components/card/Card';
+import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
 import type { HomeDashboardData } from './home.api';
 import css from './HomeDashboard.module.css';
 

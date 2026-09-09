@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { BarcodeIcon, PlusIcon, ScanLineIcon, SparklesIcon } from 'lucide-react';
-import { FloatingButton } from '@/components/floating-button/FloatingButton';
+import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
 import {
   MenuBtn,
   MenuBtnChevron,
@@ -8,7 +8,7 @@ import {
   MenuBtnItem,
   MenuBtnPopup,
   MenuBtnRoot,
-} from '@/components/menu-btn/MenuBtn';
+} from '@/components/ui/menu-btn/MenuBtn';
 
 type Props = { date: string };
 

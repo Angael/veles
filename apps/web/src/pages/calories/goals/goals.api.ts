@@ -2,11 +2,11 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { calorieGoals } from '@veles/db/schema';
-import { requireSession } from '@/lib/auth/getSession';
+import { requireSession } from '@/server/getSession.server';
 import { dateOnlyType } from '@/lib/dateOnly';
-import { db } from '@/lib/db';
-import { logMiddleware } from '@/lib/middleware/logMiddleware';
-import { optionalHundredths, toCalorieGoal, toHundredths } from '../calorieHelpers';
+import { db } from '@/server/db.server';
+import { logMiddleware } from '@/server/middleware/logMiddleware';
+import { optionalHundredths, toCalorieGoal, toHundredths } from '@/lib/nutrition';
 
 const optionalPositiveAmountType = type('number > 0 | undefined');
 

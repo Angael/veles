@@ -5,11 +5,11 @@ import { useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { calorieDashboardQueryOptions, useRecordFoodMutation } from '../calories.query';
 import { GoalPreview } from './GoalPreview';
-import { Btn } from '@/components/btn/Btn';
-import { DateInput } from '@/components/date-input/DateInput';
-import { Label } from '@/components/label/Label';
-import { NumberInput } from '@/components/number-input/NumberInput';
-import { NutritionInline } from '@/components/nutrition-inline/NutritionInline';
+import { Btn } from '@/components/ui/btn/Btn';
+import { DateInput } from '@/components/ui/date-input/DateInput';
+import { Label } from '@/components/ui/label/Label';
+import { NumberInput } from '@/components/ui/number-input/NumberInput';
+import { NutritionInline } from '../NutritionInline';
 import css from './SelectedFoodForm.module.css';
 
 type Props = {
@@ -68,7 +68,7 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
               variant='ghost'
             />
           </div>
-          <NutritionInline carbs={carbs} fat={fat} kcal={kcal} protein={protein} />
+          <NutritionInline kcal={kcal} protein={protein} fat={fat} carbs={carbs} />
         </div>
       </section>
 

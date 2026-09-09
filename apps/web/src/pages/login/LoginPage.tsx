@@ -1,10 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { AuthCard } from '@/components/auth-card/AuthCard';
+import { AuthCard } from './AuthCard';
 import { signIn } from '@/lib/auth/client';
 import { sessionUserQueryKey } from '@/lib/auth/session.query';
 import { getSafeRedirectPath } from '@/lib/auth/getSafeRedirectPath';
 import { useAuthAction } from '@/lib/auth/useAuthAction';
-import { Route } from '@/routes/login';
 
 export function LoginPendingPage() {
   return (
@@ -17,8 +16,7 @@ export function LoginPendingPage() {
   );
 }
 
-export function LoginPage() {
-  const { redirect } = Route.useSearch();
+export function LoginPage({ redirect }: { redirect?: string }) {
   const { busy, error, runAuthAction } = useAuthAction();
   const queryClient = useQueryClient();
 

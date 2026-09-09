@@ -1,5 +1,5 @@
 import { format, parseISO } from 'date-fns';
-import { Card } from '@/components/card/Card';
+import { Card } from '@/components/ui/card/Card';
 import css from './WeightPage.module.css';
 import type { WeightEntry } from './weight.api';
 

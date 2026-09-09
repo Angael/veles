@@ -1,5 +1,5 @@
 import { type } from 'arktype';
-import { isMatch } from 'date-fns';
+import { format, isMatch } from 'date-fns';
 
 /**
  * Strict ArkType for real `YYYY-MM-DD` calendar dates.
@@ -10,3 +10,7 @@ import { isMatch } from 'date-fns';
 export const dateOnlyType = type('string.date.iso').narrow((value, ctx) =>
   isMatch(value, 'yyyy-MM-dd') ? true : ctx.mustBe('a valid date in YYYY-MM-DD format'),
 );
+
+export function todayLocalDate() {
+  return format(new Date(), 'yyyy-MM-dd');
+}

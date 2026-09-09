@@ -1,10 +1,10 @@
 /// <reference types="vite/client" />
-import { AppFrame } from '@/components/app-frame/AppFrame';
-import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
-import { NotFound } from '@/components/not-found/NotFound';
-import { ToastProvider } from '@/components/toast/ToastProvider';
+import { AppFrame } from '@/components/app/app-frame/AppFrame';
+import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
+import { NotFound } from '@/components/app/not-found/NotFound';
+import { ToastProvider } from '@/components/ui/toast/ToastProvider';
 import { sessionUserQueryOptions } from '@/lib/auth/session.query';
-import { clientEnv } from '@/lib/env/client';
+import { clientEnv } from '@/lib/env.client';
 import globalCss from '@/styles/global.css?url';
 import type { QueryClient } from '@tanstack/react-query';
 import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';

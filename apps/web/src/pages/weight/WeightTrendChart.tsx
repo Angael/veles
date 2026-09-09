@@ -1,7 +1,7 @@
 import { ClientOnly } from '@tanstack/react-router';
 import { format, parseISO, subMonths } from 'date-fns';
 import { useState } from 'react';
-import { useCookieState } from '@/lib/hooks/useCookieState';
+import { useCookieState } from './useCookieState';
 import {
   Area,
   AreaChart,
@@ -12,8 +12,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { Skeleton } from '../../components/skeleton/Skeleton';
-import { SelectInput } from '../../components/select-input/SelectInput';
+import { Skeleton } from '@/components/ui/skeleton/Skeleton';
+import { SelectInput } from '@/components/ui/select-input/SelectInput';
 import css from './WeightTrendChart.module.css';
 import {
   getWeightChartRange,

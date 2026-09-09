@@ -1,6 +1,6 @@
 import { createCsrfMiddleware, createStart } from '@tanstack/react-start';
-import { sanitizeServerFnErrorMiddleware } from '@/lib/middleware/sanitizeServerFnErrorMiddleware';
-import { securityHeadersMiddleware } from '@/lib/middleware/securityHeadersMiddleware';
+import { sanitizeServerFnErrorMiddleware } from '@/server/middleware/sanitizeServerFnErrorMiddleware';
+import { securityHeadersMiddleware } from '@/server/middleware/securityHeadersMiddleware';
 
 const csrfMiddleware = createCsrfMiddleware({
   filter: (context) => context.handlerType === 'serverFn',

@@ -1,5 +1,5 @@
 import { MutationCache, QueryClient, type QueryKey } from '@tanstack/react-query';
-import { toastManager } from '@/components/toast/toastManager';
+import { toastManager } from '@/components/ui/toast/toastManager';
 
 type MutationNotification = {
   id?: string;

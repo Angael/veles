@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { RecipesPage } from '@/pages/recipes/RecipesPage';
+import { RecipesPage } from '@/pages/recipes/library/RecipesPage';
 import { getRecipeLibrary } from '@/pages/recipes/recipes.api';
 
 export const Route = createFileRoute('/_authenticated/recipes/')({

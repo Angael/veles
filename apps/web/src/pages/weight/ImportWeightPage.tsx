@@ -1,12 +1,12 @@
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
 import { ClipboardIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Btn } from '@/components/btn/Btn';
-import { Card } from '@/components/card/Card';
-import { Label } from '@/components/label/Label';
-import { TextareaInput } from '@/components/textarea-input/TextareaInput';
-import { toastManager } from '@/components/toast/toastManager';
-import { TypedForm } from '@/components/typed-form/TypedForm';
+import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
+import { Label } from '@/components/ui/label/Label';
+import { TextareaInput } from '@/components/ui/textarea-input/TextareaInput';
+import { toastManager } from '@/components/ui/toast/toastManager';
+import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import css from './WeightEntryPages.module.css';
 import { parseWeightEntries } from './parseWeightEntries';
 import { MAX_WEIGHT_IMPORT_ENTRIES } from './weight.api';

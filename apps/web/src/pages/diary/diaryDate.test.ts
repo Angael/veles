@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/lib/auth/getSession', () => ({ requireSession: vi.fn() }));
-vi.mock('@/lib/db', () => ({ db: {} }));
+vi.mock('@/server/getSession.server', () => ({ requireSession: vi.fn() }));
+vi.mock('@/server/db.server', () => ({ db: {} }));
 
 import { formatDiaryDate } from './diary.api';
 
