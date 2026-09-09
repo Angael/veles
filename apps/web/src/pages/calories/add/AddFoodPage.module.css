@@ -1,0 +1,37 @@
+.page {
+  width: min(760px, 100%);
+  margin-inline: auto;
+  display: grid;
+  gap: var(--space-md);
+  padding-bottom: 5rem;
+}
+
+.search {
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+  padding: var(--space-md);
+}
+
+.results {
+  display: grid;
+  gap: var(--space-sm);
+  list-style: none;
+}
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl) var(--space-md);
+  color: var(--c-muted);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.emptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
+}

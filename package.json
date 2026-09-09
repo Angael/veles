@@ -23,7 +23,8 @@
     "db:push": "pnpm --filter @veles/db db:push",
     "db:reset": "pnpm --filter @veles/db db:reset",
     "db:studio": "pnpm --filter @veles/db db:studio",
-    "db:studio:prod": "pnpm --filter @veles/db db:studio:prod"
+    "db:studio:prod": "pnpm --filter @veles/db db:studio:prod",
+    "db:seed:prod": "pnpm --filter @veles/db db:seed:prod"
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "5.102.8",

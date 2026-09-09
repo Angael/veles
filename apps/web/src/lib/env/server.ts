@@ -8,17 +8,17 @@ const appUrlType = type('string.url').pipe((value) => new URL(value).origin);
 
 const serverEnvType = type({
   DATABASE_URL: 'string >= 1',
-  BETTER_AUTH_SECRET: 'string',
+  BETTER_AUTH_SECRET: 'string >= 1',
   AUTH_ALLOWED_EMAILS: allowedAuthEmailsType,
   APP_URL: appUrlType,
-  GOOGLE_CLIENT_ID: 'string',
-  GOOGLE_CLIENT_SECRET: 'string',
+  GOOGLE_CLIENT_ID: 'string >= 1',
+  GOOGLE_CLIENT_SECRET: 'string >= 1',
   NODE_ENV: "'development' | 'production' | 'test'",
   VITE_CF_CDN_URL: 'string.url',
-  R2_ACCOUNT_ID: 'string',
-  R2_ACCESS_KEY_ID: 'string',
-  R2_SECRET_ACCESS_KEY: 'string',
-  R2_BUCKET_NAME: 'string',
+  R2_ACCOUNT_ID: 'string >= 1',
+  R2_ACCESS_KEY_ID: 'string >= 1',
+  R2_SECRET_ACCESS_KEY: 'string >= 1',
+  R2_BUCKET_NAME: 'string >= 1',
 }).pipe((env) => {
   const isProduction = env.NODE_ENV === 'production';
 

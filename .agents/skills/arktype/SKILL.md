@@ -16,6 +16,7 @@ Use ArkType as the primary boundary validation layer. Prefer keywords, ranges, l
 - File upload routes may manually extract/filter `FormData`; let ArkType handle scalar parsing and constraints.
 - Separate `if` checks are fine for auth, permissions, DB/storage state, async checks, and business logic.
 - Avoid `as any`, `as unknown`, `as never`; ask if a cast seems unavoidable.
+- Define an ArkType schema immediately above the function, server function, or route that exclusively uses it. Keep schemas at broader file scope only when multiple consumers share them.
 
 ## Boundary Patterns
 

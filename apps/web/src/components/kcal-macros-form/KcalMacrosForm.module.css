@@ -1,0 +1,17 @@
+@import '../../styles/breakpoints.css';
+
+.fields {
+  display: flex;
+  gap: var(--space-sm);
+
+  > * {
+    min-width: 0;
+    flex: 1;
+  }
+}
+
+@media (--phone) {
+  .fields {
+    flex-direction: column;
+  }
+}

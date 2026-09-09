@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import type { ComponentPropsWithoutRef } from 'react';
 import css from './Card.module.css';
 
-export type CardVariant = 'default' | 'primary' | 'danger';
+type CardVariant = 'default' | 'primary' | 'danger';
 
 type CardProps = ComponentPropsWithoutRef<'div'> & {
   as?: 'article' | 'aside' | 'div' | 'section';

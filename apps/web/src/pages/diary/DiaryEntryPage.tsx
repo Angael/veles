@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useRouter } from '@tanstack/react-router';
 import { Trash2Icon } from 'lucide-react';
 import { Card } from '@/components/card/Card';
@@ -7,7 +6,8 @@ import { DateInput } from '@/components/date-input/DateInput';
 import { SeamlessTextInput } from '@/components/seamless-text-input/SeamlessTextInput';
 import { SeamlessTextarea } from '@/components/seamless-textarea/SeamlessTextarea';
 import { useAutoSaveState } from '@/lib/hooks/useAutoSaveState';
-import { type DiaryEntrySummary, deleteDiaryEntry, updateDiaryEntry } from './diary.api';
+import type { DiaryEntrySummary } from './diary.api';
+import { useDeleteDiaryEntryMutation, useUpdateDiaryEntryMutation } from './diary.query';
 import css from './DiaryEntryPage.module.css';
 
 type DiaryEntryPageProps = {
@@ -19,17 +19,8 @@ export function DiaryEntryPage({ entry, focusTitle = false }: DiaryEntryPageProp
   const navigate = useNavigate();
   const router = useRouter();
 
-  const saveMutation = useMutation({
-    mutationFn: updateDiaryEntry,
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteDiaryEntry,
-    onSuccess: async () => {
-      await navigate({ to: '/diary' });
-      await router.invalidate();
-    },
-  });
+  const saveMutation = useUpdateDiaryEntryMutation();
+  const deleteMutation = useDeleteDiaryEntryMutation();
 
   const [draft, setDraft] = useAutoSaveState(
     {
@@ -80,7 +71,16 @@ export function DiaryEntryPage({ entry, focusTitle = false }: DiaryEntryPageProp
                     `Delete “${draft.title || 'Untitled entry'}”? This cannot be undone.`,
                   )
                 ) {
-                  deleteMutation.mutate({ data: { id: entry.id } });
+                  deleteMutation.mutate(
+                    { data: { id: entry.id } },
+                    {
+                      onSuccess: () => {
+                        void navigate({ to: '/diary' })
+                          .then(() => router.invalidate())
+                          .catch(() => undefined);
+                      },
+                    },
+                  );
                 }
               }}
               size='sm'

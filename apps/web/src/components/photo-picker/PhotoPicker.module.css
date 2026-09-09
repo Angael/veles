@@ -1,0 +1,105 @@
+.root {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  padding: 0;
+  color: var(--c-text-strong);
+  font-weight: var(--font-weight-semibold);
+}
+
+.card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 13rem;
+  overflow: hidden;
+  border: var(--border-width) solid var(--c-border-strong);
+  border-radius: var(--radius-sm);
+  background:
+    radial-gradient(circle at 50% 35%, var(--c-primary-surface), transparent 55%),
+    var(--c-surface-inset);
+
+  &[data-has-image]::after {
+    position: absolute;
+    inset: 45% 0 0;
+    z-index: 1;
+    background: linear-gradient(transparent, rgba(2, 6, 23, 0.72));
+    content: '';
+    pointer-events: none;
+  }
+}
+
+.preview {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 13rem;
+  max-height: 24rem;
+  object-fit: cover;
+}
+
+.placeholder {
+  display: grid;
+  place-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xl);
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.placeholderIcon {
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--c-muted-strong);
+}
+
+.status {
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  z-index: 2;
+  max-width: calc(100% - 2 * var(--space-sm));
+  overflow: hidden;
+  padding: 0.35rem 0.65rem;
+  border: var(--border-width) solid color-mix(in srgb, var(--c-border-strong) 60%, white 40%);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--c-surface-solid) 84%, transparent);
+  color: var(--c-text);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  backdrop-filter: var(--blur-surface);
+}
+
+.actions {
+  position: absolute;
+  right: var(--space-sm);
+  bottom: var(--space-sm);
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+
+.action {
+  --btn-height: 2.5rem;
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.root:disabled .card {
+  opacity: 0.56;
+}

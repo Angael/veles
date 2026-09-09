@@ -1,0 +1,278 @@
+.page {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.overviewStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.logSection {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.logHeading {
+  display: grid;
+  align-items: end;
+  gap: var(--space-md);
+  padding: 0 var(--space-lg);
+}
+
+.logHeading h2 {
+  font-size: var(--text-lg-dynamic);
+  text-wrap: balance;
+}
+
+.emptyLog {
+  padding: var(--space-md) var(--space-lg);
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.logList {
+  display: grid;
+  gap: var(--space-sm);
+  list-style: none;
+}
+
+@media (--phone) {
+  .logList {
+    gap: var(--space-xs);
+  }
+}
+
+.dateControls {
+  display: grid;
+  grid-template-areas: 'strip today';
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.todayButton {
+  grid-area: today;
+}
+
+@media (--phone) {
+  .dateControls {
+    grid-template-areas:
+      'today'
+      'strip';
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xs);
+  }
+
+  .todayButton {
+    justify-self: end;
+  }
+}
+
+.dayStrip {
+  grid-area: strip;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  padding: 0.25rem;
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-inset);
+}
+
+.dayOptions {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.dayNav {
+  flex: none;
+  color: var(--c-muted);
+}
+
+.day {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 3.75rem;
+  padding: 0.35rem 0.2rem 0.5rem;
+  place-items: center;
+  align-content: center;
+  overflow: hidden;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--c-muted);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
+}
+
+.day span {
+  font-size: var(--text-xs);
+  line-height: 1.15;
+}
+
+.day strong {
+  color: var(--c-text);
+  font-size: var(--text-md);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.dayProgress {
+  position: absolute;
+  right: 0.45rem;
+  bottom: 0.3rem;
+  left: 0.45rem;
+  height: 0.25rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--c-surface-input);
+  box-shadow: inset 0 0 0 1px var(--c-border);
+  pointer-events: none;
+}
+
+.dayProgressFill,
+.dayProgressOver {
+  position: absolute;
+  inset-block: 0;
+  margin: 0;
+  transition: width var(--duration-fast) var(--ease-out);
+}
+
+.dayProgressFill {
+  inset-inline-start: 0;
+  background: var(--c-accent);
+}
+
+.dayProgressSuccess {
+  background: var(--c-macro-carb);
+}
+
+.dayProgressToday {
+  background: var(--c-muted-soft);
+}
+
+.dayProgressFuture {
+  background: var(--c-muted-strong);
+}
+
+.dayProgressOver {
+  z-index: 1;
+  inset-inline-end: 0;
+  background: rgb(248 113 113 / 88%);
+  box-shadow: 0 0 0.35rem rgb(248 113 113 / 35%);
+}
+
+.dayLogged {
+  color: var(--c-accent-soft);
+}
+
+.dayWithinGoal {
+  color: var(--c-macro-carb);
+}
+
+.dayOverGoal {
+  color: var(--c-text);
+}
+
+.day.todayDay {
+  background: var(--c-surface-raised);
+  color: var(--c-text-strong);
+}
+
+.day.todayDay strong {
+  color: var(--c-text-strong);
+}
+
+.day.futureDay {
+  opacity: 0.48;
+  color: var(--c-placeholder);
+}
+
+.day.futureDay strong {
+  color: var(--c-muted-strong);
+}
+
+.day[data-pressed] {
+  border-color: var(--c-text-strong);
+  background: var(--c-surface-raised);
+}
+
+.day:focus-visible {
+  outline: 2px solid var(--c-primary-focus);
+  outline-offset: 2px;
+}
+
+.compactDay {
+  display: none;
+}
+
+.expandedDay {
+  display: block;
+}
+
+@media (--phone) {
+  .logHeading {
+    padding: 0 var(--space-sm);
+  }
+
+  .compactDay {
+    display: block;
+  }
+
+  .expandedDay {
+    display: none;
+  }
+
+  .day {
+    min-height: 3.5rem;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .day:hover {
+    background-color: var(--c-surface-raised);
+    color: var(--c-text);
+  }
+
+  .dayWithinGoal:hover {
+    background-color: color-mix(in srgb, var(--c-macro-carb) 12%, transparent);
+    color: var(--c-macro-carb);
+  }
+
+  .dayOverGoal:hover {
+    background-color: var(--c-surface-raised);
+    color: var(--c-text-strong);
+  }
+
+  .day.todayDay:hover {
+    background-color: var(--c-surface-raised);
+    color: var(--c-text-strong);
+  }
+
+  .day.futureDay:hover {
+    opacity: 0.65;
+    color: var(--c-placeholder);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day,
+  .dayProgressFill,
+  .dayProgressOver {
+    transition: none;
+  }
+}

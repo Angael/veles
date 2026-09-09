@@ -1,8 +1,8 @@
 import { glob, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import process from 'node:process';
-import { describe, expect, it } from 'vitest';
 import { invariant } from '@/lib/invariant';
+import { describe, expect, it } from 'vitest';
 
 describe('theme tokens', () => {
   it('only uses defined CSS variables', async () => {

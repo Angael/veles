@@ -14,7 +14,7 @@
   box-shadow: var(--btn-shadow, none);
   font: inherit;
   font-size: var(--btn-font-size);
-  font-weight: 500;
+  font-weight: var(--btn-font-weight, 500);
   line-height: 1;
   text-decoration: none;
   white-space: nowrap;
@@ -24,7 +24,8 @@
     background-color 180ms var(--ease-out),
     border-color 180ms var(--ease-out),
     color 180ms var(--ease-out),
-    opacity 180ms var(--ease-out);
+    opacity 180ms var(--ease-out),
+    text-decoration-color 180ms var(--ease-out);
 }
 
 .button {
@@ -112,6 +113,30 @@
   --btn-border-hover: transparent;
   --btn-color: var(--c-danger-text);
   --btn-color-hover: var(--c-danger-text);
+}
+
+.text {
+  --btn-bg: transparent;
+  --btn-bg-hover: transparent;
+  --btn-border: transparent;
+  --btn-border-hover: transparent;
+  --btn-border-width: 0;
+  --btn-color: var(--c-accent-soft);
+  --btn-color-hover: var(--c-text-strong);
+  --btn-font-weight: var(--font-weight-semibold);
+  --btn-padding-x: 0;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.3em;
+}
+
+.text:hover {
+  text-decoration-color: currentColor;
+}
+
+.text .content > svg {
+  width: var(--text-lg);
+  height: var(--text-lg);
 }
 
 .sm {

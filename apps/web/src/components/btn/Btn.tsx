@@ -11,11 +11,15 @@ export type BtnVariant =
   | 'outlineDanger'
   | 'white'
   | 'ghost'
-  | 'ghostDanger';
+  | 'ghostDanger'
+  | 'text';
 export type BtnSize = 'sm' | 'md' | 'lg';
 type BtnRadius = 'md' | 'pill';
 
-type BtnProps = Omit<ComponentPropsWithoutRef<typeof Button>, 'className' | 'children'> & {
+type BtnProps = Omit<
+  ComponentPropsWithoutRef<typeof Button>,
+  'className' | 'children' | 'render'
+> & {
   children?: ReactNode;
   className?: string;
   icon?: ReactNode;
@@ -23,6 +27,8 @@ type BtnProps = Omit<ComponentPropsWithoutRef<typeof Button>, 'className' | 'chi
   isLink?: boolean;
   loading?: boolean;
   radius?: BtnRadius;
+  /** Renders Btn styling and behavior on another element, such as a TanStack Router Link. */
+  render?: ComponentPropsWithoutRef<typeof Button>['render'];
   size?: BtnSize;
   variant?: BtnVariant;
 };
@@ -36,6 +42,7 @@ export function Btn({
   isLink = false,
   loading = false,
   radius = 'md',
+  render,
   size = 'md',
   variant = 'main',
   ...props
@@ -55,6 +62,7 @@ export function Btn({
       nativeButton={!isLink}
       aria-busy={loading || undefined}
       disabled={loading || disabled}
+      render={render}
       {...props}
     >
       {loading ? <LoaderCircleIcon aria-hidden='true' className={css.loader} /> : null}
