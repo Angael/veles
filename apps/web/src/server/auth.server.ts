@@ -11,6 +11,9 @@ const env = getServerEnv();
 export const auth = betterAuth({
   baseURL: env.appUrl,
   secret: env.betterAuthSecret,
+  onAPIError: {
+    errorURL: new URL('/auth/error', env.appUrl).toString(),
+  },
   database: drizzleAdapter(db, {
     provider: 'pg',
     schema: {
