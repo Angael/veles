@@ -22,6 +22,10 @@ body,
   min-height: 100%;
 }
 
+html {
+  background-color: #060816;
+}
+
 body {
   min-width: 320px;
 }

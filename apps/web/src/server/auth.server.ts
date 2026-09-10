@@ -10,6 +10,9 @@ const env = getServerEnv();
 export const auth = betterAuth({
   baseURL: env.appUrl,
   secret: env.betterAuthSecret,
+  onAPIError: {
+    errorURL: new URL('/auth/error', env.appUrl).toString(),
+  },
   database: drizzleAdapter(db, {
     provider: 'pg',
     schema: {
@@ -48,6 +51,7 @@ export const auth = betterAuth({
           google: {
             clientId: env.googleClientId,
             clientSecret: env.googleClientSecret,
+            prompt: 'select_account',
           },
         }
       : {},
