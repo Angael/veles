@@ -14,10 +14,6 @@ const AUTH_ERROR_COPY: { default: AuthErrorCopy; [code: string]: AuthErrorCopy }
     title: 'We could not finish signing you in',
     msg: 'Something interrupted sign-in. Return to the sign-in page and try again.',
   },
-  this_account_needs_a_connection_invitation_to_use_veles: {
-    title: 'An invitation is needed',
-    msg: 'This Google account is not connected to Veles yet. Ask a Veles member to invite this email address, then come back and try again.',
-  },
 };
 
 export function AuthErrorPage({ code }: { code?: string }) {
