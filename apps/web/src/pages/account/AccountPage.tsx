@@ -230,7 +230,9 @@ export function AccountPage({ invitation, user }: AccountPageProps) {
         !data?.connections.length &&
         !data?.incoming.length &&
         !data?.outgoing.length ? (
-          <p className={css.emptyState}>No connections or pending invitations yet.</p>
+          <p className={css.emptyState} data-appear>
+            No connections or pending invitations yet.
+          </p>
         ) : null}
       </Card>
     </main>
