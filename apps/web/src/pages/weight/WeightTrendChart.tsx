@@ -1,7 +1,7 @@
 import { ClientOnly } from '@tanstack/react-router';
 import { format, parseISO, subMonths } from 'date-fns';
 import { useState } from 'react';
-import { useCookieState } from '@/lib/hooks/useCookieState';
+import { useCookieState } from './useCookieState';
 import {
   Area,
   AreaChart,
@@ -12,8 +12,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { Skeleton } from '../../components/skeleton/Skeleton';
-import { SelectInput } from '../../components/select-input/SelectInput';
+import { Skeleton } from '@/components/ui/skeleton/Skeleton';
+import { SelectInput } from '@/components/ui/select-input/SelectInput';
 import css from './WeightTrendChart.module.css';
 import {
   getWeightChartRange,
@@ -59,7 +59,7 @@ function getXAxisTicks(domain: [number, number], chartWidth: number, usesLongRan
 }
 
 function WeightTooltip({ active, payload }: TooltipContentProps) {
-  const value = payload?.[0]?.value;
+  const value = payload[0]?.value;
 
   if (!active || value === undefined) {
     return null;
@@ -78,6 +78,7 @@ export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProp
   }));
   const weights = visibleEntries.map((entry) => entry.weightKg);
   const domain = [Math.floor(Math.min(...weights)), Math.ceil(Math.max(...weights))];
+  // oxlint-disable-next-line typescript/no-non-null-assertion -- every WeightChartRange has a chart option.
   const rangeLabel = rangeOptions.find((option) => option.value === range)!.label;
   const firstTimestamp = chartEntries.at(0)?.timestamp;
   const lastTimestamp = chartEntries.at(-1)?.timestamp;
@@ -141,6 +142,7 @@ export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProp
                 dataKey='timestamp'
                 domain={xDomain}
                 interval={0}
+                padding={{ right: 24 }}
                 scale='time'
                 tick={{ className: css.dateTick }}
                 tickFormatter={(value: number) =>
@@ -159,7 +161,7 @@ export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProp
                 tickLine={false}
                 width={58}
               />
-              <Tooltip content={WeightTooltip} />
+              <Tooltip animationDuration={0} content={WeightTooltip} />
               <Area
                 dataKey='weightKg'
                 dot={false}

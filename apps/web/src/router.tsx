@@ -1,17 +1,18 @@
-import { QueryClient } from '@tanstack/react-query';
 import { createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
-import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
-import { NotFound } from '@/components/not-found/NotFound';
+import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
+import { NotFound } from '@/components/app/not-found/NotFound';
+import { createQueryClient } from '@/lib/queryClient';
 import { routeTree } from './routeTree.gen';
 
 export function getRouter() {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const queryClient = createQueryClient();
 
   const router = createRouter({
     routeTree,
     context: { queryClient },
     defaultPreload: 'intent',
+    defaultPreloadStaleTime: 0, // Let TanStack Query control data freshness instead of Router's preload cache.
     defaultErrorComponent: DefaultCatchBoundary,
     defaultNotFoundComponent: () => <NotFound />,
     scrollRestoration: true,

@@ -2,11 +2,11 @@ import { Avatar } from '@base-ui/react/avatar';
 import { useNavigate, useRouter } from '@tanstack/react-router';
 import { LogOutIcon, UserMinusIcon, UserPlusIcon, UsersIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Btn } from '@/components/btn/Btn';
-import { Card } from '@/components/card/Card';
-import { signOut } from '@/lib/auth/client';
+import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
 import type { SessionUser } from '@/lib/auth/session.api';
 import { getInitials } from '@/lib/getInitials';
+import { useSignOutMutation } from './account.query';
 import css from './AccountPage.module.css';
 
 interface AccountPageProps {
@@ -37,15 +37,13 @@ export function AccountPage({ user }: AccountPageProps) {
   const navigate = useNavigate();
   const router = useRouter();
   const [friendIds, setFriendIds] = useState(() => new Set(['friend-1', 'friend-3']));
-  const [logoutBusy, setLogoutBusy] = useState(false);
   const accountInitials = useMemo(() => getInitials(user.name) || 'A', [user.name]);
+  const signOutMutation = useSignOutMutation();
 
   async function handleLogout() {
-    setLogoutBusy(true);
-    const result = await signOut();
+    const result = await signOutMutation.mutateAsync();
 
     if (result.error) {
-      setLogoutBusy(false);
       return;
     }
 
@@ -81,8 +79,10 @@ export function AccountPage({ user }: AccountPageProps) {
         </div>
         <Btn
           icon={<LogOutIcon aria-hidden='true' />}
-          loading={logoutBusy}
-          onClick={handleLogout}
+          loading={signOutMutation.isPending}
+          onClick={() => {
+            void handleLogout().catch(() => undefined);
+          }}
           size='sm'
           variant='outlineDanger'
         >

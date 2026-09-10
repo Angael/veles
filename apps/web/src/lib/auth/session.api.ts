@@ -1,6 +1,5 @@
 import { createServerFn } from '@tanstack/react-start';
-import { logMiddleware } from '@/lib/middleware/logMiddleware';
-import { getSession } from './getSession';
+import { getSession } from '@/server/getSession.server';
 
 export interface SessionUser {
   id: string;
@@ -9,10 +8,8 @@ export interface SessionUser {
   name: string;
 }
 
-export const getSessionUser = createServerFn({ method: 'GET' })
-  // Logging middleware deliberately skipped here, as it would just spam on every page view
-  // .middleware([logMiddleware('getSessionUser')])
-  .handler(async (): Promise<SessionUser | null> => {
+export const getSessionUser = createServerFn({ method: 'GET' }).handler(
+  async (): Promise<SessionUser | null> => {
     const session = await getSession();
 
     if (!session) {
@@ -25,4 +22,5 @@ export const getSessionUser = createServerFn({ method: 'GET' })
       image: session.user.image ?? null,
       name: session.user.name,
     };
-  });
+  },
+);

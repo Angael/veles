@@ -1,0 +1,10 @@
+.root {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .root:hover {
+    border-color: var(--c-primary-border-soft);
+    background: color-mix(in srgb, rgba(2, 6, 23, 0.4) 84%, var(--c-primary-surface) 16%);
+  }
+}

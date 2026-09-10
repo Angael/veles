@@ -13,8 +13,8 @@ export function useAuthAction() {
 
     try {
       await action();
-    } catch (error) {
-      setError(error instanceof Error ? error.message : fallbackMessage);
+    } catch (actionError) {
+      setError(actionError instanceof Error ? actionError.message : fallbackMessage);
     } finally {
       setBusy(false);
     }

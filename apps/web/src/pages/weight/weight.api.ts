@@ -5,9 +5,9 @@ import { getCookie } from '@tanstack/react-start/server';
 import { asc, eq, sql } from 'drizzle-orm';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { weightEntries } from '@veles/db/schema';
-import { db } from '@/lib/db';
-import { requireSession } from '@/lib/auth/getSession';
-import { logMiddleware } from '@/lib/middleware/logMiddleware';
+import { db } from '@/server/db.server';
+import { requireSession } from '@/server/getSession.server';
+import { logMiddleware } from '@/server/middleware/logMiddleware';
 import {
   DEFAULT_WEIGHT_CHART_RANGE,
   WEIGHT_CHART_RANGE_COOKIE,

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 // Skipped components are already visible throughout the app or are too large or impractical to
 // showcase meaningfully on the components demo page.
-const SKIPPED_COMPONENTS = new Set(['app-frame', 'auth-card']);
+const SKIPPED_COMPONENTS: Record<string, true> = { 'app-frame': true };
 
 describe('components demo', () => {
   it('showcases every shared component directory', async () => {
@@ -18,18 +18,28 @@ describe('components demo', () => {
 
     const demoSource = demoSources.join('\n');
 
-    for await (const componentFile of glob('src/components/*/*.tsx', { cwd: root })) {
-      const componentDirectory = componentFile.split('/').at(-2)!;
+    for (const category of ['ui', 'app']) {
+      for await (const componentFile of glob(`src/components/${category}/**/*.tsx`, {
+        cwd: root,
+      })) {
+        const pathSegments = componentFile.split('/');
+        const componentsIndex = pathSegments.indexOf('components');
+        const componentDirectory = pathSegments.at(-2);
+        if (componentsIndex < 0 || componentDirectory === undefined) {
+          throw new Error(`Expected component glob path to include a directory: ${componentFile}`);
+        }
 
-      if (SKIPPED_COMPONENTS.has(componentDirectory)) {
-        continue;
-      }
+        if (SKIPPED_COMPONENTS[componentDirectory]) {
+          continue;
+        }
 
-      if (!demoSource.includes(`@/components/${componentDirectory}/`)) {
-        missingComponents.push(componentDirectory);
+        const importPath = pathSegments.slice(componentsIndex + 1, -1).join('/');
+        if (!demoSource.includes(`@/components/${importPath}/`)) {
+          missingComponents.push(importPath);
+        }
       }
     }
 
-    expect([...new Set(missingComponents)].sort()).toEqual([]);
+    expect([...new Set(missingComponents)].toSorted()).toEqual([]);
   });
 });

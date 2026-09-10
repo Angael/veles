@@ -1,8 +1,9 @@
-import { AuthCard } from '@/components/auth-card/AuthCard';
+import { useQueryClient } from '@tanstack/react-query';
+import { AuthCard } from './AuthCard';
 import { signIn } from '@/lib/auth/client';
+import { sessionUserQueryKey } from '@/lib/auth/session.query';
 import { getSafeRedirectPath } from '@/lib/auth/getSafeRedirectPath';
 import { useAuthAction } from '@/lib/auth/useAuthAction';
-import { Route } from '@/routes/login';
 
 export function LoginPendingPage() {
   return (
@@ -15,9 +16,9 @@ export function LoginPendingPage() {
   );
 }
 
-export function LoginPage() {
-  const { redirect } = Route.useSearch();
+export function LoginPage({ redirect }: { redirect?: string }) {
   const { busy, error, runAuthAction } = useAuthAction();
+  const queryClient = useQueryClient();
 
   return (
     <AuthCard
@@ -26,10 +27,14 @@ export function LoginPage() {
       error={error}
       onGoogle={async () => {
         await runAuthAction(async () => {
-          await signIn.social({
+          const result = await signIn.social({
             provider: 'google',
             callbackURL: getSafeRedirectPath(redirect),
           });
+
+          if (!result.error) {
+            queryClient.removeQueries({ queryKey: sessionUserQueryKey });
+          }
         }, 'Google sign-in failed');
       }}
       title='Sign in'

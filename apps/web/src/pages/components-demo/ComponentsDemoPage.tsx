@@ -2,26 +2,35 @@
 import { PlusIcon, SearchIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { Btn, type BtnSize, type BtnVariant } from '@/components/btn/Btn';
-import { Card } from '@/components/card/Card';
-import { DateInput } from '@/components/date-input/DateInput';
-import { DefaultCatchBoundary } from '@/components/default-catch-boundary/DefaultCatchBoundary';
-import { ErrorCard } from '@/components/error-card/ErrorCard';
-import { FloatingButton } from '@/components/floating-button/FloatingButton';
-import { Label } from '@/components/label/Label';
-import { Navbar } from '@/components/navbar/Navbar';
-import { NotFound } from '@/components/not-found/NotFound';
-import { PillBtn } from '@/components/pill-btn/PillBtn';
-import { NumberInput } from '@/components/number-input/NumberInput';
-import { SeamlessTextInput } from '@/components/seamless-text-input/SeamlessTextInput';
-import { SeamlessTextarea } from '@/components/seamless-textarea/SeamlessTextarea';
-import { SelectInput } from '@/components/select-input/SelectInput';
-import { Skeleton } from '@/components/skeleton/Skeleton';
-import { SliderInput } from '@/components/slider-input/SliderInput';
-import { TextInput } from '@/components/text-input/TextInput';
-import { TextareaInput } from '@/components/textarea-input/TextareaInput';
-import { toastManager } from '@/components/toast/toastManager';
-import { UploadTileGrid } from '@/components/upload-tile-grid/UploadTileGrid';
+import { Btn, type BtnSize, type BtnVariant } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
+import { DateInput } from '@/components/ui/date-input/DateInput';
+import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
+import { ErrorCard } from '@/components/ui/error-card/ErrorCard';
+import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
+import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
+import { Label } from '@/components/ui/label/Label';
+import {
+  MenuBtn,
+  MenuBtnChevron,
+  MenuBtnDivider,
+  MenuBtnItem,
+  MenuBtnPopup,
+  MenuBtnRoot,
+} from '@/components/ui/menu-btn/MenuBtn';
+import { Navbar } from '@/components/app/navbar/Navbar';
+import { NotFound } from '@/components/app/not-found/NotFound';
+import { PillBtn } from '@/components/ui/pill-btn/PillBtn';
+import { NumberInput } from '@/components/ui/number-input/NumberInput';
+import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
+import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
+import { SelectInput } from '@/components/ui/select-input/SelectInput';
+import { Skeleton } from '@/components/ui/skeleton/Skeleton';
+import { SliderInput } from '@/components/ui/slider-input/SliderInput';
+import { TextInput } from '@/components/ui/text-input/TextInput';
+import { TextareaInput } from '@/components/ui/textarea-input/TextareaInput';
+import { toastManager } from '@/components/ui/toast/toastManager';
+import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import css from './ComponentsDemoPage.module.css';
 
 const SELECT_OPTIONS = [
@@ -37,6 +46,7 @@ const BTN_VARIANTS = [
   { label: 'White', value: 'white' },
   { label: 'Ghost', value: 'ghost' },
   { label: 'Ghost danger', value: 'ghostDanger' },
+  { label: 'Text', value: 'text' },
 ] satisfies DemoProp<BtnVariant>[];
 
 const BTN_SIZES = [
@@ -56,7 +66,6 @@ export function ComponentsDemoPage() {
   const [numberValue, setNumberValue] = useState<number | null>(320);
   const [selectValue, setSelectValue] = useState<(typeof SELECT_OPTIONS)[number]['value']>('lte');
   const [btnLoading, setBtnLoading] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
   const [sliderValue, setSliderValue] = useState(50);
 
   return (
@@ -105,10 +114,37 @@ export function ComponentsDemoPage() {
       </section>
 
       <section>
+        <h2>MenuBtn</h2>
+        <MenuBtnRoot>
+          <Btn icon={<PlusIcon aria-hidden='true' />} render={<MenuBtn />}>
+            Open menu
+            <MenuBtnChevron />
+          </Btn>
+          <MenuBtnPopup
+            aria-label='Demo menu'
+            description='Reusable popup parts composed with Btn.'
+            heading='Demo menu'
+          >
+            <MenuBtnItem
+              description='An item with supporting copy'
+              icon={<PlusIcon aria-hidden='true' />}
+              label='Primary action'
+            />
+            <MenuBtnDivider />
+            <MenuBtnItem
+              description='Items can be separated into groups'
+              icon={<SearchIcon aria-hidden='true' />}
+              label='Secondary action'
+            />
+          </MenuBtnPopup>
+        </MenuBtnRoot>
+      </section>
+
+      <section>
         <h2>PillBtn</h2>
         <PillBtn
           label='Add recipe'
-          to='/recipes/new'
+          to='/recipes/add'
           visual={<PlusIcon size={16} strokeWidth={1.8} />}
         />
       </section>
@@ -147,6 +183,35 @@ export function ComponentsDemoPage() {
           value={textValue}
         />
       </section>
+      <section>
+        <h2>TypedForm</h2>
+        <TypedForm
+          className={css.formGrid}
+          onSubmit={(data) => {
+            data.string('typedFormDemo');
+          }}
+        >
+          <Label text='Demo field'>
+            <TextInput defaultValue='Breakfast' name='typedFormDemo' required />
+          </Label>
+          <Btn type='submit'>Submit demo</Btn>
+        </TypedForm>
+      </section>
+
+      <section>
+        <h2>TypedForm</h2>
+        <TypedForm
+          className={css.formGrid}
+          onSubmit={(data) => {
+            data.string('typedFormDemo');
+          }}
+        >
+          <Label text='Demo field'>
+            <TextInput defaultValue='Breakfast' name='typedFormDemo' required />
+          </Label>
+          <Btn type='submit'>Submit demo</Btn>
+        </TypedForm>
+      </section>
 
       <section>
         <h2>NumberInput</h2>
@@ -156,9 +221,13 @@ export function ComponentsDemoPage() {
           min={0}
           onValueChange={setNumberValue}
           placeholder='Calories'
-          step={10}
           value={numberValue}
         />
+      </section>
+
+      <section>
+        <h2>KcalMacrosForm</h2>
+        <KcalMacrosForm defaultValues={{ kcal: 420, protein: 32, fat: 14, carbs: 48 }} />
       </section>
 
       <section>
@@ -262,16 +331,6 @@ export function ComponentsDemoPage() {
         >
           Show toast
         </Btn>
-      </section>
-
-      <section>
-        <h2>UploadTileGrid</h2>
-        <UploadTileGrid
-          files={files}
-          maxItemSize={5 * 1024 * 1024}
-          maxItems={4}
-          onFilesChange={setFiles}
-        />
       </section>
 
       <FloatingButton

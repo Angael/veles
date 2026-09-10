@@ -1,5 +1,5 @@
 import { format, parseISO } from 'date-fns';
-import { Card } from '@/components/card/Card';
+import { Card } from '@/components/ui/card/Card';
 import css from './WeightPage.module.css';
 import type { WeightEntry } from './weight.api';
 
@@ -8,7 +8,7 @@ type RecentWeightEntriesProps = {
 };
 
 export function RecentWeightEntries({ entries }: RecentWeightEntriesProps) {
-  const recentEntries = entries.slice(-8).reverse();
+  const recentEntries = entries.slice(-8).toReversed();
 
   return (
     <Card as='section' aria-label='Recent weight entries' className={css.entriesCard}>

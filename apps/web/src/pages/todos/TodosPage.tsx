@@ -1,6 +1,6 @@
 import { Share2Icon } from 'lucide-react';
-import { Btn } from '@/components/btn/Btn';
-import { Card } from '@/components/card/Card';
+import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
 import css from './TodosPage.module.css';
 
 const todoLists = [

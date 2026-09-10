@@ -5,11 +5,11 @@ import { createServerFn } from '@tanstack/react-start';
 import { and, desc, eq } from 'drizzle-orm';
 import { format, parseISO } from 'date-fns';
 import { diaryEntries } from '@veles/db/schema';
-import { db } from '@/lib/db';
+import { db } from '@/server/db.server';
 import { dateOnlyType } from '@/lib/dateOnly';
-import { requireSession } from '@/lib/auth/getSession';
+import { requireSession } from '@/server/getSession.server';
 import { invariant } from '@/lib/invariant';
-import { logMiddleware } from '@/lib/middleware/logMiddleware';
+import { logMiddleware } from '@/server/middleware/logMiddleware';
 
 export type DiaryEntrySummary = {
   entryDate: string;
@@ -70,10 +70,12 @@ export const getDiaryEntryById = createServerFn({ method: 'GET' })
     const entry = entries[0];
 
     invariant(entry, () => {
+      // oxlint-disable-next-line typescript/only-throw-error -- Router control flow intentionally throws this object.
       throw notFound();
     });
 
     if (!dateOnlyType.allows(entry.entryDate)) {
+      // oxlint-disable-next-line typescript/only-throw-error -- Router control flow intentionally throws this object.
       throw notFound();
     }
 

@@ -18,11 +18,11 @@ sources:
 
 # React Start (`@tanstack/react-start`)
 
-This skill builds on start-core. Read [start-core](../../../start-client-core/skills/start-core/SKILL.md) first for foundational concepts.
+This skill builds on start-core. Read [start-core](skill://start-core) first for foundational concepts.
 
 This skill covers the React-specific bindings, setup, and patterns for TanStack Start.
 
-For React Server Components patterns, see [react-start/server-components](./server-components/SKILL.md).
+For React Server Components patterns, see [react-start-server-components](skill://react-start-server-components).
 
 > **CRITICAL**: All code is ISOMORPHIC by default. Loaders run on BOTH server and client. Use `createServerFn` for server-only logic.
 
@@ -282,6 +282,6 @@ Without `<Scripts />` in the root route's `<body>`, client JavaScript doesn't lo
 
 ## Cross-References
 
-- [start-core](../../../start-client-core/skills/start-core/SKILL.md) — core Start concepts
-- [router-core](../../../router-core/skills/router-core/SKILL.md) — routing fundamentals
-- [react-router](../../../react-router/skills/react-router/SKILL.md) — React Router hooks and components
+- [start-core](skill://start-core) — core Start concepts
+- [router-core](skill://router-core) — routing fundamentals
+- [react-router](skill://react-router) — React Router hooks and components

@@ -1,0 +1,122 @@
+@import '../../../styles/breakpoints.css';
+
+.method,
+.currentGoals {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+}
+
+.methodHeading {
+  h2 {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+    color: var(--c-text-strong);
+    font-size: var(--text-lg-dynamic);
+    text-wrap: balance;
+  }
+
+  span {
+    color: var(--c-muted-strong);
+    font-family: inherit;
+    font-size: inherit;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.calculatorGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.activityField {
+  grid-column: 1 / -1;
+}
+
+.formulaNote {
+  color: var(--c-muted-strong);
+  font-size: var(--text-xs);
+  text-wrap: pretty;
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.percentGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.validTotal,
+.invalidTotal {
+  justify-self: end;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.validTotal {
+  color: var(--c-muted);
+}
+
+.invalidTotal {
+  color: var(--c-danger-text);
+}
+
+.currentGoals {
+  gap: var(--space-lg);
+  border-color: var(--c-primary-border-soft);
+  background:
+    linear-gradient(135deg, var(--c-primary-surface) 0%, transparent 48%), var(--c-surface-strong);
+  box-shadow: var(--shadow-card-primary);
+
+  > button {
+    justify-self: end;
+  }
+}
+
+.currentGoalsHeading {
+  h2 {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+    color: var(--c-text-strong);
+    font-size: var(--text-xl-dynamic);
+    text-wrap: balance;
+  }
+
+  span {
+    color: var(--c-muted-strong);
+    font-family: inherit;
+    font-size: inherit;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (--phone) {
+  .method,
+  .currentGoals {
+    padding: var(--space-md);
+  }
+
+  .calculatorGrid,
+  .percentGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .activityField {
+    grid-column: auto;
+  }
+
+  .currentGoals > button {
+    width: 100%;
+  }
+}

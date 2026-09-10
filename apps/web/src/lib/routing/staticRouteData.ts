@@ -1,5 +1,6 @@
 export type NavbarTarget =
   | { to: '/' }
+  | { to: '/calories' }
   | { to: '/diary' }
   | { to: '/recipes' }
   | { to: '/weight' }
