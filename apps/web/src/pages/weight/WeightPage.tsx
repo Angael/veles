@@ -121,6 +121,7 @@ function WeightForm({ isSaving, onChange, onSubmit, value }: WeightFormProps) {
       <label className={css.captureField}>
         <span>Today&apos;s weight</span>
         <NumberInput
+          enterKeyHint='done'
           aria-label="Today's weight in kilograms"
           className={css.weightInput}
           inputClassName={css.weightInputField}
