@@ -8,6 +8,7 @@ import { GoalPreview } from './GoalPreview';
 import { Btn } from '@/components/ui/btn/Btn';
 import { DateInput } from '@/components/ui/date-input/DateInput';
 import { Label } from '@/components/ui/label/Label';
+import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { NutritionInline } from '../NutritionInline';
 import css from './SelectedFoodForm.module.css';
@@ -72,7 +73,7 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
         </div>
       </section>
 
-      <section className={css.panel}>
+      <TypedForm className={css.panel} onSubmit={save}>
         {recordFoodMutation.error ? (
           <p className={css.error} role='alert'>
             {recordFoodMutation.error.toString()}
@@ -84,9 +85,24 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
             <DateInput onValueChange={setDate} value={date} />
           </Label>
           <div className={css.amountField}>
-            <Label text='Amount eaten (g)'>
-              <NumberInput min={1} onValueChange={setGrams} value={grams} />
-            </Label>
+            <div className={css.amountEntry}>
+              <Label text='Amount eaten (g)'>
+                <NumberInput
+                  enterKeyHint='done'
+                  min={1}
+                  required
+                  onValueChange={setGrams}
+                  value={grams}
+                />
+              </Label>
+              <Btn
+                disabled={selectedGrams < 1}
+                loading={recordFoodMutation.isPending}
+                type='submit'
+              >
+                Save
+              </Btn>
+            </div>
             {packageSizeGrams !== null && packageSizeGrams > 0 ? (
               <div
                 aria-label='Package amount shortcuts'
@@ -133,19 +149,16 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
           pending={dashboardQuery.isPending}
         />
         <div className={css.actions}>
-          <Btn disabled={recordFoodMutation.isPending} onClick={onCancel} variant='ghost'>
+          <Btn
+            disabled={recordFoodMutation.isPending}
+            onClick={onCancel}
+            type='button'
+            variant='ghost'
+          >
             {cancelLabel}
           </Btn>
-          <Btn
-            loading={recordFoodMutation.isPending}
-            onClick={() => {
-              void save();
-            }}
-          >
-            Save
-          </Btn>
         </div>
-      </section>
+      </TypedForm>
     </main>
   );
 }
