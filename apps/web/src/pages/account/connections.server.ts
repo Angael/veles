@@ -1,9 +1,30 @@
+import { type } from 'arktype';
 import { getServerEnv } from '@/server/env.server';
 
 interface SendConnectionInvitationOptions {
   recipientEmail: string;
   inviterName: string;
   token: string;
+}
+
+const resendErrorResponseType = type({
+  'message?': '0 < string <= 500',
+  'name?': '0 < string <= 100',
+});
+
+/** Extracts bounded provider diagnostics while tolerating non-JSON rejection bodies. */
+async function describeResendRejection(response: Response) {
+  try {
+    const body = resendErrorResponseType(await response.json());
+
+    if (!(body instanceof type.errors)) {
+      const detail = [body.name, body.message].filter(Boolean).join(': ');
+      if (detail)
+        return `Resend rejected the invitation email with status ${response.status}: ${detail}`;
+    }
+  } catch {}
+
+  return `Resend rejected the invitation email with status ${response.status}.`;
 }
 
 /** Sends one connection invitation without exposing the Resend credential to client code. */
@@ -35,6 +56,6 @@ export async function sendConnectionInvitationEmail({
   });
 
   if (!response.ok) {
-    throw new Error(`Resend rejected the invitation email with status ${response.status}.`);
+    throw new Error(await describeResendRejection(response));
   }
 }

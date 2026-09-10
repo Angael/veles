@@ -7,6 +7,7 @@ import { connectionInvitations, userConnections, users } from '@veles/db/schema'
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
+import { log } from '@/server/logger.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { sendConnectionInvitationEmail } from './connections.server';
 
@@ -109,8 +110,14 @@ export const sendConnectionInvitation = createServerFn({ method: 'POST' })
         recipientEmail: data.email,
         token,
       });
+      log.info('Connection invitation email sent', { recipientEmail: data.email });
       return { delivered: true };
-    } catch {
+    } catch (error) {
+      log.error('Connection invitation email delivery failed', {
+        recipientEmail: data.email,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack?.split('\n') : undefined,
+      });
       await db
         .update(connectionInvitations)
         .set({ deliveryFailed: true, updatedAt: new Date() })
