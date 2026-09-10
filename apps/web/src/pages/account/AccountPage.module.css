@@ -134,7 +134,7 @@
 
 .friendRow {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: var(--space-md);
   min-height: 5rem;
@@ -142,6 +142,10 @@
 
   & + & {
     border-top: 1px solid var(--c-border);
+  }
+
+  &:has(.friendAvatar) {
+    grid-template-columns: auto 1fr auto;
   }
 }
 
@@ -185,10 +189,46 @@
   }
 }
 
-.mockNote {
-  padding-top: var(--space-sm);
-  color: var(--c-muted-strong);
-  font-size: var(--text-xs);
+.inviteForm {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-md);
+}
+
+.feedback,
+.invitationNotice {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--c-primary-border-soft);
+  border-radius: var(--radius-md);
+  background: var(--c-primary-surface);
+  color: var(--c-text);
+  font-size: var(--text-sm);
+  text-wrap: pretty;
+}
+
+.group {
+  padding-top: var(--space-lg);
+
+  & h3 {
+    padding-bottom: var(--space-xs);
+    color: var(--c-text-strong);
+    font-size: var(--text-md);
+  }
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+
+.emptyState {
+  padding-block: var(--space-xl);
+  border-block: 1px solid var(--c-border);
+  color: var(--c-muted);
   text-align: center;
   text-wrap: pretty;
 }
@@ -218,11 +258,28 @@
   }
 
   .friendRow {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr;
 
-    & > button {
+    &:has(.friendAvatar) {
+      grid-template-columns: auto 1fr;
+    }
+
+    & > button,
+    & > .rowActions {
       grid-column: 1 / -1;
       width: 100%;
     }
+  }
+
+  .inviteForm {
+    grid-template-columns: 1fr;
+
+    & > button {
+      width: 100%;
+    }
+  }
+
+  .rowActions > button {
+    flex: 1;
   }
 }
