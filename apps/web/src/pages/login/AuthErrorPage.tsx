@@ -1,42 +1,42 @@
 import { Link } from '@tanstack/react-router';
-import { ArrowLeftIcon, CircleAlertIcon, HomeIcon } from 'lucide-react';
+import { ArrowLeftIcon, HomeIcon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import css from './AuthErrorPage.module.css';
 
-const invitationErrorCode = 'this_account_needs_a_connection_invitation_to_use_veles';
+type AuthErrorCopy = {
+  msg: string;
+  title: string;
+};
 
-export function AuthErrorPage({ code, description }: { code?: string; description?: string }) {
-  const normalizedCode = code?.trim().toLowerCase() ?? '';
-  const needsInvitation = normalizedCode === invitationErrorCode;
-  const displayCode = code?.replaceAll('_', ' ') || 'Unknown sign-in error';
-  const title = needsInvitation ? 'An invitation is needed' : 'We could not finish signing you in';
-  const message = needsInvitation
-    ? 'This Google account is not connected to Veles yet. Ask a Veles member to invite this email address, then come back and try again.'
-    : description?.replaceAll('_', ' ') ||
-      'Something interrupted sign-in. Return to the sign-in page and try again.';
+const AUTH_ERROR_COPY: { default: AuthErrorCopy; [code: string]: AuthErrorCopy } = {
+  default: {
+    msg: 'Something interrupted sign-in. Return to the sign-in page and try again.',
+    title: 'We could not finish signing you in',
+  },
+  this_account_needs_a_connection_invitation_to_use_veles: {
+    msg: 'This Google account is not connected to Veles yet. Ask a Veles member to invite this email address, then come back and try again.',
+    title: 'An invitation is needed',
+  },
+};
+
+export function AuthErrorPage({ code }: { code?: string }) {
+  const normalizedCode = code?.trim().toLowerCase() ?? 'default';
+  const copy = AUTH_ERROR_COPY[normalizedCode] ?? AUTH_ERROR_COPY.default;
 
   return (
     <main className={css.page}>
       <Card
         aria-labelledby='auth-error-title'
         as='section'
-        className={css.card}
+        className={css.panel}
         data-appear
         role='alert'
         variant='danger'
       >
-        <div className={css.signal}>
-          <CircleAlertIcon aria-hidden='true' size={22} strokeWidth={1.8} />
-        </div>
         <div className={css.content}>
-          <h1 id='auth-error-title'>{title}</h1>
-          <p className={css.message}>{message}</p>
-
-          <details className={css.details}>
-            <summary>View technical details</summary>
-            <code>{displayCode}</code>
-          </details>
+          <h1 id='auth-error-title'>{copy.title}</h1>
+          <p className={css.message}>{copy.msg}</p>
 
           <div className={css.actions}>
             <Btn

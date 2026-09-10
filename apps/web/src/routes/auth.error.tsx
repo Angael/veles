@@ -9,7 +9,7 @@ export const Route = createFileRoute('/auth/error')({
 });
 
 function AuthErrorRoute() {
-  const { error, error_description: description } = Route.useSearch();
+  const { error } = Route.useSearch();
 
-  return <AuthErrorPage code={error} description={description} />;
+  return <AuthErrorPage code={error} />;
 }
