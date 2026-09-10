@@ -225,6 +225,56 @@
   gap: var(--space-xs);
 }
 
+.loadingState {
+  padding-top: var(--space-lg);
+}
+
+.loadingLabel {
+  width: max-content;
+  margin-bottom: var(--space-xs);
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+}
+
+.loadingList {
+  border-block: 1px solid var(--c-border);
+}
+
+.loadingRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-md);
+  min-height: 5rem;
+  padding-block: var(--space-sm);
+
+  & + & {
+    border-top: 1px solid var(--c-border);
+  }
+}
+
+.loadingAvatar {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+}
+
+.loadingInfo {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.loadingName {
+  width: min(12rem, 58%);
+  height: 0.875rem;
+}
+
+.loadingMeta {
+  width: min(18rem, 78%);
+  height: 0.75rem;
+}
+
 .emptyState {
   padding-block: var(--space-xl);
   border-block: 1px solid var(--c-border);
