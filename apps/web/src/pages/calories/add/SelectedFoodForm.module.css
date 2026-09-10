@@ -75,6 +75,13 @@
   width: 100%;
 }
 
+.amountEntry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--space-sm);
+}
+
 .packageShortcuts {
   display: grid;
   gap: var(--space-xs);
@@ -190,7 +197,7 @@
 
 .actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: var(--space-sm);
 }
 
