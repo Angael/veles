@@ -107,41 +107,48 @@
   }
 }
 
-.friendCount {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: 0.4rem;
-  min-height: 2rem;
-  padding-inline: 0.7rem;
-  border: 1px solid var(--c-primary-border-soft);
-  border-radius: var(--radius-pill);
-  background: var(--c-primary-surface);
-  color: var(--c-accent-soft);
-  font-size: var(--text-xs);
-  font-weight: var(--font-weight-semibold);
-  font-variant-numeric: tabular-nums;
-
-  & svg {
-    width: 0.9rem;
-    height: 0.9rem;
-  }
+.sharingSettings {
+  display: grid;
+  gap: var(--space-xs);
 }
 
-.friendList {
-  border-block: 1px solid var(--c-border);
+.sharingSetting {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-md);
+  min-height: 4.25rem;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-xs);
+  background: var(--c-surface-inset);
+
+  & > span {
+    display: grid;
+    min-width: 0;
+  }
+
+  & strong {
+    color: var(--c-text-strong);
+    font-size: var(--text-sm-dynamic);
+  }
+
+  & small {
+    color: var(--c-muted-strong);
+    font-size: var(--text-xs);
+    text-wrap: pretty;
+  }
 }
 
 .friendRow {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: var(--space-md);
   min-height: 5rem;
   padding-block: var(--space-sm);
 
-  & + & {
-    border-top: 1px solid var(--c-border);
+  &:has(.friendAvatar) {
+    grid-template-columns: auto 1fr auto;
   }
 }
 
@@ -185,10 +192,50 @@
   }
 }
 
-.mockNote {
-  padding-top: var(--space-sm);
-  color: var(--c-muted-strong);
-  font-size: var(--text-xs);
+.inviteForm {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-md);
+}
+
+.feedback {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--c-primary-border-soft);
+  border-radius: var(--radius-md);
+  background: var(--c-primary-surface);
+  color: var(--c-text);
+  font-size: var(--text-sm);
+  text-wrap: pretty;
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+
+.loadingInfo {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.loadingName {
+  width: min(12rem, 58%);
+  height: 0.875rem;
+}
+
+.loadingMeta {
+  width: min(18rem, 78%);
+  height: 0.75rem;
+}
+
+.emptyState {
+  padding-block: var(--space-xl);
+  color: var(--c-muted);
   text-align: center;
   text-wrap: pretty;
 }
@@ -218,10 +265,17 @@
   }
 
   .friendRow {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr auto;
+
+    &:has(.friendAvatar) {
+      grid-template-columns: auto 1fr auto;
+    }
+  }
+
+  .inviteForm {
+    grid-template-columns: 1fr;
 
     & > button {
-      grid-column: 1 / -1;
       width: 100%;
     }
   }

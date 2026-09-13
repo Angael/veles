@@ -24,6 +24,7 @@
     "@tanstack/router/create-route-property-order": "error",
     "@tanstack/router/route-param-names": "error",
     "eqeqeq": "error",
+    "no-nested-ternary": "error",
     "no-shadow": "error",
     "no-useless-assignment": "error",
     "react/exhaustive-deps": "off",

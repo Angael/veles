@@ -25,6 +25,15 @@ export function ImportWeightPage() {
   const parsed = useMemo(() => parseWeightEntries(value), [value]);
   const hasTooManyEntries = parsed.entries.length > MAX_WEIGHT_IMPORT_ENTRIES;
   const mutation = useSaveWeightsMutation();
+  let importStatus = 'Format: YYYY-MM-DD 78.4kg';
+  if (parsed.entries.length > 0) {
+    const entryLabel = parsed.entries.length === 1 ? 'entry' : 'entries';
+    importStatus = `${parsed.entries.length} ${entryLabel} ready to import.`;
+  }
+  if (parsed.errors.length > 0) importStatus = parsed.errors.join(' ');
+  if (hasTooManyEntries) {
+    importStatus = `You can import up to ${MAX_WEIGHT_IMPORT_ENTRIES.toLocaleString()} entries at once.`;
+  }
 
   return (
     <main className={css.page}>
@@ -89,13 +98,7 @@ export function ImportWeightPage() {
             data-error={hasTooManyEntries ? '' : undefined}
             id='weight-import-status'
           >
-            {hasTooManyEntries
-              ? `You can import up to ${MAX_WEIGHT_IMPORT_ENTRIES.toLocaleString()} entries at once.`
-              : parsed.errors.length > 0
-                ? parsed.errors.join(' ')
-                : parsed.entries.length > 0
-                  ? `${parsed.entries.length} ${parsed.entries.length === 1 ? 'entry' : 'entries'} ready to import.`
-                  : 'Format: YYYY-MM-DD 78.4kg'}
+            {importStatus}
           </div>
           <div className={css.formActions}>
             <Btn isLink render={<Link to='/weight' />} size='sm' variant='ghost'>

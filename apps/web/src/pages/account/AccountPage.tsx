@@ -1,68 +1,32 @@
 import { Avatar } from '@base-ui/react/avatar';
 import { useNavigate, useRouter } from '@tanstack/react-router';
-import { LogOutIcon, UserMinusIcon, UserPlusIcon, UsersIcon } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { LogOutIcon } from 'lucide-react';
+import { useMemo } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import type { SessionUser } from '@/lib/auth/session.api';
 import { getInitials } from '@/lib/getInitials';
 import { useSignOutMutation } from './account.query';
+import { FriendsCard } from './FriendsCard';
+import { SharingSettingsCard } from './SharingSettingsCard';
 import css from './AccountPage.module.css';
 
 interface AccountPageProps {
   user: SessionUser;
 }
 
-interface MockFriend {
-  id: string;
-  name: string;
-  email: string;
-  initials: string;
-  color: string;
-}
-
-const MOCK_USERS: MockFriend[] = [
-  { id: 'friend-1', name: 'Maya Chen', email: 'maya@example.com', initials: 'MC', color: 'cyan' },
-  {
-    id: 'friend-2',
-    name: 'Theo Martin',
-    email: 'theo@example.com',
-    initials: 'TM',
-    color: 'violet',
-  },
-  { id: 'friend-3', name: 'Nora Silva', email: 'nora@example.com', initials: 'NS', color: 'amber' },
-];
-
 export function AccountPage({ user }: AccountPageProps) {
   const navigate = useNavigate();
   const router = useRouter();
-  const [friendIds, setFriendIds] = useState(() => new Set(['friend-1', 'friend-3']));
   const accountInitials = useMemo(() => getInitials(user.name) || 'A', [user.name]);
   const signOutMutation = useSignOutMutation();
 
   async function handleLogout() {
     const result = await signOutMutation.mutateAsync();
-
-    if (result.error) {
-      return;
+    if (!result.error) {
+      await router.invalidate();
+      await navigate({ to: '/' });
     }
-
-    await router.invalidate();
-    await navigate({ to: '/' });
-  }
-
-  function toggleFriend(id: string) {
-    setFriendIds((current) => {
-      const next = new Set(current);
-
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-
-      return next;
-    });
   }
 
   return (
@@ -80,9 +44,7 @@ export function AccountPage({ user }: AccountPageProps) {
         <Btn
           icon={<LogOutIcon aria-hidden='true' />}
           loading={signOutMutation.isPending}
-          onClick={() => {
-            void handleLogout().catch(() => undefined);
-          }}
+          onClick={() => void handleLogout().catch(() => undefined)}
           size='sm'
           variant='outlineDanger'
         >
@@ -90,55 +52,9 @@ export function AccountPage({ user }: AccountPageProps) {
         </Btn>
       </Card>
 
-      <Card as='section' className={css.friendsCard} data-appear='1'>
-        <header className={css.sectionHeader}>
-          <div>
-            <h2>Friends</h2>
-            <p>Choose who you want to connect with.</p>
-          </div>
-          <span className={css.friendCount}>
-            <UsersIcon aria-hidden='true' />
-            {friendIds.size} {friendIds.size === 1 ? 'friend' : 'friends'}
-          </span>
-        </header>
+      <SharingSettingsCard />
 
-        <ul className={css.friendList}>
-          {MOCK_USERS.map((friend) => {
-            const isFriend = friendIds.has(friend.id);
-
-            return (
-              <li className={css.friendRow} key={friend.id}>
-                <Avatar.Root className={css.friendAvatar}>
-                  <Avatar.Fallback className={css.friendFallback} data-color={friend.color}>
-                    {friend.initials}
-                  </Avatar.Fallback>
-                </Avatar.Root>
-                <div className={css.friendInfo}>
-                  <strong>{friend.name}</strong>
-                  <span>{friend.email}</span>
-                </div>
-                <Btn
-                  aria-label={`${isFriend ? 'Remove' : 'Add'} ${friend.name}`}
-                  icon={
-                    isFriend ? (
-                      <UserMinusIcon aria-hidden='true' />
-                    ) : (
-                      <UserPlusIcon aria-hidden='true' />
-                    )
-                  }
-                  onClick={() => toggleFriend(friend.id)}
-                  size='sm'
-                  variant={isFriend ? 'ghostDanger' : 'outlineMain'}
-                >
-                  {isFriend ? 'Remove' : 'Add friend'}
-                </Btn>
-              </li>
-            );
-          })}
-        </ul>
-
-        <p className={css.mockNote}>Friend changes are a preview and are not saved yet.</p>
-      </Card>
+      <FriendsCard />
     </main>
   );
 }
