@@ -8,14 +8,14 @@ import type { SessionUser } from '@/lib/auth/session.api';
 import { getInitials } from '@/lib/getInitials';
 import { useSignOutMutation } from './account.query';
 import { FriendsCard } from './FriendsCard';
+import { SharingSettingsCard } from './SharingSettingsCard';
 import css from './AccountPage.module.css';
 
 interface AccountPageProps {
-  invitation?: string;
   user: SessionUser;
 }
 
-export function AccountPage({ invitation, user }: AccountPageProps) {
+export function AccountPage({ user }: AccountPageProps) {
   const navigate = useNavigate();
   const router = useRouter();
   const accountInitials = useMemo(() => getInitials(user.name) || 'A', [user.name]);
@@ -52,7 +52,9 @@ export function AccountPage({ invitation, user }: AccountPageProps) {
         </Btn>
       </Card>
 
-      <FriendsCard invitation={invitation} />
+      <SharingSettingsCard />
+
+      <FriendsCard />
     </main>
   );
 }

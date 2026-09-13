@@ -8,6 +8,11 @@ import {
   removeConnectionInvitation,
   sendConnectionInvitation,
 } from './connections.api';
+import {
+  getSharingSettings,
+  type SharingSetting,
+  updateSharingSetting,
+} from './sharing-settings.api';
 
 export function useSignOutMutation() {
   return useMutation({
@@ -29,6 +34,25 @@ export const connectionsQueryOptions = queryOptions({
 
 export function useConnectionsQuery() {
   return useQuery(connectionsQueryOptions);
+}
+
+export const sharingSettingsQueryKey = ['sharingSettings'] as const;
+
+export const sharingSettingsQueryOptions = queryOptions({
+  queryFn: () => getSharingSettings(),
+  queryKey: sharingSettingsQueryKey,
+});
+
+export function useSharingSettingsQuery() {
+  return useQuery(sharingSettingsQueryOptions);
+}
+
+export function useUpdateSharingSettingMutation() {
+  return useMutation({
+    meta: { invalidateQueryKey: sharingSettingsQueryKey },
+    mutationFn: ({ enabled, setting }: { enabled: boolean; setting: SharingSetting }) =>
+      updateSharingSetting({ data: { enabled, setting } }),
+  });
 }
 
 export function useSendConnectionInvitationMutation() {

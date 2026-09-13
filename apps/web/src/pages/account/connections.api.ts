@@ -15,6 +15,7 @@ const emailType = type('string.email').pipe((email) => email.trim().toLowerCase(
 const inviteInputType = type({ email: emailType });
 const invitationIdInputType = type({ id: 'string.uuid' });
 const connectionUserInputType = type({ userId: 'string >= 1' });
+const invitationTokenInputType = type({ token: 'string == 43' });
 
 function hashToken(token: string) {
   return createHash('sha256').update(token).digest('hex');
@@ -46,6 +47,7 @@ export const getConnections = createServerFn({ method: 'GET' })
           createdAt: connectionInvitations.createdAt,
           id: connectionInvitations.id,
           inviterEmail: users.email,
+          inviterImage: users.image,
           inviterName: users.name,
         })
         .from(connectionInvitations)
@@ -154,6 +156,40 @@ export const acceptConnectionInvitation = createServerFn({ method: 'POST' })
         .values(canonicalConnection(session.user.id, invitation.inviterUserId))
         .onConflictDoNothing();
       await tx.delete(connectionInvitations).where(eq(connectionInvitations.id, data.id));
+    });
+  });
+
+/** Accepts a signed invitation link for its authenticated recipient. */
+export const acceptConnectionInvitationToken = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('acceptConnectionInvitationToken')])
+  .validator(arkTypeValidator(invitationTokenInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    const invitationRows = await db
+      .select({
+        id: connectionInvitations.id,
+        inviterUserId: connectionInvitations.inviterUserId,
+      })
+      .from(connectionInvitations)
+      .where(
+        and(
+          eq(connectionInvitations.tokenHash, hashToken(data.token)),
+          eq(connectionInvitations.recipientEmail, session.user.email.toLowerCase()),
+        ),
+      )
+      .limit(1);
+    const invitation = invitationRows[0];
+
+    if (!invitation) {
+      return;
+    }
+
+    await db.transaction(async (tx) => {
+      await tx
+        .insert(userConnections)
+        .values(canonicalConnection(session.user.id, invitation.inviterUserId))
+        .onConflictDoNothing();
+      await tx.delete(connectionInvitations).where(eq(connectionInvitations.id, invitation.id));
     });
   });
 

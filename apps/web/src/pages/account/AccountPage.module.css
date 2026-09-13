@@ -107,29 +107,36 @@
   }
 }
 
-.friendCount {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: 0.4rem;
-  min-height: 2rem;
-  padding-inline: 0.7rem;
-  border: 1px solid var(--c-primary-border-soft);
-  border-radius: var(--radius-pill);
-  background: var(--c-primary-surface);
-  color: var(--c-accent-soft);
-  font-size: var(--text-xs);
-  font-weight: var(--font-weight-semibold);
-  font-variant-numeric: tabular-nums;
-
-  & svg {
-    width: 0.9rem;
-    height: 0.9rem;
-  }
+.sharingSettings {
+  display: grid;
+  gap: var(--space-xs);
 }
 
-.friendList {
-  border-block: 1px solid var(--c-border);
+.sharingSetting {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-md);
+  min-height: 4.25rem;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-xs);
+  background: var(--c-surface-inset);
+
+  & > span {
+    display: grid;
+    min-width: 0;
+  }
+
+  & strong {
+    color: var(--c-text-strong);
+    font-size: var(--text-sm-dynamic);
+  }
+
+  & small {
+    color: var(--c-muted-strong);
+    font-size: var(--text-xs);
+    text-wrap: pretty;
+  }
 }
 
 .friendRow {
@@ -139,10 +146,6 @@
   gap: var(--space-md);
   min-height: 5rem;
   padding-block: var(--space-sm);
-
-  & + & {
-    border-top: 1px solid var(--c-border);
-  }
 
   &:has(.friendAvatar) {
     grid-template-columns: auto 1fr auto;
@@ -197,8 +200,7 @@
   padding-bottom: var(--space-md);
 }
 
-.feedback,
-.invitationNotice {
+.feedback {
   padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--c-primary-border-soft);
   border-radius: var(--radius-md);
@@ -208,55 +210,11 @@
   text-wrap: pretty;
 }
 
-.group {
-  padding-top: var(--space-lg);
-
-  & h3 {
-    padding-bottom: var(--space-xs);
-    color: var(--c-text-strong);
-    font-size: var(--text-md);
-  }
-}
-
 .rowActions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: var(--space-xs);
-}
-
-.loadingState {
-  padding-top: var(--space-lg);
-}
-
-.loadingLabel {
-  width: max-content;
-  margin-bottom: var(--space-xs);
-  color: var(--c-muted);
-  font-size: var(--text-sm);
-}
-
-.loadingList {
-  border-block: 1px solid var(--c-border);
-}
-
-.loadingRow {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: var(--space-md);
-  min-height: 5rem;
-  padding-block: var(--space-sm);
-
-  & + & {
-    border-top: 1px solid var(--c-border);
-  }
-}
-
-.loadingAvatar {
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 50%;
 }
 
 .loadingInfo {
@@ -277,7 +235,6 @@
 
 .emptyState {
   padding-block: var(--space-xl);
-  border-block: 1px solid var(--c-border);
   color: var(--c-muted);
   text-align: center;
   text-wrap: pretty;
@@ -308,16 +265,10 @@
   }
 
   .friendRow {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr auto;
 
     &:has(.friendAvatar) {
-      grid-template-columns: auto 1fr;
-    }
-
-    & > button,
-    & > .rowActions {
-      grid-column: 1 / -1;
-      width: 100%;
+      grid-template-columns: auto 1fr auto;
     }
   }
 
@@ -327,9 +278,5 @@
     & > button {
       width: 100%;
     }
-  }
-
-  .rowActions > button {
-    flex: 1;
   }
 }

@@ -39,8 +39,8 @@ export async function sendConnectionInvitationEmail({
     throw new Error('Connection invitation email is not configured.');
   }
 
-  const invitationUrl = new URL('/account', env.appUrl);
-  invitationUrl.searchParams.set('invitation', token);
+  const invitationUrl = new URL('/login', env.appUrl);
+  invitationUrl.searchParams.set('redirect', `/?invitation=${token}`);
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -51,7 +51,7 @@ export async function sendConnectionInvitationEmail({
       from: env.invitationEmailFrom,
       to: [recipientEmail],
       subject: `${inviterName} invited you to connect on Veles`,
-      text: `${inviterName} invited you to connect on Veles. Sign in with ${recipientEmail} and review the invitation: ${invitationUrl.toString()}`,
+      text: `${inviterName} invited you to connect on Veles. Sign in with ${recipientEmail} to accept the invitation: ${invitationUrl.toString()}`,
     }),
   });
 
