@@ -11,11 +11,7 @@ import { log } from '@/server/logger.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { sendConnectionInvitationEmail } from './connections.server';
 
-const emailType = type('string.email').pipe((email) => email.trim().toLowerCase());
-const inviteInputType = type({ email: emailType });
 const invitationIdInputType = type({ id: 'string.uuid' });
-const connectionUserInputType = type({ userId: 'string >= 1' });
-const invitationTokenInputType = type({ token: 'string == 43' });
 
 function hashToken(token: string) {
   return createHash('sha256').update(token).digest('hex');
@@ -75,6 +71,9 @@ export const getConnections = createServerFn({ method: 'GET' })
 
     return { connections: connectedUsers, incoming: incomingRows, outgoing: outgoingRows };
   });
+
+const emailType = type('string.email').pipe((email) => email.trim().toLowerCase());
+const inviteInputType = type({ email: emailType });
 
 /** Creates or rotates an invitation before attempting its independent email delivery. */
 export const sendConnectionInvitation = createServerFn({ method: 'POST' })
@@ -159,6 +158,8 @@ export const acceptConnectionInvitation = createServerFn({ method: 'POST' })
     });
   });
 
+const invitationTokenInputType = type({ token: 'string == 43' });
+
 /** Accepts a signed invitation link for its authenticated recipient. */
 export const acceptConnectionInvitationToken = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('acceptConnectionInvitationToken')])
@@ -211,6 +212,8 @@ export const removeConnectionInvitation = createServerFn({ method: 'POST' })
         ),
       );
   });
+
+const connectionUserInputType = type({ userId: 'string >= 1' });
 
 /** Disconnects the authenticated user from one explicitly selected connected account. */
 export const disconnectUser = createServerFn({ method: 'POST' })
