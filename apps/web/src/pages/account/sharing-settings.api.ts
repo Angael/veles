@@ -44,12 +44,14 @@ export const updateSharingSetting = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(updateSharingSettingInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const changedSetting =
-      data.setting === 'calories'
-        ? { shareCalories: data.enabled }
-        : data.setting === 'recipes'
-          ? { shareRecipes: data.enabled }
-          : { shareWeight: data.enabled };
+    let changedSetting: Partial<typeof defaultSharingSettings>;
+    if (data.setting === 'calories') {
+      changedSetting = { shareCalories: data.enabled };
+    } else if (data.setting === 'recipes') {
+      changedSetting = { shareRecipes: data.enabled };
+    } else {
+      changedSetting = { shareWeight: data.enabled };
+    }
 
     await db
       .insert(userSharingSettings)

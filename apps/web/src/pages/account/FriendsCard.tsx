@@ -23,9 +23,25 @@ export function FriendsCard() {
   const removeInvitationMutation = useRemoveConnectionInvitationMutation();
   const disconnectMutation = useDisconnectUserMutation();
   const data = connectionsQuery.data;
+
   const hasPeople =
     data !== undefined &&
     (data.connections.length > 0 || data.incoming.length > 0 || data.outgoing.length > 0);
+
+  const loadingState = connectionsQuery.isPending ? (
+    <div aria-label='Loading friends' role='status'>
+      <ul>
+        <FriendRowSkeleton />
+      </ul>
+    </div>
+  ) : null;
+
+  const emptyState =
+    !connectionsQuery.isPending && !hasPeople ? (
+      <p className={css.emptyState} data-appear>
+        No friends or pending invitations yet.
+      </p>
+    ) : null;
 
   return (
     <Card
@@ -150,17 +166,8 @@ export function FriendsCard() {
         </ul>
       ) : null}
 
-      {connectionsQuery.isPending ? (
-        <div aria-label='Loading friends' role='status'>
-          <ul>
-            <FriendRowSkeleton />
-          </ul>
-        </div>
-      ) : !hasPeople ? (
-        <p className={css.emptyState} data-appear>
-          No friends or pending invitations yet.
-        </p>
-      ) : null}
+      {loadingState}
+      {emptyState}
     </Card>
   );
 }

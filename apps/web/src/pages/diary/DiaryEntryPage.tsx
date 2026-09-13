@@ -35,6 +35,9 @@ export function DiaryEntryPage({ entry, focusTitle = false }: DiaryEntryPageProp
       deps: [entry.entryDate, entry.id, entry.markdown, entry.title],
     },
   );
+  let saveState = 'Saved';
+  if (saveMutation.isPending) saveState = 'Saving...';
+  if (saveMutation.isError) saveState = 'Changes could not be saved.';
 
   return (
     <main className={css.page}>
@@ -113,11 +116,7 @@ export function DiaryEntryPage({ entry, focusTitle = false }: DiaryEntryPageProp
             value={draft.markdown}
           />
           <p aria-live='polite' className={css.saveState}>
-            {saveMutation.isError
-              ? 'Changes could not be saved.'
-              : saveMutation.isPending
-                ? 'Saving...'
-                : 'Saved'}
+            {saveState}
           </p>
         </Card>
       </article>
