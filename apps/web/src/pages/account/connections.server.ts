@@ -39,8 +39,7 @@ export async function sendConnectionInvitationEmail({
     throw new Error('Connection invitation email is not configured.');
   }
 
-  const invitationUrl = new URL('/login', env.appUrl);
-  invitationUrl.searchParams.set('redirect', `/?invitation=${token}`);
+  const invitationUrl = new URL(`/invite/${token}`, env.appUrl);
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
