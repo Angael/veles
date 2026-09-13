@@ -18,6 +18,7 @@ import { Route as AuthenticatedTodosRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as AuthErrorRouteImport } from './routes/auth.error'
+import { Route as AuthGoogleRouteImport } from './routes/auth.google'
 import { Route as DemoComponentsRouteImport } from './routes/demo.components'
 import { Route as AuthenticatedCaloriesAddRouteImport } from './routes/_authenticated/calories_/add'
 import { Route as AuthenticatedCaloriesGoalsRouteImport } from './routes/_authenticated/calories_/goals'
@@ -79,6 +80,11 @@ const ApiHealthRoute = ApiHealthRouteImport.update({
 const AuthErrorRoute = AuthErrorRouteImport.update({
   id: '/auth/error',
   path: '/auth/error',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthGoogleRoute = AuthGoogleRouteImport.update({
+  id: '/auth/google',
+  path: '/auth/google',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoComponentsRoute = DemoComponentsRouteImport.update({
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/weight': typeof AuthenticatedWeightRoute
   '/api/health': typeof ApiHealthRoute
   '/auth/error': typeof AuthErrorRoute
+  '/auth/google': typeof AuthGoogleRoute
   '/demo/components': typeof DemoComponentsRoute
   '/calories/add': typeof AuthenticatedCaloriesAddRoute
   '/calories/goals': typeof AuthenticatedCaloriesGoalsRoute
@@ -219,6 +226,7 @@ export interface FileRoutesByTo {
   '/weight': typeof AuthenticatedWeightRoute
   '/api/health': typeof ApiHealthRoute
   '/auth/error': typeof AuthErrorRoute
+  '/auth/google': typeof AuthGoogleRoute
   '/demo/components': typeof DemoComponentsRoute
   '/calories/add': typeof AuthenticatedCaloriesAddRoute
   '/calories/goals': typeof AuthenticatedCaloriesGoalsRoute
@@ -249,6 +257,7 @@ export interface FileRoutesById {
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/api/health': typeof ApiHealthRoute
   '/auth/error': typeof AuthErrorRoute
+  '/auth/google': typeof AuthGoogleRoute
   '/demo/components': typeof DemoComponentsRoute
   '/_authenticated/calories_/add': typeof AuthenticatedCaloriesAddRoute
   '/_authenticated/calories_/goals': typeof AuthenticatedCaloriesGoalsRoute
@@ -279,6 +288,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/api/health'
     | '/auth/error'
+    | '/auth/google'
     | '/demo/components'
     | '/calories/add'
     | '/calories/goals'
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/api/health'
     | '/auth/error'
+    | '/auth/google'
     | '/demo/components'
     | '/calories/add'
     | '/calories/goals'
@@ -336,6 +347,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weight'
     | '/api/health'
     | '/auth/error'
+    | '/auth/google'
     | '/demo/components'
     | '/_authenticated/calories_/add'
     | '/_authenticated/calories_/goals'
@@ -362,6 +374,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ApiHealthRoute: typeof ApiHealthRoute
   AuthErrorRoute: typeof AuthErrorRoute
+  AuthGoogleRoute: typeof AuthGoogleRoute
   DemoComponentsRoute: typeof DemoComponentsRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDemoPingRoute: typeof ApiDemoPingRoute
@@ -431,6 +444,13 @@ declare module '@tanstack/react-router' {
       path: '/auth/error'
       fullPath: '/auth/error'
       preLoaderRoute: typeof AuthErrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/google': {
+      id: '/auth/google'
+      path: '/auth/google'
+      fullPath: '/auth/google'
+      preLoaderRoute: typeof AuthGoogleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/components': {
@@ -614,6 +634,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ApiHealthRoute: ApiHealthRoute,
   AuthErrorRoute: AuthErrorRoute,
+  AuthGoogleRoute: AuthGoogleRoute,
   DemoComponentsRoute: DemoComponentsRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDemoPingRoute: ApiDemoPingRoute,

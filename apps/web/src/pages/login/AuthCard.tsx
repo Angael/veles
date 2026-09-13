@@ -3,16 +3,12 @@ import { Card } from '@/components/ui/card/Card';
 import css from './AuthCard.module.css';
 
 type AuthCardProps = {
-  title: string;
   description: string;
-  onGoogle?: () => Promise<void>;
-  busy: boolean;
-  error: string | null;
+  googleHref: string;
+  title: string;
 };
 
-export function AuthCard(props: AuthCardProps) {
-  const { busy, description, error, onGoogle, title } = props;
-
+export function AuthCard({ description, googleHref, title }: AuthCardProps) {
   return (
     <section className={css.authShell}>
       <h1 className={css.authTitle}>{title}</h1>
@@ -21,9 +17,7 @@ export function AuthCard(props: AuthCardProps) {
           <p>{description}</p>
         </div>
 
-        {error ? <div className={css.errorBox}>{error}</div> : null}
-
-        <Btn disabled={!onGoogle} loading={busy} onClick={() => void onGoogle?.()} variant='main'>
+        <Btn isLink render={<a href={googleHref} />} variant='main'>
           Continue with Google
         </Btn>
       </Card>
