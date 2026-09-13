@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { accounts, connectionInvitations, sessions, users, verifications } from '@veles/db/schema';
 import { db } from '@/server/db.server';
 import { getServerEnv } from '@/server/env.server';
+import { log } from '@/server/logger.server';
 
 const env = getServerEnv();
 
@@ -53,6 +54,9 @@ export const auth = betterAuth({
           }
 
           return { data: user };
+        },
+        after: async (user) => {
+          log.info('New user signed up', { userId: user.id, email: user.email });
         },
       },
     },
