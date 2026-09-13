@@ -39,15 +39,18 @@ export const auth = betterAuth({
           const isAllowedAdmin = env.allowedAuthEmails.some(
             (email) => email.toLowerCase() === normalizedEmail,
           );
-          const invitations = isAllowedAdmin
-            ? []
-            : await db
-                .select({ id: connectionInvitations.id })
-                .from(connectionInvitations)
-                .where(eq(connectionInvitations.recipientEmail, normalizedEmail))
-                .limit(1);
 
-          if (!isAllowedAdmin && invitations.length === 0) {
+          if (isAllowedAdmin) {
+            return { data: user };
+          }
+
+          const invitations = await db
+            .select({ id: connectionInvitations.id })
+            .from(connectionInvitations)
+            .where(eq(connectionInvitations.recipientEmail, normalizedEmail))
+            .limit(1);
+
+          if (invitations.length === 0) {
             throw new APIError('BAD_REQUEST', {
               message: 'This account needs a connection invitation to use Veles',
             });
