@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import css from './NutritionInline.module.css';
 
 type NutritionInlineProps = {
@@ -6,6 +7,7 @@ type NutritionInlineProps = {
   fat: number;
   carbs: number;
   energyDisplay?: 'always' | 'phone';
+  stackEnergyOnPhone?: boolean;
 };
 
 export function NutritionInline({
@@ -14,9 +16,10 @@ export function NutritionInline({
   fat,
   carbs,
   energyDisplay = 'always',
+  stackEnergyOnPhone = false,
 }: NutritionInlineProps) {
   return (
-    <div className={css.root}>
+    <div className={clsx(css.root, stackEnergyOnPhone && css.stackEnergyOnPhone)}>
       <div className={energyDisplay === 'phone' ? css.energyPhoneOnly : css.energy}>
         <strong>{Math.round(kcal)}</strong>
         <span>kcal</span>
