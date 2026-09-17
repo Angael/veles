@@ -25,15 +25,7 @@ export function ImportWeightPage() {
   const parsed = useMemo(() => parseWeightEntries(value), [value]);
   const hasTooManyEntries = parsed.entries.length > MAX_WEIGHT_IMPORT_ENTRIES;
   const mutation = useSaveWeightsMutation();
-  let importStatus = 'Format: YYYY-MM-DD 78.4kg';
-  if (parsed.entries.length > 0) {
-    const entryLabel = parsed.entries.length === 1 ? 'entry' : 'entries';
-    importStatus = `${parsed.entries.length} ${entryLabel} ready to import.`;
-  }
-  if (parsed.errors.length > 0) importStatus = parsed.errors.join(' ');
-  if (hasTooManyEntries) {
-    importStatus = `You can import up to ${MAX_WEIGHT_IMPORT_ENTRIES.toLocaleString()} entries at once.`;
-  }
+  const importStatus = getImportStatus(parsed.entries.length, parsed.errors, hasTooManyEntries);
 
   return (
     <main className={css.page}>
@@ -119,6 +111,17 @@ export function ImportWeightPage() {
       </Card>
     </main>
   );
+}
+function getImportStatus(entryCount: number, errors: string[], hasTooManyEntries: boolean) {
+  if (hasTooManyEntries) {
+    return `You can import up to ${MAX_WEIGHT_IMPORT_ENTRIES.toLocaleString()} entries at once.`;
+  }
+  if (errors.length > 0) return errors.join(' ');
+  if (entryCount > 0) {
+    const entryLabel = entryCount === 1 ? 'entry' : 'entries';
+    return `${entryCount} ${entryLabel} ready to import.`;
+  }
+  return 'Format: YYYY-MM-DD 78.4kg';
 }
 
 async function copyPrompt(prompt: string) {
