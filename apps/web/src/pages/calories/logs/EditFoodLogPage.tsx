@@ -12,7 +12,6 @@ import { SelectedFoodCard } from '../SelectedFoodCard';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
-import { CalorieFormError } from '../CalorieFormError';
 import css from '../CalorieFlows.module.css';
 import { useProportionalNutrition } from './useProportionalNutrition';
 
@@ -75,8 +74,11 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
       ) : null}
 
       <section className={css.panel}>
-        <CalorieFormError error={updateMutation.error ?? deleteMutation.error} />
-        <TypedForm className={css.form} onSubmit={submit}>
+        <TypedForm
+          className={css.form}
+          errorMsg={(updateMutation.error ?? deleteMutation.error)?.message}
+          onSubmit={submit}
+        >
           {!isProduct ? (
             <Label text='Name'>
               <TextInput defaultValue={log.name} name='name' required />

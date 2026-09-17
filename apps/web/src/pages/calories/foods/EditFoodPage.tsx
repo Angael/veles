@@ -3,7 +3,6 @@ import type { CalorieFood } from '../calories.api';
 import { useUpdateFoodProductMutation } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
 import { todayLocalDate } from '@/lib/dateOnly';
-import { CalorieFormError } from '../CalorieFormError';
 import css from '../CalorieFlows.module.css';
 
 export function EditFoodPage({ food }: { food: CalorieFood }) {
@@ -24,8 +23,8 @@ export function EditFoodPage({ food }: { food: CalorieFood }) {
         </div>
       </header>
       <section className={css.panel}>
-        <CalorieFormError error={updateMutation.error} />
         <FoodEditor
+          errorMsg={updateMutation.error?.message}
           food={food}
           onSubmit={save}
           pending={updateMutation.isPending}

@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label/Label';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { SelectedFoodCard } from '../SelectedFoodCard';
-import { CalorieFormError } from '../CalorieFormError';
 import css from './SelectedFoodForm.module.css';
 
 type Props = {
@@ -62,9 +61,7 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
         protein={protein}
       />
 
-      <TypedForm className={css.panel} onSubmit={save}>
-        <CalorieFormError error={recordFoodMutation.error} />
-
+      <TypedForm className={css.panel} errorMsg={recordFoodMutation.error?.message} onSubmit={save}>
         <div className={css.fields}>
           <Label text='Date'>
             <DateInput onValueChange={setDate} value={date} />

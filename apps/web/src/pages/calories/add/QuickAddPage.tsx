@@ -8,7 +8,6 @@ import { PhotoPicker, type PhotoPickerValue } from '../PhotoPicker';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
-import { CalorieFormError } from '../CalorieFormError';
 import css from '../CalorieFlows.module.css';
 
 export function QuickAddPage({ date }: { date: string }) {
@@ -39,8 +38,7 @@ export function QuickAddPage({ date }: { date: string }) {
         </div>
       </header>
       <section className={css.panel}>
-        <CalorieFormError error={recordMutation.error} />
-        <TypedForm className={css.form} onSubmit={submit}>
+        <TypedForm className={css.form} errorMsg={recordMutation.error?.message} onSubmit={submit}>
           <Label text='Label'>
             <TextInput defaultValue='Quick add' name='name' required />
           </Label>
