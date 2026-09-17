@@ -1,10 +1,11 @@
 import { hash } from 'node:crypto';
-import { and, eq } from 'drizzle-orm';
-import { connectionInvitations, userConnections } from '@veles/db/schema';
+import { and, eq, or } from 'drizzle-orm';
+import { Resend } from 'resend';
+import { connectionInvitations, userConnections, users } from '@veles/db/schema';
 import { invariant } from '@/lib/invariant';
 import { db } from '@/server/db.server';
-import { type } from 'arktype';
 import { getServerEnv } from '@/server/env.server';
+import { ConnectionInvitationEmail } from '@/server/email/ConnectionInvitationEmail';
 
 interface SendConnectionInvitationOptions {
   recipientEmail: string;
@@ -23,6 +24,22 @@ export function canonicalConnection(firstUserId: string, secondUserId: string) {
   return firstUserId < secondUserId
     ? { userHighId: secondUserId, userLowId: firstUserId }
     : { userHighId: firstUserId, userLowId: secondUserId };
+}
+
+export function connectionInvitationsBetween(
+  firstUser: { email: string; id: string },
+  secondUser: { email: string; id: string },
+) {
+  return or(
+    and(
+      eq(connectionInvitations.inviterUserId, firstUser.id),
+      eq(connectionInvitations.recipientEmail, secondUser.email.toLowerCase()),
+    ),
+    and(
+      eq(connectionInvitations.inviterUserId, secondUser.id),
+      eq(connectionInvitations.recipientEmail, firstUser.email.toLowerCase()),
+    ),
+  );
 }
 
 /** Consumes a matching invitation and creates the connection as one transaction. */
@@ -44,31 +61,27 @@ export async function acceptConnectionInvitationTokenForUser({
 
     invariant(invitation, 'Connection invitation not found.');
 
+    const inviterRows = await tx
+      .select({ email: users.email })
+      .from(users)
+      .where(eq(users.id, invitation.inviterUserId))
+      .limit(1);
+    const inviter = inviterRows[0];
+
+    invariant(inviter, 'Connection invitation sender not found.');
+
     await tx
       .insert(userConnections)
       .values(canonicalConnection(user.id, invitation.inviterUserId))
       .onConflictDoNothing();
+    // Remove the reciprocal invite so it cannot restore a connection after a later disconnect.
+    await tx.delete(connectionInvitations).where(
+      connectionInvitationsBetween(user, {
+        email: inviter.email,
+        id: invitation.inviterUserId,
+      }),
+    );
   });
-}
-
-const resendErrorResponseType = type({
-  'message?': '0 < string <= 500',
-  'name?': '0 < string <= 100',
-});
-
-/** Extracts bounded provider diagnostics while tolerating non-JSON rejection bodies. */
-async function describeResendRejection(response: Response) {
-  try {
-    const body = resendErrorResponseType(await response.json());
-
-    if (!(body instanceof type.errors)) {
-      const detail = [body.name, body.message].filter(Boolean).join(': ');
-      if (detail)
-        return `Resend rejected the invitation email with status ${response.status}: ${detail}`;
-    }
-  } catch {}
-
-  return `Resend rejected the invitation email with status ${response.status}.`;
 }
 
 /** Sends one connection invitation without exposing the Resend credential to client code. */
@@ -78,27 +91,21 @@ export async function sendConnectionInvitationEmail({
   token,
 }: SendConnectionInvitationOptions) {
   const env = getServerEnv();
+  invariant(env.resendApiKey, 'Connection invitation email is not configured.');
+  invariant(env.invitationEmailFrom, 'Connection invitation email is not configured.');
 
-  if (!env.resendApiKey || !env.invitationEmailFrom) {
-    throw new Error('Connection invitation email is not configured.');
-  }
-
-  const invitationUrl = new URL(`/invite/${token}`, env.appUrl);
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.resendApiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: env.invitationEmailFrom,
-      to: [recipientEmail],
-      subject: `${inviterName} invited you to connect on Veles`,
-      text: `${inviterName} invited you to connect on Veles. Sign in with ${recipientEmail} to accept the invitation: ${invitationUrl.toString()}`,
-    }),
+  const invitationUrl = new URL(`/invite/${token}`, env.appUrl).toString();
+  const resend = new Resend(env.resendApiKey);
+  const { error } = await resend.emails.send({
+    from: env.invitationEmailFrom,
+    to: [recipientEmail],
+    subject: `${inviterName} invited you to connect on Veles`,
+    react: ConnectionInvitationEmail({ invitationUrl, inviterName, recipientEmail }),
   });
-
-  if (!response.ok) {
-    throw new Error(await describeResendRejection(response));
-  }
+  invariant(
+    !error,
+    error
+      ? `Resend rejected the invitation email: ${error.name}: ${error.message}`
+      : 'Resend rejected the invitation email.',
+  );
 }

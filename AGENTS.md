@@ -21,6 +21,7 @@
 - `src/components/app` contains only global application composition
 - `src/lib` contains shared client-safe utilities and capabilities. Prefer a descriptive flat file over a directory containing one file.
 - `src/server` contains shared server-only infrastructure, no page-specific stuff
+- `src/server/email` contains email templates
 - `src/styles` contains global styles, theme
 - Dependencies flow `routes -> pages -> shared components/lib`
 - File conventions:

@@ -9,7 +9,11 @@ import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { log } from '@/server/logger.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
-import { canonicalConnection, sendConnectionInvitationEmail } from './connections.server';
+import {
+  canonicalConnection,
+  connectionInvitationsBetween,
+  sendConnectionInvitationEmail,
+} from './connections.server';
 
 const invitationIdInputType = type({ id: 'string.uuid' });
 
@@ -76,6 +80,32 @@ export const sendConnectionInvitation = createServerFn({ method: 'POST' })
       throw new ClientSafeError('You cannot invite your own email address.');
     }
 
+    const recipientRows = await db
+      .select({ email: users.email, id: users.id })
+      .from(users)
+      .where(eq(users.email, data.email))
+      .limit(1);
+    const recipient = recipientRows[0];
+
+    if (recipient) {
+      const connection = canonicalConnection(session.user.id, recipient.id);
+      const existingConnections = await db
+        .select({ userLowId: userConnections.userLowId })
+        .from(userConnections)
+        .where(
+          and(
+            eq(userConnections.userLowId, connection.userLowId),
+            eq(userConnections.userHighId, connection.userHighId),
+          ),
+        )
+        .limit(1);
+
+      // An invite created while connected would become stale consent after a later disconnect.
+      if (existingConnections.length > 0) {
+        throw new ClientSafeError('You are already connected to this user.');
+      }
+    }
+
     const token = randomBytes(32).toString('base64url');
     const tokenHash = hash('sha256', token);
     const invitationRows = await db
@@ -128,9 +158,15 @@ export const acceptConnectionInvitation = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(invitationIdInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
+    // This read intentionally stays outside the transaction: simultaneous revoke and accept is
+    // not a realistic concern for this hobby app, and the simpler flow is preferred.
     const invitationRows = await db
-      .select({ inviterUserId: connectionInvitations.inviterUserId })
+      .select({
+        inviterEmail: users.email,
+        inviterUserId: connectionInvitations.inviterUserId,
+      })
       .from(connectionInvitations)
+      .innerJoin(users, eq(users.id, connectionInvitations.inviterUserId))
       .where(
         and(
           eq(connectionInvitations.id, data.id),
@@ -149,7 +185,13 @@ export const acceptConnectionInvitation = createServerFn({ method: 'POST' })
         .insert(userConnections)
         .values(canonicalConnection(session.user.id, invitation.inviterUserId))
         .onConflictDoNothing();
-      await tx.delete(connectionInvitations).where(eq(connectionInvitations.id, data.id));
+      // Clear the reciprocal invite so it cannot restore this connection after a later disconnect.
+      await tx.delete(connectionInvitations).where(
+        connectionInvitationsBetween(session.user, {
+          email: invitation.inviterEmail,
+          id: invitation.inviterUserId,
+        }),
+      );
     });
   });
 
@@ -181,12 +223,32 @@ export const disconnectUser = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const session = await requireSession();
     const connection = canonicalConnection(session.user.id, data.userId);
-    await db
-      .delete(userConnections)
-      .where(
-        and(
-          eq(userConnections.userLowId, connection.userLowId),
-          eq(userConnections.userHighId, connection.userHighId),
-        ),
-      );
+
+    await db.transaction(async (tx) => {
+      const disconnectedUserRows = await tx
+        .select({ email: users.email })
+        .from(users)
+        .where(eq(users.id, data.userId))
+        .limit(1);
+      const disconnectedUser = disconnectedUserRows[0];
+
+      await tx
+        .delete(userConnections)
+        .where(
+          and(
+            eq(userConnections.userLowId, connection.userLowId),
+            eq(userConnections.userHighId, connection.userHighId),
+          ),
+        );
+
+      if (disconnectedUser) {
+        // A disconnect revokes prior consent, so neither direction may retain a reusable invite.
+        await tx.delete(connectionInvitations).where(
+          connectionInvitationsBetween(session.user, {
+            email: disconnectedUser.email,
+            id: data.userId,
+          }),
+        );
+      }
+    });
   });

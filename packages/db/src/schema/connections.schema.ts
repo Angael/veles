@@ -40,6 +40,7 @@ export const connectionInvitations = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     recipientEmail: text('recipient_email').notNull(),
+    // SHA-256 digest of the invitation token; the plaintext token is never persisted.
     tokenHash: text('token_hash').notNull(),
     deliveryFailed: boolean('delivery_failed').notNull().default(false),
     createdAt: timestamp('created_at').notNull().defaultNow(),
