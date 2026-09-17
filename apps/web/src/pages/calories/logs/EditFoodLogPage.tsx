@@ -29,7 +29,6 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
     carbs: log.carbs,
   });
   const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
-  const error = updateMutation.error?.message ?? deleteMutation.error?.message ?? '';
 
   async function submit(formData: TypedFormData, _navigate: UseNavigateResult<string>) {
     const nextDate = formData.string('date');
@@ -75,12 +74,11 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
       ) : null}
 
       <section className={css.panel}>
-        {error ? (
-          <p className={css.error} role='alert'>
-            {error}
-          </p>
-        ) : null}
-        <TypedForm className={css.form} onSubmit={submit}>
+        <TypedForm
+          className={css.form}
+          errorMsg={(updateMutation.error ?? deleteMutation.error)?.message}
+          onSubmit={submit}
+        >
           {!isProduct ? (
             <Label text='Name'>
               <TextInput defaultValue={log.name} name='name' required />

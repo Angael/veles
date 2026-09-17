@@ -71,7 +71,7 @@ export function CalorieGoalsPage({
       <header className={flowCss.header}>
         <h1>Current goals</h1>
       </header>
-      <TypedForm className={flowCss.form} onSubmit={submit}>
+      <TypedForm className={flowCss.form} errorMsg={goalMutation.error?.message} onSubmit={submit}>
         <CalorieGoalCalculator
           initialWeightKg={latestWeightKg}
           onApply={setValues}

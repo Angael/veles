@@ -1,12 +1,14 @@
 import { useNavigate, type UseNavigateResult } from '@tanstack/react-router';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { TypedFormData } from './TypedFormData';
+import css from './TypedForm.module.css';
 
 type TypedFormProps = Omit<ComponentPropsWithoutRef<'form'>, 'onSubmit'> & {
+  errorMsg?: ReactNode;
   onSubmit: (data: TypedFormData, navigate: UseNavigateResult<string>) => void | Promise<void>;
 };
 
-export function TypedForm({ onSubmit, ...props }: TypedFormProps) {
+export function TypedForm({ children, errorMsg, onSubmit, ...props }: TypedFormProps) {
   const navigate = useNavigate();
 
   return (
@@ -16,6 +18,13 @@ export function TypedForm({ onSubmit, ...props }: TypedFormProps) {
         event.preventDefault();
         void onSubmit(new TypedFormData(event.currentTarget), navigate);
       }}
-    />
+    >
+      {errorMsg ? (
+        <p className={css.error} role='alert'>
+          {errorMsg}
+        </p>
+      ) : null}
+      {children}
+    </form>
   );
 }

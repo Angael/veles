@@ -155,10 +155,6 @@
   gap: var(--space-sm);
 }
 
-.error {
-  color: var(--c-danger-text);
-}
-
 @media (--phone) {
   .goalCaption {
     gap: var(--space-xs) var(--space-sm);
