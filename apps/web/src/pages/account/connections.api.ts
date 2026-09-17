@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from 'node:crypto';
+import { randomBytes } from 'node:crypto';
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
@@ -9,19 +9,13 @@ import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { log } from '@/server/logger.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
-import { sendConnectionInvitationEmail } from './connections.server';
+import {
+  canonicalConnection,
+  hashToken,
+  sendConnectionInvitationEmail,
+} from './connections.server';
 
 const invitationIdInputType = type({ id: 'string.uuid' });
-
-function hashToken(token: string) {
-  return createHash('sha256').update(token).digest('hex');
-}
-
-function canonicalConnection(firstUserId: string, secondUserId: string) {
-  return firstUserId < secondUserId
-    ? { userHighId: secondUserId, userLowId: firstUserId }
-    : { userHighId: firstUserId, userLowId: secondUserId };
-}
 
 /** Loads the signed-in user's connections and both sides of their pending invitations. */
 export const getConnections = createServerFn({ method: 'GET' })
@@ -155,42 +149,6 @@ export const acceptConnectionInvitation = createServerFn({ method: 'POST' })
         .values(canonicalConnection(session.user.id, invitation.inviterUserId))
         .onConflictDoNothing();
       await tx.delete(connectionInvitations).where(eq(connectionInvitations.id, data.id));
-    });
-  });
-
-const invitationTokenInputType = type({ token: 'string == 43' });
-
-/** Accepts a signed invitation link for its authenticated recipient. */
-export const acceptConnectionInvitationToken = createServerFn({ method: 'POST' })
-  .middleware([logMiddleware('acceptConnectionInvitationToken')])
-  .validator(arkTypeValidator(invitationTokenInputType))
-  .handler(async ({ data }) => {
-    const session = await requireSession();
-    const invitationRows = await db
-      .select({
-        id: connectionInvitations.id,
-        inviterUserId: connectionInvitations.inviterUserId,
-      })
-      .from(connectionInvitations)
-      .where(
-        and(
-          eq(connectionInvitations.tokenHash, hashToken(data.token)),
-          eq(connectionInvitations.recipientEmail, session.user.email.toLowerCase()),
-        ),
-      )
-      .limit(1);
-    const invitation = invitationRows[0];
-
-    if (!invitation) {
-      return;
-    }
-
-    await db.transaction(async (tx) => {
-      await tx
-        .insert(userConnections)
-        .values(canonicalConnection(session.user.id, invitation.inviterUserId))
-        .onConflictDoNothing();
-      await tx.delete(connectionInvitations).where(eq(connectionInvitations.id, invitation.id));
     });
   });
 
