@@ -42,12 +42,23 @@ export function connectionInvitationsBetween(
   );
 }
 
+/** Checks whether an invitation token is currently available without consuming it. */
+export async function connectionInvitationTokenExists(token: string) {
+  const invitations = await db
+    .select({ id: connectionInvitations.id })
+    .from(connectionInvitations)
+    .where(eq(connectionInvitations.tokenHash, hash('sha256', token)))
+    .limit(1);
+
+  return invitations.length > 0;
+}
+
 /** Consumes a matching invitation and creates the connection as one transaction. */
-export async function acceptConnectionInvitationTokenForUser({
+export function acceptConnectionInvitationTokenForUser({
   token,
   user,
 }: AcceptConnectionInvitationTokenOptions) {
-  await db.transaction(async (tx) => {
+  return db.transaction(async (tx) => {
     const invitationRows = await tx
       .delete(connectionInvitations)
       .where(
@@ -59,8 +70,7 @@ export async function acceptConnectionInvitationTokenForUser({
       .returning({ inviterUserId: connectionInvitations.inviterUserId });
     const invitation = invitationRows[0];
 
-    invariant(invitation, 'Connection invitation not found.');
-
+    if (!invitation) return false;
     const inviterRows = await tx
       .select({ email: users.email })
       .from(users)
@@ -81,6 +91,7 @@ export async function acceptConnectionInvitationTokenForUser({
         id: invitation.inviterUserId,
       }),
     );
+    return true;
   });
 }
 

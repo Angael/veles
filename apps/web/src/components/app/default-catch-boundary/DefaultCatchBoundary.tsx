@@ -31,7 +31,7 @@ export function DefaultCatchBoundary(props: ErrorComponentProps) {
           <h1 id='catch-boundary-title'>Something went wrong</h1>
         </div>
         <p className={css.message} role='alert'>
-          {props.error.message}
+          {props.error instanceof Error ? props.error.message : 'An unexpected error occurred.'}
         </p>
         <Btn loading={isRetrying} onClick={() => void retry()} type='button'>
           Try again

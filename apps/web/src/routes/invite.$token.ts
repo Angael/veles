@@ -1,15 +1,24 @@
 import { type } from 'arktype';
 import { createFileRoute } from '@tanstack/react-router';
-import { acceptConnectionInvitationTokenForUser } from '@/pages/account/connections.server';
+import {
+  acceptConnectionInvitationTokenForUser,
+  connectionInvitationTokenExists,
+} from '@/pages/account/connections.server';
 import { auth } from '@/server/auth.server';
 
 const invitationTokenType = type('string == 43');
+function redirect(location: URL) {
+  return new Response(null, {
+    headers: { Location: location.toString() },
+    status: 302,
+  });
+}
 
 /** Starts authentication while preserving this invitation as the return destination. */
 function startInvitationAuthentication(token: string, origin: string) {
   const googleSignInUrl = new URL('/auth/google', origin);
   googleSignInUrl.searchParams.set('redirect', `/invite/${token}`);
-  return Response.redirect(googleSignInUrl);
+  return redirect(googleSignInUrl);
 }
 
 /** Accepts the invitation after authentication, then leaves the invitation route. */
@@ -18,8 +27,9 @@ async function completeInvitationAcceptance(
   user: { email: string; id: string },
   origin: string,
 ) {
-  await acceptConnectionInvitationTokenForUser({ token, user });
-  return Response.redirect(new URL('/', origin));
+  const accepted = await acceptConnectionInvitationTokenForUser({ token, user });
+  const destination = accepted ? '/' : '/auth/error?error=invalid_invitation';
+  return redirect(new URL(destination, origin));
 }
 
 export const Route = createFileRoute('/invite/$token')({
@@ -30,9 +40,11 @@ export const Route = createFileRoute('/invite/$token')({
         const token = invitationTokenType(params.token);
 
         if (token instanceof type.errors) {
-          return Response.redirect(
-            new URL('/auth/error?error=invalid_invitation', requestUrl.origin),
-          );
+          return redirect(new URL('/auth/error?error=invalid_invitation', requestUrl.origin));
+        }
+
+        if (!(await connectionInvitationTokenExists(token))) {
+          return redirect(new URL('/auth/error?error=invalid_invitation', requestUrl.origin));
         }
 
         const session = await auth.api.getSession({ headers: request.headers });
