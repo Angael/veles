@@ -8,7 +8,6 @@ export const Route = createFileRoute('/_authenticated/calories_/foods_/$foodId')
     context.queryClient.ensureQueryData(calorieFoodQueryOptions(params.foodId)),
   component: Component,
   staticData: {
-    backTo: { to: '/calories' },
     layout: 'focus',
   },
 });

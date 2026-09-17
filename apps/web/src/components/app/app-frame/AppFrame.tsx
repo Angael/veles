@@ -9,10 +9,6 @@ import type { SessionUser } from '@/lib/auth/session.api';
 import type { NavbarTarget } from '@/lib/routing/staticRouteData';
 import css from './AppFrame.module.css';
 
-type RouteTarget =
-  | NavbarTarget
-  | ((match: { params: Record<string, string | undefined> }) => NavbarTarget);
-
 export function AppFrame({
   children,
   user = null,
@@ -28,11 +24,8 @@ export function AppFrame({
         return undefined;
       }
 
-      const resolveTarget = (target: RouteTarget) =>
-        typeof target === 'function' ? target({ params: match.params }) : target;
-
-      if (match.staticData.layout === 'focus' && match.staticData.backTo) {
-        return { backTo: resolveTarget(match.staticData.backTo), layout: 'focus' as const };
+      if (match.staticData.layout === 'focus') {
+        return { layout: 'focus' as const };
       }
 
       const navbarData = match.staticData.navbar;
@@ -44,7 +37,10 @@ export function AppFrame({
       return {
         layout: 'app' as const,
         label: navbarData.label,
-        upTo: navbarData.upTo ? resolveTarget(navbarData.upTo) : undefined,
+        upTo:
+          typeof navbarData.upTo === 'function'
+            ? navbarData.upTo({ params: match.params })
+            : navbarData.upTo,
       };
     },
   });
@@ -53,11 +49,7 @@ export function AppFrame({
   return (
     <div className={css.page}>
       <div className={clsx(css.shell, isFocusLayout && css.focusShell)}>
-        {isFocusLayout ? (
-          <header className={css.focusHeader}>
-            <FocusBackLink backTo={routeFrame.backTo} />
-          </header>
-        ) : (
+        {isFocusLayout ? null : (
           <header className={css.header}>
             {routeFrame?.layout === 'app' ? (
               <RouteLabel label={routeFrame.label} upTo={routeFrame.upTo} />
@@ -71,21 +63,6 @@ export function AppFrame({
         {!isFocusLayout ? <MobileNavbar user={user} /> : null}
       </div>
     </div>
-  );
-}
-
-function FocusBackLink({ backTo }: { backTo: NavbarTarget }) {
-  return (
-    <Btn
-      aria-label='Back'
-      icon={<ChevronLeftIcon aria-hidden='true' size={18} strokeWidth={2} />}
-      isLink
-      render={<Link {...backTo} />}
-      size='sm'
-      variant='ghost'
-    >
-      Back
-    </Btn>
   );
 }
 

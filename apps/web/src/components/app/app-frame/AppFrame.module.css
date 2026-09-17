@@ -42,13 +42,6 @@
   }
 }
 
-.focusHeader {
-  display: flex;
-  align-items: center;
-  min-height: 2.25rem;
-  padding: 0 0 var(--space-md);
-}
-
 .brand {
   display: flex;
   align-items: center;

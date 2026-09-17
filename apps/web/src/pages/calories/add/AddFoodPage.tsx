@@ -59,7 +59,7 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
 
   return (
     <main className={css.page}>
-      <section className={css.search}>
+      <div>
         <Label text='Food name'>
           <TextInput
             autoFocus
@@ -71,7 +71,7 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
             value={query}
           />
         </Label>
-      </section>
+      </div>
 
       <ul aria-busy={foodsQuery.isFetching || isFiltering} className={css.results}>
         {foods.map((food) => {

@@ -7,7 +7,6 @@ export const Route = createFileRoute('/_authenticated/calories_/foods_/new')({
   validateSearch: type({ 'barcode?': 'string', 'date?': 'string', 'name?': 'string' }),
   component: Component,
   staticData: {
-    backTo: { to: '/calories' },
     layout: 'focus',
   },
 });

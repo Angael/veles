@@ -16,7 +16,6 @@ export const Route = createFileRoute('/_authenticated/calories_/add')({
   },
   component: Component,
   staticData: {
-    backTo: { to: '/calories' },
     layout: 'focus',
   },
 });
