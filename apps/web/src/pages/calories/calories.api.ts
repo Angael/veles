@@ -692,8 +692,9 @@ export const updateFoodLog = createServerFn({ method: 'POST' })
       throw new ClientSafeError('Product-backed entries use the product photo.');
     }
     const image = await prepareImageAction(action, photo, session.user.id);
-    const imageUploadObjectId =
-      action === 'replace' ? (image?.asset.id ?? null) : action === 'remove' ? null : undefined;
+    let imageUploadObjectId: string | null | undefined;
+    if (action === 'replace') imageUploadObjectId = image?.asset.id ?? null;
+    if (action === 'remove') imageUploadObjectId = null;
 
     try {
       const nextGrams = optionalHundredths(values.grams ?? undefined);
@@ -703,17 +704,19 @@ export const updateFoodLog = createServerFn({ method: 'POST' })
           ? nextGrams / existing.gramsHundredths
           : null;
 
+      let kcalHundredths = toHundredths(values.kcal);
+      if (isProduct) {
+        kcalHundredths = existing.kcalHundredths;
+        if (ratio !== null) kcalHundredths = Math.round(existing.kcalHundredths * ratio);
+      }
+
       const [updated] = await db.transaction(async (tx) => {
         if (image) await tx.insert(uploadObjects).values(image.asset);
         return tx
           .update(foodLogs)
           .set({
             gramsHundredths: nextGrams,
-            kcalHundredths: isProduct
-              ? ratio === null
-                ? existing.kcalHundredths
-                : Math.round(existing.kcalHundredths * ratio)
-              : toHundredths(values.kcal),
+            kcalHundredths,
             proteinHundredths: updateOptionalNutrient(
               values.protein,
               existing.proteinHundredths,

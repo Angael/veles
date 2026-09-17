@@ -1,43 +1,24 @@
-import { useQueryClient } from '@tanstack/react-query';
-import { AuthCard } from './AuthCard';
-import { signIn } from '@/lib/auth/client';
-import { sessionUserQueryKey } from '@/lib/auth/session.query';
+import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
 import { getSafeRedirectPath } from '@/lib/auth/getSafeRedirectPath';
-import { useAuthAction } from '@/lib/auth/useAuthAction';
-
-export function LoginPendingPage() {
-  return (
-    <AuthCard
-      busy={true}
-      description='Continue with an invited Google account.'
-      error={null}
-      title='Sign in'
-    />
-  );
-}
+import css from './LoginPage.module.css';
 
 export function LoginPage({ redirect }: { redirect?: string }) {
-  const { busy, error, runAuthAction } = useAuthAction();
-  const queryClient = useQueryClient();
+  const callbackURL = getSafeRedirectPath(redirect);
+  const googleSignInUrl = `/auth/google?redirect=${encodeURIComponent(callbackURL)}`;
 
   return (
-    <AuthCard
-      busy={busy}
-      description='Continue with an invited Google account.'
-      error={error}
-      onGoogle={async () => {
-        await runAuthAction(async () => {
-          const result = await signIn.social({
-            provider: 'google',
-            callbackURL: getSafeRedirectPath(redirect),
-          });
+    <section className={css.authShell}>
+      <h1 className={css.authTitle}>Sign in</h1>
+      <Card className={css.authCard}>
+        <div className={css.authHeader}>
+          <p>Continue with an invited Google account.</p>
+        </div>
 
-          if (!result.error) {
-            queryClient.removeQueries({ queryKey: sessionUserQueryKey });
-          }
-        }, 'Google sign-in failed');
-      }}
-      title='Sign in'
-    />
+        <Btn isLink render={<a href={googleSignInUrl} />} variant='main'>
+          Continue with Google
+        </Btn>
+      </Card>
+    </section>
   );
 }

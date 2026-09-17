@@ -1,11 +1,10 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { type } from 'arktype';
-import { LoginPage, LoginPendingPage } from '@/pages/login/LoginPage';
+import { LoginPage } from '@/pages/login/LoginPage';
 import { getSafeRedirectPath } from '@/lib/auth/getSafeRedirectPath';
 
 export const Route = createFileRoute('/login')({
   validateSearch: type({ 'redirect?': 'string' }),
-  ssr: false,
   beforeLoad: ({ context, search }) => {
     if (context.user) {
       // oxlint-disable-next-line typescript/only-throw-error -- Router control flow intentionally throws this object.
@@ -13,7 +12,6 @@ export const Route = createFileRoute('/login')({
     }
   },
   component: RouteComponent,
-  pendingComponent: LoginPendingPage,
 });
 
 function RouteComponent() {

@@ -31,6 +31,7 @@ import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TextareaInput } from '@/components/ui/textarea-input/TextareaInput';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
+import { Toggle } from '@/components/ui/toggle/Toggle';
 import css from './ComponentsDemoPage.module.css';
 
 const SELECT_OPTIONS = [
@@ -67,6 +68,7 @@ export function ComponentsDemoPage() {
   const [selectValue, setSelectValue] = useState<(typeof SELECT_OPTIONS)[number]['value']>('lte');
   const [btnLoading, setBtnLoading] = useState(false);
   const [sliderValue, setSliderValue] = useState(50);
+  const [toggleChecked, setToggleChecked] = useState(true);
 
   return (
     <main className={css.page}>
@@ -147,6 +149,14 @@ export function ComponentsDemoPage() {
           to='/recipes/add'
           visual={<PlusIcon size={16} strokeWidth={1.8} />}
         />
+      </section>
+
+      <section>
+        <h2>Toggle</h2>
+        <label className={css.toggleDemo}>
+          <span>Share calories</span>
+          <Toggle checked={toggleChecked} onCheckedChange={setToggleChecked} />
+        </label>
       </section>
 
       <section>

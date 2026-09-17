@@ -108,7 +108,7 @@
 
 .ghostDanger {
   --btn-bg: transparent;
-  --btn-bg-hover: color-mix(in srgb, var(--c-danger-surface) 58%, transparent);
+  --btn-bg-hover: var(--c-danger-surface);
   --btn-border: transparent;
   --btn-border-hover: transparent;
   --btn-color: var(--c-danger-text);
