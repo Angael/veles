@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { PencilIcon } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { calorieDashboardQueryOptions, useRecordFoodMutation } from '../calories.query';
@@ -10,7 +9,7 @@ import { DateInput } from '@/components/ui/date-input/DateInput';
 import { Label } from '@/components/ui/label/Label';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
-import { NutritionInline } from '../NutritionInline';
+import { SelectedFoodCard } from '../SelectedFoodCard';
 import css from './SelectedFoodForm.module.css';
 
 type Props = {
@@ -52,26 +51,15 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
 
   return (
     <main className={css.page}>
-      <section className={css.product}>
-        {food.imageUrl ? <img alt='' className={css.productImage} src={food.imageUrl} /> : null}
-        <div className={css.productBody}>
-          <div className={css.productHeading}>
-            <div>
-              <strong>{food.name}</strong>
-            </div>
-            <Btn
-              aria-label={`Edit ${food.name}`}
-              icon={<PencilIcon aria-hidden='true' />}
-              iconOnly
-              isLink
-              render={<Link params={{ foodId: food.id }} to='/calories/foods/$foodId' />}
-              size='sm'
-              variant='ghost'
-            />
-          </div>
-          <NutritionInline kcal={kcal} protein={protein} fat={fat} carbs={carbs} />
-        </div>
-      </section>
+      <SelectedFoodCard
+        carbs={carbs}
+        fat={fat}
+        imageUrl={food.imageUrl}
+        kcal={kcal}
+        name={food.name}
+        productId={food.id}
+        protein={protein}
+      />
 
       <TypedForm className={css.panel} onSubmit={save}>
         {recordFoodMutation.error ? (

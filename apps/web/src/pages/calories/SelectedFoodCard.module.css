@@ -1,0 +1,46 @@
+@import '../../styles/breakpoints.css';
+
+.product {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+
+  & > img {
+    width: 7rem;
+    height: 7rem;
+    flex: none;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+  }
+}
+
+.productBody {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+  gap: var(--space-md);
+}
+
+.productHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+
+  & strong {
+    min-width: 0;
+    font-size: var(--text-lg);
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+}
+
+@media (--phone) {
+  .product > img {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+}

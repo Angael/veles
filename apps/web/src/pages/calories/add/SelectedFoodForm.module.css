@@ -8,59 +8,13 @@
   padding-bottom: 5rem;
 }
 
-.product,
 .panel {
+  display: grid;
+  gap: var(--space-md);
   border: 1px solid var(--c-border);
   border-radius: var(--radius-md);
   background: var(--c-surface);
   padding: var(--space-md);
-}
-
-.product {
-  display: flex;
-  gap: var(--space-md);
-
-  & > img {
-    width: 7rem;
-    height: 7rem;
-    flex: none;
-    border-radius: var(--radius-sm);
-    object-fit: cover;
-  }
-}
-
-.productBody {
-  min-width: 0;
-  flex: 1;
-  display: grid;
-  gap: var(--space-md);
-}
-
-.productHeading {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-sm);
-
-  & > div {
-    min-width: 0;
-    display: grid;
-    gap: var(--space-xs);
-  }
-
-  & strong {
-    font-size: var(--text-lg);
-    text-wrap: balance;
-  }
-
-  & span {
-    color: var(--c-muted);
-  }
-}
-
-.panel {
-  display: grid;
-  gap: var(--space-md);
 }
 
 .fields,
@@ -206,13 +160,6 @@
 }
 
 @media (--phone) {
-  .product {
-    & > img {
-      width: 4.5rem;
-      height: 4.5rem;
-    }
-  }
-
   .goalCaption {
     gap: var(--space-xs) var(--space-sm);
   }
