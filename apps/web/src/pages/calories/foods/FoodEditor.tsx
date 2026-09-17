@@ -87,8 +87,8 @@ export function FoodEditor({
         value={photo}
       />
       <p>This changes the shared catalog photo for everyone.</p>
-      <Btn disabled={pending} type='submit'>
-        {pending ? 'Saving…' : submitLabel}
+      <Btn loading={pending} type='submit'>
+        {submitLabel}
       </Btn>
     </TypedForm>
   );
