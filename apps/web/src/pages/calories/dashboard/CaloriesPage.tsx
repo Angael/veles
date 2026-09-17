@@ -80,14 +80,7 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
               const isFuture = isAfter(parsedDay, today);
               const isToday = day === todayDate;
               const isPast = isBefore(parsedDay, today);
-              const statusClass =
-                isPast && dayStatus?.hasLogs
-                  ? dayStatus.withinKcalGoal === true
-                    ? css.dayWithinGoal
-                    : dayStatus.overKcalGoal
-                      ? css.dayOverGoal
-                      : css.dayLogged
-                  : undefined;
+              const statusClass = getDayStatusClass(isPast, dayStatus);
 
               return (
                 <Toggle
@@ -158,13 +151,7 @@ function DayProgress({
   const progress = progressFor(consumedKcal, goalKcal);
   const overProgress =
     isPast && consumedKcal > goalKcal ? progressFor(consumedKcal - goalKcal, goalKcal) : null;
-  const fillClass = isToday
-    ? css.dayProgressToday
-    : isFuture
-      ? css.dayProgressFuture
-      : dayStatus.withinKcalGoal
-        ? css.dayProgressSuccess
-        : css.dayProgressFill;
+  const fillClass = getDayProgressClass(isToday, isFuture, dayStatus.withinKcalGoal);
 
   return (
     <span
@@ -189,6 +176,20 @@ function DayProgress({
       )}
     </span>
   );
+}
+
+function getDayStatusClass(isPast: boolean, dayStatus: CalorieDashboardDay | undefined) {
+  if (!isPast || !dayStatus?.hasLogs) return undefined;
+  if (dayStatus.withinKcalGoal === true) return css.dayWithinGoal;
+  if (dayStatus.overKcalGoal) return css.dayOverGoal;
+  return css.dayLogged;
+}
+
+function getDayProgressClass(isToday: boolean, isFuture: boolean, withinKcalGoal: boolean | null) {
+  if (isToday) return css.dayProgressToday;
+  if (isFuture) return css.dayProgressFuture;
+  if (withinKcalGoal) return css.dayProgressSuccess;
+  return css.dayProgressFill;
 }
 
 function progressFor(value: number, goal: number) {

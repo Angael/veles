@@ -278,21 +278,7 @@ function ScannerMessage({ state }: { state: Exclude<ScannerState, 'scanning'> })
     );
   }
 
-  const copy =
-    state === 'permissionDenied'
-      ? [
-          'Camera permission denied',
-          'Allow camera access in your browser settings, or type the barcode instead.',
-        ]
-      : state === 'unavailable'
-        ? [
-            'Camera unavailable',
-            'This browser cannot access a camera. You can still type the barcode.',
-          ]
-        : [
-            'Scanner stopped',
-            'We could not read from the camera. Close it and try again, or type the barcode.',
-          ];
+  const copy = scannerMessageCopy[state];
 
   return (
     <div className={css.message} role='alert'>
@@ -302,3 +288,21 @@ function ScannerMessage({ state }: { state: Exclude<ScannerState, 'scanning'> })
     </div>
   );
 }
+
+const scannerMessageCopy: Record<
+  Exclude<ScannerState, 'starting' | 'scanning'>,
+  [string, string]
+> = {
+  permissionDenied: [
+    'Camera permission denied',
+    'Allow camera access in your browser settings, or type the barcode instead.',
+  ],
+  unavailable: [
+    'Camera unavailable',
+    'This browser cannot access a camera. You can still type the barcode.',
+  ],
+  error: [
+    'Scanner stopped',
+    'We could not read from the camera. Close it and try again, or type the barcode.',
+  ],
+};
