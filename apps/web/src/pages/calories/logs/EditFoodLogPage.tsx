@@ -13,9 +13,7 @@ import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import css from '../CalorieFlows.module.css';
-
-type NutritionField = 'kcal' | 'protein' | 'fat' | 'carbs';
-type NutritionValues = Record<NutritionField, number | null>;
+import { useProportionalNutrition } from './useProportionalNutrition';
 
 export function EditFoodLogPage({ log }: { log: CalorieLog }) {
   const navigate = useNavigate();
@@ -24,8 +22,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
   const updateMutation = useUpdateFoodLogMutation();
   const isProduct = log.productId !== null;
   const isPending = updateMutation.isPending || deleteMutation.isPending;
-  const [grams, setGrams] = useState(log.grams);
-  const [nutrition, setNutrition] = useState<NutritionValues>({
+  const { changeGrams, changeNutrition, grams, nutrition } = useProportionalNutrition(log.grams, {
     kcal: log.kcal,
     protein: log.protein,
     fat: log.fat,
@@ -33,6 +30,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
   });
   const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
   const error = updateMutation.error?.message ?? deleteMutation.error?.message ?? '';
+
   async function submit(formData: TypedFormData, _navigate: UseNavigateResult<string>) {
     const nextDate = formData.string('date');
     await updateMutation.mutateAsync({
@@ -49,24 +47,6 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
     });
     await router.invalidate();
     await _navigate({ to: '/calories', search: { date: nextDate } });
-  }
-
-  /** Keeps the logged nutrition snapshot proportional when its serving quantity changes. */
-  function changeGrams(nextGrams: number | null) {
-    const ratio = grams !== null && grams > 0 && nextGrams !== null ? nextGrams / grams : null;
-    if (ratio !== null) {
-      setNutrition((values) => ({
-        kcal: scaleNutrient(values.kcal, ratio),
-        protein: scaleNutrient(values.protein, ratio),
-        fat: scaleNutrient(values.fat, ratio),
-        carbs: scaleNutrient(values.carbs, ratio),
-      }));
-    }
-    setGrams(nextGrams);
-  }
-
-  function changeNutrition(field: NutritionField, value: number | null) {
-    setNutrition((values) => ({ ...values, [field]: value }));
   }
 
   async function remove() {
@@ -148,8 +128,4 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
       </section>
     </main>
   );
-}
-
-function scaleNutrient(value: number | null, ratio: number) {
-  return value === null ? null : Math.round(value * ratio * 100) / 100;
 }
