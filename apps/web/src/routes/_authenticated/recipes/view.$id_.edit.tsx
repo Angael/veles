@@ -16,14 +16,12 @@ export const Route = createFileRoute('/_authenticated/recipes/view/$id_/edit')({
   component: RouteComponent,
   head: ({ loaderData }) => ({ meta: [{ title: `Edit ${loaderData?.name ?? 'recipe'}` }] }),
   staticData: {
-    navbar: {
-      label: 'Edit recipe',
-      upTo: ({ params }) => {
-        const { id } = params;
+    backTo: ({ params }) => {
+      const { id } = params;
 
-        return id ? { params: { id }, to: '/recipes/view/$id' } : { to: '/' };
-      },
+      return id ? { params: { id }, to: '/recipes/view/$id' } : { to: '/' };
     },
+    layout: 'focus',
   },
 });
 

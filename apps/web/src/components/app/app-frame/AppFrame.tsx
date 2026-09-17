@@ -1,4 +1,5 @@
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { ChevronLeftIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -8,6 +9,10 @@ import type { SessionUser } from '@/lib/auth/session.api';
 import type { NavbarTarget } from '@/lib/routing/staticRouteData';
 import css from './AppFrame.module.css';
 
+type RouteTarget =
+  | NavbarTarget
+  | ((match: { params: Record<string, string | undefined> }) => NavbarTarget);
+
 export function AppFrame({
   children,
   user = null,
@@ -15,36 +20,72 @@ export function AppFrame({
   children?: ReactNode;
   user?: SessionUser | null;
 }) {
-  const navbar = useRouterState({
+  const routeFrame = useRouterState({
     select: (state) => {
       const match = state.matches.at(-1);
-      const navbarData = match?.staticData.navbar;
 
-      if (!match || !navbarData) {
+      if (!match) {
+        return undefined;
+      }
+
+      const resolveTarget = (target: RouteTarget) =>
+        typeof target === 'function' ? target({ params: match.params }) : target;
+
+      if (match.staticData.layout === 'focus' && match.staticData.backTo) {
+        return { backTo: resolveTarget(match.staticData.backTo), layout: 'focus' as const };
+      }
+
+      const navbarData = match.staticData.navbar;
+
+      if (!navbarData) {
         return undefined;
       }
 
       return {
+        layout: 'app' as const,
         label: navbarData.label,
-        upTo:
-          typeof navbarData.upTo === 'function'
-            ? navbarData.upTo({ params: match.params })
-            : navbarData.upTo,
+        upTo: navbarData.upTo ? resolveTarget(navbarData.upTo) : undefined,
       };
     },
   });
+  const isFocusLayout = routeFrame?.layout === 'focus';
 
   return (
     <div className={css.page}>
-      <div className={css.shell}>
-        <header className={css.header}>
-          {navbar ? <RouteLabel label={navbar.label} upTo={navbar.upTo} /> : <div />}
-          <Navbar user={user} />
-        </header>
+      <div className={clsx(css.shell, isFocusLayout && css.focusShell)}>
+        {isFocusLayout ? (
+          <header className={css.focusHeader}>
+            <FocusBackLink backTo={routeFrame.backTo} />
+          </header>
+        ) : (
+          <header className={css.header}>
+            {routeFrame?.layout === 'app' ? (
+              <RouteLabel label={routeFrame.label} upTo={routeFrame.upTo} />
+            ) : (
+              <div />
+            )}
+            <Navbar user={user} />
+          </header>
+        )}
         {children === undefined ? <Outlet /> : children}
-        <MobileNavbar user={user} />
+        {!isFocusLayout ? <MobileNavbar user={user} /> : null}
       </div>
     </div>
+  );
+}
+
+function FocusBackLink({ backTo }: { backTo: NavbarTarget }) {
+  return (
+    <Btn
+      aria-label='Back'
+      icon={<ChevronLeftIcon aria-hidden='true' size={18} strokeWidth={2} />}
+      isLink
+      render={<Link {...backTo} />}
+      size='sm'
+      variant='ghost'
+    >
+      Back
+    </Btn>
   );
 }
 

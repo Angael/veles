@@ -7,10 +7,8 @@ export const Route = createFileRoute('/_authenticated/calories_/foods_/new')({
   validateSearch: type({ 'barcode?': 'string', 'date?': 'string', 'name?': 'string' }),
   component: Component,
   staticData: {
-    navbar: {
-      label: 'Create food',
-      upTo: { to: '/calories' },
-    },
+    backTo: { to: '/calories' },
+    layout: 'focus',
   },
 });
 

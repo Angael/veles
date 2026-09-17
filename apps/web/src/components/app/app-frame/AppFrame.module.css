@@ -17,6 +17,17 @@
   }
 }
 
+.focusShell {
+  width: min(720px, calc(100% - 2rem));
+  padding-bottom: var(--space-xl);
+
+  @media (--phone) {
+    width: min(720px, calc(100% - 1rem));
+    padding-top: max(var(--space-sm), env(safe-area-inset-top, 0px));
+    padding-bottom: max(var(--space-lg), env(safe-area-inset-bottom, 0px));
+  }
+}
+
 .header {
   position: relative;
   z-index: 10;
@@ -29,6 +40,13 @@
   @media (--phone) {
     padding: 0 0 var(--space-lg);
   }
+}
+
+.focusHeader {
+  display: flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0 0 var(--space-md);
 }
 
 .brand {
