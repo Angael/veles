@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto';
+import { hash } from 'node:crypto';
 import { and, eq } from 'drizzle-orm';
 import { connectionInvitations, userConnections } from '@veles/db/schema';
 import { invariant } from '@/lib/invariant';
@@ -18,9 +18,6 @@ interface AcceptConnectionInvitationTokenOptions {
     id: string;
   };
 }
-export function hashToken(token: string) {
-  return createHash('sha256').update(token).digest('hex');
-}
 
 export function canonicalConnection(firstUserId: string, secondUserId: string) {
   return firstUserId < secondUserId
@@ -38,7 +35,7 @@ export async function acceptConnectionInvitationTokenForUser({
       .delete(connectionInvitations)
       .where(
         and(
-          eq(connectionInvitations.tokenHash, hashToken(token)),
+          eq(connectionInvitations.tokenHash, hash('sha256', token)),
           eq(connectionInvitations.recipientEmail, user.email.toLowerCase()),
         ),
       )

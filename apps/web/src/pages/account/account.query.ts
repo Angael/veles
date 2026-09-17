@@ -25,9 +25,9 @@ export function useSignOutMutation() {
   });
 }
 
-export const connectionsQueryKey = ['connections'] as const;
+const connectionsQueryKey = ['connections'] as const;
 
-export const connectionsQueryOptions = queryOptions({
+const connectionsQueryOptions = queryOptions({
   queryFn: () => getConnections(),
   queryKey: connectionsQueryKey,
 });
@@ -36,9 +36,9 @@ export function useConnectionsQuery() {
   return useQuery(connectionsQueryOptions);
 }
 
-export const sharingSettingsQueryKey = ['sharingSettings'] as const;
+const sharingSettingsQueryKey = ['sharingSettings'] as const;
 
-export const sharingSettingsQueryOptions = queryOptions({
+const sharingSettingsQueryOptions = queryOptions({
   queryFn: () => getSharingSettings(),
   queryKey: sharingSettingsQueryKey,
 });

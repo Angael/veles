@@ -1,4 +1,4 @@
-import { randomBytes } from 'node:crypto';
+import { hash, randomBytes } from 'node:crypto';
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
@@ -9,11 +9,7 @@ import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { log } from '@/server/logger.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
-import {
-  canonicalConnection,
-  hashToken,
-  sendConnectionInvitationEmail,
-} from './connections.server';
+import { canonicalConnection, sendConnectionInvitationEmail } from './connections.server';
 
 const invitationIdInputType = type({ id: 'string.uuid' });
 
@@ -81,16 +77,21 @@ export const sendConnectionInvitation = createServerFn({ method: 'POST' })
     }
 
     const token = randomBytes(32).toString('base64url');
+    const tokenHash = hash('sha256', token);
     const invitationRows = await db
       .insert(connectionInvitations)
       .values({
         inviterUserId: session.user.id,
         recipientEmail: data.email,
-        tokenHash: hashToken(token),
+        tokenHash,
       })
       .onConflictDoUpdate({
         target: [connectionInvitations.inviterUserId, connectionInvitations.recipientEmail],
-        set: { deliveryFailed: false, tokenHash: hashToken(token), updatedAt: new Date() },
+        set: {
+          deliveryFailed: false,
+          tokenHash,
+          updatedAt: new Date(),
+        },
       })
       .returning({ id: connectionInvitations.id });
     const invitation = invitationRows[0];
