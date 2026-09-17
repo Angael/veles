@@ -1,4 +1,4 @@
-import { Link, useNavigate, type UseNavigateResult } from '@tanstack/react-router';
+import { useNavigate, useRouter, type UseNavigateResult } from '@tanstack/react-router';
 import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogMutation, useUpdateFoodLogMutation } from '../calories.query';
@@ -8,17 +8,26 @@ import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm'
 import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { PhotoPicker, type PhotoPickerValue } from '../PhotoPicker';
+import { SelectedFoodCard } from '../SelectedFoodCard';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import css from '../CalorieFlows.module.css';
+import { useProportionalNutrition } from './useProportionalNutrition';
 
 export function EditFoodLogPage({ log }: { log: CalorieLog }) {
   const navigate = useNavigate();
+  const router = useRouter();
   const deleteMutation = useDeleteFoodLogMutation();
   const updateMutation = useUpdateFoodLogMutation();
   const isProduct = log.productId !== null;
   const isPending = updateMutation.isPending || deleteMutation.isPending;
+  const { changeGrams, changeNutrition, grams, nutrition } = useProportionalNutrition(log.grams, {
+    kcal: log.kcal,
+    protein: log.protein,
+    fat: log.fat,
+    carbs: log.carbs,
+  });
   const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
   const error = updateMutation.error?.message ?? deleteMutation.error?.message ?? '';
 
@@ -28,14 +37,15 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
       id: log.id,
       date: nextDate,
       previousDate: log.date,
-      name: formData.string('name'),
-      grams: formData.optionalNumber('grams'),
-      kcal: formData.number('kcal'),
-      protein: formData.optionalNumber('protein'),
-      fat: formData.optionalNumber('fat'),
-      carbs: formData.optionalNumber('carbs'),
+      name: isProduct ? log.name : formData.string('name'),
+      grams: grams ?? undefined,
+      kcal: isProduct ? log.kcal : formData.number('kcal'),
+      protein: isProduct ? (log.protein ?? undefined) : formData.optionalNumber('protein'),
+      fat: isProduct ? (log.fat ?? undefined) : formData.optionalNumber('fat'),
+      carbs: isProduct ? (log.carbs ?? undefined) : formData.optionalNumber('carbs'),
       ...(isProduct ? {} : { imageAction: photo.imageAction, photo: photo.photo }),
     });
+    await router.invalidate();
     await _navigate({ to: '/calories', search: { date: nextDate } });
   }
 
@@ -48,14 +58,22 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
     <main className={css.page}>
       <header className={css.header}>
         <div>
-          <h1>Edit logged entry</h1>
-          <p>
-            {isProduct
-              ? 'Product details are saved as a snapshot. Edit the product, then delete and add this entry again to use the new details.'
-              : 'Adjust the custom calories and macros.'}
-          </p>
+          <h1>Edit food log</h1>
         </div>
       </header>
+
+      {isProduct && log.productId ? (
+        <SelectedFoodCard
+          carbs={nutrition.carbs ?? 0}
+          fat={nutrition.fat ?? 0}
+          imageUrl={log.imageUrl}
+          kcal={nutrition.kcal ?? 0}
+          name={log.name}
+          productId={log.productId}
+          protein={nutrition.protein ?? 0}
+        />
+      ) : null}
+
       <section className={css.panel}>
         {error ? (
           <p className={css.error} role='alert'>
@@ -63,29 +81,26 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
           </p>
         ) : null}
         <TypedForm className={css.form} onSubmit={submit}>
-          <div className={css.grid}>
+          {!isProduct ? (
             <Label text='Name'>
-              <TextInput defaultValue={log.name} name='name' readOnly={isProduct} required />
+              <TextInput defaultValue={log.name} name='name' required />
             </Label>
+          ) : null}
 
+          <div className={css.logFields}>
             <Label text='Date'>
               <DateInput defaultValue={log.date} name='date' required />
             </Label>
 
-            <Label text='Quantity (g)'>
-              <NumberInput defaultValue={log.grams ?? undefined} min={0} name='grams' />
+            <Label text='Amount eaten (g)'>
+              <NumberInput min={0} name='grams' onValueChange={changeGrams} value={grams} />
             </Label>
           </div>
 
-          <KcalMacrosForm
-            defaultValues={{
-              kcal: log.kcal,
-              protein: log.protein,
-              fat: log.fat,
-              carbs: log.carbs,
-            }}
-            readOnly={isProduct}
-          />
+          {!isProduct ? (
+            <KcalMacrosForm onValueChange={changeNutrition} values={nutrition} />
+          ) : null}
+
           {!isProduct ? (
             <PhotoPicker
               disabled={isPending}
@@ -95,21 +110,18 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             />
           ) : null}
 
-          <div className={css.actions}>
-            <Btn disabled={isPending} onClick={() => void remove()} variant='ghost'>
-              Delete entry
+          <div className={css.logActions}>
+            <Btn
+              disabled={isPending}
+              loading={deleteMutation.isPending}
+              onClick={() => void remove()}
+              type='button'
+              variant='danger'
+            >
+              Delete
             </Btn>
-            {log.productId ? (
-              <Btn
-                isLink
-                render={<Link params={{ foodId: log.productId }} to='/calories/foods/$foodId' />}
-                variant='ghost'
-              >
-                Edit product itself
-              </Btn>
-            ) : null}
-            <Btn disabled={isPending} type='submit'>
-              Save entry
+            <Btn disabled={isPending} loading={updateMutation.isPending} type='submit'>
+              Save
             </Btn>
           </div>
         </TypedForm>
