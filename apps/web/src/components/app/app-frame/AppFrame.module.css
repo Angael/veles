@@ -31,6 +31,22 @@
   }
 }
 
+.logoLink {
+  display: inline-flex;
+  width: clamp(7.5rem, 14vw, 10rem);
+  border-radius: var(--radius-xs);
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: var(--space-xs);
+  }
+}
+
+.logo {
+  width: 100%;
+  height: auto;
+}
+
 .brand {
   display: flex;
   align-items: center;

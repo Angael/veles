@@ -38,7 +38,19 @@ export function AppFrame({
     <div className={css.page}>
       <div className={css.shell}>
         <header className={css.header}>
-          {navbar ? <RouteLabel label={navbar.label} upTo={navbar.upTo} /> : <div />}
+          {navbar ? (
+            <RouteLabel label={navbar.label} upTo={navbar.upTo} />
+          ) : (
+            <Link aria-label='Veles home' className={css.logoLink} to='/'>
+              <img
+                alt='Veles'
+                className={css.logo}
+                height='90'
+                src='/veles-logo.webp'
+                width='242'
+              />
+            </Link>
+          )}
           <Navbar user={user} />
         </header>
         {children === undefined ? <Outlet /> : children}

@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_APP_NAME: string;
+  readonly VITE_APP_ENV?: 'production' | 'development' | 'localhost';
   readonly VITE_CF_CDN_URL: string;
 }
 
@@ -23,6 +24,7 @@ declare global {
       readonly R2_SECRET_ACCESS_KEY: string;
       readonly R2_BUCKET_NAME: string;
       readonly VITE_APP_NAME?: string;
+      readonly VITE_APP_ENV?: 'production' | 'development' | 'localhost';
       readonly VITE_CF_CDN_URL: string;
       readonly NODE_ENV: 'development' | 'production' | 'test';
     }

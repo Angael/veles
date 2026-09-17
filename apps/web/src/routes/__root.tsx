@@ -9,25 +9,48 @@ import type { QueryClient } from '@tanstack/react-query';
 import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
 import * as React from 'react';
 
-const isLocalhostApp = import.meta.env.DEV;
+type AppEnvironment = 'production' | 'development' | 'localhost';
+
+const appEnvironment =
+  (import.meta.env.VITE_APP_ENV as AppEnvironment | undefined) ??
+  (import.meta.env.DEV ? 'localhost' : 'production');
 const appName = (import.meta.env.VITE_APP_NAME as string) || 'Veles';
 const ComponentsDemoLink = React.lazy(() => import('./-ComponentsDemoLink'));
 
-const faviconLinks = isLocalhostApp
-  ? [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon-localhost.ico' },
-      { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32-localhost.png' },
-      { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16-localhost.png' },
-      { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon-localhost.png' },
-      { rel: 'manifest', href: '/site-localhost.webmanifest' },
-    ]
-  : [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
-      { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
-      { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
-      { rel: 'manifest', href: '/site.webmanifest' },
-    ];
+function getFaviconConfig(environment: AppEnvironment) {
+  if (environment === 'production') {
+    return { suffix: '', manifest: 'site.webmanifest' };
+  }
+
+  if (environment === 'development') {
+    return { suffix: '-dev', manifest: 'site-dev.webmanifest' };
+  }
+
+  return { suffix: '-localhost', manifest: 'site-localhost.webmanifest' };
+}
+
+const faviconConfig = getFaviconConfig(appEnvironment);
+const faviconLinks = [
+  { rel: 'icon', type: 'image/x-icon', href: `/favicon${faviconConfig.suffix}.ico` },
+  {
+    rel: 'icon',
+    type: 'image/png',
+    sizes: '32x32',
+    href: `/favicon-32x32${faviconConfig.suffix}.png`,
+  },
+  {
+    rel: 'icon',
+    type: 'image/png',
+    sizes: '16x16',
+    href: `/favicon-16x16${faviconConfig.suffix}.png`,
+  },
+  {
+    rel: 'apple-touch-icon',
+    sizes: '180x180',
+    href: `/apple-touch-icon${faviconConfig.suffix}.png`,
+  },
+  { rel: 'manifest', href: `/${faviconConfig.manifest}` },
+];
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: async ({ context }) => ({
@@ -78,7 +101,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {isLocalhostApp ? <ComponentsDemoLink /> : null}
+        {appEnvironment === 'localhost' ? <ComponentsDemoLink /> : null}
         {children}
         {/* {import.meta.env.DEV ? (
           <>
