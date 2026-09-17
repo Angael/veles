@@ -7,6 +7,7 @@ import { Btn } from '@/components/ui/btn/Btn';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
+import { CalorieFormError } from '../CalorieFormError';
 import { CalorieGoalCalculator } from './CalorieGoalCalculator';
 import {
   DEFAULT_MACRO_PERCENTAGES,
@@ -72,6 +73,7 @@ export function CalorieGoalsPage({
         <h1>Current goals</h1>
       </header>
       <TypedForm className={flowCss.form} onSubmit={submit}>
+        <CalorieFormError error={goalMutation.error} />
         <CalorieGoalCalculator
           initialWeightKg={latestWeightKg}
           onApply={setValues}

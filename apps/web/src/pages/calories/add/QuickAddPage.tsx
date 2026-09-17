@@ -8,12 +8,12 @@ import { PhotoPicker, type PhotoPickerValue } from '../PhotoPicker';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
+import { CalorieFormError } from '../CalorieFormError';
 import css from '../CalorieFlows.module.css';
 
 export function QuickAddPage({ date }: { date: string }) {
   const recordMutation = useRecordCustomCaloriesMutation();
   const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
-  const error = recordMutation.error?.message ?? '';
 
   async function submit(formData: TypedFormData, navigate: UseNavigateResult<string>) {
     await recordMutation.mutateAsync({
@@ -39,11 +39,7 @@ export function QuickAddPage({ date }: { date: string }) {
         </div>
       </header>
       <section className={css.panel}>
-        {error ? (
-          <p className={css.error} role='alert'>
-            {error}
-          </p>
-        ) : null}
+        <CalorieFormError error={recordMutation.error} />
         <TypedForm className={css.form} onSubmit={submit}>
           <Label text='Label'>
             <TextInput defaultValue='Quick add' name='name' required />

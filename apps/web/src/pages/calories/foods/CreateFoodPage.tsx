@@ -1,13 +1,13 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useCreateFoodProductMutation } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
+import { CalorieFormError } from '../CalorieFormError';
 import css from '../CalorieFlows.module.css';
 
 type Props = { barcode?: string; date: string; name?: string };
 export function CreateFoodPage({ barcode, date, name }: Props) {
   const navigate = useNavigate();
   const createMutation = useCreateFoodProductMutation();
-  const error = createMutation.error?.message ?? '';
 
   async function save(value: FoodEditorValue) {
     const product = await createMutation.mutateAsync(value);
@@ -23,11 +23,7 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
         </div>
       </header>
       <section className={css.panel}>
-        {error ? (
-          <p className={css.error} role='alert'>
-            {error}
-          </p>
-        ) : null}
+        <CalorieFormError error={createMutation.error} />
         <FoodEditor
           initialBarcode={barcode}
           initialName={name}

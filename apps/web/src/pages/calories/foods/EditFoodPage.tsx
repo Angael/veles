@@ -3,12 +3,12 @@ import type { CalorieFood } from '../calories.api';
 import { useUpdateFoodProductMutation } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
 import { todayLocalDate } from '@/lib/dateOnly';
+import { CalorieFormError } from '../CalorieFormError';
 import css from '../CalorieFlows.module.css';
 
 export function EditFoodPage({ food }: { food: CalorieFood }) {
   const navigate = useNavigate();
   const updateMutation = useUpdateFoodProductMutation();
-  const error = updateMutation.error?.message ?? '';
 
   async function save(value: FoodEditorValue) {
     await updateMutation.mutateAsync({ ...value, id: food.id });
@@ -24,11 +24,7 @@ export function EditFoodPage({ food }: { food: CalorieFood }) {
         </div>
       </header>
       <section className={css.panel}>
-        {error ? (
-          <p className={css.error} role='alert'>
-            {error}
-          </p>
-        ) : null}
+        <CalorieFormError error={updateMutation.error} />
         <FoodEditor
           food={food}
           onSubmit={save}
