@@ -6,13 +6,6 @@
   padding-bottom: 5rem;
 }
 
-.search {
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-md);
-  background: var(--c-surface);
-  padding: var(--space-md);
-}
-
 .results {
   display: grid;
   gap: var(--space-sm);

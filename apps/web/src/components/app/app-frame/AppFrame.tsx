@@ -1,4 +1,11 @@
-import { Link, Outlet, useRouterState } from '@tanstack/react-router';
+import {
+  Link,
+  Outlet,
+  useRouterState,
+  type RegisteredRouter,
+  type RouterState,
+} from '@tanstack/react-router';
+import clsx from 'clsx';
 import { ChevronLeftIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -8,6 +15,10 @@ import type { SessionUser } from '@/lib/auth/session.api';
 import type { NavbarTarget } from '@/lib/routing/staticRouteData';
 import css from './AppFrame.module.css';
 
+const routeMatchOptions = {
+  select: (state: RouterState<RegisteredRouter['routeTree']>) => state.matches.at(-1),
+};
+
 export function AppFrame({
   children,
   user = null,
@@ -15,34 +26,32 @@ export function AppFrame({
   children?: ReactNode;
   user?: SessionUser | null;
 }) {
-  const navbar = useRouterState({
-    select: (state) => {
-      const match = state.matches.at(-1);
-      const navbarData = match?.staticData.navbar;
-
-      if (!match || !navbarData) {
-        return undefined;
-      }
-
-      return {
-        label: navbarData.label,
-        upTo:
-          typeof navbarData.upTo === 'function'
-            ? navbarData.upTo({ params: match.params })
-            : navbarData.upTo,
-      };
-    },
-  });
+  const routeMatch = useRouterState(routeMatchOptions);
+  const { layout, navbar } = routeMatch?.staticData ?? {};
+  const isFocusLayout = layout === 'focus';
 
   return (
     <div className={css.page}>
-      <div className={css.shell}>
-        <header className={css.header}>
-          {navbar ? <RouteLabel label={navbar.label} upTo={navbar.upTo} /> : <div />}
-          <Navbar user={user} />
-        </header>
+      <div className={clsx(css.shell, isFocusLayout && 'focusShell')}>
+        {!isFocusLayout && (
+          <header className={css.header}>
+            {navbar ? (
+              <RouteLabel
+                label={navbar.label}
+                upTo={
+                  typeof navbar.upTo === 'function'
+                    ? navbar.upTo({ params: routeMatch?.params ?? {} })
+                    : navbar.upTo
+                }
+              />
+            ) : (
+              <div />
+            )}
+            <Navbar user={user} />
+          </header>
+        )}
         {children === undefined ? <Outlet /> : children}
-        <MobileNavbar user={user} />
+        {!isFocusLayout && <MobileNavbar user={user} />}
       </div>
     </div>
   );

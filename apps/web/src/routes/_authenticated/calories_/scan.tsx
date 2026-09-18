@@ -7,10 +7,7 @@ export const Route = createFileRoute('/_authenticated/calories_/scan')({
   validateSearch: type({ 'date?': 'string' }),
   component: Component,
   staticData: {
-    navbar: {
-      label: 'Look up barcode',
-      upTo: { to: '/calories' },
-    },
+    layout: 'focus',
   },
 });
 

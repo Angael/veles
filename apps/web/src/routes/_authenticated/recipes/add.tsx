@@ -6,5 +6,5 @@ export const Route = createFileRoute('/_authenticated/recipes/add')({
   component: AddRecipePage,
 
   head: () => ({ meta: [{ title: 'Add recipe' }] }),
-  staticData: { navbar: { label: 'Add recipe', upTo: { to: '/recipes' } } },
+  staticData: { layout: 'focus' },
 });

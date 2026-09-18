@@ -12,4 +12,9 @@
     right: var(--space-lg);
     bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
   }
+
+  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+  :global(.focusShell) .button {
+    bottom: max(var(--space-lg), env(safe-area-inset-bottom, 0px));
+  }
 }
