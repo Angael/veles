@@ -32,7 +32,7 @@ export function AppFrame({
 
   return (
     <div className={css.page}>
-      <div className={clsx(css.shell, isFocusLayout && css.focusShell)}>
+      <div className={clsx(css.shell, isFocusLayout && 'focusShell')}>
         {!isFocusLayout && (
           <header className={css.header}>
             {navbar ? (
