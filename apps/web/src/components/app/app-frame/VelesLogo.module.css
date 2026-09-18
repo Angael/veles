@@ -1,0 +1,66 @@
+.logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.wordmark {
+  fill: var(--c-text-strong);
+  font-family: var(--font-sans);
+  font-size: 78px;
+  font-weight: 650;
+  letter-spacing: -4px;
+  animation: appear 450ms ease-out both;
+}
+
+.orbit {
+  animation: appear 700ms ease-out 150ms both;
+}
+
+.farRing,
+.nearRing {
+  fill: none;
+  stroke: var(--c-accent);
+  stroke-width: 1.5px;
+}
+
+.farRing {
+  opacity: 0.3;
+}
+
+.nearRing {
+  opacity: 0.8;
+}
+
+.planet {
+  offset-path: path('M284 55a134 32 0 1 1-268 0a134 32 0 1 1 268 0');
+  offset-distance: 0%;
+  offset-rotate: 0deg;
+  offset-anchor: 0px 0px;
+  animation: revolve 24s linear infinite;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes revolve {
+  to {
+    offset-distance: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordmark,
+  .orbit,
+  .planet {
+    animation: none;
+  }
+}

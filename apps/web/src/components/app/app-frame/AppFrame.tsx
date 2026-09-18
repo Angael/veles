@@ -14,6 +14,7 @@ import { Navbar } from '@/components/app/navbar/Navbar';
 import type { SessionUser } from '@/lib/auth/session.api';
 import type { NavbarTarget } from '@/lib/routing/staticRouteData';
 import css from './AppFrame.module.css';
+import { VelesLogo } from './VelesLogo';
 
 const routeMatchOptions = {
   select: (state: RouterState<RegisteredRouter['routeTree']>) => state.matches.at(-1),
@@ -46,13 +47,7 @@ export function AppFrame({
               />
             ) : (
               <Link aria-label='Veles home' className={css.logoLink} to='/'>
-                <img
-                  alt='Veles'
-                  className={css.logo}
-                  height='90'
-                  src='/veles-logo.webp'
-                  width='270'
-                />
+                <VelesLogo />
               </Link>
             )}
             <Navbar user={user} />
