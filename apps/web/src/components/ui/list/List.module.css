@@ -15,10 +15,6 @@
   }
 }
 
-.noPadding {
-  padding: 0;
-}
-
 .interactive {
   transition: background-color var(--duration-fast) var(--ease-out);
 
