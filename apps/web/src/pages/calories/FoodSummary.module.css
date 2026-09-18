@@ -117,11 +117,9 @@
   }
 
   .identity {
-    flex-wrap: wrap;
-    gap: 0 var(--space-xs);
+    gap: var(--space-xs);
 
     & strong {
-      width: 100%;
       font-size: var(--text-md-dynamic);
     }
 

@@ -24,29 +24,20 @@ export function NutritionInline({
         <strong>{Math.round(kcal)}</strong>
         <span>kcal</span>
       </div>
-      <dl className={css.macros}>
+      <div className={css.macros}>
         <div className={css.macro}>
-          <dt>Protein</dt>
-          <dd>
-            <i aria-hidden='true' className={css.dotProtein} />
-            {Math.round(protein)} g
-          </dd>
+          {Math.round(protein)}
+          <span className={css.unit}>g</span>
         </div>
         <div className={css.macro}>
-          <dt>Fat</dt>
-          <dd>
-            <i aria-hidden='true' className={css.dotFat} />
-            {Math.round(fat)} g
-          </dd>
+          {Math.round(fat)}
+          <span className={css.unit}>g</span>
         </div>
         <div className={css.macro}>
-          <dt>Carbs</dt>
-          <dd>
-            <i aria-hidden='true' className={css.dotCarbs} />
-            {Math.round(carbs)} g
-          </dd>
+          {Math.round(carbs)}
+          <span className={css.unit}>g</span>
         </div>
-      </dl>
+      </div>
     </div>
   );
 }
