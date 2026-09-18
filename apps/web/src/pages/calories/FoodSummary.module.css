@@ -6,6 +6,7 @@
 }
 
 .summary {
+  position: relative;
   display: grid;
   grid-template-columns: 6.75rem minmax(0, 1fr) auto;
   align-items: center;
@@ -70,6 +71,12 @@
     text-decoration: none;
   }
 
+  & a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
   & a:focus-visible {
     border-radius: 0.2rem;
     outline: 2px solid var(--c-primary-focus);
@@ -81,6 +88,8 @@
   --btn-height: 2.75rem;
   --btn-icon-size: 1.05rem;
 
+  position: relative;
+  z-index: 1;
   flex: none;
 }
 
