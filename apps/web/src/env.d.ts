@@ -19,6 +19,8 @@ declare global {
       readonly AUTH_ALLOWED_EMAILS: string;
       readonly GOOGLE_CLIENT_ID?: string;
       readonly GOOGLE_CLIENT_SECRET?: string;
+      readonly RESEND_API_KEY?: string;
+      readonly INVITATION_EMAIL_FROM?: string;
       readonly R2_ACCOUNT_ID: string;
       readonly R2_ACCESS_KEY_ID: string;
       readonly R2_SECRET_ACCESS_KEY: string;

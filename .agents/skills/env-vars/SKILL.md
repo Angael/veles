@@ -51,6 +51,8 @@ For every added, removed, renamed, or behaviorally changed variable, inspect the
 9. Database configs and scripts — check when the variable is used by Drizzle or maintenance commands.
 10. Every code access and test stub — migrate all callers on rename or removal; do not leave aliases.
 
+The local Oxlint rule `veles/env-vars` checks these required mentions automatically. Keep `.oxlint/env-vars.mjs` aligned when adding a new environment context or delivery surface; do not bypass the rule.
+
 ## Production Build Invariant
 
 A client variable needed in production must traverse the complete build-time chain:
@@ -64,5 +66,6 @@ Runtime `web.environment` is too late for values compiled by Vite. If the server
 - Build the web app with the expected production environment, including the missing-value case when the variable is optional or has a default.
 - For variables read by route modules, import or exercise the emitted SSR router/entry so module initialization is verified, not only compilation.
 - Run `docker compose config --quiet` after changing Compose wiring.
+- Run `pnpm lint` to catch missing type, Docker, Compose, example, worker, and database-tool wiring.
 - Run `pnpm check:fix` before finishing.
 - Do not launch the dev server or perform browser/computer-use smoke tests.
