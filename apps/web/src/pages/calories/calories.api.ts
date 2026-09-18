@@ -7,7 +7,7 @@ import { calorieGoals, foodLogs, foodProducts, uploadObjects } from '@veles/db/s
 import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
-import { downloadFile } from './downloadFile';
+import { downloadFile } from '@/server/downloadFile.server';
 import { storagePathToUrl } from '@/server/storage/config.server';
 import { log } from '@/server/logger.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
