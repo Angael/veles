@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { UtensilsIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { NutritionInline } from './NutritionInline';
 import css from './FoodSummary.module.css';
@@ -29,9 +30,13 @@ export function FoodSummary({
 }: FoodSummaryProps) {
   return (
     <div className={clsx(css.summary, density === 'compact' && css.compact)}>
-      {imageUrl ? (
-        <img alt='' aria-hidden='true' className={css.image} loading='lazy' src={imageUrl} />
-      ) : null}
+      <div className={css.media}>
+        {imageUrl ? (
+          <img alt='' aria-hidden='true' className={css.image} loading='lazy' src={imageUrl} />
+        ) : (
+          <UtensilsIcon aria-hidden='true' />
+        )}
+      </div>
       <div className={css.body}>
         <div className={css.identity}>
           <strong>{name}</strong>
