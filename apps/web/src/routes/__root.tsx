@@ -9,27 +9,16 @@ import type { QueryClient } from '@tanstack/react-query';
 import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
 import * as React from 'react';
 
-type AppEnvironment = 'production' | 'development' | 'localhost';
-
-const appEnvironment =
-  (import.meta.env.VITE_APP_ENV as AppEnvironment | undefined) ??
-  (import.meta.env.DEV ? 'localhost' : 'production');
-const appName = (import.meta.env.VITE_APP_NAME as string) || 'Veles';
+const appName = import.meta.env.VITE_APP_NAME || 'Veles';
 const ComponentsDemoLink = React.lazy(() => import('./-ComponentsDemoLink'));
+const faviconConfigByEnvironment = {
+  production: { suffix: '', manifest: 'site.webmanifest' },
+  development: { suffix: '-dev', manifest: 'site-dev.webmanifest' },
+  localhost: { suffix: '-localhost', manifest: 'site-localhost.webmanifest' },
+} as const;
 
-function getFaviconConfig(environment: AppEnvironment) {
-  if (environment === 'production') {
-    return { suffix: '', manifest: 'site.webmanifest' };
-  }
+const faviconConfig = faviconConfigByEnvironment[import.meta.env.VITE_APP_ENV];
 
-  if (environment === 'development') {
-    return { suffix: '-dev', manifest: 'site-dev.webmanifest' };
-  }
-
-  return { suffix: '-localhost', manifest: 'site-localhost.webmanifest' };
-}
-
-const faviconConfig = getFaviconConfig(appEnvironment);
 const faviconLinks = [
   { rel: 'icon', type: 'image/x-icon', href: `/favicon${faviconConfig.suffix}.ico` },
   {
@@ -101,7 +90,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {appEnvironment === 'localhost' ? <ComponentsDemoLink /> : null}
+        {import.meta.env.VITE_APP_ENV === 'localhost' ? <ComponentsDemoLink /> : null}
         {children}
         {/* {import.meta.env.DEV ? (
           <>
