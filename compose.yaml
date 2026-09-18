@@ -27,6 +27,7 @@ services:
       dockerfile: apps/web/Dockerfile
       args:
         VITE_APP_NAME: '${VITE_APP_NAME:-Veles}'
+        VITE_APP_ENV: '${VITE_APP_ENV:-production}'
         VITE_CF_CDN_URL: '${VITE_CF_CDN_URL:-https://cdn.example.com}'
     environment:
       NODE_ENV: production

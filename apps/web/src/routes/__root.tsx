@@ -17,7 +17,7 @@ const faviconConfigByEnvironment = {
   localhost: { suffix: '-localhost', manifest: 'site-localhost.webmanifest' },
 } as const;
 
-const faviconConfig = faviconConfigByEnvironment[import.meta.env.VITE_APP_ENV];
+const faviconConfig = faviconConfigByEnvironment[import.meta.env.VITE_APP_ENV ?? 'production'];
 
 const faviconLinks = [
   { rel: 'icon', type: 'image/x-icon', href: `/favicon${faviconConfig.suffix}.ico` },

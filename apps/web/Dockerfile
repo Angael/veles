@@ -1,9 +1,11 @@
 FROM node:26.2.0-alpine AS builder
 
 ARG VITE_APP_NAME=Veles
+ARG VITE_APP_ENV=production
 ARG VITE_CF_CDN_URL=https://cdn.example.com
 
 ENV VITE_APP_NAME=$VITE_APP_NAME
+ENV VITE_APP_ENV=$VITE_APP_ENV
 ENV VITE_CF_CDN_URL=$VITE_CF_CDN_URL
 
 RUN npm install -g pnpm@12.3.4
