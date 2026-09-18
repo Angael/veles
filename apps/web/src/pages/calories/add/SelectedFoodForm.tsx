@@ -1,15 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { ArrowLeftIcon, PencilIcon } from 'lucide-react';
 import { useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { calorieDashboardQueryOptions, useRecordFoodMutation } from '../calories.query';
+import { FoodSummary } from '../FoodSummary';
 import { GoalPreview } from './GoalPreview';
 import { Btn } from '@/components/ui/btn/Btn';
 import { DateInput } from '@/components/ui/date-input/DateInput';
 import { Label } from '@/components/ui/label/Label';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
-import { SelectedFoodCard } from '../SelectedFoodCard';
 import css from './SelectedFoodForm.module.css';
 
 type Props = {
@@ -51,40 +52,41 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
 
   return (
     <main className={css.page}>
-      <SelectedFoodCard
-        carbs={carbs}
-        fat={fat}
-        imageUrl={food.imageUrl}
-        kcal={kcal}
-        name={food.name}
-        productId={food.id}
-        protein={protein}
-      />
-
+      <div className={css.backAction}>
+        <Btn
+          icon={<ArrowLeftIcon aria-hidden='true' />}
+          onClick={onCancel}
+          type='button'
+          variant='ghost'
+        >
+          {cancelLabel}
+        </Btn>
+      </div>
       <TypedForm className={css.panel} errorMsg={recordFoodMutation.error?.message} onSubmit={save}>
         <div className={css.fields}>
           <Label text='Date'>
             <DateInput onValueChange={setDate} value={date} />
           </Label>
-          <div className={css.amountField}>
-            <div className={css.amountEntry}>
-              <Label text='Amount eaten (g)'>
-                <NumberInput
-                  enterKeyHint='done'
-                  min={1}
-                  required
-                  onValueChange={setGrams}
-                  value={grams}
-                />
-              </Label>
+          <FoodSummary
+            action={
               <Btn
-                disabled={selectedGrams < 1}
-                loading={recordFoodMutation.isPending}
-                type='submit'
-              >
-                Save
-              </Btn>
-            </div>
+                aria-label={`Edit ${food.name}`}
+                icon={<PencilIcon aria-hidden='true' />}
+                iconOnly
+                isLink
+                render={<Link params={{ foodId: food.id }} to='/calories/foods/$foodId' />}
+                size='sm'
+                variant='ghost'
+              />
+            }
+            carbs={carbs}
+            fat={fat}
+            imageUrl={food.imageUrl}
+            kcal={kcal}
+            name={food.name}
+            protein={protein}
+          />
+          <div className={css.amountField}>
             {packageSizeGrams !== null && packageSizeGrams > 0 ? (
               <div
                 aria-label='Package amount shortcuts'
@@ -122,6 +124,24 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
                 </div>
               </div>
             ) : null}
+            <div className={css.amountEntry}>
+              <Label text='Amount eaten (g)'>
+                <NumberInput
+                  enterKeyHint='done'
+                  min={1}
+                  required
+                  onValueChange={setGrams}
+                  value={grams}
+                />
+              </Label>
+              <Btn
+                disabled={selectedGrams < 1}
+                loading={recordFoodMutation.isPending}
+                type='submit'
+              >
+                Save
+              </Btn>
+            </div>
           </div>
         </div>
         <GoalPreview
@@ -130,16 +150,6 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
           goalKcal={goalKcal}
           pending={dashboardQuery.isPending}
         />
-        <div className={css.actions}>
-          <Btn
-            disabled={recordFoodMutation.isPending}
-            onClick={onCancel}
-            type='button'
-            variant='ghost'
-          >
-            {cancelLabel}
-          </Btn>
-        </div>
       </TypedForm>
     </main>
   );

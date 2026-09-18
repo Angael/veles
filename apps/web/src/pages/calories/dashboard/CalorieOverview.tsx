@@ -1,6 +1,7 @@
 import type { CalorieGoal, CalorieLog, CalorieTotals } from '../calories.api';
 import { DailySummary } from './DailySummary';
 import { LoggedFood } from './LoggedFood';
+import { List } from '@/components/ui/list/List';
 import css from './CaloriesPage.module.css';
 
 type Props = {
@@ -20,11 +21,11 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
           <h2>Logged products</h2>
         </div>
         {logs.length ? (
-          <ol className={css.logList}>
+          <List as='ol'>
             {logs.map((entry) => (
               <LoggedFood date={date} entry={entry} key={entry.id} />
             ))}
-          </ol>
+          </List>
         ) : (
           <p className={css.emptyLog}>Nothing logged for this day</p>
         )}

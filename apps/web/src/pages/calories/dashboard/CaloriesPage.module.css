@@ -34,18 +34,6 @@
   text-wrap: pretty;
 }
 
-.logList {
-  display: grid;
-  gap: var(--space-sm);
-  list-style: none;
-}
-
-@media (--phone) {
-  .logList {
-    gap: var(--space-xs);
-  }
-}
-
 .dateControls {
   display: grid;
   grid-template-areas: 'strip today';

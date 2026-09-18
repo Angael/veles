@@ -7,7 +7,7 @@ type NutritionInlineProps = {
   fat: number;
   carbs: number;
   energyDisplay?: 'always' | 'phone';
-  stackEnergyOnPhone?: boolean;
+  stacked?: boolean;
 };
 
 export function NutritionInline({
@@ -16,37 +16,28 @@ export function NutritionInline({
   fat,
   carbs,
   energyDisplay = 'always',
-  stackEnergyOnPhone = false,
+  stacked = false,
 }: NutritionInlineProps) {
   return (
-    <div className={clsx(css.root, stackEnergyOnPhone && css.stackEnergyOnPhone)}>
+    <div className={clsx(css.root, stacked && css.stacked)}>
       <div className={energyDisplay === 'phone' ? css.energyPhoneOnly : css.energy}>
         <strong>{Math.round(kcal)}</strong>
         <span>kcal</span>
       </div>
-      <dl className={css.macros}>
+      <div className={css.macros}>
         <div className={css.macro}>
-          <dt>Protein</dt>
-          <dd>
-            <i aria-hidden='true' className={css.dotProtein} />
-            {Math.round(protein)} g
-          </dd>
+          {Math.round(protein)}
+          <span className={css.unit}>g</span>
         </div>
         <div className={css.macro}>
-          <dt>Fat</dt>
-          <dd>
-            <i aria-hidden='true' className={css.dotFat} />
-            {Math.round(fat)} g
-          </dd>
+          {Math.round(fat)}
+          <span className={css.unit}>g</span>
         </div>
         <div className={css.macro}>
-          <dt>Carbs</dt>
-          <dd>
-            <i aria-hidden='true' className={css.dotCarbs} />
-            {Math.round(carbs)} g
-          </dd>
+          {Math.round(carbs)}
+          <span className={css.unit}>g</span>
         </div>
-      </dl>
+      </div>
     </div>
   );
 }
