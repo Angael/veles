@@ -33,6 +33,7 @@ export function LoggedFood({ date, entry }: LoggedFoodProps) {
           />
         }
         carbs={entry.carbs ?? 0}
+        density='compact'
         fat={entry.fat ?? 0}
         imageUrl={entry.imageUrl}
         kcal={entry.kcal}
