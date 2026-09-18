@@ -7,7 +7,6 @@ type Props = { barcode?: string; date: string; name?: string };
 export function CreateFoodPage({ barcode, date, name }: Props) {
   const navigate = useNavigate();
   const createMutation = useCreateFoodProductMutation();
-  const error = createMutation.error?.message ?? '';
 
   async function save(value: FoodEditorValue) {
     const product = await createMutation.mutateAsync(value);
@@ -23,12 +22,8 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
         </div>
       </header>
       <section className={css.panel}>
-        {error ? (
-          <p className={css.error} role='alert'>
-            {error}
-          </p>
-        ) : null}
         <FoodEditor
+          errorMsg={createMutation.error?.message}
           initialBarcode={barcode}
           initialName={name}
           onSubmit={save}

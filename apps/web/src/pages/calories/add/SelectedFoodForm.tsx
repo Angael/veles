@@ -61,13 +61,7 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
         protein={protein}
       />
 
-      <TypedForm className={css.panel} onSubmit={save}>
-        {recordFoodMutation.error ? (
-          <p className={css.error} role='alert'>
-            {recordFoodMutation.error.toString()}
-          </p>
-        ) : null}
-
+      <TypedForm className={css.panel} errorMsg={recordFoodMutation.error?.message} onSubmit={save}>
         <div className={css.fields}>
           <Label text='Date'>
             <DateInput onValueChange={setDate} value={date} />

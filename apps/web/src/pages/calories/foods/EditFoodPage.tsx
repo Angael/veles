@@ -8,7 +8,6 @@ import css from '../CalorieFlows.module.css';
 export function EditFoodPage({ food }: { food: CalorieFood }) {
   const navigate = useNavigate();
   const updateMutation = useUpdateFoodProductMutation();
-  const error = updateMutation.error?.message ?? '';
 
   async function save(value: FoodEditorValue) {
     await updateMutation.mutateAsync({ ...value, id: food.id });
@@ -24,12 +23,8 @@ export function EditFoodPage({ food }: { food: CalorieFood }) {
         </div>
       </header>
       <section className={css.panel}>
-        {error ? (
-          <p className={css.error} role='alert'>
-            {error}
-          </p>
-        ) : null}
         <FoodEditor
+          errorMsg={updateMutation.error?.message}
           food={food}
           onSubmit={save}
           pending={updateMutation.isPending}
