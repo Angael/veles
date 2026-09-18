@@ -9,25 +9,23 @@ type SelectedFoodCardProps = Omit<FoodSummaryProps, 'action' | 'meta' | 'name'> 
   productId: string;
 };
 
-function EditFoodButton({ name, productId }: Pick<SelectedFoodCardProps, 'name' | 'productId'>) {
-  return (
-    <Btn
-      aria-label={`Edit ${name}`}
-      icon={<PencilIcon aria-hidden='true' />}
-      iconOnly
-      isLink
-      render={<Link params={{ foodId: productId }} to='/calories/foods/$foodId' />}
-      size='sm'
-      variant='ghost'
-    />
-  );
-}
-
-/** Shows the selected food in a compact food summary card. */
 export function SelectedFoodCard({ productId, ...props }: SelectedFoodCardProps) {
   return (
     <Card aria-label='Selected food' as='section' style={{ padding: 0 }}>
-      <FoodSummary {...props} action={<EditFoodButton name={props.name} productId={productId} />} />
+      <FoodSummary
+        {...props}
+        action={
+          <Btn
+            aria-label={`Edit ${props.name}`}
+            icon={<PencilIcon aria-hidden='true' />}
+            iconOnly
+            isLink
+            render={<Link params={{ foodId: productId }} to='/calories/foods/$foodId' />}
+            size='sm'
+            variant='ghost'
+          />
+        }
+      />
     </Card>
   );
 }
