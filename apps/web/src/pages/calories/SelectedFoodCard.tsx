@@ -1,7 +1,8 @@
 import { Link } from '@tanstack/react-router';
 import { PencilIcon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
-import { FoodSummaryCard, type FoodSummaryProps } from './FoodSummary';
+import { Card } from '@/components/ui/card/Card';
+import { FoodSummary, type FoodSummaryProps } from './FoodSummary';
 
 type SelectedFoodCardProps = Omit<FoodSummaryProps, 'action' | 'meta' | 'name'> & {
   name: string;
@@ -22,13 +23,11 @@ function EditFoodButton({ name, productId }: Pick<SelectedFoodCardProps, 'name' 
   );
 }
 
-/** Shows the selected food in a reusable compact food summary card. */
+/** Shows the selected food in a compact food summary card. */
 export function SelectedFoodCard({ productId, ...props }: SelectedFoodCardProps) {
   return (
-    <FoodSummaryCard
-      {...props}
-      action={<EditFoodButton name={props.name} productId={productId} />}
-      ariaLabel='Selected food'
-    />
+    <Card aria-label='Selected food' as='section' style={{ padding: 0 }}>
+      <FoodSummary {...props} action={<EditFoodButton name={props.name} productId={productId} />} />
+    </Card>
   );
 }

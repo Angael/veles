@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-import { Card } from '@/components/ui/card/Card';
 import { NutritionInline } from './NutritionInline';
 import css from './FoodSummary.module.css';
 
@@ -42,21 +41,5 @@ export function FoodSummary({
       </div>
       {action ? <div className={css.action}>{action}</div> : null}
     </div>
-  );
-}
-
-/** Places the reusable food summary layout on a card surface. */
-export function FoodSummaryCard({
-  ariaLabel,
-  as = 'section',
-  ...props
-}: FoodSummaryProps & {
-  ariaLabel?: string;
-  as?: 'article' | 'aside' | 'div' | 'section';
-}) {
-  return (
-    <Card aria-label={ariaLabel} as={as} className={css.card}>
-      <FoodSummary {...props} />
-    </Card>
   );
 }
