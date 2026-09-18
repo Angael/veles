@@ -14,6 +14,7 @@
   animation: appear 450ms ease-out both;
 }
 
+/* Fade the orbit in after the letters without delaying either moving layer's shared clock. */
 .orbit {
   animation: appear 700ms ease-out 150ms both;
 }
@@ -26,19 +27,74 @@
 }
 
 .farRing {
-  opacity: 0.3;
+  opacity: 0.12;
 }
 
 .nearRing {
-  opacity: 0.8;
+  opacity: 0.2;
+}
+
+.trail {
+  fill: none;
+  stroke: var(--c-accent);
+  stroke-width: 2px;
+  stroke-dashoffset: 0;
+}
+
+.planet,
+.trail {
+  /*
+   * One clock for planet position and trail dash phase, including both depth-clipped copies.
+   * 33 normalized arc-length samples at equal angles (theta = 2πi/32) on the 134 × 32 ellipse.
+   * This projects uniform circular motion: fast across front/back, slow at the side turns,
+   * with matching speed at the loop seam. It is perspective-like motion, not gravitational acceleration.
+   * Changing the ellipse radii requires recomputing these samples; keep duration/easing shared.
+   */
+  animation: revolve 24s
+    linear(
+      0,
+      0.012052,
+      0.029103,
+      0.052844,
+      0.0832,
+      0.119382,
+      0.160217,
+      0.204282,
+      0.25,
+      0.295718,
+      0.339783,
+      0.380618,
+      0.4168,
+      0.447156,
+      0.470897,
+      0.487948,
+      0.5,
+      0.512052,
+      0.529103,
+      0.552844,
+      0.5832,
+      0.619382,
+      0.660217,
+      0.704282,
+      0.75,
+      0.795718,
+      0.839783,
+      0.880618,
+      0.9168,
+      0.947156,
+      0.970897,
+      0.987948,
+      1
+    )
+    infinite;
 }
 
 .planet {
+  /* Must match the SVG trail path's geometry, rightmost start, and clockwise direction. */
   offset-path: path('M284 55a134 32 0 1 1-268 0a134 32 0 1 1 268 0');
   offset-distance: 0%;
   offset-rotate: 0deg;
   offset-anchor: 0px 0px;
-  animation: revolve 24s linear infinite;
 }
 
 @keyframes appear {
@@ -52,15 +108,23 @@
 }
 
 @keyframes revolve {
+  /* CSS motion uses percentages; SVG dashoffset uses pathLength=100 units and the opposite sign. */
   to {
     offset-distance: 100%;
+    stroke-dashoffset: -100;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* No entrance or orbital motion: show the complete mark and parked planet, without a frozen trail. */
   .wordmark,
   .orbit,
-  .planet {
+  .planet,
+  .trail {
     animation: none;
+  }
+
+  .trail {
+    display: none;
   }
 }
