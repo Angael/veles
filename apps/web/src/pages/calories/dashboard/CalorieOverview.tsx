@@ -21,7 +21,7 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
           <h2>Logged products</h2>
         </div>
         {logs.length ? (
-          <List aria-label='Logged products' as='ol'>
+          <List as='ol'>
             {logs.map((entry) => (
               <LoggedFood date={date} entry={entry} key={entry.id} />
             ))}
