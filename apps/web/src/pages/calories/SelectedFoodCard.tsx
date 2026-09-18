@@ -1,25 +1,17 @@
 import { Link } from '@tanstack/react-router';
 import { PencilIcon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
-import { Card } from '@/components/ui/card/Card';
-import { NutritionInline } from './NutritionInline';
-import css from './SelectedFoodCard.module.css';
+import { FoodSummaryCard, type FoodSummaryProps } from './FoodSummary';
 
-type SelectedFoodCardProps = {
-  carbs: number;
-  fat: number;
-  imageUrl: string | null;
-  kcal: number;
+type SelectedFoodCardProps = Omit<FoodSummaryProps, 'action' | 'meta' | 'name'> & {
   name: string;
   productId: string;
-  protein: number;
 };
 
 function EditFoodButton({ name, productId }: Pick<SelectedFoodCardProps, 'name' | 'productId'>) {
   return (
     <Btn
       aria-label={`Edit ${name}`}
-      className={css.editButton}
       icon={<PencilIcon aria-hidden='true' />}
       iconOnly
       isLink
@@ -30,24 +22,13 @@ function EditFoodButton({ name, productId }: Pick<SelectedFoodCardProps, 'name' 
   );
 }
 
-/** Shows the selected food in a compact summary with an optional product image. */
-export function SelectedFoodCard(props: SelectedFoodCardProps) {
+/** Shows the selected food in a reusable compact food summary card. */
+export function SelectedFoodCard({ productId, ...props }: SelectedFoodCardProps) {
   return (
-    <Card aria-label='Selected food' as='section' className={css.compact}>
-      {props.imageUrl ? <img alt='' aria-hidden='true' src={props.imageUrl} /> : null}
-      <div className={css.compactBody}>
-        <strong>{props.name}</strong>
-        <div className={css.compactNutrition}>
-          <NutritionInline
-            carbs={props.carbs}
-            fat={props.fat}
-            kcal={props.kcal}
-            protein={props.protein}
-            stackEnergyOnPhone
-          />
-        </div>
-      </div>
-      <EditFoodButton name={props.name} productId={props.productId} />
-    </Card>
+    <FoodSummaryCard
+      {...props}
+      action={<EditFoodButton name={props.name} productId={productId} />}
+      ariaLabel='Selected food'
+    />
   );
 }

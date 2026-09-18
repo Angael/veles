@@ -1,0 +1,108 @@
+@import '../../styles/breakpoints.css';
+
+.card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: 6.75rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-md);
+  min-width: 0;
+  min-height: 6.75rem;
+  padding: var(--space-sm) var(--space-md) var(--space-sm) var(--space-sm);
+
+  &:not(:has(> .image)) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-left: var(--space-md);
+  }
+}
+
+.image {
+  width: 6.75rem;
+  height: 6.75rem;
+  max-height: 110px;
+  object-fit: contain;
+}
+
+.body {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+}
+
+.identity {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+  min-width: 0;
+
+  & strong {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--c-text-strong);
+    font-size: var(--text-lg);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  & span {
+    flex: none;
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  & a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  & a:focus-visible {
+    border-radius: 0.2rem;
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 2px;
+  }
+}
+
+.action {
+  --btn-height: 2.75rem;
+  --btn-icon-size: 1.05rem;
+
+  flex: none;
+}
+
+@media (--phone) {
+  .summary {
+    grid-template-columns: 4.75rem minmax(0, 1fr) auto;
+    gap: var(--space-sm);
+    min-height: 5.5rem;
+    padding: var(--space-xs) var(--space-sm) var(--space-xs) var(--space-xs);
+
+    &:not(:has(> .image)) {
+      grid-template-columns: minmax(0, 1fr) auto;
+      padding-left: var(--space-sm);
+    }
+  }
+
+  .image {
+    width: 4.75rem;
+    height: 4.75rem;
+  }
+
+  .identity {
+    flex-wrap: wrap;
+    gap: 0 var(--space-xs);
+
+    & strong {
+      width: 100%;
+      font-size: var(--text-md-dynamic);
+    }
+
+    & span {
+      font-size: var(--text-xs);
+    }
+  }
+}

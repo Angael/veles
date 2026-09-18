@@ -8,6 +8,7 @@ type ListProps = ComponentPropsWithoutRef<'ul'> & {
 
 type ListItemProps = ComponentPropsWithoutRef<'li'> & {
   interactive?: boolean;
+  padding?: 'default' | 'none';
   selected?: boolean;
 };
 
@@ -20,13 +21,19 @@ export function List({ as: Component = 'ul', className, ...props }: ListProps) {
 export function ListItem({
   className,
   interactive = false,
+  padding = 'default',
   selected = false,
   ...props
 }: ListItemProps) {
   return (
     <li
       {...props}
-      className={clsx(css.item, interactive && css.interactive, className)}
+      className={clsx(
+        css.item,
+        interactive && css.interactive,
+        padding === 'none' && css.noPadding,
+        className,
+      )}
       data-selected={selected || undefined}
     />
   );

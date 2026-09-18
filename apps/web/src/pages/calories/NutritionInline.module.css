@@ -6,6 +6,26 @@
   gap: var(--space-sm);
 }
 
+.stacked {
+  display: grid;
+  justify-items: start;
+  gap: 0.35rem;
+
+  & .energy,
+  & .energyPhoneOnly {
+    width: auto;
+  }
+
+  & .macros {
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  & .macro {
+    width: auto;
+  }
+}
+
 .energy,
 .energyPhoneOnly {
   flex: none;
@@ -82,25 +102,6 @@
 }
 
 @media (--phone) {
-  .stackEnergyOnPhone {
-    display: grid;
-    justify-items: start;
-    gap: 0.35rem;
-
-    & .energy,
-    & .energyPhoneOnly {
-      width: auto;
-    }
-
-    & .macros {
-      gap: var(--space-sm);
-    }
-
-    & .macro {
-      width: auto;
-    }
-  }
-
   .energyPhoneOnly {
     display: flex;
   }
