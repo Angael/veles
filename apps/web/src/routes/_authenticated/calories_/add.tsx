@@ -16,10 +16,7 @@ export const Route = createFileRoute('/_authenticated/calories_/add')({
   },
   component: Component,
   staticData: {
-    navbar: {
-      label: 'Add food',
-      upTo: { to: '/calories' },
-    },
+    layout: 'focus',
   },
 });
 

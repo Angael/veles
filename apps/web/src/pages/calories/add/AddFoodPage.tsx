@@ -59,19 +59,17 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
 
   return (
     <main className={css.page}>
-      <section className={css.search}>
-        <Label text='Food name'>
-          <TextInput
-            autoFocus
-            onValueChange={(value) => {
-              setQuery(value);
-              startFiltering(() => setFilterQuery(value));
-            }}
-            placeholder='Banana, bread, yoghurt…'
-            value={query}
-          />
-        </Label>
-      </section>
+      <Label text='Food name'>
+        <TextInput
+          autoFocus
+          onValueChange={(value) => {
+            setQuery(value);
+            startFiltering(() => setFilterQuery(value));
+          }}
+          placeholder='Banana, bread, yoghurt…'
+          value={query}
+        />
+      </Label>
 
       <ul aria-busy={foodsQuery.isFetching || isFiltering} className={css.results}>
         {foods.map((food) => {

@@ -6,10 +6,7 @@ export const Route = createFileRoute('/_authenticated/calories_/logs_/$logId')({
   loader: ({ params }) => getFoodLog({ data: { id: params.logId } }),
   component: Component,
   staticData: {
-    navbar: {
-      label: 'Edit food log',
-      upTo: { to: '/calories' },
-    },
+    layout: 'focus',
   },
 });
 
