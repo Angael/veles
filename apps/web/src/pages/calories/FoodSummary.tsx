@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { Card } from '@/components/ui/card/Card';
 import { NutritionInline } from './NutritionInline';
@@ -9,6 +10,7 @@ export type FoodSummaryProps = {
   fat: number;
   imageUrl: string | null;
   kcal: number;
+  density?: 'compact' | 'default';
   meta?: ReactNode;
   name: ReactNode;
   protein: number;
@@ -18,6 +20,7 @@ export type FoodSummaryProps = {
 export function FoodSummary({
   action,
   carbs,
+  density = 'default',
   fat,
   imageUrl,
   kcal,
@@ -26,7 +29,7 @@ export function FoodSummary({
   protein,
 }: FoodSummaryProps) {
   return (
-    <div className={css.summary}>
+    <div className={clsx(css.summary, density === 'compact' && css.compact)}>
       {imageUrl ? (
         <img alt='' aria-hidden='true' className={css.image} loading='lazy' src={imageUrl} />
       ) : null}

@@ -24,7 +24,17 @@
   width: 6.75rem;
   height: 6.75rem;
   max-height: 110px;
-  object-fit: contain;
+  border-radius: var(--radius-xs);
+  object-fit: cover;
+}
+
+.summary.compact {
+  gap: var(--space-sm);
+  padding-block: var(--space-xs);
+
+  & .body {
+    gap: 0.125rem;
+  }
 }
 
 .body {
