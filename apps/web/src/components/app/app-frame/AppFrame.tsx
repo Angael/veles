@@ -51,7 +51,7 @@ export function AppFrame({
                   className={css.logo}
                   height='90'
                   src='/veles-logo.webp'
-                  width='242'
+                  width='270'
                 />
               </Link>
             )}
