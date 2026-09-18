@@ -1,7 +1,7 @@
-import { useNavigate, useRouter, type UseNavigateResult } from '@tanstack/react-router';
+import { useRouter, type UseNavigateResult } from '@tanstack/react-router';
 import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
-import { useDeleteFoodLogMutation, useUpdateFoodLogMutation } from '../calories.query';
+import { useUpdateFoodLogMutation } from '../calories.query';
 import { Btn } from '@/components/ui/btn/Btn';
 import { DateInput } from '@/components/ui/date-input/DateInput';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
@@ -16,12 +16,10 @@ import css from '../CalorieFlows.module.css';
 import { useProportionalNutrition } from './useProportionalNutrition';
 
 export function EditFoodLogPage({ log }: { log: CalorieLog }) {
-  const navigate = useNavigate();
   const router = useRouter();
-  const deleteMutation = useDeleteFoodLogMutation();
   const updateMutation = useUpdateFoodLogMutation();
   const isProduct = log.productId !== null;
-  const isPending = updateMutation.isPending || deleteMutation.isPending;
+  const isPending = updateMutation.isPending;
   const { changeGrams, changeNutrition, grams, nutrition } = useProportionalNutrition(log.grams, {
     kcal: log.kcal,
     protein: log.protein,
@@ -48,11 +46,6 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
     await _navigate({ to: '/calories', search: { date: nextDate } });
   }
 
-  async function remove() {
-    await deleteMutation.mutateAsync({ date: log.date, id: log.id });
-    await navigate({ to: '/calories', search: { date: log.date } });
-  }
-
   return (
     <main className={css.page}>
       <header className={css.header}>
@@ -74,11 +67,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
       ) : null}
 
       <section className={css.panel}>
-        <TypedForm
-          className={css.form}
-          errorMsg={(updateMutation.error ?? deleteMutation.error)?.message}
-          onSubmit={submit}
-        >
+        <TypedForm className={css.form} errorMsg={updateMutation.error?.message} onSubmit={submit}>
           {!isProduct ? (
             <Label text='Name'>
               <TextInput defaultValue={log.name} name='name' required />
@@ -111,12 +100,11 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
           <div className={css.logActions}>
             <Btn
               disabled={isPending}
-              loading={deleteMutation.isPending}
-              onClick={() => void remove()}
+              onClick={() => router.history.back()}
               type='button'
-              variant='danger'
+              variant='ghost'
             >
-              Delete
+              Cancel
             </Btn>
             <Btn disabled={isPending} loading={updateMutation.isPending} type='submit'>
               Save
