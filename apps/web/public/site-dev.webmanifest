@@ -1,0 +1,11 @@
+{
+  "name": "Veles (Development)",
+  "short_name": "Veles Dev",
+  "icons": [
+    { "src": "/android-chrome-192x192-dev.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/android-chrome-512x512-dev.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#060816",
+  "background_color": "#060816",
+  "display": "standalone"
+}
