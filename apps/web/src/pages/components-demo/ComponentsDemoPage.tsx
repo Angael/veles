@@ -10,6 +10,7 @@ import { ErrorCard } from '@/components/ui/error-card/ErrorCard';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/ui/label/Label';
+import { List, ListItem } from '@/components/ui/list/List';
 import {
   MenuBtn,
   MenuBtnChevron,
@@ -37,6 +38,36 @@ import css from './ComponentsDemoPage.module.css';
 const SELECT_OPTIONS = [
   { label: 'Less than or equal', value: 'lte' },
   { label: 'More than or equal', value: 'gte' },
+] as const;
+
+const LIST_DEMO_FOODS = [
+  {
+    id: 'smoky-bowl',
+    name: 'Smoky chicken bowl',
+    quantity: '420 g',
+    kcal: 612,
+    protein: 48,
+    fat: 18,
+    carbs: 64,
+  },
+  {
+    id: 'skyr',
+    name: 'Blueberry skyr',
+    quantity: '180 g',
+    kcal: 164,
+    protein: 19,
+    fat: 1,
+    carbs: 20,
+  },
+  {
+    id: 'toast',
+    name: 'Avocado toast',
+    quantity: '145 g',
+    kcal: 328,
+    protein: 9,
+    fat: 17,
+    carbs: 35,
+  },
 ] as const;
 
 const BTN_VARIANTS = [
@@ -69,6 +100,7 @@ export function ComponentsDemoPage() {
   const [btnLoading, setBtnLoading] = useState(false);
   const [sliderValue, setSliderValue] = useState(50);
   const [toggleChecked, setToggleChecked] = useState(true);
+  const [selectedFoodId, setSelectedFoodId] = useState<string>(LIST_DEMO_FOODS[0].id);
 
   return (
     <main className={css.page}>
@@ -173,6 +205,36 @@ export function ComponentsDemoPage() {
             Card without shadow
           </Card>
         </div>
+      </section>
+
+      <section>
+        <h2>List</h2>
+        <p>
+          Compact interactive rows use dividers and selection color instead of individual cards.
+        </p>
+        <List aria-label='Food results' className={css.foodList}>
+          {LIST_DEMO_FOODS.map((food) => (
+            <ListItem interactive key={food.id} selected={selectedFoodId === food.id}>
+              <button
+                aria-pressed={selectedFoodId === food.id}
+                className={css.foodListButton}
+                onClick={() => setSelectedFoodId(food.id)}
+                type='button'
+              >
+                <span className={css.foodListIdentity}>
+                  <strong>{food.name}</strong>
+                  <span>{food.quantity}</span>
+                </span>
+                <span className={css.foodListMacros}>
+                  <strong>{food.kcal} kcal</strong>
+                  <span>{food.protein} g protein</span>
+                  <span>{food.fat} g fat</span>
+                  <span>{food.carbs} g carbs</span>
+                </span>
+              </button>
+            </ListItem>
+          ))}
+        </List>
       </section>
 
       <section>
