@@ -58,6 +58,8 @@
   display: flex;
   align-items: center;
   min-width: 0;
+  /* Match .logoLink width at the SVG's 300:110 ratio to keep the header stable. */
+  min-height: calc(clamp(7.5rem, 14vw, 10rem) * 110 / 300);
   gap: var(--space-xs);
 
   & strong {
