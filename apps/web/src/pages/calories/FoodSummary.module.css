@@ -11,6 +11,16 @@
   padding: var(--space-sm) var(--space-md) var(--space-sm) var(--space-sm);
 }
 
+.summary:has(.identity a) {
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .summary:has(.identity a:hover) {
+    background-color: var(--c-surface-raised);
+  }
+}
+
 .media {
   display: grid;
   width: 5.625rem;
