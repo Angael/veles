@@ -7,8 +7,12 @@
 }
 
 .selectButton {
+  padding: 0;
+  border: 0;
   color: inherit;
+  background: none;
   text-align: start;
+  cursor: pointer;
 
   &::after {
     content: '';
