@@ -52,8 +52,8 @@ export const noteMembers = pgTable(
   ],
 );
 
-export const shoppingListItems = pgTable(
-  'shopping_list_item',
+export const listItems = pgTable(
+  'list_item',
   {
     id: uuid('id')
       .primaryKey()
@@ -69,7 +69,7 @@ export const shoppingListItems = pgTable(
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (table) => [
-    index('shopping_list_item_note_id_idx').on(table.noteId),
-    check('shopping_list_item_position_non_negative_check', sql`${table.position} >= 0`),
+    index('list_item_note_id_idx').on(table.noteId),
+    check('list_item_position_non_negative_check', sql`${table.position} >= 0`),
   ],
 );
