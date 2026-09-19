@@ -6,10 +6,15 @@
   padding-bottom: 5rem;
 }
 
-.results {
-  display: grid;
-  gap: var(--space-sm);
-  list-style: none;
+.selectButton {
+  color: inherit;
+  text-align: start;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
 }
 
 .empty {
