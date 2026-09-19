@@ -3,7 +3,8 @@
   gap: var(--space-lg);
 }
 
-.header {
+.header,
+.composerHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -11,50 +12,89 @@
 }
 
 .header h1,
-.listCard h2 {
+.composer h2,
+.listCard h2,
+.noteCard h2,
+.emptyState h2 {
   margin: 0;
   text-wrap: balance;
 }
 
-.header p {
+.header p,
+.emptyState p {
   margin: var(--space-xs) 0 0;
   color: var(--c-muted);
   text-wrap: pretty;
 }
 
-.mockNote {
-  width: fit-content;
-  margin: 0;
-  padding: 0.35rem 0.65rem;
+.composer {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
   border: var(--border-width) solid var(--c-primary-border-soft);
-  border-radius: var(--radius-pill);
-  background: var(--c-primary-surface);
-  color: var(--c-accent-soft);
-  font-size: var(--text-xs);
+  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--c-surface-solid) 82%, var(--c-primary-surface));
+}
+
+.composerHeader {
+  align-items: center;
+}
+
+.typePicker {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.composerForm {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-md);
+  align-items: end;
+}
+
+.titleInput {
+  grid-column: 1 / -1;
+  font-size: var(--text-xl-dynamic);
+  font-weight: var(--font-weight-semibold);
+}
+
+.contentInput {
+  min-height: 5rem;
+  resize: vertical;
 }
 
 .listGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-lg);
+  align-items: start;
 }
 
-.listCard {
+.listCard,
+.noteCard,
+.emptyState {
   display: grid;
   align-content: start;
   gap: var(--space-md);
 }
 
+.noteCard p {
+  margin: 0;
+  color: var(--c-muted-soft);
+  white-space: pre-wrap;
+}
+
 .items {
   display: grid;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-sm);
   min-height: var(--button-min-height);
@@ -63,10 +103,15 @@
 }
 
 .item input {
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1.25rem;
+  height: 1.25rem;
   margin: 0;
   accent-color: var(--c-primary);
+}
+
+.item input:focus-visible {
+  outline: 2px solid var(--c-primary-focus);
+  outline-offset: 0.2rem;
 }
 
 .done {
@@ -74,13 +119,63 @@
   text-decoration: line-through;
 }
 
+.quantity {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.emptyList {
+  margin: 0;
+  color: var(--c-muted-strong);
+}
+
+.productForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: var(--space-sm);
+  align-items: center;
+  padding: var(--space-sm);
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-xs);
+  background: var(--c-surface-inset);
+}
+
+.quantityFields {
+  display: grid;
+  grid-template-columns: 4rem 4rem;
+  gap: var(--space-xs);
+}
+
+.emptyState {
+  text-align: center;
+}
+
 @media (--phone) {
   .header,
+  .composerHeader,
   .listGrid {
     display: grid;
   }
 
-  .listGrid {
+  .listGrid,
+  .composerForm {
     grid-template-columns: 1fr;
+  }
+
+  .composer {
+    padding: var(--space-sm);
+  }
+
+  .typePicker {
+    flex-wrap: wrap;
+  }
+
+  .productForm {
+    grid-template-columns: 1fr auto;
+  }
+
+  .productForm > :first-child {
+    grid-column: 1 / -1;
   }
 }
