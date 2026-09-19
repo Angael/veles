@@ -2,7 +2,14 @@ import type {
   BarcodeDetector as PolyfillBarcodeDetector,
   BarcodeFormat,
 } from 'barcode-detector/pure';
-import { CameraIcon, CameraOffIcon, SwitchCameraIcon, XIcon } from 'lucide-react';
+import {
+  CameraIcon,
+  CameraOffIcon,
+  LoaderCircleIcon,
+  SearchXIcon,
+  SwitchCameraIcon,
+  XIcon,
+} from 'lucide-react';
 import { type ReactElement, useEffect, useRef, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
@@ -20,12 +27,21 @@ declare global {
   }
 }
 
-type ScannerState = 'starting' | 'scanning' | 'permissionDenied' | 'unavailable' | 'error';
+type ScannerState =
+  | 'starting'
+  | 'scanning'
+  | 'lookingUp'
+  | 'notFound'
+  | 'permissionDenied'
+  | 'unavailable'
+  | 'error';
+
+export type BarcodeScannerStatus = 'scanning' | 'lookingUp' | 'notFound';
 
 type BarcodeScannerProps = {
   closeRender: ReactElement;
-  enabled: boolean;
   onDetected: (barcode: string) => void;
+  status: BarcodeScannerStatus;
 };
 
 const formats: BarcodeFormat[] = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'];
@@ -53,7 +69,7 @@ async function enableContinuousFocus(stream: MediaStream) {
   await track.applyConstraints(constraints);
 }
 
-export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScannerProps) {
+export function BarcodeScanner({ closeRender, onDetected, status }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const callbackRef = useRef(onDetected);
   callbackRef.current = onDetected;
@@ -70,7 +86,7 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
     selectNextCamera,
   } = useCameraPreference();
   useEffect(() => {
-    if (!enabled) {
+    if (status !== 'scanning') {
       setState('starting');
       return;
     }
@@ -206,12 +222,15 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
       active = false;
       stopCamera();
     };
-  }, [cameraPreferenceReady, enabled, preferredCameraId]);
+  }, [cameraPreferenceReady, preferredCameraId, status]);
 
   function switchCamera() {
     if (!selectNextCamera()) return;
     setState('starting');
   }
+
+  const displayState = status === 'scanning' ? state : status;
+  const isScanning = displayState === 'scanning';
 
   return (
     <section aria-label='Barcode camera scanner' className={css.scanner}>
@@ -232,8 +251,8 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
 
       <div className={css.viewport}>
         <video aria-label='Live camera preview' muted playsInline ref={videoRef} />
-        {state !== 'scanning' ? <ScannerMessage state={state} /> : null}
-        {cameras.length > 1 ? (
+        {!isScanning ? <ScannerMessage state={displayState} /> : null}
+        {isScanning && cameras.length > 1 ? (
           <div className={css.cameraControls}>
             <div
               aria-live='polite'
@@ -252,13 +271,13 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
             />
           </div>
         ) : null}
-        {state === 'scanning' && cameraHintVisible ? (
+        {isScanning && cameraHintVisible ? (
           <Card className={css.cameraHint} shadow={false} variant='primary'>
             If the image looks blurry, try switching to another rear camera.
           </Card>
         ) : null}
       </div>
-      {state === 'scanning' ? (
+      {isScanning ? (
         <p aria-live='polite' className={css.status}>
           Looking for an EAN or UPC barcode…
         </p>
@@ -279,10 +298,16 @@ function ScannerMessage({ state }: { state: Exclude<ScannerState, 'scanning'> })
   }
 
   const copy = scannerMessageCopy[state];
+  let icon = <CameraOffIcon aria-hidden='true' />;
+  if (state === 'lookingUp') {
+    icon = <LoaderCircleIcon aria-hidden='true' className={css.loadingIcon} />;
+  } else if (state === 'notFound') {
+    icon = <SearchXIcon aria-hidden='true' />;
+  }
 
   return (
-    <div className={css.message} role='alert'>
-      <CameraOffIcon aria-hidden='true' />
+    <div className={css.message} role={state === 'lookingUp' ? 'status' : 'alert'}>
+      {icon}
       <strong>{copy[0]}</strong>
       <span>{copy[1]}</span>
     </div>
@@ -293,6 +318,8 @@ const scannerMessageCopy: Record<
   Exclude<ScannerState, 'starting' | 'scanning'>,
   [string, string]
 > = {
+  lookingUp: ['Looking up product…', 'Checking the product catalog.'],
+  notFound: ['Barcode not found', 'Create this product or scan another barcode.'],
   permissionDenied: [
     'Camera permission denied',
     'Allow camera access in your browser settings, or type the barcode instead.',

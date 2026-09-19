@@ -19,7 +19,7 @@ export function LoggedFood({ date, entry }: LoggedFoodProps) {
   }
 
   return (
-    <ListItem interactive style={{ padding: 0 }}>
+    <ListItem style={{ padding: 0 }}>
       <FoodSummary
         action={
           <Btn
