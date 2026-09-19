@@ -2,7 +2,7 @@ import type {
   BarcodeDetector as PolyfillBarcodeDetector,
   BarcodeFormat,
 } from 'barcode-detector/pure';
-import { CameraIcon, CameraOffIcon, SwitchCameraIcon, XIcon } from 'lucide-react';
+import { CameraIcon, CameraOffIcon, LoaderCircleIcon, SwitchCameraIcon, XIcon } from 'lucide-react';
 import { type ReactElement, useEffect, useRef, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
@@ -23,6 +23,7 @@ declare global {
 type ScannerState = 'starting' | 'scanning' | 'permissionDenied' | 'unavailable' | 'error';
 
 type BarcodeScannerProps = {
+  busy: boolean;
   closeRender: ReactElement;
   onDetected: (barcode: string) => void;
 };
@@ -54,7 +55,7 @@ async function enableContinuousFocus(stream: MediaStream) {
   await track.applyConstraints(constraints);
 }
 
-export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps) {
+export function BarcodeScanner({ busy, closeRender, onDetected }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const callbackRef = useRef(onDetected);
   callbackRef.current = onDetected;
@@ -237,9 +238,15 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
         />
       </div>
 
-      <div className={css.viewport}>
+      <div aria-busy={busy || undefined} className={css.viewport}>
         <video aria-label='Live camera preview' muted playsInline ref={videoRef} />
         {state !== 'scanning' ? <ScannerMessage state={state} /> : null}
+        {state === 'scanning' && busy ? (
+          <div aria-live='polite' className={css.lookupMessage} role='status'>
+            <LoaderCircleIcon aria-hidden='true' />
+            <strong>Finding product…</strong>
+          </div>
+        ) : null}
         {cameras.length > 1 ? (
           <div className={css.cameraControls}>
             <div
@@ -267,7 +274,9 @@ export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps)
       </div>
       {state === 'scanning' ? (
         <p aria-live='polite' className={css.status}>
-          Looking for an EAN or UPC barcode…
+          {busy
+            ? 'Barcode found. Checking the product catalog…'
+            : 'Looking for an EAN or UPC barcode…'}
         </p>
       ) : null}
     </section>
