@@ -1,6 +1,7 @@
 import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { users } from './auth.schema.ts';
 
+// useful helper: `getSharingFriendsIds`
 export const userSharingSettings = pgTable('user_sharing_setting', {
   userId: text('user_id')
     .primaryKey()
