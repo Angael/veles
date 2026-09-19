@@ -35,6 +35,25 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
       return [];
     }
 
+    // Nested subquery. Only on real request to db tho, even tho this is a "db.select"
+    const sharingFriendIds = db
+      .select({ userId: userSharingSettings.userId })
+      .from(userSharingSettings)
+      .innerJoin(
+        userConnections,
+        or(
+          and(
+            eq(userConnections.userLowId, userId),
+            eq(userConnections.userHighId, userSharingSettings.userId),
+          ),
+          and(
+            eq(userConnections.userHighId, userId),
+            eq(userConnections.userLowId, userSharingSettings.userId),
+          ),
+        ),
+      )
+      .where(eq(userSharingSettings.shareRecipes, true));
+
     const recipeRows = await db
       .select({
         carbs: recipes.carbs,
@@ -53,26 +72,7 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
         updatedAt: recipes.updatedAt,
       })
       .from(recipes)
-      .leftJoin(userSharingSettings, eq(userSharingSettings.userId, recipes.userId))
-      .leftJoin(
-        userConnections,
-        or(
-          and(
-            eq(userConnections.userLowId, userId),
-            eq(userConnections.userHighId, recipes.userId),
-          ),
-          and(
-            eq(userConnections.userHighId, userId),
-            eq(userConnections.userLowId, recipes.userId),
-          ),
-        ),
-      )
-      .where(
-        or(
-          eq(recipes.userId, userId),
-          and(eq(userSharingSettings.shareRecipes, true), recipeConnectionPredicate(userId)),
-        ),
-      );
+      .where(or(eq(recipes.userId, userId), inArray(recipes.userId, sharingFriendIds)));
 
     const imagesByRecipeId = await getImagesByRecipeId(recipeRows.map((recipe) => recipe.id));
     return recipeRows
@@ -276,6 +276,7 @@ async function getImagesByRecipeId(recipeIds: string[]) {
   return imagesByRecipeId;
 }
 
+/** Checks that the joined connection includes the viewer; the join matches its other user to the recipe owner. */
 function recipeConnectionPredicate(userId: string) {
   return or(eq(userConnections.userLowId, userId), eq(userConnections.userHighId, userId));
 }
