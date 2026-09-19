@@ -5,6 +5,7 @@ import { PlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Card } from '@/components/ui/card/Card';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
+import { SelectInput } from '@/components/ui/select-input/SelectInput';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
 import type { RecipeLibraryItem } from '../recipes.api';
@@ -14,6 +15,11 @@ type RecipesPageProps = {
   recipes: RecipeLibraryItem[];
 };
 
+const recipeScopeItems = [
+  { label: 'All recipes', value: 'all' },
+  { label: 'Your recipes', value: 'owned' },
+] as const;
+
 const recipeSearchFields = [
   (recipe) => recipe.name,
   (recipe) => recipe.tags,
@@ -21,9 +27,12 @@ const recipeSearchFields = [
 ] satisfies RankedSearchFields<RecipeLibraryItem>;
 
 export function RecipesPage({ recipes }: RecipesPageProps) {
+  const [recipeScope, setRecipeScope] = useState<'all' | 'owned'>('all');
   const [searchInputValue, setSearchInputValue] = useState('');
   const [search] = useThrottledValue(searchInputValue, { wait: 200 });
-  const visibleRecipes = filterAndRankBySearch(recipes, search, recipeSearchFields);
+  const scopedRecipes =
+    recipeScope === 'owned' ? recipes.filter((recipe) => recipe.isOwned) : recipes;
+  const visibleRecipes = filterAndRankBySearch(scopedRecipes, search, recipeSearchFields);
 
   return (
     <main className={css.page}>
@@ -42,6 +51,17 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
               value={searchInputValue}
             />
           </label>
+          <SelectInput
+            aria-label='Recipe ownership'
+            className={css.scopeSelect}
+            items={recipeScopeItems}
+            onValueChange={(value) => {
+              if (value) {
+                setRecipeScope(value);
+              }
+            }}
+            value={recipeScope}
+          />
         </div>
       </section>
 
