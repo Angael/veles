@@ -17,9 +17,10 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
   const date = initialDate;
 
   async function lookup(code: string) {
-    if (!code.trim() || lookingUp.current || food || missing) return;
+    if (!code.trim() || lookingUp.current || food) return;
     lookingUp.current = true;
     setBarcode(code);
+    setMissing('');
     try {
       const result = await lookupMutation.mutateAsync({ data: { barcode: code } });
       if (result.status === 'found') {
@@ -38,7 +39,6 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
       <main className={css.scanViewport}>
         <BarcodeScanner
           closeRender={<Link search={{ date }} to='/calories' />}
-          enabled={!lookupMutation.isPending && !missing}
           onDetected={(code) => void lookup(code)}
         />
         <div className={css.scanBottom}>
