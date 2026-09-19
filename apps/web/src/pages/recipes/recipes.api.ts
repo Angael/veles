@@ -2,15 +2,10 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { and, eq, inArray, or } from 'drizzle-orm';
-import {
-  recipeImages,
-  recipes,
-  uploadObjects,
-  userConnections,
-  userSharingSettings,
-} from '@veles/db/schema';
+import { recipeImages, recipes, uploadObjects, userSharingSettings } from '@veles/db/schema';
 import { db } from '@/server/db.server';
 import { getSessionUserId, requireSession } from '@/server/getSession.server';
+import { getSharingFriendsIds } from '@/server/getSharingFriendsIds.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { storagePathToUrl } from '@/server/storage/config.server';
@@ -35,24 +30,7 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
       return [];
     }
 
-    // Nested subquery. Only on real request to db tho, even tho this is a "db.select"
-    const sharingFriendIds = db
-      .select({ userId: userSharingSettings.userId })
-      .from(userSharingSettings)
-      .innerJoin(
-        userConnections,
-        or(
-          and(
-            eq(userConnections.userLowId, userId),
-            eq(userConnections.userHighId, userSharingSettings.userId),
-          ),
-          and(
-            eq(userConnections.userHighId, userId),
-            eq(userConnections.userLowId, userSharingSettings.userId),
-          ),
-        ),
-      )
-      .where(eq(userSharingSettings.shareRecipes, true));
+    const sharingFriendIds = getSharingFriendsIds(userId, userSharingSettings.shareRecipes);
 
     const recipeRows = await db
       .select({
@@ -131,34 +109,18 @@ export const getRecipeById = createServerFn({ method: 'GET' })
       return null;
     }
 
-    const recipeRows = await db
-      .select({ recipe: recipes })
+    const sharingFriendIds = getSharingFriendsIds(userId, userSharingSettings.shareRecipes);
+
+    const [recipe] = await db
+      .select()
       .from(recipes)
-      .leftJoin(userSharingSettings, eq(userSharingSettings.userId, recipes.userId))
-      .leftJoin(
-        userConnections,
-        or(
-          and(
-            eq(userConnections.userLowId, userId),
-            eq(userConnections.userHighId, recipes.userId),
-          ),
-          and(
-            eq(userConnections.userHighId, userId),
-            eq(userConnections.userLowId, recipes.userId),
-          ),
-        ),
-      )
       .where(
         and(
           eq(recipes.id, data.id),
-          or(
-            eq(recipes.userId, userId),
-            and(eq(userSharingSettings.shareRecipes, true), recipeConnectionPredicate(userId)),
-          ),
+          or(eq(recipes.userId, userId), inArray(recipes.userId, sharingFriendIds)),
         ),
       )
       .limit(1);
-    const recipe = recipeRows[0]?.recipe;
 
     if (!recipe) {
       return null;
@@ -274,11 +236,6 @@ async function getImagesByRecipeId(recipeIds: string[]) {
   }
 
   return imagesByRecipeId;
-}
-
-/** Checks that the joined connection includes the viewer; the join matches its other user to the recipe owner. */
-function recipeConnectionPredicate(userId: string) {
-  return or(eq(userConnections.userLowId, userId), eq(userConnections.userHighId, userId));
 }
 
 function toRecipeLibraryItem(
