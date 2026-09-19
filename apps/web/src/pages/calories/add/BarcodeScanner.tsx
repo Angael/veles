@@ -24,11 +24,12 @@ type ScannerState = 'starting' | 'scanning' | 'permissionDenied' | 'unavailable'
 
 type BarcodeScannerProps = {
   closeRender: ReactElement;
-  enabled: boolean;
   onDetected: (barcode: string) => void;
 };
 
 const formats: BarcodeFormat[] = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'];
+const detectionIntervalMs = 250;
+const barcodeAbsentResetMs = 1000;
 
 /** Uses the native detector when available and only downloads the WASM-backed fallback when needed. */
 async function createDetector(): Promise<BarcodeDetectorLike> {
@@ -53,7 +54,7 @@ async function enableContinuousFocus(stream: MediaStream) {
   await track.applyConstraints(constraints);
 }
 
-export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScannerProps) {
+export function BarcodeScanner({ closeRender, onDetected }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const callbackRef = useRef(onDetected);
   callbackRef.current = onDetected;
@@ -70,16 +71,14 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
     selectNextCamera,
   } = useCameraPreference();
   useEffect(() => {
-    if (!enabled) {
-      setState('starting');
-      return;
-    }
     if (!cameraPreferenceReady) return;
     let active = true;
     let animationFrame = 0;
     let stream: MediaStream | undefined;
     let detecting = false;
     let lastDetection = 0;
+    let lastDetectedBarcode = '';
+    let lastDetectedAt = 0;
 
     const stopCamera = () => {
       cancelAnimationFrame(animationFrame);
@@ -145,7 +144,11 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
 
         const scan = async (timestamp: number) => {
           if (!active) return;
-          if (!detecting && timestamp - lastDetection >= 250 && video.readyState >= 2) {
+          if (
+            !detecting &&
+            timestamp - lastDetection >= detectionIntervalMs &&
+            video.readyState >= 2
+          ) {
             detecting = true;
             lastDetection = timestamp;
             try {
@@ -154,9 +157,13 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
               // Effect cleanup can flip this flag while detector.detect is awaiting the browser.
               // oxlint-disable-next-line typescript/no-unnecessary-condition -- Avoid invoking the callback after scanner unmount.
               if (barcode && active) {
-                stopCamera();
-                callbackRef.current(barcode);
-                return;
+                if (barcode !== lastDetectedBarcode) {
+                  lastDetectedBarcode = barcode;
+                  callbackRef.current(barcode);
+                }
+                lastDetectedAt = timestamp;
+              } else if (timestamp - lastDetectedAt >= barcodeAbsentResetMs) {
+                lastDetectedBarcode = '';
               }
             } catch {
               stopCamera();
@@ -206,7 +213,7 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
       active = false;
       stopCamera();
     };
-  }, [cameraPreferenceReady, enabled, preferredCameraId]);
+  }, [cameraPreferenceReady, preferredCameraId]);
 
   function switchCamera() {
     if (!selectNextCamera()) return;
