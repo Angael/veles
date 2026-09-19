@@ -20,10 +20,6 @@
   gap: var(--space-xs);
 }
 
-.scopeSelect {
-  width: 100%;
-}
-
 .description {
   display: -webkit-box;
   max-height: calc(1.5em * 3);

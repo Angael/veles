@@ -53,7 +53,6 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
           </label>
           <SelectInput
             aria-label='Recipe ownership'
-            className={css.scopeSelect}
             items={recipeScopeItems}
             onValueChange={(value) => {
               if (value) {
