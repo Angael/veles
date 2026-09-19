@@ -90,6 +90,7 @@ function toFoodProduct(
   return {
     id: product.id,
     name: product.name,
+    namePl: product.namePl,
     barcode: product.barcode,
     imageUrl: asset ? storagePathToUrl(asset.key) : null,
     productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
@@ -319,6 +320,7 @@ export type CalorieDashboardDay = {
 export type CalorieFood = {
   id: string;
   name: string;
+  namePl: string | null;
   barcode: string | null;
   imageUrl: string | null;
   productSizeGrams: number | null;
