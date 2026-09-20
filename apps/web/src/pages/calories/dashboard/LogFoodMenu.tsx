@@ -36,7 +36,7 @@ const loggingActions = [
 export function LogFoodMenu({ date }: Props) {
   return (
     <MenuBtnRoot>
-      <FloatingButton icon={<PlusIcon aria-hidden='true' />} render={<MenuBtn />}>
+      <FloatingButton icon={<PlusIcon aria-hidden='true' />} render={<MenuBtn openOnHover />}>
         Log food
         <MenuBtnChevron />
       </FloatingButton>

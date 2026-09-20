@@ -22,10 +22,85 @@
   width: fit-content;
 }
 
+.toggleDemo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  width: min(100%, 22rem);
+  min-height: 3rem;
+  color: var(--c-text-strong);
+}
+
 .cardRow {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
+}
+
+.foodList {
+  max-width: 52rem;
+}
+
+.foodListButton {
+  display: grid;
+  grid-template-columns: minmax(10rem, 1fr) auto;
+  align-items: center;
+  gap: var(--space-lg);
+  width: 100%;
+  min-height: var(--button-min-height);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.foodListIdentity {
+  display: grid;
+  min-width: 0;
+
+  & strong {
+    overflow: hidden;
+    color: var(--c-text-strong);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  & span {
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+  }
+}
+
+.foodListMacros {
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  gap: var(--space-md);
+  color: var(--c-muted);
+  font-size: var(--text-sm-dynamic);
+  font-variant-numeric: tabular-nums;
+
+  & strong {
+    color: var(--c-text-strong);
+  }
+}
+
+@media (--phone) {
+  .foodListButton {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xs);
+  }
+
+  .foodListMacros {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem var(--space-sm);
+  }
 }
 
 .tableScroller {

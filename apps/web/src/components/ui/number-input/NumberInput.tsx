@@ -1,5 +1,6 @@
 import { NumberField, type NumberFieldRootProps } from '@base-ui/react/number-field';
 import clsx from 'clsx';
+import type { ComponentPropsWithoutRef } from 'react';
 import { MinusIcon, PlusIcon } from 'lucide-react';
 import { useRef } from 'react';
 import css from './NumberInput.module.css';
@@ -8,12 +9,14 @@ type NumberInputProps = Omit<NumberFieldRootProps, 'className' | 'step'> & {
   className?: string;
   inputClassName?: string;
   placeholder?: string;
+  enterKeyHint?: ComponentPropsWithoutRef<'input'>['enterKeyHint'];
   stepperStep?: number;
 };
 
 export function NumberInput({
   className,
   inputClassName,
+  enterKeyHint,
   placeholder,
   stepperStep,
   ...props
@@ -50,6 +53,7 @@ export function NumberInput({
         <NumberField.Input
           ref={inputRef}
           className={clsx(css.input, inputClassName)}
+          enterKeyHint={enterKeyHint}
           onChange={(event) => {
             event.currentTarget.value = normalizeDecimalSeparator(event.currentTarget.value);
           }}

@@ -13,16 +13,23 @@
 - Never run Drizzle commands yourself; leave them to the human user
 - DB migrations need to be run before pushing/merging to `main`
 
+## Database Scripts
+- `pnpm db:seed` inserts only the shared food products into the development database at `DATABASE_URL`.
+- `pnpm db:seed:prod` inserts only the shared food products into the production database at `PROD_DATABASE_URL`.
+- `pnpm db:reset` rebuilds the development database and seeds the development user/account, calorie goal, food products, food logs and weights, recipes, and diary entries.
+
 ## Structure
-- `src/routes` owns URLs, guards, loaders, and tiny adapters. Route implementation belongs in `src/pages`.
-- `src/pages` owns product features. Small features flat; split large features by workflows.
+- The web app lives under `apps/web`; paths in this section are repository-root-relative.
+- `apps/web/src/routes` owns URLs, guards, loaders, and tiny adapters. Route implementation belongs in `apps/web/src/pages`.
+- `apps/web/src/pages` owns product features. Small features flat; split large features by workflows.
 - Keep feature-specific code beside the owning page or workflow. Features shouldn't import other feature's page components.
-- `src/components/ui` contains reusable controls and primitives. It must not import pages or feature APIs.
-- `src/components/app` contains only global application composition
-- `src/lib` contains shared client-safe utilities and capabilities. Prefer a descriptive flat file over a directory containing one file.
-- `src/server` contains shared server-only infrastructure, no page-specific stuff
-- `src/styles` contains global styles, theme
-- Dependencies flow `routes -> pages -> shared components/lib`
+- `apps/web/src/components/ui` contains reusable controls and primitives. It must not import pages or feature APIs.
+- `apps/web/src/components/app` contains only global application composition
+- `apps/web/src/lib` contains shared client-safe utilities and capabilities. Prefer a descriptive flat file over a directory containing one file.
+- `apps/web/src/server` contains shared server-only infrastructure, no page-specific stuff
+- `apps/web/src/server/email` contains email templates
+- `apps/web/src/styles` contains global styles, theme
+- Dependencies flow `apps/web/src/routes -> apps/web/src/pages -> apps/web/src/components` and shared `apps/web/src/lib` capabilities.
 - File conventions:
   - `.api.ts`: For server functions / api routes
   - `.query.ts`: For useMutation and queryOptions
@@ -43,12 +50,12 @@
 - Prefer css modules, prefer syntax `import css from ...`
 - In css modules, prefer nested selectors when it keeps related styles together.
 - This app uses css reset and theme.css
-- Shared responsive breakpoints live in `src/styles/breakpoints.css`; use its custom media names instead of repeating raw width queries.
+- Shared responsive breakpoints live in `apps/web/src/styles/breakpoints.css`; use its custom media names instead of repeating raw width queries.
 - Respect the css reset first: margins for text blocks, base font inheritance, and default line-height are already normalized there, so only restyle them when a component intentionally needs to diverge.
 - Avoid decorative eyebrow/kicker UI text that only repeats context without adding clarity.
 - Components should not have more than soft cap 200 lines of code, hard cap 300 lines. It's a code smell that file does too much.
-- `src/routes/**/*.tsx` files should stay small. They can contain up to soft cap ~200, hard cap 300 lines. Beyond that export the feature implementation from `src/pages`.
-- Keep demo route code outside reusable `src/components`.
+- `apps/web/src/routes/**/*.tsx` files should stay small. They can contain up to soft cap ~200, hard cap 300 lines. Beyond that export the feature implementation from `apps/web/src/pages`.
+- Keep demo route code outside reusable `apps/web/src/components`.
 - For icons use `lucide-react`, always renaming imports with an `Icon` suffix to avoid naming conflicts.
 
 ## TS

@@ -13,7 +13,6 @@ import css from '../CalorieFlows.module.css';
 export function QuickAddPage({ date }: { date: string }) {
   const recordMutation = useRecordCustomCaloriesMutation();
   const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
-  const error = recordMutation.error?.message ?? '';
 
   async function submit(formData: TypedFormData, navigate: UseNavigateResult<string>) {
     await recordMutation.mutateAsync({
@@ -39,12 +38,7 @@ export function QuickAddPage({ date }: { date: string }) {
         </div>
       </header>
       <section className={css.panel}>
-        {error ? (
-          <p className={css.error} role='alert'>
-            {error}
-          </p>
-        ) : null}
-        <TypedForm className={css.form} onSubmit={submit}>
+        <TypedForm className={css.form} errorMsg={recordMutation.error?.message} onSubmit={submit}>
           <Label text='Label'>
             <TextInput defaultValue='Quick add' name='name' required />
           </Label>

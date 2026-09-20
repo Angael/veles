@@ -53,21 +53,19 @@ export function AddWeightPage() {
               value={date}
             />
           </Label>
-          <Label text='Weight (kg)'>
-            <NumberInput
-              max={300}
-              min={30}
-              onValueChange={setWeightKg}
-              placeholder='e.g. 78.4'
-              required
-              stepperStep={0.1}
-              value={weightKg}
-            />
-          </Label>
-          <div className={css.formActions}>
-            <Btn isLink render={<Link to='/weight' />} size='sm' variant='ghost'>
-              Cancel
-            </Btn>
+          <div className={css.weightEntry}>
+            <Label text='Weight (kg)'>
+              <NumberInput
+                enterKeyHint='done'
+                max={300}
+                min={30}
+                onValueChange={setWeightKg}
+                placeholder='e.g. 78.4'
+                required
+                stepperStep={0.1}
+                value={weightKg}
+              />
+            </Label>
             <Btn
               disabled={!date || weightKg === null}
               loading={mutation.isPending}
@@ -75,6 +73,11 @@ export function AddWeightPage() {
               type='submit'
             >
               Save entry
+            </Btn>
+          </div>
+          <div className={css.formActions}>
+            <Btn isLink render={<Link to='/weight' />} size='sm' variant='ghost'>
+              Cancel
             </Btn>
           </div>
         </TypedForm>

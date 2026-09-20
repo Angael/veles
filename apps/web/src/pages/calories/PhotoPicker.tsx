@@ -87,6 +87,7 @@ export function PhotoPicker({
       <input
         ref={inputRef}
         accept='image/*'
+        capture='environment'
         aria-label='Upload photo'
         className={css.fileInput}
         onChange={(event) => {

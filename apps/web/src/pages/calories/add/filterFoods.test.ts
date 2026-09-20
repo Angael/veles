@@ -6,6 +6,7 @@ const foods: CalorieFood[] = [
   {
     id: '1',
     name: 'Oat milk (Oatly)',
+    namePl: null,
     barcode: null,
     imageUrl: null,
     productSizeGrams: 250,
@@ -17,6 +18,7 @@ const foods: CalorieFood[] = [
   {
     id: '2',
     name: 'Banana',
+    namePl: null,
     barcode: null,
     imageUrl: null,
     productSizeGrams: null,
@@ -45,6 +47,7 @@ describe('filterFoods', () => {
     const catalog: CalorieFood[] = Array.from({ length: 12 }, (_, index) => ({
       id: String(index),
       name: `Oat milk ${String(11 - index).padStart(2, '0')}`,
+      namePl: null,
       barcode: null,
       imageUrl: null,
       productSizeGrams: 250,

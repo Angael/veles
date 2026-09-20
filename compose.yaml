@@ -27,6 +27,7 @@ services:
       dockerfile: apps/web/Dockerfile
       args:
         VITE_APP_NAME: '${VITE_APP_NAME:-Veles}'
+        VITE_APP_ENV: '${VITE_APP_ENV:-production}'
         VITE_CF_CDN_URL: '${VITE_CF_CDN_URL:-https://cdn.example.com}'
     environment:
       NODE_ENV: production
@@ -36,6 +37,8 @@ services:
       APP_URL: '${APP_URL}'
       GOOGLE_CLIENT_ID: '${GOOGLE_CLIENT_ID}'
       GOOGLE_CLIENT_SECRET: '${GOOGLE_CLIENT_SECRET}'
+      RESEND_API_KEY: '${RESEND_API_KEY:-}'
+      INVITATION_EMAIL_FROM: '${INVITATION_EMAIL_FROM:-}'
       VITE_CF_CDN_URL: '${VITE_CF_CDN_URL}'
       R2_ACCOUNT_ID: '${R2_ACCOUNT_ID}'
       R2_ACCESS_KEY_ID: '${R2_ACCESS_KEY_ID}'

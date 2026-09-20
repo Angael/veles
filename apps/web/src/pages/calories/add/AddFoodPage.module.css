@@ -6,17 +6,19 @@
   padding-bottom: 5rem;
 }
 
-.search {
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-md);
-  background: var(--c-surface);
-  padding: var(--space-md);
-}
+.selectButton {
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: none;
+  text-align: start;
+  cursor: pointer;
 
-.results {
-  display: grid;
-  gap: var(--space-sm);
-  list-style: none;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
 }
 
 .empty {

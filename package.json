@@ -24,7 +24,10 @@
     "db:reset": "pnpm --filter @veles/db db:reset",
     "db:studio": "pnpm --filter @veles/db db:studio",
     "db:studio:prod": "pnpm --filter @veles/db db:studio:prod",
-    "db:seed:prod": "pnpm --filter @veles/db db:seed:prod"
+    "db:seed": "pnpm --filter @veles/db db:seed",
+    "db:seed:prod": "pnpm --filter @veles/db db:seed:prod",
+    "db:seed-remove": "pnpm --filter @veles/db db:seed-remove",
+    "db:seed-remove:prod": "pnpm --filter @veles/db db:seed-remove:prod"
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "5.102.8",
@@ -36,5 +39,5 @@
   "engines": {
     "node": ">=26.2.0"
   },
-  "packageManager": "pnpm@11.5.0"
+  "packageManager": "pnpm@12.3.4"
 }

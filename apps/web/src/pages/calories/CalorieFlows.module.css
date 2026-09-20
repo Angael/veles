@@ -45,15 +45,18 @@
   gap: 0.8rem;
 }
 
-.actions {
+.logFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.actions,
+.logActions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.7rem;
   justify-content: flex-end;
-}
-
-.error {
-  color: var(--c-danger-text, #b42318);
 }
 
 .scanViewport {
@@ -113,8 +116,18 @@
 }
 
 @media (--phone) {
-  .grid {
+  .grid,
+  .logFields {
     grid-template-columns: 1fr;
+  }
+
+  .logActions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    & > * {
+      width: 100%;
+    }
   }
 
   .header {

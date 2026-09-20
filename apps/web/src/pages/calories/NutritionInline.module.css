@@ -3,14 +3,25 @@
 .root {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
+}
+
+.stacked {
+  display: grid;
+  justify-items: start;
+  gap: 0.35rem;
+
+  & .energy,
+  & .energyPhoneOnly {
+    width: auto;
+  }
 }
 
 .energy,
 .energyPhoneOnly {
   flex: none;
   display: flex;
-  width: 4.5rem;
+  width: auto;
   align-items: baseline;
   gap: 0.3rem;
   font-variant-numeric: tabular-nums;
@@ -29,52 +40,47 @@
 }
 
 .macros {
-  display: flex;
-  gap: var(--space-xs);
-
-  & .macro {
-    width: 3.4rem;
-  }
-
-  & dt {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
+  display: grid;
+  width: 9rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border-radius: var(--radius-pill);
 }
 
-.macro dd {
+.macro {
   display: flex;
-  align-items: center;
-  gap: 0.35rem;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.1rem;
+  padding: 0 0.25rem;
+  color: var(--c-text-strong);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-semibold);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.dotProtein,
-.dotFat,
-.dotCarbs {
-  flex: none;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: var(--radius-pill);
+.macro:nth-child(1) {
+  background: color-mix(in srgb, var(--c-macro-protein) 18%, var(--c-surface));
+  color: color-mix(in srgb, var(--c-text-strong) 78%, var(--c-macro-protein));
 }
 
-.dotProtein {
-  background: var(--c-macro-protein);
+.macro:nth-child(2) {
+  background: color-mix(in srgb, var(--c-macro-fat) 18%, var(--c-surface));
+  color: color-mix(in srgb, var(--c-text-strong) 78%, var(--c-macro-fat));
 }
 
-.dotFat {
-  background: var(--c-macro-fat);
+.macro:nth-child(3) {
+  background: color-mix(in srgb, var(--c-macro-carb) 18%, var(--c-surface));
+  color: color-mix(in srgb, var(--c-text-strong) 78%, var(--c-macro-carb));
 }
 
-.dotCarbs {
-  background: var(--c-macro-carb);
+.unit {
+  color: currentcolor;
+  opacity: 0.62;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-regular);
 }
 
 .energyPhoneOnly {

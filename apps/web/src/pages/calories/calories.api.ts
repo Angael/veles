@@ -7,7 +7,7 @@ import { calorieGoals, foodLogs, foodProducts, uploadObjects } from '@veles/db/s
 import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
-import { downloadFile } from './downloadFile';
+import { downloadFile } from '@/server/downloadFile.server';
 import { storagePathToUrl } from '@/server/storage/config.server';
 import { log } from '@/server/logger.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
@@ -90,6 +90,7 @@ function toFoodProduct(
   return {
     id: product.id,
     name: product.name,
+    namePl: product.namePl,
     barcode: product.barcode,
     imageUrl: asset ? storagePathToUrl(asset.key) : null,
     productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
@@ -319,6 +320,7 @@ export type CalorieDashboardDay = {
 export type CalorieFood = {
   id: string;
   name: string;
+  namePl: string | null;
   barcode: string | null;
   imageUrl: string | null;
   productSizeGrams: number | null;
@@ -692,8 +694,9 @@ export const updateFoodLog = createServerFn({ method: 'POST' })
       throw new ClientSafeError('Product-backed entries use the product photo.');
     }
     const image = await prepareImageAction(action, photo, session.user.id);
-    const imageUploadObjectId =
-      action === 'replace' ? (image?.asset.id ?? null) : action === 'remove' ? null : undefined;
+    let imageUploadObjectId: string | null | undefined;
+    if (action === 'replace') imageUploadObjectId = image?.asset.id ?? null;
+    if (action === 'remove') imageUploadObjectId = null;
 
     try {
       const nextGrams = optionalHundredths(values.grams ?? undefined);
@@ -703,17 +706,19 @@ export const updateFoodLog = createServerFn({ method: 'POST' })
           ? nextGrams / existing.gramsHundredths
           : null;
 
+      let kcalHundredths = toHundredths(values.kcal);
+      if (isProduct) {
+        kcalHundredths = existing.kcalHundredths;
+        if (ratio !== null) kcalHundredths = Math.round(existing.kcalHundredths * ratio);
+      }
+
       const [updated] = await db.transaction(async (tx) => {
         if (image) await tx.insert(uploadObjects).values(image.asset);
         return tx
           .update(foodLogs)
           .set({
             gramsHundredths: nextGrams,
-            kcalHundredths: isProduct
-              ? ratio === null
-                ? existing.kcalHundredths
-                : Math.round(existing.kcalHundredths * ratio)
-              : toHundredths(values.kcal),
+            kcalHundredths,
             proteinHundredths: updateOptionalNutrient(
               values.protein,
               existing.proteinHundredths,

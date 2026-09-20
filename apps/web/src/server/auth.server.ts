@@ -1,15 +1,20 @@
 import { APIError, betterAuth } from 'better-auth';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
-import { accounts, sessions, users, verifications } from '@veles/db/schema';
+import { eq } from 'drizzle-orm';
+import { accounts, connectionInvitations, sessions, users, verifications } from '@veles/db/schema';
 import { db } from '@/server/db.server';
 import { getServerEnv } from '@/server/env.server';
+import { log } from '@/server/logger.server';
 
 const env = getServerEnv();
 
 export const auth = betterAuth({
   baseURL: env.appUrl,
   secret: env.betterAuthSecret,
+  onAPIError: {
+    errorURL: new URL('/auth/error', env.appUrl).toString(),
+  },
   database: drizzleAdapter(db, {
     provider: 'pg',
     schema: {
@@ -30,14 +35,31 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (user) => {
-          // Enforce the allowlist at the persistence boundary so every signup flow is covered.
-          if (!env.allowedAuthEmails.includes(user.email)) {
+          const normalizedEmail = user.email.toLowerCase();
+          const isAllowedAdmin = env.allowedAuthEmails.some(
+            (email) => email.toLowerCase() === normalizedEmail,
+          );
+
+          if (isAllowedAdmin) {
+            return { data: user };
+          }
+
+          const invitations = await db
+            .select({ id: connectionInvitations.id })
+            .from(connectionInvitations)
+            .where(eq(connectionInvitations.recipientEmail, normalizedEmail))
+            .limit(1);
+
+          if (invitations.length === 0) {
             throw new APIError('BAD_REQUEST', {
-              message: 'This account is not authorized to use Veles',
+              message: 'This account needs a connection invitation to use Veles',
             });
           }
 
           return { data: user };
+        },
+        after: async (user) => {
+          log.info('New user signed up', { userId: user.id, email: user.email });
         },
       },
     },
@@ -48,6 +70,7 @@ export const auth = betterAuth({
           google: {
             clientId: env.googleClientId,
             clientSecret: env.googleClientSecret,
+            prompt: 'select_account',
           },
         }
       : {},

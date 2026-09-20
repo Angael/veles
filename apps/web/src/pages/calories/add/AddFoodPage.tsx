@@ -2,13 +2,14 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { PlusIcon } from 'lucide-react';
 import { useState, useTransition } from 'react';
-import { CalorieFoodCard } from '../CalorieFoodCard';
+import { FoodSummary } from '../FoodSummary';
 import type { CalorieFood } from '../calories.api';
 import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '../calories.query';
 import { SelectedFoodForm } from './SelectedFoodForm';
 import { filterFoods } from './filterFoods';
 import { Btn } from '@/components/ui/btn/Btn';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
+import { List, ListItem } from '@/components/ui/list/List';
 import { Label } from '@/components/ui/label/Label';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import css from './AddFoodPage.module.css';
@@ -59,42 +60,47 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
 
   return (
     <main className={css.page}>
-      <section className={css.search}>
-        <Label text='Food name'>
-          <TextInput
-            autoFocus
-            onValueChange={(value) => {
-              setQuery(value);
-              startFiltering(() => setFilterQuery(value));
-            }}
-            placeholder='Banana, bread, yoghurt…'
-            value={query}
-          />
-        </Label>
-      </section>
+      <Label text='Food name'>
+        <TextInput
+          autoFocus
+          onValueChange={(value) => {
+            setQuery(value);
+            startFiltering(() => setFilterQuery(value));
+          }}
+          placeholder='Banana, bread, yoghurt…'
+          value={query}
+        />
+      </Label>
 
-      <ul aria-busy={foodsQuery.isFetching || isFiltering} className={css.results}>
+      <List aria-busy={foodsQuery.isFetching || isFiltering}>
         {foods.map((food) => {
           const productGrams = shownGrams(food);
           const kcal = nutritionAtGrams(food.kcalPer100g, productGrams);
 
           return (
-            <CalorieFoodCard
-              gramsLabel={`${Math.round(productGrams)} g`}
-              imageUrl={food.imageUrl}
-              kcal={kcal}
-              protein={nutritionAtGrams(food.proteinPer100g, productGrams)}
-              fat={nutritionAtGrams(food.fatPer100g, productGrams)}
-              carbs={nutritionAtGrams(food.carbsPer100g, productGrams)}
-              key={food.id}
-            >
-              <button onClick={() => selectFood(food)} type='button'>
-                {food.name}
-              </button>
-            </CalorieFoodCard>
+            <ListItem interactive key={food.id} style={{ padding: 0 }}>
+              <FoodSummary
+                carbs={nutritionAtGrams(food.carbsPer100g, productGrams)}
+                density='compact'
+                fat={nutritionAtGrams(food.fatPer100g, productGrams)}
+                imageUrl={food.imageUrl}
+                kcal={kcal}
+                meta={`${Math.round(productGrams)} g`}
+                name={
+                  <button
+                    className={css.selectButton}
+                    onClick={() => selectFood(food)}
+                    type='button'
+                  >
+                    {food.name}
+                  </button>
+                }
+                protein={nutritionAtGrams(food.proteinPer100g, productGrams)}
+              />
+            </ListItem>
           );
         })}
-      </ul>
+      </List>
 
       {!foodsQuery.isFetching && foods.length === 0 && query.trim() ? (
         <div className={css.empty}>

@@ -30,9 +30,16 @@
   gap: var(--space-md);
 }
 
+.weightEntry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--space-xs);
+}
+
 .formActions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: var(--space-xs);
 }
 

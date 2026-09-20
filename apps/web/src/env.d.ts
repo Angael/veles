@@ -1,15 +1,16 @@
 /// <reference types="vite/client" />
 
-interface ImportMetaEnv {
-  readonly VITE_APP_NAME: string;
-  readonly VITE_CF_CDN_URL: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
-
 declare global {
+  interface ImportMetaEnv {
+    readonly VITE_APP_NAME: string;
+    readonly VITE_APP_ENV?: 'production' | 'development' | 'localhost';
+    readonly VITE_CF_CDN_URL: string;
+  }
+
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+
   namespace NodeJS {
     interface ProcessEnv {
       readonly DATABASE_URL: string;
@@ -18,11 +19,14 @@ declare global {
       readonly AUTH_ALLOWED_EMAILS: string;
       readonly GOOGLE_CLIENT_ID?: string;
       readonly GOOGLE_CLIENT_SECRET?: string;
+      readonly RESEND_API_KEY?: string;
+      readonly INVITATION_EMAIL_FROM?: string;
       readonly R2_ACCOUNT_ID: string;
       readonly R2_ACCESS_KEY_ID: string;
       readonly R2_SECRET_ACCESS_KEY: string;
       readonly R2_BUCKET_NAME: string;
       readonly VITE_APP_NAME?: string;
+      readonly VITE_APP_ENV?: 'production' | 'development' | 'localhost';
       readonly VITE_CF_CDN_URL: string;
       readonly NODE_ENV: 'development' | 'production' | 'test';
     }

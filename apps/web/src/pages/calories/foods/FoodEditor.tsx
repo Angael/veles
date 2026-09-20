@@ -23,6 +23,7 @@ export type FoodEditorValue = {
 
 type Props = {
   food?: CalorieFood;
+  errorMsg?: string;
   initialBarcode?: string;
   initialName?: string;
   pending: boolean;
@@ -31,6 +32,7 @@ type Props = {
 };
 
 export function FoodEditor({
+  errorMsg,
   food,
   initialBarcode,
   initialName,
@@ -54,7 +56,7 @@ export function FoodEditor({
     });
   }
   return (
-    <TypedForm className={css.form} onSubmit={handleSubmit}>
+    <TypedForm className={css.form} errorMsg={errorMsg} onSubmit={handleSubmit}>
       <Label text='Food name'>
         <TextInput defaultValue={food?.name ?? initialName} name='name' required />
       </Label>
@@ -87,8 +89,8 @@ export function FoodEditor({
         value={photo}
       />
       <p>This changes the shared catalog photo for everyone.</p>
-      <Btn disabled={pending} type='submit'>
-        {pending ? 'Saving…' : submitLabel}
+      <Btn loading={pending} type='submit'>
+        {submitLabel}
       </Btn>
     </TypedForm>
   );

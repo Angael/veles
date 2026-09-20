@@ -7,10 +7,7 @@ export const Route = createFileRoute('/_authenticated/calories_/quick-add')({
   validateSearch: type({ 'date?': 'string' }),
   component: Component,
   staticData: {
-    navbar: {
-      label: 'Quick add',
-      upTo: { to: '/calories' },
-    },
+    layout: 'focus',
   },
 });
 

@@ -2,7 +2,14 @@ import type {
   BarcodeDetector as PolyfillBarcodeDetector,
   BarcodeFormat,
 } from 'barcode-detector/pure';
-import { CameraIcon, CameraOffIcon, SwitchCameraIcon, XIcon } from 'lucide-react';
+import {
+  CameraIcon,
+  CameraOffIcon,
+  LoaderCircleIcon,
+  SearchXIcon,
+  SwitchCameraIcon,
+  XIcon,
+} from 'lucide-react';
 import { type ReactElement, useEffect, useRef, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
@@ -20,15 +27,26 @@ declare global {
   }
 }
 
-type ScannerState = 'starting' | 'scanning' | 'permissionDenied' | 'unavailable' | 'error';
+type ScannerState =
+  | 'starting'
+  | 'scanning'
+  | 'lookingUp'
+  | 'notFound'
+  | 'permissionDenied'
+  | 'unavailable'
+  | 'error';
+
+export type BarcodeScannerStatus = 'scanning' | 'lookingUp' | 'notFound';
 
 type BarcodeScannerProps = {
   closeRender: ReactElement;
-  enabled: boolean;
   onDetected: (barcode: string) => void;
+  status: BarcodeScannerStatus;
 };
 
 const formats: BarcodeFormat[] = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'];
+const detectionIntervalMs = 250;
+const barcodeAbsentResetMs = 1000;
 
 /** Uses the native detector when available and only downloads the WASM-backed fallback when needed. */
 async function createDetector(): Promise<BarcodeDetectorLike> {
@@ -53,7 +71,7 @@ async function enableContinuousFocus(stream: MediaStream) {
   await track.applyConstraints(constraints);
 }
 
-export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScannerProps) {
+export function BarcodeScanner({ closeRender, onDetected, status }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const callbackRef = useRef(onDetected);
   callbackRef.current = onDetected;
@@ -70,16 +88,14 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
     selectNextCamera,
   } = useCameraPreference();
   useEffect(() => {
-    if (!enabled) {
-      setState('starting');
-      return;
-    }
     if (!cameraPreferenceReady) return;
     let active = true;
     let animationFrame = 0;
     let stream: MediaStream | undefined;
     let detecting = false;
     let lastDetection = 0;
+    let lastDetectedBarcode = '';
+    let lastDetectedAt = 0;
 
     const stopCamera = () => {
       cancelAnimationFrame(animationFrame);
@@ -145,7 +161,11 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
 
         const scan = async (timestamp: number) => {
           if (!active) return;
-          if (!detecting && timestamp - lastDetection >= 250 && video.readyState >= 2) {
+          if (
+            !detecting &&
+            timestamp - lastDetection >= detectionIntervalMs &&
+            video.readyState >= 2
+          ) {
             detecting = true;
             lastDetection = timestamp;
             try {
@@ -154,9 +174,13 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
               // Effect cleanup can flip this flag while detector.detect is awaiting the browser.
               // oxlint-disable-next-line typescript/no-unnecessary-condition -- Avoid invoking the callback after scanner unmount.
               if (barcode && active) {
-                stopCamera();
-                callbackRef.current(barcode);
-                return;
+                if (barcode !== lastDetectedBarcode) {
+                  lastDetectedBarcode = barcode;
+                  callbackRef.current(barcode);
+                }
+                lastDetectedAt = timestamp;
+              } else if (timestamp - lastDetectedAt >= barcodeAbsentResetMs) {
+                lastDetectedBarcode = '';
               }
             } catch {
               stopCamera();
@@ -206,12 +230,15 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
       active = false;
       stopCamera();
     };
-  }, [cameraPreferenceReady, enabled, preferredCameraId]);
+  }, [cameraPreferenceReady, preferredCameraId]);
 
   function switchCamera() {
     if (!selectNextCamera()) return;
     setState('starting');
   }
+
+  const displayState = status === 'scanning' ? state : status;
+  const isScanning = displayState === 'scanning';
 
   return (
     <section aria-label='Barcode camera scanner' className={css.scanner}>
@@ -230,10 +257,10 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
         />
       </div>
 
-      <div className={css.viewport}>
+      <div aria-busy={status === 'lookingUp' || undefined} className={css.viewport}>
         <video aria-label='Live camera preview' muted playsInline ref={videoRef} />
-        {state !== 'scanning' ? <ScannerMessage state={state} /> : null}
-        {cameras.length > 1 ? (
+        {!isScanning ? <ScannerMessage state={displayState} /> : null}
+        {isScanning && cameras.length > 1 ? (
           <div className={css.cameraControls}>
             <div
               aria-live='polite'
@@ -252,13 +279,13 @@ export function BarcodeScanner({ closeRender, enabled, onDetected }: BarcodeScan
             />
           </div>
         ) : null}
-        {state === 'scanning' && cameraHintVisible ? (
+        {isScanning && cameraHintVisible ? (
           <Card className={css.cameraHint} shadow={false} variant='primary'>
             If the image looks blurry, try switching to another rear camera.
           </Card>
         ) : null}
       </div>
-      {state === 'scanning' ? (
+      {isScanning ? (
         <p aria-live='polite' className={css.status}>
           Looking for an EAN or UPC barcode…
         </p>
@@ -278,27 +305,39 @@ function ScannerMessage({ state }: { state: Exclude<ScannerState, 'scanning'> })
     );
   }
 
-  const copy =
-    state === 'permissionDenied'
-      ? [
-          'Camera permission denied',
-          'Allow camera access in your browser settings, or type the barcode instead.',
-        ]
-      : state === 'unavailable'
-        ? [
-            'Camera unavailable',
-            'This browser cannot access a camera. You can still type the barcode.',
-          ]
-        : [
-            'Scanner stopped',
-            'We could not read from the camera. Close it and try again, or type the barcode.',
-          ];
+  const copy = scannerMessageCopy[state];
+  let icon = <CameraOffIcon aria-hidden='true' />;
+  if (state === 'lookingUp') {
+    icon = <LoaderCircleIcon aria-hidden='true' className={css.loadingIcon} />;
+  } else if (state === 'notFound') {
+    icon = <SearchXIcon aria-hidden='true' />;
+  }
 
   return (
-    <div className={css.message} role='alert'>
-      <CameraOffIcon aria-hidden='true' />
+    <div className={css.message} role={state === 'lookingUp' ? 'status' : 'alert'}>
+      {icon}
       <strong>{copy[0]}</strong>
       <span>{copy[1]}</span>
     </div>
   );
 }
+
+const scannerMessageCopy: Record<
+  Exclude<ScannerState, 'starting' | 'scanning'>,
+  [string, string]
+> = {
+  lookingUp: ['Looking up product…', 'Checking the product catalog.'],
+  notFound: ['Barcode not found', 'Create this product or scan another barcode.'],
+  permissionDenied: [
+    'Camera permission denied',
+    'Allow camera access in your browser settings, or type the barcode instead.',
+  ],
+  unavailable: [
+    'Camera unavailable',
+    'This browser cannot access a camera. You can still type the barcode.',
+  ],
+  error: [
+    'Scanner stopped',
+    'We could not read from the camera. Close it and try again, or type the barcode.',
+  ],
+};

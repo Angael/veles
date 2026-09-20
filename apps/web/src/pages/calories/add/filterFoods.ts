@@ -18,6 +18,25 @@ function fuzzyTermScore(value: string, term: string) {
   return 20 + firstMatch + gaps;
 }
 
+function foodNameScore(food: CalorieFood, terms: string[]) {
+  let bestScore: number | null = null;
+  for (const name of [food.name, food.namePl]) {
+    if (!name) continue;
+    const value = name.toLocaleLowerCase();
+    let score = 0;
+    for (const term of terms) {
+      const termScore = fuzzyTermScore(value, term);
+      if (termScore === null) {
+        score = -1;
+        break;
+      }
+      score += termScore;
+    }
+    if (score >= 0 && (bestScore === null || score < bestScore)) bestScore = score;
+  }
+  return bestScore;
+}
+
 type RankedFood = { food: CalorieFood; score: number };
 
 /** Finds the best catalog matches in one pass while retaining only the requested result count. */
@@ -31,20 +50,8 @@ export function filterFoods(foods: CalorieFood[], query: string, limit: number) 
   const rankedFoods: RankedFood[] = [];
 
   for (const food of foods) {
-    const value = food.name.toLocaleLowerCase();
-    let score = 0;
-    let matches = true;
-
-    for (const term of terms) {
-      const termScore = fuzzyTermScore(value, term);
-      if (termScore === null) {
-        matches = false;
-        break;
-      }
-      score += termScore;
-    }
-
-    if (!matches) continue;
+    const score = foodNameScore(food, terms);
+    if (score === null) continue;
 
     let insertionIndex = 0;
     for (const rankedFood of rankedFoods) {

@@ -2,7 +2,7 @@ FROM node:26.2.0-alpine
 
 ENV NODE_ENV=production
 
-RUN npm install -g pnpm@11.5.0
+RUN npm install -g pnpm@12.3.4
 
 WORKDIR /app
 

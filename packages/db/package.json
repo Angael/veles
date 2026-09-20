@@ -16,7 +16,10 @@
     "db:reset": "node --env-file=../../.env scripts/db-reset.ts",
     "db:studio": "drizzle-kit studio",
     "db:studio:prod": "drizzle-kit studio --config=drizzle-prod.config.ts",
-    "db:seed:prod": "node --env-file=../../.env scripts/seed-prod.ts"
+    "db:seed": "node --env-file=../../.env scripts/seed.ts",
+    "db:seed:prod": "node --env-file=../../.env scripts/seed.ts --prod",
+    "db:seed-remove": "node --env-file=../../.env scripts/seed-remove.ts",
+    "db:seed-remove:prod": "node --env-file=../../.env scripts/seed-remove.ts --prod"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

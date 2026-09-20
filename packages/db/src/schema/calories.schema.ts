@@ -21,6 +21,8 @@ export const foodProducts = pgTable(
       .default(sql`uuidv7()`),
     barcode: text('barcode'),
     name: text('name').notNull(),
+    /** Optional Polish search alias populated by seeds; product create/edit flows must not write it. */
+    namePl: text('name_pl'),
     imageUploadObjectId: text('image_upload_object_id').references(() => uploadObjects.id, {
       onDelete: 'restrict',
     }),

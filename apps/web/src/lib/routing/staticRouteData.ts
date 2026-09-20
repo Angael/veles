@@ -13,6 +13,8 @@ type NavbarData = {
 
 declare module '@tanstack/react-router' {
   interface StaticDataRouteOption {
+    /** Uses page-owned chrome without the global application frame. */
+    layout?: 'focus';
     navbar?: NavbarData;
   }
 }
