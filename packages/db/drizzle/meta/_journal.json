@@ -43,6 +43,13 @@
       "when": 1789640577730,
       "tag": "0005_daffy_slyde",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789892295732,
+      "tag": "0006_overjoyed_slayback",
+      "breakpoints": true
     }
   ]
 }
