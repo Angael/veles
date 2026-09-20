@@ -45,6 +45,8 @@ type BarcodeScannerProps = {
 };
 
 const formats: BarcodeFormat[] = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'];
+const detectionIntervalMs = 250;
+const barcodeAbsentResetMs = 1000;
 
 /** Uses the native detector when available and only downloads the WASM-backed fallback when needed. */
 async function createDetector(): Promise<BarcodeDetectorLike> {
@@ -86,16 +88,14 @@ export function BarcodeScanner({ closeRender, onDetected, status }: BarcodeScann
     selectNextCamera,
   } = useCameraPreference();
   useEffect(() => {
-    if (status !== 'scanning') {
-      setState('starting');
-      return;
-    }
     if (!cameraPreferenceReady) return;
     let active = true;
     let animationFrame = 0;
     let stream: MediaStream | undefined;
     let detecting = false;
     let lastDetection = 0;
+    let lastDetectedBarcode = '';
+    let lastDetectedAt = 0;
 
     const stopCamera = () => {
       cancelAnimationFrame(animationFrame);
@@ -161,7 +161,11 @@ export function BarcodeScanner({ closeRender, onDetected, status }: BarcodeScann
 
         const scan = async (timestamp: number) => {
           if (!active) return;
-          if (!detecting && timestamp - lastDetection >= 250 && video.readyState >= 2) {
+          if (
+            !detecting &&
+            timestamp - lastDetection >= detectionIntervalMs &&
+            video.readyState >= 2
+          ) {
             detecting = true;
             lastDetection = timestamp;
             try {
@@ -170,9 +174,13 @@ export function BarcodeScanner({ closeRender, onDetected, status }: BarcodeScann
               // Effect cleanup can flip this flag while detector.detect is awaiting the browser.
               // oxlint-disable-next-line typescript/no-unnecessary-condition -- Avoid invoking the callback after scanner unmount.
               if (barcode && active) {
-                stopCamera();
-                callbackRef.current(barcode);
-                return;
+                if (barcode !== lastDetectedBarcode) {
+                  lastDetectedBarcode = barcode;
+                  callbackRef.current(barcode);
+                }
+                lastDetectedAt = timestamp;
+              } else if (timestamp - lastDetectedAt >= barcodeAbsentResetMs) {
+                lastDetectedBarcode = '';
               }
             } catch {
               stopCamera();
@@ -222,7 +230,7 @@ export function BarcodeScanner({ closeRender, onDetected, status }: BarcodeScann
       active = false;
       stopCamera();
     };
-  }, [cameraPreferenceReady, preferredCameraId, status]);
+  }, [cameraPreferenceReady, preferredCameraId]);
 
   function switchCamera() {
     if (!selectNextCamera()) return;
@@ -249,7 +257,7 @@ export function BarcodeScanner({ closeRender, onDetected, status }: BarcodeScann
         />
       </div>
 
-      <div className={css.viewport}>
+      <div aria-busy={status === 'lookingUp' || undefined} className={css.viewport}>
         <video aria-label='Live camera preview' muted playsInline ref={videoRef} />
         {!isScanning ? <ScannerMessage state={displayState} /> : null}
         {isScanning && cameras.length > 1 ? (

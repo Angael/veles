@@ -20,9 +20,10 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
   else if (missing) scannerStatus = 'notFound';
 
   async function lookup(code: string) {
-    if (!code.trim() || lookingUp.current || food || missing) return;
+    if (!code.trim() || lookingUp.current || food) return;
     lookingUp.current = true;
     setBarcode(code);
+    setMissing('');
     try {
       const result = await lookupMutation.mutateAsync({ data: { barcode: code } });
       if (result.status === 'found') {
