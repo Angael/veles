@@ -3,16 +3,18 @@ import { createDatabaseConnection } from '../src/index.ts';
 import { foodProducts } from '../src/schema/calories.schema.ts';
 import { foodProductSeeds, retiredFoodProductNames } from '../src/seed/food-products.ts';
 
-const prodDatabaseUrl = process.env.PROD_DATABASE_URL;
+const isProduction = process.argv.includes('--prod');
+const databaseUrlName = isProduction ? 'PROD_DATABASE_URL' : 'DATABASE_URL';
+const databaseUrl = process.env[databaseUrlName];
 
-if (!prodDatabaseUrl) {
-  throw new Error('PROD_DATABASE_URL is required.');
+if (!databaseUrl) {
+  throw new Error(`${databaseUrlName} is required.`);
 }
 
-await removeProductionFoodProducts(prodDatabaseUrl);
+await removeFoodProducts(databaseUrl);
 
-/** Removes only known current and legacy shared-catalog rows from production. */
-async function removeProductionFoodProducts(connectionString: string) {
+/** Removes only known current and legacy shared-catalog rows from the selected database. */
+async function removeFoodProducts(connectionString: string) {
   const connection = createDatabaseConnection({
     connectionString,
     maxConnections: 1,
@@ -33,7 +35,9 @@ async function removeProductionFoodProducts(connectionString: string) {
       .delete(foodProducts)
       .where(and(isNull(foodProducts.barcode), inArray(foodProducts.name, namesToRemove)))
       .returning({ id: foodProducts.id });
-    console.info(`Removed ${removedProducts.length} shared food products from production.`);
+    console.info(
+      `Removed ${removedProducts.length} shared food products from ${isProduction ? 'production' : 'development'}.`,
+    );
   } finally {
     await connection.close();
   }

@@ -2,16 +2,19 @@ import { createDatabaseConnection } from '../src/index.ts';
 import { foodProducts } from '../src/schema/calories.schema.ts';
 import { foodProductSeeds } from '../src/seed/food-products.ts';
 
-const prodDatabaseUrl = process.env.PROD_DATABASE_URL;
+const isProduction = process.argv.includes('--prod');
+const databaseUrlName = isProduction ? 'PROD_DATABASE_URL' : 'DATABASE_URL';
+const databaseUrl = process.env[databaseUrlName];
+const databaseName = isProduction ? 'production' : 'development';
 
-if (!prodDatabaseUrl) {
-  throw new Error('PROD_DATABASE_URL is required.');
+if (!databaseUrl) {
+  throw new Error(`${databaseUrlName} is required.`);
 }
 
-await seedProductionFoodProducts(prodDatabaseUrl);
+await seedFoodProducts(databaseUrl);
 
-/** Inserts the shared bilingual food catalog into production as one atomic seed operation. */
-async function seedProductionFoodProducts(connectionString: string) {
+/** Inserts the shared bilingual food catalog into the selected database atomically. */
+async function seedFoodProducts(connectionString: string) {
   const connection = createDatabaseConnection({
     connectionString,
     maxConnections: 1,
@@ -27,7 +30,7 @@ async function seedProductionFoodProducts(connectionString: string) {
     await connection.db.transaction(async (tx) => {
       await tx.insert(foodProducts).values(products);
     });
-    console.info(`Inserted ${foodProductSeeds.length} food products into production.`);
+    console.info(`Inserted ${foodProductSeeds.length} food products into ${databaseName}.`);
   } finally {
     await connection.close();
   }
