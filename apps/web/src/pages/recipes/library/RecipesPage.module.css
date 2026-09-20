@@ -10,7 +10,7 @@
 
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(10rem, 13rem);
   gap: var(--space-xs);
   align-items: center;
 }
@@ -167,6 +167,10 @@
 }
 
 @media (--phone) {
+  .toolbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .grid {
     grid-template-columns: 1fr;
   }

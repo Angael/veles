@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { useLookupFoodByBarcodeMutation } from '../calories.query';
-import { BarcodeScanner } from './BarcodeScanner';
+import { BarcodeScanner, type BarcodeScannerStatus } from './BarcodeScanner';
 import { SelectedFoodForm } from './SelectedFoodForm';
 import { Btn } from '@/components/ui/btn/Btn';
 import { TextInput } from '@/components/ui/text-input/TextInput';
@@ -15,6 +15,9 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
   const [missing, setMissing] = useState('');
   const [food, setFood] = useState<CalorieFood | null>(null);
   const date = initialDate;
+  let scannerStatus: BarcodeScannerStatus = 'scanning';
+  if (lookupMutation.isPending) scannerStatus = 'lookingUp';
+  else if (missing) scannerStatus = 'notFound';
 
   async function lookup(code: string) {
     if (!code.trim() || lookingUp.current || food) return;
@@ -38,9 +41,9 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
     return (
       <main className={css.scanViewport}>
         <BarcodeScanner
-          busy={lookupMutation.isPending}
           closeRender={<Link search={{ date }} to='/calories' />}
           onDetected={(code) => void lookup(code)}
+          status={scannerStatus}
         />
         <div className={css.scanBottom}>
           {missing ? (
@@ -52,24 +55,26 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
                   render={<Link search={{ barcode: missing, date }} to='/calories/foods/new' />}
                   variant='ghost'
                 >
-                  Create product
+                  Add product
                 </Btn>
                 <Btn onClick={() => setMissing('')} variant='ghost'>
-                  Keep scanning
+                  Scan again
                 </Btn>
               </div>
             </div>
           ) : null}
-          <div className={css.barcodeInput}>
-            <TextInput
-              aria-label='Enter barcode manually'
-              inputMode='numeric'
-              onValueChange={setBarcode}
-              placeholder='Enter barcode'
-              value={barcode}
-            />
-            <Btn onClick={() => void lookup(barcode)}>Look up</Btn>
-          </div>
+          {!missing && !lookupMutation.isPending ? (
+            <div className={css.barcodeInput}>
+              <TextInput
+                aria-label='Enter barcode manually'
+                inputMode='numeric'
+                onValueChange={setBarcode}
+                placeholder='Enter barcode'
+                value={barcode}
+              />
+              <Btn onClick={() => void lookup(barcode)}>Look up</Btn>
+            </div>
+          ) : null}
         </div>
       </main>
     );
