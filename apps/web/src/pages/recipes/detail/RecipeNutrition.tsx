@@ -1,4 +1,6 @@
+import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
+import { Btn } from '@/components/ui/btn/Btn';
 import clsx from 'clsx';
 import { SliderInput } from '@/components/ui/slider-input/SliderInput';
 import type { RecipeLibraryItem } from '../recipes.api';
@@ -8,6 +10,12 @@ export function RecipeNutrition({ recipe }: { recipe: RecipeLibraryItem }) {
   const basePortions = Math.max(1, recipe.portions);
   const [portions, setPortions] = useState(basePortions);
   const scale = portions / basePortions;
+  const nutrition = {
+    carbs: scaled(recipe.carbs, scale),
+    fat: scaled(recipe.fats, scale),
+    kcal: scaled(recipe.kcal, scale),
+    protein: scaled(recipe.protein, scale),
+  };
 
   return (
     <section className={css.nutrition} aria-label='Recipe nutrition and portions'>
@@ -23,35 +31,49 @@ export function RecipeNutrition({ recipe }: { recipe: RecipeLibraryItem }) {
 
       <div className={css.nutritionValues}>
         <dl>
-          <NutritionItem className={css.kcal} label='Kcal' value={scaled(recipe.kcal, scale)} />
+          <NutritionItem className={css.kcal} label='Kcal' value={nutrition.kcal} />
         </dl>
         <dl className={css.macros}>
           <NutritionItem
             className={css.protein}
             label='Protein'
             unit='g'
-            value={scaled(recipe.protein, scale)}
+            value={nutrition.protein}
           />
-          <NutritionItem
-            className={css.fat}
-            label='Fat'
-            unit='g'
-            value={scaled(recipe.fats, scale)}
-          />
-          <NutritionItem
-            className={css.carb}
-            label='Carb'
-            unit='g'
-            value={scaled(recipe.carbs, scale)}
-          />
+          <NutritionItem className={css.fat} label='Fat' unit='g' value={nutrition.fat} />
+          <NutritionItem className={css.carb} label='Carb' unit='g' value={nutrition.carbs} />
         </dl>
       </div>
+      {nutrition.kcal !== null ? (
+        <Btn
+          isLink
+          render={
+            <Link
+              search={{
+                carbs: toSearchNumber(nutrition.carbs),
+                fat: toSearchNumber(nutrition.fat),
+                kcal: String(nutrition.kcal),
+                name: `${recipe.name} (quick add)`,
+                protein: toSearchNumber(nutrition.protein),
+              }}
+              to='/calories/quick-add'
+            />
+          }
+          variant='outlineMain'
+        >
+          Quick add kcal
+        </Btn>
+      ) : null}
     </section>
   );
 }
 
 function scaled(value: number | null, scale: number) {
   return value === null ? null : value * scale;
+}
+
+function toSearchNumber(value: number | null) {
+  return value === null ? undefined : String(value);
 }
 
 function NutritionItem({
