@@ -3,16 +3,6 @@
   gap: var(--space-lg);
 }
 
-.header,
-.composerHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-lg);
-}
-
-.header h1,
-.composer h2,
 .listCard h2,
 .noteCard h2,
 .emptyState h2 {
@@ -20,7 +10,6 @@
   text-wrap: balance;
 }
 
-.header p,
 .emptyState p {
   margin: var(--space-xs) 0 0;
   color: var(--c-muted);
@@ -29,15 +18,7 @@
 
 .composer {
   display: grid;
-  gap: var(--space-md);
-  padding: var(--space-lg);
-  border: var(--border-width) solid var(--c-primary-border-soft);
-  border-radius: var(--radius-xs);
-  background: color-mix(in srgb, var(--c-surface-solid) 82%, var(--c-primary-surface));
-}
-
-.composerHeader {
-  align-items: center;
+  gap: var(--space-lg);
 }
 
 .typePicker {
@@ -47,9 +28,7 @@
 
 .composerForm {
   display: grid;
-  grid-template-columns: 1fr auto;
   gap: var(--space-md);
-  align-items: end;
 }
 
 .titleInput {
@@ -152,23 +131,9 @@
 }
 
 @media (--phone) {
-  .header,
-  .composerHeader,
   .listGrid {
     display: grid;
-  }
-
-  .listGrid,
-  .composerForm {
     grid-template-columns: 1fr;
-  }
-
-  .composer {
-    padding: var(--space-sm);
-  }
-
-  .typePicker {
-    flex-wrap: wrap;
   }
 
   .productForm {
