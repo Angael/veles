@@ -52,7 +52,7 @@ export function RecipeNutrition({ recipe }: { recipe: RecipeLibraryItem }) {
               search={{
                 carbs: toSearchNumber(nutrition.carbs),
                 fat: toSearchNumber(nutrition.fat),
-                kcal: String(nutrition.kcal),
+                kcal: nutrition.kcal,
                 name: `${recipe.name} (quick add)`,
                 protein: toSearchNumber(nutrition.protein),
               }}
@@ -73,7 +73,7 @@ function scaled(value: number | null, scale: number) {
 }
 
 function toSearchNumber(value: number | null) {
-  return value === null ? undefined : String(value);
+  return value ?? undefined;
 }
 
 function NutritionItem({

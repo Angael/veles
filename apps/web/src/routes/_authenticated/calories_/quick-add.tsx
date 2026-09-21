@@ -4,12 +4,12 @@ import { QuickAddPage } from '@/pages/calories/add/QuickAddPage';
 import { normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 
 const quickAddSearchType = type({
-  'carbs?': 'string.numeric.parse |> number >= 0',
+  'carbs?': 'number >= 0',
   'date?': 'string',
-  'fat?': 'string.numeric.parse |> number >= 0',
-  'kcal?': 'string.numeric.parse |> number >= 0',
+  'fat?': 'number >= 0',
+  'kcal?': 'number >= 0',
   'name?': 'string',
-  'protein?': 'string.numeric.parse |> number >= 0',
+  'protein?': 'number >= 0',
 });
 
 export const Route = createFileRoute('/_authenticated/calories_/quick-add')({
