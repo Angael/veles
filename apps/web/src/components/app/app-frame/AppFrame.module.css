@@ -17,6 +17,16 @@
   }
 }
 
+/* A fixed action needs scroll room so the final page control can clear it. */
+@media (--phone) {
+  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+  .shell:has(:global(.floatingButton)) {
+    padding-bottom: calc(
+      4rem + var(--button-min-height) + var(--space-lg) + env(safe-area-inset-bottom, 0px)
+    );
+  }
+}
+
 /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
 :global(.focusShell) {
   width: min(720px, calc(100% - 2rem));
@@ -26,6 +36,16 @@
     width: min(720px, calc(100% - 1rem));
     padding-top: max(var(--space-sm), env(safe-area-inset-top, 0px));
     padding-bottom: max(var(--space-lg), env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (--phone) {
+  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+  :global(.focusShell):has(:global(.floatingButton)) {
+    padding-bottom: calc(
+      var(--button-min-height) + var(--space-lg) +
+        max(var(--space-lg), env(safe-area-inset-bottom, 0px))
+    );
   }
 }
 

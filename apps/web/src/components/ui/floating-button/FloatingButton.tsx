@@ -23,7 +23,7 @@ export function FloatingButton(props: FloatingButtonProps) {
     return (
       <Btn
         aria-label={typeof props.children === 'string' ? props.children : undefined}
-        className={css.button}
+        className={`${css.button} floatingButton`}
         icon={props.icon}
         isLink
         radius='pill'
@@ -40,7 +40,7 @@ export function FloatingButton(props: FloatingButtonProps) {
     return (
       <Btn
         aria-label={typeof props.children === 'string' ? props.children : undefined}
-        className={css.button}
+        className={`${css.button} floatingButton`}
         icon={props.icon}
         loading={props.loading}
         radius='pill'
@@ -56,7 +56,7 @@ export function FloatingButton(props: FloatingButtonProps) {
   return (
     <Btn
       aria-label={typeof props.children === 'string' ? props.children : undefined}
-      className={css.button}
+      className={`${css.button} floatingButton`}
       icon={props.icon}
       loading={props.loading}
       onClick={props.onClick}
