@@ -50,11 +50,11 @@ export function RecipeNutrition({ recipe }: { recipe: RecipeLibraryItem }) {
           render={
             <Link
               search={{
-                carbs: toSearchNumber(nutrition.carbs),
-                fat: toSearchNumber(nutrition.fat),
+                carbs: nutrition.carbs ?? undefined,
+                fat: nutrition.fat ?? undefined,
                 kcal: nutrition.kcal,
                 name: `${recipe.name} (quick add)`,
-                protein: toSearchNumber(nutrition.protein),
+                protein: nutrition.protein ?? undefined,
               }}
               to='/calories/quick-add'
             />
@@ -70,10 +70,6 @@ export function RecipeNutrition({ recipe }: { recipe: RecipeLibraryItem }) {
 
 function scaled(value: number | null, scale: number) {
   return value === null ? null : value * scale;
-}
-
-function toSearchNumber(value: number | null) {
-  return value ?? undefined;
 }
 
 function NutritionItem({
