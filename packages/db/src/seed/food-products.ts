@@ -1099,6 +1099,106 @@ export const foodProductSeeds = [
   },
   {
     barcode: null,
+    name_en: 'Wheat-rye bread',
+    name_pl: 'Chleb pszenno-żytni',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 23_800,
+    proteinPer100gHundredths: 690,
+    fatPer100gHundredths: 90,
+    carbsPer100gHundredths: 4_900,
+  },
+  {
+    barcode: null,
+    name_en: 'Spelt bread',
+    name_pl: 'Chleb orkiszowy',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 26_100,
+    proteinPer100gHundredths: 840,
+    fatPer100gHundredths: 240,
+    carbsPer100gHundredths: 5_000,
+  },
+  {
+    barcode: null,
+    name_en: 'Wheat-rye bread with seeds',
+    name_pl: 'Chleb pszenno-żytni z ziarnami',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 26_100,
+    proteinPer100gHundredths: 950,
+    fatPer100gHundredths: 360,
+    carbsPer100gHundredths: 4_600,
+  },
+  {
+    barcode: null,
+    name_en: 'Poznań wheat roll',
+    name_pl: 'Bułka poznańska',
+    productSizeGramsHundredths: 7_500,
+    kcalPer100gHundredths: 27_400,
+    proteinPer100gHundredths: 870,
+    fatPer100gHundredths: 210,
+    carbsPer100gHundredths: 5_400,
+  },
+  {
+    barcode: null,
+    name_en: 'Morning wheat roll',
+    name_pl: 'Bułka poranna',
+    productSizeGramsHundredths: 6_500,
+    kcalPer100gHundredths: 28_900,
+    proteinPer100gHundredths: 900,
+    fatPer100gHundredths: 260,
+    carbsPer100gHundredths: 5_600,
+  },
+  {
+    barcode: null,
+    name_en: 'Graham wheat roll',
+    name_pl: 'Bułka grahamka',
+    productSizeGramsHundredths: 7_000,
+    kcalPer100gHundredths: 23_400,
+    proteinPer100gHundredths: 1_100,
+    fatPer100gHundredths: 180,
+    carbsPer100gHundredths: 4_100,
+  },
+  {
+    barcode: null,
+    name_en: 'Breakfast roll with seeds',
+    name_pl: 'Bułka śniadaniowa z ziarnami',
+    productSizeGramsHundredths: 8_000,
+    kcalPer100gHundredths: 33_700,
+    proteinPer100gHundredths: 1_100,
+    fatPer100gHundredths: 870,
+    carbsPer100gHundredths: 5_100,
+  },
+  {
+    barcode: null,
+    name_en: 'Kaiser roll',
+    name_pl: 'Bułka kajzerka',
+    productSizeGramsHundredths: 5_000,
+    kcalPer100gHundredths: 28_600,
+    proteinPer100gHundredths: 930,
+    fatPer100gHundredths: 250,
+    carbsPer100gHundredths: 5_500,
+  },
+  {
+    barcode: null,
+    name_en: 'Spelt roll with seeds',
+    name_pl: 'Bułka orkiszowa z ziarnami',
+    productSizeGramsHundredths: 7_000,
+    kcalPer100gHundredths: 28_200,
+    proteinPer100gHundredths: 1_000,
+    fatPer100gHundredths: 510,
+    carbsPer100gHundredths: 4_700,
+  },
+  {
+    barcode: null,
+    name_en: 'Flaxseed and sesame roll',
+    name_pl: 'Bułka z siemieniem lnianym i sezamem',
+    productSizeGramsHundredths: 6_700,
+    kcalPer100gHundredths: 27_400,
+    proteinPer100gHundredths: 860,
+    fatPer100gHundredths: 400,
+    carbsPer100gHundredths: 4_900,
+  },
+  {
+    barcode: null,
     name_en: 'Pita bread',
     name_pl: 'Chleb pita',
     productSizeGramsHundredths: 6_000,
@@ -2127,6 +2227,16 @@ export const foodProductSeeds = [
   },
   {
     barcode: null,
+    name_en: 'Halloumi cheese',
+    name_pl: 'Ser halloumi',
+    productSizeGramsHundredths: 5_000,
+    kcalPer100gHundredths: 32_900,
+    proteinPer100gHundredths: 2_160,
+    fatPer100gHundredths: 2_640,
+    carbsPer100gHundredths: 120,
+  },
+  {
+    barcode: null,
     name_en: 'Ricotta cheese, whole milk',
     name_pl: 'Ricotta pełnotłusta',
     productSizeGramsHundredths: 12_400,
@@ -2521,6 +2631,16 @@ export const foodProductSeeds = [
   },
   {
     barcode: null,
+    name_en: 'Nutella hazelnut cocoa spread',
+    name_pl: 'Krem Nutella',
+    productSizeGramsHundredths: 1_500,
+    kcalPer100gHundredths: 53_900,
+    proteinPer100gHundredths: 630,
+    fatPer100gHundredths: 3_090,
+    carbsPer100gHundredths: 5_750,
+  },
+  {
+    barcode: null,
     name_en: 'Dark chocolate',
     name_pl: 'Czekolada gorzka',
     productSizeGramsHundredths: 1_000,
@@ -2591,15 +2711,6 @@ export const foodProductSeeds = [
   },
   // Gym staples available in Poland. Powders are dry (not mixed with milk/water).
   // Unbranded entries are representative quick-log estimates; labels vary by flavor.
-  // Reference labels (per 100 g):
-  // https://sklep.sfd.pl/SFD_NUTRITION_WPC_80_Pure_Protein-opis39228.html
-  // https://sklep.sfd.pl/ALLNUTRITION_Whey_Protein-opis33284.html
-  // https://sklep.sfd.pl/ALLNUTRITION_Isolate_Protein-opis33551.html
-  // https://sklep.sfd.pl/ALLNUTRITION_Pro+_Casein-opis42030.html
-  // https://piatnica.com.pl/produkt/skyr-naturalny-150g/
-  // https://piatnica.com.pl/produkt/twarog-chudy/
-  // https://piatnica.com.pl/produkt/twarog-poltlusty-4/
-  // https://piatnica.com.pl/produkt/serek-wiejski-wysokobialkowy/
   {
     barcode: null,
     name_en: 'WPC 75 whey protein powder',
