@@ -2589,4 +2589,105 @@ export const foodProductSeeds = [
     fatPer100gHundredths: 2_430,
     carbsPer100gHundredths: 5_390,
   },
+  // Gym staples available in Poland. Powders are dry (not mixed with milk/water).
+  // Unbranded entries are representative quick-log estimates; labels vary by flavor.
+  // Reference labels (per 100 g):
+  // https://sklep.sfd.pl/SFD_NUTRITION_WPC_80_Pure_Protein-opis39228.html
+  // https://sklep.sfd.pl/ALLNUTRITION_Whey_Protein-opis33284.html
+  // https://sklep.sfd.pl/ALLNUTRITION_Isolate_Protein-opis33551.html
+  // https://sklep.sfd.pl/ALLNUTRITION_Pro+_Casein-opis42030.html
+  // https://piatnica.com.pl/produkt/skyr-naturalny-150g/
+  // https://piatnica.com.pl/produkt/twarog-chudy/
+  // https://piatnica.com.pl/produkt/twarog-poltlusty-4/
+  // https://piatnica.com.pl/produkt/serek-wiejski-wysokobialkowy/
+  {
+    barcode: null,
+    name_en: 'WPC 75 whey protein powder',
+    name_pl: 'Odżywka białkowa WPC 75',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 37_700,
+    proteinPer100gHundredths: 7_500,
+    fatPer100gHundredths: 500,
+    carbsPer100gHundredths: 800,
+  },
+  {
+    barcode: null,
+    name_en: 'WPC 80 whey protein powder, plain',
+    name_pl: 'Odżywka białkowa WPC 80 naturalna',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 40_600,
+    proteinPer100gHundredths: 8_000,
+    fatPer100gHundredths: 690,
+    carbsPer100gHundredths: 690,
+  },
+  {
+    barcode: null,
+    name_en: 'Whey protein powder, flavored',
+    name_pl: 'Odżywka białkowa whey smakowa',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 40_300,
+    proteinPer100gHundredths: 7_000,
+    fatPer100gHundredths: 660,
+    carbsPer100gHundredths: 1_600,
+  },
+  {
+    barcode: null,
+    name_en: 'WPI whey isolate protein powder',
+    name_pl: 'Odżywka białkowa WPI izolat serwatki',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 37_700,
+    proteinPer100gHundredths: 8_500,
+    fatPer100gHundredths: 290,
+    carbsPer100gHundredths: 260,
+  },
+  {
+    barcode: null,
+    name_en: 'Micellar casein protein powder',
+    name_pl: 'Odżywka białkowa kazeina micelarna',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 35_300,
+    proteinPer100gHundredths: 8_000,
+    fatPer100gHundredths: 200,
+    carbsPer100gHundredths: 430,
+  },
+  {
+    barcode: null,
+    name_en: 'Skyr, plain',
+    name_pl: 'Skyr naturalny',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 6_400,
+    proteinPer100gHundredths: 1_200,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 410,
+  },
+  {
+    barcode: null,
+    name_en: 'Quark, low-fat',
+    name_pl: 'Twaróg chudy',
+    productSizeGramsHundredths: 25_000,
+    kcalPer100gHundredths: 8_200,
+    proteinPer100gHundredths: 1_700,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 350,
+  },
+  {
+    barcode: null,
+    name_en: 'Quark, semi-fat',
+    name_pl: 'Twaróg półtłusty',
+    productSizeGramsHundredths: 25_000,
+    kcalPer100gHundredths: 11_500,
+    proteinPer100gHundredths: 1_600,
+    fatPer100gHundredths: 400,
+    carbsPer100gHundredths: 380,
+  },
+  {
+    barcode: null,
+    name_en: 'High-protein cottage cheese',
+    name_pl: 'Serek wiejski wysokobiałkowy',
+    productSizeGramsHundredths: 20_000,
+    kcalPer100gHundredths: 9_300,
+    proteinPer100gHundredths: 1_400,
+    fatPer100gHundredths: 300,
+    carbsPer100gHundredths: 240,
+  },
 ];
