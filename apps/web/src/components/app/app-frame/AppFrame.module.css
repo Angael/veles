@@ -14,16 +14,13 @@
   @media (--phone) {
     width: min(1100px, calc(100% - 1rem));
     padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
-  }
-}
+    --btn-floating-clearance: calc(var(--button-min-height) + var(--space-lg));
 
-/* A fixed action needs scroll room so the final page control can clear it. */
-@media (--phone) {
-  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
-  .shell:has(:global(.floatingButton)) {
-    padding-bottom: calc(
-      4rem + var(--button-min-height) + var(--space-lg) + env(safe-area-inset-bottom, 0px)
-    );
+    /* A fixed action needs scroll room so the final page control can clear it. */
+    /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+    &:has(:global(.floatingButton)) {
+      padding-bottom: calc(4rem + var(--btn-floating-clearance) + env(safe-area-inset-bottom, 0px));
+    }
   }
 }
 
@@ -36,16 +33,13 @@
     width: min(720px, calc(100% - 1rem));
     padding-top: max(var(--space-sm), env(safe-area-inset-top, 0px));
     padding-bottom: max(var(--space-lg), env(safe-area-inset-bottom, 0px));
-  }
-}
 
-@media (--phone) {
-  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
-  :global(.focusShell):has(:global(.floatingButton)) {
-    padding-bottom: calc(
-      var(--button-min-height) + var(--space-lg) +
-        max(var(--space-lg), env(safe-area-inset-bottom, 0px))
-    );
+    /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+    &:has(:global(.floatingButton)) {
+      padding-bottom: calc(
+        var(--btn-floating-clearance) + max(var(--space-lg), env(safe-area-inset-bottom, 0px))
+      );
+    }
   }
 }
 
