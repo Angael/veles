@@ -1,7 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { differenceInCalendarDays, format, parseISO } from 'date-fns';
 import {
-  ArrowRightIcon,
   BookOpenIcon,
   CheckIcon,
   DumbbellIcon,
@@ -36,6 +35,39 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
   return (
     <main className={css.page}>
       <div className={css.grid}>
+        <Card as='article' className={css.foodTile} data-appear='1' shadow={false}>
+          <div className={css.tileHeading}>
+            <h2>Today’s food</h2>
+            <FlameIcon aria-hidden='true' />
+          </div>
+          <div className={css.macroBars}>
+            <MacroProgress
+              label='kcal'
+              total={data.nutrition.totals.kcal}
+              goal={data.nutrition.goal?.kcal ?? null}
+            />
+            <MacroProgress
+              label='protein'
+              total={data.nutrition.totals.protein}
+              goal={data.nutrition.goal?.protein ?? null}
+              unit='g'
+            />
+            <MacroProgress
+              label='fat'
+              total={data.nutrition.totals.fat}
+              goal={data.nutrition.goal?.fat ?? null}
+              unit='g'
+            />
+            <MacroProgress
+              label='carbs'
+              total={data.nutrition.totals.carbs}
+              goal={data.nutrition.goal?.carbs ?? null}
+              unit='g'
+            />
+          </div>
+          <Link aria-label='Open Today’s food' className={css.cardLink} to='/calories' />
+        </Card>
+
         <Card as='article' className={css.weightTile} data-appear variant='primary'>
           <div className={css.tileHeading}>
             <h2>Weight</h2>
@@ -74,46 +106,38 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
               <p>Log your first weight to begin a trend built around you.</p>
             </div>
           )}
-          <Btn className={css.tileAction} isLink render={<Link to='/weight' />} variant='text'>
-            {latestWeight ? 'Go to Weight' : 'Log first weight'}
-            <ArrowRightIcon aria-hidden='true' />
-          </Btn>
+          <Link aria-label='Open Weight' className={css.cardLink} to='/weight' />
         </Card>
 
-        <Card as='article' className={css.foodTile} data-appear='1' shadow={false}>
+        <Card as='article' className={css.todosTile} data-appear='3' shadow={false}>
           <div className={css.tileHeading}>
-            <h2>Today’s food</h2>
-            <FlameIcon aria-hidden='true' />
+            <h2>Todos</h2>
+            <CheckIcon aria-hidden='true' />
           </div>
-          <div className={css.macroBars}>
-            <MacroProgress
-              label='kcal'
-              total={data.nutrition.totals.kcal}
-              goal={data.nutrition.goal?.kcal ?? null}
-            />
-            <MacroProgress
-              label='protein'
-              total={data.nutrition.totals.protein}
-              goal={data.nutrition.goal?.protein ?? null}
-              unit='g'
-            />
-            <MacroProgress
-              label='fat'
-              total={data.nutrition.totals.fat}
-              goal={data.nutrition.goal?.fat ?? null}
-              unit='g'
-            />
-            <MacroProgress
-              label='carbs'
-              total={data.nutrition.totals.carbs}
-              goal={data.nutrition.goal?.carbs ?? null}
-              unit='g'
-            />
+          <ul className={css.todoList}>
+            {todoPreview.map((todo) => (
+              <li key={todo.label} className={todo.done ? css.todoDone : undefined}>
+                <span aria-hidden='true'>{todo.done ? '✓' : ''}</span>
+                {todo.label}
+              </li>
+            ))}
+          </ul>
+          <p className={css.mobileTodoPrompt}>Open your todos</p>
+          <Link aria-label='Open Todos' className={css.cardLink} to='/todos' />
+        </Card>
+
+        <Card as='article' className={css.diaryTile} data-appear='4' shadow={false}>
+          <div className={css.tileHeading}>
+            <h2>Diary</h2>
+            <BookOpenIcon aria-hidden='true' />
           </div>
-          <Btn className={css.tileAction} isLink render={<Link to='/calories' />} variant='text'>
-            Log food
-            <ArrowRightIcon aria-hidden='true' />
-          </Btn>
+          <div className={css.diaryReadout}>{formatDiaryDistance(data.lastDiaryEntryDate)}</div>
+          <div className={css.diaryLines} aria-hidden='true'>
+            <i />
+            <i />
+            <i />
+          </div>
+          <Link aria-label='Open Diary' className={css.cardLink} to='/diary' />
         </Card>
 
         <Card as='section' className={css.recipeTile} data-appear='2' shadow={false}>
@@ -147,46 +171,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
               </div>
             )}
           </div>
-          <Btn className={css.tileAction} isLink render={<Link to='/recipes' />} variant='text'>
-            Browse all recipes
-            <ArrowRightIcon aria-hidden='true' />
-          </Btn>
-        </Card>
-
-        <Card as='article' className={css.todosTile} data-appear='3' shadow={false}>
-          <div className={css.tileHeading}>
-            <h2>Todos</h2>
-            <CheckIcon aria-hidden='true' />
-          </div>
-          <ul className={css.todoList}>
-            {todoPreview.map((todo) => (
-              <li key={todo.label} className={todo.done ? css.todoDone : undefined}>
-                <span aria-hidden='true'>{todo.done ? '✓' : ''}</span>
-                {todo.label}
-              </li>
-            ))}
-          </ul>
-          <Btn className={css.tileAction} isLink render={<Link to='/todos' />} variant='text'>
-            Go to Todos
-            <ArrowRightIcon aria-hidden='true' />
-          </Btn>
-        </Card>
-
-        <Card as='article' className={css.diaryTile} data-appear='4' shadow={false}>
-          <div className={css.tileHeading}>
-            <h2>Diary</h2>
-            <BookOpenIcon aria-hidden='true' />
-          </div>
-          <div className={css.diaryReadout}>{formatDiaryDistance(data.lastDiaryEntryDate)}</div>
-          <div className={css.diaryLines} aria-hidden='true'>
-            <i />
-            <i />
-            <i />
-          </div>
-          <Btn className={css.tileAction} isLink render={<Link to='/diary' />} variant='text'>
-            Go to Diary
-            <ArrowRightIcon aria-hidden='true' />
-          </Btn>
+          <Link aria-label='Browse recipes' className={css.cardLink} to='/recipes' />
         </Card>
 
         <Card as='article' className={css.familyTile} data-appear='5' shadow={false}>

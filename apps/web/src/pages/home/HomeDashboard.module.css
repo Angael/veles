@@ -154,9 +154,34 @@
   text-wrap: pretty;
 }
 
-.tileAction {
-  align-self: end;
-  justify-self: end;
+.cardLink {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.cardLink:focus-visible {
+  outline: 2px solid var(--c-primary-focus);
+  outline-offset: -3px;
+}
+
+.weightTile:has(.cardLink):hover,
+.foodTile:has(.cardLink):hover,
+.recipeTile:has(.cardLink):hover,
+.todosTile:has(.cardLink):hover,
+.diaryTile:has(.cardLink):hover {
+  border-color: var(--c-primary-border);
+}
+
+.recipeStack a,
+.emptyRecipes a {
+  position: relative;
+  z-index: 2;
+}
+
+.mobileTodoPrompt {
+  display: none;
 }
 
 .recipeTile {
@@ -560,8 +585,12 @@
 }
 
 @media (--phone) {
+  .page {
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+  }
+
   .grid {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-rows: auto;
     gap: var(--space-sm);
   }
@@ -570,24 +599,152 @@
   .recipeTile,
   .todosTile,
   .diaryTile,
-  .familyTile,
-  .foodTile,
-  .workoutTile {
-    grid-column: 1;
+  .foodTile {
     grid-row: auto;
-    padding: var(--space-lg);
+    min-height: 0;
+    padding: var(--space-sm);
+    gap: var(--space-sm);
   }
 
-  .weightTile,
   .foodTile {
-    min-height: 26rem;
+    grid-column: 1 / -1;
+    grid-template-rows: auto auto;
+  }
+
+  .macroBars {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-sm);
+  }
+
+  .macroProgress > div {
+    flex-wrap: wrap;
+    gap: 0 var(--space-xs);
+  }
+
+  .macroProgress strong {
+    font-size: var(--text-xs);
+  }
+
+  .weightTile {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-items: center;
+  }
+
+  .weightTile .tileHeading,
+  .weightMeta,
+  .emptyWeight {
+    grid-column: 1 / -1;
+  }
+
+  .weightValue {
+    margin-top: 0;
   }
 
   .weightValue strong {
-    font-size: clamp(4.6rem, 24vw, 7rem);
+    font-size: clamp(2.7rem, 12vw, 4rem);
+    line-height: 1;
+  }
+
+  .weightValue span {
+    margin-left: var(--space-xs);
+    font-size: var(--text-sm);
+  }
+
+  .chart svg {
+    height: 3.5rem;
+  }
+
+  .singlePoint {
+    margin-block: 1.5rem;
+  }
+
+  .weightMeta {
+    padding-top: var(--space-xs);
   }
 
   .emptyWeight strong {
-    font-size: clamp(2.75rem, 14vw, 4rem);
+    font-size: var(--text-lg);
+  }
+
+  .emptyWeight {
+    gap: var(--space-xs);
+  }
+
+  .recipeTile {
+    grid-column: 1 / -1;
+    grid-template-rows: auto auto;
+  }
+
+  .recipeTile h2 {
+    max-width: none;
+  }
+
+  .recipeStack {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-sm);
+  }
+
+  .recipe:nth-child(n + 3) {
+    display: none;
+  }
+
+  .recipe {
+    padding: var(--space-xs) 0;
+  }
+
+  .todosTile,
+  .diaryTile {
+    grid-column: span 1;
+    grid-template-rows: auto 1fr;
+  }
+
+  .todoList,
+  .diaryLines {
+    display: none;
+  }
+
+  .mobileTodoPrompt {
+    display: block;
+    align-self: end;
+    margin: 0;
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+  }
+
+  .diaryReadout {
+    align-self: end;
+    max-width: none;
+    font-size: var(--text-lg);
+    line-height: 1.1;
+  }
+
+  .tileHeading h2 {
+    font-size: var(--text-lg);
+  }
+
+  .familyTile,
+  .workoutTile {
+    grid-column: span 1;
+    grid-row: auto;
+    grid-template-rows: auto 1fr;
+    min-height: 0;
+    padding: var(--space-sm);
+    gap: var(--space-sm);
+  }
+
+  .familyTile p,
+  .workoutTile p {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .orbitPeople,
+  .repRail {
+    display: none;
   }
 }
