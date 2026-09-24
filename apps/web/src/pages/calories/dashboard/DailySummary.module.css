@@ -10,14 +10,13 @@
 }
 
 .energyPanel {
-  position: relative;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-xs);
   width: 100%;
   min-width: 0;
   height: 100%;
-  align-self: start;
-  overflow: hidden;
   padding: var(--space-md);
   border: var(--border-width) solid rgba(125, 211, 252, 0.16);
   border-radius: var(--radius-sm);
@@ -27,141 +26,94 @@
     linear-gradient(145deg, rgba(15, 23, 42, 0.7), var(--c-surface-inset));
 }
 
+.energyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+
+  & h2 {
+    color: var(--c-text);
+    font-size: var(--text-md);
+    font-weight: var(--font-weight-semibold);
+  }
+}
+
 .goalAction {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 1;
+  --btn-height: 2.5rem;
+
+  flex: none;
   color: var(--c-muted);
 }
 
-.energyDial {
-  position: relative;
+.energyAmounts {
   display: grid;
-  place-items: center;
-  width: min(100%, 10.5rem);
-  aspect-ratio: 1;
-  margin-inline: auto;
-  color: var(--c-accent);
+  gap: 0.1rem;
+  min-width: 0;
+  font-variant-numeric: tabular-nums;
 
-  & svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    transform: rotate(-90deg);
-  }
-
-  & circle {
-    fill: none;
-    stroke-width: 8;
-  }
-}
-
-.energyDial:is(button) {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  font: inherit;
-  cursor: pointer;
-}
-
-.energyDial:is(button):focus-visible {
-  border-radius: var(--radius-pill);
-  outline: 2px solid var(--c-primary-focus);
-  outline-offset: 3px;
-}
-
-.dialTrack {
-  stroke: rgba(148, 163, 184, 0.13);
-  transition: stroke var(--duration-fast) ease-out;
-}
-
-.dialProgress,
-.dialOverProgress {
-  stroke-linecap: round;
-  transition: stroke-dashoffset 500ms var(--ease-out);
-}
-
-.dialOverProgress {
-  filter: drop-shadow(0 0 0.2rem rgba(239, 68, 68, 0.42));
-  animation: draw-over-ring 650ms var(--ease-out) both;
-}
-
-.dialGradientStart {
-  stop-color: currentColor;
-}
-
-.dialGradientEnd {
-  stop-color: color-mix(in srgb, currentColor 52%, white);
-}
-
-.dialOverGradientStart {
-  stop-color: #fb7185;
-}
-
-.dialOverGradientEnd {
-  stop-color: #ef4444;
-}
-
-.energyValue {
-  z-index: 1;
-  display: grid;
-  justify-items: center;
-  gap: 0.15rem;
-  max-width: 75%;
-  text-align: center;
-
-  & > strong {
+  & strong {
     color: var(--c-text-strong);
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 3.2vw, 2.7rem);
     font-weight: 650;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.065em;
-    line-height: 0.92;
+    letter-spacing: -0.06em;
+    line-height: 1;
   }
 
   & span {
     color: var(--c-muted);
-    font-size: var(--text-xs);
+    font-size: var(--text-sm);
     line-height: 1.25;
-    text-wrap: balance;
   }
-}
 
-.energyStack {
-  display: grid;
-  justify-items: center;
-  gap: 0.05rem;
-  color: var(--c-text-strong);
-  font-variant-numeric: tabular-nums;
-
-  & strong {
-    font-size: clamp(1.2rem, 3vw, 1.65rem);
+  & .energyGoal {
+    color: var(--c-text);
+    font-size: var(--text-md);
     font-weight: var(--font-weight-semibold);
-    letter-spacing: -0.04em;
-    line-height: 1;
-  }
-
-  & small {
-    margin-left: 0.15rem;
-    color: var(--c-muted);
-    font-size: 0.55em;
-    font-weight: var(--font-weight-regular);
-    letter-spacing: 0;
-  }
-
-  & > span {
-    color: var(--c-muted-strong);
   }
 }
 
-.fractionLine {
-  width: 3.75rem;
-  height: 1px;
-  margin-block: 0.18rem;
-  background: color-mix(in srgb, var(--c-muted) 62%, transparent);
+.energyFooter {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.energyTrack {
+  position: relative;
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.energyFill,
+.energyOverFill {
+  position: absolute;
+  inset-block: 0;
+  transition: width 500ms var(--ease-out);
+}
+
+.energyFill {
+  inset-inline-start: 0;
+  border-radius: inherit;
+  background: var(--c-accent);
+}
+
+.energyOverFill {
+  inset-inline-end: 0;
+  background: #ef4444;
+}
+
+.energyRemaining,
+.energyOver {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+
+.energyOver {
+  color: var(--c-danger-text);
 }
 
 .macros {
@@ -303,13 +255,6 @@
   }
 }
 
-@keyframes draw-over-ring {
-  from {
-    opacity: 0.35;
-    stroke-dashoffset: 100;
-  }
-}
-
 @keyframes reveal-over-fill {
   from {
     clip-path: inset(0 100% 0 0);
@@ -322,12 +267,6 @@
   }
 }
 
-@media (--tablet) {
-  .energyPanel {
-    padding-inline: var(--space-xl);
-  }
-}
-
 @media (--phone) {
   .body {
     grid-template-columns: 1fr;
@@ -335,14 +274,8 @@
   }
 
   .energyPanel {
-    width: 100%;
-    height: 13.5rem;
-    min-height: 0;
-    padding: var(--space-sm);
-  }
-
-  .energyDial {
-    width: min(10.5rem, 62vw);
+    min-height: 12.5rem;
+    height: auto;
   }
 
   .protein,
@@ -362,14 +295,9 @@
   }
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .energyDial:is(button):hover .dialTrack {
-    stroke: rgba(148, 163, 184, 0.24);
-  }
-}
 @media (prefers-reduced-motion: reduce) {
-  .dialProgress,
-  .dialOverProgress,
+  .energyFill,
+  .energyOverFill,
   .macroFill,
   .macroOverFill {
     transition: none;
