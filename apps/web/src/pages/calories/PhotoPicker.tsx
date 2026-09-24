@@ -16,6 +16,35 @@ type PhotoPickerProps = {
   value: PhotoPickerValue;
 };
 
+/** Decode away from the image element and display only a small preview of the camera file. */
+async function preparePreview(photo: File, signal: AbortSignal, onReady: (url: string) => void) {
+  try {
+    const bitmap = await createImageBitmap(photo, {
+      resizeWidth: 640,
+      resizeQuality: 'medium',
+    });
+    try {
+      if (signal.aborted) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      const context = canvas.getContext('2d');
+      if (!context) return;
+      context.drawImage(bitmap, 0, 0);
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, 'image/webp', 0.8),
+      );
+      if (!blob) return;
+      signal.throwIfAborted();
+      onReady(URL.createObjectURL(blob));
+    } finally {
+      bitmap.close();
+    }
+  } catch {
+    // A failed preview must not prevent uploading the original photo.
+  }
+}
+
 /** Keeps a single image local until its owner submits the surrounding form. */
 export function PhotoPicker({
   allowUpload = true,
@@ -38,37 +67,10 @@ export function PhotoPicker({
     let objectUrl: string | null = null;
     setPreviewUrl(null);
 
-    /** Decode away from the image element and display only a small preview of the camera file. */
-    async function preparePreview(photo: File) {
-      try {
-        const bitmap = await createImageBitmap(photo, {
-          resizeWidth: 640,
-          resizeQuality: 'medium',
-        });
-        try {
-          if (controller.signal.aborted) return;
-          const canvas = document.createElement('canvas');
-          canvas.width = bitmap.width;
-          canvas.height = bitmap.height;
-          const context = canvas.getContext('2d');
-          if (!context) return;
-          context.drawImage(bitmap, 0, 0);
-          const blob = await new Promise<Blob | null>((resolve) =>
-            canvas.toBlob(resolve, 'image/webp', 0.8),
-          );
-          if (!blob) return;
-          controller.signal.throwIfAborted();
-          objectUrl = URL.createObjectURL(blob);
-          setPreviewUrl(objectUrl);
-        } finally {
-          bitmap.close();
-        }
-      } catch {
-        // A failed preview must not prevent uploading the original photo.
-      }
-    }
-
-    void preparePreview(value.photo);
+    void preparePreview(value.photo, controller.signal, (url) => {
+      objectUrl = url;
+      setPreviewUrl(url);
+    });
     return () => {
       controller.abort();
       if (objectUrl) URL.revokeObjectURL(objectUrl);
