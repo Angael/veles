@@ -1,0 +1,210 @@
+@import '../../../styles/breakpoints.css';
+
+.selectionTarget {
+  position: relative;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  cursor: pointer;
+}
+
+.selectionTarget input,
+.selectAll input,
+.recipients input {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: 0;
+  accent-color: var(--c-primary);
+  cursor: pointer;
+}
+
+.selectionTarget input:focus-visible,
+.selectAll input:focus-visible,
+.recipients input:focus-visible {
+  outline: 2px solid var(--c-primary-focus);
+  outline-offset: 3px;
+}
+
+.sampleNote,
+.feedback {
+  padding: 0 var(--space-lg);
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  text-wrap: pretty;
+}
+
+.feedback {
+  color: var(--c-accent-soft);
+}
+
+.selectAll {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: fit-content;
+  min-height: 44px;
+  padding: 0 var(--space-lg);
+  color: var(--c-text);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.floatingControls {
+  position: fixed;
+  right: max(var(--space-md), calc((100vw - 1100px) / 2));
+  bottom: var(--space-md);
+  z-index: 3;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: var(--space-sm);
+  width: min(28rem, calc(100vw - 2 * var(--space-md)));
+  pointer-events: none;
+}
+
+.actionBar,
+.actionPanel {
+  pointer-events: auto;
+  border: var(--border-width) solid var(--c-border-strong);
+  background: var(--c-surface-solid);
+  box-shadow: var(--shadow-popup);
+}
+
+.actionBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  max-width: 100%;
+  padding: 0.3rem;
+  border-radius: var(--radius-pill);
+}
+
+.actionBar > button,
+.panelActions > button,
+.actionPanel > button {
+  min-height: 44px;
+}
+
+.count {
+  min-width: 5.5rem;
+  color: var(--c-text-strong);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.actionPanel {
+  display: grid;
+  gap: var(--space-md);
+  width: 100%;
+  max-height: min(60vh, 30rem);
+  padding: var(--space-lg);
+  overflow-y: auto;
+  border-radius: var(--radius-md);
+}
+
+.actionPanel h3 {
+  font-size: var(--text-lg);
+  text-wrap: balance;
+}
+
+.actionPanel p {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  text-wrap: pretty;
+}
+
+.selectedNames {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  max-height: 6rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.selectedNames li {
+  padding: 0.25rem 0.6rem;
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-pill);
+  color: var(--c-text);
+  font-size: var(--text-sm);
+}
+
+.recipients {
+  display: grid;
+  gap: var(--space-xs);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.recipients legend {
+  margin-bottom: var(--space-xs);
+  color: var(--c-text-strong);
+  font-weight: var(--font-weight-semibold);
+}
+
+.recipients label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 44px;
+  padding: 0 var(--space-sm);
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+}
+
+.recipients label:has(input:checked) {
+  border-color: var(--c-primary-border-soft);
+  background: var(--c-primary-surface);
+}
+
+.panelActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+
+@media (--phone) {
+  .floatingControls {
+    right: var(--space-sm);
+    bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+    width: calc(100vw - 2 * var(--space-sm));
+  }
+
+  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+  :global(.focusShell) .floatingControls {
+    bottom: max(var(--space-lg), env(safe-area-inset-bottom, 0px));
+  }
+
+  .actionBar {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.15rem;
+  }
+
+  .compactAction {
+    --btn-padding-x: 0.5rem;
+
+    & > span:first-child {
+      display: none;
+    }
+  }
+
+  .count {
+    min-width: 0;
+  }
+
+  .sampleNote,
+  .feedback,
+  .selectAll {
+    padding-inline: var(--space-sm);
+  }
+}
