@@ -612,13 +612,36 @@
   }
 
   .macroBars {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-sm);
+  }
+
+  .macroProgress:first-child {
+    grid-column: 1 / -1;
+    padding-bottom: var(--space-sm);
+    border-bottom: var(--border-width) solid var(--c-border);
+  }
+
+  .macroProgress:first-child strong {
+    font-size: var(--text-lg);
   }
 
   .macroProgress > div {
     flex-wrap: wrap;
     gap: 0 var(--space-xs);
+  }
+
+  .macroProgress:not(:first-child) > div {
+    display: grid;
+    gap: var(--space-xs);
+  }
+
+  .macroProgress:not(:first-child) strong {
+    white-space: nowrap;
+  }
+
+  .macroProgress:not(:first-child) small {
+    display: block;
   }
 
   .macroProgress strong {
