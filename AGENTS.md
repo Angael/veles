@@ -3,7 +3,7 @@
 - Run `pnpm check:fix` before finishing
 - Always use exact pinned package versions
 - skip "computer use"/"browser smoke tests" checks and launching dev server.
-- Correct order for macros is always: 1. kcal 2. protein 3. fat 4. carbs.
+- Display kcal as a distinct energy metric, never grouped on the same row with macros; group macros together in this order: protein, fat, carbs.
 - Generated files are exempt and must not be hand-edited.
 - Skip adding tests unless user tells you to write them
 
