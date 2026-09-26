@@ -19,6 +19,19 @@
     "@tanstack/eslint-plugin-router",
     { "name": "veles", "specifier": "./.oxlint/env-vars.mjs" }
   ],
+  "overrides": [
+    {
+      "files": ["scripts/preview/**/*.mjs"],
+      "rules": {
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-return": "off",
+        "typescript/use-unknown-in-catch-callback-variable": "off"
+      }
+    }
+  ],
   "rules": {
     "@tanstack/query/exhaustive-deps": "error",
     "@tanstack/query/stable-query-client": "error",

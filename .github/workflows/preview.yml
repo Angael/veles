@@ -1,0 +1,46 @@
+name: Preview reconcile
+
+on:
+  pull_request_target:
+    types:
+      [
+        opened,
+        reopened,
+        synchronize,
+        labeled,
+        unlabeled,
+        closed,
+        ready_for_review,
+        converted_to_draft,
+      ]
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: preview-reconcile
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    # This workflow always runs trusted main-branch code, never the PR's code.
+    if: github.event_name != 'pull_request_target' || (github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.base.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out trusted default branch only
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Reconcile previews (explicitly disabled unless configured)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PREVIEW_ENABLED: ${{ vars.PREVIEW_ENABLED }}
+          PREVIEW_CONFIG: ${{ secrets.PREVIEW_CONFIG }}
+          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+        run: node scripts/preview/reconcile.mjs
