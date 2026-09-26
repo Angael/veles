@@ -19,6 +19,7 @@ const commentResponse = type({
   'body?': 'string | null',
   'user?': type({ login: 'string' }).or('null'),
 });
+const apiErrorResponse = type({ message: 'string' });
 
 type Options = {
   repository: string;
@@ -121,7 +122,14 @@ export function createGithub({
       },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
-    if (!response.ok) throw new Error(`GitHub API ${method} ${path} failed (${response.status})`);
+    if (!response.ok) {
+      const error = apiErrorResponse(await response.json().catch(() => null));
+      const message = error instanceof type.errors ? '' : `: ${error.message}`;
+      const permissions = response.headers.get('x-accepted-github-permissions');
+      throw new Error(
+        `GitHub API ${method} ${path} failed (${response.status})${message}${permissions ? `; accepted permissions: ${permissions}` : ''}`,
+      );
+    }
     return response.status === 204 ? null : response.json();
   }
 
