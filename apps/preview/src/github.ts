@@ -3,7 +3,11 @@ import { type, type ArkErrors } from 'arktype';
 import type { GithubClient, Pull } from './types.ts';
 
 const marker = '<!-- veles-preview-controller -->';
-const installationResponse = type({ token: 'string', expires_at: 'string' });
+const installationResponse = type({
+  token: 'string',
+  expires_at: 'string',
+  'permissions?': { '[string]': 'string' },
+});
 const appResponse = type({ slug: 'string' });
 const pullResponse = type({
   number: 'number',
@@ -56,6 +60,7 @@ export function createGithub({
   let installationToken: string | undefined;
   let expiresAt = 0;
   let botLogin: string | undefined;
+  let grantedPermissions: Record<string, string> | undefined;
 
   function verify(rawBody: Uint8Array, signature: string | undefined): boolean {
     if (!(rawBody instanceof Uint8Array)) return false;
@@ -91,6 +96,7 @@ export function createGithub({
         throw new Error('GitHub installation token response is invalid');
       const fresh = result.token;
       installationToken = fresh;
+      grantedPermissions = result.permissions;
       expiresAt = Date.parse(result.expires_at);
       return fresh;
     })().finally(() => {
@@ -127,7 +133,7 @@ export function createGithub({
       const message = error instanceof type.errors ? '' : `: ${error.message}`;
       const permissions = response.headers.get('x-accepted-github-permissions');
       throw new Error(
-        `GitHub API ${method} ${path} failed (${response.status})${message}${permissions ? `; accepted permissions: ${permissions}` : ''}`,
+        `GitHub API ${method} ${path} failed (${response.status})${message}${permissions ? `; accepted permissions: ${permissions}` : ''}${response.status === 403 ? `; authenticated app: ${botLogin ?? appId}; installation: ${installationId}; token permissions: ${JSON.stringify(grantedPermissions ?? {})}` : ''}`,
       );
     }
     return response.status === 204 ? null : response.json();
