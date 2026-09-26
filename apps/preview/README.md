@@ -7,4 +7,6 @@
 - Hono serves `POST /webhook` (signed GitHub App pull-request events) and `GET /health`. Webhooks and a five-minute timer reconcile live GitHub PRs with fixed Dokploy slots.
 - SQLite at `PREVIEW_DB_PATH` (default `/data/preview.sqlite`) owns reservations; mount a persistent writable `/data` volume and run **one replica**. Dokploy builds PR branches; this app never runs database migrations or resets shared dev data.
 
+`PREVIEW_SLOTS` is an ordered array of `{ "composeId": "...", "url": "..." }` entries; slot numbers are derived from array position. `GITHUB_MAIN_BRANCH_NAME` supplies the idle branch for all slots. SQLite rejects reordering after a slot has been configured.
+
 For slot configuration, OAuth domains, takeover, and the live rollout checklist, see [PR previews](../../docs/2026-09-25-pr-previews.md).

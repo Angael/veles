@@ -2,7 +2,6 @@ export type Slot = {
   number: number;
   composeId: string;
   url: string;
-  idleBranch: string;
 };
 
 export type Pull = {

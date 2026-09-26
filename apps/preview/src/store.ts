@@ -21,9 +21,23 @@ export function createStore(path: string, slots: Slot[]): SlotStore {
       phase TEXT NOT NULL DEFAULT 'idle'
     );
     CREATE UNIQUE INDEX IF NOT EXISTS slots_unique_owner ON slots(owner) WHERE owner IS NOT NULL;
+    CREATE TABLE IF NOT EXISTS slot_bindings (
+      slot INTEGER PRIMARY KEY,
+      compose_id TEXT NOT NULL UNIQUE
+    );
   `);
+  const binding = db.prepare('SELECT compose_id FROM slot_bindings WHERE slot = ?');
+  const bind = db.prepare('INSERT INTO slot_bindings (slot, compose_id) VALUES (?, ?)');
+  for (const slot of slots) {
+    const existing = binding.get(slot.number);
+    if (existing && existing.compose_id !== slot.composeId)
+      throw new Error(`Slot ${slot.number} Compose changed; refusing to reassign its reservation`);
+  }
   const insert = db.prepare('INSERT OR IGNORE INTO slots (slot) VALUES (?)');
-  for (const slot of slots) insert.run(slot.number);
+  for (const slot of slots) {
+    if (!binding.get(slot.number)) bind.run(slot.number, slot.composeId);
+    insert.run(slot.number);
+  }
   const configured = new Set(slots.map((slot) => slot.number));
   const all = db.prepare('SELECT slot, owner, branch, phase FROM slots ORDER BY slot');
   const save = db.prepare('UPDATE slots SET owner = ?, branch = ?, phase = ? WHERE slot = ?');

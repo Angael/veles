@@ -2,6 +2,7 @@ import { type } from 'arktype';
 
 const configType = type({
   GITHUB_REPOSITORY: 'string >= 3',
+  GITHUB_MAIN_BRANCH_NAME: 'string >= 1',
   GITHUB_APP_ID: 'string.digits',
   GITHUB_INSTALLATION_ID: 'string.digits',
   GITHUB_APP_PRIVATE_KEY: 'string >= 1',
@@ -14,10 +15,9 @@ const configType = type({
   'PORT?': 'string.numeric.parse |> 1 <= number.integer <= 65535',
 });
 const slotType = type({
-  number: '1 <= number.integer <= 3',
+  '+': 'reject',
   composeId: 'string >= 1',
   url: 'string.url',
-  idleBranch: 'string >= 1',
 });
 const slotsType = slotType.array().atLeastLength(1).atMostLength(3);
 
@@ -31,21 +31,20 @@ export function loadConfig() {
   if (slots instanceof type.errors) throw new Error(`Invalid PREVIEW_SLOTS: ${slots.summary}`);
   const dokployUrl = new URL(raw.DOKPLOY_URL);
   if (dokployUrl.protocol !== 'https:') throw new Error('DOKPLOY_URL must use HTTPS');
-  const numbers = new Set<number>();
   const ids = new Set<string>();
   const urls = new Set<string>();
-  for (const slot of slots) {
+  for (const [index, slot] of slots.entries()) {
     const url = new URL(slot.url);
     if (url.protocol !== 'https:' || url.origin !== slot.url)
-      throw new Error(`Slot ${slot.number} needs an HTTPS origin`);
-    if (numbers.has(slot.number) || ids.has(slot.composeId) || urls.has(slot.url))
-      throw new Error('Duplicate preview slot number, Compose ID, or URL');
-    numbers.add(slot.number);
+      throw new Error(`Slot ${index + 1} needs an HTTPS origin`);
+    if (ids.has(slot.composeId) || urls.has(slot.url))
+      throw new Error('Duplicate preview Compose ID or URL');
     ids.add(slot.composeId);
     urls.add(slot.url);
   }
   return {
     repository: raw.GITHUB_REPOSITORY,
+    mainBranchName: raw.GITHUB_MAIN_BRANCH_NAME,
     appId: raw.GITHUB_APP_ID,
     installationId: raw.GITHUB_INSTALLATION_ID,
     privateKey: raw.GITHUB_APP_PRIVATE_KEY.replaceAll('\\n', '\n'),
@@ -53,7 +52,7 @@ export function loadConfig() {
     dokployUrl: dokployUrl.origin,
     dokployApiKey: raw.DOKPLOY_API_KEY,
     environmentId: raw.PREVIEW_ENVIRONMENT_ID,
-    slots: slots.toSorted((a, b) => a.number - b.number),
+    slots: slots.map((slot, index) => ({ ...slot, number: index + 1 })),
     dbPath: raw.PREVIEW_DB_PATH || '/data/preview.sqlite',
     port: raw.PORT || 3000,
   };
