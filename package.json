@@ -8,7 +8,7 @@
     "dev:worker": "pnpm --filter @veles/worker dev",
     "build": "pnpm --recursive build",
     "start": "pnpm --filter @veles/web start",
-    "test": "pnpm --recursive test && node --test scripts/preview/*.test.mjs",
+    "test": "pnpm --recursive test",
     "lint:css": "pnpm --filter @veles/web lint:css",
     "lint:css:fix": "pnpm --filter @veles/web lint:css:fix",
     "lint": "oxlint --config .oxlintrc.json .",

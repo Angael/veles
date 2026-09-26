@@ -139,6 +139,25 @@ importers:
         specifier: 7.0.2001
         version: 7.0.2001
 
+  apps/preview:
+    dependencies:
+      '@hono/node-server':
+        specifier: 2.1.1
+        version: 2.1.1(hono@4.13.9)
+      arktype:
+        specifier: 2.2.3
+        version: 2.2.3
+      hono:
+        specifier: 4.13.9
+        version: 4.13.9
+    devDependencies:
+      '@types/node':
+        specifier: 26.2.0
+        version: 26.2.0
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+
   apps/web:
     dependencies:
       '@aws-sdk/client-s3':
@@ -860,6 +879,12 @@ packages:
 
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
+
+  '@hono/node-server@2.1.1':
+    resolution: {integrity: sha512-ELuehkj5VCBdgEw9zs+ivkKwyzzUCSQuE96YmiPvn1ECBoZCczbFXJLeEGMTYjphP6gydh4pHMqEYPVMYUVgQg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      hono: ^4
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -2935,6 +2960,10 @@ packages:
   help-me@5.0.0:
     resolution: {integrity: sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg==}
 
+  hono@4.13.9:
+    resolution: {integrity: sha512-7dMkQmZoC4E6F7AtaQSPhlWAdnBti+j7rreMZl8QB4jFiEhP9TWbGWUMi8WYzBCgmgulxuvLQupKqo+Co6Omyg==}
+    engines: {node: '>=16.9.0'}
+
   hookable@6.1.1:
     resolution: {integrity: sha512-U9LYDy1CwhMCnprUfeAZWZGByVbhd54hwepegYTK7Pi5NvqEj63ifz5z+xukznehT7i6NIZRu89Ay1AZmRsLEQ==}
 
@@ -4846,6 +4875,10 @@ snapshots:
 
   '@floating-ui/utils@0.2.12': {}
 
+  '@hono/node-server@2.1.1(hono@4.13.9)':
+    dependencies:
+      hono: 4.13.9
+
   '@humanfs/core@0.19.2':
     dependencies:
       '@humanfs/types': 0.15.0
@@ -6588,6 +6621,8 @@ snapshots:
       hookified: 1.15.1
 
   help-me@5.0.0: {}
+
+  hono@4.13.9: {}
 
   hookable@6.1.1: {}
 
