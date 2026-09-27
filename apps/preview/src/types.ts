@@ -18,6 +18,7 @@ export type GithubClient = {
   verify(rawBody: Uint8Array, signature: string | undefined): boolean;
   pulls(): Promise<Pull[]>;
   comment(prNumber: number, text: string): Promise<void>;
+  syncPreviewLabel(prNumber: number, slot: number | null): Promise<void>;
 };
 
 export type DokployClient = {

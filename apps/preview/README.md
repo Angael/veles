@@ -10,4 +10,6 @@
 
 `PREVIEW_SLOTS` is an ordered array of `{ "composeId": "...", "url": "..." }` entries; slot numbers are derived from array position. Idle slots are stopped with auto-deploy disabled and keep their last branch until reassigned. SQLite rejects reordering after a slot has been configured.
 
+Reconciliation keeps exactly one `preview-n` label on each PR owning slot `n` and removes it when the reservation ends. Create the numbered labels in GitHub before enabling slots; the GitHub App needs **Issues: read/write** to update labels and its existing PR comment.
+
 For the rationale and safety boundaries behind fixed preview slots, see [PR preview architecture](../../docs/2026-09-25-pr-previews.md).

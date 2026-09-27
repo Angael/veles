@@ -47,6 +47,7 @@ export function createController({
     await dokploy.update(row.slot, { autoDeploy: false });
     await dokploy.stop(row.slot);
     await github.comment(owner, `Preview stopped; ${slot.url} is no longer assigned to this PR.`);
+    await github.syncPreviewLabel(owner, null);
     store.save(idle(row.slot));
     logger.info(`Released slot ${row.slot} from PR #${owner}`);
   }
@@ -69,6 +70,7 @@ export function createController({
     if (row.owner === null || row.branch === null) throw new Error('Cannot deploy an idle slot');
     const owner = row.owner;
     const slot = getSlot(row.slot);
+    await github.syncPreviewLabel(owner, row.slot);
     if (row.phase === 'assigned') {
       logger.info(`Configuring slot ${row.slot} for PR #${owner} (${row.branch})`);
       await dokploy.inspect(row.slot);
@@ -161,6 +163,7 @@ export function createController({
     for (const pr of candidates) {
       if (!owners.has(pr.number)) {
         try {
+          await github.syncPreviewLabel(pr.number, null);
           await github.comment(pr.number, 'Preview waiting for a free slot.');
         } catch (error) {
           logger.error(`Cannot comment on PR #${pr.number}:`, error);
