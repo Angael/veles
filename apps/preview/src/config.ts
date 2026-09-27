@@ -2,7 +2,6 @@ import { type } from 'arktype';
 
 const configType = type({
   GITHUB_REPOSITORY: 'string >= 3',
-  GITHUB_MAIN_BRANCH_NAME: 'string >= 1',
   GITHUB_APP_ID: 'string.digits',
   GITHUB_INSTALLATION_ID: 'string.digits',
   GITHUB_APP_PRIVATE_KEY: 'string >= 1',
@@ -44,7 +43,6 @@ export function loadConfig() {
   }
   return {
     repository: raw.GITHUB_REPOSITORY,
-    mainBranchName: raw.GITHUB_MAIN_BRANCH_NAME,
     appId: raw.GITHUB_APP_ID,
     installationId: raw.GITHUB_INSTALLATION_ID,
     privateKey: raw.GITHUB_APP_PRIVATE_KEY.replaceAll('\\n', '\n'),

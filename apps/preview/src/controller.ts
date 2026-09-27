@@ -13,14 +13,12 @@ const idle = (slot: number): SlotRecord => ({ slot, owner: null, branch: null, p
 export function createController({
   repository,
   slots,
-  mainBranchName,
   github,
   dokploy,
   store,
   logger = console,
 }: {
   repository: string;
-  mainBranchName: string;
   slots: Slot[];
   github: GithubClient;
   dokploy: DokployClient;
@@ -44,11 +42,10 @@ export function createController({
       store.save(row);
     }
     const compose = await dokploy.inspect(row.slot);
-    if (compose.branch !== row.branch && compose.branch !== mainBranchName)
+    if (compose.branch !== row.branch)
       throw new Error(`Slot ${row.slot} branch changed outside the controller`);
     await dokploy.update(row.slot, { autoDeploy: false });
     await dokploy.stop(row.slot);
-    await dokploy.update(row.slot, { branch: mainBranchName, autoDeploy: false });
     await github.comment(owner, `Preview stopped; ${slot.url} is no longer assigned to this PR.`);
     store.save(idle(row.slot));
     logger.info(`Released slot ${row.slot} from PR #${owner}`);
@@ -64,8 +61,6 @@ export function createController({
     logger.info(`Stopping idle slot ${slot.number}`);
     await dokploy.stop(slot.number);
     logger.info(`Stopped idle slot ${slot.number}`);
-    if (compose.branch !== mainBranchName)
-      await dokploy.update(slot.number, { branch: mainBranchName, autoDeploy: false });
     logger.info(`Prepared idle slot ${slot.number}`);
   }
 

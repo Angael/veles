@@ -8,6 +8,6 @@
 - SQLite at `PREVIEW_DB_PATH` (default `/data/preview.sqlite`) owns reservations; mount a persistent writable `/data` volume and run **one replica**. Dokploy builds PR branches; this app never runs database migrations or resets shared dev data.
 - Controller logs each reconciliation's eligible count and final slot owners/waiting PRs. Slot transition logs identify the Dokploy action underway; failures keep their reservation and are retried on the next run.
 
-`PREVIEW_SLOTS` is an ordered array of `{ "composeId": "...", "url": "..." }` entries; slot numbers are derived from array position. `GITHUB_MAIN_BRANCH_NAME` supplies the idle branch for all slots. SQLite rejects reordering after a slot has been configured.
+`PREVIEW_SLOTS` is an ordered array of `{ "composeId": "...", "url": "..." }` entries; slot numbers are derived from array position. Idle slots are stopped with auto-deploy disabled and keep their last branch until reassigned. SQLite rejects reordering after a slot has been configured.
 
 For slot configuration, OAuth domains, takeover, and the live rollout checklist, see [PR previews](../../docs/2026-09-25-pr-previews.md).
