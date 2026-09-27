@@ -1,4 +1,4 @@
-import { PlusIcon } from 'lucide-react';
+import { PlusIcon, Trash2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
@@ -7,13 +7,14 @@ import { NoteActions } from './NoteActions';
 import type { NoteListItem, NoteSummary } from './notes.api';
 import {
   useCreateListItemMutation,
+  useDeleteListItemMutation,
   useSetListItemCheckedMutation,
   useUpdateListItemMutation,
   useUpdateNoteMutation,
 } from './notes.query';
 import css from './TodosPage.module.css';
 
-export function ShoppingListCard({ note }: { note: NoteSummary }) {
+export function CheckedNoteCard({ note }: { note: NoteSummary }) {
   const [newItemId, setNewItemId] = useState<string | null>(null);
   const createItem = useCreateListItemMutation();
   const updateNote = useUpdateNoteMutation();
@@ -39,10 +40,10 @@ export function ShoppingListCard({ note }: { note: NoteSummary }) {
         </h2>
         <NoteActions note={note} />
       </div>
-      {note.items.length === 0 ? <p className={css.emptyList}>No products yet.</p> : null}
+      {note.items.length === 0 ? <p className={css.emptyList}>No items yet.</p> : null}
       <ul className={css.items}>
         {note.items.map((item) => (
-          <ShoppingListItem
+          <CheckedNoteItem
             autoFocus={note.isOwned && item.id === newItemId}
             isOwned={note.isOwned}
             item={item}
@@ -52,13 +53,13 @@ export function ShoppingListCard({ note }: { note: NoteSummary }) {
       </ul>
       {note.isOwned && (
         <Btn
-          aria-label='Add product'
+          aria-label='Add item'
           className={css.addItem}
           icon={<PlusIcon aria-hidden='true' />}
           loading={createItem.isPending}
           onClick={() => {
             createItem.mutate(
-              { name: 'New product', noteId: note.id },
+              { name: 'New item', noteId: note.id },
               { onSuccess: (created) => setNewItemId(created.id) },
             );
           }}
@@ -66,14 +67,14 @@ export function ShoppingListCard({ note }: { note: NoteSummary }) {
           type='button'
           variant='outlineMain'
         >
-          Add product
+          Add item
         </Btn>
       )}
     </Card>
   );
 }
 
-function ShoppingListItem({
+function CheckedNoteItem({
   autoFocus,
   isOwned,
   item,
@@ -85,13 +86,14 @@ function ShoppingListItem({
   const [checked, setChecked] = useState(item.checked);
   const setItemChecked = useSetListItemCheckedMutation();
   const updateItem = useUpdateListItemMutation();
+  const deleteItem = useDeleteListItemMutation();
 
   useEffect(() => setChecked(item.checked), [item.checked]);
 
   return (
     <li className={css.item}>
       <input
-        aria-label={`Mark ${item.name} as ${checked ? 'not bought' : 'bought'}`}
+        aria-label={`Mark ${item.name} as ${checked ? 'incomplete' : 'complete'}`}
         checked={checked}
         disabled={!isOwned || setItemChecked.isPending}
         onChange={(event) => {
@@ -106,12 +108,23 @@ function ShoppingListItem({
       />
       <SeamlessTextInput
         autoFocus={autoFocus}
-        aria-label='Product name'
+        aria-label='Checklist item'
         className={checked ? css.done : undefined}
         defaultValue={item.name}
         readOnly={!isOwned}
         maxLength={240}
         onFocus={autoFocus ? (event) => event.currentTarget.select() : undefined}
+        onKeyDown={(event) => {
+          if (
+            isOwned &&
+            !deleteItem.isPending &&
+            (event.key === 'Backspace' || event.key === 'Delete') &&
+            !event.currentTarget.value.trim()
+          ) {
+            event.preventDefault();
+            deleteItem.mutate({ id: item.id });
+          }
+        }}
         onBlur={(event) => {
           if (!isOwned) return;
           const name = event.currentTarget.value.trim();
@@ -120,6 +133,19 @@ function ShoppingListItem({
         }}
         required
       />
+      {checked && isOwned && (
+        <Btn
+          aria-label={`Delete ${item.name}`}
+          className={css.deleteItem}
+          icon={<Trash2Icon aria-hidden='true' />}
+          iconOnly
+          loading={deleteItem.isPending}
+          onClick={() => deleteItem.mutate({ id: item.id })}
+          size='sm'
+          type='button'
+          variant='ghostDanger'
+        />
+      )}
     </li>
   );
 }

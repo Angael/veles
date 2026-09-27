@@ -306,3 +306,23 @@ export const setListItemChecked = createServerFn({ method: 'POST' })
 
     await db.update(listItems).set({ checked: data.checked }).where(eq(listItems.id, item.id));
   });
+
+const deleteListItemInputType = type({ id: 'string.uuid' });
+
+export const deleteListItem = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('deleteListItem')])
+  .validator(arkTypeValidator(deleteListItemInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    const [item] = await db
+      .select({ id: listItems.id, noteId: listItems.noteId })
+      .from(listItems)
+      .innerJoin(notes, eq(notes.id, listItems.noteId))
+      .where(and(eq(listItems.id, data.id), eq(notes.ownerId, session.user.id)))
+      .limit(1);
+
+    if (!item) throw new ClientSafeError('Item not found.');
+
+    await db.delete(listItems).where(eq(listItems.id, item.id));
+    await db.update(notes).set({ updatedAt: new Date() }).where(eq(notes.id, item.noteId));
+  });

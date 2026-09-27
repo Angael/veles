@@ -3,6 +3,13 @@
   gap: var(--space-lg);
 }
 
+.controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(10rem, 13rem);
+  gap: var(--space-xs);
+  align-items: center;
+}
+
 .listCard h2,
 .noteCard h2,
 .emptyState h2 {
@@ -84,10 +91,10 @@
 
 .item {
   display: grid;
-  grid-template-columns: 1.25rem minmax(0, 1fr);
+  grid-template-columns: 1.25rem minmax(0, 1fr) 2.5rem;
   align-items: center;
   gap: var(--space-sm);
-  min-height: 2rem;
+  min-height: 2.5rem;
   padding: 0 var(--space-xs);
   border-radius: var(--radius-xs);
 }
@@ -102,6 +109,11 @@
 .item input[type='checkbox']:focus-visible {
   outline: 2px solid var(--c-primary-focus);
   outline-offset: 0.2rem;
+}
+
+.deleteItem {
+  --btn-height: 2.5rem;
+  grid-column: 3;
 }
 
 .done {
@@ -123,6 +135,10 @@
 }
 
 @media (--phone) {
+  .controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .listGrid {
     grid-template-columns: 1fr;
   }

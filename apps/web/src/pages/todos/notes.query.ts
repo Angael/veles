@@ -2,6 +2,7 @@ import { queryOptions, useMutation } from '@tanstack/react-query';
 import {
   createListItem,
   createNote,
+  deleteListItem,
   deleteNote,
   getNotes,
   setListItemChecked,
@@ -33,6 +34,13 @@ export function useCreateListItemMutation() {
     meta: { invalidateQueryKey: notesQueryKey },
     mutationFn: (variables: { name: string; noteId: string }) =>
       createListItem({ data: variables }),
+  });
+}
+
+export function useDeleteListItemMutation() {
+  return useMutation({
+    meta: { error: { title: 'Item could not be deleted' }, invalidateQueryKey: notesQueryKey },
+    mutationFn: (variables: { id: string }) => deleteListItem({ data: variables }),
   });
 }
 

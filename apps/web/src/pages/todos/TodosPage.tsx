@@ -1,26 +1,71 @@
+import { useThrottledValue } from '@tanstack/react-pacer';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card/Card';
+import { SelectInput } from '@/components/ui/select-input/SelectInput';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
 import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
+import { TextInput } from '@/components/ui/text-input/TextInput';
+import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
+import { CheckedNoteCard } from './CheckedNoteCard';
 import type { NoteSummary } from './notes.api';
 import { NoteActions } from './NoteActions';
 import { NoteComposer } from './NoteComposer';
 import { useUpdateNoteMutation } from './notes.query';
-import { ShoppingListCard } from './ShoppingListCard';
 import css from './TodosPage.module.css';
 
+const noteScopeItems = [
+  { label: 'All notes', value: 'all' },
+  { label: 'Your notes', value: 'owned' },
+] as const;
+
+const noteSearchFields = [
+  (note) => note.title,
+  (note) => note.content,
+  (note) => note.items.map((item) => item.name),
+] satisfies RankedSearchFields<NoteSummary>;
+
 export function TodosPage({ notes }: { notes: NoteSummary[] }) {
+  const [noteScope, setNoteScope] = useState<'all' | 'owned'>('all');
+  const [searchInputValue, setSearchInputValue] = useState('');
+  const [search] = useThrottledValue(searchInputValue, { wait: 200 });
+  const scopedNotes = noteScope === 'owned' ? notes.filter((note) => note.isOwned) : notes;
+  const visibleNotes = filterAndRankBySearch(scopedNotes, search, noteSearchFields);
+
   return (
     <main className={css.page}>
-      {notes.length === 0 ? (
+      <section aria-label='Filter notes' className={css.controls}>
+        <TextInput
+          aria-label='Search notes'
+          autoComplete='off'
+          name='search'
+          onValueChange={setSearchInputValue}
+          placeholder='Search notes'
+          type='search'
+          value={searchInputValue}
+        />
+        <SelectInput
+          aria-label='Note ownership'
+          items={noteScopeItems}
+          onValueChange={(value) => {
+            if (value) setNoteScope(value);
+          }}
+          value={noteScope}
+        />
+      </section>
+      {visibleNotes.length === 0 ? (
         <Card as='section' className={css.emptyState}>
-          <h2>No notes yet</h2>
-          <p>Add your first text note or checklist.</p>
+          <h2>{notes.length === 0 ? 'No notes yet' : 'No matching notes'}</h2>
+          <p>
+            {notes.length === 0
+              ? 'Add your first text note or checklist.'
+              : 'Try another search or ownership filter.'}
+          </p>
         </Card>
       ) : (
         <section aria-label='Your notes and shared notes' className={css.listGrid}>
-          {notes.map((note) =>
+          {visibleNotes.map((note) =>
             note.type === 'shopping_list' ? (
-              <ShoppingListCard key={note.id} note={note} />
+              <CheckedNoteCard key={note.id} note={note} />
             ) : (
               <TextNoteCard key={note.id} note={note} />
             ),
