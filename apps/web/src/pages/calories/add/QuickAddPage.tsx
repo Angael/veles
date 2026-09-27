@@ -10,7 +10,21 @@ import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import css from '../CalorieFlows.module.css';
 
-export function QuickAddPage({ date }: { date: string }) {
+type QuickAddDefaultValues = {
+  carbs?: number;
+  fat?: number;
+  kcal?: number;
+  name?: string;
+  protein?: number;
+};
+
+export function QuickAddPage({
+  date,
+  defaultValues,
+}: {
+  date: string;
+  defaultValues?: QuickAddDefaultValues;
+}) {
   const recordMutation = useRecordCustomCaloriesMutation();
   const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
 
@@ -40,10 +54,17 @@ export function QuickAddPage({ date }: { date: string }) {
       <section className={css.panel}>
         <TypedForm className={css.form} errorMsg={recordMutation.error?.message} onSubmit={submit}>
           <Label text='Label'>
-            <TextInput defaultValue='Quick add' name='name' required />
+            <TextInput defaultValue={defaultValues?.name ?? 'Quick add'} name='name' required />
           </Label>
 
-          <KcalMacrosForm />
+          <KcalMacrosForm
+            defaultValues={{
+              carbs: defaultValues?.carbs,
+              fat: defaultValues?.fat,
+              kcal: defaultValues?.kcal,
+              protein: defaultValues?.protein,
+            }}
+          />
           <PhotoPicker disabled={recordMutation.isPending} onChange={setPhoto} value={photo} />
 
           <Btn loading={recordMutation.isPending} type='submit'>
