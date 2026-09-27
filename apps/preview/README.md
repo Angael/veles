@@ -6,6 +6,7 @@
 - `pnpm --filter @veles/preview start` runs it with the controller variables in the root `.env.example` supplied by the shell/Dokploy. Never commit credentials.
 - Hono serves `POST /webhook` (signed GitHub App pull-request events) and `GET /health`. Webhooks and a five-minute timer reconcile live GitHub PRs with fixed Dokploy slots.
 - SQLite at `PREVIEW_DB_PATH` (default `/data/preview.sqlite`) owns reservations; mount a persistent writable `/data` volume and run **one replica**. Dokploy builds PR branches; this app never runs database migrations or resets shared dev data.
+- Controller logs each reconciliation's eligible count and final slot owners/waiting PRs. Slot transition logs identify the Dokploy action underway; failures keep their reservation and are retried on the next run.
 
 `PREVIEW_SLOTS` is an ordered array of `{ "composeId": "...", "url": "..." }` entries; slot numbers are derived from array position. `GITHUB_MAIN_BRANCH_NAME` supplies the idle branch for all slots. SQLite rejects reordering after a slot has been configured.
 
