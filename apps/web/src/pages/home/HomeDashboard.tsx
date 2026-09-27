@@ -3,7 +3,6 @@ import { differenceInCalendarDays, format, parseISO } from 'date-fns';
 import {
   BookOpenIcon,
   CheckIcon,
-  DumbbellIcon,
   FlameIcon,
   ScaleIcon,
   UsersRoundIcon,
@@ -17,12 +16,6 @@ import css from './HomeDashboard.module.css';
 type HomeDashboardProps = {
   data: HomeDashboardData;
 };
-
-const todoPreview = [
-  { done: true, label: 'Coffee beans' },
-  { done: false, label: 'Plan the week' },
-  { done: false, label: 'Pick up groceries' },
-] as const;
 
 export function HomeDashboard({ data }: HomeDashboardProps) {
   const latestWeight = data.weightEntries.at(-1);
@@ -102,47 +95,16 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
             </>
           ) : (
             <div className={css.emptyWeight}>
-              <strong>Ready when you are.</strong>
-              <p>Log your first weight to begin a trend built around you.</p>
+              <strong>No weight logged yet</strong>
+              <p>Log your first weight to see your trend.</p>
             </div>
           )}
           <Link aria-label='Open Weight' className={css.cardLink} to='/weight' />
         </Card>
 
-        <Card as='article' className={css.todosTile} data-appear='2' shadow={false}>
+        <Card as='section' className={css.recipeTile} data-appear='2' shadow={false}>
           <div className={css.tileHeading}>
-            <h2>Todos</h2>
-            <CheckIcon aria-hidden='true' />
-          </div>
-          <ul className={css.todoList}>
-            {todoPreview.map((todo) => (
-              <li key={todo.label} className={todo.done ? css.todoDone : undefined}>
-                <span aria-hidden='true'>{todo.done ? '✓' : ''}</span>
-                {todo.label}
-              </li>
-            ))}
-          </ul>
-          <p className={css.mobileTodoPrompt}>Open your todos</p>
-          <Link aria-label='Open Todos' className={css.cardLink} to='/todos' />
-        </Card>
-
-        <Card as='article' className={css.diaryTile} data-appear='3' shadow={false}>
-          <div className={css.tileHeading}>
-            <h2>Diary</h2>
-            <BookOpenIcon aria-hidden='true' />
-          </div>
-          <div className={css.diaryReadout}>{formatDiaryDistance(data.lastDiaryEntryDate)}</div>
-          <div className={css.diaryLines} aria-hidden='true'>
-            <i />
-            <i />
-            <i />
-          </div>
-          <Link aria-label='Open Diary' className={css.cardLink} to='/diary' />
-        </Card>
-
-        <Card as='section' className={css.recipeTile} data-appear='4' shadow={false}>
-          <div className={css.tileHeading}>
-            <h2>Recommended recipes for today</h2>
+            <h2>Recipes for today</h2>
             <UtensilsIcon aria-hidden='true' />
           </div>
           <div className={css.recipeStack}>
@@ -174,38 +136,35 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           <Link aria-label='Browse recipes' className={css.cardLink} to='/recipes' />
         </Card>
 
+        <Card as='article' className={css.todosTile} data-appear='3' shadow={false}>
+          <div className={css.tileHeading}>
+            <h2>Todos</h2>
+            <CheckIcon aria-hidden='true' />
+          </div>
+          <p>View your list</p>
+          <Link aria-label='Open Todos' className={css.cardLink} to='/todos' />
+        </Card>
+
+        <Card as='article' className={css.diaryTile} data-appear='4' shadow={false}>
+          <div className={css.tileHeading}>
+            <h2>Diary</h2>
+            <BookOpenIcon aria-hidden='true' />
+          </div>
+          <div className={css.diaryReadout}>{formatDiaryDistance(data.lastDiaryEntryDate)}</div>
+          <Link aria-label='Open Diary' className={css.cardLink} to='/diary' />
+        </Card>
+
         <Card as='article' className={css.familyTile} data-appear='5' shadow={false}>
           <div className={css.tileHeading}>
             <h2>Family and friends</h2>
             <UsersRoundIcon aria-hidden='true' />
           </div>
-          <p>A shared corner for the people you choose. Nothing leaves your orbit by default.</p>
-          <div className={css.orbitPeople} aria-hidden='true'>
-            <i />
-            <i />
-            <i />
-            <i />
-          </div>
+          <p>Manage your connections in Account</p>
           <Link
             aria-label='Open Family and friends in Account'
             className={css.cardLink}
             to='/account'
           />
-        </Card>
-
-        <Card as='article' className={css.workoutTile} data-appear='6' shadow={false}>
-          <div className={css.tileHeading}>
-            <h2>Workout log</h2>
-            <DumbbellIcon aria-hidden='true' />
-          </div>
-          <p>Last sessions and training notes will slot into this rhythm later.</p>
-          <div className={css.repRail} aria-hidden='true'>
-            <i />
-            <i />
-            <i />
-            <i />
-            <i />
-          </div>
         </Card>
       </div>
     </main>
@@ -225,30 +184,17 @@ function MacroProgress({
 }) {
   const maximum = goal ?? Math.max(total, 1);
 
-  const progress = (
-    <progress aria-label={`${label} progress`} max={maximum} value={Math.min(total, maximum)} />
-  );
-
   return (
     <div className={css.macroProgress}>
-      <div>
+      <div className={css.macroHeading}>
         <span>{label}</span>
         <strong>
           {Math.round(total)}
           {unit}
-          <small>{goal === null ? 'No goal' : ` / ${Math.round(goal)}${unit}`}</small>
+          <small>{goal === null ? ' · No goal' : ` / ${Math.round(goal)}${unit}`}</small>
         </strong>
       </div>
-      <div className={css.macroTrack}>
-        {progress}
-        <div className={css.macroTrackValues} aria-hidden='true'>
-          <span>
-            {Math.round(total)}
-            {unit}
-          </span>
-          <span>{goal === null ? 'No goal' : `${Math.round(goal)}${unit}`}</span>
-        </div>
-      </div>
+      <progress aria-label={`${label} progress`} max={maximum} value={Math.min(total, maximum)} />
     </div>
   );
 }
