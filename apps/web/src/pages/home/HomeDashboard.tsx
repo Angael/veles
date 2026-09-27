@@ -1,10 +1,8 @@
 import { Link } from '@tanstack/react-router';
 import { differenceInCalendarDays, format, parseISO } from 'date-fns';
 import {
-  ArrowRightIcon,
   BookOpenIcon,
   CheckIcon,
-  DumbbellIcon,
   FlameIcon,
   ScaleIcon,
   UsersRoundIcon,
@@ -19,12 +17,6 @@ type HomeDashboardProps = {
   data: HomeDashboardData;
 };
 
-const todoPreview = [
-  { done: true, label: 'Coffee beans' },
-  { done: false, label: 'Plan the week' },
-  { done: false, label: 'Pick up groceries' },
-] as const;
-
 export function HomeDashboard({ data }: HomeDashboardProps) {
   const latestWeight = data.weightEntries.at(-1);
   const previousWeight = data.weightEntries.at(-2);
@@ -32,11 +24,53 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
     latestWeight && previousWeight ? latestWeight.weightKg - previousWeight.weightKg : null;
   const chartPoints = getChartPoints(data.weightEntries);
   const recommendedRecipes = getDailyRecommendations(data.recipes, data.date);
+  const kcal = data.nutrition.totals.kcal;
 
   return (
     <main className={css.page}>
       <div className={css.grid}>
-        <Card as='article' className={css.weightTile} data-appear variant='primary'>
+        <Card as='article' className={css.foodTile} data-appear shadow={false}>
+          <div className={css.tileHeading}>
+            <h2>Today’s food</h2>
+            <FlameIcon aria-hidden='true' />
+          </div>
+          <div className={css.nutrition}>
+            <div className={css.kcal}>
+              <div className={css.kcalValue}>
+                <strong>{Math.round(kcal)}</strong>
+                <span>kcal</span>
+                <small>
+                  {data.nutrition.goal ? `of ${Math.round(data.nutrition.goal.kcal)}` : 'No goal'}
+                </small>
+              </div>
+              <NutritionProgress
+                goal={data.nutrition.goal?.kcal ?? null}
+                label='kcal'
+                total={kcal}
+              />
+            </div>
+            <div className={css.macros}>
+              <MacroProgress
+                label='protein'
+                total={data.nutrition.totals.protein}
+                goal={data.nutrition.goal?.protein ?? null}
+              />
+              <MacroProgress
+                label='fat'
+                total={data.nutrition.totals.fat}
+                goal={data.nutrition.goal?.fat ?? null}
+              />
+              <MacroProgress
+                label='carbs'
+                total={data.nutrition.totals.carbs}
+                goal={data.nutrition.goal?.carbs ?? null}
+              />
+            </div>
+          </div>
+          <Link aria-label='Open Today’s food' className={css.cardLink} to='/calories' />
+        </Card>
+
+        <Card as='article' className={css.weightTile} data-appear='1' shadow={false}>
           <div className={css.tileHeading}>
             <h2>Weight</h2>
             <ScaleIcon aria-hidden='true' />
@@ -70,55 +104,16 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
             </>
           ) : (
             <div className={css.emptyWeight}>
-              <strong>Ready when you are.</strong>
-              <p>Log your first weight to begin a trend built around you.</p>
+              <strong>No weight logged yet</strong>
+              <p>Log your first weight to see your trend.</p>
             </div>
           )}
-          <Btn className={css.tileAction} isLink render={<Link to='/weight' />} variant='text'>
-            {latestWeight ? 'Go to Weight' : 'Log first weight'}
-            <ArrowRightIcon aria-hidden='true' />
-          </Btn>
-        </Card>
-
-        <Card as='article' className={css.foodTile} data-appear='1' shadow={false}>
-          <div className={css.tileHeading}>
-            <h2>Today’s food</h2>
-            <FlameIcon aria-hidden='true' />
-          </div>
-          <div className={css.macroBars}>
-            <MacroProgress
-              label='kcal'
-              total={data.nutrition.totals.kcal}
-              goal={data.nutrition.goal?.kcal ?? null}
-            />
-            <MacroProgress
-              label='protein'
-              total={data.nutrition.totals.protein}
-              goal={data.nutrition.goal?.protein ?? null}
-              unit='g'
-            />
-            <MacroProgress
-              label='fat'
-              total={data.nutrition.totals.fat}
-              goal={data.nutrition.goal?.fat ?? null}
-              unit='g'
-            />
-            <MacroProgress
-              label='carbs'
-              total={data.nutrition.totals.carbs}
-              goal={data.nutrition.goal?.carbs ?? null}
-              unit='g'
-            />
-          </div>
-          <Btn className={css.tileAction} isLink render={<Link to='/calories' />} variant='text'>
-            Log food
-            <ArrowRightIcon aria-hidden='true' />
-          </Btn>
+          <Link aria-label='Open Weight' className={css.cardLink} to='/weight' />
         </Card>
 
         <Card as='section' className={css.recipeTile} data-appear='2' shadow={false}>
           <div className={css.tileHeading}>
-            <h2>Recommended recipes for today</h2>
+            <h2>Recipes for today</h2>
             <UtensilsIcon aria-hidden='true' />
           </div>
           <div className={css.recipeStack}>
@@ -147,10 +142,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
               </div>
             )}
           </div>
-          <Btn className={css.tileAction} isLink render={<Link to='/recipes' />} variant='text'>
-            Browse all recipes
-            <ArrowRightIcon aria-hidden='true' />
-          </Btn>
+          <Link aria-label='Browse recipes' className={css.cardLink} to='/recipes' />
         </Card>
 
         <Card as='article' className={css.todosTile} data-appear='3' shadow={false}>
@@ -158,18 +150,8 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
             <h2>Todos</h2>
             <CheckIcon aria-hidden='true' />
           </div>
-          <ul className={css.todoList}>
-            {todoPreview.map((todo) => (
-              <li key={todo.label} className={todo.done ? css.todoDone : undefined}>
-                <span aria-hidden='true'>{todo.done ? '✓' : ''}</span>
-                {todo.label}
-              </li>
-            ))}
-          </ul>
-          <Btn className={css.tileAction} isLink render={<Link to='/todos' />} variant='text'>
-            Go to Todos
-            <ArrowRightIcon aria-hidden='true' />
-          </Btn>
+          <p>View your list</p>
+          <Link aria-label='Open Todos' className={css.cardLink} to='/todos' />
         </Card>
 
         <Card as='article' className={css.diaryTile} data-appear='4' shadow={false}>
@@ -178,15 +160,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
             <BookOpenIcon aria-hidden='true' />
           </div>
           <div className={css.diaryReadout}>{formatDiaryDistance(data.lastDiaryEntryDate)}</div>
-          <div className={css.diaryLines} aria-hidden='true'>
-            <i />
-            <i />
-            <i />
-          </div>
-          <Btn className={css.tileAction} isLink render={<Link to='/diary' />} variant='text'>
-            Go to Diary
-            <ArrowRightIcon aria-hidden='true' />
-          </Btn>
+          <Link aria-label='Open Diary' className={css.cardLink} to='/diary' />
         </Card>
 
         <Card as='article' className={css.familyTile} data-appear='5' shadow={false}>
@@ -194,28 +168,12 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
             <h2>Family and friends</h2>
             <UsersRoundIcon aria-hidden='true' />
           </div>
-          <p>A shared corner for the people you choose. Nothing leaves your orbit by default.</p>
-          <div className={css.orbitPeople} aria-hidden='true'>
-            <i />
-            <i />
-            <i />
-            <i />
-          </div>
-        </Card>
-
-        <Card as='article' className={css.workoutTile} data-appear='6' shadow={false}>
-          <div className={css.tileHeading}>
-            <h2>Workout log</h2>
-            <DumbbellIcon aria-hidden='true' />
-          </div>
-          <p>Last sessions and training notes will slot into this rhythm later.</p>
-          <div className={css.repRail} aria-hidden='true'>
-            <i />
-            <i />
-            <i />
-            <i />
-            <i />
-          </div>
+          <p>Manage your connections in Account</p>
+          <Link
+            aria-label='Open Family and friends in Account'
+            className={css.cardLink}
+            to='/account'
+          />
         </Card>
       </div>
     </main>
@@ -226,26 +184,55 @@ function MacroProgress({
   label,
   total,
   goal,
-  unit = '',
+}: {
+  label: 'protein' | 'fat' | 'carbs';
+  total: number;
+  goal: number | null;
+}) {
+  return (
+    <div className={css.macroProgress}>
+      <div className={css.macroHeading}>
+        <span>{label}</span>
+        <strong>{Math.round(total)}g</strong>
+        <small>{goal === null ? 'No goal' : `of ${Math.round(goal)}g`}</small>
+      </div>
+      <NutritionProgress goal={goal} label={label} total={total} />
+    </div>
+  );
+}
+
+/** Overlays excess from the start of the filled track, as on the calories page. */
+function NutritionProgress({
+  label,
+  total,
+  goal,
 }: {
   label: 'kcal' | 'protein' | 'fat' | 'carbs';
   total: number;
   goal: number | null;
-  unit?: string;
 }) {
-  const maximum = goal ?? Math.max(total, 1);
+  const maximum = goal === null ? Math.max(total, 1) : Math.max(goal, 1);
 
   return (
-    <div className={css.macroProgress}>
-      <div>
-        <span>{label}</span>
-        <strong>
-          {Math.round(total)}
-          {unit}
-          <small>{goal === null ? 'No goal' : ` / ${Math.round(goal)}${unit}`}</small>
-        </strong>
-      </div>
-      <progress aria-label={`${label} progress`} max={maximum} value={Math.min(total, maximum)} />
+    <div className={css.progressTrack}>
+      <progress
+        aria-label={`${label} progress`}
+        aria-valuetext={
+          goal !== null && total > goal
+            ? `${Math.round(total)} of ${Math.round(goal)}${label === 'kcal' ? ' kcal' : 'g'}`
+            : undefined
+        }
+        max={maximum}
+        value={Math.min(total, maximum)}
+      />
+      {goal !== null && total > goal && (
+        <progress
+          aria-hidden='true'
+          className={css.overfill}
+          max={maximum}
+          value={Math.min(total - goal, maximum)}
+        />
+      )}
     </div>
   );
 }

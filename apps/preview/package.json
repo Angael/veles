@@ -1,0 +1,21 @@
+{
+  "name": "@veles/preview",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.1.1",
+    "arktype": "2.2.3",
+    "hono": "4.13.9"
+  },
+  "devDependencies": {
+    "@types/node": "26.2.0",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=26.2.0"
+  }
+}
