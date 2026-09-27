@@ -10,7 +10,7 @@ export const notes = pgTable(
       .default(sql`uuidv7()`),
     type: text('type').notNull(),
     title: text('title').notNull(),
-    content: text('content'),
+    content: text('content').notNull().default(''),
     ownerId: text('owner_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),

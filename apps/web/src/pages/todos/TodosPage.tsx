@@ -54,10 +54,10 @@ function TextNoteCard({ note }: { note: NoteSummary }) {
       <SeamlessTextarea
         aria-label='Note content'
         className={css.contentInput}
-        defaultValue={note.content ?? ''}
+        defaultValue={note.content}
         maxLength={16000}
         onBlur={(event) => {
-          if (event.currentTarget.value !== (note.content ?? '')) {
+          if (event.currentTarget.value !== note.content) {
             updateNote.mutate({ id: note.id, content: event.currentTarget.value });
           }
         }}

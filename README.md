@@ -43,6 +43,8 @@ pnpm db:migrate:prod
 
 The Notes page stores private text notes and checklists. Titles, note bodies, and checklist item names are edited in place and saved when the field loses focus; checklist items can also be checked off. Items are plain text, without quantity or unit fields. Sharing is not available.
 
+If an existing development database contains shopping lists with `NULL` content, backfill them with `UPDATE note SET content = '' WHERE content IS NULL;` before running `pnpm db:push`; a column default does not fill existing rows.
+
 Before deploying the notes schema, generate and review its migration with `pnpm db:generate -- --name=add-notes-shopping-lists`, then apply the migration before merging into `main`.
 
 ### Compose
