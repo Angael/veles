@@ -633,24 +633,24 @@
 
   .macroProgress:first-child .macroTrack progress {
     height: 2.5rem;
-    border: var(--border-width) solid var(--c-primary-border-soft);
+    border: var(--border-width) solid var(--c-border);
     border-radius: 0.625rem;
-    background: var(--c-primary-surface);
+    background: var(--c-surface-input);
   }
 
   .macroProgress:first-child progress::-webkit-progress-bar {
     border-radius: 0.625rem;
-    background: var(--c-primary-surface);
+    background: var(--c-surface-input);
   }
 
   .macroProgress:first-child progress::-webkit-progress-value {
     border-radius: 0.625rem;
-    background: color-mix(in srgb, var(--c-accent) 38%, var(--c-surface-solid));
+    background: color-mix(in srgb, currentColor 38%, var(--c-surface-solid));
   }
 
   .macroProgress:first-child progress::-moz-progress-bar {
     border-radius: 0.625rem;
-    background: color-mix(in srgb, var(--c-accent) 38%, var(--c-surface-solid));
+    background: color-mix(in srgb, currentColor 38%, var(--c-surface-solid));
   }
 
   .macroProgress > div:first-child {
