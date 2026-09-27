@@ -239,20 +239,16 @@ function MacroProgress({
           <small>{goal === null ? 'No goal' : ` / ${Math.round(goal)}${unit}`}</small>
         </strong>
       </div>
-      {label === 'kcal' ? (
-        progress
-      ) : (
-        <div className={css.macroTrack}>
-          {progress}
-          <div className={css.macroTrackValues} aria-hidden='true'>
-            <span>
-              {Math.round(total)}
-              {unit}
-            </span>
-            <span>{goal === null ? 'No goal' : `${Math.round(goal)}${unit}`}</span>
-          </div>
+      <div className={css.macroTrack}>
+        {progress}
+        <div className={css.macroTrackValues} aria-hidden='true'>
+          <span>
+            {Math.round(total)}
+            {unit}
+          </span>
+          <span>{goal === null ? 'No goal' : `${Math.round(goal)}${unit}`}</span>
         </div>
-      )}
+      </div>
     </div>
   );
 }

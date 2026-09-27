@@ -621,14 +621,36 @@
     gap: var(--space-sm);
   }
 
+  .macroProgress {
+    gap: 0.25rem;
+  }
+
   .macroProgress:first-child {
     grid-column: 1 / -1;
     padding-bottom: var(--space-sm);
     border-bottom: var(--border-width) solid var(--c-border);
   }
 
-  .macroProgress:first-child strong {
-    font-size: var(--text-lg);
+  .macroProgress:first-child .macroTrack progress {
+    height: 2.5rem;
+    border: var(--border-width) solid var(--c-primary-border-soft);
+    border-radius: 0.625rem;
+    background: var(--c-primary-surface);
+  }
+
+  .macroProgress:first-child progress::-webkit-progress-bar {
+    border-radius: 0.625rem;
+    background: var(--c-primary-surface);
+  }
+
+  .macroProgress:first-child progress::-webkit-progress-value {
+    border-radius: 0.625rem;
+    background: color-mix(in srgb, var(--c-accent) 38%, var(--c-surface-solid));
+  }
+
+  .macroProgress:first-child progress::-moz-progress-bar {
+    border-radius: 0.625rem;
+    background: color-mix(in srgb, var(--c-accent) 38%, var(--c-surface-solid));
   }
 
   .macroProgress > div:first-child {
@@ -636,15 +658,15 @@
     gap: 0 var(--space-xs);
   }
 
-  .macroProgress:not(:first-child) > div:first-child strong {
+  .macroProgress > div:first-child strong {
     display: none;
   }
 
-  .macroProgress:not(:first-child) .macroTrack {
+  .macroTrack {
     position: relative;
   }
 
-  .macroProgress:not(:first-child) .macroTrack progress {
+  .macroTrack progress {
     display: block;
     height: 2rem;
     appearance: none;
@@ -652,7 +674,7 @@
     background: var(--c-surface-input);
   }
 
-  .macroProgress:not(:first-child) progress::-webkit-progress-bar {
+  .macroProgress progress::-webkit-progress-bar {
     border-radius: 0.5rem;
   }
 
@@ -690,6 +712,14 @@
   .macroTrackValues span:last-child {
     color: var(--c-muted);
     font-weight: var(--font-weight-regular);
+  }
+
+  .macroProgress:first-child .macroTrackValues span:first-child {
+    font-size: var(--text-lg);
+  }
+
+  .macroProgress:first-child .macroTrackValues span:last-child {
+    font-size: var(--text-sm);
   }
 
   .weightTile {
