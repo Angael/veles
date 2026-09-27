@@ -133,7 +133,7 @@ function CheckedNoteItem({
         }}
         required
       />
-      {checked && isOwned && (
+      {isOwned && (
         <Btn
           aria-label={`Delete ${item.name}`}
           className={css.deleteItem}
