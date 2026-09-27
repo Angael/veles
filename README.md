@@ -41,7 +41,7 @@ pnpm db:migrate:prod
 
 ### Notes
 
-The Notes page stores private text notes and checklists. Titles, note bodies, and checklist item names are edited in place and saved when the field loses focus; checklist items can also be checked off. Items are plain text, without quantity or unit fields. Sharing is not available.
+The Notes page stores private text notes and checklists in creation order. Titles, note bodies, and checklist item names are edited in place and saved when the field loses focus. The icon beside each title converts between a text note and a checklist: each nonempty line becomes an unchecked item, and checklist items become plain text lines without their checked state. The plus button adds an editable checklist item. Items are plain text, without quantity or unit fields. Sharing is not available.
 
 If an existing development database contains shopping lists with `NULL` content, backfill them with `UPDATE note SET content = '' WHERE content IS NULL;` before running `pnpm db:push`; a column default does not fill existing rows.
 

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
-import { TypedForm } from '@/components/ui/typed-form/TypedForm';
+import { NoteTypeButton } from './NoteTypeButton';
 import type { NoteListItem, NoteSummary } from './notes.api';
 import {
   useCreateListItemMutation,
@@ -14,66 +14,56 @@ import {
 import css from './TodosPage.module.css';
 
 export function ShoppingListCard({ note }: { note: NoteSummary }) {
-  const [formKey, setFormKey] = useState(0);
+  const [newItemId, setNewItemId] = useState<string | null>(null);
   const createItem = useCreateListItemMutation();
   const updateNote = useUpdateNoteMutation();
 
   return (
     <Card as='article' className={css.listCard}>
-      <h2>
-        <SeamlessTextInput
-          aria-label='Checklist title'
-          className={css.titleInput}
-          defaultValue={note.title}
-          maxLength={160}
-          onBlur={(event) => {
-            const title = event.currentTarget.value.trim();
-            if (!title) event.currentTarget.value = note.title;
-            else if (title !== note.title) updateNote.mutate({ id: note.id, title });
-          }}
-          required
-        />
-      </h2>
+      <div className={css.cardHeader}>
+        <h2>
+          <SeamlessTextInput
+            aria-label='Checklist title'
+            className={css.titleInput}
+            defaultValue={note.title}
+            maxLength={160}
+            onBlur={(event) => {
+              const title = event.currentTarget.value.trim();
+              if (!title) event.currentTarget.value = note.title;
+              else if (title !== note.title) updateNote.mutate({ id: note.id, title });
+            }}
+            required
+          />
+        </h2>
+        <NoteTypeButton note={note} />
+      </div>
       {note.items.length === 0 ? <p className={css.emptyList}>No products yet.</p> : null}
       <ul className={css.items}>
         {note.items.map((item) => (
-          <ShoppingListItem item={item} key={item.id} />
+          <ShoppingListItem autoFocus={item.id === newItemId} item={item} key={item.id} />
         ))}
       </ul>
-      <TypedForm
-        key={formKey}
-        aria-label={`Add a product to ${note.title}`}
-        className={css.productForm}
-        onSubmit={async (data) => {
-          await createItem.mutateAsync({
-            name: data.string('name'),
-            noteId: note.id,
-          });
-          setFormKey((key) => key + 1);
+      <Btn
+        aria-label='Add product'
+        className={css.addItem}
+        icon={<PlusIcon aria-hidden='true' />}
+        iconOnly
+        loading={createItem.isPending}
+        onClick={() => {
+          createItem.mutate(
+            { name: 'New product', noteId: note.id },
+            { onSuccess: (created) => setNewItemId(created.id) },
+          );
         }}
-      >
-        <SeamlessTextInput
-          aria-label='Product'
-          maxLength={240}
-          name='name'
-          placeholder='New product'
-          required
-        />
-        <Btn
-          aria-label='Add product'
-          icon={<PlusIcon aria-hidden='true' />}
-          iconOnly
-          loading={createItem.isPending}
-          size='sm'
-          type='submit'
-          variant='outlineMain'
-        />
-      </TypedForm>
+        size='sm'
+        type='button'
+        variant='outlineMain'
+      />
     </Card>
   );
 }
 
-function ShoppingListItem({ item }: { item: NoteListItem }) {
+function ShoppingListItem({ autoFocus, item }: { autoFocus: boolean; item: NoteListItem }) {
   const [checked, setChecked] = useState(item.checked);
   const setItemChecked = useSetListItemCheckedMutation();
   const updateItem = useUpdateListItemMutation();
@@ -97,10 +87,12 @@ function ShoppingListItem({ item }: { item: NoteListItem }) {
         type='checkbox'
       />
       <SeamlessTextInput
+        autoFocus={autoFocus}
         aria-label='Product name'
         className={checked ? css.done : undefined}
         defaultValue={item.name}
         maxLength={240}
+        onFocus={autoFocus ? (event) => event.currentTarget.select() : undefined}
         onBlur={(event) => {
           const name = event.currentTarget.value.trim();
           if (!name) event.currentTarget.value = item.name;

@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { and, asc, desc, eq, inArray } from 'drizzle-orm';
+import { and, asc, eq, inArray } from 'drizzle-orm';
 import { listItems, notes } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { invariant } from '@/lib/invariant';
@@ -36,7 +36,7 @@ export const getNotes = createServerFn({ method: 'GET' })
       })
       .from(notes)
       .where(eq(notes.ownerId, session.user.id))
-      .orderBy(desc(notes.updatedAt));
+      .orderBy(asc(notes.createdAt), asc(notes.id));
     const shoppingListIds = ownedNotes
       .filter((note) => note.type === 'shopping_list')
       .map((note) => note.id);
@@ -110,6 +110,54 @@ export const updateNote = createServerFn({ method: 'POST' })
       .returning({ id: notes.id });
 
     if (!updated) throw new ClientSafeError('Note not found.');
+  });
+
+const toggleNoteTypeInputType = type({ id: 'string.uuid' });
+
+/** Converts the stored lines atomically so a note never exposes mixed formats. */
+export const toggleNoteType = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('toggleNoteType')])
+  .validator(arkTypeValidator(toggleNoteTypeInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    await db.transaction(async (tx) => {
+      const [note] = await tx
+        .select({ content: notes.content, type: notes.type })
+        .from(notes)
+        .where(and(eq(notes.id, data.id), eq(notes.ownerId, session.user.id)))
+        .for('update');
+
+      if (!note) throw new ClientSafeError('Note not found.');
+
+      if (note.type === 'shopping_list') {
+        const items = await tx
+          .select({ name: listItems.name })
+          .from(listItems)
+          .where(eq(listItems.noteId, data.id))
+          .orderBy(asc(listItems.createdAt), asc(listItems.id));
+        await tx
+          .update(notes)
+          .set({
+            content: items.map((item) => item.name).join('\n'),
+            type: 'note',
+            updatedAt: new Date(),
+          })
+          .where(eq(notes.id, data.id));
+        await tx.delete(listItems).where(eq(listItems.noteId, data.id));
+      } else if (note.type === 'note') {
+        const names = note.content
+          .split('\n')
+          .map((line) => line.trim())
+          .filter(Boolean);
+        await tx
+          .update(notes)
+          .set({ content: '', type: 'shopping_list', updatedAt: new Date() })
+          .where(eq(notes.id, data.id));
+        if (names.length) {
+          await tx.insert(listItems).values(names.map((name) => ({ name, noteId: data.id })));
+        }
+      }
+    });
   });
 
 const createListItemInputType = type({

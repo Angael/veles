@@ -3,6 +3,7 @@ import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessT
 import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import type { NoteSummary } from './notes.api';
 import { NoteComposer } from './NoteComposer';
+import { NoteTypeButton } from './NoteTypeButton';
 import { useUpdateNoteMutation } from './notes.query';
 import { ShoppingListCard } from './ShoppingListCard';
 import css from './TodosPage.module.css';
@@ -37,20 +38,23 @@ function TextNoteCard({ note }: { note: NoteSummary }) {
 
   return (
     <Card as='article' className={css.noteCard}>
-      <h2>
-        <SeamlessTextInput
-          aria-label='Note title'
-          className={css.titleInput}
-          defaultValue={note.title}
-          maxLength={160}
-          onBlur={(event) => {
-            const title = event.currentTarget.value.trim();
-            if (!title) event.currentTarget.value = note.title;
-            else if (title !== note.title) updateNote.mutate({ id: note.id, title });
-          }}
-          required
-        />
-      </h2>
+      <div className={css.cardHeader}>
+        <h2>
+          <SeamlessTextInput
+            aria-label='Note title'
+            className={css.titleInput}
+            defaultValue={note.title}
+            maxLength={160}
+            onBlur={(event) => {
+              const title = event.currentTarget.value.trim();
+              if (!title) event.currentTarget.value = note.title;
+              else if (title !== note.title) updateNote.mutate({ id: note.id, title });
+            }}
+            required
+          />
+        </h2>
+        <NoteTypeButton note={note} />
+      </div>
       <SeamlessTextarea
         aria-label='Note content'
         className={css.contentInput}

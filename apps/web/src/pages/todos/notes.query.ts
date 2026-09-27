@@ -5,6 +5,7 @@ import {
   getNotes,
   setListItemChecked,
   updateListItem,
+  toggleNoteType,
   updateNote,
 } from './notes.api';
 
@@ -38,6 +39,13 @@ export function useSetListItemCheckedMutation() {
     meta: { invalidateQueryKey: notesQueryKey },
     mutationFn: (variables: { checked: boolean; id: string }) =>
       setListItemChecked({ data: variables }),
+  });
+}
+
+export function useToggleNoteTypeMutation() {
+  return useMutation({
+    meta: { invalidateQueryKey: notesQueryKey },
+    mutationFn: (variables: { id: string }) => toggleNoteType({ data: variables }),
   });
 }
 

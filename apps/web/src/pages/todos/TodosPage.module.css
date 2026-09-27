@@ -57,6 +57,17 @@
   gap: var(--space-md);
 }
 
+.cardHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cardHeader h2 {
+  min-width: 0;
+}
+
 .items {
   display: grid;
   gap: var(--space-xs);
@@ -97,15 +108,8 @@
   color: var(--c-muted-strong);
 }
 
-.productForm {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--space-sm);
-  align-items: center;
-  padding: var(--space-sm);
-  border: var(--border-width) solid var(--c-border);
-  border-radius: var(--radius-xs);
-  background: var(--c-surface-inset);
+.addItem {
+  justify-self: start;
 }
 
 .emptyState {
