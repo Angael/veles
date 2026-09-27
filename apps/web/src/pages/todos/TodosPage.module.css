@@ -68,9 +68,20 @@
   min-width: 0;
 }
 
+.noteActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.sharedBy {
+  color: var(--c-muted-strong);
+  font-size: var(--text-sm);
+}
+
 .items {
   display: grid;
-  gap: var(--space-xs);
+  gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -81,7 +92,7 @@
   grid-template-columns: 1.25rem minmax(0, 1fr);
   align-items: center;
   gap: var(--space-sm);
-  min-height: var(--button-min-height);
+  min-height: 2rem;
   padding: 0 var(--space-xs);
   border-radius: var(--radius-xs);
 }

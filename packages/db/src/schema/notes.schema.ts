@@ -11,6 +11,7 @@ export const notes = pgTable(
     type: text('type').notNull(),
     title: text('title').notNull(),
     content: text('content').notNull().default(''),
+    shared: boolean('shared').notNull().default(false),
     ownerId: text('owner_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),

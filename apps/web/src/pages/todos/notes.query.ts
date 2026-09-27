@@ -2,8 +2,10 @@ import { queryOptions, useMutation } from '@tanstack/react-query';
 import {
   createListItem,
   createNote,
+  deleteNote,
   getNotes,
   setListItemChecked,
+  setNoteShared,
   updateListItem,
   toggleNoteType,
   updateNote,
@@ -46,6 +48,20 @@ export function useToggleNoteTypeMutation() {
   return useMutation({
     meta: { invalidateQueryKey: notesQueryKey },
     mutationFn: (variables: { id: string }) => toggleNoteType({ data: variables }),
+  });
+}
+
+export function useDeleteNoteMutation() {
+  return useMutation({
+    meta: { invalidateQueryKey: notesQueryKey },
+    mutationFn: (variables: { id: string }) => deleteNote({ data: variables }),
+  });
+}
+
+export function useSetNoteSharedMutation() {
+  return useMutation({
+    meta: { invalidateQueryKey: notesQueryKey },
+    mutationFn: (variables: { id: string; shared: boolean }) => setNoteShared({ data: variables }),
   });
 }
 

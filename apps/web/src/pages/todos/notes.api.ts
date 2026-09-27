@@ -1,8 +1,8 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { and, asc, eq, inArray } from 'drizzle-orm';
-import { listItems, notes } from '@veles/db/schema';
+import { and, asc, eq, inArray, or } from 'drizzle-orm';
+import { listItems, notes, userConnections, users } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { invariant } from '@/lib/invariant';
 import { db } from '@/server/db.server';
@@ -18,6 +18,9 @@ export type NoteListItem = {
 export type NoteSummary = {
   content: string;
   id: string;
+  isOwned: boolean;
+  ownerName: string;
+  shared: boolean;
   items: NoteListItem[];
   title: string;
   type: 'note' | 'shopping_list';
@@ -31,11 +34,38 @@ export const getNotes = createServerFn({ method: 'GET' })
       .select({
         content: notes.content,
         id: notes.id,
+        ownerId: notes.ownerId,
+        ownerName: users.name,
+        shared: notes.shared,
         title: notes.title,
         type: notes.type,
       })
       .from(notes)
-      .where(eq(notes.ownerId, session.user.id))
+      .innerJoin(users, eq(notes.ownerId, users.id))
+      .where(
+        or(
+          eq(notes.ownerId, session.user.id),
+          and(
+            eq(notes.shared, true),
+            or(
+              inArray(
+                notes.ownerId,
+                db
+                  .select({ id: userConnections.userHighId })
+                  .from(userConnections)
+                  .where(eq(userConnections.userLowId, session.user.id)),
+              ),
+              inArray(
+                notes.ownerId,
+                db
+                  .select({ id: userConnections.userLowId })
+                  .from(userConnections)
+                  .where(eq(userConnections.userHighId, session.user.id)),
+              ),
+            ),
+          ),
+        ),
+      )
       .orderBy(asc(notes.createdAt), asc(notes.id));
     const shoppingListIds = ownedNotes
       .filter((note) => note.type === 'shopping_list')
@@ -59,9 +89,14 @@ export const getNotes = createServerFn({ method: 'GET' })
 
       return [
         {
-          ...note,
-          type: note.type,
+          content: note.content,
+          id: note.id,
+          isOwned: note.ownerId === session.user.id,
           items: items.filter((item) => item.noteId === note.id),
+          ownerName: note.ownerName,
+          shared: note.shared,
+          title: note.title,
+          type: note.type,
         },
       ];
     });
@@ -106,6 +141,37 @@ export const updateNote = createServerFn({ method: 'POST' })
     const [updated] = await db
       .update(notes)
       .set({ title: data.title, content: data.content, updatedAt: new Date() })
+      .where(and(eq(notes.id, data.id), eq(notes.ownerId, session.user.id)))
+      .returning({ id: notes.id });
+
+    if (!updated) throw new ClientSafeError('Note not found.');
+  });
+
+const deleteNoteInputType = type({ id: 'string.uuid' });
+
+export const deleteNote = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('deleteNote')])
+  .validator(arkTypeValidator(deleteNoteInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    const [deleted] = await db
+      .delete(notes)
+      .where(and(eq(notes.id, data.id), eq(notes.ownerId, session.user.id)))
+      .returning({ id: notes.id });
+
+    if (!deleted) throw new ClientSafeError('Note not found.');
+  });
+
+const setNoteSharedInputType = type({ id: 'string.uuid', shared: 'boolean' });
+
+export const setNoteShared = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('setNoteShared')])
+  .validator(arkTypeValidator(setNoteSharedInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    const [updated] = await db
+      .update(notes)
+      .set({ shared: data.shared, updatedAt: new Date() })
       .where(and(eq(notes.id, data.id), eq(notes.ownerId, session.user.id)))
       .returning({ id: notes.id });
 
