@@ -16,7 +16,7 @@ export type NoteListItem = {
 };
 
 export type NoteSummary = {
-  content: string;
+  content: string | null;
   id: string;
   items: NoteListItem[];
   title: string;
