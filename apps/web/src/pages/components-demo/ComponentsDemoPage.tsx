@@ -76,9 +76,11 @@ const BTN_VARIANTS = [
   { label: 'Danger', value: 'danger' },
   { label: 'Outline main', value: 'outlineMain' },
   { label: 'Outline danger', value: 'outlineDanger' },
+  { label: 'Outline success', value: 'outlineSuccess' },
   { label: 'White', value: 'white' },
   { label: 'Ghost', value: 'ghost' },
   { label: 'Ghost danger', value: 'ghostDanger' },
+  { label: 'Ghost success', value: 'ghostSuccess' },
   { label: 'Text', value: 'text' },
 ] satisfies DemoProp<BtnVariant>[];
 

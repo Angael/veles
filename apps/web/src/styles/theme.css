@@ -103,6 +103,10 @@
   --c-danger-surface: rgba(127, 29, 29, 0.35);
   --c-danger-border: rgba(248, 113, 113, 0.35);
 
+  --c-success-text: #bbf7d0;
+  --c-success-surface: rgba(22, 101, 52, 0.28);
+  --c-success-border: rgba(74, 222, 128, 0.45);
+
   --gradient-page:
     radial-gradient(circle at top, rgba(96, 165, 250, 0.18), transparent 28%),
     linear-gradient(180deg, #060816 0%, #0f172a 48%, #111827 100%);

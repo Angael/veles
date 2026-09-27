@@ -1,5 +1,6 @@
-import { Share2Icon, Trash2Icon } from 'lucide-react';
+import { LockIcon, Share2Icon, Trash2Icon, UsersIcon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
+import { MenuBtn, MenuBtnItem, MenuBtnPopup, MenuBtnRoot } from '@/components/ui/menu-btn/MenuBtn';
 import type { NoteSummary } from './notes.api';
 import { useDeleteNoteMutation, useSetNoteSharedMutation } from './notes.query';
 import { NoteTypeButton } from './NoteTypeButton';
@@ -14,17 +15,40 @@ export function NoteActions({ note }: { note: NoteSummary }) {
   return (
     <div className={css.noteActions}>
       <NoteTypeButton note={note} />
-      <Btn
-        aria-label={note.shared ? 'Stop sharing note' : 'Share note with friends'}
-        aria-pressed={note.shared}
-        icon={<Share2Icon aria-hidden='true' />}
-        iconOnly
-        loading={setShared.isPending}
-        onClick={() => setShared.mutate({ id: note.id, shared: !note.shared })}
-        size='sm'
-        type='button'
-        variant={note.shared ? 'outlineMain' : 'ghost'}
-      />
+      <MenuBtnRoot>
+        <Btn
+          aria-label={`Sharing options, currently ${note.shared ? 'shared with friends' : 'private'}`}
+          icon={<Share2Icon aria-hidden='true' />}
+          iconOnly
+          loading={setShared.isPending}
+          render={<MenuBtn />}
+          size='sm'
+          type='button'
+          variant={note.shared ? 'ghostSuccess' : 'ghost'}
+        />
+        <MenuBtnPopup
+          aria-label='Note sharing options'
+          description='Choose who can access this note.'
+          heading='Share note'
+        >
+          <MenuBtnItem
+            description='Let your friends view this note'
+            icon={<UsersIcon aria-hidden='true' />}
+            label='Share with friends'
+            onClick={() => {
+              if (!note.shared) setShared.mutate({ id: note.id, shared: true });
+            }}
+          />
+          <MenuBtnItem
+            description='Only you can access this note'
+            icon={<LockIcon aria-hidden='true' />}
+            label='Keep note private'
+            onClick={() => {
+              if (note.shared) setShared.mutate({ id: note.id, shared: false });
+            }}
+          />
+        </MenuBtnPopup>
+      </MenuBtnRoot>
       <Btn
         aria-label='Delete note'
         icon={<Trash2Icon aria-hidden='true' />}

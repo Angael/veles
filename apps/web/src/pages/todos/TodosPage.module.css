@@ -21,11 +21,6 @@
   gap: var(--space-lg);
 }
 
-.typePicker {
-  display: flex;
-  gap: var(--space-xs);
-}
-
 .composerForm {
   display: grid;
   gap: var(--space-md);
