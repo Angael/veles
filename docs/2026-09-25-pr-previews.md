@@ -1,23 +1,18 @@
-# PR previews
+# PR preview architecture
 
-A standalone `apps/preview` Docker application in its own Dokploy project manages fixed Compose slots. It is **not** part of `compose.yaml` or GitHub Actions. This branch does not configure GitHub or change live Dokploy resources.
+## Context
 
-## Behavior
+PRs need isolated, predictable URLs without granting a public GitHub Actions workflow production deployment credentials. Preview builds may fail or be delayed; a URL must not imply a successful deployment.
 
-- A signed GitHub App `pull_request` webhook triggers reconciliation; startup and a five-minute timer recover missed events. Only open, non-draft, same-repository PRs without `preview:off` qualify. Oldest eligible PR gets the next free configured slot; no eviction.
-- SQLite at `/data/preview.sqlite` retains slot ownership through restarts. On assignment, the controller selects the PR branch, requests one deploy, and enables Dokploy auto-deploy for later commits. Failed builds **still own** their slot. It does not inspect build results or claim the preview is ready.
-- One edited PR comment gives the fixed URL once a deploy is requested, with a warning that it may be building or failed. Close, draft, or `preview:off` disables auto-deploy, stops the Compose, leaves its branch unchanged, removes the link, and frees the slot. An idle slot stays stopped until reassigned. API failures retain the reservation for the next reconciliation.
-- The controller does not run migrations or touch PostgreSQL/R2 data. Preview PR code does have access to the shared **dev** database and R2 bucket; never point these slots at production resources.
+## Decision
 
-## Provisioning
+- Run a standalone `apps/preview` controller in its own Dokploy application, outside the production Compose stack. A signed GitHub App webhook and periodic reconciliation drive a fixed pool of preconfigured Dokploy Compose slots; no GitHub Actions deployment workflow.
+- Assign the oldest eligible open, non-draft, same-repository PR without `preview:off` to a free slot. Do not evict an owner when the pool is full. Persist ownership in SQLite on a persistent volume with a single controller replica so restarts do not reshuffle slots.
+- On assignment, select the PR branch and request a deploy; Dokploy auto-deploy handles later commits. The controller does not inspect build results: failed builds retain their slot, and the PR comment identifies the URL as possibly still building or failed.
+- On close, draft, or opt-out, disable auto-deploy, stop the slot, remove its preview link, and free the reservation. Idle slots remain stopped on their last branch until reassigned. Reconciliation retries failed transitions.
 
-1. In Dokploy, create a separate application/project from this repo with build context `.` and Dockerfile `apps/preview/Dockerfile`; mount a **persistent writable volume** at `/data`, one replica only, and expose port 3000 at a HTTPS webhook host. Set `PREVIEW_DB_PATH=/data/preview.sqlite`.
-2. Register a GitHub App for `Angael/veles`: repository permissions **Pull requests: read**, **Issues: read/write** (PR comments), and **Metadata: read**. Subscribe to pull request events. Set its webhook URL to `https://<controller-host>/webhook` with a secret; the service also exposes `GET /health`.
-3. Set the controller variables listed in `.env.example`: GitHub App ID, installation ID, private key, webhook secret, repository; Dokploy HTTPS URL and API key; **dev** environment ID; `PREVIEW_SLOTS` JSON array (`composeId`, `url`). Array position determines slot number (first entry is slot 1). SQLite binds each position to its Compose ID and refuses reordering after activation. The global Dokploy token can modify production: keep it only in this controller and restrict network access where possible. Code permits mutations only of configured Compose IDs after checking environment, source repo and HTTPS nginx:80 domain.
-4. Configure each fixed preview Compose with its own `APP_URL`, domain and Google authorized redirect URI (`https://veles-devN.widacki.me/api/auth/callback/google`). Verify the database and R2 bucket are dev-only. Add only provisioned slots to `PREVIEW_SLOTS`; the controller takes over existing slot branches at first reconciliation.
+## Boundaries and consequences
 
-Slots 1 and 2 exist at `veles-dev1.widacki.me` (`d2yuEVuvQBlK3Q0mHb9WL`) and `veles-dev2.widacki.me` (`pj67Bs9tSK6iYkbwr62RM`), respectively. Slot 3 (`veles-dev3.widacki.me`) is **not provisioned**; do not configure it until its Compose, HTTPS domain, OAuth redirect and dev resources are verified.
-
-## Rollout check
-
-First deploy the controller with **only slot 1 configured**; activating it will stop/reassign the currently running preview. Exercise PR assignment, next commit via Dokploy auto-deploy, `preview:off`, close/reopen, a failed build retaining ownership, and an occupied-slot queue before adding slot 2. Check that setting the branch and explicitly deploying once does not trigger an unwanted second build in the installed Dokploy version. Then provision and verify slot 3. Do not run Drizzle or shared-data cleanup as part of this rollout.
+- Only explicitly configured slot IDs may be mutated, after checking their environment, repository, and HTTPS routing. Slot order is persistent identity and must not be reordered after activation.
+- Preview PR code can access shared **development** database and R2 resources; never supply production data or credentials to slots. The controller does not run migrations or reset shared data.
+- The controller needs a Dokploy token with broad privileges, so it must be isolated and its network access restricted. Capacity is fixed: extra PRs wait rather than taking an existing preview's URL.

@@ -10,4 +10,4 @@
 
 `PREVIEW_SLOTS` is an ordered array of `{ "composeId": "...", "url": "..." }` entries; slot numbers are derived from array position. Idle slots are stopped with auto-deploy disabled and keep their last branch until reassigned. SQLite rejects reordering after a slot has been configured.
 
-For slot configuration, OAuth domains, takeover, and the live rollout checklist, see [PR previews](../../docs/2026-09-25-pr-previews.md).
+For the rationale and safety boundaries behind fixed preview slots, see [PR preview architecture](../../docs/2026-09-25-pr-previews.md).
