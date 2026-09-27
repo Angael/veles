@@ -39,7 +39,7 @@
 
 .contentInput {
   min-height: 5rem;
-  resize: vertical;
+  color: var(--c-muted-soft);
 }
 
 .listGrid {
@@ -57,15 +57,31 @@
   gap: var(--space-md);
 }
 
-.noteCard p {
-  margin: 0;
-  color: var(--c-muted-soft);
-  white-space: pre-wrap;
+.cardHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cardHeader h2 {
+  min-width: 0;
+}
+
+.noteActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.sharedBy {
+  color: var(--c-muted-strong);
+  font-size: var(--text-sm);
 }
 
 .items {
   display: grid;
-  gap: var(--space-xs);
+  gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -73,22 +89,22 @@
 
 .item {
   display: grid;
-  grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
   align-items: center;
   gap: var(--space-sm);
-  min-height: var(--button-min-height);
+  min-height: 2rem;
   padding: 0 var(--space-xs);
   border-radius: var(--radius-xs);
 }
 
-.item input {
+.item input[type='checkbox'] {
   width: 1.25rem;
   height: 1.25rem;
   margin: 0;
   accent-color: var(--c-primary);
 }
 
-.item input:focus-visible {
+.item input[type='checkbox']:focus-visible {
   outline: 2px solid var(--c-primary-focus);
   outline-offset: 0.2rem;
 }
@@ -98,32 +114,13 @@
   text-decoration: line-through;
 }
 
-.quantity {
-  color: var(--c-muted);
-  font-size: var(--text-sm);
-  font-variant-numeric: tabular-nums;
-}
-
 .emptyList {
   margin: 0;
   color: var(--c-muted-strong);
 }
 
-.productForm {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  gap: var(--space-sm);
-  align-items: center;
-  padding: var(--space-sm);
-  border: var(--border-width) solid var(--c-border);
-  border-radius: var(--radius-xs);
-  background: var(--c-surface-inset);
-}
-
-.quantityFields {
-  display: grid;
-  grid-template-columns: 4rem 4rem;
-  gap: var(--space-xs);
+.addItem {
+  justify-self: start;
 }
 
 .emptyState {
@@ -132,15 +129,6 @@
 
 @media (--phone) {
   .listGrid {
-    display: grid;
     grid-template-columns: 1fr;
-  }
-
-  .productForm {
-    grid-template-columns: 1fr auto;
-  }
-
-  .productForm > :first-child {
-    grid-column: 1 / -1;
   }
 }
