@@ -24,6 +24,8 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
     latestWeight && previousWeight ? latestWeight.weightKg - previousWeight.weightKg : null;
   const chartPoints = getChartPoints(data.weightEntries);
   const recommendedRecipes = getDailyRecommendations(data.recipes, data.date);
+  const kcal = data.nutrition.totals.kcal;
+  const kcalMaximum = data.nutrition.goal?.kcal ?? Math.max(kcal, 1);
 
   return (
     <main className={css.page}>
@@ -33,30 +35,38 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
             <h2>Today’s food</h2>
             <FlameIcon aria-hidden='true' />
           </div>
-          <div className={css.macroBars}>
-            <MacroProgress
-              label='kcal'
-              total={data.nutrition.totals.kcal}
-              goal={data.nutrition.goal?.kcal ?? null}
-            />
-            <MacroProgress
-              label='protein'
-              total={data.nutrition.totals.protein}
-              goal={data.nutrition.goal?.protein ?? null}
-              unit='g'
-            />
-            <MacroProgress
-              label='fat'
-              total={data.nutrition.totals.fat}
-              goal={data.nutrition.goal?.fat ?? null}
-              unit='g'
-            />
-            <MacroProgress
-              label='carbs'
-              total={data.nutrition.totals.carbs}
-              goal={data.nutrition.goal?.carbs ?? null}
-              unit='g'
-            />
+          <div className={css.nutrition}>
+            <div className={css.kcal}>
+              <div className={css.kcalValue}>
+                <strong>{Math.round(kcal)}</strong>
+                <span>kcal</span>
+                <small>
+                  {data.nutrition.goal ? `of ${Math.round(data.nutrition.goal.kcal)}` : 'No goal'}
+                </small>
+              </div>
+              <progress
+                aria-label='kcal progress'
+                max={kcalMaximum}
+                value={Math.min(kcal, kcalMaximum)}
+              />
+            </div>
+            <div className={css.macros}>
+              <MacroProgress
+                label='protein'
+                total={data.nutrition.totals.protein}
+                goal={data.nutrition.goal?.protein ?? null}
+              />
+              <MacroProgress
+                label='fat'
+                total={data.nutrition.totals.fat}
+                goal={data.nutrition.goal?.fat ?? null}
+              />
+              <MacroProgress
+                label='carbs'
+                total={data.nutrition.totals.carbs}
+                goal={data.nutrition.goal?.carbs ?? null}
+              />
+            </div>
           </div>
           <Link aria-label='Open Today’s food' className={css.cardLink} to='/calories' />
         </Card>
@@ -175,12 +185,10 @@ function MacroProgress({
   label,
   total,
   goal,
-  unit = '',
 }: {
-  label: 'kcal' | 'protein' | 'fat' | 'carbs';
+  label: 'protein' | 'fat' | 'carbs';
   total: number;
   goal: number | null;
-  unit?: string;
 }) {
   const maximum = goal ?? Math.max(total, 1);
 
@@ -188,11 +196,8 @@ function MacroProgress({
     <div className={css.macroProgress}>
       <div className={css.macroHeading}>
         <span>{label}</span>
-        <strong>
-          {Math.round(total)}
-          {unit}
-          <small>{goal === null ? ' · No goal' : ` / ${Math.round(goal)}${unit}`}</small>
-        </strong>
+        <strong>{Math.round(total)}g</strong>
+        <small>{goal === null ? 'No goal' : `of ${Math.round(goal)}g`}</small>
       </div>
       <progress aria-label={`${label} progress`} max={maximum} value={Math.min(total, maximum)} />
     </div>
