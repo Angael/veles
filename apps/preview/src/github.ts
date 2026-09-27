@@ -24,6 +24,7 @@ const commentResponse = type({
   'user?': type({ login: 'string' }).or('null'),
 });
 const apiErrorResponse = type({ message: 'string' });
+const labelResponse = type({ name: 'string' }).array();
 
 type Options = {
   repository: string;
@@ -114,7 +115,7 @@ export function createGithub({
       authorization,
     }: {
       method?: string;
-      body?: { body: string };
+      body?: { body: string } | { labels: string[] };
       authorization?: string;
     } = {},
   ): Promise<unknown> {
@@ -196,5 +197,18 @@ export function createGithub({
     }
   }
 
-  return { verify, pulls, comment };
+  /** Keep exactly one numbered preview label, without touching unrelated PR labels. */
+  async function syncPreviewLabel(prNumber: number, slot: number | null): Promise<void> {
+    const path = `/repos/${repoPath}/issues/${prNumber}/labels`;
+    const labels = parseResponse(labelResponse, await request(path), 'GitHub issue labels');
+    const desired = slot === null ? null : `preview-${slot}`;
+    for (const label of labels) {
+      if (/^preview-[1-9]\d*$/.test(label.name) && label.name !== desired)
+        await request(`${path}/${encodeURIComponent(label.name)}`, { method: 'DELETE' });
+    }
+    if (desired !== null && !labels.some((label) => label.name === desired))
+      await request(path, { method: 'POST', body: { labels: [desired] } });
+  }
+
+  return { verify, pulls, comment, syncPreviewLabel };
 }
