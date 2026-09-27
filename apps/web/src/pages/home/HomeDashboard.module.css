@@ -216,7 +216,6 @@
   background: transparent;
   accent-color: var(--c-danger-text);
   pointer-events: none;
-  transform: scaleX(-1);
 }
 
 .nutrition .overfill::-webkit-progress-bar {

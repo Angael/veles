@@ -201,7 +201,7 @@ function MacroProgress({
   );
 }
 
-/** Keeps the goal fill visible while marking excess at the right edge of the same track. */
+/** Overlays excess from the start of the filled track, as on the calories page. */
 function NutritionProgress({
   label,
   total,
