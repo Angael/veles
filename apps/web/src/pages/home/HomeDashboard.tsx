@@ -25,7 +25,6 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
   const chartPoints = getChartPoints(data.weightEntries);
   const recommendedRecipes = getDailyRecommendations(data.recipes, data.date);
   const kcal = data.nutrition.totals.kcal;
-  const kcalMaximum = data.nutrition.goal?.kcal ?? Math.max(kcal, 1);
 
   return (
     <main className={css.page}>
@@ -44,10 +43,10 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
                   {data.nutrition.goal ? `of ${Math.round(data.nutrition.goal.kcal)}` : 'No goal'}
                 </small>
               </div>
-              <progress
-                aria-label='kcal progress'
-                max={kcalMaximum}
-                value={Math.min(kcal, kcalMaximum)}
+              <NutritionProgress
+                goal={data.nutrition.goal?.kcal ?? null}
+                label='kcal'
+                total={kcal}
               />
             </div>
             <div className={css.macros}>
@@ -71,7 +70,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           <Link aria-label='Open Today’s food' className={css.cardLink} to='/calories' />
         </Card>
 
-        <Card as='article' className={css.weightTile} data-appear='1' variant='primary'>
+        <Card as='article' className={css.weightTile} data-appear='1' shadow={false}>
           <div className={css.tileHeading}>
             <h2>Weight</h2>
             <ScaleIcon aria-hidden='true' />
@@ -190,8 +189,6 @@ function MacroProgress({
   total: number;
   goal: number | null;
 }) {
-  const maximum = goal ?? Math.max(total, 1);
-
   return (
     <div className={css.macroProgress}>
       <div className={css.macroHeading}>
@@ -199,7 +196,43 @@ function MacroProgress({
         <strong>{Math.round(total)}g</strong>
         <small>{goal === null ? 'No goal' : `of ${Math.round(goal)}g`}</small>
       </div>
-      <progress aria-label={`${label} progress`} max={maximum} value={Math.min(total, maximum)} />
+      <NutritionProgress goal={goal} label={label} total={total} />
+    </div>
+  );
+}
+
+/** Keeps the goal fill visible while marking excess at the right edge of the same track. */
+function NutritionProgress({
+  label,
+  total,
+  goal,
+}: {
+  label: 'kcal' | 'protein' | 'fat' | 'carbs';
+  total: number;
+  goal: number | null;
+}) {
+  const maximum = goal === null ? Math.max(total, 1) : Math.max(goal, 1);
+
+  return (
+    <div className={css.progressTrack}>
+      <progress
+        aria-label={`${label} progress`}
+        aria-valuetext={
+          goal !== null && total > goal
+            ? `${Math.round(total)} of ${Math.round(goal)}${label === 'kcal' ? ' kcal' : 'g'}`
+            : undefined
+        }
+        max={maximum}
+        value={Math.min(total, maximum)}
+      />
+      {goal !== null && total > goal && (
+        <progress
+          aria-hidden='true'
+          className={css.overfill}
+          max={maximum}
+          value={Math.min(total - goal, maximum)}
+        />
+      )}
     </div>
   );
 }

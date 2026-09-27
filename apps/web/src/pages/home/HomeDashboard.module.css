@@ -136,8 +136,10 @@
 }
 
 .macroHeading {
-  display: grid;
-  gap: 0.125rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--space-xs);
 }
 
 .macroHeading span,
@@ -147,6 +149,7 @@
 }
 
 .macroHeading span {
+  flex-basis: 100%;
   text-transform: capitalize;
 }
 
@@ -155,6 +158,14 @@
   font-family: var(--font-mono);
   font-size: var(--text-lg);
   font-variant-numeric: tabular-nums;
+}
+
+.macroHeading small {
+  margin-left: auto;
+}
+
+.progressTrack {
+  position: relative;
 }
 
 .nutrition progress {
@@ -196,6 +207,20 @@
 .macroProgress:nth-child(3) progress {
   color: var(--c-macro-carb);
   accent-color: var(--c-macro-carb);
+}
+
+.nutrition progress.overfill {
+  position: absolute;
+  inset: 0;
+  color: var(--c-danger-text);
+  background: transparent;
+  accent-color: var(--c-danger-text);
+  pointer-events: none;
+  transform: scaleX(-1);
+}
+
+.nutrition .overfill::-webkit-progress-bar {
+  background: transparent;
 }
 
 .weightValue strong {
@@ -367,7 +392,11 @@
   }
 
   .macroHeading strong {
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
+  }
+
+  .macroHeading small {
+    font-size: 0.6875rem;
   }
 
   .weightTile {
