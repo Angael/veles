@@ -5,16 +5,35 @@ import { Card } from '@/components/ui/card/Card';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import type { NoteListItem, NoteSummary } from './notes.api';
-import { useCreateListItemMutation, useSetListItemCheckedMutation } from './notes.query';
+import {
+  useCreateListItemMutation,
+  useSetListItemCheckedMutation,
+  useUpdateListItemMutation,
+  useUpdateNoteMutation,
+} from './notes.query';
 import css from './TodosPage.module.css';
 
 export function ShoppingListCard({ note }: { note: NoteSummary }) {
   const [formKey, setFormKey] = useState(0);
   const createItem = useCreateListItemMutation();
+  const updateNote = useUpdateNoteMutation();
 
   return (
     <Card as='article' className={css.listCard}>
-      <h2>{note.title}</h2>
+      <h2>
+        <SeamlessTextInput
+          aria-label='Checklist title'
+          className={css.titleInput}
+          defaultValue={note.title}
+          maxLength={160}
+          onBlur={(event) => {
+            const title = event.currentTarget.value.trim();
+            if (!title) event.currentTarget.value = note.title;
+            else if (title !== note.title) updateNote.mutate({ id: note.id, title });
+          }}
+          required
+        />
+      </h2>
       {note.items.length === 0 ? <p className={css.emptyList}>No products yet.</p> : null}
       <ul className={css.items}>
         {note.items.map((item) => (
@@ -29,8 +48,6 @@ export function ShoppingListCard({ note }: { note: NoteSummary }) {
           await createItem.mutateAsync({
             name: data.string('name'),
             noteId: note.id,
-            quantity: data.string('quantity'),
-            unit: data.string('unit'),
           });
           setFormKey((key) => key + 1);
         }}
@@ -42,15 +59,6 @@ export function ShoppingListCard({ note }: { note: NoteSummary }) {
           placeholder='New product'
           required
         />
-        <div className={css.quantityFields}>
-          <SeamlessTextInput
-            aria-label='Quantity'
-            maxLength={40}
-            name='quantity'
-            placeholder='Qty'
-          />
-          <SeamlessTextInput aria-label='Unit' maxLength={40} name='unit' placeholder='Unit' />
-        </div>
         <Btn
           aria-label='Add product'
           icon={<PlusIcon aria-hidden='true' />}
@@ -68,6 +76,7 @@ export function ShoppingListCard({ note }: { note: NoteSummary }) {
 function ShoppingListItem({ item }: { item: NoteListItem }) {
   const [checked, setChecked] = useState(item.checked);
   const setItemChecked = useSetListItemCheckedMutation();
+  const updateItem = useUpdateListItemMutation();
 
   useEffect(() => setChecked(item.checked), [item.checked]);
 
@@ -87,10 +96,18 @@ function ShoppingListItem({ item }: { item: NoteListItem }) {
         }}
         type='checkbox'
       />
-      <span className={checked ? css.done : undefined}>{item.name}</span>
-      {item.quantity || item.unit ? (
-        <span className={css.quantity}>{[item.quantity, item.unit].filter(Boolean).join(' ')}</span>
-      ) : null}
+      <SeamlessTextInput
+        aria-label='Product name'
+        className={checked ? css.done : undefined}
+        defaultValue={item.name}
+        maxLength={240}
+        onBlur={(event) => {
+          const name = event.currentTarget.value.trim();
+          if (!name) event.currentTarget.value = item.name;
+          else if (name !== item.name) updateItem.mutate({ id: item.id, name });
+        }}
+        required
+      />
     </li>
   );
 }

@@ -39,6 +39,12 @@ pnpm db:generate -- --name=<migration-name>
 pnpm db:migrate:prod
 ```
 
+### Notes
+
+The Notes page stores private text notes and checklists. Titles, note bodies, and checklist item names are edited in place and saved when the field loses focus; checklist items can also be checked off. Items are plain text, without quantity or unit fields. Sharing is not available.
+
+Before deploying the notes schema, generate and review its migration with `pnpm db:generate -- --name=add-notes-shopping-lists`, then apply the migration before merging into `main`.
+
 ### Compose
 
 ```bash

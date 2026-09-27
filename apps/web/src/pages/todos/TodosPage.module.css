@@ -39,7 +39,7 @@
 
 .contentInput {
   min-height: 5rem;
-  resize: vertical;
+  color: var(--c-muted-soft);
 }
 
 .listGrid {
@@ -57,12 +57,6 @@
   gap: var(--space-md);
 }
 
-.noteCard p {
-  margin: 0;
-  color: var(--c-muted-soft);
-  white-space: pre-wrap;
-}
-
 .items {
   display: grid;
   gap: var(--space-xs);
@@ -73,7 +67,7 @@
 
 .item {
   display: grid;
-  grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
   align-items: center;
   gap: var(--space-sm);
   min-height: var(--button-min-height);
@@ -81,14 +75,14 @@
   border-radius: var(--radius-xs);
 }
 
-.item input {
+.item input[type='checkbox'] {
   width: 1.25rem;
   height: 1.25rem;
   margin: 0;
   accent-color: var(--c-primary);
 }
 
-.item input:focus-visible {
+.item input[type='checkbox']:focus-visible {
   outline: 2px solid var(--c-primary-focus);
   outline-offset: 0.2rem;
 }
@@ -98,12 +92,6 @@
   text-decoration: line-through;
 }
 
-.quantity {
-  color: var(--c-muted);
-  font-size: var(--text-sm);
-  font-variant-numeric: tabular-nums;
-}
-
 .emptyList {
   margin: 0;
   color: var(--c-muted-strong);
@@ -111,7 +99,7 @@
 
 .productForm {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--space-sm);
   align-items: center;
   padding: var(--space-sm);
@@ -120,27 +108,12 @@
   background: var(--c-surface-inset);
 }
 
-.quantityFields {
-  display: grid;
-  grid-template-columns: 4rem 4rem;
-  gap: var(--space-xs);
-}
-
 .emptyState {
   text-align: center;
 }
 
 @media (--phone) {
   .listGrid {
-    display: grid;
     grid-template-columns: 1fr;
-  }
-
-  .productForm {
-    grid-template-columns: 1fr auto;
-  }
-
-  .productForm > :first-child {
-    grid-column: 1 / -1;
   }
 }

@@ -66,7 +66,7 @@ export function NoteComposer() {
               placeholder={type === 'note' ? 'Note title' : 'Checklist title'}
               required
             />
-            {type === 'note' ? (
+            {type === 'note' && (
               <SeamlessTextarea
                 aria-label='Note content'
                 className={css.contentInput}
@@ -75,8 +75,6 @@ export function NoteComposer() {
                 placeholder='Write your note…'
                 rows={5}
               />
-            ) : (
-              <input name='content' type='hidden' value='' />
             )}
           </TypedForm>
         </div>

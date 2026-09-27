@@ -1,5 +1,12 @@
 import { queryOptions, useMutation } from '@tanstack/react-query';
-import { createListItem, createNote, getNotes, setListItemChecked } from './notes.api';
+import {
+  createListItem,
+  createNote,
+  getNotes,
+  setListItemChecked,
+  updateListItem,
+  updateNote,
+} from './notes.api';
 
 export const notesQueryKey = ['notes'] as const;
 
@@ -21,7 +28,7 @@ export function useCreateNoteMutation() {
 export function useCreateListItemMutation() {
   return useMutation({
     meta: { invalidateQueryKey: notesQueryKey },
-    mutationFn: (variables: { name: string; noteId: string; quantity: string; unit: string }) =>
+    mutationFn: (variables: { name: string; noteId: string }) =>
       createListItem({ data: variables }),
   });
 }
@@ -31,5 +38,20 @@ export function useSetListItemCheckedMutation() {
     meta: { invalidateQueryKey: notesQueryKey },
     mutationFn: (variables: { checked: boolean; id: string }) =>
       setListItemChecked({ data: variables }),
+  });
+}
+
+export function useUpdateNoteMutation() {
+  return useMutation({
+    meta: { error: { title: 'Note could not be saved' }, invalidateQueryKey: notesQueryKey },
+    mutationFn: (variables: { id: string; title?: string; content?: string }) =>
+      updateNote({ data: variables }),
+  });
+}
+
+export function useUpdateListItemMutation() {
+  return useMutation({
+    meta: { error: { title: 'Product could not be saved' }, invalidateQueryKey: notesQueryKey },
+    mutationFn: (variables: { id: string; name: string }) => updateListItem({ data: variables }),
   });
 }
