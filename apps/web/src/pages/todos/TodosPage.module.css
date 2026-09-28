@@ -130,6 +130,32 @@
   justify-self: start;
 }
 
+.conflict {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-xs);
+  font-size: 0.875rem;
+
+  p {
+    margin: 0;
+  }
+}
+
+.conflictTheirs {
+  max-height: 8rem;
+  overflow: auto;
+  color: var(--c-muted-strong);
+  white-space: pre-wrap;
+}
+
+.conflictActions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
 .emptyState {
   text-align: center;
 }

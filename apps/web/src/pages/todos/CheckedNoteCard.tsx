@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
+import { EditConflict } from './EditConflict';
 import { NoteActions } from './NoteActions';
 import type { NoteListItem, NoteSummary } from './notes.api';
 import {
@@ -13,11 +14,18 @@ import {
   useUpdateNoteMutation,
 } from './notes.query';
 import css from './TodosPage.module.css';
+import { useSyncedDraft } from './useSyncedDraft';
 
 export function CheckedNoteCard({ note }: { note: NoteSummary }) {
   const [newItemId, setNewItemId] = useState<string | null>(null);
   const createItem = useCreateListItemMutation();
   const updateNote = useUpdateNoteMutation();
+  const title = useSyncedDraft({
+    normalize: (value) => value.trim() || null,
+    save: (value, base, onSuccess) =>
+      updateNote.mutate({ base, field: 'title', id: note.id, value }, { onSuccess }),
+    serverValue: note.title,
+  });
 
   return (
     <Card as='article' className={css.listCard}>
@@ -26,18 +34,20 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
           <SeamlessTextInput
             aria-label='Checklist title'
             className={css.titleInput}
-            defaultValue={note.title}
             maxLength={160}
-            onBlur={(event) => {
-              const title = event.currentTarget.value.trim();
-              if (!title) event.currentTarget.value = note.title;
-              else if (title !== note.title) updateNote.mutate({ id: note.id, title });
-            }}
             required
+            {...title.inputProps}
           />
         </h2>
         <NoteActions note={note} />
       </div>
+      {title.conflict === null ? null : (
+        <EditConflict
+          onAcceptTheirs={title.acceptTheirs}
+          onKeepMine={title.keepMine}
+          theirs={title.conflict}
+        />
+      )}
       {note.items.length === 0 ? <p className={css.emptyList}>No items yet.</p> : null}
       <ul className={css.items}>
         {note.items.map((item) => (
@@ -70,6 +80,12 @@ function CheckedNoteItem({ autoFocus, item }: { autoFocus: boolean; item: NoteLi
   const setItemChecked = useSetListItemCheckedMutation();
   const updateItem = useUpdateListItemMutation();
   const deleteItem = useDeleteListItemMutation();
+  const name = useSyncedDraft({
+    normalize: (value) => value.trim() || null,
+    save: (value, base, onSuccess) =>
+      updateItem.mutate({ base, id: item.id, name: value }, { onSuccess }),
+    serverValue: item.name,
+  });
 
   useEffect(() => setChecked(item.checked), [item.checked]);
 
@@ -93,7 +109,6 @@ function CheckedNoteItem({ autoFocus, item }: { autoFocus: boolean; item: NoteLi
         autoFocus={autoFocus}
         aria-label='Checklist item'
         className={checked ? css.done : undefined}
-        defaultValue={item.name}
         maxLength={240}
         onFocus={autoFocus ? (event) => event.currentTarget.select() : undefined}
         onKeyDown={(event) => {
@@ -106,12 +121,8 @@ function CheckedNoteItem({ autoFocus, item }: { autoFocus: boolean; item: NoteLi
             deleteItem.mutate({ id: item.id });
           }
         }}
-        onBlur={(event) => {
-          const name = event.currentTarget.value.trim();
-          if (!name) event.currentTarget.value = item.name;
-          else if (name !== item.name) updateItem.mutate({ id: item.id, name });
-        }}
         required
+        {...name.inputProps}
       />
       <Btn
         aria-label={`Delete ${item.name}`}
@@ -124,6 +135,13 @@ function CheckedNoteItem({ autoFocus, item }: { autoFocus: boolean; item: NoteLi
         type='button'
         variant='ghostDanger'
       />
+      {name.conflict === null ? null : (
+        <EditConflict
+          onAcceptTheirs={name.acceptTheirs}
+          onKeepMine={name.keepMine}
+          theirs={name.conflict}
+        />
+      )}
     </li>
   );
 }

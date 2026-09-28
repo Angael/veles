@@ -26,6 +26,13 @@ export type NoteSummary = {
   type: 'note' | 'shopping_list';
 };
 
+/** Outcome of a guarded text save: `conflict` means someone else changed the field since `base`. */
+export type SaveTextResult =
+  | { status: 'saved'; value: string }
+  | { current: string; status: 'conflict' };
+
+type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
 /** Matches notes the user owns or that a connected user shared; these are readable and editable. */
 function accessibleNote(userId: string) {
   return or(
@@ -50,6 +57,21 @@ function accessibleNote(userId: string) {
       ),
     ),
   );
+}
+
+/**
+ * Locks an accessible item's parent note row, the same lock `toggleNoteType` takes, so item writes
+ * wait for (and then observe) conversions instead of racing them. The item row itself may be stale
+ * after waiting, so callers must check affected rows of their own write.
+ */
+async function lockAccessibleItem(tx: Transaction, itemId: string, userId: string) {
+  const [item] = await tx
+    .select({ id: listItems.id, noteId: listItems.noteId })
+    .from(listItems)
+    .innerJoin(notes, eq(notes.id, listItems.noteId))
+    .where(and(eq(listItems.id, itemId), accessibleNote(userId)))
+    .for('update', { of: notes });
+  return item;
 }
 
 export const getNotes = createServerFn({ method: 'GET' })
@@ -131,23 +153,55 @@ export const createNote = createServerFn({ method: 'POST' })
   });
 
 const updateNoteInputType = type({
+  base: 'string',
+  field: "'title'",
   id: 'string.uuid',
-  'title?': 'string.trim |> 0 < string <= 160',
-  'content?': 'string <= 16000',
+  value: 'string.trim |> 0 < string <= 160',
+}).or({
+  base: 'string',
+  field: "'content'",
+  id: 'string.uuid',
+  value: 'string <= 16000',
 });
 
+/** Saves one note field only if it still equals `base`, so concurrent edits are reported instead of overwritten. */
 export const updateNote = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateNote')])
   .validator(arkTypeValidator(updateNoteInputType))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<SaveTextResult> => {
     const session = await requireSession();
+    const isContent = data.field === 'content';
     const [updated] = await db
       .update(notes)
-      .set({ title: data.title, content: data.content, updatedAt: new Date() })
-      .where(and(eq(notes.id, data.id), accessibleNote(session.user.id)))
+      .set({
+        ...(isContent ? { content: data.value } : { title: data.value }),
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(notes.id, data.id),
+          accessibleNote(session.user.id),
+          eq(isContent ? notes.content : notes.title, data.base),
+          isContent ? eq(notes.type, 'note') : undefined,
+        ),
+      )
       .returning({ id: notes.id });
 
-    if (!updated) throw new ClientSafeError('Note not found.');
+    if (updated) return { status: 'saved', value: data.value };
+
+    const [current] = await db
+      .select({ content: notes.content, title: notes.title, type: notes.type })
+      .from(notes)
+      .where(and(eq(notes.id, data.id), accessibleNote(session.user.id)))
+      .limit(1);
+
+    if (!current) throw new ClientSafeError('Note not found.');
+    if (isContent && current.type !== 'note') {
+      throw new ClientSafeError('This note was turned into a checklist.');
+    }
+    const currentValue = isContent ? current.content : current.title;
+    if (currentValue === data.value) return { status: 'saved', value: data.value };
+    return { current: currentValue, status: 'conflict' };
   });
 
 const deleteNoteInputType = type({ id: 'string.uuid' });
@@ -239,53 +293,70 @@ export const createListItem = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(createListItemInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const [shoppingList] = await db
-      .select({ id: notes.id })
-      .from(notes)
-      .where(
-        and(
-          eq(notes.id, data.noteId),
-          accessibleNote(session.user.id),
-          eq(notes.type, 'shopping_list'),
-        ),
-      )
-      .limit(1);
+    return db.transaction(async (tx) => {
+      const [shoppingList] = await tx
+        .select({ id: notes.id })
+        .from(notes)
+        .where(
+          and(
+            eq(notes.id, data.noteId),
+            accessibleNote(session.user.id),
+            eq(notes.type, 'shopping_list'),
+          ),
+        )
+        .for('update');
 
-    if (!shoppingList) throw new ClientSafeError('Shopping list not found.');
+      if (!shoppingList) throw new ClientSafeError('Shopping list not found.');
 
-    const [created] = await db
-      .insert(listItems)
-      .values({
-        name: data.name,
-        noteId: shoppingList.id,
-      })
-      .returning({ id: listItems.id });
+      const [created] = await tx
+        .insert(listItems)
+        .values({
+          name: data.name,
+          noteId: shoppingList.id,
+        })
+        .returning({ id: listItems.id });
 
-    invariant(created, 'Product could not be added.');
-    return created;
+      invariant(created, 'Product could not be added.');
+      return created;
+    });
   });
 
 const updateListItemInputType = type({
+  base: 'string',
   id: 'string.uuid',
   name: 'string.trim |> 0 < string <= 240',
 });
 
+/** Renames an item only if its name still equals `base`, so concurrent renames are reported instead of overwritten. */
 export const updateListItem = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateListItem')])
   .validator(arkTypeValidator(updateListItemInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const [item] = await db
-      .select({ id: listItems.id, noteId: listItems.noteId })
-      .from(listItems)
-      .innerJoin(notes, eq(notes.id, listItems.noteId))
-      .where(and(eq(listItems.id, data.id), accessibleNote(session.user.id)))
-      .limit(1);
+    return db.transaction(async (tx): Promise<SaveTextResult> => {
+      const item = await lockAccessibleItem(tx, data.id, session.user.id);
+      if (!item) throw new ClientSafeError('Product not found.');
 
-    if (!item) throw new ClientSafeError('Product not found.');
+      const [updated] = await tx
+        .update(listItems)
+        .set({ name: data.name })
+        .where(and(eq(listItems.id, item.id), eq(listItems.name, data.base)))
+        .returning({ id: listItems.id });
 
-    await db.update(listItems).set({ name: data.name }).where(eq(listItems.id, item.id));
-    await db.update(notes).set({ updatedAt: new Date() }).where(eq(notes.id, item.noteId));
+      if (!updated) {
+        const [current] = await tx
+          .select({ name: listItems.name })
+          .from(listItems)
+          .where(eq(listItems.id, item.id))
+          .limit(1);
+        if (!current) throw new ClientSafeError('Product not found.');
+        if (current.name !== data.name) return { current: current.name, status: 'conflict' };
+        return { status: 'saved', value: data.name };
+      }
+
+      await tx.update(notes).set({ updatedAt: new Date() }).where(eq(notes.id, item.noteId));
+      return { status: 'saved', value: data.name };
+    });
   });
 
 const setListItemCheckedInputType = type({
@@ -298,16 +369,17 @@ export const setListItemChecked = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(setListItemCheckedInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const [item] = await db
-      .select({ id: listItems.id })
-      .from(listItems)
-      .innerJoin(notes, eq(notes.id, listItems.noteId))
-      .where(and(eq(listItems.id, data.id), accessibleNote(session.user.id)))
-      .limit(1);
+    await db.transaction(async (tx) => {
+      const item = await lockAccessibleItem(tx, data.id, session.user.id);
+      if (!item) throw new ClientSafeError('Product not found.');
 
-    if (!item) throw new ClientSafeError('Product not found.');
-
-    await db.update(listItems).set({ checked: data.checked }).where(eq(listItems.id, item.id));
+      const [updated] = await tx
+        .update(listItems)
+        .set({ checked: data.checked })
+        .where(eq(listItems.id, item.id))
+        .returning({ id: listItems.id });
+      if (!updated) throw new ClientSafeError('Product not found.');
+    });
   });
 
 const deleteListItemInputType = type({ id: 'string.uuid' });
@@ -317,15 +389,16 @@ export const deleteListItem = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(deleteListItemInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const [item] = await db
-      .select({ id: listItems.id, noteId: listItems.noteId })
-      .from(listItems)
-      .innerJoin(notes, eq(notes.id, listItems.noteId))
-      .where(and(eq(listItems.id, data.id), accessibleNote(session.user.id)))
-      .limit(1);
+    await db.transaction(async (tx) => {
+      const item = await lockAccessibleItem(tx, data.id, session.user.id);
+      if (!item) throw new ClientSafeError('Item not found.');
 
-    if (!item) throw new ClientSafeError('Item not found.');
+      const [deleted] = await tx
+        .delete(listItems)
+        .where(eq(listItems.id, item.id))
+        .returning({ id: listItems.id });
+      if (!deleted) throw new ClientSafeError('Item not found.');
 
-    await db.delete(listItems).where(eq(listItems.id, item.id));
-    await db.update(notes).set({ updatedAt: new Date() }).where(eq(notes.id, item.noteId));
+      await tx.update(notes).set({ updatedAt: new Date() }).where(eq(notes.id, item.noteId));
+    });
   });

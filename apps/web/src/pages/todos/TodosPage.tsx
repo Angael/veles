@@ -8,11 +8,13 @@ import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessText
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
 import { CheckedNoteCard } from './CheckedNoteCard';
+import { EditConflict } from './EditConflict';
 import type { NoteSummary } from './notes.api';
 import { NoteActions } from './NoteActions';
 import { NoteComposer } from './NoteComposer';
 import { notesQueryOptions, useUpdateNoteMutation } from './notes.query';
 import css from './TodosPage.module.css';
+import { useSyncedDraft } from './useSyncedDraft';
 
 const noteScopeItems = [
   { label: 'All notes', value: 'all' },
@@ -84,6 +86,17 @@ export function TodosPage() {
 
 function TextNoteCard({ note }: { note: NoteSummary }) {
   const updateNote = useUpdateNoteMutation();
+  const title = useSyncedDraft({
+    normalize: (value) => value.trim() || null,
+    save: (value, base, onSuccess) =>
+      updateNote.mutate({ base, field: 'title', id: note.id, value }, { onSuccess }),
+    serverValue: note.title,
+  });
+  const content = useSyncedDraft({
+    save: (value, base, onSuccess) =>
+      updateNote.mutate({ base, field: 'content', id: note.id, value }, { onSuccess }),
+    serverValue: note.content,
+  });
 
   return (
     <Card as='article' className={css.noteCard}>
@@ -92,31 +105,35 @@ function TextNoteCard({ note }: { note: NoteSummary }) {
           <SeamlessTextInput
             aria-label='Note title'
             className={css.titleInput}
-            defaultValue={note.title}
             maxLength={160}
-            onBlur={(event) => {
-              const title = event.currentTarget.value.trim();
-              if (!title) event.currentTarget.value = note.title;
-              else if (title !== note.title) updateNote.mutate({ id: note.id, title });
-            }}
             required
+            {...title.inputProps}
           />
         </h2>
         <NoteActions note={note} />
       </div>
+      {title.conflict === null ? null : (
+        <EditConflict
+          onAcceptTheirs={title.acceptTheirs}
+          onKeepMine={title.keepMine}
+          theirs={title.conflict}
+        />
+      )}
       <SeamlessTextarea
         aria-label='Note content'
         className={css.contentInput}
-        defaultValue={note.content}
         maxLength={16000}
-        onBlur={(event) => {
-          if (event.currentTarget.value !== note.content) {
-            updateNote.mutate({ id: note.id, content: event.currentTarget.value });
-          }
-        }}
         placeholder='Write your note…'
         rows={3}
+        {...content.inputProps}
       />
+      {content.conflict === null ? null : (
+        <EditConflict
+          onAcceptTheirs={content.acceptTheirs}
+          onKeepMine={content.keepMine}
+          theirs={content.conflict}
+        />
+      )}
     </Card>
   );
 }

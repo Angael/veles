@@ -80,14 +80,19 @@ export function useSetNoteSharedMutation() {
 export function useUpdateNoteMutation() {
   return useMutation({
     meta: { error: { title: 'Note could not be saved' }, invalidateQueryKey: notesQueryKey },
-    mutationFn: (variables: { id: string; title?: string; content?: string }) =>
-      updateNote({ data: variables }),
+    mutationFn: (variables: {
+      base: string;
+      field: 'content' | 'title';
+      id: string;
+      value: string;
+    }) => updateNote({ data: variables }),
   });
 }
 
 export function useUpdateListItemMutation() {
   return useMutation({
     meta: { error: { title: 'Product could not be saved' }, invalidateQueryKey: notesQueryKey },
-    mutationFn: (variables: { id: string; name: string }) => updateListItem({ data: variables }),
+    mutationFn: (variables: { base: string; id: string; name: string }) =>
+      updateListItem({ data: variables }),
   });
 }
