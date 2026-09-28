@@ -6,7 +6,7 @@ import css from './Card.module.css';
  * Colors the card's corner glow. Pages can also pick any color by setting `--card-tone` (and
  * optionally `--card-tone-secondary`) on the card's className together with a tone.
  */
-export type CardTone = 'primary' | 'sky' | 'protein' | 'fat' | 'carbs' | 'danger';
+export type CardTone = 'primary' | 'sky' | 'danger';
 
 type CardProps = ComponentPropsWithoutRef<'div'> & {
   as?: 'article' | 'aside' | 'div' | 'section';

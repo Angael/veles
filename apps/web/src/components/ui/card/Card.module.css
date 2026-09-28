@@ -38,18 +38,6 @@
   --card-tone-secondary: var(--c-macro-carb);
 }
 
-.protein {
-  --card-tone: var(--c-macro-protein);
-}
-
-.fat {
-  --card-tone: var(--c-macro-fat);
-}
-
-.carbs {
-  --card-tone: var(--c-macro-carb);
-}
-
 .danger {
   --card-tone: #f87171;
   --card-tone-secondary: var(--c-macro-fat);

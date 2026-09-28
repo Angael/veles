@@ -201,15 +201,6 @@ export function ComponentsDemoPage() {
           <Card as='article' tone='sky'>
             Sky tone
           </Card>
-          <Card as='article' tone='protein'>
-            Protein tone
-          </Card>
-          <Card as='article' tone='fat'>
-            Fat tone
-          </Card>
-          <Card as='article' tone='carbs'>
-            Carbs tone
-          </Card>
           <Card as='article' tone='danger'>
             Danger tone
           </Card>
