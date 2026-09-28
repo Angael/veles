@@ -1,5 +1,11 @@
 import { createDatabaseConnection } from '@veles/db';
-import { foodLogs, foodProducts, recipeImages, uploadObjects } from '@veles/db/schema';
+import {
+  foodLogs,
+  foodProducts,
+  recipeImages,
+  uploadObjects,
+  weightEntryPhotos,
+} from '@veles/db/schema';
 import { and, count, eq, notExists, sql } from 'drizzle-orm';
 
 const checkIntervalMs = 10_000;
@@ -41,6 +47,12 @@ async function countUnusedUploads() {
             .select({ id: recipeImages.id })
             .from(recipeImages)
             .where(eq(recipeImages.uploadObjectId, uploadObjects.id)),
+        ),
+        notExists(
+          connection.db
+            .select({ id: weightEntryPhotos.id })
+            .from(weightEntryPhotos)
+            .where(eq(weightEntryPhotos.uploadObjectId, uploadObjects.id)),
         ),
       ),
     );
