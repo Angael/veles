@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Btn, type BtnSize, type BtnVariant } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { DateInput } from '@/components/ui/date-input/DateInput';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog/Dialog';
 import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
 import { ErrorCard } from '@/components/ui/error-card/ErrorCard';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
@@ -75,9 +76,11 @@ const BTN_VARIANTS = [
   { label: 'Danger', value: 'danger' },
   { label: 'Outline main', value: 'outlineMain' },
   { label: 'Outline danger', value: 'outlineDanger' },
+  { label: 'Outline success', value: 'outlineSuccess' },
   { label: 'White', value: 'white' },
   { label: 'Ghost', value: 'ghost' },
   { label: 'Ghost danger', value: 'ghostDanger' },
+  { label: 'Ghost success', value: 'ghostSuccess' },
   { label: 'Text', value: 'text' },
 ] satisfies DemoProp<BtnVariant>[];
 
@@ -172,6 +175,18 @@ export function ComponentsDemoPage() {
             />
           </MenuBtnPopup>
         </MenuBtnRoot>
+      </section>
+      <section>
+        <h2>Dialog</h2>
+        <Dialog
+          body='Use dialogs for focused actions that need an explicit decision.'
+          title='Example dialog'
+          trigger={
+            <Btn render={<DialogTrigger />} type='button' variant='outlineMain'>
+              Open dialog
+            </Btn>
+          }
+        />
       </section>
 
       <section>
