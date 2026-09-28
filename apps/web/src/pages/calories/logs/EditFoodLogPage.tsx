@@ -54,35 +54,31 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
         </div>
       </header>
 
-      {isProduct && log.productId ? (
-        <SelectedFoodCard
-          carbs={nutrition.carbs ?? 0}
-          fat={nutrition.fat ?? 0}
-          imageUrl={log.imageUrl}
-          kcal={nutrition.kcal ?? 0}
-          name={log.name}
-          productId={log.productId}
-          protein={nutrition.protein ?? 0}
-        />
-      ) : null}
-
       <section className={css.panel}>
         <TypedForm className={css.form} errorMsg={updateMutation.error?.message} onSubmit={submit}>
-          {!isProduct ? (
+          <Label text='Date'>
+            <DateInput defaultValue={log.date} name='date' required />
+          </Label>
+
+          {isProduct && log.productId ? (
+            <SelectedFoodCard
+              carbs={nutrition.carbs ?? 0}
+              fat={nutrition.fat ?? 0}
+              imageUrl={log.imageUrl}
+              kcal={nutrition.kcal ?? 0}
+              name={log.name}
+              productId={log.productId}
+              protein={nutrition.protein ?? 0}
+            />
+          ) : (
             <Label text='Name'>
               <TextInput defaultValue={log.name} name='name' required />
             </Label>
-          ) : null}
+          )}
 
-          <div className={css.logFields}>
-            <Label text='Date'>
-              <DateInput defaultValue={log.date} name='date' required />
-            </Label>
-
-            <Label text='Amount eaten (g)'>
-              <NumberInput min={0} name='grams' onValueChange={changeGrams} value={grams} />
-            </Label>
-          </div>
+          <Label text='Amount eaten (g)'>
+            <NumberInput min={0} name='grams' onValueChange={changeGrams} value={grams} />
+          </Label>
 
           {!isProduct ? (
             <KcalMacrosForm onValueChange={changeNutrition} values={nutrition} />
