@@ -3,15 +3,13 @@ import { useThrottledValue } from '@tanstack/react-pacer';
 import { useState } from 'react';
 import { Card } from '@/components/ui/card/Card';
 import { SelectInput } from '@/components/ui/select-input/SelectInput';
-import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
-import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
 import { CheckedNoteCard } from './CheckedNoteCard';
 import type { NoteSummary } from './notes.api';
-import { NoteActions } from './NoteActions';
 import { NoteComposer } from './NoteComposer';
-import { notesQueryOptions, useUpdateNoteMutation } from './notes.query';
+import { notesQueryOptions } from './notes.query';
+import { TextNoteCard } from './TextNoteCard';
 import css from './TodosPage.module.css';
 
 const noteScopeItems = [
@@ -79,44 +77,5 @@ export function TodosPage() {
 
       <NoteComposer />
     </main>
-  );
-}
-
-function TextNoteCard({ note }: { note: NoteSummary }) {
-  const updateNote = useUpdateNoteMutation();
-
-  return (
-    <Card as='article' className={css.noteCard}>
-      <div className={css.cardHeader}>
-        <h2>
-          <SeamlessTextInput
-            aria-label='Note title'
-            className={css.titleInput}
-            defaultValue={note.title}
-            maxLength={160}
-            onBlur={(event) => {
-              const title = event.currentTarget.value.trim();
-              if (!title) event.currentTarget.value = note.title;
-              else if (title !== note.title) updateNote.mutate({ id: note.id, title });
-            }}
-            required
-          />
-        </h2>
-        <NoteActions note={note} />
-      </div>
-      <SeamlessTextarea
-        aria-label='Note content'
-        className={css.contentInput}
-        defaultValue={note.content}
-        maxLength={16000}
-        onBlur={(event) => {
-          if (event.currentTarget.value !== note.content) {
-            updateNote.mutate({ id: note.id, content: event.currentTarget.value });
-          }
-        }}
-        placeholder='Write your note…'
-        rows={3}
-      />
-    </Card>
   );
 }
