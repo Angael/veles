@@ -280,7 +280,7 @@ export function BarcodeScanner({ closeRender, onDetected, status }: BarcodeScann
           </div>
         ) : null}
         {isScanning && cameraHintVisible ? (
-          <Card className={css.cameraHint} shadow={false} variant='primary'>
+          <Card className={css.cameraHint} shadow={false} tone='primary'>
             If the image looks blurry, try switching to another rear camera.
           </Card>
         ) : null}

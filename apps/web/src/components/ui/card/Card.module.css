@@ -11,16 +11,50 @@
   }
 }
 
+/* One glow pattern for every tone: a strong top-left bloom and a faint bottom-right echo. */
+.toned {
+  border-color: color-mix(in srgb, var(--card-tone) 20%, transparent);
+  background:
+    radial-gradient(
+      circle at 8% 12%,
+      color-mix(in srgb, var(--card-tone) 14%, transparent),
+      transparent 52%
+    ),
+    radial-gradient(
+      circle at 100% 110%,
+      color-mix(in srgb, var(--card-tone-secondary, var(--card-tone)) 9%, transparent),
+      transparent 44%
+    ),
+    linear-gradient(145deg, var(--c-surface), var(--c-surface-inset));
+}
+
 .primary {
-  border-color: var(--c-primary-border-soft);
-  background: color-mix(in srgb, var(--c-surface-solid) 82%, var(--c-primary-surface));
-  box-shadow: var(--shadow-card-primary);
+  --card-tone: var(--c-primary-border);
+  --card-tone-secondary: var(--c-accent-strong);
+}
+
+.sky {
+  --card-tone: var(--c-accent);
+  --card-tone-secondary: var(--c-macro-carb);
+}
+
+.protein {
+  --card-tone: var(--c-macro-protein);
+}
+
+.fat {
+  --card-tone: var(--c-macro-fat);
+}
+
+.carbs {
+  --card-tone: var(--c-macro-carb);
 }
 
 .danger {
+  --card-tone: #f87171;
+  --card-tone-secondary: var(--c-macro-fat);
+
   border-color: var(--c-danger-border);
-  background: color-mix(in srgb, var(--c-surface-solid) 82%, var(--c-danger-surface));
-  box-shadow: var(--shadow-card-danger);
 }
 
 .noShadow {

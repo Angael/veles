@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { GoalIcon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
 import type { CalorieGoal, CalorieTotals } from '../calories.api';
 import css from './DailySummary.module.css';
 
@@ -11,84 +12,63 @@ type DailySummaryProps = {
 
 export function DailySummary({ goal, totals }: DailySummaryProps) {
   return (
-    <section aria-label='Daily nutrition summary' className={css.summary} data-appear='1'>
-      <div className={css.body}>
-        <div className={css.energyPanel}>
-          <div className={css.energyHeader}>
-            <h2>Calories</h2>
-            <Btn
-              className={css.goalAction}
-              icon={<GoalIcon aria-hidden='true' />}
-              isLink
-              render={<Link to='/calories/goals' />}
-              size='sm'
-              variant='text'
-            >
-              {goal ? 'Edit goals' : 'Set goals'}
-            </Btn>
-          </div>
-          <EnergyProgress consumed={totals.kcal} goal={goal?.kcal ?? null} />
+    <Card
+      aria-label='Daily nutrition summary'
+      as='section'
+      className={css.summary}
+      data-appear='1'
+      tone='sky'
+    >
+      <div className={css.energy}>
+        <div className={css.energyTop}>
+          <p className={css.energyAmount}>
+            <strong>{Math.round(totals.kcal)}</strong>
+            <span>{goal ? `/ ${Math.round(goal.kcal)} kcal` : 'kcal eaten'}</span>
+          </p>
+          <Btn
+            aria-label={goal ? 'Edit goals' : undefined}
+            className={css.goalAction}
+            icon={<GoalIcon aria-hidden='true' />}
+            iconOnly={Boolean(goal)}
+            isLink
+            radius='pill'
+            render={<Link to='/calories/goals' />}
+            size='sm'
+            variant='ghost'
+          >
+            {goal ? null : 'Set goals'}
+          </Btn>
         </div>
-
-        <dl className={css.macros}>
-          <Macro goal={goal?.protein} label='Protein' tone='protein' value={totals.protein ?? 0} />
-          <Macro goal={goal?.fat} label='Fat' tone='fat' value={totals.fat ?? 0} />
-          <Macro goal={goal?.carbs} label='Carbs' tone='carbs' value={totals.carbs ?? 0} />
-        </dl>
+        {goal ? (
+          <>
+            <Meter goal={goal.kcal} size='lg' value={totals.kcal} />
+            <EnergyStatus consumed={totals.kcal} goal={goal.kcal} />
+          </>
+        ) : (
+          <p className={css.energyHint}>Set a daily goal to see how much is left.</p>
+        )}
       </div>
-    </section>
+
+      <dl className={css.macros}>
+        <Macro goal={goal?.protein} label='Protein' tone='protein' value={totals.protein ?? 0} />
+        <Macro goal={goal?.fat} label='Fat' tone='fat' value={totals.fat ?? 0} />
+        <Macro goal={goal?.carbs} label='Carbs' tone='carbs' value={totals.carbs ?? 0} />
+      </dl>
+    </Card>
   );
 }
 
-/**
- * Shows consumed kcal against the goal on one meter. The track scales to whichever is larger, so
- * once the goal is passed a notch marks it and the overage fills beyond it instead of clipping.
- */
-function EnergyProgress({ consumed, goal }: { consumed: number; goal: number | null }) {
-  const consumedKcal = Math.round(consumed);
-
-  if (goal === null) {
-    return (
-      <>
-        <p className={css.energyAmount}>
-          <strong>{consumedKcal}</strong>
-          <span>kcal eaten</span>
-        </p>
-        <p className={css.energyHint}>Set a daily goal to see how much is left.</p>
-      </>
-    );
-  }
-
-  const goalKcal = Math.round(goal);
-  const scale = Math.max(consumed, goal);
+function EnergyStatus({ consumed, goal }: { consumed: number; goal: number }) {
   const isOver = consumed > goal;
-  const withinShare = scale > 0 ? (Math.min(consumed, goal) / scale) * 100 : 0;
-  const percent = goal > 0 ? Math.round((consumed / goal) * 100) : null;
-  const difference = Math.round(Math.abs(goal - consumed));
 
   return (
-    <>
-      <p className={css.energyAmount}>
-        <strong>{consumedKcal}</strong>
-        <span>/ {goalKcal} kcal</span>
-      </p>
-      <div className={css.energyMeter} data-over={isOver || undefined}>
-        <div aria-hidden='true' className={css.energyTrack}>
-          <span className={css.energyFill} style={{ width: `${withinShare}%` }} />
-          <span
-            className={css.energyOverFill}
-            style={{ left: `${withinShare}%`, width: `${isOver ? 100 - withinShare : 0}%` }}
-          />
-          <span className={css.goalMarker} style={{ left: `${withinShare}%` }} />
-        </div>
-        <p className={css.energyStatus}>
-          <span>
-            <strong>{difference}</strong> kcal {isOver ? 'over goal' : 'left'}
-          </span>
-          {percent === null ? null : <span className={css.energyPercent}>{percent}%</span>}
-        </p>
-      </div>
-    </>
+    <p className={css.energyStatus} data-over={isOver || undefined}>
+      <span>
+        <strong>{Math.round(Math.abs(goal - consumed))}</strong> kcal{' '}
+        {isOver ? 'over goal' : 'left'}
+      </span>
+      {goal > 0 ? <span>{Math.round((consumed / goal) * 100)}%</span> : null}
+    </p>
   );
 }
 
@@ -103,41 +83,41 @@ function Macro({
   tone: 'protein' | 'fat' | 'carbs';
   value: number;
 }) {
-  const progress = progressFor(value, goal);
-  const isOverGoal = goal !== null && goal !== undefined && value > goal;
-  const overProgress =
-    goal !== null && goal !== undefined && value > goal ? progressFor(value - goal, goal) : null;
+  const hasGoal = goal !== null && goal !== undefined;
 
   return (
-    <div className={css[tone]}>
+    <div className={css.macro} data-over={(hasGoal && value > goal) || undefined} data-tone={tone}>
       <dt>{label}</dt>
       <dd className={css.macroValue}>
-        <span className={isOverGoal ? css.macroConsumedOver : css.macroConsumed}>
-          {Math.round(value)}g
-        </span>
-        {goal === null || goal === undefined ? null : (
-          <>
-            <span className={css.macroSeparator}>/</span>
-            <span className={css.macroTarget}>{Math.round(goal)}g</span>
-          </>
-        )}
+        <strong>{Math.round(value)}</strong>
+        {hasGoal ? ` / ${Math.round(goal)}` : null} g
       </dd>
-      {progress === null ? null : (
-        <dd aria-hidden='true' className={css.macroFill} style={{ width: `${progress}%` }} />
-      )}
-      {overProgress === null ? null : (
-        <dd
-          aria-hidden='true'
-          className={css.macroOverFill}
-          style={{ width: `${overProgress}%` }}
-        />
-      )}
+      {hasGoal ? (
+        <dd className={css.macroMeter}>
+          <Meter goal={goal} size='sm' value={value} />
+        </dd>
+      ) : null}
     </div>
   );
 }
 
-function progressFor(value: number, goal: number | null | undefined) {
-  if (goal === null || goal === undefined) return null;
-  if (goal <= 0) return value > 0 ? 100 : 0;
-  return Math.min(Math.max((value / goal) * 100, 0), 100);
+/**
+ * Progress track shared by kcal and macros, colored by `currentColor`. It scales to whichever of
+ * value and goal is larger, so an overage grows from the goal notch instead of clipping at 100%.
+ */
+function Meter({ goal, size, value }: { goal: number; size: 'sm' | 'lg'; value: number }) {
+  const scale = Math.max(value, goal);
+  const isOver = value > goal;
+  const withinShare = scale > 0 ? (Math.min(value, goal) / scale) * 100 : 0;
+
+  return (
+    <div aria-hidden='true' className={css.meter} data-over={isOver || undefined} data-size={size}>
+      <span className={css.meterFill} style={{ width: `${withinShare}%` }} />
+      <span
+        className={css.meterOver}
+        style={{ left: `${withinShare}%`, width: `${isOver ? 100 - withinShare : 0}%` }}
+      />
+      <span className={css.meterMarker} style={{ left: `${withinShare}%` }} />
+    </div>
+  );
 }

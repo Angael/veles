@@ -195,11 +195,23 @@ export function ComponentsDemoPage() {
         <h2>Card</h2>
         <div className={css.cardRow}>
           <Card as='article'>Default card</Card>
-          <Card as='article' variant='primary'>
-            Primary card
+          <Card as='article' tone='primary'>
+            Primary tone
           </Card>
-          <Card as='article' variant='danger'>
-            Danger card
+          <Card as='article' tone='sky'>
+            Sky tone
+          </Card>
+          <Card as='article' tone='protein'>
+            Protein tone
+          </Card>
+          <Card as='article' tone='fat'>
+            Fat tone
+          </Card>
+          <Card as='article' tone='carbs'>
+            Carbs tone
+          </Card>
+          <Card as='article' tone='danger'>
+            Danger tone
           </Card>
           <Card as='article' shadow={false}>
             Card without shadow
