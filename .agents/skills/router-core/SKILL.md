@@ -1,10 +1,9 @@
 ---
 name: router-core
 description: >-
-  Framework-agnostic core concepts for TanStack Router: route trees,
-  createRouter, createRoute, createRootRoute, createRootRouteWithContext,
-  addChildren, Register type declaration, route matching, route sorting,
-  file naming conventions. Entry point for all router skills.
+  TanStack Router core: route trees, createRouter/createRoute, file naming, route matching.
+  Entry point for router work; references cover search/path params, navigation, loaders,
+  code splitting, not-found/errors, type safety, and SSR.
 type: core
 library: tanstack-router
 library_version: '1.166.2'
@@ -18,53 +17,20 @@ TanStack Router is a type-safe router for React and Solid with built-in SWR cach
 
 > **CRITICAL**: TanStack Router is CLIENT-FIRST. Loaders run on the client by default, NOT server-only like Remix/Next.js. Do not confuse TanStack Router APIs with Next.js or React Router.
 
-## Sub-Skills
+## References
 
-| Task                                               | Sub-Skill                                                                    |
-| -------------------------------------------------- | ---------------------------------------------------------------------------- |
-| Validate, read, write, transform search params     | [router-core-search-params](skill://router-core-search-params)               |
-| Dynamic segments, splats, optional params          | [router-core-path-params](skill://router-core-path-params)                   |
-| Link, useNavigate, preloading, blocking            | [router-core-navigation](skill://router-core-navigation)                     |
-| Route loaders, SWR caching, context, deferred data | [router-core-data-loading](skill://router-core-data-loading)                 |
-| Auth guards, RBAC, beforeLoad redirects            | [router-core-auth-and-guards](skill://router-core-auth-and-guards)           |
-| Automatic and manual code splitting                | [router-core-code-splitting](skill://router-core-code-splitting)             |
-| 404 handling, error boundaries, notFound()         | [router-core-not-found-and-errors](skill://router-core-not-found-and-errors) |
-| Inference, Register, from narrowing, TS perf       | [router-core-type-safety](skill://router-core-type-safety)                   |
-| Streaming/non-streaming SSR, hydration, head mgmt  | [router-core-ssr](skill://router-core-ssr)                                   |
+Read the matching file before working in that area:
 
-## Quick Decision Tree
+- `skill://router-core/references/search-params.md` — validateSearch, reading/writing/transforming search params (patterns: `references/search-params-validation-patterns.md`)
+- `skill://router-core/references/path-params.md` — dynamic segments, splats, optional params
+- `skill://router-core/references/navigation.md` — Link, useNavigate, preloading, navigation blocking
+- `skill://router-core/references/data-loading.md` — loaders, loaderDeps, SWR caching, deferred data
+- `skill://router-core/references/code-splitting.md` — automatic/manual code splitting, `.lazy.tsx`
+- `skill://router-core/references/not-found-and-errors.md` — notFound(), notFoundComponent, error boundaries
+- `skill://router-core/references/type-safety.md` — inference, Register, `from` narrowing, TS perf
+- `skill://router-core/references/ssr.md` — streaming/non-streaming SSR, hydration, head management
 
-```
-Need to add/read/write URL query parameters?
-  → router-core-search-params
-
-Need dynamic URL segments like /posts/$postId?
-  → router-core-path-params
-
-Need to create links or navigate programmatically?
-  → router-core-navigation
-
-Need to fetch data for a route?
-  Is it client-side only or client+server?
-    → router-core-data-loading
-  Using TanStack Query as external cache?
-    → compositions-router-query (separate skill)
-
-Need to protect routes behind auth?
-  → router-core-auth-and-guards
-
-Need to reduce bundle size per route?
-  → router-core-code-splitting
-
-Need custom 404 or error handling?
-  → router-core-not-found-and-errors
-
-Having TypeScript issues or performance problems?
-  → router-core-type-safety
-
-Need server-side rendering?
-  → router-core-ssr
-```
+Separate skills: `router-core-auth-and-guards` (route protection), `compositions-router-query` (TanStack Query as loader cache), `react-router` (React bindings).
 
 ## Minimal Working Example
 

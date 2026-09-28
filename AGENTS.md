@@ -7,6 +7,12 @@
 - Generated files are exempt and must not be hand-edited.
 - Skip adding tests unless user tells you to write them
 
+## Commands
+- Fresh checkout or worktree: run `pnpm install --frozen-lockfile` first; `pnpm check:fix` fails without `node_modules`.
+- Full gate: `pnpm check:fix` (format, lint, CSS lint, typecheck, tests).
+- Single web test file: `pnpm --filter @veles/web test -- <path relative to apps/web>`. Vitest is not installed at the root, so root `pnpm exec vitest` fails.
+- Typecheck one package: `pnpm --filter <@veles/web|@veles/worker|@veles/db|@veles/preview> typecheck`.
+
 ## CI/CD
 - Avoid GitHub Actions and GitHub CI/CD for sensitive prod workflows; this repo is public
 - Pushing to `main` makes Dokploy pull, install, and deploy to prod
@@ -19,7 +25,7 @@
 - `pnpm db:reset` rebuilds the development database and seeds the development user/account, calorie goal, food products, food logs and weights, recipes, and diary entries.
 
 ## Structure
-- The web app lives under `apps/web`; paths in this section are repository-root-relative.
+- There is no root `src/`. Code lives in `apps/web/src`, `apps/worker/src`, `apps/preview/src`, and `packages/db/src`; paths in this section are repository-root-relative.
 - `apps/web/src/routes` owns URLs, guards, loaders, and tiny adapters. Route implementation belongs in `apps/web/src/pages`.
 - `apps/web/src/pages` owns product features. Small features flat; split large features by workflows.
 - Keep feature-specific code beside the owning page or workflow. Features shouldn't import other feature's page components.

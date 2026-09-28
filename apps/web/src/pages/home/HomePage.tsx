@@ -13,7 +13,7 @@ import css from './HomePage.module.css';
 export function HomePage() {
   return (
     <main className={css.layout}>
-      <Card as='article' className={css.hero} data-appear variant='primary'>
+      <Card as='article' className={css.hero} data-appear tone='primary'>
         <span aria-hidden='true' className={css.monogram}>
           V
         </span>
