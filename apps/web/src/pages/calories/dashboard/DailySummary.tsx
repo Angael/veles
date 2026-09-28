@@ -75,12 +75,11 @@ function EnergyProgress({ consumed, goal }: { consumed: number; goal: number | n
       <div className={css.energyMeter} data-over={isOver || undefined}>
         <div aria-hidden='true' className={css.energyTrack}>
           <span className={css.energyFill} style={{ width: `${withinShare}%` }} />
-          {isOver ? (
-            <>
-              <span className={css.energyOverFill} style={{ left: `${withinShare}%` }} />
-              <span className={css.goalMarker} style={{ left: `${withinShare}%` }} />
-            </>
-          ) : null}
+          <span
+            className={css.energyOverFill}
+            style={{ left: `${withinShare}%`, width: `${isOver ? 100 - withinShare : 0}%` }}
+          />
+          <span className={css.goalMarker} style={{ left: `${withinShare}%` }} />
         </div>
         <p className={css.energyStatus}>
           <span>

@@ -80,6 +80,10 @@
   display: grid;
   gap: var(--space-xs);
 
+  &:not([data-over]) .goalMarker {
+    opacity: 0;
+  }
+
   &[data-over] .energyFill {
     border-radius: 0;
     background: color-mix(in srgb, var(--c-accent) 55%, var(--c-muted-strong));
@@ -96,12 +100,19 @@
 }
 
 .energyFill,
-.energyOverFill {
+.energyOverFill,
+.goalMarker {
   position: absolute;
   inset-block: 0;
   transition:
     left 500ms var(--ease-out),
-    width 500ms var(--ease-out);
+    width 500ms var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
+
+  @starting-style {
+    left: 0;
+    width: 0;
+  }
 }
 
 .energyFill {
@@ -115,7 +126,6 @@
 }
 
 .energyOverFill {
-  right: 0;
   background: repeating-linear-gradient(
     -45deg,
     #f87171 0 0.3rem,
@@ -124,12 +134,15 @@
 }
 
 .goalMarker {
-  position: absolute;
   z-index: 1;
-  inset-block: 0;
   width: 3px;
   translate: -50% 0;
   background: var(--c-surface-solid);
+
+  @starting-style {
+    left: 0;
+    width: 3px;
+  }
 }
 
 .energyStatus {
@@ -338,6 +351,7 @@
 @media (prefers-reduced-motion: reduce) {
   .energyFill,
   .energyOverFill,
+  .goalMarker,
   .macroFill,
   .macroOverFill {
     transition: none;
