@@ -1,6 +1,6 @@
 ---
 name: date-operations
-description: Use when handling dates in typescript
+description: Use when parsing, formatting, comparing, or doing arithmetic on dates/times (day boundaries, week ranges, diary/log dates, timezones) in TypeScript; use date-fns instead of hand-rolled helpers.
 ---
 
 # Date Operations

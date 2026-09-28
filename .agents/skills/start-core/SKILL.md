@@ -1,10 +1,9 @@
 ---
 name: start-core
 description: >-
-  Core overview for TanStack Start: tanstackStart() Vite plugin,
-  getRouter() factory, root route document shell (HeadContent,
-  Scripts, Outlet), client/server entry points, routeTree.gen.ts,
-  tsconfig configuration. Entry point for all Start skills.
+  TanStack Start core: tanstackStart() Vite plugin, getRouter() factory, root document shell,
+  entry points, routeTree.gen.ts. Entry point for Start work; references cover middleware,
+  server routes, execution model, and React bindings.
 type: core
 library: tanstack-start
 library_version: '1.166.2'
@@ -22,38 +21,16 @@ TanStack Start is a full-stack React framework built on TanStack Router and Vite
 > **CRITICAL**: TanStack Start is NOT Next.js. Do not generate `getServerSideProps`, `"use server"` directives, `app/layout.tsx`, or any Next.js/Remix patterns. Use `createServerFn` for server-only code.
 > **CRITICAL**: Types are FULLY INFERRED. Never cast, never annotate inferred values.
 
-## Sub-Skills
+## References
 
-| Task                                             | Sub-Skill                                                                       |
-| ------------------------------------------------ | ------------------------------------------------------------------------------- |
-| Type-safe RPCs, data fetching, mutations         | [start-core-server-functions](skill://start-core-server-functions)             |
-| Request/function middleware, context, auth       | [start-core-middleware](skill://start-core-middleware)                         |
-| Server-side auth: sessions, cookies, OAuth, CSRF | [start-core-auth-server-primitives](skill://start-core-auth-server-primitives) |
-| Isomorphic execution, environment boundaries     | [start-core-execution-model](skill://start-core-execution-model)               |
-| REST API endpoints alongside app routes          | [start-core-server-routes](skill://start-core-server-routes)                   |
-| Hosting, SSR modes, prerendering, SEO            | [start-core-deployment](skill://start-core-deployment)                         |
+Read the matching file before working in that area:
 
-## Quick Decision Tree
+- `skill://start-core/references/middleware.md` — request/function middleware, context passing
+- `skill://start-core/references/server-routes.md` — REST endpoints via the `server` property on file routes
+- `skill://start-core/references/execution-model.md` — isomorphic code, createServerOnlyFn/createClientOnlyFn, env boundaries
+- `skill://start-core/references/react-start.md` — React bindings: createStart, StartClient/StartServer, useServerFn
 
-```text
-Need to run code exclusively on the server (DB, secrets)?
-  → start-core-server-functions
-
-Need auth checks, logging, or shared logic across server functions?
-  → start-core-middleware
-
-Need to add login, sessions, OAuth, CSRF, password reset?
-  → start-core-auth-server-primitives
-
-Need to understand where code runs (server vs client)?
-  → start-core-execution-model
-
-Need a REST API endpoint (GET/POST/PUT/DELETE)?
-  → start-core-server-routes
-
-Need to deploy, configure SSR, or prerender?
-  → start-core-deployment
-```
+Separate skills: `start-core-server-functions` (createServerFn, validators), `start-core-auth-server-primitives` (sessions, cookies, OAuth, CSRF).
 
 ## Project Setup
 

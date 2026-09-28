@@ -407,7 +407,7 @@ export function signSession(payload) {
 }
 ```
 
-On Cloudflare Workers and other edge runtimes, the module-level read evaluates to `undefined` even on the server because env is injected per-request. See [start-core-execution-model](skill://start-core-execution-model).
+On Cloudflare Workers and other edge runtimes, the module-level read evaluates to `undefined` even on the server because env is injected per-request. See [start-core-execution-model](skill://start-core/references/execution-model.md).
 
 ### MEDIUM: Long-lived sessions with no rotation
 
@@ -417,5 +417,5 @@ A session token that never rotates is functionally a long-lived credential. Rota
 
 - [router-core-auth-and-guards](skill://router-core-auth-and-guards) — the routing side: `_authenticated` layout, `beforeLoad`, `redirect`, RBAC checks.
 - [start-core-server-functions](skill://start-core-server-functions) — how to expose RPCs (and how the route guard does NOT cover them).
-- [start-core-middleware](skill://start-core-middleware) — composing `authMiddleware` and others.
-- [start-core-execution-model](skill://start-core-execution-model) — why module-level env/secret reads are wrong.
+- [start-core-middleware](skill://start-core/references/middleware.md) — composing `authMiddleware` and others.
+- [start-core-execution-model](skill://start-core/references/execution-model.md) — why module-level env/secret reads are wrong.
