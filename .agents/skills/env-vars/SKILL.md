@@ -1,6 +1,6 @@
 ---
 name: env-vars
-description: Use when adding, renaming, removing, or reading environment variables — .env/.env.example, VITE_* client vars, getServerEnv(), env.d.ts, Dockerfile ARG/ENV, compose.yaml, worker or Drizzle env, or the veles/env-vars lint rule.
+description: Use when modyfing env files
 ---
 
 # Environment Variables
