@@ -10,11 +10,6 @@ type DailySummaryProps = {
 };
 
 export function DailySummary({ goal, totals }: DailySummaryProps) {
-  const remaining = goal ? goal.kcal - totals.kcal : 0;
-  const energyProgress = progressFor(totals.kcal, goal?.kcal);
-  const energyOverProgress =
-    goal && totals.kcal > goal.kcal ? progressFor(totals.kcal - goal.kcal, goal.kcal) : null;
-
   return (
     <section aria-label='Daily nutrition summary' className={css.summary} data-appear='1'>
       <div className={css.body}>
@@ -32,31 +27,7 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
               {goal ? 'Edit goals' : 'Set goals'}
             </Btn>
           </div>
-          <div className={css.energyAmounts}>
-            <strong>{Math.round(totals.kcal)}</strong>
-            <span>kcal consumed</span>
-            {goal ? (
-              <span className={css.energyGoal}>of {Math.round(goal.kcal)} kcal goal</span>
-            ) : null}
-          </div>
-          {goal && energyProgress !== null ? (
-            <div className={css.energyFooter}>
-              <div aria-hidden='true' className={css.energyTrack}>
-                <span className={css.energyFill} style={{ width: `${energyProgress}%` }} />
-                {energyOverProgress === null ? null : (
-                  <span
-                    className={css.energyOverFill}
-                    style={{ width: `${energyOverProgress}%` }}
-                  />
-                )}
-              </div>
-              <span className={remaining < 0 ? css.energyOver : css.energyRemaining}>
-                {remaining < 0
-                  ? `${Math.round(-remaining)} kcal over goal`
-                  : `${Math.round(remaining)} kcal remaining`}
-              </span>
-            </div>
-          ) : null}
+          <EnergyProgress consumed={totals.kcal} goal={goal?.kcal ?? null} />
         </div>
 
         <dl className={css.macros}>
@@ -66,6 +37,59 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
         </dl>
       </div>
     </section>
+  );
+}
+
+/**
+ * Shows consumed kcal against the goal on one meter. The track scales to whichever is larger, so
+ * once the goal is passed a notch marks it and the overage fills beyond it instead of clipping.
+ */
+function EnergyProgress({ consumed, goal }: { consumed: number; goal: number | null }) {
+  const consumedKcal = Math.round(consumed);
+
+  if (goal === null) {
+    return (
+      <>
+        <p className={css.energyAmount}>
+          <strong>{consumedKcal}</strong>
+          <span>kcal eaten</span>
+        </p>
+        <p className={css.energyHint}>Set a daily goal to see how much is left.</p>
+      </>
+    );
+  }
+
+  const goalKcal = Math.round(goal);
+  const scale = Math.max(consumed, goal);
+  const isOver = consumed > goal;
+  const withinShare = scale > 0 ? (Math.min(consumed, goal) / scale) * 100 : 0;
+  const percent = goal > 0 ? Math.round((consumed / goal) * 100) : null;
+  const difference = Math.round(Math.abs(goal - consumed));
+
+  return (
+    <>
+      <p className={css.energyAmount}>
+        <strong>{consumedKcal}</strong>
+        <span>/ {goalKcal} kcal</span>
+      </p>
+      <div className={css.energyMeter} data-over={isOver || undefined}>
+        <div aria-hidden='true' className={css.energyTrack}>
+          <span className={css.energyFill} style={{ width: `${withinShare}%` }} />
+          {isOver ? (
+            <>
+              <span className={css.energyOverFill} style={{ left: `${withinShare}%` }} />
+              <span className={css.goalMarker} style={{ left: `${withinShare}%` }} />
+            </>
+          ) : null}
+        </div>
+        <p className={css.energyStatus}>
+          <span>
+            <strong>{difference}</strong> kcal {isOver ? 'over goal' : 'left'}
+          </span>
+          {percent === null ? null : <span className={css.energyPercent}>{percent}%</span>}
+        </p>
+      </div>
+    </>
   );
 }
 
