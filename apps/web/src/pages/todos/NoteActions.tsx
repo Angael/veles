@@ -10,7 +10,14 @@ export function NoteActions({ note }: { note: NoteSummary }) {
   const deleteNote = useDeleteNoteMutation();
   const setShared = useSetNoteSharedMutation();
 
-  if (!note.isOwned) return <span className={css.sharedBy}>Shared by {note.ownerName}</span>;
+  if (!note.isOwned) {
+    return (
+      <div className={css.noteActions}>
+        <span className={css.sharedBy}>Shared by {note.ownerName}</span>
+        <NoteTypeButton note={note} />
+      </div>
+    );
+  }
 
   return (
     <div className={css.noteActions}>
@@ -32,7 +39,7 @@ export function NoteActions({ note }: { note: NoteSummary }) {
           heading='Share note'
         >
           <MenuBtnItem
-            description='Let your friends view this note'
+            description='Let your friends view and edit this note'
             icon={<UsersIcon aria-hidden='true' />}
             label='Share with friends'
             onClick={() => {

@@ -14,10 +14,14 @@ import {
 
 export const notesQueryKey = ['notes'] as const;
 
+/** Notes are shared between users, so keep them fresh: refetch on focus and poll while visible. */
 export function notesQueryOptions() {
   return queryOptions({
     queryFn: () => getNotes(),
     queryKey: notesQueryKey,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: 'always',
+    staleTime: 5_000,
   });
 }
 

@@ -1,3 +1,4 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useThrottledValue } from '@tanstack/react-pacer';
 import { useState } from 'react';
 import { Card } from '@/components/ui/card/Card';
@@ -10,7 +11,7 @@ import { CheckedNoteCard } from './CheckedNoteCard';
 import type { NoteSummary } from './notes.api';
 import { NoteActions } from './NoteActions';
 import { NoteComposer } from './NoteComposer';
-import { useUpdateNoteMutation } from './notes.query';
+import { notesQueryOptions, useUpdateNoteMutation } from './notes.query';
 import css from './TodosPage.module.css';
 
 const noteScopeItems = [
@@ -24,7 +25,8 @@ const noteSearchFields = [
   (note) => note.items.map((item) => item.name),
 ] satisfies RankedSearchFields<NoteSummary>;
 
-export function TodosPage({ notes }: { notes: NoteSummary[] }) {
+export function TodosPage() {
+  const { data: notes, refetch: refetchNotes } = useSuspenseQuery(notesQueryOptions());
   const [noteScope, setNoteScope] = useState<'all' | 'owned'>('all');
   const [searchInputValue, setSearchInputValue] = useState('');
   const [search] = useThrottledValue(searchInputValue, { wait: 200 });
@@ -33,7 +35,7 @@ export function TodosPage({ notes }: { notes: NoteSummary[] }) {
 
   return (
     <main className={css.page}>
-      <section aria-label='Filter notes' className={css.controls}>
+      <section aria-label='Filter notes' className={css.controls} data-appear>
         <TextInput
           aria-label='Search notes'
           autoComplete='off'
@@ -47,13 +49,15 @@ export function TodosPage({ notes }: { notes: NoteSummary[] }) {
           aria-label='Note ownership'
           items={noteScopeItems}
           onValueChange={(value) => {
-            if (value) setNoteScope(value);
+            if (!value) return;
+            setNoteScope(value);
+            void refetchNotes();
           }}
           value={noteScope}
         />
       </section>
       {visibleNotes.length === 0 ? (
-        <Card as='section' className={css.emptyState}>
+        <Card as='section' className={css.emptyState} data-appear='1'>
           <h2>{notes.length === 0 ? 'No notes yet' : 'No matching notes'}</h2>
           <p>
             {notes.length === 0
@@ -62,7 +66,7 @@ export function TodosPage({ notes }: { notes: NoteSummary[] }) {
           </p>
         </Card>
       ) : (
-        <section aria-label='Your notes and shared notes' className={css.listGrid}>
+        <section aria-label='Your notes and shared notes' className={css.listGrid} data-appear='1'>
           {visibleNotes.map((note) =>
             note.type === 'shopping_list' ? (
               <CheckedNoteCard key={note.id} note={note} />
@@ -89,10 +93,8 @@ function TextNoteCard({ note }: { note: NoteSummary }) {
             aria-label='Note title'
             className={css.titleInput}
             defaultValue={note.title}
-            readOnly={!note.isOwned}
             maxLength={160}
             onBlur={(event) => {
-              if (!note.isOwned) return;
               const title = event.currentTarget.value.trim();
               if (!title) event.currentTarget.value = note.title;
               else if (title !== note.title) updateNote.mutate({ id: note.id, title });
@@ -106,10 +108,8 @@ function TextNoteCard({ note }: { note: NoteSummary }) {
         aria-label='Note content'
         className={css.contentInput}
         defaultValue={note.content}
-        readOnly={!note.isOwned}
         maxLength={16000}
         onBlur={(event) => {
-          if (!note.isOwned) return;
           if (event.currentTarget.value !== note.content) {
             updateNote.mutate({ id: note.id, content: event.currentTarget.value });
           }

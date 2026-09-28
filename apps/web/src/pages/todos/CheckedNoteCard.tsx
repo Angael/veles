@@ -27,10 +27,8 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
             aria-label='Checklist title'
             className={css.titleInput}
             defaultValue={note.title}
-            readOnly={!note.isOwned}
             maxLength={160}
             onBlur={(event) => {
-              if (!note.isOwned) return;
               const title = event.currentTarget.value.trim();
               if (!title) event.currentTarget.value = note.title;
               else if (title !== note.title) updateNote.mutate({ id: note.id, title });
@@ -43,46 +41,31 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
       {note.items.length === 0 ? <p className={css.emptyList}>No items yet.</p> : null}
       <ul className={css.items}>
         {note.items.map((item) => (
-          <CheckedNoteItem
-            autoFocus={note.isOwned && item.id === newItemId}
-            isOwned={note.isOwned}
-            item={item}
-            key={item.id}
-          />
+          <CheckedNoteItem autoFocus={item.id === newItemId} item={item} key={item.id} />
         ))}
       </ul>
-      {note.isOwned && (
-        <Btn
-          aria-label='Add item'
-          className={css.addItem}
-          icon={<PlusIcon aria-hidden='true' />}
-          loading={createItem.isPending}
-          onClick={() => {
-            createItem.mutate(
-              { name: 'New item', noteId: note.id },
-              { onSuccess: (created) => setNewItemId(created.id) },
-            );
-          }}
-          size='sm'
-          type='button'
-          variant='outlineMain'
-        >
-          Add item
-        </Btn>
-      )}
+      <Btn
+        aria-label='Add item'
+        className={css.addItem}
+        icon={<PlusIcon aria-hidden='true' />}
+        loading={createItem.isPending}
+        onClick={() => {
+          createItem.mutate(
+            { name: 'New item', noteId: note.id },
+            { onSuccess: (created) => setNewItemId(created.id) },
+          );
+        }}
+        size='sm'
+        type='button'
+        variant='outlineMain'
+      >
+        Add item
+      </Btn>
     </Card>
   );
 }
 
-function CheckedNoteItem({
-  autoFocus,
-  isOwned,
-  item,
-}: {
-  autoFocus: boolean;
-  isOwned: boolean;
-  item: NoteListItem;
-}) {
+function CheckedNoteItem({ autoFocus, item }: { autoFocus: boolean; item: NoteListItem }) {
   const [checked, setChecked] = useState(item.checked);
   const setItemChecked = useSetListItemCheckedMutation();
   const updateItem = useUpdateListItemMutation();
@@ -95,7 +78,7 @@ function CheckedNoteItem({
       <input
         aria-label={`Mark ${item.name} as ${checked ? 'incomplete' : 'complete'}`}
         checked={checked}
-        disabled={!isOwned || setItemChecked.isPending}
+        disabled={setItemChecked.isPending}
         onChange={(event) => {
           const nextChecked = event.currentTarget.checked;
           setChecked(nextChecked);
@@ -111,12 +94,10 @@ function CheckedNoteItem({
         aria-label='Checklist item'
         className={checked ? css.done : undefined}
         defaultValue={item.name}
-        readOnly={!isOwned}
         maxLength={240}
         onFocus={autoFocus ? (event) => event.currentTarget.select() : undefined}
         onKeyDown={(event) => {
           if (
-            isOwned &&
             !deleteItem.isPending &&
             (event.key === 'Backspace' || event.key === 'Delete') &&
             !event.currentTarget.value.trim()
@@ -126,26 +107,23 @@ function CheckedNoteItem({
           }
         }}
         onBlur={(event) => {
-          if (!isOwned) return;
           const name = event.currentTarget.value.trim();
           if (!name) event.currentTarget.value = item.name;
           else if (name !== item.name) updateItem.mutate({ id: item.id, name });
         }}
         required
       />
-      {isOwned && (
-        <Btn
-          aria-label={`Delete ${item.name}`}
-          className={css.deleteItem}
-          icon={<Trash2Icon aria-hidden='true' />}
-          iconOnly
-          loading={deleteItem.isPending}
-          onClick={() => deleteItem.mutate({ id: item.id })}
-          size='sm'
-          type='button'
-          variant='ghostDanger'
-        />
-      )}
+      <Btn
+        aria-label={`Delete ${item.name}`}
+        className={css.deleteItem}
+        icon={<Trash2Icon aria-hidden='true' />}
+        iconOnly
+        loading={deleteItem.isPending}
+        onClick={() => deleteItem.mutate({ id: item.id })}
+        size='sm'
+        type='button'
+        variant='ghostDanger'
+      />
     </li>
   );
 }

@@ -26,6 +26,32 @@ export type NoteSummary = {
   type: 'note' | 'shopping_list';
 };
 
+/** Matches notes the user owns or that a connected user shared; these are readable and editable. */
+function accessibleNote(userId: string) {
+  return or(
+    eq(notes.ownerId, userId),
+    and(
+      eq(notes.shared, true),
+      or(
+        inArray(
+          notes.ownerId,
+          db
+            .select({ id: userConnections.userHighId })
+            .from(userConnections)
+            .where(eq(userConnections.userLowId, userId)),
+        ),
+        inArray(
+          notes.ownerId,
+          db
+            .select({ id: userConnections.userLowId })
+            .from(userConnections)
+            .where(eq(userConnections.userHighId, userId)),
+        ),
+      ),
+    ),
+  );
+}
+
 export const getNotes = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getNotes')])
   .handler(async () => {
@@ -42,30 +68,7 @@ export const getNotes = createServerFn({ method: 'GET' })
       })
       .from(notes)
       .innerJoin(users, eq(notes.ownerId, users.id))
-      .where(
-        or(
-          eq(notes.ownerId, session.user.id),
-          and(
-            eq(notes.shared, true),
-            or(
-              inArray(
-                notes.ownerId,
-                db
-                  .select({ id: userConnections.userHighId })
-                  .from(userConnections)
-                  .where(eq(userConnections.userLowId, session.user.id)),
-              ),
-              inArray(
-                notes.ownerId,
-                db
-                  .select({ id: userConnections.userLowId })
-                  .from(userConnections)
-                  .where(eq(userConnections.userHighId, session.user.id)),
-              ),
-            ),
-          ),
-        ),
-      )
+      .where(accessibleNote(session.user.id))
       .orderBy(asc(notes.createdAt), asc(notes.id));
     const shoppingListIds = ownedNotes
       .filter((note) => note.type === 'shopping_list')
@@ -141,7 +144,7 @@ export const updateNote = createServerFn({ method: 'POST' })
     const [updated] = await db
       .update(notes)
       .set({ title: data.title, content: data.content, updatedAt: new Date() })
-      .where(and(eq(notes.id, data.id), eq(notes.ownerId, session.user.id)))
+      .where(and(eq(notes.id, data.id), accessibleNote(session.user.id)))
       .returning({ id: notes.id });
 
     if (!updated) throw new ClientSafeError('Note not found.');
@@ -190,7 +193,7 @@ export const toggleNoteType = createServerFn({ method: 'POST' })
       const [note] = await tx
         .select({ content: notes.content, type: notes.type })
         .from(notes)
-        .where(and(eq(notes.id, data.id), eq(notes.ownerId, session.user.id)))
+        .where(and(eq(notes.id, data.id), accessibleNote(session.user.id)))
         .for('update');
 
       if (!note) throw new ClientSafeError('Note not found.');
@@ -242,7 +245,7 @@ export const createListItem = createServerFn({ method: 'POST' })
       .where(
         and(
           eq(notes.id, data.noteId),
-          eq(notes.ownerId, session.user.id),
+          accessibleNote(session.user.id),
           eq(notes.type, 'shopping_list'),
         ),
       )
@@ -276,7 +279,7 @@ export const updateListItem = createServerFn({ method: 'POST' })
       .select({ id: listItems.id, noteId: listItems.noteId })
       .from(listItems)
       .innerJoin(notes, eq(notes.id, listItems.noteId))
-      .where(and(eq(listItems.id, data.id), eq(notes.ownerId, session.user.id)))
+      .where(and(eq(listItems.id, data.id), accessibleNote(session.user.id)))
       .limit(1);
 
     if (!item) throw new ClientSafeError('Product not found.');
@@ -299,7 +302,7 @@ export const setListItemChecked = createServerFn({ method: 'POST' })
       .select({ id: listItems.id })
       .from(listItems)
       .innerJoin(notes, eq(notes.id, listItems.noteId))
-      .where(and(eq(listItems.id, data.id), eq(notes.ownerId, session.user.id)))
+      .where(and(eq(listItems.id, data.id), accessibleNote(session.user.id)))
       .limit(1);
 
     if (!item) throw new ClientSafeError('Product not found.');
@@ -318,7 +321,7 @@ export const deleteListItem = createServerFn({ method: 'POST' })
       .select({ id: listItems.id, noteId: listItems.noteId })
       .from(listItems)
       .innerJoin(notes, eq(notes.id, listItems.noteId))
-      .where(and(eq(listItems.id, data.id), eq(notes.ownerId, session.user.id)))
+      .where(and(eq(listItems.id, data.id), accessibleNote(session.user.id)))
       .limit(1);
 
     if (!item) throw new ClientSafeError('Item not found.');
