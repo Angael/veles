@@ -9,7 +9,7 @@ import type { CalorieDashboard, CalorieDashboardDay } from '../calories.api';
 import { calorieDashboardQueryOptions } from '../calories.query';
 import { CalorieOverview } from './CalorieOverview';
 import { LogFoodMenu } from './LogFoodMenu';
-import { CALORIE_DATE_FORMAT, calorieWeekDates } from '../calorieHelpers';
+import { CALORIE_DATE_FORMAT, calorieWeekDates, calorieWeekStart } from '../calorieHelpers';
 import { todayLocalDate } from '@/lib/dateOnly';
 import { Btn } from '@/components/ui/btn/Btn';
 import css from './CaloriesPage.module.css';
@@ -27,14 +27,18 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
     throw new Error(`Calorie dashboard does not contain selected date ${date}.`);
   }
 
-  function prefetchWeek(amount: number) {
-    const nextDate = format(addDays(parseISO(date), amount * 7), CALORIE_DATE_FORMAT);
-    void queryClient.prefetchQuery(calorieDashboardQueryOptions(nextDate));
+  /** Previous week lands on its Sunday, next week on its Monday — the days adjacent to the current week. */
+  function adjacentWeekDate(direction: -1 | 1) {
+    const weekStart = parseISO(calorieWeekStart(date));
+    return format(addDays(weekStart, direction === -1 ? -1 : 7), CALORIE_DATE_FORMAT);
   }
 
-  function shiftWeek(amount: number) {
-    const nextDate = format(addDays(parseISO(date), amount * 7), CALORIE_DATE_FORMAT);
-    void navigate({ to: '/calories', search: { date: nextDate } });
+  function prefetchWeek(direction: -1 | 1) {
+    void queryClient.prefetchQuery(calorieDashboardQueryOptions(adjacentWeekDate(direction)));
+  }
+
+  function shiftWeek(direction: -1 | 1) {
+    void navigate({ to: '/calories', search: { date: adjacentWeekDate(direction) } });
   }
   return (
     <main className={css.page}>
