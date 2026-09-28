@@ -1,24 +1,3 @@
----
-name: router-core-search-params
-description: >-
-  validateSearch, search param validation with Zod/Valibot/ArkType adapters,
-  fallback(), search middlewares (retainSearchParams, stripSearchParams),
-  custom serialization (parseSearch, stringifySearch), search param
-  inheritance, loaderDeps for cache keys, reading and writing search params.
-type: sub-skill
-library: tanstack-router
-library_version: '1.166.2'
-requires:
-  - router-core
-sources:
-  - TanStack/router:docs/router/guide/search-params.md
-  - TanStack/router:docs/router/how-to/setup-basic-search-params.md
-  - TanStack/router:docs/router/how-to/validate-search-params.md
-  - TanStack/router:docs/router/how-to/navigate-with-search-params.md
-  - TanStack/router:docs/router/how-to/share-search-params-across-routes.md
-  - TanStack/router:docs/router/guide/custom-search-param-serialization.md
----
-
 # Search Params
 
 TanStack Router treats search params as JSON-first application state. They are automatically parsed from the URL into structured objects (numbers, booleans, arrays, nested objects) and validated via `validateSearch` on each route.
@@ -34,24 +13,24 @@ npm install zod @tanstack/zod-adapter
 
 ```tsx
 // src/routes/products.tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
+import { createFileRoute } from '@tanstack/react-router';
+import { z } from 'zod';
 
 const productSearchSchema = z.object({
   page: z.number().default(1).catch(1),
   filter: z.string().default(''),
   sort: z.enum(['newest', 'oldest', 'price']).default('newest').catch('newest'),
-})
+});
 
 export const Route = createFileRoute('/products')({
   validateSearch: productSearchSchema,
   component: ProductsPage,
-})
+});
 
 function ProductsPage() {
   // page: number, filter: string, sort: 'newest' | 'oldest' | 'price'
   // ALL INFERRED — do not annotate
-  const { page, filter, sort } = Route.useSearch()
+  const { page, filter, sort } = Route.useSearch();
 
   return (
     <div>
@@ -59,7 +38,7 @@ function ProductsPage() {
         Page {page}, filter: {filter}, sort: {sort}
       </p>
     </div>
-  )
+  );
 }
 ```
 
@@ -69,32 +48,32 @@ function ProductsPage() {
 
 ```tsx
 function ProductsPage() {
-  const { page, sort } = Route.useSearch()
-  return <div>Page {page}</div>
+  const { page, sort } = Route.useSearch();
+  return <div>Page {page}</div>;
 }
 ```
 
 ### In Code-Split Components: `getRouteApi()`
 
 ```tsx
-import { getRouteApi } from '@tanstack/react-router'
+import { getRouteApi } from '@tanstack/react-router';
 
-const routeApi = getRouteApi('/products')
+const routeApi = getRouteApi('/products');
 
 function ProductFilters() {
-  const { sort } = routeApi.useSearch()
-  return <select value={sort}>{/* options */}</select>
+  const { sort } = routeApi.useSearch();
+  return <select value={sort}>{/* options */}</select>;
 }
 ```
 
 ### From Any Component: `useSearch({ from })`
 
 ```tsx
-import { useSearch } from '@tanstack/react-router'
+import { useSearch } from '@tanstack/react-router';
 
 function SortIndicator() {
-  const { sort } = useSearch({ from: '/products' })
-  return <span>Sorted by: {sort}</span>
+  const { sort } = useSearch({ from: '/products' });
+  return <span>Sorted by: {sort}</span>;
 }
 ```
 
@@ -102,9 +81,9 @@ function SortIndicator() {
 
 ```tsx
 function GenericPaginator() {
-  const search = useSearch({ strict: false })
+  const search = useSearch({ strict: false });
   // search.page is number | undefined (union of all routes)
-  return <span>Page: {search.page ?? 1}</span>
+  return <span>Page: {search.page ?? 1}</span>;
 }
 ```
 
@@ -113,24 +92,21 @@ function GenericPaginator() {
 ### Link with Function Form (Preserves Existing Params)
 
 ```tsx
-import { Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router';
 
 function Pagination() {
   return (
-    <Link
-      from="/products"
-      search={(prev) => ({ ...prev, page: prev.page + 1 })}
-    >
+    <Link from='/products' search={(prev) => ({ ...prev, page: prev.page + 1 })}>
       Next Page
     </Link>
-  )
+  );
 }
 ```
 
 ### Link with Object Form (Replaces All Params)
 
 ```tsx
-<Link to="/products" search={{ page: 1, filter: '', sort: 'newest' }}>
+<Link to='/products' search={{ page: 1, filter: '', sort: 'newest' }}>
   Reset
 </Link>
 ```
@@ -138,23 +114,23 @@ function Pagination() {
 ### Programmatic: `useNavigate()`
 
 ```tsx
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router';
 
 function SortDropdown() {
-  const navigate = useNavigate({ from: '/products' })
+  const navigate = useNavigate({ from: '/products' });
 
   return (
     <select
       onChange={(e) => {
         navigate({
           search: (prev) => ({ ...prev, sort: e.target.value, page: 1 }),
-        })
+        });
       }}
     >
-      <option value="newest">Newest</option>
-      <option value="price">Price</option>
+      <option value='newest'>Newest</option>
+      <option value='price'>Price</option>
     </select>
-  )
+  );
 }
 ```
 
@@ -164,30 +140,30 @@ Parent route search params are automatically merged into child routes:
 
 ```tsx
 // src/routes/shop.tsx — parent defines shared params
-import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
+import { createFileRoute } from '@tanstack/react-router';
+import { z } from 'zod';
 
 const shopSearchSchema = z.object({
   currency: z.enum(['USD', 'EUR']).default('USD').catch('USD'),
-})
+});
 
 export const Route = createFileRoute('/shop')({
   validateSearch: shopSearchSchema,
-})
+});
 ```
 
 ```tsx
 // src/routes/shop/products.tsx — child inherits currency
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/shop/products')({
   component: ShopProducts,
-})
+});
 
 function ShopProducts() {
   // currency is available here from parent — fully typed
-  const { currency } = Route.useSearch()
-  return <div>Currency: {currency}</div>
+  const { currency } = Route.useSearch();
+  return <div>Currency: {currency}</div>;
 }
 ```
 
@@ -196,40 +172,40 @@ function ShopProducts() {
 ### `retainSearchParams` — Keep Params Across Navigation
 
 ```tsx
-import { createRootRoute, retainSearchParams } from '@tanstack/react-router'
-import { z } from 'zod'
+import { createRootRoute, retainSearchParams } from '@tanstack/react-router';
+import { z } from 'zod';
 
 const rootSearchSchema = z.object({
   debug: z.boolean().optional(),
-})
+});
 
 export const Route = createRootRoute({
   validateSearch: rootSearchSchema,
   search: {
     middlewares: [retainSearchParams(['debug'])],
   },
-})
+});
 ```
 
 ### `stripSearchParams` — Remove Default Values from URL
 
 ```tsx
-import { createFileRoute, stripSearchParams } from '@tanstack/react-router'
-import { z } from 'zod'
+import { createFileRoute, stripSearchParams } from '@tanstack/react-router';
+import { z } from 'zod';
 
-const defaults = { sort: 'newest', page: 1 }
+const defaults = { sort: 'newest', page: 1 };
 
 const searchSchema = z.object({
   sort: z.string().default(defaults.sort),
   page: z.number().default(defaults.page),
-})
+});
 
 export const Route = createFileRoute('/items')({
   validateSearch: searchSchema,
   search: {
     middlewares: [stripSearchParams(defaults)],
   },
-})
+});
 ```
 
 ### Chaining Middlewares
@@ -247,7 +223,7 @@ export const Route = createFileRoute('/search')({
       stripSearchParams({ arrayWithDefaults: ['foo', 'bar'] }),
     ],
   },
-})
+});
 ```
 
 ## Custom Serialization
@@ -255,18 +231,14 @@ export const Route = createFileRoute('/search')({
 Override the default JSON serialization at the router level:
 
 ```tsx
-import {
-  createRouter,
-  parseSearchWith,
-  stringifySearchWith,
-} from '@tanstack/react-router'
+import { createRouter, parseSearchWith, stringifySearchWith } from '@tanstack/react-router';
 
 const router = createRouter({
   routeTree,
   // Example: use JSURL2 for compact, human-readable URLs
   parseSearch: parseSearchWith(parse),
   stringifySearch: stringifySearchWith(stringify),
-})
+});
 ```
 
 ## Using Search Params in Loaders via `loaderDeps`
@@ -277,9 +249,9 @@ export const Route = createFileRoute('/products')({
   // Pick ONLY the params the loader needs — not the entire search object
   loaderDeps: ({ search }) => ({ page: search.page }),
   loader: async ({ deps }) => {
-    return fetchProducts({ page: deps.page })
+    return fetchProducts({ page: deps.page });
   },
-})
+});
 ```
 
 ## Common Mistakes
@@ -288,12 +260,12 @@ export const Route = createFileRoute('/products')({
 
 ```tsx
 // WRONG — .catch() with zodValidator makes the type unknown
-const schema = z.object({ page: z.number().catch(1) })
-validateSearch: zodValidator(schema) // page is typed as unknown!
+const schema = z.object({ page: z.number().catch(1) });
+validateSearch: zodValidator(schema); // page is typed as unknown!
 
 // CORRECT — fallback() preserves the inferred type
-import { fallback } from '@tanstack/zod-adapter'
-const schema = z.object({ page: fallback(z.number(), 1) })
+import { fallback } from '@tanstack/zod-adapter';
+const schema = z.object({ page: fallback(z.number(), 1) });
 ```
 
 **Important:** This only applies when using Zod v3, not when using Zod v4. For v4, using `.catch()` is correct.
@@ -302,10 +274,10 @@ const schema = z.object({ page: fallback(z.number(), 1) })
 
 ```tsx
 // WRONG — loader re-runs on ANY search param change
-loaderDeps: ({ search }) => search
+loaderDeps: ({ search }) => search;
 
 // CORRECT — loader only re-runs when page changes
-loaderDeps: ({ search }) => ({ page: search.page })
+loaderDeps: ({ search }) => ({ page: search.page });
 ```
 
 ### 3. HIGH: Passing Date objects in search params
@@ -325,13 +297,13 @@ loaderDeps: ({ search }) => ({ page: search.page })
 export const Route = createRootRoute({
   component: RootComponent,
   // no validateSearch!
-})
+});
 
 // CORRECT — parent must define validateSearch for children to inherit
 export const Route = createRootRoute({
   validateSearch: globalSearchSchema,
   component: RootComponent,
-})
+});
 ```
 
 ### 5. HIGH (cross-skill): Using search as object instead of function loses params
@@ -346,4 +318,4 @@ export const Route = createRootRoute({
 
 ## References
 
-- [Validation Patterns Reference](skill://router-core-search-params/references/validation-patterns.md) — comprehensive patterns for all validation libraries
+- [Validation Patterns Reference](skill://router-core/references/search-params-validation-patterns.md) — comprehensive patterns for all validation libraries

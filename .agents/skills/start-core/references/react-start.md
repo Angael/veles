@@ -1,28 +1,6 @@
----
-name: react-start
-description: >-
-  React bindings for TanStack Start: createStart, StartClient,
-  StartServer, React-specific imports, re-exports from
-  @tanstack/react-router, full project setup with React, useServerFn
-  hook.
-type: framework
-library: tanstack-start
-library_version: '1.166.2'
-framework: react
-requires:
-  - start-core
-sources:
-  - TanStack/router:packages/react-start/src
-  - TanStack/router:docs/start/framework/react/build-from-scratch.md
----
-
 # React Start (`@tanstack/react-start`)
 
-This skill builds on start-core. Read [start-core](skill://start-core) first for foundational concepts.
-
-This skill covers the React-specific bindings, setup, and patterns for TanStack Start.
-
-For React Server Components patterns, see [react-start-server-components](skill://react-start-server-components).
+Builds on start-core. Covers the React-specific bindings, setup, and patterns for TanStack Start.
 
 > **CRITICAL**: All code is ISOMORPHIC by default. Loaders run on BOTH server and client. Use `createServerFn` for server-only logic.
 
@@ -80,43 +58,38 @@ npm i -D vite @vitejs/plugin-react typescript @types/react @types/react-dom
 ### 4. vite.config.ts
 
 ```ts
-import { defineConfig } from 'vite'
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import viteReact from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import { tanstackStart } from '@tanstack/react-start/plugin/vite';
+import viteReact from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [
     tanstackStart(), // MUST come before react()
     viteReact(),
   ],
-})
+});
 ```
 
 ### 5. Router Factory (src/router.tsx)
 
 ```tsx
-import { createRouter } from '@tanstack/react-router'
-import { routeTree } from './routeTree.gen'
+import { createRouter } from '@tanstack/react-router';
+import { routeTree } from './routeTree.gen';
 
 export function getRouter() {
   const router = createRouter({
     routeTree,
     scrollRestoration: true,
-  })
-  return router
+  });
+  return router;
 }
 ```
 
 ### 6. Root Route (src/routes/\_\_root.tsx)
 
 ```tsx
-import type { ReactNode } from 'react'
-import {
-  Outlet,
-  createRootRoute,
-  HeadContent,
-  Scripts,
-} from '@tanstack/react-router'
+import type { ReactNode } from 'react';
+import { Outlet, createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
 
 export const Route = createRootRoute({
   head: () => ({
@@ -127,14 +100,14 @@ export const Route = createRootRoute({
     ],
   }),
   component: RootComponent,
-})
+});
 
 function RootComponent() {
   return (
     <RootDocument>
       <Outlet />
     </RootDocument>
-  )
+  );
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
@@ -148,28 +121,28 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }
 ```
 
 ### 7. Index Route (src/routes/index.tsx)
 
 ```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
+import { createFileRoute } from '@tanstack/react-router';
+import { createServerFn } from '@tanstack/react-start';
 
 const getGreeting = createServerFn({ method: 'GET' }).handler(async () => {
-  return 'Hello from TanStack Start!'
-})
+  return 'Hello from TanStack Start!';
+});
 
 export const Route = createFileRoute('/')({
   loader: () => getGreeting(),
   component: HomePage,
-})
+});
 
 function HomePage() {
-  const greeting = Route.useLoaderData()
-  return <h1>{greeting}</h1>
+  const greeting = Route.useLoaderData();
+  return <h1>{greeting}</h1>;
 }
 ```
 
@@ -178,46 +151,46 @@ function HomePage() {
 Use `useServerFn` to call server functions from React components with proper integration:
 
 ```tsx
-import { createServerFn, useServerFn } from '@tanstack/react-start'
+import { createServerFn, useServerFn } from '@tanstack/react-start';
 
 const updatePost = createServerFn({ method: 'POST' })
   .validator((data: { id: string; title: string }) => data)
   .handler(async ({ data }) => {
-    await db.posts.update(data.id, { title: data.title })
-    return { success: true }
-  })
+    await db.posts.update(data.id, { title: data.title });
+    return { success: true };
+  });
 
 function EditPostForm({ postId }: { postId: string }) {
-  const updatePostFn = useServerFn(updatePost)
-  const [title, setTitle] = useState('')
+  const updatePostFn = useServerFn(updatePost);
+  const [title, setTitle] = useState('');
 
   return (
     <form
       onSubmit={async (e) => {
-        e.preventDefault()
-        await updatePostFn({ data: { id: postId, title } })
+        e.preventDefault();
+        await updatePostFn({ data: { id: postId, title } });
       }}
     >
       <input value={title} onChange={(e) => setTitle(e.target.value)} />
-      <button type="submit">Save</button>
+      <button type='submit'>Save</button>
     </form>
-  )
+  );
 }
 ```
 
 ## Global Start Configuration (src/start.ts)
 
 ```tsx
-import { createStart, createMiddleware } from '@tanstack/react-start'
+import { createStart, createMiddleware } from '@tanstack/react-start';
 
 const requestLogger = createMiddleware().server(async ({ next, request }) => {
-  console.log(`${request.method} ${request.url}`)
-  return next()
-})
+  console.log(`${request.method} ${request.url}`);
+  return next();
+});
 
 export const startInstance = createStart(() => ({
   requestMiddleware: [requestLogger],
-}))
+}));
 ```
 
 ## React-Specific Components
@@ -255,13 +228,13 @@ All hooks from `@tanstack/react-router` work in Start:
 
 ```tsx
 // WRONG — this is the SPA router, NOT Start
-import { createServerFn } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-router';
 
 // CORRECT — server functions come from react-start
-import { createServerFn } from '@tanstack/react-start'
+import { createServerFn } from '@tanstack/react-start';
 
 // CORRECT — routing APIs come from react-router (re-exported by Start too)
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router';
 ```
 
 ### 2. HIGH: Using React hooks in beforeLoad or loader
@@ -269,11 +242,11 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 ```tsx
 // WRONG — beforeLoad/loader are NOT React components
 beforeLoad: () => {
-  const auth = useAuth() // React hook, cannot be used here
-}
+  const auth = useAuth(); // React hook, cannot be used here
+};
 
 // CORRECT — pass state via router context
-const rootRoute = createRootRouteWithContext<{ auth: AuthState }>()({})
+const rootRoute = createRootRouteWithContext<{ auth: AuthState }>()({});
 ```
 
 ### 3. HIGH: Missing Scripts component
