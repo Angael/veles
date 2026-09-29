@@ -99,12 +99,6 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
             value={grams}
           />
         </Label>
-        <GoalPreview
-          consumedKcal={consumedKcal}
-          foodKcal={kcal}
-          goalKcal={goalKcal}
-          pending={dashboardQuery.isPending}
-        />
         <FormFooter
           date={{ onValueChange: setDate, value: date }}
           disabled={selectedGrams < 1}
@@ -112,6 +106,13 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
           submitLabel='Add to diary'
         />
       </FormCard>
+      {/* Outside the Card: its backdrop-filter would trap the preview's phone `position: fixed`. */}
+      <GoalPreview
+        consumedKcal={consumedKcal}
+        foodKcal={kcal}
+        goalKcal={goalKcal}
+        pending={dashboardQuery.isPending}
+      />
     </FormPage>
   );
 }
