@@ -3,7 +3,6 @@ import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query
 import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
 import { NotFound } from '@/components/app/not-found/NotFound';
 import { createQueryClient } from '@/lib/queryClient';
-import { routeViewTransition } from '@/lib/viewTransitions'; // view-transitions:
 import { routeTree } from './routeTree.gen';
 
 export function getRouter() {
@@ -17,7 +16,6 @@ export function getRouter() {
     defaultErrorComponent: DefaultCatchBoundary,
     defaultNotFoundComponent: () => <NotFound />,
     scrollRestoration: true,
-    defaultViewTransition: routeViewTransition(), // view-transitions:
   });
 
   setupRouterSsrQueryIntegration({
