@@ -12,6 +12,7 @@ import { Navbar } from '@/components/app/navbar/Navbar';
 import { RouteBackButton } from '@/components/app/app-frame/RouteBackButton';
 import type { SessionUser } from '@/lib/auth/session.api';
 import css from './AppFrame.module.css';
+import { TaskHeader } from './TaskHeader';
 import { VelesLogo } from './VelesLogo';
 
 const routeMatchOptions = {
@@ -30,12 +31,7 @@ export function AppFrame({
   return (
     <div className={css.page}>
       <div className={clsx(css.shell, layout && 'focusShell', layout === 'task' && css.taskShell)}>
-        {layout === 'task' ? (
-          <header className={css.taskHeader}>
-            <RouteBackButton variant='ghost' />
-            {navbar ? <h1 className={css.taskTitle}>{navbar.label}</h1> : null}
-          </header>
-        ) : null}
+        {layout === 'task' ? <TaskHeader label={navbar?.label} /> : null}
         {layout ? null : (
           <header className={css.header}>
             {navbar ? (

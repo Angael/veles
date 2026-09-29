@@ -97,78 +97,9 @@
 
 /* The sticky task header owns top spacing and the safe-area inset on phones. */
 .taskShell {
+  position: relative;
+
   @media (--phone) {
     padding-top: 0;
-  }
-}
-
-.taskHeader {
-  position: sticky;
-  z-index: 10;
-  top: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  margin-bottom: var(--space-md);
-  padding-block: var(--space-xs);
-
-  /* Full-bleed frosted backdrop that fades out below the header instead of a hard edge. */
-  &::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    inset: calc(-1 * var(--space-md)) calc(50% - 50vw) calc(-1 * var(--space-md));
-    background: color-mix(in srgb, #060816 74%, transparent);
-    backdrop-filter: blur(14px);
-    mask-image: linear-gradient(to bottom, #000 calc(100% - var(--space-md)), transparent);
-    pointer-events: none;
-  }
-
-  @media (--phone) {
-    padding-top: max(var(--space-xs), env(safe-area-inset-top, 0px));
-
-    &::before {
-      top: 0;
-    }
-  }
-}
-
-.taskTitle {
-  min-width: 0;
-  font-size: clamp(1.4rem, 1.1rem + 1.5vw, 1.9rem);
-  line-height: 1.15;
-  text-wrap: balance;
-}
-
-/* Large title collapses into a compact bar and the backdrop appears as the page scrolls. */
-@supports (animation-timeline: scroll()) {
-  .taskHeader::before {
-    animation: task-header-fill linear both;
-    animation-range: 0 2rem;
-    animation-timeline: scroll(root);
-  }
-
-  .taskTitle {
-    animation: task-title-collapse linear both;
-    animation-range: 0 4rem;
-    animation-timeline: scroll(root);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .taskTitle {
-      animation: none;
-    }
-  }
-}
-
-@keyframes task-header-fill {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes task-title-collapse {
-  to {
-    font-size: var(--text-lg);
   }
 }

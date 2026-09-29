@@ -1,5 +1,4 @@
 import { useRouter, type UseNavigateResult } from '@tanstack/react-router';
-import clsx from 'clsx';
 import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
 import { useUpdateFoodLogMutation } from '../calories.query';
@@ -48,7 +47,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
   }
 
   return (
-    <main className={clsx(css.page, css.narrowPage)}>
+    <main className={css.page}>
       <TypedForm className={css.form} errorMsg={updateMutation.error?.message} onSubmit={submit}>
         {isProduct && log.productId ? (
           <SelectedFoodCard

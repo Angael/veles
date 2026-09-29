@@ -1,0 +1,58 @@
+/* Scrolling past this marks the header collapsed; absolutely placed so it takes no layout. */
+.sentinel {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 3rem;
+  pointer-events: none;
+}
+
+.header {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+  padding-block: var(--space-xs);
+
+  /* Full-bleed solid bar with a hairline edge, shown only once content scrolls beneath. */
+  &::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0 calc(50% - 50vw);
+    border-bottom: var(--border-width) solid var(--c-border-strong);
+    opacity: 0;
+    background: #0a0f1f;
+    pointer-events: none;
+    transition: opacity 160ms var(--ease-out);
+  }
+
+  &[data-collapsed]::before {
+    opacity: 1;
+  }
+
+  @media (--phone) {
+    padding-top: max(var(--space-xs), env(safe-area-inset-top, 0px));
+  }
+}
+
+/* Layout stays at the large size; collapsing is a compositor-only scale, so nothing reflows. */
+.title {
+  min-width: 0;
+  font-size: clamp(1.4rem, 1.1rem + 1.5vw, 1.9rem);
+  line-height: 1.15;
+  text-wrap: balance;
+  transform-origin: left center;
+  transition: transform 180ms var(--ease-out);
+
+  [data-collapsed] > & {
+    transform: scale(0.7);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}

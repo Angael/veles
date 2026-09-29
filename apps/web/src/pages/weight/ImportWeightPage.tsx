@@ -28,7 +28,7 @@ export function ImportWeightPage() {
   const importStatus = getImportStatus(parsed.entries.length, parsed.errors, hasTooManyEntries);
 
   return (
-    <main className={css.page}>
+    <main>
       <Card as='section' className={css.importCard}>
         <p className={css.intro}>
           Paste one measurement per line. Existing entries on the same dates are replaced.

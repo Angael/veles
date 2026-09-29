@@ -19,7 +19,7 @@ export function AddWeightPage() {
   const mutation = useSaveWeightMutation();
 
   return (
-    <main className={css.page}>
+    <main>
       <Card as='section' className={css.formCard}>
         <p className={css.intro}>
           Use this when filling a gap or entering a measurement from another day.
