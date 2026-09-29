@@ -1,15 +1,12 @@
 import type { UseNavigateResult } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useRecordCustomCaloriesMutation } from '../calories.query';
-import { Btn } from '@/components/ui/btn/Btn';
+import { FormCard, FormFooter, FormPage } from '@/components/ui/form-layout/FormLayout';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/ui/label/Label';
 import { PhotoPicker, type PhotoPickerValue } from '../PhotoPicker';
 import { TextInput } from '@/components/ui/text-input/TextInput';
-import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
-import { Card } from '@/components/ui/card/Card';
-import css from '../CalorieFlows.module.css';
 
 type QuickAddDefaultValues = {
   carbs?: number;
@@ -30,8 +27,9 @@ export function QuickAddPage({
   const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
 
   async function submit(formData: TypedFormData, navigate: UseNavigateResult<string>) {
+    const logDate = formData.string('date');
     await recordMutation.mutateAsync({
-      date,
+      date: logDate,
       name: formData.string('name') || 'Quick add',
       kcal: formData.number('kcal'),
       protein: formData.optionalNumber('protein'),
@@ -41,33 +39,32 @@ export function QuickAddPage({
       ...(photo.photo ? { photo: photo.photo } : {}),
     });
 
-    await navigate({ replace: true, search: { date }, to: '/calories' });
+    await navigate({ replace: true, search: { date: logDate }, to: '/calories' });
   }
 
   return (
-    <main className={css.page}>
-      <p className={css.lead}>Record energy now. Macros are optional.</p>
-      <Card as='section' className={css.panel}>
-        <TypedForm className={css.form} errorMsg={recordMutation.error?.message} onSubmit={submit}>
-          <Label text='Label'>
-            <TextInput defaultValue={defaultValues?.name ?? 'Quick add'} name='name' required />
-          </Label>
+    <FormPage lead='Record energy now. Macros are optional.'>
+      <FormCard errorMsg={recordMutation.error?.message} onSubmit={submit}>
+        <Label text='Label'>
+          <TextInput defaultValue={defaultValues?.name ?? 'Quick add'} name='name' required />
+        </Label>
 
-          <KcalMacrosForm
-            defaultValues={{
-              carbs: defaultValues?.carbs,
-              fat: defaultValues?.fat,
-              kcal: defaultValues?.kcal,
-              protein: defaultValues?.protein,
-            }}
-          />
-          <PhotoPicker disabled={recordMutation.isPending} onChange={setPhoto} value={photo} />
+        <KcalMacrosForm
+          defaultValues={{
+            carbs: defaultValues?.carbs,
+            fat: defaultValues?.fat,
+            kcal: defaultValues?.kcal,
+            protein: defaultValues?.protein,
+          }}
+        />
+        <PhotoPicker disabled={recordMutation.isPending} onChange={setPhoto} value={photo} />
 
-          <Btn loading={recordMutation.isPending} type='submit'>
-            Add to diary
-          </Btn>
-        </TypedForm>
-      </Card>
-    </main>
+        <FormFooter
+          date={{ defaultValue: date }}
+          loading={recordMutation.isPending}
+          submitLabel='Add to diary'
+        />
+      </FormCard>
+    </FormPage>
   );
 }

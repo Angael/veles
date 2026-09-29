@@ -1,48 +1,10 @@
-.page {
+/* Mirrors Label's layout; a real <label> would forward clicks to the file input. */
+.photos {
   display: grid;
-  gap: var(--space-md);
-}
-
-.content {
-  display: grid;
-}
-
-.formCard {
-  display: grid;
-  gap: var(--space-sm);
-}
-
-.form,
-.formBody,
-.actions {
-  display: grid;
-}
-
-.form,
-.formBody {
-  gap: var(--space-sm);
-}
-
-.field {
-  display: grid;
-  gap: 0.3rem;
-}
-
-.field span {
-  color: var(--c-accent-strong);
-  font-size: var(--text-xs);
-}
-
-.uploadFieldWrap {
   gap: var(--space-xs);
-}
 
-.actions {
-  justify-content: start;
-}
-
-@media (--phone) {
-  .formCard {
-    width: 100%;
+  & > span {
+    color: var(--c-accent-strong);
+    font-size: var(--text-xs);
   }
 }

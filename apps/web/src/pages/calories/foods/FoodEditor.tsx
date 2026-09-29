@@ -1,12 +1,11 @@
 import type { CalorieFood } from '../calories.api';
 import type { ImageFields } from '../calories.query';
-import { Btn } from '@/components/ui/btn/Btn';
+import { FormCard, FormFooter } from '@/components/ui/form-layout/FormLayout';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { PhotoPicker, type PhotoPickerValue } from '../PhotoPicker';
 import { TextInput } from '@/components/ui/text-input/TextInput';
-import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import { useState } from 'react';
 import css from '../CalorieFlows.module.css';
@@ -59,7 +58,7 @@ export function FoodEditor({
     });
   }
   return (
-    <TypedForm className={css.form} errorMsg={errorMsg} onChange={onDirty} onSubmit={handleSubmit}>
+    <FormCard errorMsg={errorMsg} onChange={onDirty} onSubmit={handleSubmit}>
       <Label text='Food name'>
         <TextInput defaultValue={food?.name ?? initialName} name='name' required />
       </Label>
@@ -95,9 +94,7 @@ export function FoodEditor({
         value={photo}
       />
       <p>This changes the shared catalog photo for everyone.</p>
-      <Btn loading={pending} type='submit'>
-        {submitLabel}
-      </Btn>
-    </TypedForm>
+      <FormFooter loading={pending} submitLabel={submitLabel} />
+    </FormCard>
   );
 }

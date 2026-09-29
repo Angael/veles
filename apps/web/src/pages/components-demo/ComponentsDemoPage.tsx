@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Btn, type BtnSize, type BtnVariant } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { DateInput } from '@/components/ui/date-input/DateInput';
+import { FormCard, FormFooter } from '@/components/ui/form-layout/FormLayout';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog/Dialog';
 import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
 import { ErrorCard } from '@/components/ui/error-card/ErrorCard';
@@ -272,6 +273,10 @@ export function ComponentsDemoPage() {
           type='search'
           value={textValue}
         />
+        <div className={css.formGrid}>
+          <TextInput aria-label='Small text input' placeholder='size sm' size='sm' />
+          <TextInput aria-label='Large text input' placeholder='size lg' size='lg' />
+        </div>
       </section>
       <section>
         <h2>TypedForm</h2>
@@ -289,18 +294,17 @@ export function ComponentsDemoPage() {
       </section>
 
       <section>
-        <h2>TypedForm</h2>
-        <TypedForm
-          className={css.formGrid}
+        <h2>FormCard and FormFooter</h2>
+        <FormCard
           onSubmit={(data) => {
-            data.string('typedFormDemo');
+            data.string('date');
           }}
         >
-          <Label text='Demo field'>
-            <TextInput defaultValue='Breakfast' name='typedFormDemo' required />
+          <Label text='Amount eaten (g)'>
+            <NumberInput defaultValue={150} size='lg' />
           </Label>
-          <Btn type='submit'>Submit demo</Btn>
-        </TypedForm>
+          <FormFooter date={{ defaultValue: '2026-08-08' }} submitLabel='Save' />
+        </FormCard>
       </section>
 
       <section>
@@ -313,6 +317,10 @@ export function ComponentsDemoPage() {
           placeholder='Calories'
           value={numberValue}
         />
+        <div className={css.formGrid}>
+          <NumberInput aria-label='Small number input' defaultValue={12} size='sm' />
+          <NumberInput aria-label='Large number input' defaultValue={78.4} size='lg' />
+        </div>
       </section>
 
       <section>

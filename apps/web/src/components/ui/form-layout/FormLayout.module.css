@@ -1,0 +1,47 @@
+@import '../../../styles/breakpoints.css';
+
+.page {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.lead {
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.footer {
+  display: flex;
+  align-items: end;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: var(--border-width) solid var(--c-border);
+
+  @media (--phone) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.date {
+  flex: 0 1 14rem;
+  min-width: 0;
+
+  @media (--phone) {
+    flex-basis: auto;
+  }
+}
+
+.submit {
+  margin-left: auto;
+
+  @media (--phone) {
+    width: 100%;
+    margin-left: 0;
+  }
+}

@@ -2,17 +2,14 @@ import { useRouter, type UseNavigateResult } from '@tanstack/react-router';
 import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
 import { useUpdateFoodLogMutation } from '../calories.query';
-import { Btn } from '@/components/ui/btn/Btn';
-import { DateInput } from '@/components/ui/date-input/DateInput';
+import { FormCard, FormFooter, FormPage } from '@/components/ui/form-layout/FormLayout';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { PhotoPicker, type PhotoPickerValue } from '../PhotoPicker';
 import { SelectedFoodCard } from '../SelectedFoodCard';
 import { TextInput } from '@/components/ui/text-input/TextInput';
-import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
-import css from '../CalorieFlows.module.css';
 import { useProportionalNutrition } from './useProportionalNutrition';
 
 export function EditFoodLogPage({ log }: { log: CalorieLog }) {
@@ -47,20 +44,20 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
   }
 
   return (
-    <main className={css.page}>
-      <TypedForm className={css.form} errorMsg={updateMutation.error?.message} onSubmit={submit}>
-        {isProduct && log.productId ? (
-          <SelectedFoodCard
-            carbs={nutrition.carbs ?? 0}
-            fat={nutrition.fat ?? 0}
-            imageUrl={log.imageUrl}
-            kcal={nutrition.kcal ?? 0}
-            name={log.name}
-            productId={log.productId}
-            protein={nutrition.protein ?? 0}
-          />
-        ) : null}
+    <FormPage>
+      {isProduct && log.productId ? (
+        <SelectedFoodCard
+          carbs={nutrition.carbs ?? 0}
+          fat={nutrition.fat ?? 0}
+          imageUrl={log.imageUrl}
+          kcal={nutrition.kcal ?? 0}
+          name={log.name}
+          productId={log.productId}
+          protein={nutrition.protein ?? 0}
+        />
+      ) : null}
 
+      <FormCard errorMsg={updateMutation.error?.message} onSubmit={submit}>
         {!isProduct ? (
           <Label text='Name'>
             <TextInput defaultValue={log.name} name='name' required />
@@ -68,14 +65,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
         ) : null}
 
         <Label text='Amount eaten (g)'>
-          <NumberInput
-            className={css.amountInput}
-            inputClassName={css.amountValue}
-            min={0}
-            name='grams'
-            onValueChange={changeGrams}
-            value={grams}
-          />
+          <NumberInput min={0} name='grams' onValueChange={changeGrams} size='lg' value={grams} />
         </Label>
 
         {!isProduct ? <KcalMacrosForm onValueChange={changeNutrition} values={nutrition} /> : null}
@@ -89,16 +79,8 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
           />
         ) : null}
 
-        <Label text='Date'>
-          <DateInput defaultValue={log.date} name='date' required />
-        </Label>
-
-        <div className={css.logActions}>
-          <Btn disabled={isPending} loading={updateMutation.isPending} type='submit'>
-            Save
-          </Btn>
-        </div>
-      </TypedForm>
-    </main>
+        <FormFooter date={{ defaultValue: log.date }} loading={isPending} submitLabel='Save' />
+      </FormCard>
+    </FormPage>
   );
 }

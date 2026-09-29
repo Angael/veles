@@ -123,8 +123,7 @@ function WeightForm({ isSaving, onChange, onSubmit, value }: WeightFormProps) {
         <NumberInput
           enterKeyHint='done'
           aria-label="Today's weight in kilograms"
-          className={css.weightInput}
-          inputClassName={css.weightInputField}
+          size='lg'
           max={300}
           min={30}
           onValueChange={onChange}
@@ -134,7 +133,7 @@ function WeightForm({ isSaving, onChange, onSubmit, value }: WeightFormProps) {
           value={value}
         />
       </label>
-      <Btn disabled={value === null} loading={isSaving} radius='pill' size='md' type='submit'>
+      <Btn disabled={value === null} loading={isSaving} radius='pill' size='lg' type='submit'>
         Save
       </Btn>
     </TypedForm>

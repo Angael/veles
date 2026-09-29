@@ -1,15 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { PencilIcon } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { calorieDashboardQueryOptions, useRecordFoodMutation } from '../calories.query';
-import { FoodSummary } from '../FoodSummary';
+import { SelectedFoodCard } from '../SelectedFoodCard';
 import { GoalPreview } from './GoalPreview';
 import { Btn } from '@/components/ui/btn/Btn';
-import { DateInput } from '@/components/ui/date-input/DateInput';
+import { FormCard, FormFooter, FormPage } from '@/components/ui/form-layout/FormLayout';
 import { Label } from '@/components/ui/label/Label';
-import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import css from './SelectedFoodForm.module.css';
 
@@ -49,96 +47,71 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
   }
 
   return (
-    <main className={css.page}>
-      <TypedForm className={css.panel} errorMsg={recordFoodMutation.error?.message} onSubmit={save}>
-        <div className={css.fields}>
-          <Label text='Date'>
-            <DateInput onValueChange={setDate} value={date} />
-          </Label>
-          <FoodSummary
-            action={
+    <FormPage className={css.page}>
+      <SelectedFoodCard
+        carbs={carbs}
+        fat={fat}
+        imageUrl={food.imageUrl}
+        kcal={kcal}
+        name={food.name}
+        productId={food.id}
+        protein={protein}
+      />
+      <FormCard errorMsg={recordFoodMutation.error?.message} onSubmit={save}>
+        {packageSizeGrams !== null && packageSizeGrams > 0 ? (
+          <div aria-label='Package amount shortcuts' className={css.packageShortcuts} role='group'>
+            <span className={css.packageLabel}>1 package ({Math.round(packageSizeGrams)} g)</span>
+            <div className={css.packageButtons}>
               <Btn
-                aria-label={`Edit ${food.name}`}
-                icon={<PencilIcon aria-hidden='true' />}
-                iconOnly
-                isLink
-                render={<Link params={{ foodId: food.id }} to='/calories/foods/$foodId' />}
+                onClick={() => setGrams(packageSizeGrams / 2)}
                 size='sm'
+                type='button'
                 variant='ghost'
-              />
-            }
-            carbs={carbs}
-            fat={fat}
-            imageUrl={food.imageUrl}
-            kcal={kcal}
-            name={food.name}
-            protein={protein}
-          />
-          <div className={css.amountField}>
-            {packageSizeGrams !== null && packageSizeGrams > 0 ? (
-              <div
-                aria-label='Package amount shortcuts'
-                className={css.packageShortcuts}
-                role='group'
               >
-                <span className={css.packageLabel}>
-                  1 package ({Math.round(packageSizeGrams)} g)
-                </span>
-                <div className={css.packageButtons}>
-                  <Btn
-                    onClick={() => setGrams(packageSizeGrams / 2)}
-                    size='sm'
-                    type='button'
-                    variant='ghost'
-                  >
-                    ½ package
-                  </Btn>
-                  <Btn
-                    onClick={() => setGrams(packageSizeGrams)}
-                    size='sm'
-                    type='button'
-                    variant='ghost'
-                  >
-                    1 package
-                  </Btn>
-                  <Btn
-                    onClick={() => setGrams(packageSizeGrams * 2)}
-                    size='sm'
-                    type='button'
-                    variant='ghost'
-                  >
-                    2 packages
-                  </Btn>
-                </div>
-              </div>
-            ) : null}
-            <div className={css.amountEntry}>
-              <Label text='Amount eaten (g)'>
-                <NumberInput
-                  enterKeyHint='done'
-                  min={1}
-                  required
-                  onValueChange={setGrams}
-                  value={grams}
-                />
-              </Label>
+                ½ package
+              </Btn>
               <Btn
-                disabled={selectedGrams < 1}
-                loading={recordFoodMutation.isPending}
-                type='submit'
+                onClick={() => setGrams(packageSizeGrams)}
+                size='sm'
+                type='button'
+                variant='ghost'
               >
-                Save
+                1 package
+              </Btn>
+              <Btn
+                onClick={() => setGrams(packageSizeGrams * 2)}
+                size='sm'
+                type='button'
+                variant='ghost'
+              >
+                2 packages
               </Btn>
             </div>
           </div>
-        </div>
+        ) : null}
+        <Label text='Amount eaten (g)'>
+          <NumberInput
+            enterKeyHint='done'
+            min={1}
+            onValueChange={setGrams}
+            required
+            size='lg'
+            value={grams}
+          />
+        </Label>
         <GoalPreview
           consumedKcal={consumedKcal}
           foodKcal={kcal}
           goalKcal={goalKcal}
           pending={dashboardQuery.isPending}
         />
-      </TypedForm>
-    </main>
+        <FormFooter
+          date={{ onValueChange: setDate, value: date }}
+          disabled={selectedGrams < 1}
+          loading={recordFoodMutation.isPending}
+          submitLabel='Add to diary'
+        />
+      </FormCard>
+    </FormPage>
   );
 }

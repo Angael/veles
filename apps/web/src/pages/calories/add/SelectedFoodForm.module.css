@@ -1,37 +1,10 @@
 @import '../../../styles/breakpoints.css';
 
+/* Room for the goal preview that is fixed to the bottom on phones. */
 .page {
-  display: grid;
-  gap: var(--space-sm);
-  padding-bottom: 5rem;
-}
-
-.panel {
-  display: grid;
-  gap: var(--space-md);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-md);
-  background: var(--c-surface);
-  padding: var(--space-md);
-}
-
-.fields,
-.amountField {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-}
-
-.fields > *,
-.amountField > * {
-  width: 100%;
-}
-
-.amountEntry {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: var(--space-sm);
+  @media (--phone) {
+    padding-bottom: 7rem;
+  }
 }
 
 .packageShortcuts {
@@ -148,10 +121,6 @@
 }
 
 @media (--phone) {
-  .page {
-    padding-bottom: 7rem;
-  }
-
   .goalPreview {
     position: fixed;
     z-index: 10;
