@@ -3,7 +3,9 @@ import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
 import { useUpdateFoodLogMutation } from '../calories.query';
 import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
 import { DateInput } from '@/components/ui/date-input/DateInput';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
@@ -43,17 +45,11 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
       ...(isProduct ? {} : { imageAction: photo.imageAction, photo: photo.photo }),
     });
     await router.invalidate();
-    await _navigate({ to: '/calories', search: { date: nextDate } });
+    await _navigate({ replace: true, search: { date: nextDate }, to: '/calories' });
   }
 
   return (
     <main className={css.page}>
-      <header className={css.header}>
-        <div>
-          <h1>Edit food log</h1>
-        </div>
-      </header>
-
       {isProduct && log.productId ? (
         <SelectedFoodCard
           carbs={nutrition.carbs ?? 0}
@@ -66,7 +62,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
         />
       ) : null}
 
-      <section className={css.panel}>
+      <Card as='section'>
         <TypedForm className={css.form} errorMsg={updateMutation.error?.message} onSubmit={submit}>
           {!isProduct ? (
             <Label text='Name'>
@@ -74,15 +70,9 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             </Label>
           ) : null}
 
-          <div className={css.logFields}>
-            <Label text='Date'>
-              <DateInput defaultValue={log.date} name='date' required />
-            </Label>
-
-            <Label text='Amount eaten (g)'>
-              <NumberInput min={0} name='grams' onValueChange={changeGrams} value={grams} />
-            </Label>
-          </div>
+          <Label text='Amount eaten (g)'>
+            <NumberInput min={0} name='grams' onValueChange={changeGrams} size='lg' value={grams} />
+          </Label>
 
           {!isProduct ? (
             <KcalMacrosForm onValueChange={changeNutrition} values={nutrition} />
@@ -97,21 +87,16 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
             />
           ) : null}
 
-          <div className={css.logActions}>
-            <Btn
-              disabled={isPending}
-              onClick={() => router.history.back()}
-              type='button'
-              variant='ghost'
-            >
-              Cancel
-            </Btn>
-            <Btn disabled={isPending} loading={updateMutation.isPending} type='submit'>
+          <FormSubmitRow>
+            <Label text='Date'>
+              <DateInput defaultValue={log.date} name='date' required />
+            </Label>
+            <Btn loading={isPending} type='submit'>
               Save
             </Btn>
-          </div>
+          </FormSubmitRow>
         </TypedForm>
-      </section>
+      </Card>
     </main>
   );
 }

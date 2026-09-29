@@ -1,9 +1,10 @@
 ## Veles
 
-Veles is a pnpm monorepo with two deployable applications and one shared database package:
+Veles is a pnpm monorepo with three deployable applications and one shared database package:
 
 - `apps/web` — the TanStack Start application.
 - `apps/worker` — a background worker. Its placeholder job currently checks PostgreSQL every ten seconds.
+- `apps/preview` — the standalone PR preview controller.
 - `packages/db` — the shared Drizzle client, schema, migrations, and migration tooling.
 - `infra/nginx` — the small reverse-proxy image used by Compose.
 
@@ -40,6 +41,8 @@ pnpm db:migrate:prod
 ```
 
 ### Compose
+
+The web and worker Dockerfiles install only their own workspace dependency trees (including `packages/db`); the preview controller has a separate filtered image build. A root `pnpm install` still installs the whole workspace.
 
 ```bash
 docker compose up --build

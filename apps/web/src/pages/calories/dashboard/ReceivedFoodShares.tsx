@@ -1,144 +1,101 @@
-import { CheckIcon, RotateCcwIcon, XIcon } from 'lucide-react';
+import { CheckIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 import { FoodSummary } from '../FoodSummary';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
+import { List, ListItem } from '@/components/ui/list/List';
+import { toastManager } from '@/components/ui/toast/toastManager';
 import css from './ReceivedFoodShares.module.css';
 
-type Decision = 'pending' | 'accepted' | 'declined';
-const decisionLabels: Record<Decision, string> = {
-  pending: 'Pending',
-  accepted: 'Accepted in preview',
-  declined: 'Declined in preview',
-};
-
-const shares = [
+/** Preview-only incoming shares until sharing exists in the data model. */
+const previewShares = [
   {
-    id: 'breakfast',
+    id: 'maya-breakfast',
     sender: 'Maya Chen',
     products: [
-      { name: 'Greek yogurt', amount: '170 g', kcal: 130, protein: 17, fat: 4, carbs: 7 },
-      { name: 'Blueberries', amount: '80 g', kcal: 46, protein: 1, fat: 0, carbs: 12 },
+      { id: 'yogurt', name: 'Greek yogurt', grams: 170, kcal: 130, protein: 17, fat: 4, carbs: 7 },
+      { id: 'berries', name: 'Blueberries', grams: 80, kcal: 46, protein: 1, fat: 0, carbs: 12 },
     ],
   },
   {
-    id: 'snack',
-    sender: 'Leo',
+    id: 'leo-snack',
+    sender: 'Leo Novak',
     products: [
-      { name: 'Almond butter toast', amount: '1 slice', kcal: 245, protein: 9, fat: 14, carbs: 22 },
+      {
+        id: 'toast',
+        name: 'Almond butter toast',
+        grams: 60,
+        kcal: 245,
+        protein: 9,
+        fat: 14,
+        carbs: 22,
+      },
     ],
   },
-] as const;
+];
 
+/** Incoming logs shown like the user's own, wrapped in a card that accepts or declines them all at once. */
 export function ReceivedFoodShares() {
-  const [decisions, setDecisions] = useState<Record<string, Decision>>({});
-  const [announcement, setAnnouncement] = useState('');
-  const pendingCount = shares.filter(
-    (share) => !decisions[share.id] || decisions[share.id] === 'pending',
-  ).length;
+  const [handledIds, setHandledIds] = useState<string[]>([]);
+  const pending = previewShares.filter((share) => !handledIds.includes(share.id));
 
-  function decide(id: string, sender: string, decision: Exclude<Decision, 'pending'>) {
-    setDecisions((current) => ({ ...current, [id]: decision }));
-    setAnnouncement(
-      `${sender}'s shared products ${decision} in this preview only. Your foods were not changed.`,
-    );
+  function decide(share: (typeof previewShares)[number], accepted: boolean) {
+    setHandledIds((current) => [...current, share.id]);
+    const count = share.products.length;
+    const products = `${count} ${count === 1 ? 'product' : 'products'}`;
+    toastManager.add({
+      description: 'Preview only: your diary was not changed.',
+      title: accepted
+        ? `Added ${products} from ${share.sender}`
+        : `Declined ${products} from ${share.sender}`,
+      type: accepted ? 'success' : undefined,
+    });
   }
 
-  function reset() {
-    setDecisions({});
-    setAnnouncement('Preview reset. Both shared product examples are pending again.');
-  }
-
-  return (
-    <section aria-labelledby='received-food-shares-heading' className={css.section}>
-      <div className={css.heading}>
-        <div>
-          <h2 id='received-food-shares-heading'>Products shared with you</h2>
-          <p>
-            Preview only · Example shares. Decisions stay on this screen and do not save products to
-            your foods.
-          </p>
-        </div>
-        {pendingCount < shares.length ? (
+  return pending.map((share) => {
+    const count = share.products.length;
+    const headingId = `share-${share.id}`;
+    return (
+      <Card
+        aria-labelledby={headingId}
+        as='article'
+        className={css.share}
+        key={share.id}
+        shadow={false}
+        tone='primary'
+      >
+        <h3 className={css.heading} id={headingId}>
+          {share.sender} shared {count === 1 ? 'a product' : `${count} products`} with you
+        </h3>
+        <List as='ol'>
+          {share.products.map((product) => (
+            <ListItem key={product.id} style={{ padding: 0 }}>
+              <FoodSummary
+                carbs={product.carbs}
+                density='compact'
+                fat={product.fat}
+                imageUrl={null}
+                kcal={product.kcal}
+                meta={`${product.grams} g`}
+                name={product.name}
+                protein={product.protein}
+              />
+            </ListItem>
+          ))}
+        </List>
+        <div className={css.actions}>
           <Btn
-            icon={<RotateCcwIcon aria-hidden='true' />}
-            onClick={reset}
-            size='md'
-            variant='outlineMain'
+            icon={<XIcon aria-hidden='true' />}
+            onClick={() => decide(share, false)}
+            variant='ghost'
           >
-            Reset preview
+            Decline
           </Btn>
-        ) : null}
-      </div>
-      <p className={css.count}>
-        {pendingCount === 0
-          ? 'No pending examples'
-          : `${pendingCount} pending example${pendingCount === 1 ? '' : 's'}`}
-      </p>
-      <div aria-live='polite' className={css.srOnly} role='status'>
-        {announcement}
-      </div>
-      <div className={css.shares}>
-        {shares.map((share) => {
-          const decision = decisions[share.id] ?? 'pending';
-          return (
-            <Card as='article' className={css.share} key={share.id} shadow={false}>
-              <div className={css.shareHeading}>
-                <h3>From {share.sender}</h3>
-                <span className={decision === 'pending' ? css.pending : css.handled}>
-                  {decisionLabels[decision]}
-                </span>
-              </div>
-              <div
-                aria-label='Nutrition per product: calories, protein grams, fat grams, carbohydrate grams'
-                className={css.products}
-                role='group'
-              >
-                {share.products.map((product) => (
-                  <FoodSummary
-                    carbs={product.carbs}
-                    density='compact'
-                    fat={product.fat}
-                    imageUrl={null}
-                    kcal={product.kcal}
-                    key={product.name}
-                    meta={product.amount}
-                    name={product.name}
-                    protein={product.protein}
-                  />
-                ))}
-              </div>
-              {decision === 'pending' ? (
-                <div className={css.actions}>
-                  <Btn
-                    aria-label={`Accept ${share.sender}'s shared products in preview`}
-                    icon={<CheckIcon aria-hidden='true' />}
-                    onClick={() => decide(share.id, share.sender, 'accepted')}
-                    size='md'
-                  >
-                    Accept
-                  </Btn>
-                  <Btn
-                    aria-label={`Decline ${share.sender}'s shared products in preview`}
-                    icon={<XIcon aria-hidden='true' />}
-                    onClick={() => decide(share.id, share.sender, 'declined')}
-                    size='md'
-                    variant='outlineDanger'
-                  >
-                    Decline
-                  </Btn>
-                </div>
-              ) : (
-                <p className={css.feedback}>
-                  {decision === 'accepted'
-                    ? 'Accepted for this preview. No products were saved to your foods.'
-                    : 'Declined for this preview. No products were changed.'}
-                </p>
-              )}
-            </Card>
-          );
-        })}
-      </div>
-    </section>
-  );
+          <Btn icon={<CheckIcon aria-hidden='true' />} onClick={() => decide(share, true)}>
+            {count === 1 ? 'Add to diary' : 'Add all to diary'}
+          </Btn>
+        </div>
+      </Card>
+    );
+  });
 }

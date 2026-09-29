@@ -1,0 +1,39 @@
+@import '../../../styles/breakpoints.css';
+
+/* Sits exactly where FloatingButton does so the swap doesn't move the user's target. */
+.bar {
+  position: fixed;
+  right: max(var(--space-md), calc((100vw - 1100px) / 2));
+  bottom: var(--space-md);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.25rem;
+  border: var(--border-width) solid var(--c-border-popup);
+  border-radius: var(--radius-pill);
+  background: var(--c-surface-solid);
+  box-shadow: var(--shadow-popup);
+  animation: bar-in var(--duration-fast) var(--ease-out);
+}
+
+.count {
+  padding-inline-end: var(--space-sm);
+  color: var(--c-text-strong);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@keyframes bar-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (--phone) {
+  .bar {
+    right: var(--space-lg);
+    bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  }
+}

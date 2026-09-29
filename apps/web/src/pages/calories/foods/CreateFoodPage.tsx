@@ -1,36 +1,31 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useCreateFoodProductMutation } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
-import css from '../CalorieFlows.module.css';
+import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 
 type Props = { barcode?: string; date: string; name?: string };
 export function CreateFoodPage({ barcode, date, name }: Props) {
   const navigate = useNavigate();
   const createMutation = useCreateFoodProductMutation();
+  const { markDirty, markSaved } = useUnsavedChangesGuard();
 
   async function save(value: FoodEditorValue) {
     const product = await createMutation.mutateAsync(value);
-    await navigate({ to: '/calories/add', search: { date, foodId: product.id } });
+    markSaved();
+    await navigate({ replace: true, search: { date, foodId: product.id }, to: '/calories/add' });
   }
 
   return (
-    <main className={css.page}>
-      <header className={css.header}>
-        <div>
-          <h1>Create food</h1>
-          <p>Add it once for everyone</p>
-        </div>
-      </header>
-      <section className={css.panel}>
-        <FoodEditor
-          errorMsg={createMutation.error?.message}
-          initialBarcode={barcode}
-          initialName={name}
-          onSubmit={save}
-          pending={createMutation.isPending}
-          submitLabel='Create food'
-        />
-      </section>
+    <main>
+      <FoodEditor
+        errorMsg={createMutation.error?.message}
+        initialBarcode={barcode}
+        initialName={name}
+        onDirty={markDirty}
+        onSubmit={save}
+        pending={createMutation.isPending}
+        submitLabel='Create food'
+      />
     </main>
   );
 }

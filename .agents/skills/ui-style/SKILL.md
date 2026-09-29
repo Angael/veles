@@ -1,6 +1,6 @@
 ---
 name: ui-style
-description: Use this skill when building or reviewing frontend UI
+description: Use when creating, restyling, or reviewing web UI in apps/web — CSS modules, theme tokens, breakpoints, hover/press/focus states, animation, hit areas, or picking shared components from apps/web/src/components.
 ---
 
 # UI Polish

@@ -7,7 +7,7 @@ export const Route = createFileRoute('/demo/components')({
   staticData: {
     navbar: {
       label: 'Components',
-      upTo: { to: '/' },
+      backFallback: { to: '/' },
     },
   },
 });

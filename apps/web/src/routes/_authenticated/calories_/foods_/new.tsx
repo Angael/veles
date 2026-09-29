@@ -1,13 +1,14 @@
 import { type } from 'arktype';
 import { createFileRoute } from '@tanstack/react-router';
 import { CreateFoodPage } from '@/pages/calories/foods/CreateFoodPage';
-import { normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
+import { caloriesDayTarget, normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 
 export const Route = createFileRoute('/_authenticated/calories_/foods_/new')({
   validateSearch: type({ 'barcode?': 'string', 'date?': 'string', 'name?': 'string' }),
   component: Component,
   staticData: {
-    layout: 'focus',
+    layout: 'task',
+    navbar: { backFallback: caloriesDayTarget, label: 'Create food product' },
   },
 });
 

@@ -419,5 +419,5 @@ TanStack Router has its own SWR cache (`staleTime`, `gcTime`, `defaultPreloadSta
 
 ## Cross-References
 
-- [router-core-data-loading](skill://router-core-data-loading) — built-in loader caching fundamentals
-- [router-core-ssr](skill://router-core-ssr) — SSR setup for dehydration/hydration
+- [router-core-data-loading](skill://router-core/references/data-loading.md) — built-in loader caching fundamentals
+- [router-core-ssr](skill://router-core/references/ssr.md) — SSR setup for dehydration/hydration

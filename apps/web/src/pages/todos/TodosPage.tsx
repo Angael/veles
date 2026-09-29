@@ -1,66 +1,81 @@
-import { Share2Icon } from 'lucide-react';
-import { Btn } from '@/components/ui/btn/Btn';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { useThrottledValue } from '@tanstack/react-pacer';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card/Card';
+import { SelectInput } from '@/components/ui/select-input/SelectInput';
+import { TextInput } from '@/components/ui/text-input/TextInput';
+import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
+import { CheckedNoteCard } from './CheckedNoteCard';
+import type { NoteSummary } from './notes.api';
+import { NoteComposer } from './NoteComposer';
+import { notesQueryOptions } from './notes.query';
+import { TextNoteCard } from './TextNoteCard';
 import css from './TodosPage.module.css';
 
-const todoLists = [
-  {
-    title: 'Shopping cart',
-    items: [
-      { done: false, text: 'Oats and Greek yogurt' },
-      { done: true, text: 'Coffee beans' },
-      { done: false, text: 'Vegetables for stir-fry' },
-      { done: false, text: 'Cat food' },
-    ],
-  },
-  {
-    title: 'Life goals',
-    items: [
-      { done: true, text: 'Renew passport' },
-      { done: false, text: 'Plan the balcony garden' },
-      { done: false, text: 'Book a Polish conversation class' },
-    ],
-  },
+const noteScopeItems = [
+  { label: 'All notes', value: 'all' },
+  { label: 'Your notes', value: 'owned' },
 ] as const;
 
+const noteSearchFields = [
+  (note) => note.title,
+  (note) => note.content,
+  (note) => note.items.map((item) => item.name),
+] satisfies RankedSearchFields<NoteSummary>;
+
 export function TodosPage() {
+  const { data: notes, refetch: refetchNotes } = useSuspenseQuery(notesQueryOptions());
+  const [noteScope, setNoteScope] = useState<'all' | 'owned'>('all');
+  const [searchInputValue, setSearchInputValue] = useState('');
+  const [search] = useThrottledValue(searchInputValue, { wait: 200 });
+  const scopedNotes = noteScope === 'owned' ? notes.filter((note) => note.isOwned) : notes;
+  const visibleNotes = filterAndRankBySearch(scopedNotes, search, noteSearchFields);
+
   return (
     <main className={css.page}>
-      <header className={css.header} data-appear>
-        <div>
-          <h1>Todos</h1>
-          <p>Simple checklists for your shopping cart and life goals.</p>
-        </div>
-        <Btn
-          disabled
-          icon={<Share2Icon aria-hidden='true' />}
-          radius='pill'
-          type='button'
-          variant='outlineMain'
-        >
-          Share soon
-        </Btn>
-      </header>
-
-      <p className={css.mockNote} data-appear='1'>
-        Mock only — editing and sharing are coming next.
-      </p>
-
-      <section aria-label='Example todo lists' className={css.listGrid} data-appear='2'>
-        {todoLists.map((list) => (
-          <Card as='article' className={css.listCard} key={list.title}>
-            <h2>{list.title}</h2>
-            <ul className={css.items}>
-              {list.items.map((item) => (
-                <li className={css.item} key={item.text}>
-                  <input defaultChecked={item.done} disabled type='checkbox' />
-                  <span className={item.done ? css.done : undefined}>{item.text}</span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        ))}
+      <section aria-label='Filter notes' className={css.controls} data-appear>
+        <TextInput
+          aria-label='Search notes'
+          autoComplete='off'
+          name='search'
+          onValueChange={setSearchInputValue}
+          placeholder='Search notes'
+          type='search'
+          value={searchInputValue}
+        />
+        <SelectInput
+          aria-label='Note ownership'
+          items={noteScopeItems}
+          onValueChange={(value) => {
+            if (!value) return;
+            setNoteScope(value);
+            void refetchNotes();
+          }}
+          value={noteScope}
+        />
       </section>
+      {visibleNotes.length === 0 ? (
+        <Card as='section' className={css.emptyState} data-appear='1'>
+          <h2>{notes.length === 0 ? 'No notes yet' : 'No matching notes'}</h2>
+          <p>
+            {notes.length === 0
+              ? 'Add your first text note or checklist.'
+              : 'Try another search or ownership filter.'}
+          </p>
+        </Card>
+      ) : (
+        <section aria-label='Your notes and shared notes' className={css.listGrid} data-appear='1'>
+          {visibleNotes.map((note) =>
+            note.type === 'shopping_list' ? (
+              <CheckedNoteCard key={note.id} note={note} />
+            ) : (
+              <TextNoteCard key={note.id} note={note} />
+            ),
+          )}
+        </section>
+      )}
+
+      <NoteComposer />
     </main>
   );
 }

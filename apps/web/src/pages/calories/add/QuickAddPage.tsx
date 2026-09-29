@@ -2,6 +2,9 @@ import type { UseNavigateResult } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useRecordCustomCaloriesMutation } from '../calories.query';
 import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
+import { DateInput } from '@/components/ui/date-input/DateInput';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/ui/label/Label';
 import { PhotoPicker, type PhotoPickerValue } from '../PhotoPicker';
@@ -29,8 +32,9 @@ export function QuickAddPage({
   const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
 
   async function submit(formData: TypedFormData, navigate: UseNavigateResult<string>) {
+    const logDate = formData.string('date');
     await recordMutation.mutateAsync({
-      date,
+      date: logDate,
       name: formData.string('name') || 'Quick add',
       kcal: formData.number('kcal'),
       protein: formData.optionalNumber('protein'),
@@ -40,18 +44,12 @@ export function QuickAddPage({
       ...(photo.photo ? { photo: photo.photo } : {}),
     });
 
-    await navigate({ to: '/calories', search: { date } });
+    await navigate({ replace: true, search: { date: logDate }, to: '/calories' });
   }
 
   return (
-    <main className={css.page}>
-      <header className={css.header}>
-        <div>
-          <h1>Quick add</h1>
-          <p>Record energy now. Macros are optional.</p>
-        </div>
-      </header>
-      <section className={css.panel}>
+    <main>
+      <Card as='section'>
         <TypedForm className={css.form} errorMsg={recordMutation.error?.message} onSubmit={submit}>
           <Label text='Label'>
             <TextInput defaultValue={defaultValues?.name ?? 'Quick add'} name='name' required />
@@ -67,11 +65,16 @@ export function QuickAddPage({
           />
           <PhotoPicker disabled={recordMutation.isPending} onChange={setPhoto} value={photo} />
 
-          <Btn loading={recordMutation.isPending} type='submit'>
-            Add to diary
-          </Btn>
+          <FormSubmitRow>
+            <Label text='Date'>
+              <DateInput defaultValue={date} name='date' required />
+            </Label>
+            <Btn loading={recordMutation.isPending} type='submit'>
+              Add to diary
+            </Btn>
+          </FormSubmitRow>
         </TypedForm>
-      </section>
+      </Card>
     </main>
   );
 }

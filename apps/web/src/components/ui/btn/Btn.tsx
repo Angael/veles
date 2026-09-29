@@ -9,9 +9,11 @@ export type BtnVariant =
   | 'danger'
   | 'outlineMain'
   | 'outlineDanger'
+  | 'outlineSuccess'
   | 'white'
   | 'ghost'
   | 'ghostDanger'
+  | 'ghostSuccess'
   | 'text';
 export type BtnSize = 'sm' | 'md' | 'lg';
 type BtnRadius = 'md' | 'pill';

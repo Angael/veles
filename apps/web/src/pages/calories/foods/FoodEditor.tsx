@@ -1,6 +1,8 @@
 import type { CalorieFood } from '../calories.api';
 import type { ImageFields } from '../calories.query';
 import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
@@ -26,6 +28,8 @@ type Props = {
   errorMsg?: string;
   initialBarcode?: string;
   initialName?: string;
+  /** Called on every edit, for unsaved-changes guards. */
+  onDirty: () => void;
   pending: boolean;
   submitLabel: string;
   onSubmit: (value: FoodEditorValue) => Promise<void>;
@@ -36,6 +40,7 @@ export function FoodEditor({
   food,
   initialBarcode,
   initialName,
+  onDirty,
   onSubmit,
   pending,
   submitLabel,
@@ -56,42 +61,54 @@ export function FoodEditor({
     });
   }
   return (
-    <TypedForm className={css.form} errorMsg={errorMsg} onSubmit={handleSubmit}>
-      <Label text='Food name'>
-        <TextInput defaultValue={food?.name ?? initialName} name='name' required />
-      </Label>
-      <div className={css.grid}>
-        <Label text='Barcode'>
-          <TextInput
-            defaultValue={food?.barcode ?? initialBarcode}
-            inputMode='numeric'
-            name='barcode'
-          />
+    <Card as='section'>
+      <TypedForm
+        className={css.form}
+        errorMsg={errorMsg}
+        onChange={onDirty}
+        onSubmit={handleSubmit}
+      >
+        <Label text='Food name'>
+          <TextInput defaultValue={food?.name ?? initialName} name='name' required />
         </Label>
-        <Label text='Product size (g)'>
-          <NumberInput defaultValue={food?.productSizeGrams ?? undefined} min={1} name='size' />
-        </Label>
-      </div>
-      <KcalMacrosForm
-        defaultValues={{
-          kcal: food?.kcalPer100g,
-          protein: food?.proteinPer100g,
-          fat: food?.fatPer100g,
-          carbs: food?.carbsPer100g,
-        }}
-        isPer100
-      />
-      <PhotoPicker
-        allowUpload={!food?.imageUrl}
-        disabled={pending}
-        existingUrl={food?.imageUrl}
-        onChange={setPhoto}
-        value={photo}
-      />
-      <p>This changes the shared catalog photo for everyone.</p>
-      <Btn loading={pending} type='submit'>
-        {submitLabel}
-      </Btn>
-    </TypedForm>
+        <div className={css.grid}>
+          <Label text='Barcode'>
+            <TextInput
+              defaultValue={food?.barcode ?? initialBarcode}
+              inputMode='numeric'
+              name='barcode'
+            />
+          </Label>
+          <Label text='Product size (g)'>
+            <NumberInput defaultValue={food?.productSizeGrams ?? undefined} min={1} name='size' />
+          </Label>
+        </div>
+        <KcalMacrosForm
+          defaultValues={{
+            kcal: food?.kcalPer100g,
+            protein: food?.proteinPer100g,
+            fat: food?.fatPer100g,
+            carbs: food?.carbsPer100g,
+          }}
+          isPer100
+        />
+        <PhotoPicker
+          allowUpload={!food?.imageUrl}
+          disabled={pending}
+          existingUrl={food?.imageUrl}
+          onChange={(next) => {
+            setPhoto(next);
+            onDirty();
+          }}
+          value={photo}
+        />
+        <p>This changes the shared catalog photo for everyone.</p>
+        <FormSubmitRow>
+          <Btn loading={pending} type='submit'>
+            {submitLabel}
+          </Btn>
+        </FormSubmitRow>
+      </TypedForm>
+    </Card>
   );
 }

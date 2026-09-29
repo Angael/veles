@@ -3,9 +3,15 @@
 - Run `pnpm check:fix` before finishing
 - Always use exact pinned package versions
 - skip "computer use"/"browser smoke tests" checks and launching dev server.
-- Correct order for macros is always: 1. kcal 2. protein 3. fat 4. carbs.
+- Display kcal as a distinct energy metric, never grouped on the same row with macros; group macros together in this order: protein, fat, carbs.
 - Generated files are exempt and must not be hand-edited.
 - Skip adding tests unless user tells you to write them
+
+## Commands
+- Fresh checkout or worktree: run `pnpm install --frozen-lockfile` first; `pnpm check:fix` fails without `node_modules`.
+- Full gate: `pnpm check:fix` (format, lint, CSS lint, typecheck, tests).
+- Single web test file: `pnpm --filter @veles/web test -- <path relative to apps/web>`. Vitest is not installed at the root, so root `pnpm exec vitest` fails.
+- Typecheck one package: `pnpm --filter <@veles/web|@veles/worker|@veles/db|@veles/preview> typecheck`.
 
 ## CI/CD
 - Avoid GitHub Actions and GitHub CI/CD for sensitive prod workflows; this repo is public
@@ -19,7 +25,7 @@
 - `pnpm db:reset` rebuilds the development database and seeds the development user/account, calorie goal, food products, food logs and weights, recipes, and diary entries.
 
 ## Structure
-- The web app lives under `apps/web`; paths in this section are repository-root-relative.
+- There is no root `src/`. Code lives in `apps/web/src`, `apps/worker/src`, `apps/preview/src`, and `packages/db/src`; paths in this section are repository-root-relative.
 - `apps/web/src/routes` owns URLs, guards, loaders, and tiny adapters. Route implementation belongs in `apps/web/src/pages`.
 - `apps/web/src/pages` owns product features. Small features flat; split large features by workflows.
 - Keep feature-specific code beside the owning page or workflow. Features shouldn't import other feature's page components.
@@ -45,6 +51,12 @@
 - Consumers use extracted hooks/options rather than duplicating pending state or invalidation wiring.
 - For toast notifications after mutation, prefer `useMutation` `meta`.
 - For simple static invalidation, prefer `meta.invalidateQueryKey`; use lifecycle callbacks for data-dependent or dynamic keys.
+
+## Navigation
+- Every "saved, now leave" navigation uses `replace: true`, so back never reopens a submitted form. Same for in-page view changes (week/day pickers) that shouldn't pile up history.
+- Route chrome comes from `staticData`: `layout: 'task'` (sticky back + title, no primary nav), `layout: 'immersive'` (page renders `RouteBackButton` itself), or omitted (section root). Task/immersive routes need `navbar.backFallback`.
+- Back goes through `RouteBackButton`: previous in-app history entry first, `navbar.backFallback` otherwise. Don't add ad-hoc Cancel/close links.
+- Forms that take effort to fill in use `useUnsavedChangesGuard`; call `markSaved()` right before the post-save navigation.
 
 ## UI
 - Prefer css modules, prefer syntax `import css from ...`

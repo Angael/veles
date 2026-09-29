@@ -4,7 +4,7 @@ import { AccountPage } from '@/pages/account/AccountPage';
 export const Route = createFileRoute('/_authenticated/account')({
   component: AccountPageRoute,
   head: () => ({ meta: [{ title: 'Account' }] }),
-  staticData: { navbar: { label: 'Account', upTo: { to: '/' } } },
+  staticData: { navbar: { label: 'Account' } },
 });
 
 function AccountPageRoute() {

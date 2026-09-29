@@ -4,7 +4,10 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Btn, type BtnSize, type BtnVariant } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
+import { Checkbox } from '@/components/ui/checkbox/Checkbox';
 import { DateInput } from '@/components/ui/date-input/DateInput';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog/Dialog';
 import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
 import { ErrorCard } from '@/components/ui/error-card/ErrorCard';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
@@ -75,9 +78,11 @@ const BTN_VARIANTS = [
   { label: 'Danger', value: 'danger' },
   { label: 'Outline main', value: 'outlineMain' },
   { label: 'Outline danger', value: 'outlineDanger' },
+  { label: 'Outline success', value: 'outlineSuccess' },
   { label: 'White', value: 'white' },
   { label: 'Ghost', value: 'ghost' },
   { label: 'Ghost danger', value: 'ghostDanger' },
+  { label: 'Ghost success', value: 'ghostSuccess' },
   { label: 'Text', value: 'text' },
 ] satisfies DemoProp<BtnVariant>[];
 
@@ -173,6 +178,18 @@ export function ComponentsDemoPage() {
           </MenuBtnPopup>
         </MenuBtnRoot>
       </section>
+      <section>
+        <h2>Dialog</h2>
+        <Dialog
+          body='Use dialogs for focused actions that need an explicit decision.'
+          title='Example dialog'
+          trigger={
+            <Btn render={<DialogTrigger />} type='button' variant='outlineMain'>
+              Open dialog
+            </Btn>
+          }
+        />
+      </section>
 
       <section>
         <h2>PillBtn</h2>
@@ -192,14 +209,25 @@ export function ComponentsDemoPage() {
       </section>
 
       <section>
+        <h2>Checkbox</h2>
+        <label className={css.toggleDemo}>
+          <span>Share with Maya</span>
+          <Checkbox defaultChecked />
+        </label>
+      </section>
+
+      <section>
         <h2>Card</h2>
         <div className={css.cardRow}>
           <Card as='article'>Default card</Card>
-          <Card as='article' variant='primary'>
-            Primary card
+          <Card as='article' tone='primary'>
+            Primary tone
           </Card>
-          <Card as='article' variant='danger'>
-            Danger card
+          <Card as='article' tone='sky'>
+            Sky tone
+          </Card>
+          <Card as='article' tone='danger'>
+            Danger tone
           </Card>
           <Card as='article' shadow={false}>
             Card without shadow
@@ -254,6 +282,10 @@ export function ComponentsDemoPage() {
           type='search'
           value={textValue}
         />
+        <div className={css.formGrid}>
+          <TextInput aria-label='Small text input' placeholder='size sm' size='sm' />
+          <TextInput aria-label='Large text input' placeholder='size lg' size='lg' />
+        </div>
       </section>
       <section>
         <h2>TypedForm</h2>
@@ -266,22 +298,12 @@ export function ComponentsDemoPage() {
           <Label text='Demo field'>
             <TextInput defaultValue='Breakfast' name='typedFormDemo' required />
           </Label>
-          <Btn type='submit'>Submit demo</Btn>
-        </TypedForm>
-      </section>
-
-      <section>
-        <h2>TypedForm</h2>
-        <TypedForm
-          className={css.formGrid}
-          onSubmit={(data) => {
-            data.string('typedFormDemo');
-          }}
-        >
-          <Label text='Demo field'>
-            <TextInput defaultValue='Breakfast' name='typedFormDemo' required />
-          </Label>
-          <Btn type='submit'>Submit demo</Btn>
+          <FormSubmitRow>
+            <Label text='Date'>
+              <DateInput defaultValue='2026-08-08' name='date' required />
+            </Label>
+            <Btn type='submit'>Submit demo</Btn>
+          </FormSubmitRow>
         </TypedForm>
       </section>
 
@@ -295,6 +317,10 @@ export function ComponentsDemoPage() {
           placeholder='Calories'
           value={numberValue}
         />
+        <div className={css.formGrid}>
+          <NumberInput aria-label='Small number input' defaultValue={12} size='sm' />
+          <NumberInput aria-label='Large number input' defaultValue={78.4} size='lg' />
+        </div>
       </section>
 
       <section>

@@ -1,17 +1,16 @@
 import type { UseNavigateResult } from '@tanstack/react-router';
-import clsx from 'clsx';
-import { SendHorizontalIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
-import { ErrorCard } from '@/components/ui/error-card/ErrorCard';
-import { UploadTileGrid } from './UploadTileGrid';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
+import { UploadTileGrid } from './UploadTileGrid';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import css from './AddRecipePage.module.css';
 import { RECIPE_UPLOAD_MAX_PHOTO_BYTES, RECIPE_UPLOAD_MAX_PHOTO_COUNT } from '../recipeUpload.api';
 import { useCreateRecipeMutation } from '../recipes.query';
+import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 
 type AddRecipeDraft = RecipeFormDraft & {
   selectedFiles: File[];
@@ -35,6 +34,7 @@ export function AddRecipePage() {
   const createMutation = useCreateRecipeMutation();
   const [draft, setDraft] = useState<AddRecipeDraft>(EMPTY_DRAFT);
   const [error, setError] = useState<string | null>(null);
+  const { markDirty, markSaved } = useUnsavedChangesGuard();
 
   /** Submits the recipe form and reports upload or navigation failures inline. */
   async function handleSubmit(data: TypedFormData, navigate: UseNavigateResult<string>) {
@@ -49,53 +49,45 @@ export function AddRecipePage() {
 
       const result = await createMutation.mutateAsync({ data: formData });
 
-      await navigate({ params: { id: result.id }, to: '/recipes/view/$id' });
+      markSaved();
+      await navigate({ params: { id: result.id }, replace: true, to: '/recipes/view/$id' });
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Recipe upload failed');
     }
   }
 
   return (
-    <main className={css.page}>
-      <section className={css.content}>
-        <Card as='section' className={css.formCard}>
-          <h1>Add recipe</h1>
+    <main>
+      <Card as='section'>
+        <TypedForm className={css.form} errorMsg={error} onSubmit={handleSubmit}>
+          <RecipeForm
+            draft={draft}
+            onDraftChange={(nextDraft) => {
+              markDirty();
+              setDraft((current) => ({ ...current, ...nextDraft }));
+            }}
+          />
 
-          <TypedForm className={css.form} onSubmit={handleSubmit}>
-            <div className={css.formBody}>
-              <RecipeForm
-                draft={draft}
-                onDraftChange={(nextDraft) => setDraft((current) => ({ ...current, ...nextDraft }))}
-              />
+          <div className={css.photos}>
+            <span>Photos</span>
+            <UploadTileGrid
+              files={draft.selectedFiles}
+              maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES}
+              maxItems={RECIPE_UPLOAD_MAX_PHOTO_COUNT}
+              onFilesChange={(selectedFiles) => {
+                markDirty();
+                setDraft((current) => ({ ...current, selectedFiles }));
+              }}
+            />
+          </div>
 
-              <div className={clsx(css.field, css.uploadFieldWrap)}>
-                <span>Photos</span>
-                <UploadTileGrid
-                  files={draft.selectedFiles}
-                  maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES}
-                  maxItems={RECIPE_UPLOAD_MAX_PHOTO_COUNT}
-                  onFilesChange={(selectedFiles) =>
-                    setDraft((current) => ({ ...current, selectedFiles }))
-                  }
-                />
-              </div>
-            </div>
-
-            {error ? <ErrorCard message={error} title='Recipe not saved' /> : null}
-
-            <div className={css.actions}>
-              <Btn
-                icon={<SendHorizontalIcon aria-hidden='true' size={18} />}
-                loading={createMutation.isPending}
-                type='submit'
-                variant='main'
-              >
-                Save recipe
-              </Btn>
-            </div>
-          </TypedForm>
-        </Card>
-      </section>
+          <FormSubmitRow>
+            <Btn loading={createMutation.isPending} type='submit'>
+              Add recipe
+            </Btn>
+          </FormSubmitRow>
+        </TypedForm>
+      </Card>
     </main>
   );
 }

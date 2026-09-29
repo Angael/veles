@@ -1,9 +1,20 @@
 .page {
   min-height: 100dvh;
+  /* Keep local chrome stacking below Base UI portals mounted on body. */
+  isolation: isolate;
+  /* Lets the task header backdrop bleed to the viewport edges without horizontal scroll. */
+  overflow-x: clip;
   color: var(--c-text);
+}
+
+/* Keep the viewport gradient off the scrolling page's paint layer. */
+.page::before {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
   background: var(--gradient-page);
-  background-attachment: fixed;
-  background-size: 100vw 100dvh;
+  content: '';
+  pointer-events: none;
 }
 
 .shell {
@@ -81,12 +92,17 @@
   }
 }
 
-.brandBackLink {
-  flex: 0 0 auto;
-}
-
 .routeLabelTitle {
   min-width: 0;
   font-size: var(--text-lg);
   line-height: 1.1;
+}
+
+/* The sticky task header owns top spacing and the safe-area inset on phones. */
+.taskShell {
+  position: relative;
+
+  @media (--phone) {
+    padding-top: 0;
+  }
 }

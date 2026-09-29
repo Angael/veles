@@ -36,7 +36,7 @@ export function AuthErrorPage({ code }: { code?: string }) {
         className={css.panel}
         data-appear
         role='alert'
-        variant='danger'
+        tone='danger'
       >
         <div className={css.content}>
           <h1 id='auth-error-title'>{copy.title}</h1>

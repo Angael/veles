@@ -11,6 +11,8 @@ export type FoodSummaryProps = {
   imageUrl: string | null;
   kcal: number;
   density?: 'compact' | 'default';
+  /** Rendered on top of the image, e.g. a selection target covering the whole image. */
+  mediaOverlay?: ReactNode;
   meta?: ReactNode;
   name: ReactNode;
   protein: number;
@@ -24,6 +26,7 @@ export function FoodSummary({
   fat,
   imageUrl,
   kcal,
+  mediaOverlay,
   meta,
   name,
   protein,
@@ -36,6 +39,7 @@ export function FoodSummary({
         ) : (
           <UtensilsIcon aria-hidden='true' />
         )}
+        {mediaOverlay}
       </div>
       <div className={css.body}>
         <div className={css.identity}>

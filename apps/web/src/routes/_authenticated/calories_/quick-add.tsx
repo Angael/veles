@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 import { createFileRoute } from '@tanstack/react-router';
 import { QuickAddPage } from '@/pages/calories/add/QuickAddPage';
-import { normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
+import { caloriesDayTarget, normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 
 const quickAddSearchType = type({
   'carbs?': 'number >= 0',
@@ -15,9 +15,7 @@ const quickAddSearchType = type({
 export const Route = createFileRoute('/_authenticated/calories_/quick-add')({
   validateSearch: quickAddSearchType,
   component: Component,
-  staticData: {
-    layout: 'focus',
-  },
+  staticData: { layout: 'task', navbar: { backFallback: caloriesDayTarget, label: 'Quick add' } },
 });
 
 function Component() {

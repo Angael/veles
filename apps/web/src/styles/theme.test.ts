@@ -12,6 +12,7 @@ describe('theme tokens', () => {
     const declaredTokens = new Set(themeSource.match(/--[a-z0-9-]+/g) ?? []);
     const allowedLocalPrefixes = [
       '--btn-',
+      '--input-',
       '--duration',
       '--easing',
       '--positioner-',
@@ -20,6 +21,7 @@ describe('theme tokens', () => {
       '--transform-origin',
       '--anchor-width',
       '--card-padding',
+      '--card-tone',
       '--toast-',
     ];
     const errors: string[] = [];

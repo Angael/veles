@@ -7,10 +7,9 @@ RUN npm install -g pnpm@12.3.4
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/web/package.json apps/web/package.json
 COPY apps/worker/package.json apps/worker/package.json
 COPY packages/db/package.json packages/db/package.json
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm --filter @veles/worker... install --frozen-lockfile --prod
 
 COPY apps/worker apps/worker
 COPY packages/db packages/db

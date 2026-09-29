@@ -22,6 +22,7 @@
 }
 
 .media {
+  position: relative;
   display: grid;
   width: 5.625rem;
   height: 5.625rem;
