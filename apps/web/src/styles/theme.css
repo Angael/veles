@@ -103,6 +103,10 @@
   --c-danger-surface: rgba(127, 29, 29, 0.35);
   --c-danger-border: rgba(248, 113, 113, 0.35);
 
+  --c-success-text: #bbf7d0;
+  --c-success-surface: rgba(22, 101, 52, 0.28);
+  --c-success-border: rgba(74, 222, 128, 0.45);
+
   --gradient-page:
     radial-gradient(circle at top, rgba(96, 165, 250, 0.18), transparent 28%),
     linear-gradient(180deg, #060816 0%, #0f172a 48%, #111827 100%);
@@ -126,7 +130,6 @@
   --border-width: 1px;
   --shadow-card: 0 24px 80px rgba(15, 23, 42, 0.35);
   --shadow-card-primary: 0 24px 70px rgba(37, 99, 235, 0.2);
-  --shadow-card-danger: 0 24px 70px rgba(127, 29, 29, 0.28);
   --shadow-popup: 0 24px 60px rgba(2, 6, 23, 0.4);
   --blur-surface: blur(8px);
 

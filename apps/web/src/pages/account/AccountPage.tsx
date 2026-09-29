@@ -31,7 +31,7 @@ export function AccountPage({ user }: AccountPageProps) {
 
   return (
     <main className={css.page}>
-      <Card as='section' className={css.profileCard} data-appear variant='primary'>
+      <Card as='section' className={css.profileCard} data-appear tone='primary'>
         <Avatar.Root className={css.profileAvatar}>
           {user.image ? <Avatar.Image alt='' className={css.avatarImage} src={user.image} /> : null}
           <Avatar.Fallback className={css.profileFallback}>{accountInitials}</Avatar.Fallback>

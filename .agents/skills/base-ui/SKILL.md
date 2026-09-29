@@ -1,6 +1,6 @@
 ---
 name: base-ui
-description: Use when working on/with base-ui library for docs
+description: Use when adding, reviewing, or debugging a @base-ui/react component (Dialog, Popover, Select, Menu, Tabs, Toggle, etc.) or checking its props, parts, and accessibility behavior against the official docs.
 ---
 
 # Base UI
