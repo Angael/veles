@@ -54,8 +54,8 @@
 
 ## Navigation
 - Every "saved, now leave" navigation uses `replace: true`, so back never reopens a submitted form. Same for in-page view changes (week/day pickers) that shouldn't pile up history.
-- Route chrome comes from `staticData`: `layout: 'task'` (sticky back + title, no primary nav), `layout: 'immersive'` (page renders `RouteBackButton` itself), or omitted (section root). Task/immersive routes need `navbar.upTo`.
-- Back goes through `RouteBackButton`: previous in-app history entry first, `navbar.upTo` fallback. Don't add ad-hoc Cancel/close links.
+- Route chrome comes from `staticData`: `layout: 'task'` (sticky back + title, no primary nav), `layout: 'immersive'` (page renders `RouteBackButton` itself), or omitted (section root). Task/immersive routes need `navbar.backFallback`.
+- Back goes through `RouteBackButton`: previous in-app history entry first, `navbar.backFallback` otherwise. Don't add ad-hoc Cancel/close links.
 - Forms that take effort to fill in use `useUnsavedChangesGuard`; call `markSaved()` right before the post-save navigation.
 
 ## UI

@@ -4,5 +4,5 @@ import { AddWeightPage } from '@/pages/weight/AddWeightPage';
 export const Route = createFileRoute('/_authenticated/weight_/add')({
   component: AddWeightPage,
   head: () => ({ meta: [{ title: 'Add weight for date' }] }),
-  staticData: { layout: 'task', navbar: { label: 'Add weight', upTo: { to: '/weight' } } },
+  staticData: { layout: 'task', navbar: { backFallback: { to: '/weight' }, label: 'Add weight' } },
 });

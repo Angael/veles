@@ -13,8 +13,11 @@ type NavbarTargetMatch = {
 
 type NavbarData = {
   label: string;
-  /** Fallback back target, used only when there is no in-app history entry to return to. */
-  upTo?: NavbarTarget | ((match: NavbarTargetMatch) => NavbarTarget);
+  /**
+   * Back target used when there is no in-app history entry to return to. Also the back link's
+   * `href`, and its presence is what makes the route show a back button.
+   */
+  backFallback?: NavbarTarget | ((match: NavbarTargetMatch) => NavbarTarget);
 };
 
 /** Falls back to the calorie diary day the current flow was opened for. */

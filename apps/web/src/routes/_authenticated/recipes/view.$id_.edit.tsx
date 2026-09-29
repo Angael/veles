@@ -18,8 +18,8 @@ export const Route = createFileRoute('/_authenticated/recipes/view/$id_/edit')({
   staticData: {
     layout: 'task',
     navbar: {
+      backFallback: ({ params }) => ({ params: { id: params.id ?? '' }, to: '/recipes/view/$id' }),
       label: 'Edit recipe',
-      upTo: ({ params }) => ({ params: { id: params.id ?? '' }, to: '/recipes/view/$id' }),
     },
   },
 });

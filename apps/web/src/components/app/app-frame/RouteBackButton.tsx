@@ -15,12 +15,12 @@ const leafMatchOptions = {
   select: (state: RouterState<RegisteredRouter['routeTree']>) => state.matches.at(-1),
 };
 
-/** Resolves the current route's configured `upTo` fallback, if any. */
-export function useRouteUpTarget(): NavbarTarget | undefined {
+/** Resolves the current route's configured `backFallback` target, if any. */
+function useRouteBackFallback(): NavbarTarget | undefined {
   const match = useRouterState(leafMatchOptions);
-  const upTo = match?.staticData.navbar?.upTo;
-  if (typeof upTo !== 'function') return upTo;
-  return upTo({ params: match?.params ?? {}, search: match?.search ?? {} });
+  const backFallback = match?.staticData.navbar?.backFallback;
+  if (typeof backFallback !== 'function') return backFallback;
+  return backFallback({ params: match?.params ?? {}, search: match?.search ?? {} });
 }
 
 type Props = {
@@ -30,13 +30,13 @@ type Props = {
 
 /**
  * Back control shared by every route: returns to the previous in-app history entry when one
- * exists, otherwise follows the route's `upTo`. The `href` always points at `upTo` so SSR
- * markup, new-tab clicks, and no-JS fallbacks stay meaningful.
+ * exists, otherwise follows the route's `backFallback`. The `href` always points at
+ * `backFallback` so SSR markup, new-tab clicks, and no-JS fallbacks stay meaningful.
  */
 export function RouteBackButton({ className, variant = 'outlineMain' }: Props) {
   const router = useRouter();
   const canGoBack = useCanGoBack();
-  const target = useRouteUpTarget();
+  const target = useRouteBackFallback();
 
   if (!target) return null;
 

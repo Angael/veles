@@ -6,6 +6,6 @@ export const Route = createFileRoute('/_authenticated/weight_/import')({
   head: () => ({ meta: [{ title: 'Import weight history' }] }),
   staticData: {
     layout: 'task',
-    navbar: { label: 'Import weight history', upTo: { to: '/weight' } },
+    navbar: { backFallback: { to: '/weight' }, label: 'Import weight history' },
   },
 });

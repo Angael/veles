@@ -7,7 +7,7 @@ import { normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 export const Route = createFileRoute('/_authenticated/calories_/foods_/new')({
   validateSearch: type({ 'barcode?': 'string', 'date?': 'string', 'name?': 'string' }),
   component: Component,
-  staticData: { layout: 'task', navbar: { label: 'Create food', upTo: caloriesDayTarget } },
+  staticData: { layout: 'task', navbar: { backFallback: caloriesDayTarget, label: 'Create food' } },
 });
 
 function Component() {
