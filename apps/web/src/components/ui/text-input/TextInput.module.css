@@ -3,7 +3,7 @@
   min-height: var(--button-min-height);
   border: var(--border-width) solid var(--c-border-strong);
   border-radius: var(--radius-xs);
-  background: rgba(2, 6, 23, 0.4);
+  background: var(--c-surface-input);
   color: var(--c-text);
   padding: 0 1rem;
   font: inherit;
@@ -52,6 +52,6 @@ label:has(.root[data-required]) > span:first-child::after {
 @media (hover: hover) and (pointer: fine) {
   .root:hover:not(:disabled) {
     border-color: var(--c-primary-border-soft);
-    background: color-mix(in srgb, rgba(2, 6, 23, 0.4) 84%, var(--c-primary-surface) 16%);
+    background: color-mix(in oklch, var(--c-surface-input) 84%, var(--c-primary-surface) 16%);
   }
 }

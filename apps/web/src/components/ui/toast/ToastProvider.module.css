@@ -32,8 +32,8 @@
   backdrop-filter: var(--blur-surface);
   color: var(--c-text-strong);
   box-shadow:
-    0 16px 42px rgba(2, 6, 23, 0.22),
-    0 1px 0 color-mix(in srgb, white, transparent 88%) inset;
+    var(--shadow-popup),
+    0 1px 0 var(--c-border) inset;
   cursor: default;
   transform: translateX(var(--toast-swipe-movement-x))
     translateY(

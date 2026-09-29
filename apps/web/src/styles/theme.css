@@ -64,56 +64,60 @@
   --text-xl-dynamic: clamp(1.25rem, 1.05rem + 1vw, 1.5rem);
   --text-hero: clamp(2.7rem, 7vw, 4.8rem);
 
-  --c-text: #e8ecf7;
-  --c-text-strong: #f8fafc;
-  --c-muted: #b5c0d9;
-  --c-muted-strong: #94a3b8;
-  --c-placeholder: rgba(148, 163, 184, 0.72);
-  --c-muted-soft: rgba(226, 232, 240, 0.82);
+  /* Palette: shadcn/ui neutral (dark), https://ui.shadcn.com/colors */
+  --c-background: oklch(0.145 0 0);
 
-  --c-accent: #7dd3fc;
-  --c-accent-soft: #bfdbfe;
-  --c-accent-strong: #c7d2fe;
-  --c-macro-protein: #7dd3fc;
-  --c-macro-fat: #fbbf7a;
-  --c-macro-carb: #a7e3a1;
+  --c-text: oklch(0.922 0 0);
+  --c-text-strong: oklch(0.985 0 0);
+  --c-muted: oklch(0.708 0 0);
+  --c-muted-strong: oklch(0.63 0 0);
+  --c-placeholder: oklch(0.556 0 0);
+  --c-muted-soft: oklch(0.87 0 0);
 
-  --c-primary: #2563eb;
-  --c-primary-contrast: white;
-  --c-primary-border: rgba(96, 165, 250, 0.75);
-  --c-primary-border-soft: rgba(96, 165, 250, 0.55);
-  --c-primary-focus: rgba(96, 165, 250, 0.85);
-  --c-primary-surface: rgba(37, 99, 235, 0.18);
-  --c-primary-surface-strong: rgba(37, 99, 235, 0.25);
+  --c-accent: oklch(0.922 0 0);
+  --c-accent-soft: oklch(0.87 0 0);
+  --c-accent-strong: oklch(0.985 0 0);
+  --c-macro-protein: oklch(0.707 0.165 254.624);
+  --c-macro-fat: oklch(0.828 0.189 84.429);
+  --c-macro-carb: oklch(0.765 0.177 163.223);
 
-  --c-surface: rgba(15, 23, 42, 0.72);
-  --c-surface-strong: rgba(15, 23, 42, 0.85);
-  --c-surface-solid: rgba(15, 23, 42, 0.96);
-  --c-surface-raised: rgba(30, 41, 59, 0.9);
-  --c-surface-input: rgba(2, 6, 23, 0.55);
-  --c-surface-inset: rgba(2, 6, 23, 0.5);
-  --c-surface-header: #0a0f1f;
+  --c-primary: oklch(0.922 0 0);
+  --c-primary-contrast: oklch(0.205 0 0);
+  --c-primary-border: oklch(1 0 0 / 22%);
+  --c-primary-border-soft: oklch(1 0 0 / 16%);
+  --c-primary-focus: oklch(0.556 0 0);
+  --c-primary-surface: oklch(1 0 0 / 7%);
+  --c-primary-surface-strong: oklch(1 0 0 / 11%);
 
-  --c-border: rgba(148, 163, 184, 0.2);
+  --c-surface: oklch(0.205 0 0);
+  --c-surface-strong: oklch(0.205 0 0);
+  --c-surface-solid: oklch(0.205 0 0);
+  --c-surface-raised: oklch(0.269 0 0);
+  --c-surface-input: oklch(1 0 0 / 4.5%);
+  --c-surface-inset: oklch(1 0 0 / 3%);
+  --c-surface-header: oklch(0.145 0 0);
+  --c-overlay: oklch(0 0 0 / 60%);
+  --c-on-media: oklch(1 0 0);
+
+  --c-border: oklch(1 0 0 / 10%);
   /* Reserved theme token for upcoming hover treatments. */
-  --c-border-hover: rgba(148, 163, 184, 0.22);
-  --c-border-strong: rgba(148, 163, 184, 0.24);
-  --c-border-popup: rgba(148, 163, 184, 0.28);
+  --c-border-hover: oklch(1 0 0 / 15%);
+  --c-border-strong: oklch(1 0 0 / 15%);
+  --c-border-popup: oklch(1 0 0 / 10%);
 
-  --c-danger-text: #fecaca;
-  --c-danger-surface: rgba(127, 29, 29, 0.35);
-  --c-danger-border: rgba(248, 113, 113, 0.35);
+  --c-danger: oklch(0.704 0.191 22.216);
+  --c-danger-text: oklch(0.808 0.114 19.571);
+  --c-danger-surface: oklch(0.704 0.191 22.216 / 20%);
+  --c-danger-border: oklch(0.704 0.191 22.216 / 40%);
 
-  --c-success-text: #bbf7d0;
-  --c-success-surface: rgba(22, 101, 52, 0.28);
-  --c-success-border: rgba(74, 222, 128, 0.45);
+  --c-success-text: oklch(0.871 0.15 154.449);
+  --c-success-surface: oklch(0.696 0.17 162.48 / 18%);
+  --c-success-border: oklch(0.696 0.17 162.48 / 40%);
 
-  --gradient-page:
-    radial-gradient(circle at top, rgba(96, 165, 250, 0.18), transparent 28%),
-    linear-gradient(180deg, #060816 0%, #0f172a 48%, #111827 100%);
+  --gradient-page: linear-gradient(var(--c-background), var(--c-background));
 
   /* Reserved theme token for upcoming primary gradient treatments. */
-  --gradient-primary: linear-gradient(135deg, var(--c-primary) 0%, #7c3aed 100%);
+  --gradient-primary: linear-gradient(135deg, var(--c-primary) 0%, var(--c-muted) 100%);
 
   --space-xs: 0.5rem;
   --space-sm: 0.75rem;
@@ -129,9 +133,9 @@
   --radius-pill: 999px;
 
   --border-width: 1px;
-  --shadow-card: 0 24px 80px rgba(15, 23, 42, 0.35);
-  --shadow-card-primary: 0 24px 70px rgba(37, 99, 235, 0.2);
-  --shadow-popup: 0 24px 60px rgba(2, 6, 23, 0.4);
+  --shadow-card: 0 1px 2px oklch(0 0 0 / 30%);
+  --shadow-card-primary: 0 1px 2px oklch(0 0 0 / 30%);
+  --shadow-popup: 0 10px 30px oklch(0 0 0 / 50%);
   --blur-surface: blur(8px);
 
   --duration-fast: 0.2s;

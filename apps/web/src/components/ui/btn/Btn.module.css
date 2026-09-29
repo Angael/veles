@@ -57,10 +57,10 @@
 }
 
 .main {
-  --btn-bg: color-mix(in srgb, var(--c-primary) 70%, var(--c-surface-strong) 30%);
-  --btn-bg-hover: color-mix(in srgb, var(--c-primary) 78%, var(--c-surface-strong) 22%);
+  --btn-bg: var(--c-primary);
+  --btn-bg-hover: color-mix(in oklch, var(--c-primary) 90%, transparent);
   --btn-border: transparent;
-  --btn-border-hover: var(--c-primary-border-soft);
+  --btn-border-hover: transparent;
   --btn-color: var(--c-primary-contrast);
 }
 
@@ -97,12 +97,12 @@
 }
 
 .white {
-  --btn-bg: color-mix(in srgb, white 94%, var(--c-primary-surface) 6%);
-  --btn-bg-hover: color-mix(in srgb, white 82%, var(--c-primary-surface) 18%);
-  --btn-border: color-mix(in srgb, var(--c-border-strong) 42%, white 58%);
-  --btn-border-hover: color-mix(in srgb, var(--c-primary-border-soft) 48%, white 52%);
-  --btn-color: #0f172a;
-  --btn-shadow: 0 10px 26px rgba(2, 6, 23, 0.14);
+  --btn-bg: var(--c-text-strong);
+  --btn-bg-hover: var(--c-primary);
+  --btn-border: transparent;
+  --btn-border-hover: transparent;
+  --btn-color: var(--c-primary-contrast);
+  --btn-shadow: var(--shadow-card);
   --btn-shadow-hover: var(--btn-shadow);
 }
 

@@ -96,7 +96,7 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  outline: 1px solid rgba(255, 255, 255, 0.1);
+  outline: 1px solid var(--c-border);
   outline-offset: -1px;
 }
 

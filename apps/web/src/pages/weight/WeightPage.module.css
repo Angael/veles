@@ -77,7 +77,7 @@
 }
 
 .deltaBetter {
-  color: #86efac;
+  color: var(--c-success-text);
 }
 
 .deltaNeutral {

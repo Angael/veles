@@ -23,7 +23,7 @@ body,
 }
 
 html {
-  background-color: #060816;
+  background-color: var(--c-background);
 }
 
 body {
