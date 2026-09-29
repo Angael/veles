@@ -1,23 +1,6 @@
-.page {
-  display: grid;
-}
-
-.card {
-  display: grid;
-  gap: var(--space-sm);
-}
-
-.form,
-.actions {
-  display: grid;
-}
-
 .form {
-  gap: var(--space-sm);
-}
-
-.actions {
-  justify-content: start;
+  display: grid;
+  gap: var(--space-md);
 }
 
 .photoNote {

@@ -4,6 +4,8 @@ import type { CalorieGoal } from '../calories.api';
 import { useSetDailyCalorieGoalMutation } from '../calories.query';
 import { todayLocalDate } from '@/lib/dateOnly';
 import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
@@ -17,7 +19,6 @@ import {
 } from './calorieGoalCalculator';
 import { MacroPercentageEditor } from './MacroPercentageEditor';
 import css from './CalorieGoalsPage.module.css';
-import flowCss from '../CalorieFlows.module.css';
 
 export function CalorieGoalsPage({
   goal,
@@ -67,8 +68,8 @@ export function CalorieGoalsPage({
     setPercentages(percentagesFromMacros(nextValues, percentages));
   }
   return (
-    <main className={flowCss.page}>
-      <TypedForm className={flowCss.form} errorMsg={goalMutation.error?.message} onSubmit={submit}>
+    <main>
+      <TypedForm className={css.sections} errorMsg={goalMutation.error?.message} onSubmit={submit}>
         <CalorieGoalCalculator
           initialWeightKg={latestWeightKg}
           onApply={setValues}
@@ -76,7 +77,7 @@ export function CalorieGoalsPage({
         />
         <MacroPercentageEditor onChange={applyPercentages} percentages={percentages} />
 
-        <section className={css.currentGoals}>
+        <Card as='section' className={css.currentGoals} tone='primary'>
           <div className={css.currentGoalsHeading}>
             <h2>
               <span aria-hidden='true'>3.</span> Review daily targets
@@ -84,10 +85,12 @@ export function CalorieGoalsPage({
           </div>
           <KcalMacrosForm kcalInput={{ min: 1 }} onValueChange={updateGoalValue} values={values} />
 
-          <Btn loading={goalMutation.isPending} type='submit'>
-            Save current goals
-          </Btn>
-        </section>
+          <FormSubmitRow>
+            <Btn loading={goalMutation.isPending} type='submit'>
+              Save
+            </Btn>
+          </FormSubmitRow>
+        </Card>
       </TypedForm>
     </main>
   );

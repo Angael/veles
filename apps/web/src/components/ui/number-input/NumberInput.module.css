@@ -2,6 +2,25 @@
   width: 100%;
 }
 
+/* Heights mirror Btn sizes so inputs and buttons line up in the same row. */
+.sm {
+  --input-height: 2.35rem;
+  --input-font-size: var(--text-sm);
+  --input-font-weight: var(--font-weight-regular);
+}
+
+.md {
+  --input-height: var(--button-min-height);
+  --input-font-size: var(--text-md);
+  --input-font-weight: var(--font-weight-regular);
+}
+
+.lg {
+  --input-height: 3.25rem;
+  --input-font-size: var(--text-lg);
+  --input-font-weight: var(--font-weight-semibold);
+}
+
 label:has(.root[data-required]) > span:first-child::after {
   content: ' *';
   color: var(--c-danger-text);
@@ -11,7 +30,7 @@ label:has(.root[data-required]) > span:first-child::after {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   width: 100%;
-  min-height: var(--button-min-height);
+  min-height: var(--input-height);
   border: var(--border-width) solid var(--c-border-strong);
   border-radius: var(--radius-xs);
   background: rgba(2, 6, 23, 0.4);
@@ -36,6 +55,8 @@ label:has(.root[data-required]) > span:first-child::after {
   color: var(--c-text);
   padding: 0 0.85rem;
   font: inherit;
+  font-size: var(--input-font-size);
+  font-weight: var(--input-font-weight);
   font-variant-numeric: tabular-nums;
   text-align: left;
 
@@ -52,7 +73,7 @@ label:has(.root[data-required]) > span:first-child::after {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: calc(var(--button-min-height) - (var(--border-width) * 2));
+  width: calc(var(--input-height) - (var(--border-width) * 2));
   border: 0;
   background: color-mix(in srgb, var(--c-surface-strong) 72%, transparent);
   color: var(--c-muted-strong);

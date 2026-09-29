@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import type { ComponentPropsWithoutRef } from 'react';
 import { MinusIcon, PlusIcon } from 'lucide-react';
 import { useRef } from 'react';
+import type { InputSize } from '@/components/ui/text-input/TextInput';
 import css from './NumberInput.module.css';
 
 type NumberInputProps = Omit<NumberFieldRootProps, 'className' | 'step'> & {
@@ -10,6 +11,8 @@ type NumberInputProps = Omit<NumberFieldRootProps, 'className' | 'step'> & {
   inputClassName?: string;
   placeholder?: string;
   enterKeyHint?: ComponentPropsWithoutRef<'input'>['enterKeyHint'];
+  /** Visual size matching `Btn` heights. */
+  size?: InputSize;
   stepperStep?: number;
 };
 
@@ -18,6 +21,7 @@ export function NumberInput({
   inputClassName,
   enterKeyHint,
   placeholder,
+  size = 'md',
   stepperStep,
   ...props
 }: NumberInputProps) {
@@ -25,7 +29,7 @@ export function NumberInput({
   return (
     <NumberField.Root
       allowWheelScrub
-      className={clsx(css.root, className)}
+      className={clsx(css.root, css[size], className)}
       data-required={props.required ? '' : undefined}
       step='any'
       smallStep={stepperStep}

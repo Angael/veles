@@ -1,24 +1,9 @@
 @import '../../styles/breakpoints.css';
 
-.page {
-  display: grid;
-  gap: 1.25rem;
-  padding-bottom: 5rem;
-}
-
-.lead {
-  color: var(--c-muted);
-  text-wrap: pretty;
-}
-
-.panel {
-  display: grid;
-  gap: 1rem;
-}
-
+.page,
 .form {
   display: grid;
-  gap: 1rem;
+  gap: var(--space-md);
 }
 
 .grid {
@@ -27,28 +12,11 @@
   gap: 0.8rem;
 }
 
-.actions,
-.logActions {
+.actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.7rem;
   justify-content: flex-end;
-}
-
-.logActions {
-  padding-top: var(--space-sm);
-}
-
-/* Nested under .form so these beat NumberInput's own single-class rules regardless of CSS order. */
-.form .amountInput {
-  width: min(15rem, 100%);
-
-  & .amountValue {
-    padding-block: 0.35rem;
-    font-size: var(--text-xl);
-    font-weight: var(--font-weight-semibold);
-    text-align: center;
-  }
 }
 
 .scanViewport {
@@ -110,13 +78,5 @@
 @media (--phone) {
   .grid {
     grid-template-columns: 1fr;
-  }
-
-  .form .amountInput {
-    width: 100%;
-  }
-
-  .logActions > * {
-    width: 100%;
   }
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
 import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { SelectInput } from '@/components/ui/select-input/SelectInput';
@@ -63,7 +64,7 @@ export function CalorieGoalCalculator({
   }
 
   return (
-    <section className={css.method}>
+    <Card as='section' className={css.method}>
       <div className={css.methodHeading}>
         <h2>
           <span aria-hidden='true'>1.</span> Estimate maintenance calories
@@ -110,6 +111,6 @@ export function CalorieGoalCalculator({
       >
         Use maintenance estimate
       </Btn>
-    </section>
+    </Card>
   );
 }

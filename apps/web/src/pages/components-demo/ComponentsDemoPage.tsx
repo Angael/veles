@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Btn, type BtnSize, type BtnVariant } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { DateInput } from '@/components/ui/date-input/DateInput';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog/Dialog';
 import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
 import { ErrorCard } from '@/components/ui/error-card/ErrorCard';
@@ -272,6 +273,10 @@ export function ComponentsDemoPage() {
           type='search'
           value={textValue}
         />
+        <div className={css.formGrid}>
+          <TextInput aria-label='Small text input' placeholder='size sm' size='sm' />
+          <TextInput aria-label='Large text input' placeholder='size lg' size='lg' />
+        </div>
       </section>
       <section>
         <h2>TypedForm</h2>
@@ -284,22 +289,12 @@ export function ComponentsDemoPage() {
           <Label text='Demo field'>
             <TextInput defaultValue='Breakfast' name='typedFormDemo' required />
           </Label>
-          <Btn type='submit'>Submit demo</Btn>
-        </TypedForm>
-      </section>
-
-      <section>
-        <h2>TypedForm</h2>
-        <TypedForm
-          className={css.formGrid}
-          onSubmit={(data) => {
-            data.string('typedFormDemo');
-          }}
-        >
-          <Label text='Demo field'>
-            <TextInput defaultValue='Breakfast' name='typedFormDemo' required />
-          </Label>
-          <Btn type='submit'>Submit demo</Btn>
+          <FormSubmitRow>
+            <Label text='Date'>
+              <DateInput defaultValue='2026-08-08' name='date' required />
+            </Label>
+            <Btn type='submit'>Submit demo</Btn>
+          </FormSubmitRow>
         </TypedForm>
       </section>
 
@@ -313,6 +308,10 @@ export function ComponentsDemoPage() {
           placeholder='Calories'
           value={numberValue}
         />
+        <div className={css.formGrid}>
+          <NumberInput aria-label='Small number input' defaultValue={12} size='sm' />
+          <NumberInput aria-label='Large number input' defaultValue={78.4} size='lg' />
+        </div>
       </section>
 
       <section>
