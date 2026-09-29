@@ -4,5 +4,8 @@ import { ImportWeightPage } from '@/pages/weight/ImportWeightPage';
 export const Route = createFileRoute('/_authenticated/weight_/import')({
   component: ImportWeightPage,
   head: () => ({ meta: [{ title: 'Import weight history' }] }),
-  staticData: { layout: 'focus' },
+  staticData: {
+    layout: 'task',
+    navbar: { label: 'Import weight history', upTo: { to: '/weight' } },
+  },
 });

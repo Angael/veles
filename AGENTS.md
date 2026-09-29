@@ -52,6 +52,12 @@
 - For toast notifications after mutation, prefer `useMutation` `meta`.
 - For simple static invalidation, prefer `meta.invalidateQueryKey`; use lifecycle callbacks for data-dependent or dynamic keys.
 
+## Navigation
+- Every "saved, now leave" navigation uses `replace: true`, so back never reopens a submitted form. Same for in-page view changes (week/day pickers) that shouldn't pile up history.
+- Route chrome comes from `staticData`: `layout: 'task'` (sticky back + title, no primary nav), `layout: 'immersive'` (page renders `RouteBackButton` itself), or omitted (section root). Task/immersive routes need `navbar.upTo`.
+- Back goes through `RouteBackButton`: previous in-app history entry first, `navbar.upTo` fallback. Don't add ad-hoc Cancel/close links.
+- Forms that take effort to fill in use `useUnsavedChangesGuard`; call `markSaved()` right before the post-save navigation.
+
 ## UI
 - Prefer css modules, prefer syntax `import css from ...`
 - In css modules, prefer nested selectors when it keeps related styles together.

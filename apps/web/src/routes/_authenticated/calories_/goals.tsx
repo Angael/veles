@@ -15,12 +15,7 @@ export const Route = createFileRoute('/_authenticated/calories_/goals')({
     return { latestWeightKg };
   },
   component: Component,
-  staticData: {
-    navbar: {
-      label: 'Daily goals',
-      upTo: { to: '/calories' },
-    },
-  },
+  staticData: { layout: 'task', navbar: { label: 'Daily goals', upTo: { to: '/calories' } } },
 });
 
 function Component() {

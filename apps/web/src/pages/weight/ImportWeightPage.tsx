@@ -1,4 +1,4 @@
-import { Link, useNavigate, useRouter } from '@tanstack/react-router';
+import { useNavigate, useRouter } from '@tanstack/react-router';
 import { ClipboardIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -30,10 +30,9 @@ export function ImportWeightPage() {
   return (
     <main className={css.page}>
       <Card as='section' className={css.importCard}>
-        <div className={css.intro}>
-          <h1>Import weight history</h1>
-          <p>Paste one measurement per line. Existing entries on the same dates are replaced.</p>
-        </div>
+        <p className={css.intro}>
+          Paste one measurement per line. Existing entries on the same dates are replaced.
+        </p>
 
         <div className={css.promptBlock}>
           <div>
@@ -64,7 +63,7 @@ export function ImportWeightPage() {
                   onSuccess: () => {
                     void router
                       .invalidate()
-                      .then(() => navigate({ to: '/weight' }))
+                      .then(() => navigate({ replace: true, to: '/weight' }))
                       .catch(() => undefined);
                   },
                 },
@@ -93,9 +92,6 @@ export function ImportWeightPage() {
             {importStatus}
           </div>
           <div className={css.formActions}>
-            <Btn isLink render={<Link to='/weight' />} size='sm' variant='ghost'>
-              Cancel
-            </Btn>
             <Btn
               disabled={
                 parsed.entries.length === 0 || parsed.errors.length > 0 || hasTooManyEntries

@@ -9,6 +9,7 @@ import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import type { RecipeLibraryItem } from '../recipes.api';
 import { useUpdateRecipeMutation } from '../recipes.query';
 import css from './EditRecipePage.module.css';
+import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 
 type EditRecipePageProps = {
   recipe: RecipeLibraryItem;
@@ -19,12 +20,11 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
   const router = useRouter();
   const [draft, setDraft] = useState<RecipeFormDraft>(() => recipeToDraft(recipe));
   const saveMutation = useUpdateRecipeMutation();
+  const { markDirty, markSaved } = useUnsavedChangesGuard();
 
   return (
     <main className={css.page}>
       <Card as='section' className={css.card}>
-        <h1>Edit {recipe.name}</h1>
-
         <TypedForm
           className={css.form}
           onSubmit={() => {
@@ -32,7 +32,12 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
               { data: { ...draft, id: recipe.id } },
               {
                 onSuccess: () => {
-                  void navigate({ params: { id: recipe.id }, to: '/recipes/view/$id' })
+                  markSaved();
+                  void navigate({
+                    params: { id: recipe.id },
+                    replace: true,
+                    to: '/recipes/view/$id',
+                  })
                     .then(() => router.invalidate())
                     .catch(() => undefined);
                 },
@@ -40,7 +45,13 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
             );
           }}
         >
-          <RecipeForm draft={draft} onDraftChange={setDraft} />
+          <RecipeForm
+            draft={draft}
+            onDraftChange={(nextDraft) => {
+              markDirty();
+              setDraft(nextDraft);
+            }}
+          />
 
           <p className={css.photoNote}>
             Photos stay as they are for now and are not editable here.

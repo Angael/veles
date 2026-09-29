@@ -27,6 +27,23 @@
   }
 }
 
+.field {
+  position: relative;
+  width: 100%;
+}
+
+.withTrailing {
+  padding-right: calc(var(--button-min-height) + var(--space-xs));
+}
+
+.trailing {
+  position: absolute;
+  top: 50%;
+  right: 0.3rem;
+  display: flex;
+  transform: translateY(-50%);
+}
+
 label:has(.root[data-required]) > span:first-child::after {
   content: ' *';
   color: var(--c-danger-text);

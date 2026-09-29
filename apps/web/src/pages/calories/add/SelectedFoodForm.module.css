@@ -8,10 +8,6 @@
   padding-bottom: 5rem;
 }
 
-.backAction {
-  justify-self: start;
-}
-
 .panel {
   display: grid;
   gap: var(--space-md);

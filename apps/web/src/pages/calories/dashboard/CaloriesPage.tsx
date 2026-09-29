@@ -38,7 +38,11 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
   }
 
   function shiftWeek(direction: -1 | 1) {
-    void navigate({ to: '/calories', search: { date: adjacentWeekDate(direction) } });
+    void navigate({
+      replace: true,
+      search: { date: adjacentWeekDate(direction) },
+      to: '/calories',
+    });
   }
   return (
     <main className={css.page}>
@@ -49,7 +53,7 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
           className={css.todayButton}
           disabled={date === todayDate}
           icon={<CalendarDaysIcon aria-hidden='true' />}
-          onClick={() => void navigate({ to: '/calories', search: {} })}
+          onClick={() => void navigate({ replace: true, search: {}, to: '/calories' })}
           size='sm'
           variant='outlineMain'
         >
@@ -74,7 +78,8 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
             className={css.dayOptions}
             onValueChange={(values) => {
               const selected = values[0];
-              if (selected) void navigate({ to: '/calories', search: { date: selected } });
+              if (selected)
+                void navigate({ replace: true, search: { date: selected }, to: '/calories' });
             }}
             value={[date]}
           >

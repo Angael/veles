@@ -78,7 +78,7 @@ export function DiaryEntryPage({ entry, focusTitle = false }: DiaryEntryPageProp
                     { data: { id: entry.id } },
                     {
                       onSuccess: () => {
-                        void navigate({ to: '/diary' })
+                        void navigate({ replace: true, to: '/diary' })
                           .then(() => router.invalidate())
                           .catch(() => undefined);
                       },

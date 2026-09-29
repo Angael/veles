@@ -9,17 +9,7 @@
   gap: var(--space-lg);
 }
 
-.intro {
-  display: grid;
-  gap: var(--space-xs);
-}
-
-.intro h1 {
-  font-size: var(--text-xl-dynamic);
-  text-wrap: balance;
-}
-
-.intro p,
+.intro,
 .promptBlock p {
   color: var(--c-muted);
   text-wrap: pretty;

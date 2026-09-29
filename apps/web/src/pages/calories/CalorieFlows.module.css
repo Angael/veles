@@ -8,19 +8,11 @@
   padding-bottom: 5rem;
 }
 
-.header {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-  justify-content: space-between;
+.narrowPage {
+  width: min(560px, 100%);
 }
 
-.header h1 {
-  font-size: clamp(1.75rem, 5vw, 2.5rem);
-  text-wrap: balance;
-}
-
-.header p {
+.lead {
   color: var(--c-muted);
   text-wrap: pretty;
 }
@@ -47,6 +39,22 @@
   flex-wrap: wrap;
   gap: 0.7rem;
   justify-content: flex-end;
+}
+
+.logActions {
+  padding-top: var(--space-sm);
+}
+
+/* Nested under .form so these beat NumberInput's own single-class rules regardless of CSS order. */
+.form .amountInput {
+  width: min(15rem, 100%);
+
+  & .amountValue {
+    padding-block: 0.35rem;
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+  }
 }
 
 .scanViewport {
@@ -110,16 +118,11 @@
     grid-template-columns: 1fr;
   }
 
-  .logActions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-
-    & > * {
-      width: 100%;
-    }
+  .form .amountInput {
+    width: 100%;
   }
 
-  .header {
-    display: grid;
+  .logActions > * {
+    width: 100%;
   }
 }
