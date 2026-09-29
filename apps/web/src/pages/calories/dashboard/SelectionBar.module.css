@@ -25,6 +25,31 @@
   white-space: nowrap;
 }
 
+.dialogBody {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.factorRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.factorInput {
+  flex: 1 1 8rem;
+}
+
+.kcalPreview {
+  color: var(--c-muted);
+  font-variant-numeric: tabular-nums;
+
+  & strong {
+    color: var(--c-text-strong);
+  }
+}
+
 @keyframes bar-in {
   from {
     opacity: 0;
@@ -35,5 +60,18 @@
   .bar {
     right: var(--space-lg);
     bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Secondary actions collapse to icons so the bar fits narrow screens; Share keeps its label. */
+  .collapsible {
+    --btn-padding-x: 0;
+    --btn-min-width: var(--btn-height);
+
+    width: var(--btn-height);
+    gap: 0;
+  }
+
+  .label {
+    display: none;
   }
 }

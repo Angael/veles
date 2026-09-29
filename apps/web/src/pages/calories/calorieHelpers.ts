@@ -3,6 +3,8 @@ import { todayLocalDate } from '@/lib/dateOnly';
 import type { NavbarTarget, NavbarTargetMatch } from '@/lib/routing/staticRouteData';
 
 export const CALORIE_DATE_FORMAT = 'yyyy-MM-dd';
+/** Upper bound for scaling selected logs; keeps hundredths far from integer overflow. */
+export const MAX_FOOD_LOG_MULTIPLIER = 20;
 
 export function normalizeCalorieDate(value: string | undefined) {
   return value && isMatch(value, CALORIE_DATE_FORMAT) ? value : todayLocalDate();

@@ -13,6 +13,7 @@
   z-index: 1;
   display: grid;
   place-items: center;
+  border-radius: inherit;
   background-color: transparent;
   cursor: pointer;
   transition: background-color var(--duration-fast) var(--ease-out);

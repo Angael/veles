@@ -1,15 +1,18 @@
 import { XIcon } from 'lucide-react';
+import type { CalorieLog } from '../calories.api';
+import { DeleteLogsDialog } from './DeleteLogsDialog';
+import { MultiplyLogsDialog } from './MultiplyLogsDialog';
 import { ShareLogsDialog } from './ShareLogsDialog';
 import { Btn } from '@/components/ui/btn/Btn';
 import css from './SelectionBar.module.css';
 
 type Props = {
-  count: number;
+  logs: CalorieLog[];
   onClear: () => void;
 };
 
 /** Floating bar that takes the Log food button's place while logs are selected. */
-export function SelectionBar({ count, onClear }: Props) {
+export function SelectionBar({ logs, onClear }: Props) {
   return (
     <div aria-label='Selected products' className={css.bar} role='toolbar'>
       <Btn
@@ -21,9 +24,11 @@ export function SelectionBar({ count, onClear }: Props) {
         variant='ghost'
       />
       <span aria-live='polite' className={css.count}>
-        {count} selected
+        {logs.length} selected
       </span>
-      <ShareLogsDialog count={count} onShared={onClear} />
+      <MultiplyLogsDialog logs={logs} onMultiplied={onClear} />
+      <DeleteLogsDialog logs={logs} onDeleted={onClear} />
+      <ShareLogsDialog count={logs.length} onShared={onClear} />
     </div>
   );
 }

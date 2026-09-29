@@ -16,12 +16,12 @@ type Props = {
   totals: CalorieTotals;
 };
 
-/** Day overview; selecting logs via their images swaps the Log food button for sharing actions. */
+/** Day overview; selecting logs via their images swaps the Log food button for bulk actions. */
 export function CalorieOverview({ date, goal, logs, totals }: Props) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const selectedCount = logs.filter((entry) => selectedIds.includes(entry.id)).length;
-  const selecting = selectedCount > 0;
-  const allSelected = selectedCount === logs.length;
+  const selectedLogs = logs.filter((entry) => selectedIds.includes(entry.id));
+  const selecting = selectedLogs.length > 0;
+  const allSelected = selectedLogs.length === logs.length;
 
   function setSelected(id: string, selected: boolean) {
     setSelectedIds((current) =>
@@ -32,7 +32,7 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
   return (
     <div className={css.overviewStack}>
       {selecting ? (
-        <SelectionBar count={selectedCount} onClear={() => setSelectedIds([])} />
+        <SelectionBar logs={selectedLogs} onClear={() => setSelectedIds([])} />
       ) : (
         <LogFoodMenu date={date} />
       )}

@@ -2,10 +2,12 @@ import { queryOptions, useMutation } from '@tanstack/react-query';
 import {
   createFoodProduct,
   deleteFoodLog,
+  deleteFoodLogs,
   getCalorieDashboard,
   getFoodProduct,
   getFoodProducts,
   lookupFoodByBarcode,
+  multiplyFoodLogs,
   recordCustomCalories,
   recordFood,
   updateFoodLog,
@@ -121,6 +123,27 @@ export function useDeleteFoodLogMutation() {
     mutationFn: ({ id }: DeleteFoodLogVariables) => deleteFoodLog({ data: { id } }),
   });
 }
+
+export function useDeleteFoodLogsMutation() {
+  return useMutation({
+    meta: {
+      error: { title: 'Could not delete products' },
+      invalidateQueryKey: calorieDashboardKey,
+    },
+    mutationFn: (ids: string[]) => deleteFoodLogs({ data: { ids } }),
+  });
+}
+
+export function useMultiplyFoodLogsMutation() {
+  return useMutation({
+    meta: {
+      error: { title: 'Could not multiply products' },
+      invalidateQueryKey: calorieDashboardKey,
+    },
+    mutationFn: (data: { factor: number; ids: string[] }) => multiplyFoodLogs({ data }),
+  });
+}
+
 export function useRecordFoodMutation() {
   return useMutation({
     meta: { invalidateQueryKey: calorieDashboardKey },

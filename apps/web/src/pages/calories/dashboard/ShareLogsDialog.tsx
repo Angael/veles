@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox/Checkbox';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog/Dialog';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import css from './ShareLogsDialog.module.css';
+import { productCount } from './selectionText';
 
 /** Preview-only recipients until friends exist in the data model. */
 const previewFriends = ['Maya Chen', 'Alex Rivera', 'Leo Novak'];
@@ -18,7 +19,7 @@ type Props = {
 export function ShareLogsDialog({ count, onShared }: Props) {
   const [open, setOpen] = useState(false);
   const [recipients, setRecipients] = useState<string[]>([]);
-  const products = `${count} ${count === 1 ? 'product' : 'products'}`;
+  const products = productCount(count);
 
   function share() {
     toastManager.add({

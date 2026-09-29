@@ -1,7 +1,8 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createMiddleware, createServerFn } from '@tanstack/react-start';
-import { and, desc, eq, gte, inArray, lte } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, lte, sql } from 'drizzle-orm';
+import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { calorieGoals, foodLogs, foodProducts, uploadObjects } from '@veles/db/schema';
 import { requireSession } from '@/server/getSession.server';
@@ -26,7 +27,7 @@ import {
   toCalorieGoal,
   toHundredths,
 } from '@/lib/nutrition';
-import { calorieWeekDates, isWithinKcalGoal } from './calorieHelpers';
+import { calorieWeekDates, isWithinKcalGoal, MAX_FOOD_LOG_MULTIPLIER } from './calorieHelpers';
 
 const MAX_TEXT_LENGTH = 500;
 const FOOD_UPLOAD_MAX_REQUEST_BYTES = 12 * 1024 * 1024;
@@ -762,4 +763,39 @@ export const deleteFoodLog = createServerFn({ method: 'POST' })
     await db
       .delete(foodLogs)
       .where(and(eq(foodLogs.id, data.id), eq(foodLogs.userId, session.user.id)));
+  });
+
+const foodLogIdsType = type('string.uuid[]').atLeastLength(1).atMostLength(200);
+
+export const deleteFoodLogs = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('deleteFoodLogs')])
+  .validator(arkTypeValidator(type({ ids: foodLogIdsType })))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    await db
+      .delete(foodLogs)
+      .where(and(inArray(foodLogs.id, data.ids), eq(foodLogs.userId, session.user.id)));
+  });
+
+/** Scales grams, kcal, and macros of the user's selected logs, e.g. ×2 after eating a second sandwich logged as ingredients. */
+export const multiplyFoodLogs = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('multiplyFoodLogs')])
+  .validator(
+    arkTypeValidator(
+      type({ ids: foodLogIdsType, factor: `0 < number <= ${MAX_FOOD_LOG_MULTIPLIER}` }),
+    ),
+  )
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    const scaled = (column: AnyPgColumn) => sql<number>`round(${column} * ${data.factor}::numeric)`;
+    await db
+      .update(foodLogs)
+      .set({
+        gramsHundredths: scaled(foodLogs.gramsHundredths),
+        kcalHundredths: scaled(foodLogs.kcalHundredths),
+        proteinHundredths: scaled(foodLogs.proteinHundredths),
+        fatHundredths: scaled(foodLogs.fatHundredths),
+        carbsHundredths: scaled(foodLogs.carbsHundredths),
+      })
+      .where(and(inArray(foodLogs.id, data.ids), eq(foodLogs.userId, session.user.id)));
   });
