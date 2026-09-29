@@ -12,6 +12,7 @@ import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import css from './AddRecipePage.module.css';
 import { RECIPE_UPLOAD_MAX_PHOTO_BYTES, RECIPE_UPLOAD_MAX_PHOTO_COUNT } from '../recipeUpload.api';
 import { useCreateRecipeMutation } from '../recipes.query';
+import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 
 type AddRecipeDraft = RecipeFormDraft & {
   selectedFiles: File[];
@@ -35,6 +36,7 @@ export function AddRecipePage() {
   const createMutation = useCreateRecipeMutation();
   const [draft, setDraft] = useState<AddRecipeDraft>(EMPTY_DRAFT);
   const [error, setError] = useState<string | null>(null);
+  const { markDirty, markSaved } = useUnsavedChangesGuard();
 
   /** Submits the recipe form and reports upload or navigation failures inline. */
   async function handleSubmit(data: TypedFormData, navigate: UseNavigateResult<string>) {
@@ -49,7 +51,8 @@ export function AddRecipePage() {
 
       const result = await createMutation.mutateAsync({ data: formData });
 
-      await navigate({ params: { id: result.id }, to: '/recipes/view/$id' });
+      markSaved();
+      await navigate({ params: { id: result.id }, replace: true, to: '/recipes/view/$id' });
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Recipe upload failed');
     }
@@ -59,13 +62,14 @@ export function AddRecipePage() {
     <main className={css.page}>
       <section className={css.content}>
         <Card as='section' className={css.formCard}>
-          <h1>Add recipe</h1>
-
           <TypedForm className={css.form} onSubmit={handleSubmit}>
             <div className={css.formBody}>
               <RecipeForm
                 draft={draft}
-                onDraftChange={(nextDraft) => setDraft((current) => ({ ...current, ...nextDraft }))}
+                onDraftChange={(nextDraft) => {
+                  markDirty();
+                  setDraft((current) => ({ ...current, ...nextDraft }));
+                }}
               />
 
               <div className={clsx(css.field, css.uploadFieldWrap)}>
@@ -74,9 +78,10 @@ export function AddRecipePage() {
                   files={draft.selectedFiles}
                   maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES}
                   maxItems={RECIPE_UPLOAD_MAX_PHOTO_COUNT}
-                  onFilesChange={(selectedFiles) =>
-                    setDraft((current) => ({ ...current, selectedFiles }))
-                  }
+                  onFilesChange={(selectedFiles) => {
+                    markDirty();
+                    setDraft((current) => ({ ...current, selectedFiles }));
+                  }}
                 />
               </div>
             </div>

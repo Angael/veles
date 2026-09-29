@@ -12,7 +12,7 @@ export const Route = createFileRoute('/_authenticated/diary/$id')({
   head: ({ loaderData }) => ({
     meta: [{ title: loaderData?.title || 'Untitled entry' }],
   }),
-  staticData: { navbar: { label: 'Diary entry', upTo: { to: '/diary' } } },
+  staticData: { navbar: { backFallback: { to: '/diary' }, label: 'Diary entry' } },
 });
 
 function RouteComponent() {

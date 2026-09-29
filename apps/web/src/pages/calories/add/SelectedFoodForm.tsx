@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { ArrowLeftIcon, PencilIcon } from 'lucide-react';
+import { PencilIcon } from 'lucide-react';
 import { useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { calorieDashboardQueryOptions, useRecordFoodMutation } from '../calories.query';
@@ -14,10 +14,8 @@ import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import css from './SelectedFoodForm.module.css';
 
 type Props = {
-  cancelLabel: string;
   food: CalorieFood;
   initialDate: string;
-  onCancel: () => void;
 };
 
 function nutritionAtGrams(valuePer100g: number | null, grams: number) {
@@ -25,7 +23,7 @@ function nutritionAtGrams(valuePer100g: number | null, grams: number) {
 }
 
 /** Confirms a food log while keeping its nutrition preview and daily allowance in sync. */
-export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: Props) {
+export function SelectedFoodForm({ food, initialDate }: Props) {
   const navigate = useNavigate();
   const recordFoodMutation = useRecordFoodMutation();
   const [date, setDate] = useState(initialDate);
@@ -47,21 +45,11 @@ export function SelectedFoodForm({ cancelLabel, food, initialDate, onCancel }: P
       grams: selectedGrams,
       productId: food.id,
     });
-    await navigate({ to: '/calories', search: { date } });
+    await navigate({ replace: true, search: { date }, to: '/calories' });
   }
 
   return (
     <main className={css.page}>
-      <div className={css.backAction}>
-        <Btn
-          icon={<ArrowLeftIcon aria-hidden='true' />}
-          onClick={onCancel}
-          type='button'
-          variant='ghost'
-        >
-          {cancelLabel}
-        </Btn>
-      </div>
       <TypedForm className={css.panel} errorMsg={recordFoodMutation.error?.message} onSubmit={save}>
         <div className={css.fields}>
           <Label text='Date'>

@@ -8,9 +8,9 @@ import {
   LoaderCircleIcon,
   SearchXIcon,
   SwitchCameraIcon,
-  XIcon,
 } from 'lucide-react';
-import { type ReactElement, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { RouteBackButton } from '@/components/app/app-frame/RouteBackButton';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import css from './BarcodeScanner.module.css';
@@ -39,7 +39,6 @@ type ScannerState =
 export type BarcodeScannerStatus = 'scanning' | 'lookingUp' | 'notFound';
 
 type BarcodeScannerProps = {
-  closeRender: ReactElement;
   onDetected: (barcode: string) => void;
   status: BarcodeScannerStatus;
 };
@@ -71,7 +70,7 @@ async function enableContinuousFocus(stream: MediaStream) {
   await track.applyConstraints(constraints);
 }
 
-export function BarcodeScanner({ closeRender, onDetected, status }: BarcodeScannerProps) {
+export function BarcodeScanner({ onDetected, status }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const callbackRef = useRef(onDetected);
   callbackRef.current = onDetected;
@@ -243,18 +242,11 @@ export function BarcodeScanner({ closeRender, onDetected, status }: BarcodeScann
   return (
     <section aria-label='Barcode camera scanner' className={css.scanner}>
       <div className={css.header}>
+        <RouteBackButton variant='ghost' />
         <div>
-          <h3>Scan a barcode</h3>
+          <h1>Scan a barcode</h1>
           <p>Hold the package steady with the barcode visible.</p>
         </div>
-        <Btn
-          aria-label='Close camera'
-          icon={<XIcon aria-hidden='true' />}
-          iconOnly
-          isLink
-          render={closeRender}
-          variant='ghost'
-        />
       </div>
 
       <div aria-busy={status === 'lookingUp' || undefined} className={css.viewport}>

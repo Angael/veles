@@ -92,6 +92,7 @@
   --c-surface-raised: rgba(30, 41, 59, 0.9);
   --c-surface-input: rgba(2, 6, 23, 0.55);
   --c-surface-inset: rgba(2, 6, 23, 0.5);
+  --c-surface-header: #0a0f1f;
 
   --c-border: rgba(148, 163, 184, 0.2);
   /* Reserved theme token for upcoming hover treatments. */

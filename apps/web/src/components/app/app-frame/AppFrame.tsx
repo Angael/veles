@@ -6,18 +6,17 @@ import {
   type RouterState,
 } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { ChevronLeftIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { Btn } from '@/components/ui/btn/Btn';
 import { MobileNavbar } from '@/components/app/navbar/MobileNavbar';
 import { Navbar } from '@/components/app/navbar/Navbar';
 import type { SessionUser } from '@/lib/auth/session.api';
-import type { NavbarTarget } from '@/lib/routing/staticRouteData';
 import css from './AppFrame.module.css';
+import { RouteBackButton } from './RouteBackButton';
+import { TaskHeader } from './TaskHeader';
 import { VelesLogo } from './VelesLogo';
 
 const routeMatchOptions = {
-  select: (state: RouterState<RegisteredRouter['routeTree']>) => state.matches.at(-1),
+  select: (state: RouterState<RegisteredRouter['routeTree']>) => state.matches.at(-1)?.staticData,
 };
 
 export function AppFrame({
@@ -27,24 +26,19 @@ export function AppFrame({
   children?: ReactNode;
   user?: SessionUser | null;
 }) {
-  const routeMatch = useRouterState(routeMatchOptions);
-  const { layout, navbar } = routeMatch?.staticData ?? {};
-  const isFocusLayout = layout === 'focus';
+  const { layout, navbar } = useRouterState(routeMatchOptions) ?? {};
 
   return (
     <div className={css.page}>
-      <div className={clsx(css.shell, isFocusLayout && 'focusShell')}>
-        {!isFocusLayout && (
+      <div className={clsx(css.shell, layout && 'focusShell', layout === 'task' && css.taskShell)}>
+        {layout === 'task' ? <TaskHeader label={navbar?.label} /> : null}
+        {layout ? null : (
           <header className={css.header}>
             {navbar ? (
-              <RouteLabel
-                label={navbar.label}
-                upTo={
-                  typeof navbar.upTo === 'function'
-                    ? navbar.upTo({ params: routeMatch?.params ?? {} })
-                    : navbar.upTo
-                }
-              />
+              <div className={css.brand}>
+                <RouteBackButton />
+                <strong className={css.routeLabelTitle}>{navbar.label}</strong>
+              </div>
             ) : (
               <Link aria-label='Veles home' className={css.logoLink} to='/'>
                 <VelesLogo />
@@ -54,28 +48,8 @@ export function AppFrame({
           </header>
         )}
         {children === undefined ? <Outlet /> : children}
-        {!isFocusLayout && <MobileNavbar user={user} />}
+        {layout ? null : <MobileNavbar user={user} />}
       </div>
-    </div>
-  );
-}
-
-function RouteLabel({ label, upTo }: { label: string; upTo?: NavbarTarget }) {
-  return (
-    <div className={css.brand}>
-      {upTo ? (
-        <Btn
-          aria-label='Go up'
-          className={css.brandBackLink}
-          icon={<ChevronLeftIcon aria-hidden='true' size={18} strokeWidth={2} />}
-          iconOnly
-          isLink
-          render={<Link {...upTo} />}
-          size='sm'
-          variant='outlineMain'
-        />
-      ) : null}
-      <strong className={css.routeLabelTitle}>{label}</strong>
     </div>
   );
 }

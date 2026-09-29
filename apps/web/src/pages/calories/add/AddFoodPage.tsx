@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { Link } from '@tanstack/react-router';
-import { PlusIcon } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { BarcodeIcon, PlusIcon } from 'lucide-react';
 import { useState, useTransition } from 'react';
 import { FoodSummary } from '../FoodSummary';
 import type { CalorieFood } from '../calories.api';
@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label/Label';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import css from './AddFoodPage.module.css';
 
-type Props = { date: string; initialFoodId?: string };
+type Props = { date: string; foodId?: string };
 const MAX_VISIBLE_FOODS = 10;
 
 function shownGrams(food: CalorieFood) {
@@ -24,38 +24,27 @@ function nutritionAtGrams(valuePer100g: number | null, grams: number) {
   return Math.round(((valuePer100g ?? 0) * grams) / 100);
 }
 
-export function AddFoodPage({ date, initialFoodId }: Props) {
+/** Food search; picking a food pushes `?foodId` so back returns from the confirm step to the list. */
+export function AddFoodPage({ date, foodId }: Props) {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
   const [filterQuery, setFilterQuery] = useState('');
   const [isFiltering, startFiltering] = useTransition();
-  const [selectedFood, setSelectedFood] = useState<CalorieFood | null>(null);
-  const [selectionDismissed, setSelectionDismissed] = useState(false);
   const foodQuery = useQuery({
-    ...calorieFoodQueryOptions(initialFoodId ?? ''),
-    enabled: initialFoodId !== undefined,
+    ...calorieFoodQueryOptions(foodId ?? ''),
+    enabled: foodId !== undefined,
   });
   const foodsQuery = useQuery(calorieFoodsQueryOptions());
   const foods = filterFoods(foodsQuery.data ?? [], filterQuery, MAX_VISIBLE_FOODS);
-  const selected = selectedFood ?? (!selectionDismissed ? (foodQuery.data ?? null) : null);
 
   function selectFood(food: CalorieFood) {
-    setSelectedFood(food);
+    queryClient.setQueryData(calorieFoodQueryOptions(food.id).queryKey, food);
+    void navigate({ search: { date, foodId: food.id }, to: '/calories/add' });
   }
 
-  function cancelSelection() {
-    setSelectedFood(null);
-    setSelectionDismissed(true);
-  }
-
-  if (selected) {
-    return (
-      <SelectedFoodForm
-        cancelLabel='Go back'
-        food={selected}
-        initialDate={date}
-        onCancel={cancelSelection}
-      />
-    );
+  if (foodId !== undefined && foodQuery.data) {
+    return <SelectedFoodForm food={foodQuery.data} initialDate={date} key={foodId} />;
   }
 
   return (
@@ -68,6 +57,17 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
             startFiltering(() => setFilterQuery(value));
           }}
           placeholder='Banana, bread, yoghurt…'
+          trailing={
+            <Btn
+              aria-label='Scan barcode'
+              icon={<BarcodeIcon aria-hidden='true' />}
+              iconOnly
+              isLink
+              render={<Link search={{ date }} to='/calories/scan' />}
+              size='sm'
+              variant='ghost'
+            />
+          }
           value={query}
         />
       </Label>
@@ -112,9 +112,6 @@ export function AddFoodPage({ date, initialFoodId }: Props) {
               variant='text'
             >
               Create the food
-            </Btn>
-            <Btn isLink render={<Link search={{ date }} to='/calories/scan' />} variant='text'>
-              Scan
             </Btn>
           </div>
         </div>

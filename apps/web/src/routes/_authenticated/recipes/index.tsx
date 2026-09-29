@@ -6,7 +6,7 @@ export const Route = createFileRoute('/_authenticated/recipes/')({
   loader: () => getRecipeLibrary(),
   component: RouteComponent,
   head: () => ({ meta: [{ title: 'Recipes' }] }),
-  staticData: { navbar: { label: 'Recipes', upTo: { to: '/' } } },
+  staticData: { navbar: { label: 'Recipes' } },
 });
 
 function RouteComponent() {

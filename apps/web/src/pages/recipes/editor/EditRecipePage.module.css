@@ -1,12 +1,10 @@
 .page {
   display: grid;
-  justify-items: center;
 }
 
 .card {
   display: grid;
   gap: var(--space-sm);
-  width: min(100%, 42rem);
 }
 
 .form,

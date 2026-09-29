@@ -46,7 +46,7 @@ export function CalorieGoalsPage({
       fat: formData.optionalNumber('fat'),
       carbs: formData.optionalNumber('carbs'),
     });
-    await navigate({ to: '/calories', search: { date } });
+    await navigate({ replace: true, search: { date }, to: '/calories' });
   }
 
   function applyPercentages(nextPercentages: MacroPercentages) {
@@ -68,9 +68,6 @@ export function CalorieGoalsPage({
   }
   return (
     <main className={flowCss.page}>
-      <header className={flowCss.header}>
-        <h1>Current goals</h1>
-      </header>
       <TypedForm className={flowCss.form} errorMsg={goalMutation.error?.message} onSubmit={submit}>
         <CalorieGoalCalculator
           initialWeightKg={latestWeightKg}

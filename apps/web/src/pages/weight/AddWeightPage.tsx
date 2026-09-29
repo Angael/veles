@@ -1,4 +1,4 @@
-import { Link, useNavigate, useRouter } from '@tanstack/react-router';
+import { useNavigate, useRouter } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -19,12 +19,11 @@ export function AddWeightPage() {
   const mutation = useSaveWeightMutation();
 
   return (
-    <main className={css.page}>
+    <main>
       <Card as='section' className={css.formCard}>
-        <div className={css.intro}>
-          <h1>Add weight for a date</h1>
-          <p>Use this when filling a gap or entering a measurement from another day.</p>
-        </div>
+        <p className={css.intro}>
+          Use this when filling a gap or entering a measurement from another day.
+        </p>
         <TypedForm
           className={css.form}
           onSubmit={() => {
@@ -38,7 +37,7 @@ export function AddWeightPage() {
                 onSuccess: () => {
                   void router
                     .invalidate()
-                    .then(() => navigate({ to: '/weight' }))
+                    .then(() => navigate({ replace: true, to: '/weight' }))
                     .catch(() => undefined);
                 },
               },
@@ -73,11 +72,6 @@ export function AddWeightPage() {
               type='submit'
             >
               Save entry
-            </Btn>
-          </div>
-          <div className={css.formActions}>
-            <Btn isLink render={<Link to='/weight' />} size='sm' variant='ghost'>
-              Cancel
             </Btn>
           </div>
         </TypedForm>

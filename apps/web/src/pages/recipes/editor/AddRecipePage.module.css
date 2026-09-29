@@ -5,13 +5,11 @@
 
 .content {
   display: grid;
-  justify-items: center;
 }
 
 .formCard {
   display: grid;
   gap: var(--space-sm);
-  width: min(100%, 44rem);
 }
 
 .form,

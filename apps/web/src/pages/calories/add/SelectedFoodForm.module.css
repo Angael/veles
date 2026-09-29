@@ -1,15 +1,9 @@
 @import '../../../styles/breakpoints.css';
 
 .page {
-  width: min(760px, 100%);
-  margin-inline: auto;
   display: grid;
   gap: var(--space-sm);
   padding-bottom: 5rem;
-}
-
-.backAction {
-  justify-self: start;
 }
 
 .panel {
