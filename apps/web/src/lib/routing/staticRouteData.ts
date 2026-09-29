@@ -6,7 +6,7 @@ export type NavbarTarget =
   | { to: '/weight' }
   | { params: { id: string }; to: '/recipes/view/$id' };
 
-type NavbarTargetMatch = {
+export type NavbarTargetMatch = {
   params: Record<string, string | undefined>;
   search: Record<string, unknown>;
 };
@@ -19,14 +19,6 @@ type NavbarData = {
    */
   backFallback?: NavbarTarget | ((match: NavbarTargetMatch) => NavbarTarget);
 };
-
-/** Falls back to the calorie diary day the current flow was opened for. */
-export function caloriesDayTarget({ search }: NavbarTargetMatch): NavbarTarget {
-  return {
-    search: typeof search.date === 'string' ? { date: search.date } : {},
-    to: '/calories',
-  };
-}
 
 declare module '@tanstack/react-router' {
   interface StaticDataRouteOption {

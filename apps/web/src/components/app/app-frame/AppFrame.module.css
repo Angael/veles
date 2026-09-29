@@ -92,10 +92,6 @@
   }
 }
 
-.brandBackLink {
-  flex: 0 0 auto;
-}
-
 .routeLabelTitle {
   min-width: 0;
   font-size: var(--text-lg);

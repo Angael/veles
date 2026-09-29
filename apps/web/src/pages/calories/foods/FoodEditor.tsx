@@ -26,7 +26,7 @@ type Props = {
   errorMsg?: string;
   initialBarcode?: string;
   initialName?: string;
-  /** Called on the first and every later edit, for unsaved-changes guards. */
+  /** Called on every edit, for unsaved-changes guards. */
   onDirty: () => void;
   pending: boolean;
   submitLabel: string;

@@ -9,9 +9,9 @@ import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { MobileNavbar } from '@/components/app/navbar/MobileNavbar';
 import { Navbar } from '@/components/app/navbar/Navbar';
-import { RouteBackButton } from '@/components/app/app-frame/RouteBackButton';
 import type { SessionUser } from '@/lib/auth/session.api';
 import css from './AppFrame.module.css';
+import { RouteBackButton } from './RouteBackButton';
 import { TaskHeader } from './TaskHeader';
 import { VelesLogo } from './VelesLogo';
 

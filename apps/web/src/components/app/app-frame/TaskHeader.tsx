@@ -4,8 +4,7 @@ import css from './TaskHeader.module.css';
 
 /**
  * Sticky back + title bar for task routes. An IntersectionObserver flips `data-collapsed` once the
- * page scrolls past the sentinel; CSS then scales the title and fades in the bar. No scroll
- * listeners, no React re-renders, no layout work while scrolling.
+ * page scrolls past the sentinel; CSS then scales the title and fades in the bar.
  */
 export function TaskHeader({ label }: { label?: string }) {
   const sentinelRef = useRef<HTMLDivElement>(null);
