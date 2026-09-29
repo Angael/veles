@@ -1,6 +1,9 @@
 import { useNavigate, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
-import { FormCard, FormFooter, FormPage } from '@/components/ui/form-layout/FormLayout';
+import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
+import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import type { RecipeLibraryItem } from '../recipes.api';
 import { useUpdateRecipeMutation } from '../recipes.query';
@@ -19,40 +22,49 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
   const { markDirty, markSaved } = useUnsavedChangesGuard();
 
   return (
-    <FormPage>
-      <FormCard
-        errorMsg={saveMutation.error?.message}
-        onSubmit={() => {
-          saveMutation.mutate(
-            { data: { ...draft, id: recipe.id } },
-            {
-              onSuccess: () => {
-                markSaved();
-                void navigate({
-                  params: { id: recipe.id },
-                  replace: true,
-                  to: '/recipes/view/$id',
-                })
-                  .then(() => router.invalidate())
-                  .catch(() => undefined);
+    <main>
+      <Card as='section'>
+        <TypedForm
+          className={css.form}
+          errorMsg={saveMutation.error?.message}
+          onSubmit={() => {
+            saveMutation.mutate(
+              { data: { ...draft, id: recipe.id } },
+              {
+                onSuccess: () => {
+                  markSaved();
+                  void navigate({
+                    params: { id: recipe.id },
+                    replace: true,
+                    to: '/recipes/view/$id',
+                  })
+                    .then(() => router.invalidate())
+                    .catch(() => undefined);
+                },
               },
-            },
-          );
-        }}
-      >
-        <RecipeForm
-          draft={draft}
-          onDraftChange={(nextDraft) => {
-            markDirty();
-            setDraft(nextDraft);
+            );
           }}
-        />
+        >
+          <RecipeForm
+            draft={draft}
+            onDraftChange={(nextDraft) => {
+              markDirty();
+              setDraft(nextDraft);
+            }}
+          />
 
-        <p className={css.photoNote}>Photos stay as they are for now and are not editable here.</p>
+          <p className={css.photoNote}>
+            Photos stay as they are for now and are not editable here.
+          </p>
 
-        <FormFooter loading={saveMutation.isPending} submitLabel='Save' />
-      </FormCard>
-    </FormPage>
+          <FormSubmitRow>
+            <Btn loading={saveMutation.isPending} type='submit'>
+              Save
+            </Btn>
+          </FormSubmitRow>
+        </TypedForm>
+      </Card>
+    </main>
   );
 }
 

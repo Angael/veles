@@ -2,7 +2,6 @@ import { useNavigate } from '@tanstack/react-router';
 import { useCreateFoodProductMutation } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
-import { FormPage } from '@/components/ui/form-layout/FormLayout';
 
 type Props = { barcode?: string; date: string; name?: string };
 export function CreateFoodPage({ barcode, date, name }: Props) {
@@ -17,7 +16,7 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
   }
 
   return (
-    <FormPage lead='Add it once for everyone.'>
+    <main>
       <FoodEditor
         errorMsg={createMutation.error?.message}
         initialBarcode={barcode}
@@ -27,6 +26,6 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
         pending={createMutation.isPending}
         submitLabel='Create food'
       />
-    </FormPage>
+    </main>
   );
 }

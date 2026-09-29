@@ -1,6 +1,9 @@
 import type { UseNavigateResult } from '@tanstack/react-router';
 import { useState } from 'react';
-import { FormCard, FormFooter, FormPage } from '@/components/ui/form-layout/FormLayout';
+import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
+import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { UploadTileGrid } from './UploadTileGrid';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
@@ -54,31 +57,37 @@ export function AddRecipePage() {
   }
 
   return (
-    <FormPage>
-      <FormCard errorMsg={error} onSubmit={handleSubmit}>
-        <RecipeForm
-          draft={draft}
-          onDraftChange={(nextDraft) => {
-            markDirty();
-            setDraft((current) => ({ ...current, ...nextDraft }));
-          }}
-        />
-
-        <div className={css.photos}>
-          <span>Photos</span>
-          <UploadTileGrid
-            files={draft.selectedFiles}
-            maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES}
-            maxItems={RECIPE_UPLOAD_MAX_PHOTO_COUNT}
-            onFilesChange={(selectedFiles) => {
+    <main>
+      <Card as='section'>
+        <TypedForm className={css.form} errorMsg={error} onSubmit={handleSubmit}>
+          <RecipeForm
+            draft={draft}
+            onDraftChange={(nextDraft) => {
               markDirty();
-              setDraft((current) => ({ ...current, selectedFiles }));
+              setDraft((current) => ({ ...current, ...nextDraft }));
             }}
           />
-        </div>
 
-        <FormFooter loading={createMutation.isPending} submitLabel='Add recipe' />
-      </FormCard>
-    </FormPage>
+          <div className={css.photos}>
+            <span>Photos</span>
+            <UploadTileGrid
+              files={draft.selectedFiles}
+              maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES}
+              maxItems={RECIPE_UPLOAD_MAX_PHOTO_COUNT}
+              onFilesChange={(selectedFiles) => {
+                markDirty();
+                setDraft((current) => ({ ...current, selectedFiles }));
+              }}
+            />
+          </div>
+
+          <FormSubmitRow>
+            <Btn loading={createMutation.isPending} type='submit'>
+              Add recipe
+            </Btn>
+          </FormSubmitRow>
+        </TypedForm>
+      </Card>
+    </main>
   );
 }

@@ -1,3 +1,9 @@
+.page,
+.form {
+  display: grid;
+  gap: var(--space-md);
+}
+
 .promptBlock {
   display: grid;
   justify-items: start;

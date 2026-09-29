@@ -1,3 +1,8 @@
+.form {
+  display: grid;
+  gap: var(--space-md);
+}
+
 .photoNote {
   padding: 0.85rem 1rem;
   border: var(--border-width) solid var(--c-border);

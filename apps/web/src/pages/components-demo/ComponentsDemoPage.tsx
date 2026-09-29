@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Btn, type BtnSize, type BtnVariant } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { DateInput } from '@/components/ui/date-input/DateInput';
-import { FormCard, FormFooter } from '@/components/ui/form-layout/FormLayout';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog/Dialog';
 import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
 import { ErrorCard } from '@/components/ui/error-card/ErrorCard';
@@ -289,22 +289,13 @@ export function ComponentsDemoPage() {
           <Label text='Demo field'>
             <TextInput defaultValue='Breakfast' name='typedFormDemo' required />
           </Label>
-          <Btn type='submit'>Submit demo</Btn>
+          <FormSubmitRow>
+            <Label text='Date'>
+              <DateInput defaultValue='2026-08-08' name='date' required />
+            </Label>
+            <Btn type='submit'>Submit demo</Btn>
+          </FormSubmitRow>
         </TypedForm>
-      </section>
-
-      <section>
-        <h2>FormCard and FormFooter</h2>
-        <FormCard
-          onSubmit={(data) => {
-            data.string('date');
-          }}
-        >
-          <Label text='Amount eaten (g)'>
-            <NumberInput defaultValue={150} size='lg' />
-          </Label>
-          <FormFooter date={{ defaultValue: '2026-08-08' }} submitLabel='Save' />
-        </FormCard>
       </section>
 
       <section>

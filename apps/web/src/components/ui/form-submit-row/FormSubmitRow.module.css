@@ -1,0 +1,32 @@
+@import '../../../styles/breakpoints.css';
+
+.row {
+  display: flex;
+  align-items: end;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: var(--border-width) solid var(--c-border);
+
+  & > label {
+    flex: 0 1 14rem;
+    min-width: 0;
+  }
+
+  & > :last-child {
+    margin-left: auto;
+  }
+
+  @media (--phone) {
+    flex-direction: column;
+    align-items: stretch;
+
+    & > label {
+      flex-basis: auto;
+    }
+
+    & > :last-child {
+      width: 100%;
+      margin-left: 0;
+    }
+  }
+}

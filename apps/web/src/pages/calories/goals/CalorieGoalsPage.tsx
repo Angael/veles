@@ -3,8 +3,9 @@ import { useState } from 'react';
 import type { CalorieGoal } from '../calories.api';
 import { useSetDailyCalorieGoalMutation } from '../calories.query';
 import { todayLocalDate } from '@/lib/dateOnly';
+import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
-import { FormFooter, FormPage } from '@/components/ui/form-layout/FormLayout';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
@@ -67,7 +68,7 @@ export function CalorieGoalsPage({
     setPercentages(percentagesFromMacros(nextValues, percentages));
   }
   return (
-    <FormPage>
+    <main>
       <TypedForm className={css.sections} errorMsg={goalMutation.error?.message} onSubmit={submit}>
         <CalorieGoalCalculator
           initialWeightKg={latestWeightKg}
@@ -84,9 +85,13 @@ export function CalorieGoalsPage({
           </div>
           <KcalMacrosForm kcalInput={{ min: 1 }} onValueChange={updateGoalValue} values={values} />
 
-          <FormFooter loading={goalMutation.isPending} submitLabel='Save' />
+          <FormSubmitRow>
+            <Btn loading={goalMutation.isPending} type='submit'>
+              Save
+            </Btn>
+          </FormSubmitRow>
         </Card>
       </TypedForm>
-    </FormPage>
+    </main>
   );
 }

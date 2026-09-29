@@ -2,9 +2,11 @@ import { useNavigate, useRouter } from '@tanstack/react-router';
 import { ClipboardIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
-import { FormCard, FormFooter, FormPage } from '@/components/ui/form-layout/FormLayout';
+import { Card } from '@/components/ui/card/Card';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { Label } from '@/components/ui/label/Label';
 import { TextareaInput } from '@/components/ui/textarea-input/TextareaInput';
+import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import css from './WeightEntryPages.module.css';
 import { parseWeightEntries } from './parseWeightEntries';
@@ -27,7 +29,7 @@ export function ImportWeightPage() {
   const importStatus = getImportStatus(parsed.entries.length, parsed.errors, hasTooManyEntries);
 
   return (
-    <FormPage lead='Paste one measurement per line. Existing entries on the same dates are replaced.'>
+    <main className={css.page}>
       <div className={css.promptBlock}>
         <div>
           <strong>Need help formatting your data?</strong>
@@ -47,50 +49,59 @@ export function ImportWeightPage() {
         </Btn>
       </div>
 
-      <FormCard
-        onSubmit={() => {
-          if (parsed.entries.length > 0 && parsed.errors.length === 0 && !hasTooManyEntries) {
-            mutation.mutate(
-              { data: { entries: parsed.entries } },
-              {
-                onSuccess: () => {
-                  void router
-                    .invalidate()
-                    .then(() => navigate({ replace: true, to: '/weight' }))
-                    .catch(() => undefined);
+      <Card as='section'>
+        <TypedForm
+          className={css.form}
+          onSubmit={() => {
+            if (parsed.entries.length > 0 && parsed.errors.length === 0 && !hasTooManyEntries) {
+              mutation.mutate(
+                { data: { entries: parsed.entries } },
+                {
+                  onSuccess: () => {
+                    void router
+                      .invalidate()
+                      .then(() => navigate({ replace: true, to: '/weight' }))
+                      .catch(() => undefined);
+                  },
                 },
-              },
-            );
-          }
-        }}
-      >
-        <Label text='Weight data'>
-          <TextareaInput
-            aria-describedby='weight-import-status'
-            aria-invalid={hasTooManyEntries}
-            className={css.importInput}
-            onChange={(event) => setValue(event.currentTarget.value)}
-            placeholder={'2026-08-01 78.4kg\n2026-08-02 78.1kg'}
-            required
-            spellCheck={false}
-            value={value}
-          />
-        </Label>
-        <div
-          aria-live='polite'
-          className={css.importStatus}
-          data-error={hasTooManyEntries ? '' : undefined}
-          id='weight-import-status'
+              );
+            }
+          }}
         >
-          {importStatus}
-        </div>
-        <FormFooter
-          disabled={parsed.entries.length === 0 || parsed.errors.length > 0 || hasTooManyEntries}
-          loading={mutation.isPending}
-          submitLabel={`Import ${parsed.entries.length || ''}`.trim()}
-        />
-      </FormCard>
-    </FormPage>
+          <Label text='Weight data'>
+            <TextareaInput
+              aria-describedby='weight-import-status'
+              aria-invalid={hasTooManyEntries}
+              className={css.importInput}
+              onChange={(event) => setValue(event.currentTarget.value)}
+              placeholder={'2026-08-01 78.4kg\n2026-08-02 78.1kg'}
+              required
+              spellCheck={false}
+              value={value}
+            />
+          </Label>
+          <div
+            aria-live='polite'
+            className={css.importStatus}
+            data-error={hasTooManyEntries ? '' : undefined}
+            id='weight-import-status'
+          >
+            {importStatus}
+          </div>
+          <FormSubmitRow>
+            <Btn
+              disabled={
+                parsed.entries.length === 0 || parsed.errors.length > 0 || hasTooManyEntries
+              }
+              loading={mutation.isPending}
+              type='submit'
+            >
+              Import {parsed.entries.length || ''}
+            </Btn>
+          </FormSubmitRow>
+        </TypedForm>
+      </Card>
+    </main>
   );
 }
 function getImportStatus(entryCount: number, errors: string[], hasTooManyEntries: boolean) {

@@ -2,14 +2,19 @@ import { useRouter, type UseNavigateResult } from '@tanstack/react-router';
 import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
 import { useUpdateFoodLogMutation } from '../calories.query';
-import { FormCard, FormFooter, FormPage } from '@/components/ui/form-layout/FormLayout';
+import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
+import { DateInput } from '@/components/ui/date-input/DateInput';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { PhotoPicker, type PhotoPickerValue } from '../PhotoPicker';
 import { SelectedFoodCard } from '../SelectedFoodCard';
 import { TextInput } from '@/components/ui/text-input/TextInput';
+import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
+import css from '../CalorieFlows.module.css';
 import { useProportionalNutrition } from './useProportionalNutrition';
 
 export function EditFoodLogPage({ log }: { log: CalorieLog }) {
@@ -44,7 +49,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
   }
 
   return (
-    <FormPage>
+    <main className={css.page}>
       {isProduct && log.productId ? (
         <SelectedFoodCard
           carbs={nutrition.carbs ?? 0}
@@ -57,30 +62,41 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
         />
       ) : null}
 
-      <FormCard errorMsg={updateMutation.error?.message} onSubmit={submit}>
-        {!isProduct ? (
-          <Label text='Name'>
-            <TextInput defaultValue={log.name} name='name' required />
+      <Card as='section'>
+        <TypedForm className={css.form} errorMsg={updateMutation.error?.message} onSubmit={submit}>
+          {!isProduct ? (
+            <Label text='Name'>
+              <TextInput defaultValue={log.name} name='name' required />
+            </Label>
+          ) : null}
+
+          <Label text='Amount eaten (g)'>
+            <NumberInput min={0} name='grams' onValueChange={changeGrams} size='lg' value={grams} />
           </Label>
-        ) : null}
 
-        <Label text='Amount eaten (g)'>
-          <NumberInput min={0} name='grams' onValueChange={changeGrams} size='lg' value={grams} />
-        </Label>
+          {!isProduct ? (
+            <KcalMacrosForm onValueChange={changeNutrition} values={nutrition} />
+          ) : null}
 
-        {!isProduct ? <KcalMacrosForm onValueChange={changeNutrition} values={nutrition} /> : null}
+          {!isProduct ? (
+            <PhotoPicker
+              disabled={isPending}
+              existingUrl={log.imageUrl}
+              onChange={setPhoto}
+              value={photo}
+            />
+          ) : null}
 
-        {!isProduct ? (
-          <PhotoPicker
-            disabled={isPending}
-            existingUrl={log.imageUrl}
-            onChange={setPhoto}
-            value={photo}
-          />
-        ) : null}
-
-        <FormFooter date={{ defaultValue: log.date }} loading={isPending} submitLabel='Save' />
-      </FormCard>
-    </FormPage>
+          <FormSubmitRow>
+            <Label text='Date'>
+              <DateInput defaultValue={log.date} name='date' required />
+            </Label>
+            <Btn loading={isPending} type='submit'>
+              Save
+            </Btn>
+          </FormSubmitRow>
+        </TypedForm>
+      </Card>
+    </main>
   );
 }

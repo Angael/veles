@@ -1,3 +1,8 @@
+.form {
+  display: grid;
+  gap: var(--space-md);
+}
+
 /* Mirrors Label's layout; a real <label> would forward clicks to the file input. */
 .photos {
   display: grid;
