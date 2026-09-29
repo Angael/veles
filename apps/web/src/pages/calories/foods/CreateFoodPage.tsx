@@ -1,6 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useCreateFoodProductMutation } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
+import { Card } from '@/components/ui/card/Card';
 import css from '../CalorieFlows.module.css';
 
 type Props = { barcode?: string; date: string; name?: string };
@@ -21,7 +22,7 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
           <p>Add it once for everyone</p>
         </div>
       </header>
-      <section className={css.panel}>
+      <Card as='section' className={css.panel}>
         <FoodEditor
           errorMsg={createMutation.error?.message}
           initialBarcode={barcode}
@@ -30,7 +31,7 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
           pending={createMutation.isPending}
           submitLabel='Create food'
         />
-      </section>
+      </Card>
     </main>
   );
 }

@@ -26,10 +26,6 @@
 }
 
 .panel {
-  border: 1px solid var(--c-border);
-  border-radius: 1rem;
-  background: var(--c-surface);
-  padding: 1rem;
   display: grid;
   gap: 1rem;
 }

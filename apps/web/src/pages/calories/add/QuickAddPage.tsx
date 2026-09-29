@@ -8,6 +8,7 @@ import { PhotoPicker, type PhotoPickerValue } from '../PhotoPicker';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
+import { Card } from '@/components/ui/card/Card';
 import css from '../CalorieFlows.module.css';
 
 type QuickAddDefaultValues = {
@@ -51,7 +52,7 @@ export function QuickAddPage({
           <p>Record energy now. Macros are optional.</p>
         </div>
       </header>
-      <section className={css.panel}>
+      <Card as='section' className={css.panel}>
         <TypedForm className={css.form} errorMsg={recordMutation.error?.message} onSubmit={submit}>
           <Label text='Label'>
             <TextInput defaultValue={defaultValues?.name ?? 'Quick add'} name='name' required />
@@ -71,7 +72,7 @@ export function QuickAddPage({
             Add to diary
           </Btn>
         </TypedForm>
-      </section>
+      </Card>
     </main>
   );
 }

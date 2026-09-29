@@ -3,6 +3,7 @@ import type { CalorieFood } from '../calories.api';
 import { useUpdateFoodProductMutation } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
 import { todayLocalDate } from '@/lib/dateOnly';
+import { Card } from '@/components/ui/card/Card';
 import css from '../CalorieFlows.module.css';
 
 export function EditFoodPage({ food }: { food: CalorieFood }) {
@@ -22,7 +23,7 @@ export function EditFoodPage({ food }: { food: CalorieFood }) {
           <p>Changes apply to future diary entries only.</p>
         </div>
       </header>
-      <section className={css.panel}>
+      <Card as='section' className={css.panel}>
         <FoodEditor
           errorMsg={updateMutation.error?.message}
           food={food}
@@ -30,7 +31,7 @@ export function EditFoodPage({ food }: { food: CalorieFood }) {
           pending={updateMutation.isPending}
           submitLabel='Save food'
         />
-      </section>
+      </Card>
     </main>
   );
 }

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
 import { useUpdateFoodLogMutation } from '../calories.query';
 import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
 import { DateInput } from '@/components/ui/date-input/DateInput';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/ui/label/Label';
@@ -54,60 +55,60 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
         </div>
       </header>
 
-      <section className={css.panel}>
-        <TypedForm className={css.form} errorMsg={updateMutation.error?.message} onSubmit={submit}>
-          <Label text='Date'>
-            <DateInput defaultValue={log.date} name='date' required />
+      <TypedForm className={css.form} errorMsg={updateMutation.error?.message} onSubmit={submit}>
+        <Label text='Date'>
+          <DateInput defaultValue={log.date} name='date' required />
+        </Label>
+
+        {isProduct && log.productId ? (
+          <SelectedFoodCard
+            carbs={nutrition.carbs ?? 0}
+            fat={nutrition.fat ?? 0}
+            imageUrl={log.imageUrl}
+            kcal={nutrition.kcal ?? 0}
+            name={log.name}
+            productId={log.productId}
+            protein={nutrition.protein ?? 0}
+          />
+        ) : null}
+
+        {/* <Card as='section' className={css.form}> */}
+        {!isProduct ? (
+          <Label text='Name'>
+            <TextInput defaultValue={log.name} name='name' required />
           </Label>
+        ) : null}
 
-          {isProduct && log.productId ? (
-            <SelectedFoodCard
-              carbs={nutrition.carbs ?? 0}
-              fat={nutrition.fat ?? 0}
-              imageUrl={log.imageUrl}
-              kcal={nutrition.kcal ?? 0}
-              name={log.name}
-              productId={log.productId}
-              protein={nutrition.protein ?? 0}
-            />
-          ) : (
-            <Label text='Name'>
-              <TextInput defaultValue={log.name} name='name' required />
-            </Label>
-          )}
+        <Label text='Amount eaten (g)'>
+          <NumberInput min={0} name='grams' onValueChange={changeGrams} value={grams} />
+        </Label>
 
-          <Label text='Amount eaten (g)'>
-            <NumberInput min={0} name='grams' onValueChange={changeGrams} value={grams} />
-          </Label>
+        {!isProduct ? <KcalMacrosForm onValueChange={changeNutrition} values={nutrition} /> : null}
 
-          {!isProduct ? (
-            <KcalMacrosForm onValueChange={changeNutrition} values={nutrition} />
-          ) : null}
+        {!isProduct ? (
+          <PhotoPicker
+            disabled={isPending}
+            existingUrl={log.imageUrl}
+            onChange={setPhoto}
+            value={photo}
+          />
+        ) : null}
 
-          {!isProduct ? (
-            <PhotoPicker
-              disabled={isPending}
-              existingUrl={log.imageUrl}
-              onChange={setPhoto}
-              value={photo}
-            />
-          ) : null}
-
-          <div className={css.logActions}>
-            <Btn
-              disabled={isPending}
-              onClick={() => router.history.back()}
-              type='button'
-              variant='ghost'
-            >
-              Cancel
-            </Btn>
-            <Btn disabled={isPending} loading={updateMutation.isPending} type='submit'>
-              Save
-            </Btn>
-          </div>
-        </TypedForm>
-      </section>
+        <div className={css.logActions}>
+          <Btn
+            disabled={isPending}
+            onClick={() => router.history.back()}
+            type='button'
+            variant='ghost'
+          >
+            Cancel
+          </Btn>
+          <Btn disabled={isPending} loading={updateMutation.isPending} type='submit'>
+            Save
+          </Btn>
+        </div>
+        {/* </Card> */}
+      </TypedForm>
     </main>
   );
 }
