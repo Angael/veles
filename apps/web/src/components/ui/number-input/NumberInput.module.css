@@ -33,7 +33,7 @@ label:has(.root[data-required]) > span:first-child::after {
   min-height: var(--input-height);
   border: var(--border-width) solid var(--c-border-strong);
   border-radius: var(--radius-xs);
-  background: rgba(2, 6, 23, 0.4);
+  background: var(--c-surface-input);
   overflow: hidden;
   transition:
     border-color 180ms var(--ease-out),
@@ -102,7 +102,7 @@ label:has(.root[data-required]) > span:first-child::after {
 @media (hover: hover) and (pointer: fine) {
   .root:hover .group {
     border-color: var(--c-primary-border-soft);
-    background: color-mix(in srgb, rgba(2, 6, 23, 0.4) 84%, var(--c-primary-surface) 16%);
+    background: color-mix(in oklch, var(--c-surface-input) 84%, var(--c-primary-surface) 16%);
   }
 
   .stepper:hover:not([data-disabled]) {

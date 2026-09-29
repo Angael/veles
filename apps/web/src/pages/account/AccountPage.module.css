@@ -34,7 +34,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  outline: 1px solid rgba(255, 255, 255, 0.1);
+  outline: 1px solid var(--c-border);
   outline-offset: -1px;
 }
 
@@ -49,7 +49,7 @@
 }
 
 .profileFallback {
-  background: linear-gradient(145deg, var(--c-primary-surface-strong), rgba(125, 211, 252, 0.18));
+  background: var(--c-surface-raised);
   font-size: var(--text-xl);
 }
 
@@ -162,11 +162,11 @@
   background: var(--c-primary-surface-strong);
 
   &[data-color='violet'] {
-    background: rgba(124, 58, 237, 0.28);
+    background: oklch(0.627 0.265 303.9 / 28%);
   }
 
   &[data-color='amber'] {
-    background: rgba(217, 119, 6, 0.26);
+    background: oklch(0.769 0.188 70.08 / 26%);
   }
 }
 

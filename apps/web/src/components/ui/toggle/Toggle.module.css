@@ -42,7 +42,7 @@
   height: 1.25rem;
   border-radius: 50%;
   background: var(--c-muted);
-  box-shadow: 0 1px 3px rgba(2, 6, 23, 0.35);
+  box-shadow: var(--shadow-card);
   transition:
     background-color var(--duration-fast) var(--ease-out),
     transform var(--duration-fast) var(--ease-out);

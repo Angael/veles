@@ -160,8 +160,8 @@
 .dayProgressOver {
   z-index: 1;
   inset-inline-end: 0;
-  background: rgb(248 113 113 / 88%);
-  box-shadow: 0 0 0.35rem rgb(248 113 113 / 35%);
+  background: color-mix(in oklch, var(--c-danger) 88%, transparent);
+  box-shadow: 0 0 0.35rem var(--c-danger-border);
 }
 
 .dayLogged {

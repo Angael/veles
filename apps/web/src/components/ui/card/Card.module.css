@@ -39,7 +39,7 @@
 }
 
 .danger {
-  --card-tone: #f87171;
+  --card-tone: var(--c-danger);
   --card-tone-secondary: var(--c-macro-fat);
 
   border-color: var(--c-danger-border);

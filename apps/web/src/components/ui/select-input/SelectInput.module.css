@@ -7,7 +7,7 @@
   min-height: var(--button-min-height);
   border: var(--border-width) solid var(--c-border-strong);
   border-radius: var(--radius-xs);
-  background: rgba(2, 6, 23, 0.4);
+  background: var(--c-surface-input);
   color: var(--c-text);
   padding: 0 0.85rem 0 1rem;
   font: inherit;
@@ -26,7 +26,7 @@
   &[data-popup-open] {
     border-color: var(--c-primary-border);
     box-shadow: 0 0 0 2px var(--c-primary-focus);
-    background: color-mix(in srgb, rgba(2, 6, 23, 0.4) 80%, var(--c-primary-surface) 20%);
+    background: color-mix(in oklch, var(--c-surface-input) 80%, var(--c-primary-surface) 20%);
   }
 
   &:focus-visible {
@@ -81,7 +81,7 @@ label:has(.trigger[data-required]) > span:first-child::after {
   overflow: hidden;
   border: var(--border-width) solid var(--c-border-popup);
   border-radius: var(--radius-xs);
-  background: color-mix(in srgb, var(--c-surface) 78%, rgba(2, 6, 23, 0.82) 22%);
+  background: var(--c-surface-solid);
   backdrop-filter: var(--blur-surface);
   box-shadow: var(--shadow-popup);
   color: var(--c-text);
@@ -144,7 +144,7 @@ label:has(.trigger[data-required]) > span:first-child::after {
 @media (hover: hover) and (pointer: fine) {
   .trigger:hover:not([data-disabled]) {
     border-color: var(--c-primary-border-soft);
-    background: color-mix(in srgb, rgba(2, 6, 23, 0.4) 84%, var(--c-primary-surface) 16%);
+    background: color-mix(in oklch, var(--c-surface-input) 84%, var(--c-primary-surface) 16%);
   }
 }
 

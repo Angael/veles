@@ -44,8 +44,8 @@ export function ConnectionInvitationEmail({
 }
 
 const bodyStyle = {
-  backgroundColor: '#f4f4f5',
-  color: '#18181b',
+  backgroundColor: '#f5f5f5',
+  color: '#171717',
   fontFamily: 'Arial, sans-serif',
   margin: 0,
   padding: '32px 16px',
@@ -53,7 +53,7 @@ const bodyStyle = {
 
 const containerStyle = {
   backgroundColor: '#ffffff',
-  border: '1px solid #e4e4e7',
+  border: '1px solid #e5e5e5',
   borderRadius: '8px',
   margin: '0 auto',
   maxWidth: '560px',
@@ -73,9 +73,9 @@ const textStyle = {
 };
 
 const buttonStyle = {
-  backgroundColor: '#18181b',
+  backgroundColor: '#171717',
   borderRadius: '6px',
-  color: '#ffffff',
+  color: '#fafafa',
   display: 'inline-block',
   fontSize: '16px',
   fontWeight: 700,
@@ -85,19 +85,19 @@ const buttonStyle = {
 };
 
 const dividerStyle = {
-  borderColor: '#e4e4e7',
+  borderColor: '#e5e5e5',
   margin: '0 0 24px',
 };
 
 const secondaryTextStyle = {
-  color: '#52525b',
+  color: '#525252',
   fontSize: '14px',
   lineHeight: '20px',
   margin: '0 0 12px',
 };
 
 const linkStyle = {
-  color: '#2563eb',
+  color: '#171717',
   display: 'block',
   fontSize: '14px',
   lineHeight: '20px',
