@@ -17,7 +17,7 @@ export const Route = createFileRoute('/_authenticated/calories')({
     }),
   component: RouteComponent,
   head: () => ({ meta: [{ title: 'Food diary' }] }),
-  staticData: { navbar: { label: 'Calories', upTo: { to: '/' } } },
+  staticData: { navbar: { label: 'Calories' } },
 });
 function RouteComponent() {
   const search = Route.useSearch();

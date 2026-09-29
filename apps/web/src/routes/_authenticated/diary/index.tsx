@@ -6,7 +6,7 @@ export const Route = createFileRoute('/_authenticated/diary/')({
   loader: () => getDiaryEntries(),
   component: RouteComponent,
   head: () => ({ meta: [{ title: 'Diary' }] }),
-  staticData: { navbar: { label: 'Diary', upTo: { to: '/' } } },
+  staticData: { navbar: { label: 'Diary' } },
 });
 
 function RouteComponent() {

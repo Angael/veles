@@ -26,6 +26,8 @@ type Props = {
   errorMsg?: string;
   initialBarcode?: string;
   initialName?: string;
+  /** Called on every edit, for unsaved-changes guards. */
+  onDirty: () => void;
   pending: boolean;
   submitLabel: string;
   onSubmit: (value: FoodEditorValue) => Promise<void>;
@@ -36,6 +38,7 @@ export function FoodEditor({
   food,
   initialBarcode,
   initialName,
+  onDirty,
   onSubmit,
   pending,
   submitLabel,
@@ -56,7 +59,7 @@ export function FoodEditor({
     });
   }
   return (
-    <TypedForm className={css.form} errorMsg={errorMsg} onSubmit={handleSubmit}>
+    <TypedForm className={css.form} errorMsg={errorMsg} onChange={onDirty} onSubmit={handleSubmit}>
       <Label text='Food name'>
         <TextInput defaultValue={food?.name ?? initialName} name='name' required />
       </Label>
@@ -85,7 +88,10 @@ export function FoodEditor({
         allowUpload={!food?.imageUrl}
         disabled={pending}
         existingUrl={food?.imageUrl}
-        onChange={setPhoto}
+        onChange={(next) => {
+          setPhoto(next);
+          onDirty();
+        }}
         value={photo}
       />
       <p>This changes the shared catalog photo for everyone.</p>

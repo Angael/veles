@@ -15,7 +15,7 @@ export const Route = createFileRoute('/recipes/view/$id')({
   },
   component: RouteComponent,
   head: ({ loaderData }) => ({ meta: [{ title: loaderData?.name ?? 'Recipe' }] }),
-  staticData: { navbar: { label: 'Recipe', upTo: { to: '/recipes' } } },
+  staticData: { navbar: { backFallback: { to: '/recipes' }, label: 'Recipe' } },
 });
 
 function RouteComponent() {

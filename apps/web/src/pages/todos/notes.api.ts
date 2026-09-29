@@ -32,7 +32,6 @@ export type SaveTextResult =
   | { current: string; status: 'conflict' };
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
-
 /** Matches notes the user owns or that a connected user shared; these are readable and editable. */
 function accessibleNote(userId: string) {
   return or(
@@ -73,7 +72,6 @@ async function lockAccessibleItem(tx: Transaction, itemId: string, userId: strin
     .for('update', { of: notes });
   return item;
 }
-
 export const getNotes = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getNotes')])
   .handler(async () => {

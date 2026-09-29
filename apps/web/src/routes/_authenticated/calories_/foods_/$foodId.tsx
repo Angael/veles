@@ -7,9 +7,7 @@ export const Route = createFileRoute('/_authenticated/calories_/foods_/$foodId')
   loader: ({ context, params }) =>
     context.queryClient.ensureQueryData(calorieFoodQueryOptions(params.foodId)),
   component: Component,
-  staticData: {
-    layout: 'focus',
-  },
+  staticData: { layout: 'task', navbar: { backFallback: { to: '/calories' }, label: 'Edit food' } },
 });
 
 function Component() {

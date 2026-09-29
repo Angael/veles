@@ -2,7 +2,7 @@ import { type } from 'arktype';
 import { createFileRoute } from '@tanstack/react-router';
 import { AddFoodPage } from '@/pages/calories/add/AddFoodPage';
 import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '@/pages/calories/calories.query';
-import { normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
+import { caloriesDayTarget, normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 
 export const Route = createFileRoute('/_authenticated/calories_/add')({
   validateSearch: type({ 'date?': 'string', 'foodId?': 'string' }),
@@ -15,12 +15,10 @@ export const Route = createFileRoute('/_authenticated/calories_/add')({
     return context.queryClient.ensureQueryData(calorieFoodsQueryOptions());
   },
   component: Component,
-  staticData: {
-    layout: 'focus',
-  },
+  staticData: { layout: 'task', navbar: { backFallback: caloriesDayTarget, label: 'Add food' } },
 });
 
 function Component() {
   const search = Route.useSearch();
-  return <AddFoodPage date={normalizeCalorieDate(search.date)} initialFoodId={search.foodId} />;
+  return <AddFoodPage date={normalizeCalorieDate(search.date)} foodId={search.foodId} />;
 }

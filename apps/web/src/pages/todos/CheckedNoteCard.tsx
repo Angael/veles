@@ -27,6 +27,15 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
     serverValue: note.title,
   });
 
+  /** Appends a placeholder item and focuses it once created; shared by the button and Enter key. */
+  const addItem = () => {
+    if (createItem.isPending) return;
+    createItem.mutate(
+      { name: 'New item', noteId: note.id },
+      { onSuccess: (created) => setNewItemId(created.id) },
+    );
+  };
+
   return (
     <Card as='article' className={css.listCard}>
       <div className={css.cardHeader}>
@@ -34,7 +43,14 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
           <SeamlessTextInput
             aria-label='Checklist title'
             className={css.titleInput}
+            enterKeyHint='next'
             maxLength={160}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
+                event.preventDefault();
+                addItem();
+              }
+            }}
             required
             {...title.inputProps}
           />
@@ -51,7 +67,12 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
       {note.items.length === 0 ? <p className={css.emptyList}>No items yet.</p> : null}
       <ul className={css.items}>
         {note.items.map((item) => (
-          <CheckedNoteItem autoFocus={item.id === newItemId} item={item} key={item.id} />
+          <CheckedNoteItem
+            autoFocus={item.id === newItemId}
+            item={item}
+            key={item.id}
+            onEnter={addItem}
+          />
         ))}
       </ul>
       <Btn
@@ -59,12 +80,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
         className={css.addItem}
         icon={<PlusIcon aria-hidden='true' />}
         loading={createItem.isPending}
-        onClick={() => {
-          createItem.mutate(
-            { name: 'New item', noteId: note.id },
-            { onSuccess: (created) => setNewItemId(created.id) },
-          );
-        }}
+        onClick={addItem}
         size='sm'
         type='button'
         variant='outlineMain'
@@ -75,7 +91,15 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
   );
 }
 
-function CheckedNoteItem({ autoFocus, item }: { autoFocus: boolean; item: NoteListItem }) {
+function CheckedNoteItem({
+  autoFocus,
+  item,
+  onEnter,
+}: {
+  autoFocus: boolean;
+  item: NoteListItem;
+  onEnter: () => void;
+}) {
   const [checked, setChecked] = useState(item.checked);
   const setItemChecked = useSetListItemCheckedMutation();
   const updateItem = useUpdateListItemMutation();
@@ -109,10 +133,14 @@ function CheckedNoteItem({ autoFocus, item }: { autoFocus: boolean; item: NoteLi
         autoFocus={autoFocus}
         aria-label='Checklist item'
         className={checked ? css.done : undefined}
+        enterKeyHint='next'
         maxLength={240}
         onFocus={autoFocus ? (event) => event.currentTarget.select() : undefined}
         onKeyDown={(event) => {
-          if (
+          if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
+            event.preventDefault();
+            onEnter();
+          } else if (
             !deleteItem.isPending &&
             (event.key === 'Backspace' || event.key === 'Delete') &&
             !event.currentTarget.value.trim()

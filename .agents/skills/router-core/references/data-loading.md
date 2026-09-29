@@ -1,23 +1,3 @@
----
-name: router-core-data-loading
-description: >-
-  Route loader option, loaderDeps for cache keys, staleTime/gcTime/
-  defaultPreloadStaleTime SWR caching, pendingComponent/pendingMs/
-  pendingMinMs, errorComponent/onError/onCatch, beforeLoad, router
-  context and createRootRouteWithContext DI pattern, router.invalidate,
-  Await component, deferred data loading with unawaited promises.
-type: sub-skill
-library: tanstack-router
-library_version: '1.166.2'
-requires:
-  - router-core
-sources:
-  - TanStack/router:docs/router/guide/data-loading.md
-  - TanStack/router:docs/router/guide/deferred-data-loading.md
-  - TanStack/router:docs/router/guide/router-context.md
-  - TanStack/router:docs/router/guide/data-mutations.md
----
-
 # Data Loading
 
 ## Setup
@@ -26,35 +6,35 @@ Basic loader returning data, consumed via `useLoaderData`:
 
 ```tsx
 // src/routes/posts.tsx
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/posts')({
   loader: () => fetchPosts(),
   component: PostsComponent,
-})
+});
 
 function PostsComponent() {
-  const posts = Route.useLoaderData()
+  const posts = Route.useLoaderData();
   return (
     <ul>
       {posts.map((post) => (
         <li key={post.id}>{post.title}</li>
       ))}
     </ul>
-  )
+  );
 }
 ```
 
 In code-split components, use `getRouteApi` instead of importing Route:
 
 ```tsx
-import { getRouteApi } from '@tanstack/react-router'
+import { getRouteApi } from '@tanstack/react-router';
 
-const routeApi = getRouteApi('/posts')
+const routeApi = getRouteApi('/posts');
 
 function PostsComponent() {
-  const posts = routeApi.useLoaderData()
-  return <ul>{/* ... */}</ul>
+  const posts = routeApi.useLoaderData();
+  return <ul>{/* ... */}</ul>;
 }
 ```
 
@@ -85,7 +65,7 @@ Loaders don't receive search params directly. Use `loaderDeps` to declare which 
 
 ```tsx
 // src/routes/posts.tsx
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/posts')({
   validateSearch: (search) => ({
@@ -94,7 +74,7 @@ export const Route = createFileRoute('/posts')({
   }),
   loaderDeps: ({ search: { offset, limit } }) => ({ offset, limit }),
   loader: ({ deps: { offset, limit } }) => fetchPosts({ offset, limit }),
-})
+});
 ```
 
 When deps change, the route reloads regardless of `staleTime`.
@@ -114,7 +94,7 @@ export const Route = createFileRoute('/posts')({
   loader: () => fetchPosts(),
   staleTime: 10_000, // 10s: data considered fresh for 10 seconds
   gcTime: 5 * 60 * 1000, // 5min: garbage collect after 5 minutes
-})
+});
 ```
 
 Disable SWR caching entirely:
@@ -123,7 +103,7 @@ Disable SWR caching entirely:
 export const Route = createFileRoute('/posts')({
   loader: () => fetchPosts(),
   staleTime: Infinity,
-})
+});
 ```
 
 Globally:
@@ -132,7 +112,7 @@ Globally:
 const router = createRouter({
   routeTree,
   defaultStaleTime: Infinity,
-})
+});
 ```
 
 ### Pending States (pendingComponent / pendingMs / pendingMinMs)
@@ -146,7 +126,7 @@ export const Route = createFileRoute('/posts')({
   pendingMinMs: 300,
   pendingComponent: () => <div>Loading posts...</div>,
   component: PostsComponent,
-})
+});
 ```
 
 ### Router Context with createRootRouteWithContext (Factory Pattern)
@@ -155,25 +135,25 @@ export const Route = createFileRoute('/posts')({
 
 ```tsx
 // src/routes/__root.tsx
-import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 
 interface MyRouterContext {
-  auth: { userId: string }
-  fetchPosts: () => Promise<Post[]>
+  auth: { userId: string };
+  fetchPosts: () => Promise<Post[]>;
 }
 
 // NOTE: double call — createRootRouteWithContext<Type>()({...})
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: () => <Outlet />,
-})
+});
 ```
 
 Supply the context when creating the router:
 
 ```tsx
 // src/router.tsx
-import { createRouter } from '@tanstack/react-router'
-import { routeTree } from './routeTree.gen'
+import { createRouter } from '@tanstack/react-router';
+import { routeTree } from './routeTree.gen';
 
 const router = createRouter({
   routeTree,
@@ -181,7 +161,7 @@ const router = createRouter({
     auth: { userId: '123' },
     fetchPosts,
   },
-})
+});
 ```
 
 Consume in loaders and beforeLoad:
@@ -190,17 +170,17 @@ Consume in loaders and beforeLoad:
 // src/routes/posts.tsx
 export const Route = createFileRoute('/posts')({
   loader: ({ context: { fetchPosts } }) => fetchPosts(),
-})
+});
 ```
 
 To pass React hook values into the router context, call the hook above `RouterProvider` and inject via the `context` prop:
 
 ```tsx
-import { RouterProvider } from '@tanstack/react-router'
+import { RouterProvider } from '@tanstack/react-router';
 
 function InnerApp() {
-  const auth = useAuth()
-  return <RouterProvider router={router} context={{ auth }} />
+  const auth = useAuth();
+  return <RouterProvider router={router} context={{ auth }} />;
 }
 
 function App() {
@@ -208,7 +188,7 @@ function App() {
     <AuthProvider>
       <InnerApp />
     </AuthProvider>
-  )
+  );
 }
 ```
 
@@ -220,7 +200,7 @@ export const Route = createFileRoute('/posts')({
     fetchPosts: () => fetch('/api/posts').then((r) => r.json()),
   }),
   loader: ({ context: { fetchPosts } }) => fetchPosts(),
-})
+});
 ```
 
 ### Deferred Data Loading
@@ -228,30 +208,27 @@ export const Route = createFileRoute('/posts')({
 Return unawaited promises from the loader for non-critical data. Use the `Await` component to render them:
 
 ```tsx
-import { createFileRoute, Await } from '@tanstack/react-router'
+import { createFileRoute, Await } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/posts/$postId')({
   loader: async ({ params: { postId } }) => {
     // Slow data — do NOT await
-    const slowDataPromise = fetchComments(postId)
+    const slowDataPromise = fetchComments(postId);
     // Fast data — await
-    const post = await fetchPost(postId)
+    const post = await fetchPost(postId);
 
-    return { post, deferredComments: slowDataPromise }
+    return { post, deferredComments: slowDataPromise };
   },
   component: PostComponent,
-})
+});
 
 function PostComponent() {
-  const { post, deferredComments } = Route.useLoaderData()
+  const { post, deferredComments } = Route.useLoaderData();
 
   return (
     <div>
       <h1>{post.title}</h1>
-      <Await
-        promise={deferredComments}
-        fallback={<div>Loading comments...</div>}
-      >
+      <Await promise={deferredComments} fallback={<div>Loading comments...</div>}>
         {(comments) => (
           <ul>
             {comments.map((c) => (
@@ -261,7 +238,7 @@ function PostComponent() {
         )}
       </Await>
     </div>
-  )
+  );
 }
 ```
 
@@ -270,42 +247,38 @@ function PostComponent() {
 `router.invalidate()` forces all active route loaders to re-run and marks all cached data as stale:
 
 ```tsx
-import { useRouter } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router';
 
 function AddPostButton() {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleAdd = async () => {
-    await fetch('/api/posts', { method: 'POST', body: '...' })
-    router.invalidate()
-  }
+    await fetch('/api/posts', { method: 'POST', body: '...' });
+    router.invalidate();
+  };
 
-  return <button onClick={handleAdd}>Add Post</button>
+  return <button onClick={handleAdd}>Add Post</button>;
 }
 ```
 
 For synchronous invalidation (wait until loaders finish):
 
 ```tsx
-await router.invalidate({ sync: true })
+await router.invalidate({ sync: true });
 ```
 
 ### Error Handling
 
 ```tsx
-import {
-  createFileRoute,
-  ErrorComponent,
-  useRouter,
-} from '@tanstack/react-router'
+import { createFileRoute, ErrorComponent, useRouter } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/posts')({
   loader: () => fetchPosts(),
   errorComponent: ({ error, reset }) => {
-    const router = useRouter()
+    const router = useRouter();
 
     if (error instanceof CustomError) {
-      return <div>{error.message}</div>
+      return <div>{error.message}</div>;
     }
 
     return (
@@ -314,15 +287,15 @@ export const Route = createFileRoute('/posts')({
         <button
           onClick={() => {
             // For loader errors, invalidate to re-run loader + reset boundary
-            router.invalidate()
+            router.invalidate();
           }}
         >
           Retry
         </button>
       </div>
-    )
+    );
   },
-})
+});
 ```
 
 ### Loader Parameters
@@ -343,7 +316,7 @@ The `loader` function receives:
 export const Route = createFileRoute('/posts/$postId')({
   loader: ({ params: { postId }, abortController }) =>
     fetchPost(postId, { signal: abortController.signal }),
-})
+});
 ```
 
 ## Common Mistakes
@@ -356,18 +329,18 @@ TanStack Router is **client-first**. Loaders run on the **client** by default. T
 // WRONG — this will crash in the browser
 export const Route = createFileRoute('/posts')({
   loader: async () => {
-    const fs = await import('fs') // Node.js only!
-    return JSON.parse(fs.readFileSync('...')) // fails in browser
+    const fs = await import('fs'); // Node.js only!
+    return JSON.parse(fs.readFileSync('...')); // fails in browser
   },
-})
+});
 
 // CORRECT — loaders run in the browser, use fetch or API calls
 export const Route = createFileRoute('/posts')({
   loader: async () => {
-    const res = await fetch('/api/posts')
-    return res.json()
+    const res = await fetch('/api/posts');
+    return res.json();
   },
-})
+});
 ```
 
 Do NOT put database queries, filesystem access, or server-only code in loaders unless you are using TanStack Start server functions.
@@ -380,7 +353,7 @@ Default `staleTime` is `0`. This means data reloads in the background on every r
 export const Route = createFileRoute('/posts')({
   loader: () => fetchPosts(),
   staleTime: 60_000, // Consider fresh for 1 minute
-})
+});
 ```
 
 ### HIGH: Using reset() instead of router.invalidate() in error components
@@ -390,13 +363,13 @@ export const Route = createFileRoute('/posts')({
 ```tsx
 // WRONG — resets boundary but loader still has stale error
 function PostErrorComponent({ error, reset }) {
-  return <button onClick={reset}>Retry</button>
+  return <button onClick={reset}>Retry</button>;
 }
 
 // CORRECT — re-runs loader and resets the error boundary
 function PostErrorComponent({ error }) {
-  const router = useRouter()
-  return <button onClick={() => router.invalidate()}>Retry</button>
+  const router = useRouter();
+  return <button onClick={() => router.invalidate()}>Retry</button>;
 }
 ```
 
@@ -408,12 +381,12 @@ function PostErrorComponent({ error }) {
 // WRONG — missing second call, passes options to the factory
 const rootRoute = createRootRouteWithContext<{ auth: AuthState }>({
   component: RootComponent,
-})
+});
 
 // CORRECT — factory()({options})
 const rootRoute = createRootRouteWithContext<{ auth: AuthState }>()({
   component: RootComponent,
-})
+});
 ```
 
 ### HIGH: Using React hooks in beforeLoad or loader
@@ -424,22 +397,22 @@ const rootRoute = createRootRouteWithContext<{ auth: AuthState }>()({
 // WRONG — hooks cannot be called outside React components
 export const Route = createFileRoute('/posts')({
   loader: () => {
-    const auth = useAuth() // This will crash!
-    return fetchPosts(auth.userId)
+    const auth = useAuth(); // This will crash!
+    return fetchPosts(auth.userId);
   },
-})
+});
 
 // CORRECT — inject hook values via router context
 // In your App component:
 function InnerApp() {
-  const auth = useAuth()
-  return <RouterProvider router={router} context={{ auth }} />
+  const auth = useAuth();
+  return <RouterProvider router={router} context={{ auth }} />;
 }
 
 // In your route:
 export const Route = createFileRoute('/posts')({
   loader: ({ context: { auth } }) => fetchPosts(auth.userId),
-})
+});
 ```
 
 ### HIGH: Property order affects TypeScript inference
@@ -451,23 +424,23 @@ Router infers types from earlier properties into later ones. Declaring `beforeLo
 export const Route = createFileRoute('/admin')({
   loader: ({ context }) => fetchData(context.user),
   beforeLoad: () => ({ user: getUser() }),
-})
+});
 
 // CORRECT — validateSearch → loaderDeps → beforeLoad → loader
 export const Route = createFileRoute('/admin')({
   beforeLoad: () => ({ user: getUser() }),
   loader: ({ context }) => fetchData(context.user),
-})
+});
 ```
 
 ### HIGH: Returning entire search object from loaderDeps
 
 ```tsx
 // WRONG — loader re-runs on ANY search param change
-loaderDeps: ({ search }) => search
+loaderDeps: ({ search }) => search;
 
 // CORRECT — only re-run when page changes
-loaderDeps: ({ search }) => ({ page: search.page })
+loaderDeps: ({ search }) => ({ page: search.page });
 ```
 
 Returning the whole `search` object means unrelated param changes (e.g., `sortDirection`, `viewMode`) trigger unnecessary reloads because deep equality fails on the entire object.

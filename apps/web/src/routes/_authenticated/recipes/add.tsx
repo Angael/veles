@@ -6,5 +6,5 @@ export const Route = createFileRoute('/_authenticated/recipes/add')({
   component: AddRecipePage,
 
   head: () => ({ meta: [{ title: 'Add recipe' }] }),
-  staticData: { layout: 'focus' },
+  staticData: { layout: 'task', navbar: { backFallback: { to: '/recipes' }, label: 'Add recipe' } },
 });

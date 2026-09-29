@@ -6,5 +6,5 @@ export const Route = createFileRoute('/_authenticated/todos')({
   loader: ({ context }) => context.queryClient.ensureQueryData(notesQueryOptions()),
   component: TodosPage,
   head: () => ({ meta: [{ title: 'Notes' }] }),
-  staticData: { navbar: { label: 'Notes', upTo: { to: '/' } } },
+  staticData: { navbar: { label: 'Notes' } },
 });

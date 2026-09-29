@@ -43,75 +43,62 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
       ...(isProduct ? {} : { imageAction: photo.imageAction, photo: photo.photo }),
     });
     await router.invalidate();
-    await _navigate({ to: '/calories', search: { date: nextDate } });
+    await _navigate({ replace: true, search: { date: nextDate }, to: '/calories' });
   }
 
   return (
     <main className={css.page}>
-      <header className={css.header}>
-        <div>
-          <h1>Edit food log</h1>
+      <TypedForm className={css.form} errorMsg={updateMutation.error?.message} onSubmit={submit}>
+        {isProduct && log.productId ? (
+          <SelectedFoodCard
+            carbs={nutrition.carbs ?? 0}
+            fat={nutrition.fat ?? 0}
+            imageUrl={log.imageUrl}
+            kcal={nutrition.kcal ?? 0}
+            name={log.name}
+            productId={log.productId}
+            protein={nutrition.protein ?? 0}
+          />
+        ) : null}
+
+        {!isProduct ? (
+          <Label text='Name'>
+            <TextInput defaultValue={log.name} name='name' required />
+          </Label>
+        ) : null}
+
+        <Label text='Amount eaten (g)'>
+          <NumberInput
+            className={css.amountInput}
+            inputClassName={css.amountValue}
+            min={0}
+            name='grams'
+            onValueChange={changeGrams}
+            value={grams}
+          />
+        </Label>
+
+        {!isProduct ? <KcalMacrosForm onValueChange={changeNutrition} values={nutrition} /> : null}
+
+        {!isProduct ? (
+          <PhotoPicker
+            disabled={isPending}
+            existingUrl={log.imageUrl}
+            onChange={setPhoto}
+            value={photo}
+          />
+        ) : null}
+
+        <Label text='Date'>
+          <DateInput defaultValue={log.date} name='date' required />
+        </Label>
+
+        <div className={css.logActions}>
+          <Btn disabled={isPending} loading={updateMutation.isPending} type='submit'>
+            Save
+          </Btn>
         </div>
-      </header>
-
-      {isProduct && log.productId ? (
-        <SelectedFoodCard
-          carbs={nutrition.carbs ?? 0}
-          fat={nutrition.fat ?? 0}
-          imageUrl={log.imageUrl}
-          kcal={nutrition.kcal ?? 0}
-          name={log.name}
-          productId={log.productId}
-          protein={nutrition.protein ?? 0}
-        />
-      ) : null}
-
-      <section className={css.panel}>
-        <TypedForm className={css.form} errorMsg={updateMutation.error?.message} onSubmit={submit}>
-          {!isProduct ? (
-            <Label text='Name'>
-              <TextInput defaultValue={log.name} name='name' required />
-            </Label>
-          ) : null}
-
-          <div className={css.logFields}>
-            <Label text='Date'>
-              <DateInput defaultValue={log.date} name='date' required />
-            </Label>
-
-            <Label text='Amount eaten (g)'>
-              <NumberInput min={0} name='grams' onValueChange={changeGrams} value={grams} />
-            </Label>
-          </div>
-
-          {!isProduct ? (
-            <KcalMacrosForm onValueChange={changeNutrition} values={nutrition} />
-          ) : null}
-
-          {!isProduct ? (
-            <PhotoPicker
-              disabled={isPending}
-              existingUrl={log.imageUrl}
-              onChange={setPhoto}
-              value={photo}
-            />
-          ) : null}
-
-          <div className={css.logActions}>
-            <Btn
-              disabled={isPending}
-              onClick={() => router.history.back()}
-              type='button'
-              variant='ghost'
-            >
-              Cancel
-            </Btn>
-            <Btn disabled={isPending} loading={updateMutation.isPending} type='submit'>
-              Save
-            </Btn>
-          </div>
-        </TypedForm>
-      </section>
+      </TypedForm>
     </main>
   );
 }

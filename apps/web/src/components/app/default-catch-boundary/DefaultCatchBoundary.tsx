@@ -21,12 +21,7 @@ export function DefaultCatchBoundary(props: ErrorComponentProps) {
 
   return (
     <main className={css.page}>
-      <Card
-        as='section'
-        aria-labelledby='catch-boundary-title'
-        className={css.panel}
-        variant='danger'
-      >
+      <Card as='section' aria-labelledby='catch-boundary-title' className={css.panel} tone='danger'>
         <div className={css.copy}>
           <h1 id='catch-boundary-title'>Something went wrong</h1>
         </div>
