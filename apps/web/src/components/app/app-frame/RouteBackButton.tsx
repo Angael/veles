@@ -10,13 +10,14 @@ import { ChevronLeftIcon } from 'lucide-react';
 import type { MouseEvent } from 'react';
 import { Btn, type BtnVariant } from '@/components/ui/btn/Btn';
 import type { NavbarTarget } from '@/lib/routing/staticRouteData';
+import { markBackTransition } from '@/lib/viewTransitions'; // view-transitions:
 
 const leafMatchOptions = {
   select: (state: RouterState<RegisteredRouter['routeTree']>) => state.matches.at(-1),
 };
 
 /** Resolves the current route's configured `upTo` fallback, if any. */
-export function useRouteUpTarget(): NavbarTarget | undefined {
+function useRouteUpTarget(): NavbarTarget | undefined {
   const match = useRouterState(leafMatchOptions);
   const upTo = match?.staticData.navbar?.upTo;
   if (typeof upTo !== 'function') return upTo;
@@ -41,9 +42,9 @@ export function RouteBackButton({ className, variant = 'outlineMain' }: Props) {
   if (!target) return null;
 
   function goBack(event: MouseEvent) {
-    if (!canGoBack || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) {
-      return;
-    }
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) return;
+    markBackTransition(); // view-transitions:
+    if (!canGoBack) return;
     event.preventDefault();
     router.history.back();
   }

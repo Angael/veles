@@ -1,0 +1,64 @@
+/* view-transitions: removable file; types come from lib/viewTransitions.ts. */
+
+/* Keep the bottom navigation still while pages slide beneath it. */
+nav[aria-label='Primary mobile navigation'] {
+  view-transition-name: vt-mobile-nav;
+}
+
+::view-transition-group(vt-mobile-nav) {
+  animation: none;
+}
+
+html:active-view-transition-type(nav-forward, nav-back) {
+  &::view-transition-old(root),
+  &::view-transition-new(root) {
+    animation-duration: 180ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+
+html:active-view-transition-type(nav-forward) {
+  &::view-transition-old(root) {
+    animation-name: vt-fade-out;
+  }
+
+  &::view-transition-new(root) {
+    animation-name: vt-enter-from-right;
+  }
+}
+
+html:active-view-transition-type(nav-back) {
+  &::view-transition-old(root) {
+    animation-name: vt-exit-to-right;
+  }
+
+  &::view-transition-new(root) {
+    animation-name: vt-fade-in;
+  }
+}
+
+@keyframes vt-enter-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@keyframes vt-exit-to-right {
+  to {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}

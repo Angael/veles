@@ -1,5 +1,6 @@
 @import './theme.css';
 @import './breakpoints.css';
+@import './view-transitions.css'; /* view-transitions: */
 
 :root {
   font-family: var(--font-sans);
