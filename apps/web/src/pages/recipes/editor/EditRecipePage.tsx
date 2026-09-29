@@ -1,9 +1,8 @@
 import { useNavigate, useRouter } from '@tanstack/react-router';
-import { SaveIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
-import { ErrorCard } from '@/components/ui/error-card/ErrorCard';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import type { RecipeLibraryItem } from '../recipes.api';
@@ -23,10 +22,11 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
   const { markDirty, markSaved } = useUnsavedChangesGuard();
 
   return (
-    <main className={css.page}>
-      <Card as='section' className={css.card}>
+    <main>
+      <Card as='section'>
         <TypedForm
           className={css.form}
+          errorMsg={saveMutation.error?.message}
           onSubmit={() => {
             saveMutation.mutate(
               { data: { ...draft, id: recipe.id } },
@@ -57,27 +57,11 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
             Photos stay as they are for now and are not editable here.
           </p>
 
-          {saveMutation.error ? (
-            <ErrorCard
-              message={
-                saveMutation.error instanceof Error
-                  ? saveMutation.error.message
-                  : 'Recipe update failed'
-              }
-              title='Recipe not saved'
-            />
-          ) : null}
-
-          <div className={css.actions}>
-            <Btn
-              icon={<SaveIcon aria-hidden='true' size={18} />}
-              loading={saveMutation.isPending}
-              type='submit'
-              variant='main'
-            >
-              Save changes
+          <FormSubmitRow>
+            <Btn loading={saveMutation.isPending} type='submit'>
+              Save
             </Btn>
-          </div>
+          </FormSubmitRow>
         </TypedForm>
       </Card>
     </main>

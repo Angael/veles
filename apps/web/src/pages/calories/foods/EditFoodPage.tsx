@@ -4,8 +4,6 @@ import { useUpdateFoodProductMutation } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 import { todayLocalDate } from '@/lib/dateOnly';
-import { Card } from '@/components/ui/card/Card';
-import css from '../CalorieFlows.module.css';
 
 export function EditFoodPage({ food }: { food: CalorieFood }) {
   const navigate = useNavigate();
@@ -19,18 +17,15 @@ export function EditFoodPage({ food }: { food: CalorieFood }) {
   }
 
   return (
-    <main className={css.page}>
-      <p className={css.lead}>Changes apply to future diary entries only.</p>
-      <Card as='section' className={css.panel}>
-        <FoodEditor
-          errorMsg={updateMutation.error?.message}
-          food={food}
-          onDirty={markDirty}
-          onSubmit={save}
-          pending={updateMutation.isPending}
-          submitLabel='Save food'
-        />
-      </Card>
+    <main>
+      <FoodEditor
+        errorMsg={updateMutation.error?.message}
+        food={food}
+        onDirty={markDirty}
+        onSubmit={save}
+        pending={updateMutation.isPending}
+        submitLabel='Save'
+      />
     </main>
   );
 }

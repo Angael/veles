@@ -104,11 +104,6 @@
   gap: var(--space-xs);
 }
 
-.weightInputField {
-  font-size: var(--text-md);
-  font-weight: var(--font-weight-semibold);
-}
-
 .tableFrame {
   min-width: 0;
   overflow-x: auto;

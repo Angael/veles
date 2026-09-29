@@ -3,10 +3,11 @@ import { ClipboardIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { Label } from '@/components/ui/label/Label';
 import { TextareaInput } from '@/components/ui/textarea-input/TextareaInput';
-import { toastManager } from '@/components/ui/toast/toastManager';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
+import { toastManager } from '@/components/ui/toast/toastManager';
 import css from './WeightEntryPages.module.css';
 import { parseWeightEntries } from './parseWeightEntries';
 import { MAX_WEIGHT_IMPORT_ENTRIES } from './weight.api';
@@ -28,31 +29,27 @@ export function ImportWeightPage() {
   const importStatus = getImportStatus(parsed.entries.length, parsed.errors, hasTooManyEntries);
 
   return (
-    <main>
-      <Card as='section' className={css.importCard}>
-        <p className={css.intro}>
-          Paste one measurement per line. Existing entries on the same dates are replaced.
-        </p>
-
-        <div className={css.promptBlock}>
-          <div>
-            <strong>Need help formatting your data?</strong>
-            <p>Give the prompt below and your exported data to your preferred AI assistant.</p>
-          </div>
-          <pre>{aiPrompt}</pre>
-          <Btn
-            icon={<ClipboardIcon aria-hidden='true' />}
-            onClick={() => {
-              void copyPrompt(aiPrompt);
-            }}
-            size='sm'
-            type='button'
-            variant='outlineMain'
-          >
-            Copy prompt
-          </Btn>
+    <main className={css.page}>
+      <div className={css.promptBlock}>
+        <div>
+          <strong>Need help formatting your data?</strong>
+          <p>Give the prompt below and your exported data to your preferred AI assistant.</p>
         </div>
+        <pre>{aiPrompt}</pre>
+        <Btn
+          icon={<ClipboardIcon aria-hidden='true' />}
+          onClick={() => {
+            void copyPrompt(aiPrompt);
+          }}
+          size='sm'
+          type='button'
+          variant='outlineMain'
+        >
+          Copy prompt
+        </Btn>
+      </div>
 
+      <Card as='section'>
         <TypedForm
           className={css.form}
           onSubmit={() => {
@@ -91,18 +88,17 @@ export function ImportWeightPage() {
           >
             {importStatus}
           </div>
-          <div className={css.formActions}>
+          <FormSubmitRow>
             <Btn
               disabled={
                 parsed.entries.length === 0 || parsed.errors.length > 0 || hasTooManyEntries
               }
               loading={mutation.isPending}
-              size='sm'
               type='submit'
             >
               Import {parsed.entries.length || ''}
             </Btn>
-          </div>
+          </FormSubmitRow>
         </TypedForm>
       </Card>
     </main>

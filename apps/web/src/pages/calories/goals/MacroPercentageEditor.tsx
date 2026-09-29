@@ -1,4 +1,5 @@
 import { Btn } from '@/components/ui/btn/Btn';
+import { Card } from '@/components/ui/card/Card';
 import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { macroPercentageTotal, type MacroPercentages } from './calorieGoalCalculator';
@@ -25,7 +26,7 @@ export function MacroPercentageEditor({ onChange, percentages }: MacroPercentage
   }
 
   return (
-    <section className={css.method}>
+    <Card as='section' className={css.method}>
       <div className={css.methodHeading}>
         <h2>
           <span aria-hidden='true'>2.</span> Split calories into macros
@@ -84,6 +85,6 @@ export function MacroPercentageEditor({ onChange, percentages }: MacroPercentage
       <p aria-live='polite' className={hasValidTotal ? css.validTotal : css.invalidTotal}>
         Total: {total.toFixed(1).replace('.0', '')}%{hasValidTotal ? '' : ' — adjust to 100%'}
       </p>
-    </section>
+    </Card>
   );
 }

@@ -1,13 +1,14 @@
 @import '../../../styles/breakpoints.css';
 
+.sections {
+  display: grid;
+  gap: var(--space-md);
+}
+
 .method,
 .currentGoals {
   display: grid;
   gap: var(--space-md);
-  padding: var(--space-lg);
-  border: var(--border-width) solid var(--c-border);
-  border-radius: var(--radius-sm);
-  background: var(--c-surface);
 }
 
 .methodHeading {
@@ -71,18 +72,6 @@
   color: var(--c-danger-text);
 }
 
-.currentGoals {
-  gap: var(--space-lg);
-  border-color: var(--c-primary-border-soft);
-  background:
-    linear-gradient(135deg, var(--c-primary-surface) 0%, transparent 48%), var(--c-surface-strong);
-  box-shadow: var(--shadow-card-primary);
-
-  > button {
-    justify-self: end;
-  }
-}
-
 .currentGoalsHeading {
   h2 {
     display: flex;
@@ -102,11 +91,6 @@
 }
 
 @media (--phone) {
-  .method,
-  .currentGoals {
-    padding: var(--space-md);
-  }
-
   .calculatorGrid,
   .percentGrid {
     grid-template-columns: 1fr;
@@ -114,9 +98,5 @@
 
   .activityField {
     grid-column: auto;
-  }
-
-  .currentGoals > button {
-    width: 100%;
   }
 }

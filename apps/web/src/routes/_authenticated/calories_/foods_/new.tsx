@@ -6,7 +6,10 @@ import { caloriesDayTarget, normalizeCalorieDate } from '@/pages/calories/calori
 export const Route = createFileRoute('/_authenticated/calories_/foods_/new')({
   validateSearch: type({ 'barcode?': 'string', 'date?': 'string', 'name?': 'string' }),
   component: Component,
-  staticData: { layout: 'task', navbar: { backFallback: caloriesDayTarget, label: 'Create food' } },
+  staticData: {
+    layout: 'task',
+    navbar: { backFallback: caloriesDayTarget, label: 'Create food product' },
+  },
 });
 
 function Component() {

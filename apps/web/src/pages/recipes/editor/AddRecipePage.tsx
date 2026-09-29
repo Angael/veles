@@ -1,12 +1,10 @@
 import type { UseNavigateResult } from '@tanstack/react-router';
-import clsx from 'clsx';
-import { SendHorizontalIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
-import { ErrorCard } from '@/components/ui/error-card/ErrorCard';
-import { UploadTileGrid } from './UploadTileGrid';
+import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
+import { UploadTileGrid } from './UploadTileGrid';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import css from './AddRecipePage.module.css';
@@ -59,48 +57,37 @@ export function AddRecipePage() {
   }
 
   return (
-    <main className={css.page}>
-      <section className={css.content}>
-        <Card as='section' className={css.formCard}>
-          <TypedForm className={css.form} onSubmit={handleSubmit}>
-            <div className={css.formBody}>
-              <RecipeForm
-                draft={draft}
-                onDraftChange={(nextDraft) => {
-                  markDirty();
-                  setDraft((current) => ({ ...current, ...nextDraft }));
-                }}
-              />
+    <main>
+      <Card as='section'>
+        <TypedForm className={css.form} errorMsg={error} onSubmit={handleSubmit}>
+          <RecipeForm
+            draft={draft}
+            onDraftChange={(nextDraft) => {
+              markDirty();
+              setDraft((current) => ({ ...current, ...nextDraft }));
+            }}
+          />
 
-              <div className={clsx(css.field, css.uploadFieldWrap)}>
-                <span>Photos</span>
-                <UploadTileGrid
-                  files={draft.selectedFiles}
-                  maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES}
-                  maxItems={RECIPE_UPLOAD_MAX_PHOTO_COUNT}
-                  onFilesChange={(selectedFiles) => {
-                    markDirty();
-                    setDraft((current) => ({ ...current, selectedFiles }));
-                  }}
-                />
-              </div>
-            </div>
+          <div className={css.photos}>
+            <span>Photos</span>
+            <UploadTileGrid
+              files={draft.selectedFiles}
+              maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES}
+              maxItems={RECIPE_UPLOAD_MAX_PHOTO_COUNT}
+              onFilesChange={(selectedFiles) => {
+                markDirty();
+                setDraft((current) => ({ ...current, selectedFiles }));
+              }}
+            />
+          </div>
 
-            {error ? <ErrorCard message={error} title='Recipe not saved' /> : null}
-
-            <div className={css.actions}>
-              <Btn
-                icon={<SendHorizontalIcon aria-hidden='true' size={18} />}
-                loading={createMutation.isPending}
-                type='submit'
-                variant='main'
-              >
-                Save recipe
-              </Btn>
-            </div>
-          </TypedForm>
-        </Card>
-      </section>
+          <FormSubmitRow>
+            <Btn loading={createMutation.isPending} type='submit'>
+              Add recipe
+            </Btn>
+          </FormSubmitRow>
+        </TypedForm>
+      </Card>
     </main>
   );
 }
