@@ -14,16 +14,18 @@
   gap: var(--space-sm);
 }
 
+/* Reserves the Select all button's height so selecting doesn't shift the list below. */
 .logHeading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-md);
+  min-height: var(--button-min-height);
   padding: 0 var(--space-lg);
 }
 
 .logHeading button {
-  min-height: 44px;
+  min-height: var(--button-min-height);
 }
 
 .logHeading h2 {

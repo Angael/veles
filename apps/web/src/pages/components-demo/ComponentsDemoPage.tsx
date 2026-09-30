@@ -371,7 +371,7 @@ export function ComponentsDemoPage() {
         <h2>FloatingButton and SelectionBar</h2>
         <p>
           Both stay fixed to the viewport. SelectionBar replaces the FloatingButton while items are
-          selected.
+          selected, and takes over the mobile navbar on phones.
         </p>
         <Btn onClick={() => setDemoSelecting((current) => !current)} variant='outlineMain'>
           {demoSelecting ? 'Clear selection' : 'Select 3 items'}

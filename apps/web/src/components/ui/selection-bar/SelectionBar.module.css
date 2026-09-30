@@ -1,17 +1,7 @@
-/* Desktop: sits exactly where FloatingButton does so the swap doesn't move the user's target. */
 .bar {
-  position: fixed;
-  right: max(var(--space-md), calc((100vw - 1100px) / 2));
-  bottom: var(--space-md);
-  z-index: 2;
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  padding: 0.25rem;
-  border: var(--border-width) solid var(--c-border-popup);
-  border-radius: var(--radius-pill);
-  background: var(--c-surface-solid);
-  box-shadow: var(--shadow-popup);
   animation: bar-in var(--duration-fast) var(--ease-out);
 }
 
@@ -33,17 +23,30 @@
   }
 }
 
-@media (--phone) {
-  /* Pinned to the page content edges instead of growing leftwards from the right. */
+/* Desktop: sits exactly where FloatingButton does so the swap doesn't move the user's target. */
+@media not (--phone) {
   .bar {
-    right: var(--space-xs);
-    bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
-    left: var(--space-xs);
+    position: fixed;
+    right: max(var(--space-md), calc((100vw - 1100px) / 2));
+    bottom: var(--space-md);
+    z-index: 2;
+    padding: 0.25rem;
+    border: var(--border-width) solid var(--c-border-popup);
+    border-radius: var(--radius-pill);
+    background: var(--c-surface-solid);
+    box-shadow: var(--shadow-popup);
   }
+}
 
-  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
-  :global(.focusShell) .bar {
-    bottom: max(var(--space-lg), env(safe-area-inset-bottom, 0px));
+/* Phones: MobileDock supplies the navbar's slot and surface. */
+@media (--phone) {
+  .bar {
+    gap: 0.25rem;
+
+    /* Beats Btn's size class so the bar keeps the navbar's height. */
+    & > :is(a, button) {
+      --btn-height: var(--dock-item-height);
+    }
   }
 
   .collapsible {

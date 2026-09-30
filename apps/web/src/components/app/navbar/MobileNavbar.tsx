@@ -1,6 +1,8 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
 import { Link, useRouterState } from '@tanstack/react-router';
+import clsx from 'clsx';
+import dock from '@/components/ui/mobile-dock/MobileDock.module.css';
 import type { SessionUser } from '@/lib/auth/session.api';
 import css from './MobileNavbar.module.css';
 import { NAVBAR_ITEMS } from './navbarItems';
@@ -19,7 +21,7 @@ export function MobileNavbar({ user }: { user: SessionUser | null }) {
   }
 
   return (
-    <nav aria-label='Primary mobile navigation' className={css.wrapper}>
+    <nav aria-label='Primary mobile navigation' className={clsx(dock.dock, css.wrapper)}>
       <ToggleGroup
         aria-label='Primary mobile navigation'
         className={css.group}

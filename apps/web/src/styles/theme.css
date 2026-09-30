@@ -122,6 +122,8 @@
   --space-xl: 2rem;
 
   --button-min-height: 44px;
+  /* Control height inside the phone bottom dock (mobile navbar, selection bar). */
+  --dock-item-height: 2.2rem;
 
   --radius-xs: 14px;
   --radius-sm: 16px;
