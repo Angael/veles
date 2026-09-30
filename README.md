@@ -32,6 +32,13 @@ pnpm check
 pnpm check:fix
 ```
 
+Security fixes for transitive dependencies are pinned in `pnpm-workspace.yaml`
+under `overrides`. The `brace-expansion` overrides preserve the 1.x and 5.x
+dependency lines while fixing recursion and quadratic-time denial-of-service
+advisories. After changing overrides, regenerate the lockfile with
+`pnpm install --no-frozen-lockfile`, then run `pnpm audit --audit-level high`
+and `pnpm check:fix`.
+
 Database commands remain available from the repository root. Migrations are an explicit deployment step and are never run by the web or worker containers.
 
 ```bash
