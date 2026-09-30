@@ -8,7 +8,6 @@ import { CalendarDaysIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-reac
 import type { CalorieDashboard, CalorieDashboardDay } from '../calories.api';
 import { calorieDashboardQueryOptions } from '../calories.query';
 import { CalorieOverview } from './CalorieOverview';
-import { LogFoodMenu } from './LogFoodMenu';
 import { CALORIE_DATE_FORMAT, calorieWeekDates, calorieWeekStart } from '../calorieHelpers';
 import { todayLocalDate } from '@/lib/dateOnly';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -46,8 +45,6 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
   }
   return (
     <main className={css.page}>
-      <LogFoodMenu date={date} />
-
       <div className={css.dateControls} data-appear>
         <Btn
           className={css.todayButton}
@@ -134,6 +131,7 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
       <CalorieOverview
         date={date}
         goal={selectedDay.goal}
+        key={date}
         logs={selectedDay.logs}
         totals={selectedDay.totals}
       />

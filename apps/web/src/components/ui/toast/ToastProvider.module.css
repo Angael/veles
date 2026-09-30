@@ -169,10 +169,42 @@
   }
 }
 
+/* Phones: the bottom edge belongs to the navbar and floating actions, so toasts drop in from the
+   top like native notifications, stack downwards, and swipe up to dismiss. */
 @media (--phone) {
   .viewport {
-    right: var(--space-sm);
-    bottom: calc(var(--space-sm) + env(safe-area-inset-bottom));
-    width: calc(100vw - (var(--space-sm) * 2));
+    top: calc(var(--space-xs) + env(safe-area-inset-top));
+    right: var(--space-xs);
+    bottom: auto;
+    width: calc(100vw - (var(--space-xs) * 2));
+  }
+
+  .toast {
+    --toast-offset-expanded-y: calc(
+      var(--toast-offset-y) + (var(--toast-index) * var(--toast-gap)) +
+        var(--toast-swipe-movement-y)
+    );
+
+    top: 0;
+    bottom: auto;
+    transform: translateX(var(--toast-swipe-movement-x))
+      translateY(
+        calc(
+          var(--toast-swipe-movement-y) + (var(--toast-index) * var(--toast-peek)) +
+            (var(--toast-shrink) * var(--toast-current-height))
+        )
+      )
+      scale(var(--toast-scale));
+    transform-origin: top center;
+
+    &[data-starting-style],
+    &[data-ending-style] {
+      transform: translateY(-125%);
+    }
+
+    &::after {
+      top: auto;
+      bottom: 100%;
+    }
   }
 }

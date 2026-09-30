@@ -4,14 +4,18 @@ import { FoodSummary } from '../FoodSummary';
 import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogMutation } from '../calories.query';
 import { Btn } from '@/components/ui/btn/Btn';
+import { Checkbox } from '@/components/ui/checkbox/Checkbox';
 import { ListItem } from '@/components/ui/list/List';
+import css from './LoggedFood.module.css';
 
 type LoggedFoodProps = {
   date: string;
   entry: CalorieLog;
+  onSelectedChange: (id: string, selected: boolean) => void;
+  selected: boolean;
 };
 
-export function LoggedFood({ date, entry }: LoggedFoodProps) {
+export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFoodProps) {
   const deleteMutation = useDeleteFoodLogMutation();
 
   function remove() {
@@ -19,7 +23,7 @@ export function LoggedFood({ date, entry }: LoggedFoodProps) {
   }
 
   return (
-    <ListItem style={{ padding: 0 }}>
+    <ListItem className={css.item} selected={selected} style={{ padding: 0 }}>
       <FoodSummary
         action={
           <Btn
@@ -37,6 +41,16 @@ export function LoggedFood({ date, entry }: LoggedFoodProps) {
         fat={entry.fat ?? 0}
         imageUrl={entry.imageUrl}
         kcal={entry.kcal}
+        mediaOverlay={
+          <label className={css.selectTarget}>
+            <Checkbox
+              aria-label={`Select ${entry.name}`}
+              checked={selected}
+              className={css.checkbox}
+              onCheckedChange={(checked) => onSelectedChange(entry.id, checked)}
+            />
+          </label>
+        }
         meta={entry.grams === null ? 'Custom entry' : `${Math.round(entry.grams)} g`}
         name={
           <Link params={{ logId: entry.id }} to='/calories/logs/$logId'>

@@ -1,0 +1,61 @@
+/* Desktop: sits exactly where FloatingButton does so the swap doesn't move the user's target. */
+.bar {
+  position: fixed;
+  right: max(var(--space-md), calc((100vw - 1100px) / 2));
+  bottom: var(--space-md);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.25rem;
+  border: var(--border-width) solid var(--c-border-popup);
+  border-radius: var(--radius-pill);
+  background: var(--c-surface-solid);
+  box-shadow: var(--shadow-popup);
+  animation: bar-in var(--duration-fast) var(--ease-out);
+}
+
+.count {
+  flex: 1;
+  min-width: 0;
+  padding-inline-end: var(--space-sm);
+  overflow: hidden;
+  color: var(--c-text-strong);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes bar-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (--phone) {
+  /* Pinned to the page content edges instead of growing leftwards from the right. */
+  .bar {
+    right: var(--space-xs);
+    bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+    left: var(--space-xs);
+  }
+
+  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+  :global(.focusShell) .bar {
+    bottom: max(var(--space-lg), env(safe-area-inset-bottom, 0px));
+  }
+
+  .collapsible {
+    --btn-padding-x: 0;
+    --btn-min-width: var(--btn-height);
+
+    flex: none;
+    width: var(--btn-height);
+    gap: 0;
+  }
+
+  .label {
+    display: none;
+  }
+}
