@@ -72,6 +72,55 @@ export const foodLogs = pgTable(
   ],
 );
 
+/** Pending batch of food logs one user sent to a connected user; removed once accepted or declined. */
+export const foodLogShares = pgTable(
+  'food_log_share',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`uuidv7()`),
+    senderUserId: text('sender_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    recipientUserId: text('recipient_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (table) => [
+    index('food_log_share_recipient_user_id_idx').on(table.recipientUserId),
+    index('food_log_share_sender_user_id_idx').on(table.senderUserId),
+  ],
+);
+
+/** Nutrition snapshots copied from the sender's logs, so later edits or deletions don't change the offer. */
+export const foodLogShareItems = pgTable(
+  'food_log_share_item',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`uuidv7()`),
+    shareId: uuid('share_id')
+      .notNull()
+      .references(() => foodLogShares.id, { onDelete: 'cascade' }),
+    productId: uuid('product_id').references(() => foodProducts.id, { onDelete: 'set null' }),
+    imageUploadObjectId: text('image_upload_object_id').references(() => uploadObjects.id, {
+      onDelete: 'restrict',
+    }),
+    name: text('name').notNull(),
+    gramsHundredths: integer('grams_hundredths'),
+    kcalHundredths: integer('kcal_hundredths').notNull(),
+    proteinHundredths: integer('protein_hundredths'),
+    fatHundredths: integer('fat_hundredths'),
+    carbsHundredths: integer('carbs_hundredths'),
+  },
+  (table) => [
+    index('food_log_share_item_share_id_idx').on(table.shareId),
+    index('food_log_share_item_product_id_idx').on(table.productId),
+    index('food_log_share_item_image_upload_object_id_idx').on(table.imageUploadObjectId),
+  ],
+);
+
 export const calorieGoals = pgTable(
   'calorie_goal',
   {

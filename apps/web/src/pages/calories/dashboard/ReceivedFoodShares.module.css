@@ -1,0 +1,40 @@
+@import '../../../styles/breakpoints.css';
+
+/* Rows run edge to edge so they line up with the user's own logged products. */
+.share {
+  display: grid;
+  overflow: hidden;
+  padding: 0;
+
+  @media (--phone) {
+    padding: 0;
+  }
+
+  & li:last-child {
+    border-block-end: 0;
+  }
+}
+
+.heading {
+  padding: var(--space-sm) var(--space-md);
+  color: var(--c-text-strong);
+  font-size: var(--text-md);
+  font-weight: var(--font-weight-semibold);
+  text-wrap: balance;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-block-start: var(--border-width) solid var(--c-border);
+}
+
+@media (--phone) {
+  .heading,
+  .actions {
+    padding-inline: var(--space-sm);
+  }
+}

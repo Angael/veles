@@ -2,10 +2,11 @@ import { hash, randomBytes } from 'node:crypto';
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { and, eq, inArray, or } from 'drizzle-orm';
-import { connectionInvitations, userConnections, users } from '@veles/db/schema';
+import { and, eq, or } from 'drizzle-orm';
+import { connectionInvitations, foodLogShares, userConnections, users } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
+import { getConnectedUsers } from '@/server/getConnectedUsers.server';
 import { requireSession } from '@/server/getSession.server';
 import { log } from '@/server/logger.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
@@ -22,16 +23,8 @@ export const getConnections = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getConnections')])
   .handler(async () => {
     const session = await requireSession();
-    const [connectionRows, incomingRows, outgoingRows] = await Promise.all([
-      db
-        .select()
-        .from(userConnections)
-        .where(
-          or(
-            eq(userConnections.userLowId, session.user.id),
-            eq(userConnections.userHighId, session.user.id),
-          ),
-        ),
+    const [connectedUsers, incomingRows, outgoingRows] = await Promise.all([
+      getConnectedUsers(session.user.id),
       db
         .select({
           createdAt: connectionInvitations.createdAt,
@@ -53,15 +46,6 @@ export const getConnections = createServerFn({ method: 'GET' })
         .from(connectionInvitations)
         .where(eq(connectionInvitations.inviterUserId, session.user.id)),
     ]);
-    const connectedUserIds = connectionRows.map((connection) =>
-      connection.userLowId === session.user.id ? connection.userHighId : connection.userLowId,
-    );
-    const connectedUsers = connectedUserIds.length
-      ? await db
-          .select({ email: users.email, id: users.id, image: users.image, name: users.name })
-          .from(users)
-          .where(inArray(users.id, connectedUserIds))
-      : [];
 
     return { connections: connectedUsers, incoming: incomingRows, outgoing: outgoingRows };
   });
@@ -238,6 +222,22 @@ export const disconnectUser = createServerFn({ method: 'POST' })
           and(
             eq(userConnections.userLowId, connection.userLowId),
             eq(userConnections.userHighId, connection.userHighId),
+          ),
+        );
+
+      // Pending food shares were sent under the connection being revoked.
+      await tx
+        .delete(foodLogShares)
+        .where(
+          or(
+            and(
+              eq(foodLogShares.senderUserId, session.user.id),
+              eq(foodLogShares.recipientUserId, data.userId),
+            ),
+            and(
+              eq(foodLogShares.senderUserId, data.userId),
+              eq(foodLogShares.recipientUserId, session.user.id),
+            ),
           ),
         );
 
