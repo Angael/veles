@@ -4,6 +4,7 @@ import { DailySummary } from './DailySummary';
 import { DeleteSelectedButton } from './DeleteSelectedButton';
 import { LogFoodMenu } from './LogFoodMenu';
 import { LoggedFood } from './LoggedFood';
+import { MultiplyLogsDialog } from './MultiplyLogsDialog';
 import { Btn } from '@/components/ui/btn/Btn';
 import { List } from '@/components/ui/list/List';
 import { SelectionBar } from '@/components/ui/selection-bar/SelectionBar';
@@ -38,6 +39,7 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
           count={selectedLogs.length}
           onClear={clearSelection}
         >
+          <MultiplyLogsDialog logs={selectedLogs} onMultiplied={clearSelection} />
           <DeleteSelectedButton logs={selectedLogs} onDeleted={clearSelection} />
         </SelectionBar>
       ) : (

@@ -1,0 +1,19 @@
+.factorRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.factorInput {
+  flex: 1 1 8rem;
+}
+
+.kcalPreview {
+  color: var(--c-muted);
+  font-variant-numeric: tabular-nums;
+
+  & strong {
+    color: var(--c-text-strong);
+  }
+}

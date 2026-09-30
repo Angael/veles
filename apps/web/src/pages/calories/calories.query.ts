@@ -7,6 +7,7 @@ import {
   getFoodProduct,
   getFoodProducts,
   lookupFoodByBarcode,
+  multiplyFoodLogs,
   recordCustomCalories,
   recordFood,
   updateFoodLog,
@@ -130,6 +131,16 @@ export function useDeleteFoodLogsMutation() {
       invalidateQueryKey: calorieDashboardKey,
     },
     mutationFn: (ids: string[]) => deleteFoodLogs({ data: { ids } }),
+  });
+}
+
+export function useMultiplyFoodLogsMutation() {
+  return useMutation({
+    meta: {
+      error: { title: 'Could not multiply products' },
+      invalidateQueryKey: calorieDashboardKey,
+    },
+    mutationFn: (data: { factor: number; ids: string[] }) => multiplyFoodLogs({ data }),
   });
 }
 
