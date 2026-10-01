@@ -3,7 +3,6 @@ import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogsMutation } from '../calories.query';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog/Dialog';
-import { productCount } from './selectionText';
 import { SelectionBarAction } from '@/components/ui/selection-bar/SelectionBar';
 
 type Props = {
@@ -15,7 +14,6 @@ type Props = {
 export function DeleteLogsDialog({ logs, onDeleted }: Props) {
   const [open, setOpen] = useState(false);
   const deleteMutation = useDeleteFoodLogsMutation();
-  const products = productCount(logs.length);
   const kcal = Math.round(logs.reduce((sum, entry) => sum + entry.kcal, 0));
 
   function confirm() {
@@ -46,7 +44,7 @@ export function DeleteLogsDialog({ logs, onDeleted }: Props) {
       okLabel='Delete'
       onOpenChange={setOpen}
       open={open}
-      title={`Delete ${products}?`}
+      title={`Delete ${logs.length} ${logs.length === 1 ? 'product' : 'products'}?`}
       trigger={
         <SelectionBarAction
           icon={<Trash2Icon aria-hidden='true' />}

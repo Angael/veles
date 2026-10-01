@@ -24,10 +24,6 @@
   padding: 0 var(--space-lg);
 }
 
-.logHeading button {
-  min-height: var(--button-min-height);
-}
-
 .logHeading h2 {
   font-size: var(--text-lg-dynamic);
   text-wrap: balance;
