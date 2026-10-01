@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { CalorieGoal, CalorieLog, CalorieTotals } from '../calories.api';
 import { DailySummary } from './DailySummary';
-import { DeleteLogsDialog } from './DeleteLogsDialog';
+import { DeleteSelectedButton } from './DeleteSelectedButton';
 import { LogFoodMenu } from './LogFoodMenu';
 import { LoggedFood } from './LoggedFood';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -38,7 +38,7 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
           count={selectedLogs.length}
           onClear={clearSelection}
         >
-          <DeleteLogsDialog logs={selectedLogs} onDeleted={clearSelection} />
+          <DeleteSelectedButton logs={selectedLogs} onDeleted={clearSelection} />
         </SelectionBar>
       ) : (
         <LogFoodMenu date={date} />

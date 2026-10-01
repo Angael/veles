@@ -19,8 +19,8 @@ type Props = {
   onDeleted: () => void;
 };
 
-/** Confirms and deletes every selected log in one request. */
-export function DeleteLogsDialog({ logs, onDeleted }: Props) {
+/** Selection bar Delete action; confirms in a dialog, then deletes every selected log in one request. */
+export function DeleteSelectedButton({ logs, onDeleted }: Props) {
   const [open, setOpen] = useState(false);
   const deleteMutation = useDeleteFoodLogsMutation();
   const products = `${logs.length} ${logs.length === 1 ? 'product' : 'products'}`;
