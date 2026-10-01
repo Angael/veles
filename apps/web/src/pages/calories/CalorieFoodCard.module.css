@@ -91,7 +91,6 @@
   & > :is(a, button) {
     width: 100%;
     display: block;
-    overflow: hidden;
     padding: 0;
     border: 0;
     background: none;
@@ -101,8 +100,7 @@
     font-weight: 700;
     text-align: left;
     text-decoration: none;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
     cursor: pointer;
   }
 
