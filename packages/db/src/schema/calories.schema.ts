@@ -41,7 +41,7 @@ export const foodProducts = pgTable(
   ],
 );
 
-/** Immutable user-owned nutrition snapshots; catalog edits never rewrite these rows. */
+/** User-owned nutrition snapshots; product edits refresh only the editing user's logs dated today. */
 export const foodLogs = pgTable(
   'food_log',
   {
