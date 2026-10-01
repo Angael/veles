@@ -66,10 +66,8 @@
   min-width: 0;
 
   & strong {
-    overflow: hidden;
     color: var(--c-text-strong);
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
 
   & span {
