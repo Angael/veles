@@ -93,7 +93,7 @@ export const foodLogShares = pgTable(
   ],
 );
 
-/** Nutrition snapshots copied from the sender's logs, so later edits or deletions don't change the offer. */
+/** Sender's logs offered in a share; values are read and rescaled from the log when listed or accepted. */
 export const foodLogShareItems = pgTable(
   'food_log_share_item',
   {
@@ -103,21 +103,15 @@ export const foodLogShareItems = pgTable(
     shareId: uuid('share_id')
       .notNull()
       .references(() => foodLogShares.id, { onDelete: 'cascade' }),
-    productId: uuid('product_id').references(() => foodProducts.id, { onDelete: 'set null' }),
-    imageUploadObjectId: text('image_upload_object_id').references(() => uploadObjects.id, {
-      onDelete: 'restrict',
-    }),
-    name: text('name').notNull(),
+    foodLogId: uuid('food_log_id')
+      .notNull()
+      .references(() => foodLogs.id, { onDelete: 'cascade' }),
+    /** Amount chosen in the share dialog; null copies the log as is (custom entries without grams). */
     gramsHundredths: integer('grams_hundredths'),
-    kcalHundredths: integer('kcal_hundredths').notNull(),
-    proteinHundredths: integer('protein_hundredths'),
-    fatHundredths: integer('fat_hundredths'),
-    carbsHundredths: integer('carbs_hundredths'),
   },
   (table) => [
     index('food_log_share_item_share_id_idx').on(table.shareId),
-    index('food_log_share_item_product_id_idx').on(table.productId),
-    index('food_log_share_item_image_upload_object_id_idx').on(table.imageUploadObjectId),
+    index('food_log_share_item_food_log_id_idx').on(table.foodLogId),
   ],
 );
 

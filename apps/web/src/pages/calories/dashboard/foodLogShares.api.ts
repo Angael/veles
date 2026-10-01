@@ -45,6 +45,29 @@ export const getFoodShareRecipients = createServerFn({ method: 'GET' })
     return connectedUsers.map(({ id, image, name }) => ({ id, image, name }));
   });
 
+type SharedFoodLogValues = Pick<
+  typeof foodLogs.$inferSelect,
+  'gramsHundredths' | 'kcalHundredths' | 'proteinHundredths' | 'fatHundredths' | 'carbsHundredths'
+>;
+
+/** Rescales a sender's log to the grams chosen in the share dialog; logs without grams stay as is. */
+function scaleSharedLog<T extends SharedFoodLogValues>(
+  logEntry: T,
+  gramsHundredths: number | null,
+): T {
+  if (!logEntry.gramsHundredths || gramsHundredths === null) return logEntry;
+  const factor = gramsHundredths / logEntry.gramsHundredths;
+  const scale = (value: number | null) => (value === null ? null : Math.round(value * factor));
+  return {
+    ...logEntry,
+    gramsHundredths,
+    kcalHundredths: Math.round(logEntry.kcalHundredths * factor),
+    proteinHundredths: scale(logEntry.proteinHundredths),
+    fatHundredths: scale(logEntry.fatHundredths),
+    carbsHundredths: scale(logEntry.carbsHundredths),
+  };
+}
+
 const shareFoodLogsInputType = type({
   items: type({ logId: 'string.uuid', grams: '0 < number <= 100000 | null' })
     .array()
@@ -54,8 +77,8 @@ const shareFoodLogsInputType = type({
 });
 
 /**
- * Sends each connected recipient its own snapshot of the sender's selected logs. Logs with grams are
- * rescaled to the amount chosen in the share dialog; custom entries without grams are copied as is.
+ * Offers the sender's selected logs to each connected recipient. Only the chosen grams are stored;
+ * values are read from the live log, so deleting it withdraws the item from pending shares.
  */
 export const shareFoodLogs = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('shareFoodLogs')])
@@ -72,7 +95,7 @@ export const shareFoodLogs = createServerFn({ method: 'POST' })
 
     const gramsByLogId = new Map(data.items.map((item) => [item.logId, item.grams]));
     const logs = await db
-      .select()
+      .select({ id: foodLogs.id, gramsHundredths: foodLogs.gramsHundredths })
       .from(foodLogs)
       .where(
         and(inArray(foodLogs.id, [...gramsByLogId.keys()]), eq(foodLogs.userId, session.user.id)),
@@ -80,22 +103,6 @@ export const shareFoodLogs = createServerFn({ method: 'POST' })
       .orderBy(desc(foodLogs.consumedAt));
 
     if (logs.length === 0) throw new ClientSafeError('The selected products no longer exist.');
-
-    const sharedLogs = logs.map((logEntry) => {
-      const grams = gramsByLogId.get(logEntry.id) ?? null;
-      if (!logEntry.gramsHundredths || grams === null) return logEntry;
-      const gramsHundredths = toHundredths(grams);
-      const factor = gramsHundredths / logEntry.gramsHundredths;
-      const scale = (value: number | null) => (value === null ? null : Math.round(value * factor));
-      return {
-        ...logEntry,
-        gramsHundredths,
-        kcalHundredths: Math.round(logEntry.kcalHundredths * factor),
-        proteinHundredths: scale(logEntry.proteinHundredths),
-        fatHundredths: scale(logEntry.fatHundredths),
-        carbsHundredths: scale(logEntry.carbsHundredths),
-      };
-    });
 
     await db.transaction(async (tx) => {
       const shares = await tx
@@ -110,17 +117,15 @@ export const shareFoodLogs = createServerFn({ method: 'POST' })
 
       await tx.insert(foodLogShareItems).values(
         shares.flatMap((share) =>
-          sharedLogs.map((logEntry) => ({
-            shareId: share.id,
-            productId: logEntry.productId,
-            imageUploadObjectId: logEntry.imageUploadObjectId,
-            name: logEntry.name,
-            gramsHundredths: logEntry.gramsHundredths,
-            kcalHundredths: logEntry.kcalHundredths,
-            proteinHundredths: logEntry.proteinHundredths,
-            fatHundredths: logEntry.fatHundredths,
-            carbsHundredths: logEntry.carbsHundredths,
-          })),
+          logs.map((logEntry) => {
+            const grams = gramsByLogId.get(logEntry.id) ?? null;
+            return {
+              shareId: share.id,
+              foodLogId: logEntry.id,
+              gramsHundredths:
+                logEntry.gramsHundredths && grams !== null ? toHundredths(grams) : null,
+            };
+          }),
         ),
       );
     });
@@ -134,6 +139,7 @@ export const getReceivedFoodLogShares = createServerFn({ method: 'GET' })
     const rows = await db
       .select({
         item: foodLogShareItems,
+        logEntry: foodLogs,
         productImageUploadObjectId: foodProducts.imageUploadObjectId,
         senderName: users.name,
         shareId: foodLogShares.id,
@@ -141,27 +147,29 @@ export const getReceivedFoodLogShares = createServerFn({ method: 'GET' })
       .from(foodLogShares)
       .innerJoin(users, eq(users.id, foodLogShares.senderUserId))
       .innerJoin(foodLogShareItems, eq(foodLogShareItems.shareId, foodLogShares.id))
-      .leftJoin(foodProducts, eq(foodProducts.id, foodLogShareItems.productId))
+      .innerJoin(foodLogs, eq(foodLogs.id, foodLogShareItems.foodLogId))
+      .leftJoin(foodProducts, eq(foodProducts.id, foodLogs.productId))
       .where(eq(foodLogShares.recipientUserId, session.user.id))
       .orderBy(desc(foodLogShares.createdAt), asc(foodLogShareItems.id));
 
     const assetsById = await getFoodImageAssets(
-      rows.map((row) => row.item.imageUploadObjectId ?? row.productImageUploadObjectId),
+      rows.map((row) => row.logEntry.imageUploadObjectId ?? row.productImageUploadObjectId),
     );
     const sharesById = new Map<string, ReceivedFoodLogShare>();
 
-    for (const { item, productImageUploadObjectId, senderName, shareId } of rows) {
-      const asset = assetsById.get(item.imageUploadObjectId ?? productImageUploadObjectId ?? '');
+    for (const { item, logEntry, productImageUploadObjectId, senderName, shareId } of rows) {
+      const shared = scaleSharedLog(logEntry, item.gramsHundredths);
+      const asset = assetsById.get(shared.imageUploadObjectId ?? productImageUploadObjectId ?? '');
       const share = sharesById.get(shareId) ?? { id: shareId, items: [], senderName };
       sharesById.set(shareId, share);
       share.items.push({
         id: item.id,
-        name: item.name,
-        grams: fromHundredths(item.gramsHundredths),
-        kcal: item.kcalHundredths / HUNDREDTHS,
-        protein: fromHundredths(item.proteinHundredths),
-        fat: fromHundredths(item.fatHundredths),
-        carbs: fromHundredths(item.carbsHundredths),
+        name: shared.name,
+        grams: fromHundredths(shared.gramsHundredths),
+        kcal: shared.kcalHundredths / HUNDREDTHS,
+        protein: fromHundredths(shared.proteinHundredths),
+        fat: fromHundredths(shared.fatHundredths),
+        carbs: fromHundredths(shared.carbsHundredths),
         imageUrl: asset ? storagePathToUrl(asset.key) : null,
       });
     }
@@ -187,9 +195,10 @@ export const acceptFoodLogShare = createServerFn({ method: 'POST' })
 
     await db.transaction(async (tx) => {
       const items = await tx
-        .select({ item: foodLogShareItems })
+        .select({ item: foodLogShareItems, logEntry: foodLogs })
         .from(foodLogShareItems)
         .innerJoin(foodLogShares, eq(foodLogShares.id, foodLogShareItems.shareId))
+        .innerJoin(foodLogs, eq(foodLogs.id, foodLogShareItems.foodLogId))
         .where(shareOwnedByRecipient)
         .orderBy(asc(foodLogShareItems.id));
       const deleted = await tx
@@ -203,19 +212,22 @@ export const acceptFoodLogShare = createServerFn({ method: 'POST' })
 
       const consumedAt = new Date();
       await tx.insert(foodLogs).values(
-        items.map(({ item }) => ({
-          userId: session.user.id,
-          productId: item.productId,
-          imageUploadObjectId: item.imageUploadObjectId,
-          name: item.name,
-          gramsHundredths: item.gramsHundredths,
-          kcalHundredths: item.kcalHundredths,
-          proteinHundredths: item.proteinHundredths,
-          fatHundredths: item.fatHundredths,
-          carbsHundredths: item.carbsHundredths,
-          logDate: data.date,
-          consumedAt,
-        })),
+        items.map(({ item, logEntry }) => {
+          const shared = scaleSharedLog(logEntry, item.gramsHundredths);
+          return {
+            userId: session.user.id,
+            productId: shared.productId,
+            imageUploadObjectId: shared.imageUploadObjectId,
+            name: shared.name,
+            gramsHundredths: shared.gramsHundredths,
+            kcalHundredths: shared.kcalHundredths,
+            proteinHundredths: shared.proteinHundredths,
+            fatHundredths: shared.fatHundredths,
+            carbsHundredths: shared.carbsHundredths,
+            logDate: data.date,
+            consumedAt,
+          };
+        }),
       );
     });
   });
