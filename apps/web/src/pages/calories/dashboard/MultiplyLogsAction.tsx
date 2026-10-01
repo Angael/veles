@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dialog/Dialog';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { SelectionBarAction } from '@/components/ui/selection-bar/SelectionBar';
-import css from './MultiplyLogsDialog.module.css';
+import css from './MultiplyLogsAction.module.css';
 
 /** ×½ covers the opposite case: half a portion eaten but a full one logged. */
 const presets = [
@@ -30,7 +30,7 @@ type Props = {
 };
 
 /** Scales the selected logs' amounts, e.g. ×2 when a second sandwich was eaten but logged as ingredients. */
-export function MultiplyLogsDialog({ logs, onMultiplied }: Props) {
+export function MultiplyLogsAction({ logs, onMultiplied }: Props) {
   const [open, setOpen] = useState(false);
   const [factor, setFactor] = useState<number | null>(2);
   const multiplyMutation = useMultiplyFoodLogsMutation();
