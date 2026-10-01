@@ -7,7 +7,15 @@ import { Card } from '@/components/ui/card/Card';
 import { Checkbox } from '@/components/ui/checkbox/Checkbox';
 import { DateInput } from '@/components/ui/date-input/DateInput';
 import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog/Dialog';
+import {
+  DialogActions,
+  DialogClose,
+  DialogDescription,
+  DialogPopup,
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog/Dialog';
 import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
 import { ErrorCard } from '@/components/ui/error-card/ErrorCard';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
@@ -182,15 +190,21 @@ export function ComponentsDemoPage() {
       </section>
       <section>
         <h2>Dialog</h2>
-        <Dialog
-          body='Use dialogs for focused actions that need an explicit decision.'
-          title='Example dialog'
-          trigger={
-            <Btn render={<DialogTrigger />} type='button' variant='outlineMain'>
-              Open dialog
-            </Btn>
-          }
-        />
+        <DialogRoot>
+          <Btn render={<DialogTrigger />} type='button' variant='outlineMain'>
+            Open dialog
+          </Btn>
+          <DialogPopup>
+            <DialogTitle>Example dialog</DialogTitle>
+            <DialogDescription>
+              Use dialogs for focused actions that need an explicit decision.
+            </DialogDescription>
+            <DialogActions>
+              <DialogClose render={<Btn variant='ghost' />}>Cancel</DialogClose>
+              <DialogClose render={<Btn />}>OK</DialogClose>
+            </DialogActions>
+          </DialogPopup>
+        </DialogRoot>
       </section>
 
       <section>

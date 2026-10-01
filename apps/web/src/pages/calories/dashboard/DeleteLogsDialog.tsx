@@ -2,7 +2,16 @@ import { Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogsMutation } from '../calories.query';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog/Dialog';
+import { Btn } from '@/components/ui/btn/Btn';
+import {
+  DialogActions,
+  DialogClose,
+  DialogDescription,
+  DialogPopup,
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog/Dialog';
 import { SelectionBarAction } from '@/components/ui/selection-bar/SelectionBar';
 
 type Props = {
@@ -14,6 +23,7 @@ type Props = {
 export function DeleteLogsDialog({ logs, onDeleted }: Props) {
   const [open, setOpen] = useState(false);
   const deleteMutation = useDeleteFoodLogsMutation();
+  const products = `${logs.length} ${logs.length === 1 ? 'product' : 'products'}`;
   const kcal = Math.round(logs.reduce((sum, entry) => sum + entry.kcal, 0));
 
   function confirm() {
@@ -29,30 +39,30 @@ export function DeleteLogsDialog({ logs, onDeleted }: Props) {
   }
 
   return (
-    <Dialog
-      body={
-        <p>
+    <DialogRoot onOpenChange={setOpen} open={open}>
+      <SelectionBarAction
+        icon={<Trash2Icon aria-hidden='true' />}
+        label='Delete'
+        render={<DialogTrigger />}
+        variant='ghostDanger'
+      />
+      <DialogPopup>
+        <DialogTitle>Delete {products}?</DialogTitle>
+        <DialogDescription>
           They are removed from this day, taking {kcal} kcal off your total. This can't be undone.
-        </p>
-      }
-      okButtonProps={{
-        icon: <Trash2Icon aria-hidden='true' />,
-        loading: deleteMutation.isPending,
-        onClick: confirm,
-        variant: 'danger',
-      }}
-      okLabel='Delete'
-      onOpenChange={setOpen}
-      open={open}
-      title={`Delete ${logs.length} ${logs.length === 1 ? 'product' : 'products'}?`}
-      trigger={
-        <SelectionBarAction
-          icon={<Trash2Icon aria-hidden='true' />}
-          label='Delete'
-          render={<DialogTrigger />}
-          variant='ghostDanger'
-        />
-      }
-    />
+        </DialogDescription>
+        <DialogActions>
+          <DialogClose render={<Btn variant='ghost' />}>Cancel</DialogClose>
+          <Btn
+            icon={<Trash2Icon aria-hidden='true' />}
+            loading={deleteMutation.isPending}
+            onClick={confirm}
+            variant='danger'
+          >
+            Delete
+          </Btn>
+        </DialogActions>
+      </DialogPopup>
+    </DialogRoot>
   );
 }

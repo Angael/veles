@@ -1,48 +1,42 @@
 import { Dialog as BaseDialog } from '@base-ui/react/dialog';
-import type { ComponentProps, ReactNode } from 'react';
-import { Btn } from '@/components/ui/btn/Btn';
+import clsx from 'clsx';
+import type { ComponentPropsWithoutRef } from 'react';
 import css from './Dialog.module.css';
 
+export const DialogRoot = BaseDialog.Root;
 export const DialogTrigger = BaseDialog.Trigger;
+export const DialogClose = BaseDialog.Close;
 
-type DialogProps = {
-  body: ReactNode;
-  cancelLabel?: ReactNode;
-  okButtonProps?: Omit<ComponentProps<typeof Btn>, 'children'>;
-  okLabel?: ReactNode;
-  onOpenChange?: ComponentProps<typeof BaseDialog.Root>['onOpenChange'];
-  open?: boolean;
-  title: ReactNode;
-  trigger: ReactNode;
-};
-
-/** Renders a modal with a standard title, body, and confirm/cancel actions. */
-export function Dialog({
-  body,
-  cancelLabel = 'Cancel',
-  okButtonProps,
-  okLabel = 'OK',
-  onOpenChange,
-  open,
-  title,
-  trigger,
-}: DialogProps) {
+/** Portals the modal over a backdrop: centered on desktop, docked to the bottom on phones. */
+export function DialogPopup({
+  className,
+  ...props
+}: ComponentPropsWithoutRef<typeof BaseDialog.Popup>) {
   return (
-    <BaseDialog.Root onOpenChange={onOpenChange} open={open}>
-      {trigger}
-      <BaseDialog.Portal>
-        <BaseDialog.Backdrop className={css.backdrop} />
-        <BaseDialog.Viewport className={css.viewport}>
-          <BaseDialog.Popup className={css.popup}>
-            <BaseDialog.Title className={css.title}>{title}</BaseDialog.Title>
-            <div className={css.body}>{body}</div>
-            <div className={css.actions}>
-              <BaseDialog.Close render={<Btn variant='ghost' />}>{cancelLabel}</BaseDialog.Close>
-              <Btn {...okButtonProps}>{okLabel}</Btn>
-            </div>
-          </BaseDialog.Popup>
-        </BaseDialog.Viewport>
-      </BaseDialog.Portal>
-    </BaseDialog.Root>
+    <BaseDialog.Portal>
+      <BaseDialog.Backdrop className={css.backdrop} />
+      <BaseDialog.Viewport className={css.viewport}>
+        <BaseDialog.Popup className={clsx(css.popup, className)} {...props} />
+      </BaseDialog.Viewport>
+    </BaseDialog.Portal>
   );
+}
+
+export function DialogTitle({
+  className,
+  ...props
+}: ComponentPropsWithoutRef<typeof BaseDialog.Title>) {
+  return <BaseDialog.Title className={clsx(css.title, className)} {...props} />;
+}
+
+export function DialogDescription({
+  className,
+  ...props
+}: ComponentPropsWithoutRef<typeof BaseDialog.Description>) {
+  return <BaseDialog.Description className={clsx(css.description, className)} {...props} />;
+}
+
+/** Right-aligned button row; put the cancel `DialogClose` first and the confirm action last. */
+export function DialogActions({ className, ...props }: ComponentPropsWithoutRef<'div'>) {
+  return <div className={clsx(css.actions, className)} {...props} />;
 }
