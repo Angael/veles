@@ -25,7 +25,13 @@ function ToastList() {
   const { toasts } = Toast.useToastManager();
 
   return toasts.map((toast) => (
-    <Toast.Root className={css.toast} key={toast.id} toast={toast}>
+    // Phones anchor toasts to the top (swipe up), desktop to the bottom (swipe down).
+    <Toast.Root
+      className={css.toast}
+      key={toast.id}
+      swipeDirection={['up', 'down', 'left', 'right']}
+      toast={toast}
+    >
       <Toast.Content className={css.content}>
         <div className={css.text}>
           <Toast.Title className={css.title} />

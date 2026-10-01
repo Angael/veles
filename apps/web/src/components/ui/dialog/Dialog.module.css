@@ -64,7 +64,7 @@
   text-wrap: balance;
 }
 
-.body {
+.description {
   min-width: 0;
   color: var(--c-muted-soft);
   text-wrap: pretty;

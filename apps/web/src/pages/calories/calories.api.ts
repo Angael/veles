@@ -763,3 +763,15 @@ export const deleteFoodLog = createServerFn({ method: 'POST' })
       .delete(foodLogs)
       .where(and(eq(foodLogs.id, data.id), eq(foodLogs.userId, session.user.id)));
   });
+
+const foodLogIdsType = type('string.uuid[]').atLeastLength(1).atMostLength(200);
+
+export const deleteFoodLogs = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('deleteFoodLogs')])
+  .validator(arkTypeValidator(type({ ids: foodLogIdsType })))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    await db
+      .delete(foodLogs)
+      .where(and(inArray(foodLogs.id, data.ids), eq(foodLogs.userId, session.user.id)));
+  });

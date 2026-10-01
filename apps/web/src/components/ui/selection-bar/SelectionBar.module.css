@@ -1,0 +1,64 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  animation: bar-in var(--duration-fast) var(--ease-out);
+}
+
+.count {
+  flex: 1;
+  min-width: 0;
+  padding-inline-end: var(--space-sm);
+  overflow: hidden;
+  color: var(--c-text-strong);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes bar-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Desktop: sits exactly where FloatingButton does so the swap doesn't move the user's target. */
+@media not (--phone) {
+  .bar {
+    position: fixed;
+    right: max(var(--space-md), calc((100vw - 1100px) / 2));
+    bottom: var(--space-md);
+    z-index: 2;
+    padding: 0.25rem;
+    border: var(--border-width) solid var(--c-border-popup);
+    border-radius: var(--radius-pill);
+    background: var(--c-surface-solid);
+    box-shadow: var(--shadow-popup);
+  }
+}
+
+/* Phones: MobileDock supplies the navbar's slot and surface. */
+@media (--phone) {
+  .bar {
+    gap: 0.25rem;
+
+    /* Beats Btn's size class so the bar keeps the navbar's height. */
+    & > :is(a, button) {
+      --btn-height: var(--dock-item-height);
+    }
+  }
+
+  .collapsible {
+    --btn-padding-x: 0;
+    --btn-min-width: var(--btn-height);
+
+    flex: none;
+    width: var(--btn-height);
+    gap: 0;
+  }
+
+  .label {
+    display: none;
+  }
+}

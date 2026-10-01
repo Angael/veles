@@ -14,8 +14,10 @@
   --toast-scale: calc(max(0, 1 - (var(--toast-index) * 0.08)));
   --toast-shrink: calc(1 - var(--toast-scale));
   --toast-current-height: var(--toast-frontmost-height, var(--toast-height));
+  /* Stack direction: -1 grows up from the bottom edge, 1 grows down from the top edge. */
+  --toast-dir: -1;
   --toast-offset-expanded-y: calc(
-    (var(--toast-offset-y) * -1) + (var(--toast-index) * var(--toast-gap) * -1) +
+    var(--toast-dir) * (var(--toast-offset-y) + (var(--toast-index) * var(--toast-gap))) +
       var(--toast-swipe-movement-y)
   );
 
@@ -38,8 +40,9 @@
   transform: translateX(var(--toast-swipe-movement-x))
     translateY(
       calc(
-        var(--toast-swipe-movement-y) - (var(--toast-index) * var(--toast-peek)) -
-          (var(--toast-shrink) * var(--toast-current-height))
+        var(--toast-swipe-movement-y) + var(--toast-dir) *
+          ((var(--toast-index) * var(--toast-peek)) +
+            (var(--toast-shrink) * var(--toast-current-height)))
       )
     )
     scale(var(--toast-scale));
@@ -59,7 +62,7 @@
   &[data-starting-style],
   &[data-ending-style] {
     opacity: 0;
-    transform: translateY(125%);
+    transform: translateY(calc(var(--toast-dir) * -125%));
   }
 
   &[data-limited] {
@@ -169,10 +172,26 @@
   }
 }
 
+/* Phones: the bottom edge belongs to the navbar and floating actions, so toasts drop in from the
+   top like native notifications and stack downwards. */
 @media (--phone) {
   .viewport {
-    right: var(--space-sm);
-    bottom: calc(var(--space-sm) + env(safe-area-inset-bottom));
-    width: calc(100vw - (var(--space-sm) * 2));
+    top: calc(var(--space-xs) + env(safe-area-inset-top));
+    right: var(--space-xs);
+    bottom: auto;
+    width: calc(100vw - (var(--space-xs) * 2));
+  }
+
+  .toast {
+    --toast-dir: 1;
+
+    top: 0;
+    bottom: auto;
+    transform-origin: top center;
+
+    &::after {
+      top: auto;
+      bottom: 100%;
+    }
   }
 }

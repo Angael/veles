@@ -23,14 +23,9 @@
   text-wrap: pretty;
 }
 
-.composer {
-  display: grid;
-  gap: var(--space-lg);
-}
-
 .composerForm {
   display: grid;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .titleInput {

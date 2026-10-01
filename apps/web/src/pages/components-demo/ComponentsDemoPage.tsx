@@ -1,12 +1,21 @@
 // This component catalog may remain intentionally long; keep all component demos together rather than splitting it needlessly.
-import { PlusIcon, SearchIcon } from 'lucide-react';
+import { CopyPlusIcon, PlusIcon, SearchIcon, SendIcon, Trash2Icon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Btn, type BtnSize, type BtnVariant } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
+import { Checkbox } from '@/components/ui/checkbox/Checkbox';
 import { DateInput } from '@/components/ui/date-input/DateInput';
 import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog/Dialog';
+import {
+  DialogActions,
+  DialogClose,
+  DialogDescription,
+  DialogPopup,
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog/Dialog';
 import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
 import { ErrorCard } from '@/components/ui/error-card/ErrorCard';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
@@ -30,6 +39,7 @@ import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessText
 import { SelectInput } from '@/components/ui/select-input/SelectInput';
 import { Skeleton } from '@/components/ui/skeleton/Skeleton';
 import { SliderInput } from '@/components/ui/slider-input/SliderInput';
+import { SelectionBar, SelectionBarAction } from '@/components/ui/selection-bar/SelectionBar';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TextareaInput } from '@/components/ui/textarea-input/TextareaInput';
 import { toastManager } from '@/components/ui/toast/toastManager';
@@ -105,6 +115,7 @@ export function ComponentsDemoPage() {
   const [sliderValue, setSliderValue] = useState(50);
   const [toggleChecked, setToggleChecked] = useState(true);
   const [selectedFoodId, setSelectedFoodId] = useState<string>(LIST_DEMO_FOODS[0].id);
+  const [demoSelecting, setDemoSelecting] = useState(false);
 
   return (
     <main className={css.page}>
@@ -179,15 +190,21 @@ export function ComponentsDemoPage() {
       </section>
       <section>
         <h2>Dialog</h2>
-        <Dialog
-          body='Use dialogs for focused actions that need an explicit decision.'
-          title='Example dialog'
-          trigger={
-            <Btn render={<DialogTrigger />} type='button' variant='outlineMain'>
-              Open dialog
-            </Btn>
-          }
-        />
+        <DialogRoot>
+          <Btn render={<DialogTrigger />} type='button' variant='outlineMain'>
+            Open dialog
+          </Btn>
+          <DialogPopup>
+            <DialogTitle>Example dialog</DialogTitle>
+            <DialogDescription>
+              Use dialogs for focused actions that need an explicit decision.
+            </DialogDescription>
+            <DialogActions>
+              <DialogClose render={<Btn variant='ghost' />}>Cancel</DialogClose>
+              <DialogClose render={<Btn />}>OK</DialogClose>
+            </DialogActions>
+          </DialogPopup>
+        </DialogRoot>
       </section>
 
       <section>
@@ -204,6 +221,14 @@ export function ComponentsDemoPage() {
         <label className={css.toggleDemo}>
           <span>Share calories</span>
           <Toggle checked={toggleChecked} onCheckedChange={setToggleChecked} />
+        </label>
+      </section>
+
+      <section>
+        <h2>Checkbox</h2>
+        <label className={css.toggleDemo}>
+          <span>Share with Maya</span>
+          <Checkbox defaultChecked />
         </label>
       </section>
 
@@ -357,8 +382,14 @@ export function ComponentsDemoPage() {
       </section>
 
       <section>
-        <h2>FloatingButton</h2>
-        <p>This component stays fixed to the viewport and is rendered once for this demo.</p>
+        <h2>FloatingButton and SelectionBar</h2>
+        <p>
+          Both stay fixed to the viewport. SelectionBar replaces the FloatingButton while items are
+          selected, and takes over the mobile navbar on phones.
+        </p>
+        <Btn onClick={() => setDemoSelecting((current) => !current)} variant='outlineMain'>
+          {demoSelecting ? 'Clear selection' : 'Select 3 items'}
+        </Btn>
       </section>
 
       <section>
@@ -422,12 +453,28 @@ export function ComponentsDemoPage() {
         </Btn>
       </section>
 
-      <FloatingButton
-        icon={<SearchIcon aria-hidden='true' size={18} strokeWidth={1.8} />}
-        to='/demo/components'
-      >
-        Floating action
-      </FloatingButton>
+      {demoSelecting ? (
+        <SelectionBar
+          aria-label='Selected demo items'
+          count={3}
+          onClear={() => setDemoSelecting(false)}
+        >
+          <SelectionBarAction icon={<CopyPlusIcon aria-hidden='true' />} label='Multiply' />
+          <SelectionBarAction
+            icon={<Trash2Icon aria-hidden='true' />}
+            label='Delete'
+            variant='ghostDanger'
+          />
+          <SelectionBarAction icon={<SendIcon aria-hidden='true' />} label='Share' primary />
+        </SelectionBar>
+      ) : (
+        <FloatingButton
+          icon={<SearchIcon aria-hidden='true' size={18} strokeWidth={1.8} />}
+          to='/demo/components'
+        >
+          Floating action
+        </FloatingButton>
+      )}
     </main>
   );
 }
