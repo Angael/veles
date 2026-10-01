@@ -78,6 +78,8 @@ export async function getOpenFoodFactsProduct(
     'product_name',
     'brands',
     'image_url',
+    // Include the source quantity so OFF also returns its derived quantity fields.
+    'quantity',
     'product_quantity',
     'product_quantity_unit',
     'nutriments',

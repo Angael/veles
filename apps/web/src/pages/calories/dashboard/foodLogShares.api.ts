@@ -5,7 +5,7 @@ import { and, asc, desc, eq, inArray } from 'drizzle-orm';
 import { foodLogShareItems, foodLogShares, foodLogs, foodProducts, users } from '@veles/db/schema';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
-import { fromHundredths, HUNDREDTHS } from '@/lib/nutrition';
+import { fromHundredths, HUNDREDTHS, toHundredths } from '@/lib/nutrition';
 import { db } from '@/server/db.server';
 import { getConnectedUsers } from '@/server/getConnectedUsers.server';
 import { requireSession } from '@/server/getSession.server';
@@ -46,11 +46,17 @@ export const getFoodShareRecipients = createServerFn({ method: 'GET' })
   });
 
 const shareFoodLogsInputType = type({
-  logIds: type('string.uuid[]').atLeastLength(1).atMostLength(200),
+  items: type({ logId: 'string.uuid', grams: '0 < number <= 100000 | null' })
+    .array()
+    .atLeastLength(1)
+    .atMostLength(200),
   recipientUserIds: type('string[]').atLeastLength(1).atMostLength(50),
 });
 
-/** Sends each connected recipient its own snapshot of the sender's selected logs. */
+/**
+ * Sends each connected recipient its own snapshot of the sender's selected logs. Logs with grams are
+ * rescaled to the amount chosen in the share dialog; custom entries without grams are copied as is.
+ */
 export const shareFoodLogs = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('shareFoodLogs')])
   .validator(arkTypeValidator(shareFoodLogsInputType))
@@ -64,13 +70,32 @@ export const shareFoodLogs = createServerFn({ method: 'POST' })
       throw new ClientSafeError('You can only share products with your friends.');
     }
 
+    const gramsByLogId = new Map(data.items.map((item) => [item.logId, item.grams]));
     const logs = await db
       .select()
       .from(foodLogs)
-      .where(and(inArray(foodLogs.id, data.logIds), eq(foodLogs.userId, session.user.id)))
+      .where(
+        and(inArray(foodLogs.id, [...gramsByLogId.keys()]), eq(foodLogs.userId, session.user.id)),
+      )
       .orderBy(desc(foodLogs.consumedAt));
 
     if (logs.length === 0) throw new ClientSafeError('The selected products no longer exist.');
+
+    const sharedLogs = logs.map((logEntry) => {
+      const grams = gramsByLogId.get(logEntry.id) ?? null;
+      if (!logEntry.gramsHundredths || grams === null) return logEntry;
+      const gramsHundredths = toHundredths(grams);
+      const factor = gramsHundredths / logEntry.gramsHundredths;
+      const scale = (value: number | null) => (value === null ? null : Math.round(value * factor));
+      return {
+        ...logEntry,
+        gramsHundredths,
+        kcalHundredths: Math.round(logEntry.kcalHundredths * factor),
+        proteinHundredths: scale(logEntry.proteinHundredths),
+        fatHundredths: scale(logEntry.fatHundredths),
+        carbsHundredths: scale(logEntry.carbsHundredths),
+      };
+    });
 
     await db.transaction(async (tx) => {
       const shares = await tx
@@ -85,7 +110,7 @@ export const shareFoodLogs = createServerFn({ method: 'POST' })
 
       await tx.insert(foodLogShareItems).values(
         shares.flatMap((share) =>
-          logs.map((logEntry) => ({
+          sharedLogs.map((logEntry) => ({
             shareId: share.id,
             productId: logEntry.productId,
             imageUploadObjectId: logEntry.imageUploadObjectId,

@@ -19,6 +19,7 @@ import {
 import { SelectionBarAction } from '@/components/ui/selection-bar/SelectionBar';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import { getInitials } from '@/lib/getInitials';
+import { ShareLogsItems } from './ShareLogsItems';
 import css from './ShareLogsAction.module.css';
 
 type Props = {
@@ -26,21 +27,37 @@ type Props = {
   onShared: () => void;
 };
 
-/** Picks friends who each receive a copy of the selected logs to accept into their own diary. */
+const gramsByLogId = (logs: CalorieLog[]) =>
+  Object.fromEntries(
+    logs.map((entry) => [entry.id, entry.grams === null ? null : Math.round(entry.grams)]),
+  );
+
+/**
+ * Picks friends who each receive a copy of the selected logs to accept into their own diary. The
+ * sender can adjust each log's grams first, e.g. to share only the friend's half of a meal.
+ */
 export function ShareLogsAction({ logs, onShared }: Props) {
   const [open, setOpen] = useState(false);
-  const [recipientIds, setRecipientIds] = useState<string[]>([]);
+  // null until the user picks: a lone friend is preselected without waiting for an effect.
+  const [pickedIds, setPickedIds] = useState<string[] | null>(null);
+  const [gramsById, setGramsById] = useState<Record<string, number | null>>({});
   const friendsQuery = useQuery(foodShareRecipientsQueryOptions());
   const shareMutation = useShareFoodLogsMutation();
   const friends = friendsQuery.data ?? [];
+  const recipientIds =
+    pickedIds ?? (friends.length === 1 ? friends.map((friend) => friend.id) : []);
   const products = `${logs.length} ${logs.length === 1 ? 'product' : 'products'}`;
+  const gramsValid = logs.every((entry) => entry.grams === null || (gramsById[entry.id] ?? 0) > 0);
 
   function share() {
     const names = friends
       .filter((friend) => recipientIds.includes(friend.id))
       .map((friend) => friend.name);
     shareMutation.mutate(
-      { logIds: logs.map((entry) => entry.id), recipientUserIds: recipientIds },
+      {
+        items: logs.map((entry) => ({ grams: gramsById[entry.id] ?? null, logId: entry.id })),
+        recipientUserIds: recipientIds,
+      },
       {
         onSuccess: () => {
           toastManager.add({
@@ -48,7 +65,6 @@ export function ShareLogsAction({ logs, onShared }: Props) {
             type: 'success',
           });
           setOpen(false);
-          setRecipientIds([]);
           onShared();
         },
       },
@@ -66,7 +82,15 @@ export function ShareLogsAction({ logs, onShared }: Props) {
   }
 
   return (
-    <DialogRoot onOpenChange={setOpen} open={open}>
+    <DialogRoot
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (!nextOpen) return;
+        setPickedIds(null);
+        setGramsById(gramsByLogId(logs));
+      }}
+      open={open}
+    >
       <SelectionBarAction
         icon={<SendIcon aria-hidden='true' />}
         label='Share'
@@ -78,6 +102,11 @@ export function ShareLogsAction({ logs, onShared }: Props) {
         <DialogDescription>
           They get a copy of these {products} to add to their own diary.
         </DialogDescription>
+        <ShareLogsItems
+          gramsById={gramsById}
+          logs={logs}
+          onGramsChange={(id, grams) => setGramsById((current) => ({ ...current, [id]: grams }))}
+        />
         {friends.length === 0 ? (
           friendsStatus()
         ) : (
@@ -95,10 +124,10 @@ export function ShareLogsAction({ logs, onShared }: Props) {
                   <Checkbox
                     checked={recipientIds.includes(friend.id)}
                     onCheckedChange={(checked) =>
-                      setRecipientIds((current) =>
+                      setPickedIds(
                         checked
-                          ? [...current, friend.id]
-                          : current.filter((id) => id !== friend.id),
+                          ? [...recipientIds, friend.id]
+                          : recipientIds.filter((id) => id !== friend.id),
                       )
                     }
                   />
@@ -110,7 +139,7 @@ export function ShareLogsAction({ logs, onShared }: Props) {
         <DialogActions>
           <DialogClose render={<Btn variant='ghost' />}>Cancel</DialogClose>
           <Btn
-            disabled={recipientIds.length === 0}
+            disabled={recipientIds.length === 0 || !gramsValid}
             icon={<SendIcon aria-hidden='true' />}
             loading={shareMutation.isPending}
             onClick={share}

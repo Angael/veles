@@ -30,7 +30,10 @@ export function receivedFoodLogSharesQueryOptions() {
 export function useShareFoodLogsMutation() {
   return useMutation({
     meta: { error: { title: 'Could not share products' } },
-    mutationFn: (data: { logIds: string[]; recipientUserIds: string[] }) => shareFoodLogs({ data }),
+    mutationFn: (data: {
+      items: { grams: number | null; logId: string }[];
+      recipientUserIds: string[];
+    }) => shareFoodLogs({ data }),
   });
 }
 

@@ -12,6 +12,52 @@
   }
 }
 
+.items {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.itemText {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+
+  & strong {
+    color: var(--c-text-strong);
+    overflow-wrap: anywhere;
+  }
+
+  & span {
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.gramsField {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-xs);
+  width: 9rem;
+  color: var(--c-muted);
+}
+
+.custom {
+  flex: none;
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+}
+
 .friend {
   display: flex;
   align-items: center;
