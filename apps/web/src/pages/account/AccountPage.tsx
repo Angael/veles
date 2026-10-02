@@ -9,6 +9,7 @@ import { getInitials } from '@/lib/getInitials';
 import { useSignOutMutation } from './account.query';
 import { FriendsCard } from './FriendsCard';
 import { SharingSettingsCard } from './SharingSettingsCard';
+import { AgentAccessCard } from './AgentAccessCard';
 import css from './AccountPage.module.css';
 
 interface AccountPageProps {
@@ -53,6 +54,8 @@ export function AccountPage({ user }: AccountPageProps) {
       </Card>
 
       <SharingSettingsCard />
+
+      <AgentAccessCard />
 
       <FriendsCard />
     </main>

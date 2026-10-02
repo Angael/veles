@@ -31,6 +31,7 @@ import { Route as AuthenticatedRecipesIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedRecipesAddRouteImport } from './routes/_authenticated/recipes/add'
 import { Route as AuthenticatedWeightAddRouteImport } from './routes/_authenticated/weight_/add'
 import { Route as AuthenticatedWeightImportRouteImport } from './routes/_authenticated/weight_/import'
+import { Route as ApiAgentMcpRouteImport } from './routes/api/agent/mcp'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiDemoPingRouteImport } from './routes/api/demo/ping'
 import { Route as RecipesViewIdRouteImport } from './routes/recipes.view.$id'
@@ -154,6 +155,11 @@ const AuthenticatedWeightImportRoute =
     path: '/weight/import',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const ApiAgentMcpRoute = ApiAgentMcpRouteImport.update({
+  id: '/api/agent/mcp',
+  path: '/api/agent/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -214,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/weight/add': typeof AuthenticatedWeightAddRoute
   '/weight/import': typeof AuthenticatedWeightImportRoute
+  '/api/agent/mcp': typeof ApiAgentMcpRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
   '/recipes/view/$id': typeof RecipesViewIdRoute
@@ -244,6 +251,7 @@ export interface FileRoutesByTo {
   '/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/weight/add': typeof AuthenticatedWeightAddRoute
   '/weight/import': typeof AuthenticatedWeightImportRoute
+  '/api/agent/mcp': typeof ApiAgentMcpRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
   '/recipes/view/$id': typeof RecipesViewIdRoute
@@ -276,6 +284,7 @@ export interface FileRoutesById {
   '/_authenticated/recipes/add': typeof AuthenticatedRecipesAddRoute
   '/_authenticated/weight_/add': typeof AuthenticatedWeightAddRoute
   '/_authenticated/weight_/import': typeof AuthenticatedWeightImportRoute
+  '/api/agent/mcp': typeof ApiAgentMcpRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
   '/recipes/view/$id': typeof RecipesViewIdRoute
@@ -308,6 +317,7 @@ export interface FileRouteTypes {
     | '/recipes/add'
     | '/weight/add'
     | '/weight/import'
+    | '/api/agent/mcp'
     | '/api/auth/$'
     | '/api/demo/ping'
     | '/recipes/view/$id'
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | '/recipes/add'
     | '/weight/add'
     | '/weight/import'
+    | '/api/agent/mcp'
     | '/api/auth/$'
     | '/api/demo/ping'
     | '/recipes/view/$id'
@@ -369,6 +380,7 @@ export interface FileRouteTypes {
     | '/_authenticated/recipes/add'
     | '/_authenticated/weight_/add'
     | '/_authenticated/weight_/import'
+    | '/api/agent/mcp'
     | '/api/auth/$'
     | '/api/demo/ping'
     | '/recipes/view/$id'
@@ -389,6 +401,7 @@ export interface RootRouteChildren {
   AuthGoogleRoute: typeof AuthGoogleRoute
   DemoComponentsRoute: typeof DemoComponentsRoute
   InviteTokenRoute: typeof InviteTokenRoute
+  ApiAgentMcpRoute: typeof ApiAgentMcpRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDemoPingRoute: typeof ApiDemoPingRoute
   RecipesViewIdRoute: typeof RecipesViewIdRoute
@@ -550,6 +563,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWeightImportRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/agent/mcp': {
+      id: '/api/agent/mcp'
+      path: '/api/agent/mcp'
+      fullPath: '/api/agent/mcp'
+      preLoaderRoute: typeof ApiAgentMcpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -657,6 +677,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthGoogleRoute: AuthGoogleRoute,
   DemoComponentsRoute: DemoComponentsRoute,
   InviteTokenRoute: InviteTokenRoute,
+  ApiAgentMcpRoute: ApiAgentMcpRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDemoPingRoute: ApiDemoPingRoute,
   RecipesViewIdRoute: RecipesViewIdRoute,
