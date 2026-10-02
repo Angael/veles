@@ -78,6 +78,8 @@ export function NumberInput({
         <NumberField.Input
           className={clsx(css.input, inputClassName)}
           enterKeyHint={enterKeyHint}
+          // Phone keypad exposes arithmetic operators, unlike Base UI's default numeric keypad.
+          inputMode='tel'
           {...(expression !== null && { value: expression })}
           onBlurCapture={(event) => commitExpression(event.currentTarget)}
           onChange={(event) => {
