@@ -3,6 +3,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { CaloriesPage } from '@/pages/calories/dashboard/CaloriesPage';
 import { calorieDashboardQueryOptions } from '@/pages/calories/calories.query';
+import { receivedFoodLogSharesQueryOptions } from '@/pages/calories/dashboard/foodLogShares.query';
 import { calorieWeekStart, normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 
 export const Route = createFileRoute('/_authenticated/calories')({
@@ -11,10 +12,14 @@ export const Route = createFileRoute('/_authenticated/calories')({
     weekStart: calorieWeekStart(normalizeCalorieDate(search.date)),
   }),
   loader: ({ context, deps }) =>
-    context.queryClient.ensureQueryData({
-      ...calorieDashboardQueryOptions(deps.weekStart),
-      revalidateIfStale: true,
-    }),
+    Promise.all([
+      context.queryClient.ensureQueryData({
+        ...calorieDashboardQueryOptions(deps.weekStart),
+        revalidateIfStale: true,
+      }),
+      // Shares are secondary: prefetch never throws, so a failure can't block the diary.
+      context.queryClient.prefetchQuery(receivedFoodLogSharesQueryOptions()),
+    ]),
   component: RouteComponent,
   head: () => ({ meta: [{ title: 'Food diary' }] }),
   staticData: { navbar: { label: 'Calories' } },

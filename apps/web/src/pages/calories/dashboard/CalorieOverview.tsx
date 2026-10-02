@@ -5,6 +5,8 @@ import { DeleteLogsAction } from './DeleteLogsAction';
 import { LogFoodMenu } from './LogFoodMenu';
 import { LoggedFood } from './LoggedFood';
 import { MultiplyLogsAction } from './MultiplyLogsAction';
+import { ReceivedFoodShares } from './ReceivedFoodShares';
+import { ShareLogsAction } from './ShareLogsAction';
 import { Btn } from '@/components/ui/btn/Btn';
 import { List } from '@/components/ui/list/List';
 import { SelectionBar } from '@/components/ui/selection-bar/SelectionBar';
@@ -41,6 +43,7 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
         >
           <MultiplyLogsAction logs={selectedLogs} onMultiplied={clearSelection} />
           <DeleteLogsAction logs={selectedLogs} onDeleted={clearSelection} />
+          <ShareLogsAction logs={selectedLogs} onShared={clearSelection} />
         </SelectionBar>
       ) : (
         <LogFoodMenu date={date} />
@@ -60,6 +63,7 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
             </Btn>
           ) : null}
         </div>
+        <ReceivedFoodShares date={date} />
         {logs.length ? (
           <List as='ol' data-selecting={selecting || undefined}>
             {logs.map((entry) => (

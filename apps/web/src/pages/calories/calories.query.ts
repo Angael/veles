@@ -17,7 +17,7 @@ import {
 import { setDailyCalorieGoal } from './goals/goals.api';
 import { calorieWeekStart } from './calorieHelpers';
 
-const calorieDashboardKey = ['calorie-dashboard'] as const;
+export const calorieDashboardKey = ['calorie-dashboard'] as const;
 const calorieFoodKey = ['calorie-food'] as const;
 const calorieFoodsKey = ['calorie-foods'] as const;
 

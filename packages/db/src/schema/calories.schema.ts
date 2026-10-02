@@ -72,6 +72,49 @@ export const foodLogs = pgTable(
   ],
 );
 
+/** Pending batch of food logs one user sent to a connected user; removed once accepted or declined. */
+export const foodLogShares = pgTable(
+  'food_log_share',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`uuidv7()`),
+    senderUserId: text('sender_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    recipientUserId: text('recipient_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (table) => [
+    index('food_log_share_recipient_user_id_idx').on(table.recipientUserId),
+    index('food_log_share_sender_user_id_idx').on(table.senderUserId),
+  ],
+);
+
+/** Sender's logs offered in a share; values are read and rescaled from the log when listed or accepted. */
+export const foodLogShareItems = pgTable(
+  'food_log_share_item',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`uuidv7()`),
+    shareId: uuid('share_id')
+      .notNull()
+      .references(() => foodLogShares.id, { onDelete: 'cascade' }),
+    foodLogId: uuid('food_log_id')
+      .notNull()
+      .references(() => foodLogs.id, { onDelete: 'cascade' }),
+    /** Amount chosen in the share dialog; null copies the log as is (custom entries without grams). */
+    gramsHundredths: integer('grams_hundredths'),
+  },
+  (table) => [
+    index('food_log_share_item_share_id_idx').on(table.shareId),
+    index('food_log_share_item_food_log_id_idx').on(table.foodLogId),
+  ],
+);
+
 export const calorieGoals = pgTable(
   'calorie_goal',
   {
