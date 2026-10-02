@@ -1,6 +1,6 @@
 import { createDatabaseConnection } from '@veles/db';
-import { foodLogs, foodProducts, recipeImages, uploadObjects } from '@veles/db/schema';
-import { and, count, eq, notExists, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
+import { createUploadCleanup } from './upload-cleanup.ts';
 
 const checkIntervalMs = 10_000;
 const databaseUrl = process.env.DATABASE_URL;
@@ -16,48 +16,18 @@ const connection = createDatabaseConnection({
 
 let isStopping = false;
 let nextCheck: NodeJS.Timeout | undefined;
+let nextCleanup: NodeJS.Timeout | undefined;
+let activeCleanup: Promise<void> | undefined;
+const cleanup = createUploadCleanup(connection.db, () => isStopping);
 
-/** Counts upload rows that no current feature references. */
-async function countUnusedUploads() {
-  const [result] = await connection.db
-    .select({ count: count() })
-    .from(uploadObjects)
-    .where(
-      and(
-        notExists(
-          connection.db
-            .select({ id: foodProducts.id })
-            .from(foodProducts)
-            .where(eq(foodProducts.imageUploadObjectId, uploadObjects.id)),
-        ),
-        notExists(
-          connection.db
-            .select({ id: foodLogs.id })
-            .from(foodLogs)
-            .where(eq(foodLogs.imageUploadObjectId, uploadObjects.id)),
-        ),
-        notExists(
-          connection.db
-            .select({ id: recipeImages.id })
-            .from(recipeImages)
-            .where(eq(recipeImages.uploadObjectId, uploadObjects.id)),
-        ),
-      ),
-    );
-
-  return result?.count ?? 0;
-}
 /** Verifies that the worker can reach PostgreSQL without overlapping checks. */
 async function checkDatabase() {
   const startedAt = Date.now();
 
   try {
     await connection.db.execute(sql`select 1`);
-    const unusedUploads = await countUnusedUploads();
-    // TODO: Unused uploads should be deleted later.
     console.info('database check succeeded', {
       durationMs: Date.now() - startedAt,
-      unusedUploads,
     });
   } catch (error) {
     console.error('database check failed', {
@@ -73,13 +43,26 @@ async function checkDatabase() {
   }
 }
 
+/** Schedules cleanup independently so slow R2 requests never delay database checks. */
+async function runCleanup() {
+  await cleanup.run();
+  if (!isStopping) {
+    nextCleanup = setTimeout(() => {
+      activeCleanup = runCleanup();
+    }, checkIntervalMs);
+  }
+}
+
 /** Stops new checks and lets the shared PostgreSQL pool close cleanly. */
 async function shutdown(signal: NodeJS.Signals) {
   if (isStopping) return;
 
   isStopping = true;
   if (nextCheck) clearTimeout(nextCheck);
+  if (nextCleanup) clearTimeout(nextCleanup);
   console.info('worker stopping', { signal });
+  await activeCleanup;
+  cleanup.close();
   await connection.close();
 }
 
@@ -98,4 +81,5 @@ process.once('SIGINT', () => requestShutdown('SIGINT'));
 process.once('SIGTERM', () => requestShutdown('SIGTERM'));
 
 console.info('worker started', { checkIntervalMs });
+activeCleanup = runCleanup();
 await checkDatabase();
