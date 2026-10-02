@@ -1,0 +1,119 @@
+/* Highlights the entry the open menu acts on. */
+.trigger {
+  transition: background-color var(--duration-fast) var(--ease-out);
+
+  &[data-popup-open] {
+    background-color: var(--c-surface-raised);
+  }
+}
+
+.positioner {
+  z-index: 30;
+  outline: none;
+}
+
+.popup {
+  display: grid;
+  min-width: 12rem;
+  max-height: var(--available-height);
+  overflow-y: auto;
+  padding: var(--space-xs);
+  border: var(--border-width) solid var(--c-border-popup);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--c-surface-raised) 92%, transparent);
+  backdrop-filter: var(--blur-surface);
+  box-shadow: var(--shadow-popup);
+  color: var(--c-text);
+  outline: none;
+  transform-origin: var(--transform-origin);
+  transition:
+    transform 140ms var(--ease-out),
+    opacity 140ms var(--ease-out);
+
+  &[data-starting-style],
+  &[data-ending-style] {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 2.5rem;
+  padding: 0 var(--space-sm);
+  border-radius: calc(var(--radius-sm) - var(--space-xs) / 2);
+  color: inherit;
+  font-size: var(--text-sm);
+  text-decoration: none;
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+
+  & svg {
+    flex: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--c-muted-strong);
+  }
+
+  &[data-highlighted] {
+    background: var(--c-primary-surface);
+
+    & svg {
+      color: var(--c-accent);
+    }
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.danger {
+  &,
+  & svg {
+    color: var(--c-danger-text);
+  }
+
+  &[data-highlighted] {
+    background: var(--c-danger-surface);
+
+    & svg {
+      color: var(--c-danger-text);
+    }
+  }
+}
+
+.separator {
+  height: var(--border-width);
+  margin: var(--space-xs) var(--space-sm);
+  background: var(--c-border);
+}
+
+/* Desktop hint that right click offers more actions. */
+@media (hover: hover) and (pointer: fine) {
+  .trigger {
+    cursor: context-menu;
+  }
+}
+
+/* Long press would otherwise start a text selection on touch devices. */
+@media (pointer: coarse) {
+  .trigger {
+    user-select: none;
+  }
+
+  .item {
+    min-height: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger,
+  .popup {
+    transition: none;
+  }
+}
