@@ -46,6 +46,7 @@ import { toastManager } from '@/components/ui/toast/toastManager';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { Toggle } from '@/components/ui/toggle/Toggle';
 import css from './ComponentsDemoPage.module.css';
+import { UploadTileGridDemo } from './UploadTileGridDemo';
 
 const SELECT_OPTIONS = [
   { label: 'Less than or equal', value: 'lte' },
@@ -288,6 +289,8 @@ export function ComponentsDemoPage() {
           title='Could not fetch data'
         />
       </section>
+
+      <UploadTileGridDemo />
 
       <section>
         <h2>TextInput</h2>

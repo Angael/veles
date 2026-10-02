@@ -1,0 +1,102 @@
+.page {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.summary {
+  display: grid;
+  gap: var(--space-xs);
+
+  time {
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+  }
+
+  strong {
+    font-size: clamp(1.75rem, 4vw, 2.4rem);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.photosCard {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.title {
+  font-size: var(--text-lg);
+}
+
+.empty {
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--space-sm);
+  padding: 0;
+  list-style: none;
+}
+
+.photo {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--c-surface-inset) 40%, transparent);
+
+  a,
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  img {
+    object-fit: cover;
+  }
+}
+
+.missingPhoto {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: var(--c-muted);
+}
+
+.removeButton {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  --btn-height: 1.85rem;
+  --btn-min-width: 1.85rem;
+  --btn-bg: rgba(15, 23, 42, 0.58);
+  --btn-bg-hover: rgba(15, 23, 42, 0.76);
+  --btn-border: transparent;
+  --btn-border-hover: transparent;
+  --btn-color: white;
+  --btn-color-hover: white;
+  --btn-shadow: none;
+  --btn-shadow-hover: none;
+}
+
+.addForm {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.uploadButton {
+  justify-self: end;
+}
+
+@media (--phone) {
+  .gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .uploadButton {
+    justify-self: stretch;
+  }
+}

@@ -4,7 +4,7 @@ import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
-import { UploadTileGrid } from './UploadTileGrid';
+import { UploadTileGrid } from '@/components/ui/upload-tile-grid/UploadTileGrid';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import css from './AddRecipePage.module.css';

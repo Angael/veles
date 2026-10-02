@@ -10,11 +10,11 @@ import { RecentWeightEntries } from './RecentWeightEntries';
 import css from './WeightPage.module.css';
 import { WeightTrendChart } from './WeightTrendChart';
 import { getChangeFromDaysAgo, type WeightChartRange } from './weightCalculations';
-import type { WeightEntry } from './weight.api';
+import type { WeightHistoryEntry } from './weight.api';
 import { useSaveWeightMutation } from './weight.query';
 
 type WeightPageProps = {
-  entries: WeightEntry[];
+  entries: WeightHistoryEntry[];
   initialChartRange: WeightChartRange;
 };
 
