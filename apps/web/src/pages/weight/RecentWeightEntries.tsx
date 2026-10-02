@@ -1,10 +1,12 @@
+import { Link } from '@tanstack/react-router';
 import { format, parseISO } from 'date-fns';
+import { ImageIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card/Card';
 import css from './WeightPage.module.css';
-import type { WeightEntry } from './weight.api';
+import type { WeightHistoryEntry } from './weight.api';
 
 type RecentWeightEntriesProps = {
-  entries: WeightEntry[];
+  entries: WeightHistoryEntry[];
 };
 
 export function RecentWeightEntries({ entries }: RecentWeightEntriesProps) {
@@ -32,7 +34,24 @@ export function RecentWeightEntries({ entries }: RecentWeightEntriesProps) {
               return (
                 <tr key={entry.date}>
                   <td>
-                    <time dateTime={entry.date}>{format(parseISO(entry.date), 'MMM d, yyyy')}</time>
+                    <Link
+                      className={css.entryLink}
+                      params={{ date: entry.date }}
+                      to='/weight/$date'
+                    >
+                      <time dateTime={entry.date}>
+                        {format(parseISO(entry.date), 'MMM d, yyyy')}
+                      </time>
+                      {entry.photoCount > 0 ? (
+                        <span
+                          aria-label={`${entry.photoCount} ${entry.photoCount === 1 ? 'photo' : 'photos'}`}
+                          className={css.photoBadge}
+                        >
+                          <ImageIcon aria-hidden='true' />
+                          {entry.photoCount}
+                        </span>
+                      ) : null}
+                    </Link>
                   </td>
                   <td>{entry.weightKg.toFixed(1)} kg</td>
                   <td

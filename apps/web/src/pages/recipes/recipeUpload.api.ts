@@ -1,11 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { ArkErrors, type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
-import { createMiddleware, createServerFn } from '@tanstack/react-start';
+import { createServerFn } from '@tanstack/react-start';
 import { recipeImages, recipes, uploadObjects } from '@veles/db/schema';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
+import { limitRequestSizeMiddleware } from '@/server/middleware/limitRequestSizeMiddleware';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { getStorageConfig } from '@/server/storage/config.server';
 import { optimizeImage } from '@/server/storage/image.server';
@@ -18,7 +19,6 @@ const RECIPE_UPLOAD_MAX_REQUEST_BYTES = 85 * 1024 * 1024;
 export const RECIPE_UPLOAD_MAX_PHOTO_COUNT = 8;
 export const RECIPE_UPLOAD_MAX_PHOTO_BYTES = IMAGE_MAX_INPUT_BYTES;
 
-const contentLengthType = type('string.numeric.parse |> number.integer >= 0');
 const formDataType = type('FormData');
 const photoCountType = type(`File[] <= ${RECIPE_UPLOAD_MAX_PHOTO_COUNT}`);
 const photoSizeType = type('File[]').narrow((files, context) =>
@@ -55,18 +55,11 @@ const uploadRecipeInputType = type({
   tags: recipeTextListType,
 });
 
-const limitRecipeUploadRequestMiddleware = createMiddleware().server(async ({ next, request }) => {
-  const contentLength = contentLengthType(request.headers.get('content-length') ?? '');
-
-  if (contentLength instanceof type.errors || contentLength > RECIPE_UPLOAD_MAX_REQUEST_BYTES) {
-    throw new ClientSafeError('Upload request is too large.');
-  }
-
-  return next();
-});
-
 export const createRecipe = createServerFn({ method: 'POST' })
-  .middleware([logMiddleware('createRecipe'), limitRecipeUploadRequestMiddleware])
+  .middleware([
+    logMiddleware('createRecipe'),
+    limitRequestSizeMiddleware(RECIPE_UPLOAD_MAX_REQUEST_BYTES),
+  ])
   .validator(arkTypeValidator(formDataType))
   .handler(async ({ data }) => {
     const session = await requireSession();
