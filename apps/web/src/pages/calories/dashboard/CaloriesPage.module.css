@@ -195,8 +195,11 @@
 }
 
 .day[data-pressed] {
-  border-color: var(--c-text-strong);
-  background: var(--c-surface-raised);
+  border-color: color-mix(in oklch, var(--c-accent) 70%, var(--c-text-strong));
+  background:
+    linear-gradient(180deg, color-mix(in oklch, var(--c-accent) 16%, transparent), transparent 75%),
+    var(--c-surface-raised);
+  box-shadow: 0 6px 22px -10px color-mix(in oklch, var(--c-accent) 85%, transparent);
 }
 
 .day:focus-visible {

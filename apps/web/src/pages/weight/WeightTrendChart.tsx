@@ -132,8 +132,8 @@ export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProp
             >
               <defs>
                 <linearGradient id='weight-chart-fill' x1='0' x2='0' y1='0' y2='1'>
-                  <stop offset='0%' stopColor='var(--c-accent)' stopOpacity={0.24} />
-                  <stop offset='100%' stopColor='var(--c-accent)' stopOpacity={0} />
+                  <stop offset='0%' stopColor='var(--c-accent)' stopOpacity={0.3} />
+                  <stop offset='100%' stopColor='var(--c-accent-2)' stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid stroke='var(--c-border)' strokeDasharray='3 7' vertical={false} />

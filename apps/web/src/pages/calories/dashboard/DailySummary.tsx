@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { GoalIcon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
+import { CountUp } from '@/components/ui/count-up/CountUp';
 import type { CalorieGoal, CalorieTotals } from '../calories.api';
 import css from './DailySummary.module.css';
 
@@ -17,12 +18,14 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
       as='section'
       className={css.summary}
       data-appear='1'
-      tone='sky'
+      tone='accent'
     >
       <div className={css.energy}>
         <div className={css.energyTop}>
           <p className={css.energyAmount}>
-            <strong>{Math.round(totals.kcal)}</strong>
+            <strong>
+              <CountUp value={Math.round(totals.kcal)} />
+            </strong>
             <span>{goal ? `/ ${Math.round(goal.kcal)} kcal` : 'kcal eaten'}</span>
           </p>
           <Btn
@@ -64,8 +67,10 @@ function EnergyStatus({ consumed, goal }: { consumed: number; goal: number }) {
   return (
     <p className={css.energyStatus} data-over={isOver || undefined}>
       <span>
-        <strong>{Math.round(Math.abs(goal - consumed))}</strong> kcal{' '}
-        {isOver ? 'over goal' : 'left'}
+        <strong>
+          <CountUp value={Math.round(Math.abs(goal - consumed))} />
+        </strong>{' '}
+        kcal {isOver ? 'over goal' : 'left'}
       </span>
       {goal > 0 ? <span>{Math.round((consumed / goal) * 100)}%</span> : null}
     </p>

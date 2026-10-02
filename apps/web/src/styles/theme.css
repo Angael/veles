@@ -74,9 +74,11 @@
   --c-placeholder: oklch(0.556 0 0);
   --c-muted-soft: oklch(0.87 0 0);
 
+  /* Page accent. Neutral by default; feature pages swap it via `data-accent` below. */
   --c-accent: oklch(0.922 0 0);
   --c-accent-soft: oklch(0.87 0 0);
   --c-accent-strong: oklch(0.985 0 0);
+  --c-accent-2: oklch(0.708 0 0);
   --c-macro-protein: oklch(0.707 0.165 254.624);
   --c-macro-fat: oklch(0.828 0.189 84.429);
   --c-macro-carb: oklch(0.765 0.177 163.223);
@@ -114,8 +116,6 @@
   --c-success-surface: oklch(0.696 0.17 162.48 / 18%);
   --c-success-border: oklch(0.696 0.17 162.48 / 40%);
 
-  --gradient-page: linear-gradient(var(--c-background), var(--c-background));
-
   /* Reserved theme token for upcoming primary gradient treatments. */
   --gradient-primary: linear-gradient(135deg, var(--c-primary) 0%, var(--c-muted) 100%);
 
@@ -139,5 +139,85 @@
   --blur-surface: blur(8px);
 
   --duration-fast: 0.2s;
+  --duration-accent: 0.9s;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/*
+ * Feature accents. Every page keeps the neutral black/white base; the accent only tints glows,
+ * borders, charts, and the animated backdrop. Shader colors in PageBackdrop mirror these values.
+ */
+[data-accent='home'] {
+  --c-accent: oklch(0.86 0.05 270);
+  --c-accent-soft: oklch(0.86 0.04 270);
+  --c-accent-strong: oklch(0.95 0.02 270);
+  --c-accent-2: oklch(0.78 0.1 220);
+}
+
+[data-accent='calories'] {
+  --c-accent: oklch(0.74 0.17 50);
+  --c-accent-soft: oklch(0.85 0.09 55);
+  --c-accent-strong: oklch(0.94 0.04 60);
+  --c-accent-2: oklch(0.64 0.21 28);
+}
+
+[data-accent='weight'] {
+  --c-accent: oklch(0.8 0.12 200);
+  --c-accent-soft: oklch(0.87 0.07 200);
+  --c-accent-strong: oklch(0.95 0.03 200);
+  --c-accent-2: oklch(0.68 0.13 235);
+}
+
+[data-accent='recipes'] {
+  --c-accent: oklch(0.72 0.17 355);
+  --c-accent-soft: oklch(0.85 0.08 355);
+  --c-accent-strong: oklch(0.94 0.03 355);
+  --c-accent-2: oklch(0.66 0.17 320);
+}
+
+[data-accent='todos'] {
+  --c-accent: oklch(0.88 0.18 128);
+  --c-accent-soft: oklch(0.9 0.1 128);
+  --c-accent-strong: oklch(0.96 0.05 128);
+  --c-accent-2: oklch(0.78 0.14 165);
+}
+
+[data-accent='diary'] {
+  --c-accent: oklch(0.74 0.15 295);
+  --c-accent-soft: oklch(0.85 0.08 295);
+  --c-accent-strong: oklch(0.94 0.03 295);
+  --c-accent-2: oklch(0.62 0.17 270);
+}
+
+/* Account stays on the neutral base, also when nested inside another feature's accent. */
+[data-accent='account'] {
+  --c-accent: oklch(0.922 0 0);
+  --c-accent-soft: oklch(0.87 0 0);
+  --c-accent-strong: oklch(0.985 0 0);
+  --c-accent-2: oklch(0.708 0 0);
+}
+
+/* Registered so a route change morphs every accent-tinted surface instead of snapping. */
+@property --c-accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: oklch(0.922 0 0);
+}
+
+@property --c-accent-soft {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: oklch(0.87 0 0);
+}
+
+@property --c-accent-strong {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: oklch(0.985 0 0);
+}
+
+@property --c-accent-2 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: oklch(0.708 0 0);
 }

@@ -5,7 +5,11 @@ import { describe, expect, it } from 'vitest';
 
 // Skipped components are already visible throughout the app or are too large or impractical to
 // showcase meaningfully on the components demo page.
-const SKIPPED_COMPONENTS: Record<string, true> = { 'app-frame': true };
+const SKIPPED_COMPONENTS: Record<string, true> = {
+  'app-frame': true,
+  'click-spark': true,
+  'page-backdrop': true,
+};
 
 describe('components demo', () => {
   it('showcases every shared component directory', async () => {

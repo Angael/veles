@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
+import { CountUp } from '@/components/ui/count-up/CountUp';
 import type { HomeDashboardData } from './home.api';
 import css from './HomeDashboard.module.css';
 
@@ -29,7 +30,14 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
   return (
     <main className={css.page}>
       <div className={css.grid}>
-        <Card as='article' className={css.foodTile} data-appear shadow={false}>
+        <Card
+          as='article'
+          className={css.foodTile}
+          data-accent='calories'
+          data-appear
+          shadow={false}
+          tone='accent'
+        >
           <div className={css.tileHeading}>
             <h2>Today’s food</h2>
             <FlameIcon aria-hidden='true' />
@@ -37,7 +45,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           <div className={css.nutrition}>
             <div className={css.kcal}>
               <div className={css.kcalValue}>
-                <strong>{Math.round(kcal)}</strong>
+                <CountUp className={css.kcalNumber} value={Math.round(kcal)} />
                 <span>kcal</span>
                 <small>
                   {data.nutrition.goal ? `of ${Math.round(data.nutrition.goal.kcal)}` : 'No goal'}
@@ -70,7 +78,14 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           <Link aria-label='Open Today’s food' className={css.cardLink} to='/calories' />
         </Card>
 
-        <Card as='article' className={css.weightTile} data-appear='1' shadow={false}>
+        <Card
+          as='article'
+          className={css.weightTile}
+          data-accent='weight'
+          data-appear='1'
+          shadow={false}
+          tone='accent'
+        >
           <div className={css.tileHeading}>
             <h2>Weight</h2>
             <ScaleIcon aria-hidden='true' />
@@ -78,7 +93,12 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           {latestWeight ? (
             <>
               <div className={css.weightValue}>
-                <strong>{latestWeight.weightKg.toFixed(1)}</strong>
+                <CountUp
+                  className={css.weightNumber}
+                  decimals={1}
+                  from={latestWeight.weightKg - 3}
+                  value={latestWeight.weightKg}
+                />
                 <span>kg</span>
               </div>
               <div className={css.chart}>
@@ -111,7 +131,13 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           <Link aria-label='Open Weight' className={css.cardLink} to='/weight' />
         </Card>
 
-        <Card as='section' className={css.recipeTile} data-appear='2' shadow={false}>
+        <Card
+          as='section'
+          className={css.recipeTile}
+          data-accent='recipes'
+          data-appear='2'
+          shadow={false}
+        >
           <div className={css.tileHeading}>
             <h2>Recipes for today</h2>
             <UtensilsIcon aria-hidden='true' />
@@ -145,7 +171,13 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           <Link aria-label='Browse recipes' className={css.cardLink} to='/recipes' />
         </Card>
 
-        <Card as='article' className={css.todosTile} data-appear='3' shadow={false}>
+        <Card
+          as='article'
+          className={css.todosTile}
+          data-accent='todos'
+          data-appear='3'
+          shadow={false}
+        >
           <div className={css.tileHeading}>
             <h2>Todos</h2>
             <CheckIcon aria-hidden='true' />
@@ -154,7 +186,13 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           <Link aria-label='Open Todos' className={css.cardLink} to='/todos' />
         </Card>
 
-        <Card as='article' className={css.diaryTile} data-appear='4' shadow={false}>
+        <Card
+          as='article'
+          className={css.diaryTile}
+          data-accent='diary'
+          data-appear='4'
+          shadow={false}
+        >
           <div className={css.tileHeading}>
             <h2>Diary</h2>
             <BookOpenIcon aria-hidden='true' />
@@ -163,7 +201,13 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           <Link aria-label='Open Diary' className={css.cardLink} to='/diary' />
         </Card>
 
-        <Card as='article' className={css.familyTile} data-appear='5' shadow={false}>
+        <Card
+          as='article'
+          className={css.familyTile}
+          data-accent='account'
+          data-appear='5'
+          shadow={false}
+        >
           <div className={css.tileHeading}>
             <h2>Family and friends</h2>
             <UsersRoundIcon aria-hidden='true' />
@@ -193,7 +237,9 @@ function MacroProgress({
     <div className={css.macroProgress}>
       <div className={css.macroHeading}>
         <span>{label}</span>
-        <strong>{Math.round(total)}g</strong>
+        <strong>
+          <CountUp value={Math.round(total)} />g
+        </strong>
         <small>{goal === null ? 'No goal' : `of ${Math.round(goal)}g`}</small>
       </div>
       <NutritionProgress goal={goal} label={label} total={total} />

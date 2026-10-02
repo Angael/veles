@@ -49,7 +49,9 @@
   overflow: hidden;
   transition:
     border-color 180ms var(--ease-out),
-    background-color 180ms var(--ease-out);
+    box-shadow 320ms var(--ease-out),
+    transform 320ms var(--ease-out),
+    --card-spot-strength 500ms var(--ease-out);
 }
 
 .cardWithImage {
@@ -58,8 +60,14 @@
 
 .cardLink:hover .card,
 .cardLink:focus-visible .card {
-  border-color: var(--c-primary-border);
-  background: color-mix(in srgb, var(--c-surface) 88%, var(--c-primary) 12%);
+  border-color: color-mix(in oklch, var(--c-accent) 50%, transparent);
+  box-shadow: 0 20px 50px -26px color-mix(in oklch, var(--c-accent) 80%, transparent);
+  transform: translateY(-3px);
+}
+
+/* Photos lean in slowly, like a dish being brought closer. */
+.cardLink:hover .recipeImage {
+  transform: scale(1.05);
 }
 
 .card,
@@ -95,6 +103,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 900ms var(--ease-out);
   display: block;
   outline: 1px solid var(--c-border);
   outline-offset: -1px;
@@ -157,6 +166,11 @@
     transition:
       border-color 140ms ease,
       background-color 140ms ease;
+  }
+
+  .cardLink:hover .card,
+  .cardLink:hover .recipeImage {
+    transform: none;
   }
 }
 

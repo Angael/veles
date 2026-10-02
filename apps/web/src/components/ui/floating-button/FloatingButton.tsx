@@ -18,12 +18,23 @@ type FloatingButtonProps = {
 );
 
 export function FloatingButton(props: FloatingButtonProps) {
+  return (
+    // Stars orbit in the ring between this wrapper and the button (after React Bits "Star Border").
+    <span className={`${css.orbit} floatingButton`}>
+      <span aria-hidden='true' className={css.starBottom} />
+      <span aria-hidden='true' className={css.starTop} />
+      <FloatingButtonControl {...props} />
+    </span>
+  );
+}
+
+function FloatingButtonControl(props: FloatingButtonProps) {
   // TODO: hide this on scroll down once the mobile bottom nav behavior is finalized.
   if (props.to) {
     return (
       <Btn
         aria-label={typeof props.children === 'string' ? props.children : undefined}
-        className={`${css.button} floatingButton`}
+        className={css.button}
         icon={props.icon}
         isLink
         radius='pill'
@@ -40,7 +51,7 @@ export function FloatingButton(props: FloatingButtonProps) {
     return (
       <Btn
         aria-label={typeof props.children === 'string' ? props.children : undefined}
-        className={`${css.button} floatingButton`}
+        className={css.button}
         icon={props.icon}
         loading={props.loading}
         radius='pill'
@@ -56,7 +67,7 @@ export function FloatingButton(props: FloatingButtonProps) {
   return (
     <Btn
       aria-label={typeof props.children === 'string' ? props.children : undefined}
-      className={`${css.button} floatingButton`}
+      className={css.button}
       icon={props.icon}
       loading={props.loading}
       onClick={props.onClick}

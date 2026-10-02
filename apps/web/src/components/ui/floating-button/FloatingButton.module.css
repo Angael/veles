@@ -1,20 +1,95 @@
-.button {
+.orbit {
   position: fixed;
   right: max(var(--space-md), calc((100vw - 1100px) / 2));
   bottom: var(--space-md);
   z-index: 2;
-
+  display: inline-flex;
+  overflow: hidden;
+  padding: 2px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklch, var(--c-accent) 22%, var(--c-surface));
+  box-shadow:
+    0 10px 30px -10px color-mix(in oklch, var(--c-accent) 75%, transparent),
+    0 0 0 1px color-mix(in oklch, var(--c-accent) 18%, transparent);
   transition: bottom 180ms var(--ease-out);
+  animation: orbit-glow 3.2s ease-in-out infinite alternate;
+}
+
+.starTop,
+.starBottom {
+  position: absolute;
+  width: 300%;
+  height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--c-accent-strong), var(--c-accent) 12%, transparent 22%);
+  animation: 5s linear infinite alternate;
+}
+
+.starBottom {
+  right: -250%;
+  bottom: -12px;
+  animation-name: star-bottom;
+}
+
+.starTop {
+  top: -12px;
+  left: -250%;
+  animation-name: star-top;
+}
+
+.button {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes star-bottom {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes star-top {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes orbit-glow {
+  to {
+    box-shadow:
+      0 14px 40px -8px color-mix(in oklch, var(--c-accent) 90%, transparent),
+      0 0 0 1px color-mix(in oklch, var(--c-accent) 30%, transparent);
+  }
 }
 
 @media (--phone) {
-  .button {
+  .orbit {
     right: var(--space-lg);
     bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
   }
 
   /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
-  :global(.focusShell) .button {
+  :global(.focusShell) .orbit {
     bottom: max(var(--space-lg), env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit,
+  .starTop,
+  .starBottom {
+    animation: none;
   }
 }

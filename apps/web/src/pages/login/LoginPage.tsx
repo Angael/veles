@@ -1,3 +1,4 @@
+import { BlurText } from '@/components/ui/blur-text/BlurText';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { getSafeRedirectPath } from '@/lib/auth/getSafeRedirectPath';
@@ -9,7 +10,9 @@ export function LoginPage({ redirect }: { redirect?: string }) {
 
   return (
     <section className={css.authShell}>
-      <h1 className={css.authTitle}>Sign in</h1>
+      <h1 className={css.authTitle}>
+        <BlurText splitBy='letters' stepMs={45} text='Sign in' />
+      </h1>
       <Card className={css.authCard}>
         <div className={css.authHeader}>
           <p>Continue with an invited Google account.</p>

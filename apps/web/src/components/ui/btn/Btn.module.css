@@ -25,7 +25,14 @@
     border-color 180ms var(--ease-out),
     color 180ms var(--ease-out),
     opacity 180ms var(--ease-out),
+    box-shadow 180ms var(--ease-out),
+    transform 180ms var(--ease-out),
     text-decoration-color 180ms var(--ease-out);
+}
+
+/* A tactile press: buttons give a little under the finger. */
+.root:active:not([data-disabled]) {
+  transform: scale(0.97);
 }
 
 .button {
@@ -62,13 +69,14 @@
   --btn-border: transparent;
   --btn-border-hover: transparent;
   --btn-color: var(--c-primary-contrast);
+  --btn-shadow-hover: 0 8px 26px -10px color-mix(in oklch, var(--c-accent) 80%, transparent);
 }
 
 .outlineMain {
   --btn-bg: var(--c-surface-strong);
-  --btn-bg-hover: var(--c-primary-surface);
+  --btn-bg-hover: color-mix(in oklch, var(--c-accent) 10%, var(--c-surface-strong));
   --btn-border: var(--c-border-strong);
-  --btn-border-hover: var(--c-primary-border-soft);
+  --btn-border-hover: color-mix(in oklch, var(--c-accent) 45%, transparent);
   --btn-color: var(--c-text);
   --btn-color-hover: var(--c-text-strong);
 }

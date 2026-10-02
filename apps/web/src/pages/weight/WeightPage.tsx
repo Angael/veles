@@ -1,9 +1,10 @@
 import { Link, useRouter } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { CalendarPlusIcon, FileUpIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
+import { CountUp } from '@/components/ui/count-up/CountUp';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { RecentWeightEntries } from './RecentWeightEntries';
@@ -88,7 +89,16 @@ export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
           <div className={css.summaryRail} data-appear='2'>
             <Card as='section' aria-label='Weight summary' className={css.summaryGrid}>
               {/* oxlint-disable-next-line typescript/no-non-null-assertion -- entries.length > 0 guarantees a latest entry. */}
-              <SummaryStat label='Current' value={`${latestEntry!.weightKg.toFixed(1)} kg`} />
+              <SummaryStat label='Current' value={`${latestEntry!.weightKg.toFixed(1)} kg`}>
+                <CountUp
+                  decimals={1}
+                  // oxlint-disable-next-line typescript/no-non-null-assertion -- Same guarantee as above.
+                  from={latestEntry!.weightKg - 2}
+                  // oxlint-disable-next-line typescript/no-non-null-assertion -- Same guarantee as above.
+                  value={latestEntry!.weightKg}
+                />{' '}
+                kg
+              </SummaryStat>
               <SummaryStat label='2 weeks' value={formatChange(twoWeekChange)} />
               <SummaryStat label='1 month' value={formatChange(oneMonthChange)} />
             </Card>
@@ -139,13 +149,23 @@ function WeightForm({ isSaving, onChange, onSubmit, value }: WeightFormProps) {
   );
 }
 
-function SummaryStat({ label, value }: { label: string; value: string }) {
+function SummaryStat({
+  children,
+  label,
+  value,
+}: {
+  children?: ReactNode;
+  label: string;
+  value: string;
+}) {
   const isImprovement = value.startsWith('-');
 
   return (
     <div className={css.summaryStat}>
       <span className={css.statLabel}>{label}</span>
-      <strong className={isImprovement ? css.deltaBetter : css.deltaNeutral}>{value}</strong>
+      <strong className={isImprovement ? css.deltaBetter : css.deltaNeutral}>
+        {children ?? value}
+      </strong>
     </div>
   );
 }

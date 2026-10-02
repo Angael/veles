@@ -26,7 +26,7 @@ export function Navbar({ user }: { user: SessionUser | null }) {
             const Icon = item.icon;
 
             return (
-              <li key={item.key}>
+              <li data-accent={item.key} key={item.key}>
                 <PillBtn
                   active={active}
                   collapseLabelAt='tablet'
@@ -42,6 +42,7 @@ export function Navbar({ user }: { user: SessionUser | null }) {
 
       <PillBtn
         active={pathname.startsWith('/account')}
+        data-accent='account'
         collapseLabelAt='phone'
         label='Account'
         to='/account'

@@ -1,0 +1,44 @@
+.root {
+  display: inline-block;
+}
+
+/* Visually hidden, still announced. */
+.label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.part {
+  display: inline-block;
+  animation: blur-in 720ms var(--ease-out) both;
+}
+
+@keyframes blur-in {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(-0.4em);
+  }
+
+  50% {
+    opacity: 0.5;
+    filter: blur(4px);
+    transform: translateY(0.06em);
+  }
+
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .part {
+    animation: none;
+  }
+}

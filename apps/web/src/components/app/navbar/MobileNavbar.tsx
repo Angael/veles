@@ -32,6 +32,7 @@ export function MobileNavbar({ user }: { user: SessionUser | null }) {
               key={item.key}
               aria-label={item.label}
               className={css.item}
+              data-accent={item.key}
               nativeButton={false}
               render={<Link to={item.link} />}
               value={item.key}

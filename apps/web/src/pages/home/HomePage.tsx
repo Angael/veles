@@ -7,6 +7,7 @@ import {
   UtensilsIcon,
 } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
+import { BlurText } from '@/components/ui/blur-text/BlurText';
 import { Card } from '@/components/ui/card/Card';
 import css from './HomePage.module.css';
 
@@ -20,9 +21,9 @@ export function HomePage() {
         <div aria-hidden='true' className={css.energyLine} />
         <div className={css.heroContent}>
           <h1>
-            Your data.
+            <BlurText delayMs={150} stepMs={110} text='Your data.' />
             <br />
-            In your orbit.
+            <BlurText delayMs={450} stepMs={110} text='In your orbit.' />
           </h1>
           <p>
             Veles keeps workouts, body weight, food logging, and shared personal files together in

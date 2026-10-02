@@ -184,6 +184,38 @@
   );
 }
 
+/* The energy bar burns from deep ember to the bright accent, with a slow sheen passing over. */
+.meter[data-size='lg']:not([data-over]) .meterFill {
+  overflow: hidden;
+  background: linear-gradient(90deg, var(--c-accent-2), var(--c-accent));
+  box-shadow: 0 0 14px color-mix(in oklch, var(--c-accent) 65%, transparent);
+
+  &::after {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 30%,
+      color-mix(in oklch, var(--c-accent-strong) 70%, transparent) 50%,
+      transparent 70%
+    );
+    background-size: 250% 100%;
+    content: '';
+    animation: sheen 3.6s ease-in-out 1s infinite;
+  }
+}
+
+@keyframes sheen {
+  from {
+    background-position: 150% 0;
+  }
+
+  60%,
+  to {
+    background-position: -100% 0;
+  }
+}
+
 .meterOver {
   background: repeating-linear-gradient(
     -45deg,
@@ -226,6 +258,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .meterFill::after {
+    animation: none;
+  }
+
   .meterFill,
   .meterOver,
   .meterMarker {

@@ -14,24 +14,39 @@
   white-space: nowrap;
   transition:
     background-color var(--duration-fast) ease,
-    border-color var(--duration-fast) ease;
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease,
+    transform var(--duration-fast) var(--ease-out);
 
   &:focus-visible {
     outline: 2px solid var(--c-primary-focus);
     outline-offset: 2px;
   }
 
+  /* Hover previews the destination's accent before you get there. */
   @media (hover: hover) and (pointer: fine) {
     &:hover {
-      border-color: var(--c-primary-border);
-      background: var(--c-primary-surface-strong);
+      border-color: color-mix(in oklch, var(--c-accent) 45%, transparent);
+      background: color-mix(in oklch, var(--c-accent) 10%, var(--c-surface));
+      transform: translateY(-1px);
+
+      .visual {
+        color: var(--c-accent);
+      }
     }
   }
 }
 
 .active {
-  border-color: var(--c-primary-border);
-  background: var(--c-primary-surface-strong);
+  border-color: color-mix(in oklch, var(--c-accent) 55%, transparent);
+  background: color-mix(in oklch, var(--c-accent) 14%, var(--c-surface));
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--c-accent) 12%, transparent),
+    0 6px 24px -8px color-mix(in oklch, var(--c-accent) 60%, transparent);
+
+  .visual {
+    color: var(--c-accent);
+  }
 }
 
 .visual {
@@ -39,6 +54,7 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
+  transition: color var(--duration-fast) ease;
 }
 
 .label {

@@ -1,41 +1,84 @@
+/* Registered so the pointer spotlight can fade instead of popping. */
+@property --card-spot-strength {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+/*
+ * Every card wears the page accent quietly: a tinted hairline, a rim light along the top edge,
+ * a corner bloom, and a spotlight that follows the pointer (after React Bits "Spotlight Card").
+ * The surface stays a translucent neutral so the black/white base still leads.
+ */
 .card {
+  --card-tone: var(--c-accent);
+  --card-tone-secondary: var(--c-accent-2);
+  --card-tone-bloom: 7%;
+  --card-tone-echo: 0%;
+
+  position: relative;
   padding: var(--space-lg);
-  border: var(--border-width) solid var(--c-border);
+  border: var(--border-width) solid color-mix(in oklch, var(--card-tone) 16%, var(--c-border));
   border-radius: var(--radius-xs);
-  background: var(--c-surface);
+  background:
+    radial-gradient(
+      260px circle at var(--card-spot-x, 50%) var(--card-spot-y, 0%),
+      color-mix(in oklch, var(--card-tone) var(--card-spot-strength), transparent),
+      transparent 70%
+    ),
+    linear-gradient(
+        90deg,
+        transparent 6%,
+        color-mix(in oklch, var(--card-tone) 50%, transparent) 50%,
+        transparent 94%
+      )
+      top / 100% 1px no-repeat,
+    radial-gradient(
+      130% 100% at 0% 0%,
+      color-mix(in oklch, var(--card-tone) var(--card-tone-bloom), transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      90% 80% at 100% 110%,
+      color-mix(in oklch, var(--card-tone-secondary) var(--card-tone-echo), transparent),
+      transparent 60%
+    ),
+    color-mix(in oklch, var(--c-surface) 88%, transparent);
   backdrop-filter: var(--blur-surface);
   box-shadow: var(--shadow-card);
+  transition:
+    border-color var(--duration-fast) ease,
+    --card-spot-strength 500ms var(--ease-out);
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      --card-spot-strength: 13%;
+
+      border-color: color-mix(in oklch, var(--card-tone) 32%, var(--c-border));
+    }
+  }
 
   @media (--phone) {
     padding: var(--space-sm);
   }
 }
 
-/* One glow pattern for every tone: a strong top-left bloom and a faint bottom-right echo. */
+/* Toned cards turn the bloom up and add an echo of the secondary accent in the far corner. */
 .toned {
-  border-color: color-mix(in srgb, var(--card-tone) 20%, transparent);
-  background:
-    radial-gradient(
-      circle at 8% 12%,
-      color-mix(in srgb, var(--card-tone) 14%, transparent),
-      transparent 52%
-    ),
-    radial-gradient(
-      circle at 100% 110%,
-      color-mix(in srgb, var(--card-tone-secondary, var(--card-tone)) 9%, transparent),
-      transparent 44%
-    ),
-    linear-gradient(145deg, var(--c-surface), var(--c-surface-inset));
+  --card-tone-bloom: 15%;
+  --card-tone-echo: 10%;
+
+  border-color: color-mix(in oklch, var(--card-tone) 26%, transparent);
 }
 
 .primary {
-  --card-tone: var(--c-primary-border);
-  --card-tone-secondary: var(--c-accent-strong);
+  --card-tone: var(--c-accent-strong);
+  --card-tone-secondary: var(--c-accent);
 }
 
-.sky {
-  --card-tone: var(--c-accent);
-  --card-tone-secondary: var(--c-macro-carb);
+.accent {
+  --card-tone-bloom: 18%;
+  --card-tone-echo: 14%;
 }
 
 .danger {
