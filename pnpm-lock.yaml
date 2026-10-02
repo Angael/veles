@@ -289,6 +289,9 @@ importers:
 
   apps/worker:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: 3.1110.0
+        version: 3.1110.0
       '@veles/db':
         specifier: workspace:*
         version: link:../../packages/db
