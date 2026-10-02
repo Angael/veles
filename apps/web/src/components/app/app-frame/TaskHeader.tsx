@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { BlurText } from '@/components/ui/blur-text/BlurText';
 import { RouteBackButton } from './RouteBackButton';
 import css from './TaskHeader.module.css';
 
@@ -28,11 +27,7 @@ export function TaskHeader({ label }: { label?: string }) {
       <div aria-hidden='true' className={css.sentinel} ref={sentinelRef} />
       <header className={css.header} ref={headerRef}>
         <RouteBackButton variant='ghost' />
-        {label ? (
-          <h1 className={css.title}>
-            <BlurText key={label} stepMs={90} text={label} />
-          </h1>
-        ) : null}
+        {label ? <h1 className={css.title}>{label}</h1> : null}
       </header>
     </>
   );

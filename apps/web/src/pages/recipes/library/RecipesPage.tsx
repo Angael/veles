@@ -68,7 +68,6 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
         {visibleRecipes.map((recipe) => (
           <Link
             className={css.cardLink}
-            data-reveal
             key={recipe.id}
             params={{ id: recipe.id }}
             to='/recipes/view/$id'

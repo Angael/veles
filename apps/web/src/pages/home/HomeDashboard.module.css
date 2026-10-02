@@ -12,11 +12,6 @@
   position: relative;
   min-width: 0;
   padding: var(--space-lg);
-  transition:
-    transform 320ms var(--ease-out),
-    box-shadow 320ms var(--ease-out),
-    border-color var(--duration-fast) ease,
-    --card-spot-strength 500ms var(--ease-out);
 }
 
 .foodTile,
@@ -56,8 +51,6 @@
   flex: none;
   width: var(--space-lg);
   height: var(--space-lg);
-  filter: drop-shadow(0 0 8px color-mix(in oklch, var(--c-accent) 60%, transparent));
-  transition: transform 420ms var(--ease-out);
 }
 
 .cardLink {
@@ -75,26 +68,10 @@
   outline: none;
 }
 
-/* Tiles lift toward the pointer and glow in their own feature's accent. */
+/* Each tile carries its own feature's accent via `data-accent`. */
 @media (hover: hover) and (pointer: fine) {
   .grid > :has(.cardLink:hover) {
     border-color: color-mix(in oklch, var(--c-accent) 45%, transparent);
-    box-shadow: 0 18px 50px -24px color-mix(in oklch, var(--c-accent) 70%, transparent);
-    transform: translateY(-3px);
-
-    .tileHeading svg {
-      transform: rotate(-8deg) scale(1.15);
-    }
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .grid > * {
-    transition: border-color var(--duration-fast) ease;
-  }
-
-  .grid > :has(.cardLink:hover) {
-    transform: none;
   }
 }
 
@@ -125,8 +102,7 @@
   color: var(--c-text-strong);
 }
 
-.kcalNumber {
-  color: var(--c-text-strong);
+.kcalValue strong {
   font-family: var(--font-mono);
   font-size: clamp(2.75rem, 5vw, 4rem);
   font-weight: var(--font-weight-semibold);
@@ -220,10 +196,9 @@
   background: currentColor;
 }
 
-/* The kcal bar burns from the deep ember into the bright accent. */
+/* The kcal bar runs from the deep into the bright accent. */
 .kcal progress:not(.overfill)::-webkit-progress-value {
   background: linear-gradient(90deg, var(--c-accent-2), var(--c-accent));
-  box-shadow: 0 0 12px color-mix(in oklch, var(--c-accent) 70%, transparent);
 }
 
 .kcal progress:not(.overfill)::-moz-progress-bar {
@@ -258,7 +233,7 @@
   background: transparent;
 }
 
-.weightNumber {
+.weightValue strong {
   color: var(--c-text-strong);
   font-family: var(--font-mono);
   font-size: clamp(3rem, 5vw, 4.5rem);
@@ -422,7 +397,7 @@
     gap: var(--space-md);
   }
 
-  .kcalNumber {
+  .kcalValue strong {
     font-size: clamp(2.5rem, 11vw, 3.25rem);
   }
 
@@ -445,7 +420,7 @@
     grid-column: 1 / -1;
   }
 
-  .weightNumber {
+  .weightValue strong {
     font-size: clamp(2.5rem, 11vw, 3.5rem);
   }
 

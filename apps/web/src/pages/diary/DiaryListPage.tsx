@@ -62,7 +62,6 @@ export function DiaryListPage({ entries }: DiaryListPageProps) {
               {visibleEntries.map((entry) => (
                 <Link
                   className={css.entryLink}
-                  data-reveal
                   key={entry.id}
                   params={{ id: entry.id }}
                   to='/diary/$id'

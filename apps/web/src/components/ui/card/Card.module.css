@@ -1,35 +1,21 @@
-/* Registered so the pointer spotlight can fade instead of popping. */
-@property --card-spot-strength {
-  syntax: '<percentage>';
-  inherits: false;
-  initial-value: 0%;
-}
-
 /*
  * Every card wears the page accent quietly: a tinted hairline, a rim light along the top edge,
- * a corner bloom, and a spotlight that follows the pointer (after React Bits "Spotlight Card").
- * The surface stays a translucent neutral so the black/white base still leads.
+ * and a faint corner bloom. The surface stays neutral so the black/white base still leads.
  */
 .card {
   --card-tone: var(--c-accent);
   --card-tone-secondary: var(--c-accent-2);
-  --card-tone-bloom: 7%;
+  --card-tone-bloom: 6%;
   --card-tone-echo: 0%;
 
-  position: relative;
   padding: var(--space-lg);
-  border: var(--border-width) solid color-mix(in oklch, var(--card-tone) 16%, var(--c-border));
+  border: var(--border-width) solid color-mix(in oklch, var(--card-tone) 14%, var(--c-border));
   border-radius: var(--radius-xs);
   background:
-    radial-gradient(
-      260px circle at var(--card-spot-x, 50%) var(--card-spot-y, 0%),
-      color-mix(in oklch, var(--card-tone) var(--card-spot-strength), transparent),
-      transparent 70%
-    ),
     linear-gradient(
         90deg,
         transparent 6%,
-        color-mix(in oklch, var(--card-tone) 50%, transparent) 50%,
+        color-mix(in oklch, var(--card-tone) 40%, transparent) 50%,
         transparent 94%
       )
       top / 100% 1px no-repeat,
@@ -43,20 +29,8 @@
       color-mix(in oklch, var(--card-tone-secondary) var(--card-tone-echo), transparent),
       transparent 60%
     ),
-    color-mix(in oklch, var(--c-surface) 88%, transparent);
-  backdrop-filter: var(--blur-surface);
+    var(--c-surface);
   box-shadow: var(--shadow-card);
-  transition:
-    border-color var(--duration-fast) ease,
-    --card-spot-strength 500ms var(--ease-out);
-
-  @media (hover: hover) and (pointer: fine) {
-    &:hover {
-      --card-spot-strength: 13%;
-
-      border-color: color-mix(in oklch, var(--card-tone) 32%, var(--c-border));
-    }
-  }
 
   @media (--phone) {
     padding: var(--space-sm);

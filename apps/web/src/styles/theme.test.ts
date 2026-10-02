@@ -22,8 +22,6 @@ describe('theme tokens', () => {
       '--anchor-width',
       '--card-padding',
       '--card-tone',
-      '--card-spot',
-      '--scene-',
       '--toast-',
     ];
     const errors: string[] = [];

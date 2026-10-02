@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router';
 import { PencilIcon, Trash2Icon } from 'lucide-react';
-import { BlurText } from '@/components/ui/blur-text/BlurText';
 import { Btn } from '@/components/ui/btn/Btn';
 import { RecipeImgSlider } from './RecipeImgSlider';
 import { RecipeNutrition } from './RecipeNutrition';
@@ -18,9 +17,7 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
       <article className={css.recipe}>
         <header className={css.heading}>
           <div className={css.identity}>
-            <h1>
-              <BlurText key={recipe.name} text={recipe.name} />
-            </h1>
+            <h1>{recipe.name}</h1>
             {recipe.tags.length > 0 ? (
               <div className={css.tags} aria-label='Recipe tags'>
                 {recipe.tags.map((tag) => (

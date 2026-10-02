@@ -36,7 +36,6 @@ import { toastManager } from '@/components/ui/toast/toastManager';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { Toggle } from '@/components/ui/toggle/Toggle';
 import css from './ComponentsDemoPage.module.css';
-import { MotionDemo } from './MotionDemo';
 
 const SELECT_OPTIONS = [
   { label: 'Less than or equal', value: 'lte' },
@@ -226,8 +225,6 @@ export function ComponentsDemoPage() {
           </Card>
         </div>
       </section>
-
-      <MotionDemo />
 
       <section>
         <h2>List</h2>

@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
-import { CountUp } from '@/components/ui/count-up/CountUp';
 import type { HomeDashboardData } from './home.api';
 import css from './HomeDashboard.module.css';
 
@@ -45,7 +44,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           <div className={css.nutrition}>
             <div className={css.kcal}>
               <div className={css.kcalValue}>
-                <CountUp className={css.kcalNumber} value={Math.round(kcal)} />
+                <strong>{Math.round(kcal)}</strong>
                 <span>kcal</span>
                 <small>
                   {data.nutrition.goal ? `of ${Math.round(data.nutrition.goal.kcal)}` : 'No goal'}
@@ -93,12 +92,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
           {latestWeight ? (
             <>
               <div className={css.weightValue}>
-                <CountUp
-                  className={css.weightNumber}
-                  decimals={1}
-                  from={latestWeight.weightKg - 3}
-                  value={latestWeight.weightKg}
-                />
+                <strong>{latestWeight.weightKg.toFixed(1)}</strong>
                 <span>kg</span>
               </div>
               <div className={css.chart}>
@@ -237,9 +231,7 @@ function MacroProgress({
     <div className={css.macroProgress}>
       <div className={css.macroHeading}>
         <span>{label}</span>
-        <strong>
-          <CountUp value={Math.round(total)} />g
-        </strong>
+        <strong>{Math.round(total)}g</strong>
         <small>{goal === null ? 'No goal' : `of ${Math.round(goal)}g`}</small>
       </div>
       <NutritionProgress goal={goal} label={label} total={total} />

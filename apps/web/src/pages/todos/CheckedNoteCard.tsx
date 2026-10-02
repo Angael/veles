@@ -29,7 +29,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
   };
 
   return (
-    <Card as='article' className={css.listCard} data-reveal>
+    <Card as='article' className={css.listCard}>
       <div className={css.cardHeader}>
         <h2>
           <SeamlessTextInput

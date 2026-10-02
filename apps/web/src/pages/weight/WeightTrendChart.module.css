@@ -27,43 +27,7 @@
   & svg *:focus {
     outline: none;
   }
-
-  /* The trend line glows in the weight accent and draws itself in on load. */
-  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
-  & :global(.recharts-area-curve) {
-    filter: drop-shadow(0 0 6px color-mix(in oklch, var(--c-accent) 70%, transparent));
-    stroke-dasharray: 6000;
-    stroke-dashoffset: 6000;
-    animation: draw-line 2.4s var(--ease-out) 200ms forwards;
-  }
-
-  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
-  & :global(.recharts-area-area) {
-    animation: fill-in 1.6s var(--ease-out) 700ms both;
-  }
 }
-
-@keyframes draw-line {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes fill-in {
-  from {
-    opacity: 0;
-  }
-}
-
-/* stylelint-disable selector-pseudo-class-no-unknown */
-@media (prefers-reduced-motion: reduce) {
-  .chartFrame :global(.recharts-area-curve),
-  .chartFrame :global(.recharts-area-area) {
-    stroke-dashoffset: 0;
-    animation: none;
-  }
-}
-/* stylelint-enable selector-pseudo-class-no-unknown */
 
 .chartSkeleton {
   position: absolute;

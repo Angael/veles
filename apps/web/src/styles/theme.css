@@ -139,13 +139,12 @@
   --blur-surface: blur(8px);
 
   --duration-fast: 0.2s;
-  --duration-accent: 0.9s;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /*
- * Feature accents. Every page keeps the neutral black/white base; the accent only tints glows,
- * borders, charts, and the animated backdrop. Shader colors in PageBackdrop mirror these values.
+ * Feature accents. Every page keeps the neutral black/white base; the accent only tints borders,
+ * charts, labels, and a faint glow at the top of the page.
  */
 [data-accent='home'] {
   --c-accent: oklch(0.86 0.05 270);
@@ -195,29 +194,4 @@
   --c-accent-soft: oklch(0.87 0 0);
   --c-accent-strong: oklch(0.985 0 0);
   --c-accent-2: oklch(0.708 0 0);
-}
-
-/* Registered so a route change morphs every accent-tinted surface instead of snapping. */
-@property --c-accent {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: oklch(0.922 0 0);
-}
-
-@property --c-accent-soft {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: oklch(0.87 0 0);
-}
-
-@property --c-accent-strong {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: oklch(0.985 0 0);
-}
-
-@property --c-accent-2 {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: oklch(0.708 0 0);
 }

@@ -104,10 +104,6 @@
   height: 1.25rem;
   margin: 0;
   accent-color: var(--c-accent);
-
-  &:checked {
-    animation: check-pop 380ms var(--ease-out);
-  }
 }
 
 .item input[type='checkbox']:focus-visible {
@@ -124,20 +120,6 @@
   color: var(--c-muted-strong);
   text-decoration: line-through;
   text-decoration-color: color-mix(in oklch, var(--c-accent) 70%, transparent);
-  text-decoration-thickness: 2px;
-}
-
-@keyframes check-pop {
-  40% {
-    transform: scale(1.3);
-    filter: drop-shadow(0 0 6px var(--c-accent));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .item input[type='checkbox']:checked {
-    animation: none;
-  }
 }
 
 .emptyList {

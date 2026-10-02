@@ -26,7 +26,7 @@ export function CalorieFoodCard({
   carbs,
 }: CalorieFoodCardProps) {
   return (
-    <li className={css.item} data-reveal>
+    <li className={css.item}>
       <Card as='article' className={css.card}>
         {imageUrl ? (
           <img alt='' aria-hidden='true' className={css.photoWash} loading='lazy' src={imageUrl} />

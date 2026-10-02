@@ -10,7 +10,7 @@ export function TextNoteCard({ note }: { note: NoteSummary }) {
   const updateNote = useUpdateNoteMutation();
 
   return (
-    <Card as='article' className={css.noteCard} data-reveal>
+    <Card as='article' className={css.noteCard}>
       <div className={css.cardHeader}>
         <h2>
           <SeamlessTextInput

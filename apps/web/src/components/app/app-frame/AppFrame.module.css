@@ -5,12 +5,23 @@
   /* Lets the task header backdrop bleed to the viewport edges without horizontal scroll. */
   overflow-x: clip;
   color: var(--c-text);
-  /* Moving between features melts one accent into the next across every tinted surface. */
-  transition:
-    --c-accent var(--duration-accent) var(--ease-out),
-    --c-accent-soft var(--duration-accent) var(--ease-out),
-    --c-accent-strong var(--duration-accent) var(--ease-out),
-    --c-accent-2 var(--duration-accent) var(--ease-out);
+}
+
+/* Keep the viewport glow off the scrolling page's paint layer. A faint, static accent wash at the
+   top edge is the only page-level hint of the current feature. */
+.page::before {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  background:
+    radial-gradient(
+      70% 45% at 50% -10%,
+      color-mix(in oklch, var(--c-accent) 9%, transparent),
+      transparent 70%
+    ),
+    var(--c-background);
+  content: '';
+  pointer-events: none;
 }
 
 .shell {
@@ -89,52 +100,9 @@
 }
 
 .routeLabelTitle {
-  position: relative;
   min-width: 0;
   font-size: var(--text-lg);
   line-height: 1.1;
-
-  /* Accent underline that draws in under the section title, then keeps a slow shimmer. */
-  &::after {
-    position: absolute;
-    right: 0;
-    bottom: -0.4rem;
-    left: 0;
-    height: 2px;
-    border-radius: var(--radius-pill);
-    background: linear-gradient(
-      90deg,
-      var(--c-accent),
-      var(--c-accent-2),
-      var(--c-accent-strong),
-      var(--c-accent)
-    );
-    background-size: 300% 100%;
-    content: '';
-    transform-origin: left;
-    animation:
-      underline-in 900ms 250ms var(--ease-out) both,
-      underline-flow 6s linear infinite;
-  }
-}
-
-@keyframes underline-in {
-  from {
-    opacity: 0;
-    transform: scaleX(0);
-  }
-}
-
-@keyframes underline-flow {
-  to {
-    background-position: 300% 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .routeLabelTitle::after {
-    animation: none;
-  }
 }
 
 /* The sticky task header owns top spacing and the safe-area inset on phones. */
