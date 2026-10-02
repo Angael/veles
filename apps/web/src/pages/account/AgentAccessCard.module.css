@@ -1,0 +1,65 @@
+@import '../../styles/breakpoints.css';
+
+.card {
+  display: grid;
+  gap: var(--space-lg);
+
+  & h2 {
+    color: var(--c-text-strong);
+    font-size: var(--text-lg-dynamic);
+  }
+
+  & p {
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+    text-wrap: pretty;
+  }
+}
+
+.form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: var(--space-sm);
+}
+
+.secret {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--c-primary-border-soft);
+  border-radius: var(--radius-md);
+
+  & label {
+    width: 100%;
+  }
+}
+
+.tokens {
+  display: grid;
+  gap: var(--space-md);
+
+  & li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+
+  & strong {
+    overflow-wrap: anywhere;
+  }
+
+  & small {
+    display: block;
+    color: var(--c-muted-strong);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (--phone) {
+  .form {
+    grid-template-columns: 1fr;
+  }
+}
