@@ -467,7 +467,7 @@ const updateFoodProductMultipartType = type('FormData.parse').to({
   'photo?': nonEmptyPhotoType,
 });
 
-/** Saves the product and refreshes the current user's logs for their local today atomically. */
+/** Saves the product and refreshes all users' matching logs for the editor's local today atomically. */
 export const updateFoodProduct = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateFoodProduct'), limitFoodUploadRequestMiddleware])
   .validator(arkTypeValidator(updateFoodProductMultipartType))
@@ -524,7 +524,6 @@ export const updateFoodProduct = createServerFn({ method: 'POST' })
           .where(
             and(
               eq(foodLogs.productId, updated.id),
-              eq(foodLogs.userId, session.user.id),
               eq(foodLogs.logDate, values.today),
               isNotNull(foodLogs.gramsHundredths),
             ),

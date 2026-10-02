@@ -41,7 +41,7 @@ export const foodProducts = pgTable(
   ],
 );
 
-/** User-owned nutrition snapshots; product edits refresh only the editing user's logs dated today. */
+/** User-owned nutrition snapshots; product edits refresh all users' matching logs dated today. */
 export const foodLogs = pgTable(
   'food_log',
   {
