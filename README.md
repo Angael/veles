@@ -32,6 +32,10 @@ pnpm check
 pnpm check:fix
 ```
 
+The [workspace dependency decision](docs/2026-10-02-workspace-dependencies.md)
+explains which tooling belongs at the root and why each package declares its own
+build and runtime dependencies.
+
 Database commands remain available from the repository root. Migrations are an explicit deployment step and are never run by the web or worker containers.
 
 ```bash
