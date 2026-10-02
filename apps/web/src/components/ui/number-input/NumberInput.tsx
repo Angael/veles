@@ -1,6 +1,6 @@
 import { NumberField, type NumberFieldRootProps } from '@base-ui/react/number-field';
 import clsx from 'clsx';
-import { useState, type ComponentPropsWithoutRef } from 'react';
+import { useState, useSyncExternalStore, type ComponentPropsWithoutRef } from 'react';
 import { flushSync } from 'react-dom';
 import { MinusIcon, PlusIcon } from 'lucide-react';
 import type { InputSize } from '@/components/ui/text-input/TextInput';
@@ -34,6 +34,11 @@ export function NumberInput({
 }: NumberInputProps) {
   // Typed arithmetic such as `10*2`; Base UI only accepts plain numbers, so it's held here until committed.
   const [expression, setExpression] = useState<string | null>(null);
+  const phoneKeypad = useSyncExternalStore(
+    subscribeToNothing,
+    () => !isIOS(),
+    () => true,
+  );
 
   /** Replaces a pending expression with its result so Base UI parses, clamps and commits it like typed input. */
   function commitExpression(input: HTMLInputElement) {
@@ -78,8 +83,7 @@ export function NumberInput({
         <NumberField.Input
           className={clsx(css.input, inputClassName)}
           enterKeyHint={enterKeyHint}
-          // Phone keypad exposes arithmetic operators, unlike Base UI's default numeric keypad.
-          inputMode='tel'
+          {...(phoneKeypad && PHONE_KEYPAD_PROPS)}
           {...(expression !== null && { value: expression })}
           onBlurCapture={(event) => commitExpression(event.currentTarget)}
           onChange={(event) => {
@@ -125,6 +129,24 @@ export function NumberInput({
         </NumberField.Increment>
       </NumberField.Group>
     </NumberField.Root>
+  );
+}
+
+/**
+ * Phone keypad exposes arithmetic operators, unlike Base UI's default numeric keypad.
+ * Skipped on iOS, whose phone keypad lacks a decimal point; Base UI picks a decimal keypad there.
+ */
+const PHONE_KEYPAD_PROPS = { inputMode: 'tel' } as const;
+
+function subscribeToNothing() {
+  return () => {};
+}
+
+function isIOS() {
+  const { maxTouchPoints, userAgent } = navigator;
+  // iPadOS reports a desktop Mac user agent, so tell it apart by touch support.
+  return (
+    /iPhone|iPad|iPod/.test(userAgent) || (userAgent.includes('Macintosh') && maxTouchPoints > 1)
   );
 }
 
