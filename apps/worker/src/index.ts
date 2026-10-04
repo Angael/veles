@@ -1,5 +1,4 @@
 import { createDatabaseConnection } from '@veles/db';
-import { sql } from 'drizzle-orm';
 import { errorMessage, startJob } from './job.ts';
 import { createUploadCleanup } from './upload-cleanup.ts';
 
@@ -19,26 +18,17 @@ const uploadCleanup = createUploadCleanup(connection.db, {
   secretAccessKey: requireEnv('R2_SECRET_ACCESS_KEY'),
 });
 
-const jobs = [
-  startJob({
-    name: 'database check',
-    intervalMs: 10_000,
-    run: async () => {
-      await connection.db.execute(sql`select 1`);
-    },
-  }),
-  startJob({
-    name: 'upload cleanup',
-    intervalMs: 6 * 60 * 60 * 1000,
-    run: uploadCleanup.run,
-  }),
-];
+const uploadCleanupJob = startJob({
+  name: 'upload cleanup',
+  intervalMs: 6 * 60 * 60 * 1000,
+  run: uploadCleanup.run,
+});
 console.info('worker started');
 
-/** Waits for in-flight job runs before closing the clients they use. */
+/** Waits for the in-flight cleanup run before closing the clients it uses. */
 async function shutdown(signal: NodeJS.Signals) {
   console.info('worker stopping', { signal });
-  await Promise.all(jobs.map((job) => job.stop()));
+  await uploadCleanupJob.stop();
   uploadCleanup.close();
   await connection.close();
 }
