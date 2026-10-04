@@ -2,8 +2,6 @@
 - This is a solo hobby app; prefer low-friction solutions
 - Run `pnpm check:fix` before finishing
 - Always use exact pinned package versions
-- Keep runtime dependencies and package build/typecheck tools declared in each consuming package; root-only declarations must not substitute for them.
-- Keep repository-wide lint/format tooling and the shared oxlint configuration at the root. See `docs/2026-10-02-workspace-dependencies.md` for the dependency ownership decision.
 - skip "computer use"/"browser smoke tests" checks and launching dev server.
 - Display kcal as a distinct energy metric, never grouped on the same row with macros; group macros together in this order: protein, fat, carbs.
 - Generated files are exempt and must not be hand-edited.

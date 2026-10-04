@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/worker/package.json apps/worker/package.json
 COPY packages/db/package.json packages/db/package.json
-RUN pnpm --filter @veles/worker... install --frozen-lockfile --prod
+RUN pnpm --filter @veles/worker... --filter veles install --frozen-lockfile --prod
 
 COPY apps/worker apps/worker
 COPY packages/db packages/db

@@ -32,10 +32,6 @@ pnpm check
 pnpm check:fix
 ```
 
-The [workspace dependency decision](docs/2026-10-02-workspace-dependencies.md)
-explains which tooling belongs at the root and why each package declares its own
-build and runtime dependencies.
-
 Database commands remain available from the repository root. Migrations are an explicit deployment step and are never run by the web or worker containers.
 
 ```bash
@@ -46,7 +42,7 @@ pnpm db:migrate:prod
 
 ### Compose
 
-The web and worker Dockerfiles install only their own workspace dependency trees (including `packages/db`); the preview controller has a separate filtered image build. A root `pnpm install` still installs the whole workspace.
+The web and worker Dockerfiles install the root shared dependencies and their own workspace dependency trees (including `packages/db`); the preview controller has a separate filtered image build. A root `pnpm install` still installs the whole workspace.
 
 ```bash
 docker compose up --build
