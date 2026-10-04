@@ -7,7 +7,7 @@ import { receivedFoodLogSharesQueryOptions } from '@/pages/calories/dashboard/fo
 import { calorieWeekStart, normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 
 export const Route = createFileRoute('/_authenticated/calories')({
-  validateSearch: type({ 'date?': 'string' }),
+  validateSearch: type({ 'date?': 'string', 'foodId?': 'string' }),
   loaderDeps: ({ search }) => ({
     weekStart: calorieWeekStart(normalizeCalorieDate(search.date)),
   }),
@@ -29,5 +29,5 @@ function RouteComponent() {
   const date = normalizeCalorieDate(search.date);
   const { data: dashboard } = useSuspenseQuery(calorieDashboardQueryOptions(date));
 
-  return <CaloriesPage dashboard={dashboard} date={date} />;
+  return <CaloriesPage dashboard={dashboard} date={date} linkedFoodId={search.foodId} />;
 }

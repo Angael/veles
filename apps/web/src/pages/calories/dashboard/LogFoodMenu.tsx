@@ -14,12 +14,6 @@ type Props = { date: string };
 
 const loggingActions = [
   {
-    description: 'Search your foods and choose a serving',
-    icon: PlusIcon,
-    label: 'Add food',
-    to: '/calories/add' as const,
-  },
-  {
     description: 'Use the camera or enter a barcode',
     icon: ScanLineIcon,
     label: 'Scan barcode',

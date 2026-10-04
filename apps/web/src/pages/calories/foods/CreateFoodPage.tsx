@@ -12,7 +12,7 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
   async function save(value: FoodEditorValue) {
     const product = await createMutation.mutateAsync(value);
     markSaved();
-    await navigate({ replace: true, search: { date, foodId: product.id }, to: '/calories/add' });
+    await navigate({ replace: true, search: { date, foodId: product.id }, to: '/calories' });
   }
 
   return (

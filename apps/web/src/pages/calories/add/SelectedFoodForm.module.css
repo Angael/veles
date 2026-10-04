@@ -1,16 +1,9 @@
 @import '../../../styles/breakpoints.css';
 
-.page,
+.stack,
 .form {
   display: grid;
   gap: var(--space-md);
-}
-
-/* Room for the goal preview that is fixed to the bottom on phones. */
-.page {
-  @media (--phone) {
-    padding-bottom: 7rem;
-  }
 }
 
 .packageShortcuts {
@@ -127,20 +120,6 @@
 }
 
 @media (--phone) {
-  .goalPreview {
-    position: fixed;
-    z-index: 10;
-    bottom: max(var(--space-sm), env(safe-area-inset-bottom));
-    left: 50%;
-    width: calc(100% - 2 * var(--space-md));
-    padding: var(--space-sm);
-    border: var(--border-width) solid var(--c-border);
-    border-radius: var(--radius-sm);
-    background: var(--c-surface);
-    box-shadow: var(--shadow-popup);
-    transform: translateX(-50%);
-  }
-
   .goalCaption {
     gap: var(--space-xs) var(--space-sm);
   }
