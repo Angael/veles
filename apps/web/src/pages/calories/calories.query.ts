@@ -1,6 +1,7 @@
 import { queryOptions, useMutation } from '@tanstack/react-query';
 import { todayLocalDate } from '@/lib/dateOnly';
 import {
+  copyFoodLogs,
   createFoodProduct,
   deleteFoodLog,
   deleteFoodLogs,
@@ -8,6 +9,7 @@ import {
   getFoodProduct,
   getFoodProducts,
   lookupFoodByBarcode,
+  moveFoodLogs,
   multiplyFoodLogs,
   recordCustomCalories,
   recordFood,
@@ -142,6 +144,28 @@ export function useMultiplyFoodLogsMutation() {
       invalidateQueryKey: calorieDashboardKey,
     },
     mutationFn: (data: { factor: number; ids: string[] }) => multiplyFoodLogs({ data }),
+  });
+}
+
+export type FoodLogsDateVariables = { date: string; ids: string[] };
+
+export function useMoveFoodLogsMutation() {
+  return useMutation({
+    meta: {
+      error: { title: 'Could not move products' },
+      invalidateQueryKey: calorieDashboardKey,
+    },
+    mutationFn: (data: FoodLogsDateVariables) => moveFoodLogs({ data }),
+  });
+}
+
+export function useCopyFoodLogsMutation() {
+  return useMutation({
+    meta: {
+      error: { title: 'Could not copy products' },
+      invalidateQueryKey: calorieDashboardKey,
+    },
+    mutationFn: (data: FoodLogsDateVariables) => copyFoodLogs({ data }),
   });
 }
 
