@@ -1,8 +1,8 @@
 import clsx from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentProps } from 'react';
 import css from './SeamlessTextInput.module.css';
 
-type SeamlessTextInputProps = Omit<ComponentPropsWithoutRef<'input'>, 'className'> & {
+type SeamlessTextInputProps = Omit<ComponentProps<'input'>, 'className'> & {
   className?: string;
 };
 

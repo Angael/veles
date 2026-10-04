@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentProps } from 'react';
 import css from './Card.module.css';
 
 /**
@@ -8,7 +8,7 @@ import css from './Card.module.css';
  */
 export type CardTone = 'primary' | 'sky' | 'danger';
 
-type CardProps = ComponentPropsWithoutRef<'div'> & {
+type CardProps = ComponentProps<'div'> & {
   as?: 'article' | 'aside' | 'div' | 'section';
   shadow?: boolean;
   tone?: CardTone;

@@ -1,8 +1,8 @@
 import clsx from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentProps } from 'react';
 import css from './SeamlessTextarea.module.css';
 
-type SeamlessTextareaProps = Omit<ComponentPropsWithoutRef<'textarea'>, 'className'> & {
+type SeamlessTextareaProps = Omit<ComponentProps<'textarea'>, 'className'> & {
   className?: string;
 };
 
