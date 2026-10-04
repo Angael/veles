@@ -3,10 +3,20 @@ import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { TextareaInput } from '@/components/ui/textarea-input/TextareaInput';
 import { TextInput } from '@/components/ui/text-input/TextInput';
-import type { UpdateRecipeInput } from '../recipes.api';
 import css from './RecipeForm.module.css';
 
-export type RecipeFormDraft = Omit<UpdateRecipeInput, 'id'>;
+export type RecipeFormDraft = {
+  carbs: number | null;
+  description: string;
+  fats: number | null;
+  ingredients: string[];
+  kcal: number | null;
+  name: string;
+  portions: number;
+  protein: number | null;
+  rating: number | null;
+  tags: string[];
+};
 
 type RecipeFormProps = {
   draft: RecipeFormDraft;
