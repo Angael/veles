@@ -3,11 +3,12 @@ import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
+import { PhotosField } from '@/components/ui/upload-tile-grid/PhotosField';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import { appendOrderedPhotos, type OrderedPhoto } from '@/lib/storage/orderedPhotos';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
-import { RecipePhotosField } from './RecipePhotosField';
+import { RECIPE_UPLOAD_MAX_PHOTO_BYTES, RECIPE_UPLOAD_MAX_PHOTO_COUNT } from '../recipeUpload.api';
 import css from './AddRecipePage.module.css';
 import { useCreateRecipeMutation } from '../recipes.query';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
@@ -65,7 +66,9 @@ export function AddRecipePage() {
             }}
           />
 
-          <RecipePhotosField
+          <PhotosField
+            maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES}
+            maxItems={RECIPE_UPLOAD_MAX_PHOTO_COUNT}
             onPhotosChange={(photos) => {
               markDirty();
               setDraft((current) => ({ ...current, photos }));

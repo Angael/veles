@@ -1,4 +1,4 @@
-import { useNavigate, useRouter } from '@tanstack/react-router';
+import { useRouter } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -8,40 +8,49 @@ import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
+import { PhotosField } from '@/components/ui/upload-tile-grid/PhotosField';
+import { appendOrderedPhotos, type OrderedPhoto } from '@/lib/storage/orderedPhotos';
 import css from './WeightEntryPages.module.css';
-import { useSaveWeightMutation } from './weight.query';
+import { useAddWeightEntryMutation } from './weight.query';
+import { WEIGHT_PHOTO_MAX_BYTES, WEIGHT_PHOTO_MAX_COUNT } from './weightPhotos.api';
 
 export function AddWeightPage() {
   const router = useRouter();
-  const navigate = useNavigate();
   const today = format(new Date(), 'yyyy-MM-dd');
   const [date, setDate] = useState(today);
   const [weightKg, setWeightKg] = useState<number | null>(null);
-  const mutation = useSaveWeightMutation();
+  const [photos, setPhotos] = useState<OrderedPhoto[]>([]);
+  const mutation = useAddWeightEntryMutation();
+
+  /** Saves the weight and photos in one request; failures keep picked files for a retry. */
+  async function handleSubmit() {
+    if (weightKg === null) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('date', date);
+    formData.append('weightKg', String(weightKg));
+    appendOrderedPhotos(formData, photos);
+
+    try {
+      await mutation.mutateAsync({ data: formData });
+    } catch {
+      return;
+    }
+
+    await router.invalidate().catch(() => undefined);
+    await router.navigate(
+      photos.length > 0
+        ? { params: { date }, replace: true, to: '/weight/$date' }
+        : { replace: true, to: '/weight' },
+    );
+  }
 
   return (
     <main>
       <Card as='section'>
-        <TypedForm
-          className={css.form}
-          onSubmit={() => {
-            if (weightKg === null) {
-              return;
-            }
-
-            mutation.mutate(
-              { data: { date, weightKg } },
-              {
-                onSuccess: () => {
-                  void router
-                    .invalidate()
-                    .then(() => navigate({ replace: true, to: '/weight' }))
-                    .catch(() => undefined);
-                },
-              },
-            );
-          }}
-        >
+        <TypedForm className={css.form} errorMsg={mutation.error?.message} onSubmit={handleSubmit}>
           <Label text='Weight (kg)'>
             <NumberInput
               enterKeyHint='done'
@@ -55,6 +64,12 @@ export function AddWeightPage() {
               value={weightKg}
             />
           </Label>
+          <PhotosField
+            maxItemSize={WEIGHT_PHOTO_MAX_BYTES}
+            maxItems={WEIGHT_PHOTO_MAX_COUNT}
+            onPhotosChange={setPhotos}
+            photos={photos}
+          />
           <FormSubmitRow>
             <Label text='Date'>
               <DateInput max={today} name='date' onValueChange={setDate} required value={date} />

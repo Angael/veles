@@ -14,6 +14,11 @@ const NEW_PHOTO_SLOT = 'new';
 
 const photoOrderType = type(`(string.uuid | '${NEW_PHOTO_SLOT}')[]`);
 
+/** Seeds an editable photo list from photos loaded from the server. */
+export function toStoredPhotos(photos: Array<{ id: string; url: string | null }>): OrderedPhoto[] {
+  return photos.map((photo) => ({ id: photo.id, kind: 'stored', url: photo.url }));
+}
+
 /**
  * Serializes an edited photo list into multipart fields: every photo gets one order slot (its
  * stored id, or `new` for a file), and files are appended in the same order as their slots.
