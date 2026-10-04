@@ -1,12 +1,9 @@
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import css from './PillBtn.module.css';
 
-type PillBtnProps = Omit<
-  ComponentPropsWithoutRef<typeof Link>,
-  'aria-current' | 'children' | 'className'
-> & {
+type PillBtnProps = Omit<ComponentProps<typeof Link>, 'aria-current' | 'children' | 'className'> & {
   active?: boolean;
   className?: string;
   collapseLabelAt?: 'phone' | 'tablet';

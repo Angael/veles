@@ -1,40 +1,13 @@
-import type {
-  BarcodeDetector as PolyfillBarcodeDetector,
-  BarcodeFormat,
-} from 'barcode-detector/pure';
-import {
-  CameraIcon,
-  CameraOffIcon,
-  LoaderCircleIcon,
-  SearchXIcon,
-  SwitchCameraIcon,
-} from 'lucide-react';
+import { SwitchCameraIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { RouteBackButton } from '@/components/app/app-frame/RouteBackButton';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import css from './BarcodeScanner.module.css';
+import { getFoodBarcode } from '../foodBarcode';
+import { createDetector } from './barcodeDetector';
+import { ScannerMessage, type ScannerState } from './ScannerMessage';
 import { useCameraPreference } from './useCameraPreference';
-
-type BarcodeDetectorLike = Pick<PolyfillBarcodeDetector, 'detect'>;
-type BarcodeDetectorConstructor = new (options: {
-  formats: BarcodeFormat[];
-}) => BarcodeDetectorLike;
-
-declare global {
-  interface Window {
-    BarcodeDetector?: BarcodeDetectorConstructor;
-  }
-}
-
-type ScannerState =
-  | 'starting'
-  | 'scanning'
-  | 'lookingUp'
-  | 'notFound'
-  | 'permissionDenied'
-  | 'unavailable'
-  | 'error';
 
 export type BarcodeScannerStatus = 'scanning' | 'lookingUp' | 'notFound';
 
@@ -43,20 +16,8 @@ type BarcodeScannerProps = {
   status: BarcodeScannerStatus;
 };
 
-const formats: BarcodeFormat[] = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'];
 const detectionIntervalMs = 250;
 const barcodeAbsentResetMs = 1000;
-
-/** Uses the native detector when available and only downloads the WASM-backed fallback when needed. */
-async function createDetector(): Promise<BarcodeDetectorLike> {
-  if (window.BarcodeDetector) {
-    return new window.BarcodeDetector({ formats });
-  }
-
-  // A static import would execute the polyfill in the initial client bundle on browsers with native support.
-  const { BarcodeDetector } = await import('barcode-detector/pure');
-  return new BarcodeDetector({ formats });
-}
 
 /** Requests continuous autofocus on browsers that expose the camera focus controls. */
 async function enableContinuousFocus(stream: MediaStream) {
@@ -169,7 +130,9 @@ export function BarcodeScanner({ onDetected, status }: BarcodeScannerProps) {
             lastDetection = timestamp;
             try {
               const results = await detector.detect(video);
-              const barcode = results.find((result) => result.rawValue.trim())?.rawValue.trim();
+              const barcode = results
+                .map((result) => getFoodBarcode(result.rawValue, result.format))
+                .find((value) => value !== null);
               // Effect cleanup can flip this flag while detector.detect is awaiting the browser.
               // oxlint-disable-next-line typescript/no-unnecessary-condition -- Avoid invoking the callback after scanner unmount.
               if (barcode && active) {
@@ -279,57 +242,9 @@ export function BarcodeScanner({ onDetected, status }: BarcodeScannerProps) {
       </div>
       {isScanning ? (
         <p aria-live='polite' className={css.status}>
-          Looking for an EAN or UPC barcode…
+          Looking for a barcode or 2D food code…
         </p>
       ) : null}
     </section>
   );
 }
-
-function ScannerMessage({ state }: { state: Exclude<ScannerState, 'scanning'> }) {
-  if (state === 'starting') {
-    return (
-      <div className={css.message}>
-        <CameraIcon aria-hidden='true' />
-        <strong>Starting camera…</strong>
-        <span>You may be asked for permission.</span>
-      </div>
-    );
-  }
-
-  const copy = scannerMessageCopy[state];
-  let icon = <CameraOffIcon aria-hidden='true' />;
-  if (state === 'lookingUp') {
-    icon = <LoaderCircleIcon aria-hidden='true' className={css.loadingIcon} />;
-  } else if (state === 'notFound') {
-    icon = <SearchXIcon aria-hidden='true' />;
-  }
-
-  return (
-    <div className={css.message} role={state === 'lookingUp' ? 'status' : 'alert'}>
-      {icon}
-      <strong>{copy[0]}</strong>
-      <span>{copy[1]}</span>
-    </div>
-  );
-}
-
-const scannerMessageCopy: Record<
-  Exclude<ScannerState, 'starting' | 'scanning'>,
-  [string, string]
-> = {
-  lookingUp: ['Looking up product…', 'Checking the product catalog.'],
-  notFound: ['Barcode not found', 'Create this product or scan another barcode.'],
-  permissionDenied: [
-    'Camera permission denied',
-    'Allow camera access in your browser settings, or type the barcode instead.',
-  ],
-  unavailable: [
-    'Camera unavailable',
-    'This browser cannot access a camera. You can still type the barcode.',
-  ],
-  error: [
-    'Scanner stopped',
-    'We could not read from the camera. Close it and try again, or type the barcode.',
-  ],
-};

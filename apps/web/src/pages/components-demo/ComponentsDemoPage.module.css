@@ -153,3 +153,12 @@
   width: 72%;
   height: 0.875rem;
 }
+
+.contextMenuDemo {
+  display: grid;
+  place-items: center;
+  min-height: 6rem;
+  border: var(--border-width) dashed var(--c-border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--c-muted);
+}

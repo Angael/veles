@@ -1,8 +1,8 @@
 import clsx from 'clsx';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import css from './Label.module.css';
 
-type LabelProps = Omit<ComponentPropsWithoutRef<'label'>, 'className' | 'children'> & {
+type LabelProps = Omit<ComponentProps<'label'>, 'className' | 'children'> & {
   children: ReactNode;
   className?: string;
   text: ReactNode;

@@ -5,6 +5,13 @@ import { useState } from 'react';
 import { Btn, type BtnSize, type BtnVariant } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { Checkbox } from '@/components/ui/checkbox/Checkbox';
+import {
+  ContextMenuItem,
+  ContextMenuPopup,
+  ContextMenuRoot,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu/ContextMenu';
 import { DateInput } from '@/components/ui/date-input/DateInput';
 import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import {
@@ -187,6 +194,24 @@ export function ComponentsDemoPage() {
             />
           </MenuBtnPopup>
         </MenuBtnRoot>
+      </section>
+      <section>
+        <h2>ContextMenu</h2>
+        <ContextMenuRoot>
+          <ContextMenuTrigger className={css.contextMenuDemo}>
+            Right click or long press here
+          </ContextMenuTrigger>
+          <ContextMenuPopup aria-label='Demo context menu'>
+            <ContextMenuItem icon={<CopyPlusIcon aria-hidden='true' />} label='Duplicate' />
+            <ContextMenuItem disabled icon={<SendIcon aria-hidden='true' />} label='Share' />
+            <ContextMenuSeparator />
+            <ContextMenuItem
+              icon={<Trash2Icon aria-hidden='true' />}
+              label='Delete'
+              variant='danger'
+            />
+          </ContextMenuPopup>
+        </ContextMenuRoot>
       </section>
       <section>
         <h2>Dialog</h2>
