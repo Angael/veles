@@ -19,6 +19,10 @@
 - Never run Drizzle commands yourself; leave them to the human user
 - DB migrations need to be run before pushing/merging to `main`
 
+## Pull Requests
+- Prepend each PR description with a short `#tldr`.
+- When writing PRs, follow ASD-STE100 (Simplified Technical English) and keep it short.
+
 ## Database Scripts
 - `pnpm db:seed` inserts only the shared food products into the development database at `DATABASE_URL`.
 - `pnpm db:seed:prod` inserts only the shared food products into the production database at `PROD_DATABASE_URL`.
