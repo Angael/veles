@@ -14,10 +14,12 @@ type RecipeSelect = typeof recipes.$inferSelect;
 
 export type RecipeLibraryItem = Omit<RecipeSelect, 'createdAt' | 'updatedAt' | 'userId'> & {
   createdAt: string;
-  images: Array<{ url: string }>;
+  images: RecipeImage[];
   isOwned: boolean;
   updatedAt: string;
 };
+
+export type RecipeImage = { id: string; url: string };
 
 export type RecipeViewItem = RecipeLibraryItem & { canManage: boolean };
 
@@ -80,24 +82,6 @@ const updateRecipeRatingInputType = type({
   id: 'string.uuid',
   rating: '1 <= number.integer <= 5',
 });
-
-const recipeTextListType = type('string.trim[]').pipe((values) => values.filter(Boolean));
-
-const updateRecipeInputType = type({
-  carbs: 'number.integer >= 0 | null',
-  description: 'string.trim',
-  fats: 'number.integer >= 0 | null',
-  id: 'string.uuid',
-  ingredients: recipeTextListType,
-  kcal: 'number.integer >= 0 | null',
-  name: 'string.trim |> string >= 1',
-  portions: 'number.integer >= 1',
-  protein: 'number.integer >= 0 | null',
-  rating: '1 <= number.integer <= 5 | null',
-  tags: recipeTextListType,
-});
-
-export type UpdateRecipeInput = typeof updateRecipeInputType.infer;
 
 export const getRecipeById = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRecipeById')])
@@ -174,39 +158,8 @@ export const updateRecipeRating = createServerFn({ method: 'POST' })
     return { ok: true };
   });
 
-export const updateRecipe = createServerFn({ method: 'POST' })
-  .middleware([logMiddleware('updateRecipe')])
-  .validator(arkTypeValidator(updateRecipeInputType))
-  .handler(async ({ data }) => {
-    const session = await requireSession();
-
-    const updatedRows = await db
-      .update(recipes)
-      .set({
-        carbs: data.carbs,
-        description: data.description,
-        fats: data.fats,
-        ingredients: data.ingredients,
-        kcal: data.kcal,
-        name: data.name,
-        portions: data.portions,
-        protein: data.protein,
-        rating: data.rating,
-        tags: data.tags,
-        updatedAt: new Date(),
-      })
-      .where(and(eq(recipes.id, data.id), eq(recipes.userId, session.user.id)))
-      .returning({ id: recipes.id });
-
-    if (!updatedRows[0]) {
-      throw new ClientSafeError('Recipe not found.');
-    }
-
-    return { ok: true };
-  });
-
 async function getImagesByRecipeId(recipeIds: string[]) {
-  const imagesByRecipeId = new Map<string, Array<{ url: string }>>();
+  const imagesByRecipeId = new Map<string, RecipeImage[]>();
 
   if (recipeIds.length === 0) {
     return imagesByRecipeId;
@@ -214,6 +167,7 @@ async function getImagesByRecipeId(recipeIds: string[]) {
 
   const rows = await db
     .select({
+      id: recipeImages.id,
       key: uploadObjects.key,
       position: recipeImages.position,
       recipeId: recipeImages.recipeId,
@@ -231,7 +185,7 @@ async function getImagesByRecipeId(recipeIds: string[]) {
     }
 
     const images = imagesByRecipeId.get(row.recipeId) ?? [];
-    images.push({ url });
+    images.push({ id: row.id, url });
     imagesByRecipeId.set(row.recipeId, images);
   }
 
@@ -240,7 +194,7 @@ async function getImagesByRecipeId(recipeIds: string[]) {
 
 function toRecipeLibraryItem(
   recipe: RecipeSelect,
-  imagesByRecipeId: Map<string, Array<{ url: string }>>,
+  imagesByRecipeId: Map<string, RecipeImage[]>,
   isOwned: boolean,
 ): RecipeLibraryItem {
   return {

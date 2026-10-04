@@ -1,31 +1,31 @@
-import { randomUUID } from 'node:crypto';
 import { ArkErrors, type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
-import { createMiddleware, createServerFn } from '@tanstack/react-start';
+import { createServerFn } from '@tanstack/react-start';
+import { and, eq, inArray } from 'drizzle-orm';
 import { recipeImages, recipes, uploadObjects } from '@veles/db/schema';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
+import { readOrderedPhotos } from '@/lib/storage/orderedPhotos';
+import { limitRequestSizeMiddleware } from '@/server/middleware/limitRequestSizeMiddleware';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
-import { getStorageConfig } from '@/server/storage/config.server';
-import { optimizeImage } from '@/server/storage/image.server';
 import { IMAGE_MAX_INPUT_BYTES } from '@/lib/storage/imageLimits';
-import { deleteFileByKey, uploadFileByKey } from '@/server/storage/r2.server';
+import {
+  deleteImageFiles,
+  planPhotoSync,
+  toUploadObjectRows,
+  uploadOptimizedImages,
+} from '@/server/storage/photoSync.server';
 // Keep below nginx's client_max_body_size with enough headroom for multipart form overhead.
 // If this changes, update the corresponding limit in infra/nginx/nginx.conf.
 const RECIPE_UPLOAD_MAX_REQUEST_BYTES = 85 * 1024 * 1024;
+const RECIPE_IMAGE_KEY_PREFIX = 'recipe-images';
 
 export const RECIPE_UPLOAD_MAX_PHOTO_COUNT = 8;
 export const RECIPE_UPLOAD_MAX_PHOTO_BYTES = IMAGE_MAX_INPUT_BYTES;
 
-const contentLengthType = type('string.numeric.parse |> number.integer >= 0');
 const formDataType = type('FormData');
-const photoCountType = type(`File[] <= ${RECIPE_UPLOAD_MAX_PHOTO_COUNT}`);
-const photoSizeType = type('File[]').narrow((files, context) =>
-  files.every((file) => file.size <= RECIPE_UPLOAD_MAX_PHOTO_BYTES)
-    ? true
-    : context.mustBe('photos no larger than 10 MiB each'),
-);
+const recipeIdType = type('string.uuid');
 
 const optionalNumericFormValueType = type('string.trim').pipe((value): number | null | ArkErrors =>
   value === '' ? null : type('string.numeric.parse')(value),
@@ -48,129 +48,122 @@ const uploadRecipeInputType = type({
   ingredients: recipeTextListType,
   kcal: optionalNumericFormValueType,
   name: 'string.trim |> string >= 1',
-  photos: 'File[]',
   portions: portionsFormValueType,
   protein: optionalNumericFormValueType,
   rating: optionalRatingFormValueType,
   tags: recipeTextListType,
 });
 
-const limitRecipeUploadRequestMiddleware = createMiddleware().server(async ({ next, request }) => {
-  const contentLength = contentLengthType(request.headers.get('content-length') ?? '');
-
-  if (contentLength instanceof type.errors || contentLength > RECIPE_UPLOAD_MAX_REQUEST_BYTES) {
-    throw new ClientSafeError('Upload request is too large.');
-  }
-
-  return next();
-});
-
 export const createRecipe = createServerFn({ method: 'POST' })
-  .middleware([logMiddleware('createRecipe'), limitRecipeUploadRequestMiddleware])
+  .middleware([
+    logMiddleware('createRecipe'),
+    limitRequestSizeMiddleware(RECIPE_UPLOAD_MAX_REQUEST_BYTES),
+  ])
   .validator(arkTypeValidator(formDataType))
   .handler(async ({ data }) => {
     const session = await requireSession();
     return persistRecipeUpload(data, session.user.id);
   });
 
-/** Validates, stores, and records one recipe while cleaning up uploaded files after any failure. */
-async function persistRecipeUpload(formData: FormData, userId: string) {
-  const uploadedKeys: string[] = [];
+export const updateRecipe = createServerFn({ method: 'POST' })
+  .middleware([
+    logMiddleware('updateRecipe'),
+    limitRequestSizeMiddleware(RECIPE_UPLOAD_MAX_REQUEST_BYTES),
+  ])
+  .validator(arkTypeValidator(formDataType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    const recipeId = recipeIdType(data.get('id'));
 
-  try {
-    const validation = validateRecipeForm(formData);
-    const optimizedImages: Array<{ id: string; key: string; type: string }> = [];
-
-    for (const file of validation.photos) {
-      const optimizedImage = await optimizeImage(file);
-      const image = {
-        id: randomUUID(),
-        key: `recipe-images/${randomUUID()}.webp`,
-        type: optimizedImage.type,
-      };
-
-      await uploadFileByKey({
-        body: optimizedImage.buffer,
-        contentType: optimizedImage.type,
-        key: image.key,
-        bucket: 'public',
-      });
-      uploadedKeys.push(image.key);
-      optimizedImages.push(image);
+    if (recipeId instanceof type.errors) {
+      throw new ClientSafeError('Recipe not found.');
     }
 
-    const { bucketName } = getStorageConfig();
+    return persistRecipeUpload(data, session.user.id, recipeId);
+  });
 
-    const recipeId = await db.transaction(async (tx) => {
-      const insertedRecipes = await tx
-        .insert(recipes)
-        .values({
-          carbs: validation.carbs,
-          description: validation.description,
-          fats: validation.fats,
-          ingredients: validation.ingredients,
-          kcal: validation.kcal,
-          name: validation.name,
-          portions: validation.portions,
-          protein: validation.protein,
-          rating: validation.rating,
-          tags: validation.tags,
-          userId,
-        })
-        .returning({ id: recipes.id });
-      const recipe = insertedRecipes[0];
+/**
+ * Validates fields and the ordered photo list, uploads new files, then creates or updates the
+ * recipe and rewrites its image links in one transaction. Uploads are cleaned up after any
+ * failure; images dropped from the list are deleted from storage after commit.
+ */
+async function persistRecipeUpload(formData: FormData, userId: string, existingRecipeId?: string) {
+  const fields = validateRecipeFields(formData);
+  const order = readOrderedPhotos(formData, {
+    maxBytes: RECIPE_UPLOAD_MAX_PHOTO_BYTES,
+    maxCount: RECIPE_UPLOAD_MAX_PHOTO_COUNT,
+  });
+  const uploaded = await uploadOptimizedImages(
+    order.flatMap((slot) => (slot.kind === 'file' ? [slot.file] : [])),
+    RECIPE_IMAGE_KEY_PREFIX,
+  );
+  let result: { id: string; removedKeys: string[] };
+
+  try {
+    result = await db.transaction(async (tx) => {
+      const [recipe] = existingRecipeId
+        ? await tx
+            .update(recipes)
+            .set({ ...fields, updatedAt: new Date() })
+            .where(and(eq(recipes.id, existingRecipeId), eq(recipes.userId, userId)))
+            .returning({ id: recipes.id })
+        : await tx
+            .insert(recipes)
+            .values({ ...fields, userId })
+            .returning({ id: recipes.id });
 
       if (!recipe) {
-        throw new Error('Recipe insert failed');
+        throw new ClientSafeError('Recipe not found.');
       }
 
-      if (optimizedImages.length > 0) {
-        await tx.insert(uploadObjects).values(
-          optimizedImages.map((image) => ({
-            bucket: bucketName,
-            id: image.id,
-            key: image.key,
-            mimeType: image.type,
-            userId,
-          })),
-        );
+      const stored = await tx
+        .select({
+          createdAt: recipeImages.createdAt,
+          id: recipeImages.id,
+          key: uploadObjects.key,
+          uploadObjectId: recipeImages.uploadObjectId,
+        })
+        .from(recipeImages)
+        .innerJoin(uploadObjects, eq(uploadObjects.id, recipeImages.uploadObjectId))
+        .where(eq(recipeImages.recipeId, recipe.id));
+      const plan = planPhotoSync(order, stored, uploaded);
 
-        await tx.insert(recipeImages).values(
-          optimizedImages.map((image, position) => ({
-            position,
-            recipeId: recipe.id,
-            uploadObjectId: image.id,
-          })),
+      // Re-inserting links sidesteps the unique (recipe, position) index while reordering.
+      await tx.delete(recipeImages).where(eq(recipeImages.recipeId, recipe.id));
+
+      if (plan.removed.length > 0) {
+        await tx.delete(uploadObjects).where(
+          inArray(
+            uploadObjects.id,
+            plan.removed.map((link) => link.uploadObjectId),
+          ),
         );
       }
 
-      return recipe.id;
+      if (uploaded.length > 0) {
+        await tx.insert(uploadObjects).values(toUploadObjectRows(uploaded, userId));
+      }
+
+      if (plan.links.length > 0) {
+        await tx
+          .insert(recipeImages)
+          .values(plan.links.map((link) => ({ ...link, recipeId: recipe.id })));
+      }
+
+      return { id: recipe.id, removedKeys: plan.removed.map((link) => link.key) };
     });
-
-    return { id: recipeId };
   } catch (error) {
-    await Promise.allSettled(uploadedKeys.map((key) => deleteFileByKey(key, 'public')));
+    await deleteImageFiles(uploaded.map((image) => image.key));
     throw error;
   }
+
+  await deleteImageFiles(result.removedKeys);
+
+  return { id: result.id };
 }
 
-/** Extracts upload fields and turns valid form values into the recipe persistence shape. */
-function validateRecipeForm(formData: FormData) {
-  const photos = formData
-    .getAll('photos')
-    .filter((value): value is File => value instanceof File && value.size > 0);
-  const photoCountValidation = photoCountType(photos);
-
-  if (photoCountValidation instanceof type.errors) {
-    throw new ClientSafeError('Too many photos.');
-  }
-
-  const photoSizeValidation = photoSizeType(photoCountValidation);
-
-  if (photoSizeValidation instanceof type.errors) {
-    throw new ClientSafeError('A photo is too large.');
-  }
-
+/** Turns recipe form fields into the recipe persistence shape. */
+function validateRecipeFields(formData: FormData) {
   const ingredientsValue = formData.get('ingredients');
   const tagsValue = formData.get('tags');
   const validation = uploadRecipeInputType({
@@ -180,7 +173,6 @@ function validateRecipeForm(formData: FormData) {
     ingredients: typeof ingredientsValue === 'string' ? ingredientsValue.split('\n') : [],
     kcal: formData.get('kcal'),
     name: formData.get('name'),
-    photos: photoSizeValidation,
     portions: formData.get('portions'),
     protein: formData.get('protein'),
     rating: formData.get('rating'),
