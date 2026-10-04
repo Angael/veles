@@ -4,7 +4,8 @@ export type NavbarTarget =
   | { to: '/diary' }
   | { to: '/recipes' }
   | { to: '/weight' }
-  | { params: { id: string }; to: '/recipes/view/$id' };
+  | { params: { id: string }; to: '/recipes/view/$id' }
+  | { params: { date: string }; to: '/weight/$date' };
 
 export type NavbarTargetMatch = {
   params: Record<string, string | undefined>;
