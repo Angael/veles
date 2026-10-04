@@ -124,6 +124,13 @@ overrides:
 importers:
 
   .:
+    dependencies:
+      arktype:
+        specifier: 2.2.3
+        version: 2.2.3
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@types/pg@8.21.0)(kysely@0.29.5)(pg@8.23.0)
     devDependencies:
       '@tanstack/eslint-plugin-query':
         specifier: 5.102.8
@@ -131,6 +138,9 @@ importers:
       '@tanstack/eslint-plugin-router':
         specifier: 1.162.0
         version: 1.162.0(eslint@9.39.5(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@7.0.2)
+      '@types/node':
+        specifier: 26.2.0
+        version: 26.2.0
       oxfmt:
         specifier: 0.63.0
         version: 0.63.0
@@ -149,19 +159,9 @@ importers:
       '@hono/node-server':
         specifier: 2.1.1
         version: 2.1.1(hono@4.13.9)
-      arktype:
-        specifier: 2.2.3
-        version: 2.2.3
       hono:
         specifier: 4.13.9
         version: 4.13.9
-    devDependencies:
-      '@types/node':
-        specifier: 26.2.0
-        version: 26.2.0
-      typescript:
-        specifier: 7.0.2
-        version: 7.0.2
 
   apps/web:
     dependencies:
@@ -201,9 +201,6 @@ importers:
       '@veles/db':
         specifier: workspace:*
         version: link:../../packages/db
-      arktype:
-        specifier: 2.2.3
-        version: 2.2.3
       barcode-detector:
         specifier: 2.3.1
         version: 2.3.1
@@ -216,9 +213,6 @@ importers:
       date-fns:
         specifier: 4.4.0
         version: 4.4.0
-      drizzle-orm:
-        specifier: 0.45.2
-        version: 0.45.2(@types/pg@8.21.0)(kysely@0.29.5)(pg@8.23.0)
       lucide-react:
         specifier: 1.31.0
         version: 1.31.0(react@19.2.8)
@@ -250,9 +244,6 @@ importers:
       '@csstools/postcss-global-data':
         specifier: 4.0.0
         version: 4.0.0(postcss@8.5.23)
-      '@types/node':
-        specifier: 26.2.0
-        version: 26.2.0
       '@types/react':
         specifier: 19.2.18
         version: 19.2.18
@@ -277,9 +268,6 @@ importers:
       stylelint-config-recommended:
         specifier: 18.0.0
         version: 18.0.0(stylelint@17.14.1(supports-color@10.2.2)(typescript@7.0.2))
-      typescript:
-        specifier: 7.0.2
-        version: 7.0.2
       vite:
         specifier: 8.2.1
         version: 8.2.1(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.12)
@@ -295,38 +283,19 @@ importers:
       '@veles/db':
         specifier: workspace:*
         version: link:../../packages/db
-      drizzle-orm:
-        specifier: 0.45.2
-        version: 0.45.2(@types/pg@8.21.0)(kysely@0.29.5)(pg@8.23.0)
-    devDependencies:
-      '@types/node':
-        specifier: 26.2.0
-        version: 26.2.0
-      typescript:
-        specifier: 7.0.2
-        version: 7.0.2
 
   packages/db:
     dependencies:
-      drizzle-orm:
-        specifier: 0.45.2
-        version: 0.45.2(@types/pg@8.21.0)(kysely@0.29.5)(pg@8.23.0)
       pg:
         specifier: 8.23.0
         version: 8.23.0
     devDependencies:
-      '@types/node':
-        specifier: 26.2.0
-        version: 26.2.0
       '@types/pg':
         specifier: 8.21.0
         version: 8.21.0
       drizzle-kit:
         specifier: 0.31.10
         version: 0.31.10
-      typescript:
-        specifier: 7.0.2
-        version: 7.0.2
 
 packages:
 

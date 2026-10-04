@@ -42,7 +42,7 @@ pnpm db:migrate:prod
 
 ### Compose
 
-The web and worker Dockerfiles install only their own workspace dependency trees (including `packages/db`); the preview controller has a separate filtered image build. A root `pnpm install` still installs the whole workspace.
+The web and worker Dockerfiles install the root shared dependencies and their own workspace dependency trees (including `packages/db`); the preview controller has a separate filtered image build. A root `pnpm install` still installs the whole workspace.
 
 ```bash
 docker compose up --build
