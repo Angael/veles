@@ -2,8 +2,16 @@ import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import type { createDatabaseConnection } from '@veles/db';
 import { foodLogs, foodProducts, recipeImages, uploadObjects } from '@veles/db/schema';
 import { and, asc, eq, gt, notExists } from 'drizzle-orm';
+import { errorMessage } from './job.ts';
 
 type Database = ReturnType<typeof createDatabaseConnection>['db'];
+
+type R2Config = {
+  accountId: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+};
+
 const batchSize = 50;
 const deletionTimeoutMs = 10_000;
 
@@ -31,30 +39,19 @@ function unusedUploadCondition(db: Pick<Database, 'select'>) {
   );
 }
 
-/** Owns an R2 client and bounded cleanup batches; failures leave rows available for retry. */
-export function createUploadCleanup(db: Database, isStopping: () => boolean) {
-  let client: S3Client | undefined;
+/** Deletes unreferenced upload objects from R2, then their database rows. */
+export function createUploadCleanup(db: Database, r2: R2Config) {
+  const client = new S3Client({
+    endpoint: `https://${r2.accountId}.r2.cloudflarestorage.com`,
+    region: 'auto',
+    credentials: { accessKeyId: r2.accessKeyId, secretAccessKey: r2.secretAccessKey },
+    maxAttempts: 1,
+  });
+  // Sweep cursor: skips past failed IDs so they cannot starve the rest of the backlog.
   let lastCandidateId: string | undefined;
 
-  function getClient() {
-    if (client) return client;
-    const accountId = process.env.R2_ACCOUNT_ID;
-    const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-    const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-    if (!accountId || !accessKeyId || !secretAccessKey) {
-      throw new Error('R2_ACCOUNT_ID, R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY are required');
-    }
-    client = new S3Client({
-      endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-      region: 'auto',
-      credentials: { accessKeyId, secretAccessKey },
-      maxAttempts: 1,
-    });
-    return client;
-  }
-
   /** Locks before rechecking references so concurrent FK attachments cannot race R2 deletion. */
-  async function deleteUnusedUpload(id: string) {
+  async function deleteUnusedUpload(id: string, signal: AbortSignal) {
     return db.transaction(
       async (tx) => {
         const [asset] = await tx
@@ -70,10 +67,10 @@ export function createUploadCleanup(db: Database, isStopping: () => boolean) {
           .select({ id: uploadObjects.id })
           .from(uploadObjects)
           .where(and(eq(uploadObjects.id, id), unusedUploadCondition(tx)));
-        if (!unused || isStopping()) return false;
+        if (!unused || signal.aborted) return false;
 
-        await getClient().send(new DeleteObjectCommand({ Bucket: asset.bucket, Key: asset.key }), {
-          abortSignal: AbortSignal.timeout(deletionTimeoutMs),
+        await client.send(new DeleteObjectCommand({ Bucket: asset.bucket, Key: asset.key }), {
+          abortSignal: AbortSignal.any([signal, AbortSignal.timeout(deletionTimeoutMs)]),
         });
         await tx.delete(uploadObjects).where(eq(uploadObjects.id, id));
         return true;
@@ -82,64 +79,60 @@ export function createUploadCleanup(db: Database, isStopping: () => boolean) {
     );
   }
 
-  /**
-   * Processes a bounded batch and isolates failures per asset and from other worker jobs.
-   * Resolves `true` when the batch was full, so the caller can drain the backlog immediately.
-   */
-  async function run() {
+  /** Processes one batch, isolating failures per asset. Returns whether the batch was full. */
+  async function runBatch(signal: AbortSignal) {
     const startedAt = Date.now();
-    let hasMore = false;
+    const candidates = await db
+      .select({ id: uploadObjects.id })
+      .from(uploadObjects)
+      .where(
+        and(
+          unusedUploadCondition(db),
+          lastCandidateId ? gt(uploadObjects.id, lastCandidateId) : undefined,
+        ),
+      )
+      .orderBy(asc(uploadObjects.id))
+      .limit(batchSize);
+    const isFull = candidates.length === batchSize;
+    // A partial batch ends the sweep; the next sweep starts over and retries failures.
+    lastCandidateId = isFull ? candidates.at(-1)?.id : undefined;
+
     let deleted = 0;
     let failed = 0;
     let skipped = 0;
-    try {
-      const candidates = await db
-        .select({ id: uploadObjects.id })
-        .from(uploadObjects)
-        .where(
-          and(
-            unusedUploadCondition(db),
-            lastCandidateId ? gt(uploadObjects.id, lastCandidateId) : undefined,
-          ),
-        )
-        .orderBy(asc(uploadObjects.id))
-        .limit(batchSize);
-      // Sweep past failures so one bad batch cannot starve other orphaned assets.
-      // Reset once a partial batch ends the sweep, so the next sweep retries failures.
-      hasMore = candidates.length === batchSize;
-      lastCandidateId = hasMore ? candidates.at(-1)?.id : undefined;
-      for (const { id } of candidates) {
-        if (isStopping()) break;
-        try {
-          if (await deleteUnusedUpload(id)) {
-            deleted++;
-            console.info('unused upload deleted', { uploadObjectId: id });
-          } else {
-            skipped++;
-          }
-        } catch (error) {
-          failed++;
-          console.error('unused upload deletion failed', {
-            uploadObjectId: id,
-            error: error instanceof Error ? error.message : 'Unknown error',
-          });
+    for (const { id } of candidates) {
+      if (signal.aborted) break;
+      try {
+        if (await deleteUnusedUpload(id, signal)) {
+          deleted++;
+          console.info('unused upload deleted', { uploadObjectId: id });
+        } else {
+          skipped++;
         }
+      } catch (error) {
+        failed++;
+        console.error('unused upload deletion failed', {
+          uploadObjectId: id,
+          error: errorMessage(error),
+        });
       }
-      console.info('upload cleanup completed', {
-        candidates: candidates.length,
-        deleted,
-        failed,
-        skipped,
-        durationMs: Date.now() - startedAt,
-      });
-    } catch (error) {
-      console.error('upload cleanup failed', {
-        durationMs: Date.now() - startedAt,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
     }
-    return hasMore && !isStopping();
+    console.info('upload cleanup batch completed', {
+      candidates: candidates.length,
+      deleted,
+      failed,
+      skipped,
+      durationMs: Date.now() - startedAt,
+    });
+    return isFull;
   }
 
-  return { run, close: () => client?.destroy() };
+  /** Drains the backlog batch by batch until a partial batch ends the sweep. */
+  async function run(signal: AbortSignal) {
+    while (!signal.aborted && (await runBatch(signal))) {
+      // Full batch: more orphans may remain, keep draining.
+    }
+  }
+
+  return { run, close: () => client.destroy() };
 }
