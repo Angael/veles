@@ -14,9 +14,19 @@ import { Btn } from '@/components/ui/btn/Btn';
 import css from './CaloriesPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-type CaloriesPageProps = { dashboard: CalorieDashboard; date: string; today: string };
+type CaloriesPageProps = {
+  dashboard: CalorieDashboard;
+  date: string;
+  linkedFoodId?: string;
+  today: string;
+};
 
-export function CaloriesPage({ dashboard, date, today: todayDate }: CaloriesPageProps) {
+export function CaloriesPage({
+  dashboard,
+  date,
+  linkedFoodId,
+  today: todayDate,
+}: CaloriesPageProps) {
   const { dateLocale, t } = useI18n();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -135,7 +145,7 @@ export function CaloriesPage({ dashboard, date, today: todayDate }: CaloriesPage
         </div>
       </div>
 
-      <CalorieOverview day={selectedDay} key={date} />
+      <CalorieOverview day={selectedDay} key={date} linkedFoodId={linkedFoodId} />
     </main>
   );
 }

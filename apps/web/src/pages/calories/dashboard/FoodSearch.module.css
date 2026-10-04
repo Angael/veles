@@ -1,0 +1,95 @@
+.search {
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: var(--space-sm);
+  width: 1.1rem;
+  color: var(--c-muted);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.search .input {
+  padding-inline-start: calc(var(--space-sm) + 1.6rem);
+}
+
+.positioner {
+  z-index: 30;
+  width: var(--anchor-width);
+  outline: none;
+}
+
+.popup {
+  display: grid;
+  max-height: min(28rem, var(--available-height));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: var(--border-width) solid var(--c-border-popup);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-solid);
+  box-shadow: var(--shadow-popup);
+  color: var(--c-text);
+}
+
+.list {
+  outline: none;
+
+  & > :first-child {
+    border-block-start: 0;
+  }
+
+  & > :last-child {
+    border-block-end: 0;
+  }
+
+  /* The food summary has its own padding. */
+  & > .option {
+    padding: 0;
+  }
+
+  & > .createOption {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--c-surface-solid);
+    color: var(--c-text-strong);
+    font-weight: var(--font-weight-semibold);
+
+    & svg {
+      flex: none;
+      width: 1.1rem;
+    }
+
+    & span {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+  }
+}
+
+.option {
+  cursor: pointer;
+
+  &[data-highlighted] {
+    background-color: var(--c-primary-surface);
+    box-shadow: inset 3px 0 0 var(--c-primary-border);
+  }
+}
+
+.message {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+  text-wrap: pretty;
+
+  &:not(:empty) {
+    padding: var(--space-md);
+  }
+}
