@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createMiddleware, createServerFn } from '@tanstack/react-start';
-import { and, desc, eq, gte, inArray, lte, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, isNotNull, lte, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { calorieGoals, foodLogs, foodProducts, uploadObjects } from '@veles/db/schema';
@@ -458,12 +458,16 @@ export const createFoodProduct = createServerFn({ method: 'POST' })
     }
   });
 
-const updateFoodProductValuesType = createFoodProductValuesType.merge({ id: 'string.uuid' });
+const updateFoodProductValuesType = createFoodProductValuesType.merge({
+  id: 'string.uuid',
+  today: dateOnlyType,
+});
 const updateFoodProductMultipartType = type('FormData.parse').to({
   values: type('string.json.parse').to(updateFoodProductValuesType),
   'photo?': nonEmptyPhotoType,
 });
 
+/** Saves the product and refreshes all users' matching logs for the editor's local today atomically. */
 export const updateFoodProduct = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateFoodProduct'), limitFoodUploadRequestMiddleware])
   .validator(arkTypeValidator(updateFoodProductMultipartType))
@@ -492,9 +496,9 @@ export const updateFoodProduct = createServerFn({ method: 'POST' })
     const imageUploadObjectId = action === 'keep' ? undefined : (image?.asset.id ?? null);
 
     try {
-      const [product] = await db.transaction(async (tx) => {
+      const product = await db.transaction(async (tx) => {
         if (image) await tx.insert(uploadObjects).values(image.asset);
-        return tx
+        const [updated] = await tx
           .update(foodProducts)
           .set({
             ...productValues(values),
@@ -503,8 +507,29 @@ export const updateFoodProduct = createServerFn({ method: 'POST' })
           })
           .where(eq(foodProducts.id, values.id))
           .returning();
+        if (!updated) throw new ClientSafeError('Food product not found.');
+
+        const scale = (value: number | null) =>
+          value === null
+            ? null
+            : sql<number>`round(${value}::numeric * ${foodLogs.gramsHundredths} / ${100 * HUNDREDTHS})`;
+        await tx
+          .update(foodLogs)
+          .set({
+            kcalHundredths: scale(updated.kcalPer100gHundredths) ?? 0,
+            proteinHundredths: scale(updated.proteinPer100gHundredths),
+            fatHundredths: scale(updated.fatPer100gHundredths),
+            carbsHundredths: scale(updated.carbsPer100gHundredths),
+          })
+          .where(
+            and(
+              eq(foodLogs.productId, updated.id),
+              eq(foodLogs.logDate, values.today),
+              isNotNull(foodLogs.gramsHundredths),
+            ),
+          );
+        return updated;
       });
-      if (!product) throw new ClientSafeError('Food product not found.');
 
       const assetsById = await getFoodImageAssets([product.imageUploadObjectId]);
       return toFoodProduct(product, assetsById.get(product.imageUploadObjectId ?? ''));

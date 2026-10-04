@@ -1,4 +1,5 @@
 import { queryOptions, useMutation } from '@tanstack/react-query';
+import { todayLocalDate } from '@/lib/dateOnly';
 import {
   createFoodProduct,
   deleteFoodLog,
@@ -16,7 +17,7 @@ import {
 import { setDailyCalorieGoal } from './goals/goals.api';
 import { calorieWeekStart } from './calorieHelpers';
 
-const calorieDashboardKey = ['calorie-dashboard'] as const;
+export const calorieDashboardKey = ['calorie-dashboard'] as const;
 const calorieFoodKey = ['calorie-food'] as const;
 const calorieFoodsKey = ['calorie-foods'] as const;
 
@@ -201,8 +202,9 @@ export function useUpdateFoodLogMutation() {
 
 export function useUpdateFoodProductMutation() {
   return useMutation({
+    meta: { invalidateQueryKey: calorieDashboardKey },
     mutationFn: (variables: UpdateFoodProductVariables) =>
-      updateFoodProduct({ data: toMultipartFormData(variables) }),
+      updateFoodProduct({ data: toMultipartFormData({ ...variables, today: todayLocalDate() }) }),
     onSuccess: (_data, _variables, _onMutateResult, context) =>
       Promise.all([
         context.client.invalidateQueries({ queryKey: calorieFoodKey }),
