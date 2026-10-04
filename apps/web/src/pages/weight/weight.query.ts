@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { saveWeight, saveWeights } from './weight.api';
-import { addWeightPhotos, updateWeightEntry } from './weightPhotos.api';
+import { addWeightEntry, updateWeightEntry } from './weightPhotos.api';
 
 export function useSaveWeightMutation() {
   return useMutation({
@@ -27,10 +27,10 @@ export function useSaveWeightsMutation() {
   });
 }
 
-/** Upload errors are shown inline by the form so selected files can be retried. */
-export function useAddWeightPhotosMutation() {
-  const addWeightPhotosFn = useServerFn(addWeightPhotos);
-  return useMutation({ mutationFn: addWeightPhotosFn });
+/** Errors are shown inline by the add form so picked files survive a retry. */
+export function useAddWeightEntryMutation() {
+  const addWeightEntryFn = useServerFn(addWeightEntry);
+  return useMutation({ mutationFn: addWeightEntryFn });
 }
 
 /** Errors are shown inline by the edit form so picked files survive a retry. */

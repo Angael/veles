@@ -48,17 +48,6 @@
   }
 }
 
-/* Mirrors Label's layout; a real <label> would forward clicks to the file input. */
-.photos {
-  display: grid;
-  gap: var(--space-xs);
-
-  & > span {
-    color: var(--c-accent-strong);
-    font-size: var(--text-xs);
-  }
-}
-
 .date {
   color: var(--c-muted);
   font-size: var(--text-sm);

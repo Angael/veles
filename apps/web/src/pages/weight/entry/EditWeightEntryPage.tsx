@@ -7,8 +7,12 @@ import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
-import { UploadTileGrid } from '@/components/ui/upload-tile-grid/UploadTileGrid';
-import { appendOrderedPhotos, type OrderedPhoto } from '@/lib/storage/orderedPhotos';
+import { PhotosField } from '@/components/ui/upload-tile-grid/PhotosField';
+import {
+  appendOrderedPhotos,
+  type OrderedPhoto,
+  toStoredPhotos,
+} from '@/lib/storage/orderedPhotos';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 import type { WeightEntryPhoto } from '../weight.api';
 import { useUpdateWeightEntryMutation } from '../weight.query';
@@ -26,9 +30,7 @@ type EditWeightEntryPageProps = {
 export function EditWeightEntryPage({ entry }: EditWeightEntryPageProps) {
   const router = useRouter();
   const [weightKg, setWeightKg] = useState<number | null>(entry.weightKg);
-  const [photos, setPhotos] = useState<OrderedPhoto[]>(() =>
-    entry.photos.map((photo) => ({ id: photo.id, kind: 'stored', url: photo.url })),
-  );
+  const [photos, setPhotos] = useState<OrderedPhoto[]>(() => toStoredPhotos(entry.photos));
   const mutation = useUpdateWeightEntryMutation();
   const { markDirty, markSaved } = useUnsavedChangesGuard();
 
@@ -78,18 +80,15 @@ export function EditWeightEntryPage({ entry }: EditWeightEntryPageProps) {
               value={weightKg}
             />
           </Label>
-          <div className={css.photos}>
-            <span>Photos</span>
-            <UploadTileGrid
-              maxItemSize={WEIGHT_PHOTO_MAX_BYTES}
-              maxItems={WEIGHT_PHOTO_MAX_COUNT}
-              onPhotosChange={(nextPhotos) => {
-                markDirty();
-                setPhotos(nextPhotos);
-              }}
-              photos={photos}
-            />
-          </div>
+          <PhotosField
+            maxItemSize={WEIGHT_PHOTO_MAX_BYTES}
+            maxItems={WEIGHT_PHOTO_MAX_COUNT}
+            onPhotosChange={(nextPhotos) => {
+              markDirty();
+              setPhotos(nextPhotos);
+            }}
+            photos={photos}
+          />
           <FormSubmitRow>
             <Btn disabled={weightKg === null} loading={mutation.isPending} type='submit'>
               Save

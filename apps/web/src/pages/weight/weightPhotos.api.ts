@@ -1,23 +1,17 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { and, count, eq, inArray, max } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { uploadObjects, weightEntries, weightEntryPhotos } from '@veles/db/schema';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { readOrderedPhotos } from '@/lib/storage/orderedPhotos';
 import { IMAGE_MAX_INPUT_BYTES } from '@/lib/storage/imageLimits';
-import { db } from '@/server/db.server';
+import type { DbTransaction } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { limitRequestSizeMiddleware } from '@/server/middleware/limitRequestSizeMiddleware';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
-import {
-  deleteImageFiles,
-  planPhotoSync,
-  toUploadObjectRows,
-  type UploadedImage,
-  uploadOptimizedImages,
-} from '@/server/storage/photoSync.server';
+import { type PhotoLinkTable, persistWithPhotos } from '@/server/storage/photoSync.server';
 
 // Keep below nginx's client_max_body_size with enough headroom for multipart form overhead.
 const WEIGHT_PHOTO_MAX_REQUEST_BYTES = 85 * 1024 * 1024;
@@ -28,48 +22,24 @@ export const WEIGHT_PHOTO_MAX_COUNT = 6;
 export const WEIGHT_PHOTO_MAX_BYTES = IMAGE_MAX_INPUT_BYTES;
 
 const formDataType = type('FormData');
-const addWeightPhotosInputType = type({
-  date: dateOnlyType,
-  photos: type('File[]')
-    .atLeastLength(1)
-    .atMostLength(WEIGHT_PHOTO_MAX_COUNT)
-    .narrow((files, context) =>
-      files.every((file) => file.size <= WEIGHT_PHOTO_MAX_BYTES)
-        ? true
-        : context.mustBe('photos no larger than 10 MiB each'),
-    ),
-});
-const updateWeightEntryInputType = type({
+const weightEntryFieldsType = type({
   date: dateOnlyType,
   weightKg: 'string.numeric.parse |> 30 <= number <= 300',
 });
 
-export const addWeightPhotos = createServerFn({ method: 'POST' })
+/** Add form: saves the day's weight and appends photos after any the entry already has. */
+export const addWeightEntry = createServerFn({ method: 'POST' })
   .middleware([
-    logMiddleware('addWeightPhotos'),
+    logMiddleware('addWeightEntry'),
     limitRequestSizeMiddleware(WEIGHT_PHOTO_MAX_REQUEST_BYTES),
   ])
   .validator(arkTypeValidator(formDataType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const input = validateAddWeightPhotosForm(data);
-    const entry = await findOwnedEntry(session.user.id, input.date);
-    await assertPhotoCapacity(entry.id, input.photos.length);
-
-    const uploaded = await uploadOptimizedImages(input.photos, WEIGHT_PHOTO_KEY_PREFIX);
-
-    try {
-      await insertWeightPhotos(entry.id, session.user.id, uploaded);
-    } catch (error) {
-      await deleteImageFiles(uploaded.map((photo) => photo.key));
-      throw error;
-    }
+    await persistWeightEntry(data, session.user.id, 'append');
   });
 
-/**
- * Saves the weight and replaces the entry's photo list with the submitted order in one
- * transaction. New files are uploaded first; dropped photos are deleted from storage after commit.
- */
+/** Edit form: saves the weight and replaces the photo list with the submitted order. */
 export const updateWeightEntry = createServerFn({ method: 'POST' })
   .middleware([
     logMiddleware('updateWeightEntry'),
@@ -78,148 +48,67 @@ export const updateWeightEntry = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(formDataType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const input = updateWeightEntryInputType({
-      date: data.get('date'),
-      weightKg: data.get('weightKg'),
-    });
+    await persistWeightEntry(data, session.user.id, 'replace');
+  });
 
-    if (input instanceof type.errors) {
-      throw new ClientSafeError(input.summary);
-    }
+/** Upserts the weight for one date and syncs its photos in the same transaction. */
+async function persistWeightEntry(formData: FormData, userId: string, mode: 'append' | 'replace') {
+  const fields = weightEntryFieldsType({
+    date: formData.get('date'),
+    weightKg: formData.get('weightKg'),
+  });
 
-    const order = readOrderedPhotos(data, {
-      maxBytes: WEIGHT_PHOTO_MAX_BYTES,
-      maxCount: WEIGHT_PHOTO_MAX_COUNT,
-    });
-    const entry = await findOwnedEntry(session.user.id, input.date);
-    const uploaded = await uploadOptimizedImages(
-      order.flatMap((slot) => (slot.kind === 'file' ? [slot.file] : [])),
-      WEIGHT_PHOTO_KEY_PREFIX,
-    );
-    let removedKeys: string[];
+  if (fields instanceof type.errors) {
+    throw new ClientSafeError(fields.summary);
+  }
 
-    try {
-      removedKeys = await db.transaction(async (tx) => {
-        // Updating the entry row locks it, serializing with concurrent photo uploads.
-        await tx
-          .update(weightEntries)
-          .set({ weightGrams: Math.round(input.weightKg * 1_000) })
-          .where(eq(weightEntries.id, entry.id));
+  const order = readOrderedPhotos(formData, {
+    maxBytes: WEIGHT_PHOTO_MAX_BYTES,
+    maxCount: WEIGHT_PHOTO_MAX_COUNT,
+  });
+  const weightGrams = Math.round(fields.weightKg * 1_000);
 
-        const stored = await tx
-          .select({
-            createdAt: weightEntryPhotos.createdAt,
-            id: weightEntryPhotos.id,
-            key: uploadObjects.key,
-            uploadObjectId: weightEntryPhotos.uploadObjectId,
-          })
-          .from(weightEntryPhotos)
-          .innerJoin(uploadObjects, eq(uploadObjects.id, weightEntryPhotos.uploadObjectId))
-          .where(eq(weightEntryPhotos.weightEntryId, entry.id));
-        const plan = planPhotoSync(order, stored, uploaded);
+  await persistWithPhotos(
+    { keyPrefix: WEIGHT_PHOTO_KEY_PREFIX, order, userId },
+    async (tx, photos) => {
+      // The upsert locks the entry row, so concurrent saves for one date run one after another.
+      const [entry] = await tx
+        .insert(weightEntries)
+        .values({ date: fields.date, userId, weightGrams })
+        .onConflictDoUpdate({
+          set: { weightGrams },
+          target: [weightEntries.userId, weightEntries.date],
+        })
+        .returning({ id: weightEntries.id });
 
-        // Re-inserting links sidesteps the unique (entry, position) index while reordering.
-        await tx.delete(weightEntryPhotos).where(eq(weightEntryPhotos.weightEntryId, entry.id));
+      if (!entry) {
+        throw new Error('Weight entry upsert returned no row');
+      }
 
-        if (plan.removed.length > 0) {
-          await tx.delete(uploadObjects).where(
-            inArray(
-              uploadObjects.id,
-              plan.removed.map((link) => link.uploadObjectId),
-            ),
-          );
-        }
-
-        if (uploaded.length > 0) {
-          await tx.insert(uploadObjects).values(toUploadObjectRows(uploaded, session.user.id));
-        }
-
-        if (plan.links.length > 0) {
-          await tx
-            .insert(weightEntryPhotos)
-            .values(plan.links.map((link) => ({ ...link, weightEntryId: entry.id })));
-        }
-
-        return plan.removed.map((link) => link.key);
+      await photos.sync(weightEntryPhotoLinks(tx, entry.id), {
+        maxCount: WEIGHT_PHOTO_MAX_COUNT,
+        mode,
       });
-    } catch (error) {
-      await deleteImageFiles(uploaded.map((photo) => photo.key));
-      throw error;
-    }
-
-    await deleteImageFiles(removedKeys);
-  });
-
-/** Pulls the date and non-empty files out of multipart data and enforces per-request limits. */
-function validateAddWeightPhotosForm(formData: FormData) {
-  const photos = formData
-    .getAll('photos')
-    .filter((value): value is File => value instanceof File && value.size > 0);
-  const validation = addWeightPhotosInputType({ date: formData.get('date'), photos });
-
-  if (validation instanceof type.errors) {
-    throw new ClientSafeError(validation.summary);
-  }
-
-  return validation;
+    },
+  );
 }
 
-async function findOwnedEntry(userId: string, date: string) {
-  const [entry] = await db
-    .select({ id: weightEntries.id })
-    .from(weightEntries)
-    .where(and(eq(weightEntries.userId, userId), eq(weightEntries.date, date)))
-    .limit(1);
-
-  if (!entry) {
-    throw new ClientSafeError('Save the weight for this date before adding photos.');
-  }
-
-  return entry;
-}
-
-/** Fails before uploading anything when the entry cannot fit the new photos. */
-async function assertPhotoCapacity(weightEntryId: string, newPhotoCount: number) {
-  const [existing] = await db
-    .select({ count: count() })
-    .from(weightEntryPhotos)
-    .where(eq(weightEntryPhotos.weightEntryId, weightEntryId));
-
-  if ((existing?.count ?? 0) + newPhotoCount > WEIGHT_PHOTO_MAX_COUNT) {
-    throw new ClientSafeError(`A weight entry can have up to ${WEIGHT_PHOTO_MAX_COUNT} photos.`);
-  }
-}
-
-/**
- * Records uploaded files after the existing photos. Locks the entry row so concurrent uploads
- * cannot exceed the limit or collide on positions.
- */
-async function insertWeightPhotos(weightEntryId: string, userId: string, photos: UploadedImage[]) {
-  await db.transaction(async (tx) => {
-    await tx
-      .select({ id: weightEntries.id })
-      .from(weightEntries)
-      .where(eq(weightEntries.id, weightEntryId))
-      .for('update');
-
-    const [existing] = await tx
-      .select({ count: count(), lastPosition: max(weightEntryPhotos.position) })
-      .from(weightEntryPhotos)
-      .where(eq(weightEntryPhotos.weightEntryId, weightEntryId));
-
-    if ((existing?.count ?? 0) + photos.length > WEIGHT_PHOTO_MAX_COUNT) {
-      throw new ClientSafeError(`A weight entry can have up to ${WEIGHT_PHOTO_MAX_COUNT} photos.`);
-    }
-
-    const firstPosition = (existing?.lastPosition ?? -1) + 1;
-
-    await tx.insert(uploadObjects).values(toUploadObjectRows(photos, userId));
-    await tx.insert(weightEntryPhotos).values(
-      photos.map((photo, index) => ({
-        position: firstPosition + index,
-        uploadObjectId: photo.id,
-        weightEntryId,
-      })),
-    );
-  });
+function weightEntryPhotoLinks(tx: DbTransaction, weightEntryId: string): PhotoLinkTable {
+  return {
+    deleteAll: () =>
+      tx.delete(weightEntryPhotos).where(eq(weightEntryPhotos.weightEntryId, weightEntryId)),
+    insert: (links) =>
+      tx.insert(weightEntryPhotos).values(links.map((link) => ({ ...link, weightEntryId }))),
+    selectStored: () =>
+      tx
+        .select({
+          createdAt: weightEntryPhotos.createdAt,
+          id: weightEntryPhotos.id,
+          key: uploadObjects.key,
+          uploadObjectId: weightEntryPhotos.uploadObjectId,
+        })
+        .from(weightEntryPhotos)
+        .innerJoin(uploadObjects, eq(uploadObjects.id, weightEntryPhotos.uploadObjectId))
+        .where(eq(weightEntryPhotos.weightEntryId, weightEntryId)),
+  };
 }

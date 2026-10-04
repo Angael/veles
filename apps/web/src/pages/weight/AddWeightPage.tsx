@@ -8,10 +8,10 @@ import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
-import { UploadTileGrid } from '@/components/ui/upload-tile-grid/UploadTileGrid';
-import type { OrderedPhoto } from '@/lib/storage/orderedPhotos';
+import { PhotosField } from '@/components/ui/upload-tile-grid/PhotosField';
+import { appendOrderedPhotos, type OrderedPhoto } from '@/lib/storage/orderedPhotos';
 import css from './WeightEntryPages.module.css';
-import { useAddWeightPhotosMutation, useSaveWeightMutation } from './weight.query';
+import { useAddWeightEntryMutation } from './weight.query';
 import { WEIGHT_PHOTO_MAX_BYTES, WEIGHT_PHOTO_MAX_COUNT } from './weightPhotos.api';
 
 export function AddWeightPage() {
@@ -20,44 +20,23 @@ export function AddWeightPage() {
   const [date, setDate] = useState(today);
   const [weightKg, setWeightKg] = useState<number | null>(null);
   const [photos, setPhotos] = useState<OrderedPhoto[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const saveMutation = useSaveWeightMutation();
-  const photosMutation = useAddWeightPhotosMutation();
+  const mutation = useAddWeightEntryMutation();
 
-  /**
-   * Saves the weight first, then uploads photos separately so a failed upload keeps the saved
-   * measurement and leaves the selected files in place for a retry.
-   */
+  /** Saves the weight and photos in one request; failures keep picked files for a retry. */
   async function handleSubmit() {
     if (weightKg === null) {
       return;
     }
 
-    setError(null);
+    const formData = new FormData();
+    formData.append('date', date);
+    formData.append('weightKg', String(weightKg));
+    appendOrderedPhotos(formData, photos);
 
     try {
-      await saveMutation.mutateAsync({ data: { date, weightKg } });
+      await mutation.mutateAsync({ data: formData });
     } catch {
       return;
-    }
-
-    if (photos.length > 0) {
-      const formData = new FormData();
-      formData.append('date', date);
-
-      for (const photo of photos) {
-        if (photo.kind === 'file') {
-          formData.append('photos', photo.file);
-        }
-      }
-
-      try {
-        await photosMutation.mutateAsync({ data: formData });
-      } catch (uploadError) {
-        const reason = uploadError instanceof Error ? uploadError.message : 'Upload failed.';
-        setError(`Weight saved, but photos were not uploaded. ${reason}`);
-        return;
-      }
     }
 
     await router.invalidate().catch(() => undefined);
@@ -71,7 +50,7 @@ export function AddWeightPage() {
   return (
     <main>
       <Card as='section'>
-        <TypedForm className={css.form} errorMsg={error} onSubmit={handleSubmit}>
+        <TypedForm className={css.form} errorMsg={mutation.error?.message} onSubmit={handleSubmit}>
           <Label text='Weight (kg)'>
             <NumberInput
               enterKeyHint='done'
@@ -85,24 +64,17 @@ export function AddWeightPage() {
               value={weightKg}
             />
           </Label>
-          <div className={css.photos}>
-            <span>Photos</span>
-            <UploadTileGrid
-              maxItemSize={WEIGHT_PHOTO_MAX_BYTES}
-              maxItems={WEIGHT_PHOTO_MAX_COUNT}
-              onPhotosChange={setPhotos}
-              photos={photos}
-            />
-          </div>
+          <PhotosField
+            maxItemSize={WEIGHT_PHOTO_MAX_BYTES}
+            maxItems={WEIGHT_PHOTO_MAX_COUNT}
+            onPhotosChange={setPhotos}
+            photos={photos}
+          />
           <FormSubmitRow>
             <Label text='Date'>
               <DateInput max={today} name='date' onValueChange={setDate} required value={date} />
             </Label>
-            <Btn
-              disabled={!date || weightKg === null}
-              loading={saveMutation.isPending || photosMutation.isPending}
-              type='submit'
-            >
+            <Btn disabled={!date || weightKg === null} loading={mutation.isPending} type='submit'>
               Add weight
             </Btn>
           </FormSubmitRow>

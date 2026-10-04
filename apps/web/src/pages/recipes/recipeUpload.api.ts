@@ -1,21 +1,16 @@
 import { ArkErrors, type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { recipeImages, recipes, uploadObjects } from '@veles/db/schema';
-import { db } from '@/server/db.server';
+import type { DbTransaction } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { readOrderedPhotos } from '@/lib/storage/orderedPhotos';
 import { limitRequestSizeMiddleware } from '@/server/middleware/limitRequestSizeMiddleware';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { IMAGE_MAX_INPUT_BYTES } from '@/lib/storage/imageLimits';
-import {
-  deleteImageFiles,
-  planPhotoSync,
-  toUploadObjectRows,
-  uploadOptimizedImages,
-} from '@/server/storage/photoSync.server';
+import { type PhotoLinkTable, persistWithPhotos } from '@/server/storage/photoSync.server';
 // Keep below nginx's client_max_body_size with enough headroom for multipart form overhead.
 // If this changes, update the corresponding limit in infra/nginx/nginx.conf.
 const RECIPE_UPLOAD_MAX_REQUEST_BYTES = 85 * 1024 * 1024;
@@ -83,9 +78,8 @@ export const updateRecipe = createServerFn({ method: 'POST' })
   });
 
 /**
- * Validates fields and the ordered photo list, uploads new files, then creates or updates the
- * recipe and rewrites its image links in one transaction. Uploads are cleaned up after any
- * failure; images dropped from the list are deleted from storage after commit.
+ * Validates fields and the ordered photo list, then creates or updates the recipe and rewrites
+ * its image links in one transaction.
  */
 async function persistRecipeUpload(formData: FormData, userId: string, existingRecipeId?: string) {
   const fields = validateRecipeFields(formData);
@@ -93,14 +87,10 @@ async function persistRecipeUpload(formData: FormData, userId: string, existingR
     maxBytes: RECIPE_UPLOAD_MAX_PHOTO_BYTES,
     maxCount: RECIPE_UPLOAD_MAX_PHOTO_COUNT,
   });
-  const uploaded = await uploadOptimizedImages(
-    order.flatMap((slot) => (slot.kind === 'file' ? [slot.file] : [])),
-    RECIPE_IMAGE_KEY_PREFIX,
-  );
-  let result: { id: string; removedKeys: string[] };
 
-  try {
-    result = await db.transaction(async (tx) => {
+  return persistWithPhotos(
+    { keyPrefix: RECIPE_IMAGE_KEY_PREFIX, order, userId },
+    async (tx, photos) => {
       const [recipe] = existingRecipeId
         ? await tx
             .update(recipes)
@@ -116,7 +106,21 @@ async function persistRecipeUpload(formData: FormData, userId: string, existingR
         throw new ClientSafeError('Recipe not found.');
       }
 
-      const stored = await tx
+      await photos.sync(recipeImageLinks(tx, recipe.id), {
+        maxCount: RECIPE_UPLOAD_MAX_PHOTO_COUNT,
+      });
+
+      return { id: recipe.id };
+    },
+  );
+}
+
+function recipeImageLinks(tx: DbTransaction, recipeId: string): PhotoLinkTable {
+  return {
+    deleteAll: () => tx.delete(recipeImages).where(eq(recipeImages.recipeId, recipeId)),
+    insert: (links) => tx.insert(recipeImages).values(links.map((link) => ({ ...link, recipeId }))),
+    selectStored: () =>
+      tx
         .select({
           createdAt: recipeImages.createdAt,
           id: recipeImages.id,
@@ -125,41 +129,8 @@ async function persistRecipeUpload(formData: FormData, userId: string, existingR
         })
         .from(recipeImages)
         .innerJoin(uploadObjects, eq(uploadObjects.id, recipeImages.uploadObjectId))
-        .where(eq(recipeImages.recipeId, recipe.id));
-      const plan = planPhotoSync(order, stored, uploaded);
-
-      // Re-inserting links sidesteps the unique (recipe, position) index while reordering.
-      await tx.delete(recipeImages).where(eq(recipeImages.recipeId, recipe.id));
-
-      if (plan.removed.length > 0) {
-        await tx.delete(uploadObjects).where(
-          inArray(
-            uploadObjects.id,
-            plan.removed.map((link) => link.uploadObjectId),
-          ),
-        );
-      }
-
-      if (uploaded.length > 0) {
-        await tx.insert(uploadObjects).values(toUploadObjectRows(uploaded, userId));
-      }
-
-      if (plan.links.length > 0) {
-        await tx
-          .insert(recipeImages)
-          .values(plan.links.map((link) => ({ ...link, recipeId: recipe.id })));
-      }
-
-      return { id: recipe.id, removedKeys: plan.removed.map((link) => link.key) };
-    });
-  } catch (error) {
-    await deleteImageFiles(uploaded.map((image) => image.key));
-    throw error;
-  }
-
-  await deleteImageFiles(result.removedKeys);
-
-  return { id: result.id };
+        .where(eq(recipeImages.recipeId, recipeId)),
+  };
 }
 
 /** Turns recipe form fields into the recipe persistence shape. */
