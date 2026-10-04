@@ -1,4 +1,3 @@
-import { format, parseISO } from 'date-fns';
 import { CalendarArrowUpIcon, CopyIcon } from 'lucide-react';
 import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
@@ -16,7 +15,6 @@ import {
 } from '@/components/ui/dialog/Dialog';
 import { Label } from '@/components/ui/label/Label';
 import { SelectionBarAction } from '@/components/ui/selection-bar/SelectionBar';
-import { toastManager } from '@/components/ui/toast/toastManager';
 import css from './LogsDateAction.module.css';
 
 export type LogsDateMode = 'copy' | 'move';
@@ -24,13 +22,11 @@ export type LogsDateMode = 'copy' | 'move';
 const modes = {
   copy: {
     description: 'Copies keep the same amounts, kcal, and macros.',
-    done: 'Copied',
     icon: <CopyIcon aria-hidden='true' />,
     label: 'Copy',
   },
   move: {
     description: 'Products leave this day and are added to the chosen one.',
-    done: 'Moved',
     icon: <CalendarArrowUpIcon aria-hidden='true' />,
     label: 'Move',
   },
@@ -109,18 +105,7 @@ function LogsDateForm({ date, logs, mode, onDone }: ActionProps) {
 
   function confirm() {
     if (!valid || mutation.isPending) return;
-    mutation.mutate(
-      { date: target, ids: logs.map((entry) => entry.id) },
-      {
-        onSuccess: () => {
-          toastManager.add({
-            title: `${modes[mode].done} ${productCount(logs.length)} to ${format(parseISO(target), 'EEE, d MMM')}`,
-            type: 'success',
-          });
-          onDone();
-        },
-      },
-    );
+    mutation.mutate({ date: target, ids: logs.map((entry) => entry.id) }, { onSuccess: onDone });
   }
 
   return (
