@@ -1,6 +1,12 @@
 import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import type { createDatabaseConnection } from '@veles/db';
-import { foodLogs, foodProducts, recipeImages, uploadObjects } from '@veles/db/schema';
+import {
+  foodLogs,
+  foodProducts,
+  recipeImages,
+  uploadObjects,
+  weightEntryPhotos,
+} from '@veles/db/schema';
 import { and, asc, eq, gt, notExists } from 'drizzle-orm';
 import { errorMessage } from './job.ts';
 
@@ -35,6 +41,12 @@ function unusedUploadCondition(db: Pick<Database, 'select'>) {
         .select({ id: recipeImages.id })
         .from(recipeImages)
         .where(eq(recipeImages.uploadObjectId, uploadObjects.id)),
+    ),
+    notExists(
+      db
+        .select({ id: weightEntryPhotos.id })
+        .from(weightEntryPhotos)
+        .where(eq(weightEntryPhotos.uploadObjectId, uploadObjects.id)),
     ),
   );
 }
