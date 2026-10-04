@@ -87,7 +87,7 @@ function MultiplyForm({ logs, onMultiplied }: Props) {
   const kcal = logs.reduce((sum, entry) => sum + entry.kcal, 0);
 
   function confirm() {
-    if (!valid) return;
+    if (!valid || multiplyMutation.isPending) return;
     multiplyMutation.mutate(
       { factor, ids: logs.map((entry) => entry.id) },
       { onSuccess: onMultiplied },
@@ -95,13 +95,20 @@ function MultiplyForm({ logs, onMultiplied }: Props) {
   }
 
   return (
-    <>
+    <form
+      className={css.form}
+      onSubmit={(event) => {
+        event.preventDefault();
+        confirm();
+      }}
+    >
       <div className={css.factorRow}>
         {presets.map((preset) => (
           <Btn
             aria-pressed={factor === preset.factor}
             key={preset.factor}
             onClick={() => setFactor(preset.factor)}
+            type='button'
             variant={factor === preset.factor ? 'main' : 'outlineMain'}
           >
             {preset.label}
@@ -110,6 +117,7 @@ function MultiplyForm({ logs, onMultiplied }: Props) {
         <NumberInput
           aria-label='Multiply by'
           className={css.factorInput}
+          enterKeyHint='done'
           max={MAX_FOOD_LOG_MULTIPLIER}
           min={0.1}
           onValueChange={setFactor}
@@ -120,16 +128,16 @@ function MultiplyForm({ logs, onMultiplied }: Props) {
         {Math.round(kcal)} kcal → <strong>{valid ? Math.round(kcal * factor) : '–'} kcal</strong>
       </p>
       <DialogActions>
-        <DialogClose render={<Btn variant='ghost' />}>Cancel</DialogClose>
+        <DialogClose render={<Btn type='button' variant='ghost' />}>Cancel</DialogClose>
         <Btn
           disabled={!valid}
           icon={<CopyPlusIcon aria-hidden='true' />}
           loading={multiplyMutation.isPending}
-          onClick={confirm}
+          type='submit'
         >
           Multiply
         </Btn>
       </DialogActions>
-    </>
+    </form>
   );
 }

@@ -1,3 +1,8 @@
+.form {
+  display: grid;
+  gap: var(--space-lg);
+}
+
 .factorRow {
   display: flex;
   flex-wrap: wrap;
