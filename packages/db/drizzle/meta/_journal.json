@@ -64,6 +64,13 @@
       "when": 1790976861258,
       "tag": "0008_minor_tombstone",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791133836572,
+      "tag": "0009_weight-entry-photos",
+      "breakpoints": true
     }
   ]
 }
