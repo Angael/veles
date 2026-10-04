@@ -104,6 +104,33 @@
   gap: var(--space-xs);
 }
 
+.entryLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--c-border);
+  text-underline-offset: 0.2em;
+
+  &:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+.photoBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--c-muted);
+  font-size: var(--text-xs);
+
+  svg {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+}
+
 .tableFrame {
   min-width: 0;
   overflow-x: auto;

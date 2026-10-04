@@ -3,7 +3,7 @@
 Veles is a pnpm monorepo with three deployable applications and one shared database package:
 
 - `apps/web` — the TanStack Start application.
-- `apps/worker` — a background worker. Its placeholder job currently checks PostgreSQL every ten seconds.
+- `apps/worker` — a background worker. It checks PostgreSQL and cleans up unreferenced upload objects in independent loops every ten seconds.
 - `apps/preview` — the standalone PR preview controller.
 - `packages/db` — the shared Drizzle client, schema, migrations, and migration tooling.
 - `infra/nginx` — the small reverse-proxy image used by Compose.
@@ -42,7 +42,7 @@ pnpm db:migrate:prod
 
 ### Compose
 
-The web and worker Dockerfiles install only their own workspace dependency trees (including `packages/db`); the preview controller has a separate filtered image build. A root `pnpm install` still installs the whole workspace.
+The web and worker Dockerfiles install the root shared dependencies and their own workspace dependency trees (including `packages/db`); the preview controller has a separate filtered image build. A root `pnpm install` still installs the whole workspace.
 
 ```bash
 docker compose up --build
@@ -52,7 +52,7 @@ Compose starts three independently logged and restarted services:
 
 - `nginx` is the only published service (port 3000 by default). It enforces the upload-size ceiling, buffers accepted request bodies, and forwards proxy metadata.
 - `web` runs TanStack Start and exposes an internal health endpoint.
-- `worker` runs independently and receives only its database configuration.
+- `worker` runs independently and receives database configuration and R2 credentials. Cleanup sweeps every 6 hours, draining full batches back-to-back until the backlog is empty. It deletes each unreferenced R2 object using the bucket and key stored in `upload_object`, then deletes its database row. Food products, historical food logs, and recipe images all prevent deletion. Failed deletions are logged and retried in the next sweep.
 
 Set `NGINX_PORT` to publish a different local port. In production, Dokploy can route to the nginx service while nginx reaches web over the private Compose network.
 

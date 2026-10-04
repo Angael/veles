@@ -13,6 +13,7 @@ import { storagePathToUrl } from '@/server/storage/config.server';
 import { log } from '@/server/logger.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { getOpenFoodFactsProduct, type OpenFoodFactsProduct } from './openFoodFacts';
+import { foodBarcodeAliases } from './foodBarcode';
 
 import {
   deletePreparedFoodImage,
@@ -158,11 +159,13 @@ function latestGoalForDate(goals: (typeof calorieGoals.$inferSelect)[], date: st
   return goals.find((goal) => goal.effectiveDate <= date);
 }
 
+/** Matches equivalent GTIN padding while preferring the exact barcode if older duplicates exist. */
 async function findFoodProductByBarcode(barcode: string) {
   const [product] = await db
     .select()
     .from(foodProducts)
-    .where(eq(foodProducts.barcode, barcode))
+    .where(inArray(foodProducts.barcode, foodBarcodeAliases(barcode)))
+    .orderBy(sql`case when ${foodProducts.barcode} = ${barcode} then 0 else 1 end`)
     .limit(1);
 
   return product;
