@@ -82,9 +82,13 @@ export function createUploadCleanup(db: Database, isStopping: () => boolean) {
     );
   }
 
-  /** Processes a bounded batch and isolates failures per asset and from other worker jobs. */
+  /**
+   * Processes a bounded batch and isolates failures per asset and from other worker jobs.
+   * Resolves `true` when the batch was full, so the caller can drain the backlog immediately.
+   */
   async function run() {
     const startedAt = Date.now();
+    let hasMore = false;
     let deleted = 0;
     let failed = 0;
     let skipped = 0;
@@ -101,8 +105,9 @@ export function createUploadCleanup(db: Database, isStopping: () => boolean) {
         .orderBy(asc(uploadObjects.id))
         .limit(batchSize);
       // Sweep past failures so one bad batch cannot starve other orphaned assets.
-      // Reset at the end of each sweep to retry failures and pick up earlier IDs.
-      lastCandidateId = candidates.at(-1)?.id;
+      // Reset once a partial batch ends the sweep, so the next sweep retries failures.
+      hasMore = candidates.length === batchSize;
+      lastCandidateId = hasMore ? candidates.at(-1)?.id : undefined;
       for (const { id } of candidates) {
         if (isStopping()) break;
         try {
@@ -133,6 +138,7 @@ export function createUploadCleanup(db: Database, isStopping: () => boolean) {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
+    return hasMore && !isStopping();
   }
 
   return { run, close: () => client?.destroy() };

@@ -52,7 +52,7 @@ Compose starts three independently logged and restarted services:
 
 - `nginx` is the only published service (port 3000 by default). It enforces the upload-size ceiling, buffers accepted request bodies, and forwards proxy metadata.
 - `web` runs TanStack Start and exposes an internal health endpoint.
-- `worker` runs independently and receives database configuration and R2 credentials. Cleanup deletes each unreferenced R2 object using the bucket and key stored in `upload_object`, then deletes its database row. Food products, historical food logs, and recipe images all prevent deletion. Failed deletions are logged and retried in later batches; cleanup failures do not interrupt database health checks.
+- `worker` runs independently and receives database configuration and R2 credentials. Cleanup sweeps every 6 hours, draining full batches back-to-back until the backlog is empty. It deletes each unreferenced R2 object using the bucket and key stored in `upload_object`, then deletes its database row. Food products, historical food logs, and recipe images all prevent deletion. Failed deletions are logged and retried in later batches; cleanup failures do not interrupt database health checks.
 
 Set `NGINX_PORT` to publish a different local port. In production, Dokploy can route to the nginx service while nginx reaches web over the private Compose network.
 

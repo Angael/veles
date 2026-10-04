@@ -3,6 +3,7 @@ import { sql } from 'drizzle-orm';
 import { createUploadCleanup } from './upload-cleanup.ts';
 
 const checkIntervalMs = 10_000;
+const cleanupIntervalMs = 6 * 60 * 60 * 1000;
 const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
@@ -43,13 +44,18 @@ async function checkDatabase() {
   }
 }
 
-/** Schedules cleanup independently so slow R2 requests never delay database checks. */
+/**
+ * Drains orphaned uploads batch by batch, then sleeps until the next sweep.
+ * Runs independently so slow R2 requests never delay database checks.
+ */
 async function runCleanup() {
-  await cleanup.run();
+  while (await cleanup.run()) {
+    // Full batch: keep draining the backlog without waiting for the next sweep.
+  }
   if (!isStopping) {
     nextCleanup = setTimeout(() => {
       activeCleanup = runCleanup();
-    }, checkIntervalMs);
+    }, cleanupIntervalMs);
   }
 }
 
@@ -80,6 +86,6 @@ function requestShutdown(signal: NodeJS.Signals) {
 process.once('SIGINT', () => requestShutdown('SIGINT'));
 process.once('SIGTERM', () => requestShutdown('SIGTERM'));
 
-console.info('worker started', { checkIntervalMs });
+console.info('worker started', { checkIntervalMs, cleanupIntervalMs });
 activeCleanup = runCleanup();
 await checkDatabase();
