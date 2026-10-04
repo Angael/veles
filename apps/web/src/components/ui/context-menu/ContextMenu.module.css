@@ -51,7 +51,7 @@
   cursor: pointer;
   user-select: none;
 
-  & svg {
+  & > svg {
     flex: none;
     width: 1.1rem;
     height: 1.1rem;
@@ -61,7 +61,7 @@
   &[data-highlighted] {
     background: var(--c-primary-surface);
 
-    & svg {
+    & > svg {
       color: var(--c-accent);
     }
   }
@@ -74,14 +74,14 @@
 
 .danger {
   &,
-  & svg {
+  & > svg {
     color: var(--c-danger-text);
   }
 
   &[data-highlighted] {
     background: var(--c-danger-surface);
 
-    & svg {
+    & > svg {
       color: var(--c-danger-text);
     }
   }

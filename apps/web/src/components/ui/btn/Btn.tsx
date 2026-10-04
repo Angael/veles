@@ -1,7 +1,7 @@
 import { Button } from '@base-ui/react/button';
 import clsx from 'clsx';
 import { LoaderCircleIcon } from 'lucide-react';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import css from './Btn.module.css';
 
 export type BtnVariant =
@@ -18,10 +18,7 @@ export type BtnVariant =
 export type BtnSize = 'sm' | 'md' | 'lg';
 type BtnRadius = 'md' | 'pill';
 
-type BtnProps = Omit<
-  ComponentPropsWithoutRef<typeof Button>,
-  'className' | 'children' | 'render'
-> & {
+type BtnProps = Omit<ComponentProps<typeof Button>, 'className' | 'children' | 'render'> & {
   children?: ReactNode;
   className?: string;
   icon?: ReactNode;
@@ -30,7 +27,7 @@ type BtnProps = Omit<
   loading?: boolean;
   radius?: BtnRadius;
   /** Renders Btn styling and behavior on another element, such as a TanStack Router Link. */
-  render?: ComponentPropsWithoutRef<typeof Button>['render'];
+  render?: ComponentProps<typeof Button>['render'];
   size?: BtnSize;
   variant?: BtnVariant;
 };

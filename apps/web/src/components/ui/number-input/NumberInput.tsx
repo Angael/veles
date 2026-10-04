@@ -1,6 +1,6 @@
 import { NumberField, type NumberFieldRootProps } from '@base-ui/react/number-field';
 import clsx from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentProps } from 'react';
 import { MinusIcon, PlusIcon } from 'lucide-react';
 import type { InputSize } from '@/components/ui/text-input/TextInput';
 import css from './NumberInput.module.css';
@@ -9,7 +9,7 @@ type NumberInputProps = Omit<NumberFieldRootProps, 'className' | 'step'> & {
   className?: string;
   inputClassName?: string;
   placeholder?: string;
-  enterKeyHint?: ComponentPropsWithoutRef<'input'>['enterKeyHint'];
+  enterKeyHint?: ComponentProps<'input'>['enterKeyHint'];
   /** Visual size matching `Btn` heights. */
   size?: InputSize;
   /** Stepper amount; also limits typed precision to this step. Defaults to 1 with any precision. */

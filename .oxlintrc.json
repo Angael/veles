@@ -30,7 +30,7 @@
     "@tanstack/router/create-route-property-order": "error",
     "@tanstack/router/route-param-names": "error",
     "veles/env-vars": "error",
-    "veles-react/no-component-props-with-ref": "error",
+    "veles-react/no-component-props-ref-variants": "error",
     "eqeqeq": "error",
     "no-nested-ternary": "error",
     "no-shadow": "error",

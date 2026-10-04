@@ -1,8 +1,9 @@
 import clsx from 'clsx';
-import type { ComponentProps, ComponentPropsWithoutRef } from 'react';
+import type { ComponentProps } from 'react';
 import css from './List.module.css';
 
-type ListProps = ComponentPropsWithoutRef<'ul'> & {
+/** No ref: `as` switches between ul and ol, whose element types differ. */
+type ListProps = Omit<ComponentProps<'ul'>, 'ref'> & {
   as?: 'ol' | 'ul';
 };
 

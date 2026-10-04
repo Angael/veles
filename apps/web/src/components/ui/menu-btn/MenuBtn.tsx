@@ -1,7 +1,7 @@
 import { Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { ChevronDownIcon } from 'lucide-react';
-import type { ComponentProps, ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import css from './MenuBtn.module.css';
 
 export const MenuBtnRoot = Menu.Root;
@@ -13,21 +13,15 @@ export function MenuBtn({ className, ...props }: MenuBtnProps) {
   return <Menu.Trigger className={clsx(css.trigger, className)} {...props} />;
 }
 
-export function MenuBtnChevron({
-  className,
-  ...props
-}: ComponentPropsWithoutRef<typeof ChevronDownIcon>) {
+export function MenuBtnChevron({ className, ...props }: ComponentProps<typeof ChevronDownIcon>) {
   return <ChevronDownIcon aria-hidden='true' className={clsx(css.chevron, className)} {...props} />;
 }
 
-type MenuBtnPopupProps = Omit<ComponentPropsWithoutRef<typeof Menu.Popup>, 'children'> & {
+type MenuBtnPopupProps = Omit<ComponentProps<typeof Menu.Popup>, 'children'> & {
   children: ReactNode;
   description?: ReactNode;
   heading?: ReactNode;
-  positionerProps?: Omit<
-    ComponentPropsWithoutRef<typeof Menu.Positioner>,
-    'children' | 'className'
-  >;
+  positionerProps?: Omit<ComponentProps<typeof Menu.Positioner>, 'children' | 'className'>;
 };
 
 /** Renders the shared anchored popover and mobile bottom-sheet presentation. */
@@ -57,7 +51,7 @@ export function MenuBtnPopup({
   );
 }
 
-type MenuBtnItemProps = Omit<ComponentPropsWithoutRef<typeof Menu.Item>, 'children'> & {
+type MenuBtnItemProps = Omit<ComponentProps<typeof Menu.Item>, 'children'> & {
   description?: ReactNode;
   icon: ReactNode;
   label: ReactNode;
@@ -75,9 +69,6 @@ export function MenuBtnItem({ className, description, icon, label, ...props }: M
   );
 }
 
-export function MenuBtnDivider({
-  className,
-  ...props
-}: ComponentPropsWithoutRef<typeof Menu.Separator>) {
+export function MenuBtnDivider({ className, ...props }: ComponentProps<typeof Menu.Separator>) {
   return <Menu.Separator className={clsx(css.divider, className)} {...props} />;
 }

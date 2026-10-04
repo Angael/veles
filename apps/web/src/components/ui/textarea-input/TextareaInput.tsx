@@ -1,8 +1,8 @@
 import clsx from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentProps } from 'react';
 import css from './TextareaInput.module.css';
 
-type TextareaInputProps = Omit<ComponentPropsWithoutRef<'textarea'>, 'className'> & {
+type TextareaInputProps = Omit<ComponentProps<'textarea'>, 'className'> & {
   className?: string;
 };
 
