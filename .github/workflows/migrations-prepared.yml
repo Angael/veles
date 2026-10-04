@@ -1,0 +1,56 @@
+name: Migrations prepared
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  migrations-prepared:
+    name: Migrations prepared
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@9fd676a19091d4595eefd76e4bd31c97133911f1 # v4.2.0
+        with:
+          version: 12.3.4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check migrations are prepared
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          # Explicit schema options bypass the config that requires DATABASE_URL.
+          # No SQL is executed; generated files only exist in this CI checkout.
+          pnpm --filter @veles/db exec drizzle-kit generate \
+            --dialect=postgresql \
+            --schema=./src/schema/index.ts \
+            --out=./drizzle \
+            --name=ci_check < /dev/null | tee "$RUNNER_TEMP/migrations-prepared.log"
+
+          changes=$(git status --porcelain --untracked-files=all -- packages/db/drizzle)
+          if [[ -n "$changes" ]]; then
+            echo '::error::Migrations are missing. Run pnpm db:generate locally, review the generated files, and commit them.'
+            echo "$changes"
+            exit 1
+          fi
+
+          # Drizzle can exit successfully after an error or an aborted prompt.
+          if ! grep -Fq 'No schema changes, nothing to migrate' "$RUNNER_TEMP/migrations-prepared.log"; then
+            echo '::error::Could not confirm migrations are prepared. Run pnpm db:generate locally and resolve any errors or prompts.'
+            exit 1
+          fi
