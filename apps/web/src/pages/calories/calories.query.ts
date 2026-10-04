@@ -1,6 +1,9 @@
 import { queryOptions, useMutation } from '@tanstack/react-query';
+import { format, parseISO } from 'date-fns';
+import { toastManager } from '@/components/ui/toast/toastManager';
 import { todayLocalDate } from '@/lib/dateOnly';
 import {
+  copyFoodLogs,
   createFoodProduct,
   deleteFoodLog,
   deleteFoodLogs,
@@ -8,6 +11,7 @@ import {
   getFoodProduct,
   getFoodProducts,
   lookupFoodByBarcode,
+  moveFoodLogs,
   multiplyFoodLogs,
   recordCustomCalories,
   recordFood,
@@ -142,6 +146,42 @@ export function useMultiplyFoodLogsMutation() {
       invalidateQueryKey: calorieDashboardKey,
     },
     mutationFn: (data: { factor: number; ids: string[] }) => multiplyFoodLogs({ data }),
+  });
+}
+
+export type FoodLogsDateVariables = { date: string; ids: string[] };
+
+/**
+ * Success toast for move/copy. Lives on the mutation, not the `mutate()` call: moved rows and the
+ * selection bar unmount once the dashboard refetches, which skips per-call callbacks.
+ */
+function toastFoodLogsDate(verb: string, { date, ids }: FoodLogsDateVariables) {
+  const products = `${ids.length} ${ids.length === 1 ? 'product' : 'products'}`;
+  toastManager.add({
+    title: `${verb} ${products} to ${format(parseISO(date), 'EEE, d MMM')}`,
+    type: 'success',
+  });
+}
+
+export function useMoveFoodLogsMutation() {
+  return useMutation({
+    meta: {
+      error: { title: 'Could not move products' },
+      invalidateQueryKey: calorieDashboardKey,
+    },
+    mutationFn: (data: FoodLogsDateVariables) => moveFoodLogs({ data }),
+    onSuccess: (_data, variables) => toastFoodLogsDate('Moved', variables),
+  });
+}
+
+export function useCopyFoodLogsMutation() {
+  return useMutation({
+    meta: {
+      error: { title: 'Could not copy products' },
+      invalidateQueryKey: calorieDashboardKey,
+    },
+    mutationFn: (data: FoodLogsDateVariables) => copyFoodLogs({ data }),
+    onSuccess: (_data, variables) => toastFoodLogsDate('Copied', variables),
   });
 }
 

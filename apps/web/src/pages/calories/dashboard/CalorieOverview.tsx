@@ -4,6 +4,7 @@ import { DailySummary } from './DailySummary';
 import { DeleteLogsAction } from './DeleteLogsAction';
 import { LogFoodMenu } from './LogFoodMenu';
 import { LoggedFood } from './LoggedFood';
+import { LogsDateAction } from './LogsDateAction';
 import { MultiplyLogsAction } from './MultiplyLogsAction';
 import { ReceivedFoodShares } from './ReceivedFoodShares';
 import { ShareLogsAction } from './ShareLogsAction';
@@ -42,6 +43,8 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
           onClear={clearSelection}
         >
           <MultiplyLogsAction logs={selectedLogs} onMultiplied={clearSelection} />
+          <LogsDateAction date={date} logs={selectedLogs} mode='move' onDone={clearSelection} />
+          <LogsDateAction date={date} logs={selectedLogs} mode='copy' onDone={clearSelection} />
           <DeleteLogsAction logs={selectedLogs} onDeleted={clearSelection} />
           <ShareLogsAction logs={selectedLogs} onShared={clearSelection} />
         </SelectionBar>

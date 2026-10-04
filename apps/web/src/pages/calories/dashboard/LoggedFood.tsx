@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { FoodSummary } from '../FoodSummary';
 import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogMutation } from '../calories.query';
+import { type LogsDateMode, LogsDateDialog, logsDateModeIcon } from './LogsDateAction';
 import { MultiplyLogsDialog } from './MultiplyLogsAction';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Checkbox } from '@/components/ui/checkbox/Checkbox';
@@ -29,6 +30,11 @@ type LoggedFoodProps = {
 export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFoodProps) {
   const deleteMutation = useDeleteFoodLogMutation();
   const [multiplyOpen, setMultiplyOpen] = useState(false);
+  // Mode outlives `open` so the dialog keeps its title while animating closed.
+  const [dateDialog, setDateDialog] = useState<{ mode: LogsDateMode; open: boolean }>({
+    mode: 'move',
+    open: false,
+  });
 
   function remove() {
     deleteMutation.mutate({ date, id: entry.id });
@@ -88,6 +94,16 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
             onClick={() => setMultiplyOpen(true)}
           />
           <ContextMenuItem
+            icon={logsDateModeIcon('move')}
+            label='Move to…'
+            onClick={() => setDateDialog({ mode: 'move', open: true })}
+          />
+          <ContextMenuItem
+            icon={logsDateModeIcon('copy')}
+            label='Copy to…'
+            onClick={() => setDateDialog({ mode: 'copy', open: true })}
+          />
+          <ContextMenuItem
             icon={
               selected ? <SquareCheckIcon aria-hidden='true' /> : <SquareIcon aria-hidden='true' />
             }
@@ -104,6 +120,13 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
         </ContextMenuPopup>
       </ContextMenuRoot>
       <MultiplyLogsDialog logs={[entry]} onOpenChange={setMultiplyOpen} open={multiplyOpen} />
+      <LogsDateDialog
+        date={date}
+        logs={[entry]}
+        mode={dateDialog.mode}
+        onOpenChange={(open) => setDateDialog((current) => ({ ...current, open }))}
+        open={dateDialog.open}
+      />
     </>
   );
 }

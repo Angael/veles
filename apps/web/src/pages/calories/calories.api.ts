@@ -805,6 +805,50 @@ export const deleteFoodLogs = createServerFn({ method: 'POST' })
       .where(and(inArray(foodLogs.id, data.ids), eq(foodLogs.userId, session.user.id)));
   });
 
+const foodLogsDateInputType = type({ date: dateOnlyType, ids: foodLogIdsType });
+
+/** Moves the user's selected logs to another day, e.g. after logging dinner under the wrong date. */
+export const moveFoodLogs = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('moveFoodLogs')])
+  .validator(arkTypeValidator(foodLogsDateInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    await db
+      .update(foodLogs)
+      .set({ logDate: data.date })
+      .where(and(inArray(foodLogs.id, data.ids), eq(foodLogs.userId, session.user.id)));
+  });
+
+/** Duplicates the user's selected logs onto another day, e.g. repeating yesterday's breakfast. */
+export const copyFoodLogs = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('copyFoodLogs')])
+  .validator(arkTypeValidator(foodLogsDateInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    const sources = await db
+      .select()
+      .from(foodLogs)
+      .where(and(inArray(foodLogs.id, data.ids), eq(foodLogs.userId, session.user.id)));
+    if (sources.length === 0) throw new ClientSafeError('These products no longer exist.');
+
+    const consumedAt = new Date();
+    await db.insert(foodLogs).values(
+      sources.map((source) => ({
+        userId: session.user.id,
+        productId: source.productId,
+        imageUploadObjectId: source.imageUploadObjectId,
+        name: source.name,
+        gramsHundredths: source.gramsHundredths,
+        kcalHundredths: source.kcalHundredths,
+        proteinHundredths: source.proteinHundredths,
+        fatHundredths: source.fatHundredths,
+        carbsHundredths: source.carbsHundredths,
+        logDate: data.date,
+        consumedAt,
+      })),
+    );
+  });
+
 /** Scales grams, kcal, and macros of the user's selected logs, e.g. ×2 after eating a second sandwich logged as ingredients. */
 export const multiplyFoodLogs = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('multiplyFoodLogs')])
