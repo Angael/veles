@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 import { sessionUserQueryKey } from '@/lib/auth/session.query';
-import { signOut } from '@/lib/auth/client';
+import { apiKey, signOut } from '@/lib/auth/client';
 import {
   acceptConnectionInvitation,
   disconnectUser,
@@ -80,5 +80,35 @@ export function useDisconnectUserMutation() {
   return useMutation({
     meta: { invalidateQueryKey: connectionsQueryKey },
     mutationFn: (userId: string) => disconnectUser({ data: { userId } }),
+  });
+}
+
+/** Better Auth's client returns `{ data, error }`; React Query needs a throw. */
+function unwrap<T>({ data, error }: { data: T | null; error: { message?: string } | null }) {
+  if (error || data === null) throw new Error(error?.message ?? 'Request failed');
+  return data;
+}
+
+const apiKeysQueryKey = ['apiKeys'] as const;
+
+export function useApiKeysQuery() {
+  return useQuery({
+    queryFn: async () => unwrap(await apiKey.list()).apiKeys,
+    queryKey: apiKeysQueryKey,
+  });
+}
+
+export function useCreateApiKeyMutation() {
+  return useMutation({
+    gcTime: 0,
+    meta: { invalidateQueryKey: apiKeysQueryKey },
+    mutationFn: async (name: string) => unwrap(await apiKey.create({ name })),
+  });
+}
+
+export function useDeleteApiKeyMutation() {
+  return useMutation({
+    meta: { invalidateQueryKey: apiKeysQueryKey },
+    mutationFn: async (keyId: string) => unwrap(await apiKey.delete({ keyId })),
   });
 }

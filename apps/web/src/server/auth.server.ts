@@ -1,8 +1,16 @@
 import { APIError, betterAuth } from 'better-auth';
+import { apiKey } from '@better-auth/api-key';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { eq } from 'drizzle-orm';
-import { accounts, connectionInvitations, sessions, users, verifications } from '@veles/db/schema';
+import {
+  accounts,
+  apiKeys,
+  connectionInvitations,
+  sessions,
+  users,
+  verifications,
+} from '@veles/db/schema';
 import { db } from '@/server/db.server';
 import { getServerEnv } from '@/server/env.server';
 import { log } from '@/server/logger.server';
@@ -22,9 +30,19 @@ export const auth = betterAuth({
       session: sessions,
       account: accounts,
       verification: verifications,
+      apikey: apiKeys,
     },
   }),
-  plugins: [tanstackStartCookies()],
+  plugins: [
+    // Read-only MCP credentials for agents (see docs/agent-integration.md).
+    apiKey({
+      defaultPrefix: 'vls_',
+      requireName: true,
+      keyExpiration: { defaultExpiresIn: 60 * 60 * 24 * 90, disableCustomExpiresTime: true },
+      rateLimit: { timeWindow: 60_000, maxRequests: 120 },
+    }),
+    tanstackStartCookies(),
+  ],
   advanced: {
     useSecureCookies: env.isProduction,
   },
