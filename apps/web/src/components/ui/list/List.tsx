@@ -1,12 +1,12 @@
 import clsx from 'clsx';
-import type { ComponentPropsWithRef, ComponentPropsWithoutRef } from 'react';
+import type { ComponentProps, ComponentPropsWithoutRef } from 'react';
 import css from './List.module.css';
 
 type ListProps = ComponentPropsWithoutRef<'ul'> & {
   as?: 'ol' | 'ul';
 };
 
-type ListItemProps = ComponentPropsWithRef<'li'> & {
+type ListItemProps = ComponentProps<'li'> & {
   interactive?: boolean;
   selected?: boolean;
 };

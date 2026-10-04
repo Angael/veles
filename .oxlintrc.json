@@ -17,7 +17,8 @@
   "jsPlugins": [
     "@tanstack/eslint-plugin-query",
     "@tanstack/eslint-plugin-router",
-    { "name": "veles", "specifier": "./.oxlint/env-vars.mjs" }
+    { "name": "veles", "specifier": "./.oxlint/env-vars.mjs" },
+    { "name": "veles-react", "specifier": "./.oxlint/react-types.mjs" }
   ],
   "rules": {
     "@tanstack/query/exhaustive-deps": "error",
@@ -29,6 +30,7 @@
     "@tanstack/router/create-route-property-order": "error",
     "@tanstack/router/route-param-names": "error",
     "veles/env-vars": "error",
+    "veles-react/no-component-props-with-ref": "error",
     "eqeqeq": "error",
     "no-nested-ternary": "error",
     "no-shadow": "error",

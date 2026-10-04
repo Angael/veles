@@ -1,31 +1,29 @@
 import { ContextMenu } from '@base-ui/react/context-menu';
 import clsx from 'clsx';
-import type { ComponentPropsWithRef, ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import css from './ContextMenu.module.css';
 
 export const ContextMenuRoot = ContextMenu.Root;
 
 /** Area opening the menu on right click or long press; adds the shared "has more actions" cue. */
-export function ContextMenuTrigger({
+export const ContextMenuTrigger = ({
   className,
   ...props
-}: ComponentPropsWithRef<typeof ContextMenu.Trigger>) {
-  return <ContextMenu.Trigger className={clsx(css.trigger, className)} {...props} />;
-}
+}: ComponentProps<typeof ContextMenu.Trigger>) => (
+  <ContextMenu.Trigger className={clsx(css.trigger, className)} {...props} />
+);
 
 /** Portals the menu next to the pointer or the long-pressed point. */
-export function ContextMenuPopup({
+export const ContextMenuPopup = ({
   className,
   ...props
-}: ComponentPropsWithoutRef<typeof ContextMenu.Popup>) {
-  return (
-    <ContextMenu.Portal>
-      <ContextMenu.Positioner className={css.positioner}>
-        <ContextMenu.Popup className={clsx(css.popup, className)} {...props} />
-      </ContextMenu.Positioner>
-    </ContextMenu.Portal>
-  );
-}
+}: ComponentProps<typeof ContextMenu.Popup>) => (
+  <ContextMenu.Portal>
+    <ContextMenu.Positioner className={css.positioner}>
+      <ContextMenu.Popup className={clsx(css.popup, className)} {...props} />
+    </ContextMenu.Positioner>
+  </ContextMenu.Portal>
+);
 
 type ItemContentProps = {
   icon: ReactNode;
@@ -34,57 +32,50 @@ type ItemContentProps = {
   variant?: 'danger' | 'default';
 };
 
-type ContextMenuItemProps = Omit<ComponentPropsWithoutRef<typeof ContextMenu.Item>, 'children'> &
+type ContextMenuItemProps = Omit<ComponentProps<typeof ContextMenu.Item>, 'children'> &
   ItemContentProps;
 
-export function ContextMenuItem({
+export const ContextMenuItem = ({
   className,
   icon,
   label,
   variant = 'default',
   ...props
-}: ContextMenuItemProps) {
-  return (
-    <ContextMenu.Item
-      className={clsx(css.item, variant === 'danger' && css.danger, className)}
-      {...props}
-    >
-      {icon}
-      <span>{label}</span>
-    </ContextMenu.Item>
-  );
-}
+}: ContextMenuItemProps) => (
+  <ContextMenu.Item
+    className={clsx(css.item, variant === 'danger' && css.danger, className)}
+    {...props}
+  >
+    {icon}
+    <span>{label}</span>
+  </ContextMenu.Item>
+);
 
-type ContextMenuLinkItemProps = Omit<
-  ComponentPropsWithoutRef<typeof ContextMenu.LinkItem>,
-  'children'
-> &
+type ContextMenuLinkItemProps = Omit<ComponentProps<typeof ContextMenu.LinkItem>, 'children'> &
   ItemContentProps;
 
 /** Navigation item; pass the router link via `render`. Closes on click, unlike Base UI's default. */
-export function ContextMenuLinkItem({
+export const ContextMenuLinkItem = ({
   className,
   closeOnClick = true,
   icon,
   label,
   variant = 'default',
   ...props
-}: ContextMenuLinkItemProps) {
-  return (
-    <ContextMenu.LinkItem
-      className={clsx(css.item, variant === 'danger' && css.danger, className)}
-      closeOnClick={closeOnClick}
-      {...props}
-    >
-      {icon}
-      <span>{label}</span>
-    </ContextMenu.LinkItem>
-  );
-}
+}: ContextMenuLinkItemProps) => (
+  <ContextMenu.LinkItem
+    className={clsx(css.item, variant === 'danger' && css.danger, className)}
+    closeOnClick={closeOnClick}
+    {...props}
+  >
+    {icon}
+    <span>{label}</span>
+  </ContextMenu.LinkItem>
+);
 
-export function ContextMenuSeparator({
+export const ContextMenuSeparator = ({
   className,
   ...props
-}: ComponentPropsWithoutRef<typeof ContextMenu.Separator>) {
-  return <ContextMenu.Separator className={clsx(css.separator, className)} {...props} />;
-}
+}: ComponentProps<typeof ContextMenu.Separator>) => (
+  <ContextMenu.Separator className={clsx(css.separator, className)} {...props} />
+);
