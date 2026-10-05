@@ -1,95 +1,81 @@
-import clsx from 'clsx';
 import { useState } from 'react';
 import { Card } from '@/components/ui/card/Card';
 import { ScrubCell } from '../scrub/ScrubCell';
 import { ScrubField } from '../scrub/ScrubField';
+import { formatMetric, MEASURE_FIELDS, scrubTuning } from '../session/metrics';
 import css from './Inputs.module.css';
 
-const STEPS = [1, 2.5];
+const [weight, reps] = MEASURE_FIELDS.weight_reps;
 
-/** The favourite: big drag fields with live speed → precision feedback. */
+/** The favourite: big drag fields where speed alone picks the step. */
 export function DragFieldCard() {
   const [weightKg, setWeightKg] = useState<number | null>(null);
-  const [reps, setReps] = useState<number | null>(null);
-  const [step, setStep] = useState(2.5);
+  const [repCount, setRepCount] = useState<number | null>(null);
+  if (!weight || !reps) return null;
   return (
     <Card as='section' className={css.demo}>
-      <h2>A. Drag, accelerated</h2>
+      <h2>A. Drag</h2>
       <p className={css.hint}>
-        Drag slowly for single steps, flick for big jumps (snaps to {Math.max(2.5, step * 2)}). The
-        bar shows your speed. Tap the number to type, or use − / +.
+        Weight steps by speed: slow 0.5, then 1, 2.5, 5. On a phone, the number follows your finger
+        like a ruler. Tap a number to type it.
       </p>
-      <div className={css.stepPicker} role='radiogroup' aria-label='Weight step'>
-        {STEPS.map((option) => (
-          <button
-            aria-checked={option === step}
-            className={clsx(option === step && css.stepActive)}
-            key={option}
-            onClick={() => setStep(option)}
-            role='radio'
-            type='button'
-          >
-            {option === 1 ? 'Dumbbells · 1 kg' : 'Barbell · 2.5 kg'}
-          </button>
-        ))}
+      <div className={css.fieldPair}>
+        <ScrubField
+          fallback={80}
+          label={weight.label}
+          onChange={setWeightKg}
+          unit={weight.unit}
+          value={weightKg}
+          {...scrubTuning(weight)}
+        />
+        <ScrubField
+          fallback={5}
+          label={reps.label}
+          onChange={setRepCount}
+          unit={reps.unit}
+          value={repCount}
+          {...scrubTuning(reps)}
+        />
       </div>
-      <ScrubField
-        coarseStep={Math.max(2.5, step * 2)}
-        fallback={step === 1 ? 6 : 80}
-        label='Weight'
-        onChange={setWeightKg}
-        step={step}
-        unit='kg'
-        value={weightKg}
-      />
-      <ScrubField
-        coarseStep={5}
-        fallback={5}
-        label='Reps'
-        onChange={setReps}
-        step={1}
-        unit='reps'
-        value={reps}
-      />
     </Card>
   );
 }
 
+type Row = { weightKg: number | null; reps: number | null };
+
 /** The combo: tiny drag cells keep the whole workout on screen. */
 export function DragCellsCard() {
-  const [rows, setRows] = useState([
-    { reps: null as number | null, weightKg: null as number | null },
-    { reps: null as number | null, weightKg: null as number | null },
+  const [rows, setRows] = useState<Row[]>([
+    { reps: null, weightKg: null },
+    { reps: null, weightKg: null },
   ]);
-  const update = (index: number, patch: Partial<(typeof rows)[number]>) =>
+  const update = (index: number, patch: Partial<Row>) =>
     setRows((current) => current.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+  if (!weight || !reps) return null;
   return (
     <Card as='section' className={css.demo}>
-      <h2>B. Drag cells (combo)</h2>
+      <h2>B. Drag cells</h2>
       <p className={css.hint}>
-        Same gesture inside small table cells. Tapping a cell opens the big top sheet; try it in the
-        Live session tab.
+        Same gesture in small table cells. In the Live session tab, tapping a cell opens the sheet.
       </p>
       {rows.map((row, index) => (
         <div className={css.cellRow} key={index}>
           <span>{index + 1}</span>
           <ScrubCell
-            aria-label='Weight'
-            coarseStep={5}
-            format={String}
+            aria-label={weight.label}
+            format={(value) => formatMetric(weight, value)}
             onChange={(weightKg) => update(index, { weightKg })}
             placeholder={80}
-            step={2.5}
             value={row.weightKg}
+            {...scrubTuning(weight)}
           />
           <ScrubCell
-            aria-label='Reps'
-            coarseStep={5}
-            format={String}
-            onChange={(reps) => update(index, { reps })}
+            aria-label={reps.label}
+            format={(value) => formatMetric(reps, value)}
+            onChange={(value) => update(index, { reps: value })}
             placeholder={5}
-            step={1}
             value={row.reps}
+            {...scrubTuning(reps)}
           />
         </div>
       ))}

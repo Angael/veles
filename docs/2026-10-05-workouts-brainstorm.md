@@ -15,6 +15,20 @@ Playground: `/demo/workouts` (mock data, nothing saves). Draft schema:
 
 Common pattern: **the set row is a tiny spreadsheet**, and **the rest timer starts itself when you tick a set**. Everything else (type, notes, supersets, reorder) hides behind a tap on the set number or a `⋯`/long press. That maps well onto our existing `ContextMenu`.
 
+## Round 3 feedback and changes
+
+Round 3 made things simpler. Some round 2 items below were changed or removed here.
+
+- **Drag direction**: on touch, the value follows the finger like a ruler, so moving the finger right makes the value smaller. With a mouse, dragging right makes it bigger.
+- **No step setting**: speed alone picks the step. Weight goes 0.5 → 1 → 2.5 → 5, reps go 1 → 2 → 5, and time goes 5 → 15 → 30 → 60 s. `exercise.weight_step_grams` is removed.
+- **Never below zero**: dragging stops at 0. Weight, reps, time and distance cannot be negative (DB check, parser, mock data). Assisted machines log the assist weight as a positive number.
+- **Less noise while dragging**: no speed bar, no `±` badge, no − / + buttons. The value and the ruler are enough.
+- **Simple sheet**: exercise name, "Set N", "Last time … use", the 1–2 drag fields, and **Save**. Changes go into a draft and are applied only on Save. No set navigation, no step grid, and no rest timer start.
+- **No "previous" column**: the "—" text looked like a set name. Last time's values are already the grey ghost text in each cell and in the sheet.
+- **History dialog**: short numeric dates (`Thu 02.10`), no set-type letters, no subtitle.
+- **Tips**: removed "tick to finish" and "tap for details" because users already expect both. Demos now move smoothly (requestAnimationFrame) and show the press. Touch screens show a finger dot; desktop shows a cursor that shrinks when clicking, with a ring. The layout no longer overflows on phones.
+- **Page width fix**: the page grid now uses `minmax(0, 1fr)`, so the wide tab strip scrolls inside the page and does not stretch it.
+
 ## Round 2 feedback and changes
 
 Picked so far (★ in the playground):
@@ -80,13 +94,13 @@ Four tables. All metric columns are nullable, so changing what an exercise track
 
 ```
 exercise          id, user_id, name (unique per user, case-insensitive), measure, rest_seconds,
-                  weight_step_grams, notes, archived_at
+                  notes, archived_at
 workout           id, user_id, kind ('routine' | 'session'), name, notes, routine_id → workout,
                   date (sessions only), started_at, ended_at, duration_seconds (manual log)
 workout_exercise  id, workout_id, exercise_id (restrict), position, superset_group,
                   rest_seconds (override), notes
 workout_set       id, workout_exercise_id, position, type ('normal'|'warmup'|'drop'|'failure'),
-                  weight_grams (negative = assisted), reps, duration_seconds, distance_meters,
+                  weight_grams, reps, duration_seconds, distance_meters,
                   rpe_tenths, completed_at
 ```
 

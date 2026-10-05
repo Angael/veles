@@ -1,8 +1,8 @@
 import { XIcon } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
-import { DragDemo, TapSheetDemo } from './DragDemos';
-import { LongPressDemo, TickRestDemo, TypeSetsDemo } from './GestureDemos';
+import { DragDemo } from './DragDemos';
+import { LongPressDemo, TypeSetsDemo } from './GestureDemos';
 import css from './Hints.module.css';
 
 export type Hint = { key: string; title: string; text: string; Demo: ComponentType };
@@ -12,20 +12,8 @@ export const HINTS: Hint[] = [
   {
     Demo: DragDemo,
     key: 'drag',
-    text: 'Slide a number sideways. Slow = small steps, fast flick = big jumps.',
+    text: 'Slide a number sideways. Slow = small steps, fast = big jumps.',
     title: 'Drag numbers',
-  },
-  {
-    Demo: TickRestDemo,
-    key: 'tick',
-    text: 'Tick a set when done. Empty cells copy last time, and the rest timer starts.',
-    title: 'Tick to finish a set',
-  },
-  {
-    Demo: TapSheetDemo,
-    key: 'sheet',
-    text: 'Tap a number for the big editor with + / − and the weight step.',
-    title: 'Tap for details',
   },
   {
     Demo: LongPressDemo,

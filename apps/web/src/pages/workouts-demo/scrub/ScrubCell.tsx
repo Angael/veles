@@ -17,7 +17,7 @@ export const rulerStyle = (offset: number): CSSProperties & { '--scrub-offset': 
 
 /**
  * Table cell you drag sideways to change, tap to open the set sheet. Small chevrons hint at the
- * gesture on touch screens; a tick ruler slides under the value while dragging.
+ * gesture on touch screens; a tick ruler slides with the finger while dragging.
  */
 export function ScrubCell({
   'aria-label': ariaLabel,
@@ -25,24 +25,26 @@ export function ScrubCell({
   placeholder,
   ...options
 }: ScrubCellProps) {
-  const { handlers, precision, scrub } = useScrub({ ...options, fallback: placeholder ?? 0 });
-  const empty = options.value === null;
+  const { handlers, offset } = useScrub({ ...options, fallback: placeholder ?? 0 });
   const shown = options.value ?? placeholder;
 
   return (
     <div
       aria-label={ariaLabel}
       aria-valuenow={options.value ?? undefined}
-      className={clsx(css.cell, empty && css.empty, scrub && css.scrubbing)}
+      className={clsx(
+        css.cell,
+        options.value === null && css.empty,
+        offset !== null && css.scrubbing,
+      )}
       role='spinbutton'
-      style={rulerStyle(scrub?.offset ?? 0)}
+      style={rulerStyle(offset ?? 0)}
       tabIndex={0}
       {...handlers}
     >
       <ChevronLeftIcon aria-hidden='true' className={css.hintChevron} />
-      <span className={css.cellValue}>{shown === null ? '–' : format(shown)}</span>
+      <span className={css.cellValue}>{shown === null ? '' : format(shown)}</span>
       <ChevronRightIcon aria-hidden='true' className={css.hintChevron} />
-      {scrub ? <span className={css.precision}>±{precision}</span> : null}
     </div>
   );
 }

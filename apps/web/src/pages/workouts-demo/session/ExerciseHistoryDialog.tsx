@@ -28,9 +28,9 @@ export function ExerciseHistoryDialog({
     <DialogRoot onOpenChange={onOpenChange} open={open}>
       <DialogPopup>
         <DialogTitle>{exerciseName}</DialogTitle>
-        <DialogDescription>
-          {entries.length > 0 ? 'Earlier sessions, newest first.' : 'No earlier sessions yet.'}
-        </DialogDescription>
+        {entries.length === 0 ? (
+          <DialogDescription>No earlier sessions yet.</DialogDescription>
+        ) : null}
         <ol className={css.history}>
           {entries.map((entry) => (
             <li className={css.historyEntry} key={entry.id}>

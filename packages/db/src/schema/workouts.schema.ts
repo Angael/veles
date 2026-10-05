@@ -44,8 +44,6 @@ export const exercises = pgTable(
     measure: text('measure', { enum: exerciseMeasures }).notNull().default('weight_reps'),
     /** Rest timer after a completed set; null turns the timer off for this exercise. */
     restSeconds: integer('rest_seconds').default(120),
-    /** Fine step for drag and ± buttons: 1000 for dumbbells (6, 7, 8 kg), 2500 for barbells. */
-    weightStepGrams: integer('weight_step_grams').notNull().default(2500),
     notes: text('notes').notNull().default(''),
     /** Hidden from the picker but kept so old sessions still resolve their exercise. */
     archivedAt: timestamp('archived_at'),
@@ -146,7 +144,6 @@ export const workoutSets = pgTable(
       .references(() => workoutExercises.id, { onDelete: 'cascade' }),
     position: integer('position').notNull(),
     type: text('type', { enum: workoutSetTypes }).notNull().default('normal'),
-    /** Negative means assistance, e.g. an assisted pull-up at -20 kg. */
     weightGrams: integer('weight_grams'),
     reps: integer('reps'),
     durationSeconds: integer('duration_seconds'),
@@ -160,7 +157,7 @@ export const workoutSets = pgTable(
     check('workout_set_type_check', sql`${table.type} IN ('normal', 'warmup', 'drop', 'failure')`),
     check(
       'workout_set_non_negative_check',
-      sql`coalesce(${table.reps}, 0) >= 0 AND coalesce(${table.durationSeconds}, 0) >= 0 AND coalesce(${table.distanceMeters}, 0) >= 0`,
+      sql`coalesce(${table.weightGrams}, 0) >= 0 AND coalesce(${table.reps}, 0) >= 0 AND coalesce(${table.durationSeconds}, 0) >= 0 AND coalesce(${table.distanceMeters}, 0) >= 0`,
     ),
     check(
       'workout_set_rpe_check',

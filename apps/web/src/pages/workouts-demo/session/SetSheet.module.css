@@ -28,7 +28,7 @@
 .sheet {
   display: grid;
   gap: var(--space-sm);
-  width: min(30rem, 100%);
+  width: min(26rem, 100%);
   max-height: calc(100dvh - 2 * var(--space-xs));
   overflow-y: auto;
   padding: var(--space-md);
@@ -55,36 +55,15 @@
 }
 
 .title {
+  display: grid;
   flex: 1;
   min-width: 0;
-  overflow: hidden;
   font-size: var(--text-lg);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
-.setNav {
-  display: grid;
-  grid-template-columns: 2.75rem 1fr 2.75rem;
-  align-items: center;
-  color: var(--c-muted-soft);
-  font-size: var(--text-sm);
-  text-align: center;
-
-  & button {
-    display: grid;
-    place-items: center;
-    height: 2.5rem;
-    border: 0;
-    border-radius: var(--radius-pill);
-    background: var(--c-surface-inset);
-    color: var(--c-text);
-    cursor: pointer;
-
-    &:disabled {
-      opacity: 0.35;
-      cursor: default;
-    }
+  & small {
+    color: var(--c-muted);
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-regular);
   }
 }
 
@@ -114,36 +93,6 @@
 
 .fields {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
   gap: var(--space-md);
-}
-
-/* Fixed four-cell grid: never wraps into odd rows. */
-.steps {
-  display: grid;
-  grid-template-columns: auto repeat(4, minmax(0, 1fr));
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--c-muted);
-  font-size: var(--text-xs);
-
-  & button {
-    min-height: 2.5rem;
-    border: var(--border-width) solid var(--c-border);
-    border-radius: 10px;
-    background: var(--c-surface-inset);
-    color: var(--c-text);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    cursor: pointer;
-  }
-
-  & .stepActive {
-    border-color: var(--c-primary-border);
-    background: var(--c-primary-surface-strong);
-  }
-}
-
-.done {
-  justify-self: stretch;
 }

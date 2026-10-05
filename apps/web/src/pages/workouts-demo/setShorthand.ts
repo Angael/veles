@@ -19,14 +19,13 @@ export const SHORTHAND_EXAMPLES = [
   ['80x5!', 'set to failure'],
   ['d60x8', 'drop set'],
   ['80x5 @8', 'RPE 8'],
-  ['-20x8', 'assisted, 20 kg help'],
   ['45s, 1:30, 2m', 'timed sets'],
   ['24kg 45s', 'weight + time'],
   ['5.2km 28:10', 'distance + time'],
   ['60x8, 70x6, 80x4x2', 'many groups, comma separated'],
 ] as const;
 
-const number = String.raw`-?\d+(?:[.,]\d+)?`;
+const number = String.raw`\d+(?:[.,]\d+)?`;
 const weightReps = new RegExp(String.raw`^(${number})?x(\d+)(?:x(\d+))?$`);
 const time = /^(?:(\d+):(\d{1,2})|(\d+(?:[.,]\d+)?)(s|m|min))$/;
 const kg = new RegExp(String.raw`^(${number})kg$`);

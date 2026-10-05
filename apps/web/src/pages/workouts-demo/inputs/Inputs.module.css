@@ -138,28 +138,6 @@
 }
 
 /* Drag demos */
-.stepPicker {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.35rem;
-
-  & button {
-    min-height: 2.5rem;
-    border: var(--border-width) solid var(--c-border);
-    border-radius: 10px;
-    background: var(--c-surface-inset);
-    color: var(--c-muted);
-    font-size: var(--text-sm);
-    cursor: pointer;
-  }
-
-  & .stepActive {
-    border-color: var(--c-primary-border);
-    background: var(--c-primary-surface-strong);
-    color: var(--c-text-strong);
-  }
-}
-
 .cellRow {
   display: grid;
   grid-template-columns: 1.5rem repeat(2, 5rem);
@@ -167,4 +145,10 @@
   gap: 0.35rem;
   color: var(--c-muted);
   font-size: var(--text-xs);
+}
+
+.fieldPair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
 }

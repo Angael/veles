@@ -15,7 +15,7 @@ import { useMockSession } from './useMockSession';
 import css from './Session.module.css';
 
 /** Tips shown at the top of a session, one at a time, until each is dismissed. */
-const SESSION_HINTS = ['drag', 'tick', 'sheet', 'longpress'];
+const SESSION_HINTS = ['drag', 'longpress'];
 
 type SessionDemoProps = { cellMode: CellMode; restVariant: RestVariant };
 
@@ -29,12 +29,13 @@ export function SessionDemo({ cellMode, restVariant }: SessionDemoProps) {
   const [sheet, setSheet] = useState<{ slotId: string; setId: string } | null>(null);
 
   const sheetSlot = slots.find((slot) => slot.id === sheet?.slotId);
+  const sheetSet = sheetSlot?.sets.find((set) => set.id === sheet?.setId);
   const nextHint = HINTS.find(
     (hint) =>
       SESSION_HINTS.includes(hint.key) &&
       hints.seen !== null &&
       !hints.seen.includes(hint.key) &&
-      (cellMode === 'drag' || (hint.key !== 'drag' && hint.key !== 'sheet')),
+      (cellMode === 'drag' || hint.key !== 'drag'),
   );
 
   function onSetCompleted(slot: MockSlot, set: MockSet) {
@@ -83,11 +84,15 @@ export function SessionDemo({ cellMode, restVariant }: SessionDemoProps) {
         open={pickerOpen}
       />
       <SetSheet
-        actions={actions}
         onClose={() => setSheet(null)}
-        onCompleted={onSetCompleted}
-        onNavigate={(setId) => setSheet((current) => current && { ...current, setId })}
-        target={sheetSlot && sheet ? { setId: sheet.setId, slot: sheetSlot } : null}
+        onSave={(patch) =>
+          sheetSlot && sheetSet && actions.updateSet(sheetSlot.id, sheetSet.id, patch)
+        }
+        target={
+          sheetSlot && sheetSet
+            ? { number: sheetSlot.sets.indexOf(sheetSet) + 1, set: sheetSet, slot: sheetSlot }
+            : null
+        }
       />
 
       {restVariant === 'dock' ? <RestDock timer={timer} /> : null}

@@ -3,7 +3,6 @@ import { CheckIcon } from 'lucide-react';
 import { ContextMenuRoot, ContextMenuTrigger } from '@/components/ui/context-menu/ContextMenu';
 import { SET_TYPE_LABELS, type MockSet, type MockSlot } from '../mockData';
 import { ScrubCell } from '../scrub/ScrubCell';
-import { describeSet } from '../setShorthand';
 import { MetricInput } from './MetricInput';
 import { completedPatch, formatMetric, MEASURE_FIELDS, scrubTuning } from './metrics';
 import { SET_BADGE, SET_TYPE_ORDER, SetMenu } from './SetMenu';
@@ -67,7 +66,6 @@ export function SetRow({
         >
           {set.type === 'normal' ? number : SET_BADGE[set.type]}
         </button>
-        <span className={css.previous}>{set.previous ? describeSet(set.previous) : '—'}</span>
         {fields.map((field) =>
           cellMode === 'drag' ? (
             <ScrubCell
@@ -78,7 +76,7 @@ export function SetRow({
               onTap={onOpenSheet}
               placeholder={set.previous?.[field.key] ?? null}
               value={set[field.key]}
-              {...scrubTuning(field, slot)}
+              {...scrubTuning(field)}
             />
           ) : (
             <MetricInput

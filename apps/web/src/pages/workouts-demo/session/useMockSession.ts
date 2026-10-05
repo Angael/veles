@@ -29,7 +29,6 @@ export function useMockSession() {
           restSeconds: 90,
           sets: [makeSet()],
           supersetGroup: null,
-          weightStep: 2.5,
         },
       ]),
     /** New set copies the last one's values, the way people actually progress through sets. */

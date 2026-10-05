@@ -1,4 +1,4 @@
-import { formatDuration, type Measure, type MockSet, type MockSlot } from '../mockData';
+import { formatDuration, type Measure, type MockSet } from '../mockData';
 
 export type MetricKey = 'weightKg' | 'reps' | 'durationSeconds' | 'distanceKm';
 
@@ -22,25 +22,24 @@ export const MEASURE_FIELDS: Record<Measure, MetricField[]> = {
   weight_reps: [weight, reps],
 };
 
+/** Drag speed (px/ms) where each bigger step kicks in. */
+const tiers = (...steps: number[]) =>
+  steps.map((step, index) => ({ from: [0, 0.3, 0.65, 1.1][index] ?? 2, step }));
+
 /**
- * Drag tuning per metric. Fine step is what a slow drag or a ± tap changes; coarse step is what
- * a fast flick snaps to. Weight uses the exercise's own step so dumbbells can go 6, 7, 8, 9.
+ * Drag tuning per metric: slow drags use the smallest step, faster drags the bigger ones, so the
+ * user never picks a step. Weight goes 0.5 → 1 → 2.5 → 5.
  */
-export function scrubTuning(field: MetricField, slot: Pick<MockSlot, 'weightStep'>) {
+export function scrubTuning(field: MetricField) {
   switch (field.key) {
     case 'weightKg':
-      return {
-        coarseStep: Math.max(2.5, slot.weightStep * 2),
-        max: 500,
-        min: -200,
-        step: slot.weightStep,
-      };
+      return { max: 500, tiers: tiers(0.5, 1, 2.5, 5) };
     case 'reps':
-      return { coarseStep: 5, max: 200, step: 1 };
+      return { max: 200, pixelsPerStep: 16, tiers: tiers(1, 1, 2, 5) };
     case 'durationSeconds':
-      return { coarseStep: 15, max: 6 * 3600, pixelsPerStep: 10, step: 5 };
+      return { max: 6 * 3600, tiers: tiers(5, 15, 30, 60) };
     case 'distanceKm':
-      return { coarseStep: 0.5, max: 300, step: 0.1 };
+      return { max: 300, tiers: tiers(0.1, 0.5, 1, 5) };
   }
 }
 

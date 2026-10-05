@@ -22,8 +22,6 @@ export type MockSlot = {
   restSeconds: number | null;
   supersetGroup: number | null;
   note: string;
-  /** Weight change per fine drag step and ± tap; 1 for dumbbells, 2.5 for most barbells. */
-  weightStep: number;
   sets: MockSet[];
 };
 
@@ -72,7 +70,6 @@ export const initialSession = (): MockSlot[] => [
     restSeconds: 120,
     sets: [lifted(40, 10, 'warmup'), lifted(80, 5), lifted(80, 5), lifted(80, 4)],
     supersetGroup: null,
-    weightStep: 2.5,
   },
   {
     id: mockId(),
@@ -82,7 +79,6 @@ export const initialSession = (): MockSlot[] => [
     restSeconds: 60,
     sets: [lifted(6, 15), lifted(7, 12), lifted(8, 10), lifted(9, 8)],
     supersetGroup: null,
-    weightStep: 1,
   },
   {
     id: mockId(),
@@ -92,7 +88,6 @@ export const initialSession = (): MockSlot[] => [
     restSeconds: 90,
     sets: [lifted(55, 10), lifted(55, 10), lifted(55, 9)],
     supersetGroup: 1,
-    weightStep: 2.5,
   },
   {
     id: mockId(),
@@ -105,7 +100,6 @@ export const initialSession = (): MockSlot[] => [
       makeSet({ previous: { ...emptyMetrics, reps: 10 } }),
     ],
     supersetGroup: 1,
-    weightStep: 2.5,
   },
   {
     id: mockId(),
@@ -115,7 +109,6 @@ export const initialSession = (): MockSlot[] => [
     restSeconds: 60,
     sets: [makeSet({ previous: { ...emptyMetrics, durationSeconds: 60 } })],
     supersetGroup: null,
-    weightStep: 2.5,
   },
 ];
 
@@ -163,7 +156,7 @@ export const MOCK_EXERCISES: MockExercise[] = [
   },
   {
     id: 'e7',
-    lastBest: '-20 × 8',
+    lastBest: '20 × 8',
     lastDone: '2 weeks ago',
     measure: 'weight_reps',
     name: 'Assisted pull-up machine',
@@ -221,9 +214,9 @@ export type MockHistoryEntry = {
 };
 
 export const MOCK_HISTORY: MockHistoryEntry[] = [
-  { date: 'Fri 3 Oct', durationMinutes: 34, id: 'h1', name: 'Run', sets: 1, volumeKg: null },
+  { date: 'Fri 03.10', durationMinutes: 34, id: 'h1', name: 'Run', sets: 1, volumeKg: null },
   {
-    date: 'Thu 2 Oct',
+    date: 'Thu 02.10',
     durationMinutes: 58,
     id: 'h2',
     name: 'Push-ish Monday',
@@ -231,7 +224,7 @@ export const MOCK_HISTORY: MockHistoryEntry[] = [
     volumeKg: 4820,
   },
   {
-    date: 'Tue 30 Sep',
+    date: 'Tue 30.09',
     durationMinutes: 90,
     id: 'h3',
     name: 'Football with the office',
@@ -240,7 +233,7 @@ export const MOCK_HISTORY: MockHistoryEntry[] = [
     volumeKg: null,
   },
   {
-    date: 'Mon 29 Sep',
+    date: 'Mon 29.09',
     durationMinutes: 66,
     id: 'h4',
     name: 'Legs + the thing Tom showed me',
@@ -270,16 +263,16 @@ export type ExerciseHistoryEntry = {
 const EXERCISE_HISTORY: Record<string, ExerciseHistoryEntry[]> = {
   'Bench (the flat one)': [
     {
-      date: 'Thu 2 Oct',
+      date: 'Thu 02.10',
       exerciseCount: 5,
       id: 'b1',
       note: 'Last set grindy. Try 82.5 next time if sleep was ok.',
       position: 1,
-      sets: ['W 40×10', '80×5', '80×5', '80×4'],
+      sets: ['80×5', '80×5', '80×4'],
       workoutName: 'Push-ish Monday',
     },
     {
-      date: 'Mon 22 Sep',
+      date: 'Mon 22.09',
       exerciseCount: 4,
       id: 'b2',
       note: 'Done after squats, felt weak.',
@@ -288,7 +281,7 @@ const EXERCISE_HISTORY: Record<string, ExerciseHistoryEntry[]> = {
       workoutName: 'Legs + the thing Tom showed me',
     },
     {
-      date: 'Thu 18 Sep',
+      date: 'Thu 18.09',
       exerciseCount: 4,
       id: 'b3',
       note: '',
@@ -299,7 +292,7 @@ const EXERCISE_HISTORY: Record<string, ExerciseHistoryEntry[]> = {
   ],
   'Cable row, the blue handle': [
     {
-      date: 'Thu 2 Oct',
+      date: 'Thu 02.10',
       exerciseCount: 5,
       id: 'c1',
       note: 'Seat on 4, chest pad touching.',
@@ -310,7 +303,7 @@ const EXERCISE_HISTORY: Record<string, ExerciseHistoryEntry[]> = {
   ],
   'Lateral raise, pink dumbbells': [
     {
-      date: 'Thu 2 Oct',
+      date: 'Thu 02.10',
       exerciseCount: 5,
       id: 'l1',
       note: 'Pyramid up, 9s were sloppy.',

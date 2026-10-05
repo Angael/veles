@@ -1,56 +1,46 @@
 import clsx from 'clsx';
-import { ChevronLeftIcon, ChevronRightIcon, PointerIcon } from 'lucide-react';
-import { useLoop } from './useHints';
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { rulerStyle } from '../scrub/ScrubCell';
+import { Pointer } from './Pointer';
+import { phase, useCoarsePointer, useTimeline } from './useHints';
 import css from './Hints.module.css';
 
-const DRAG_FRAMES = [
-  { value: '80', x: 0, press: false },
-  { value: '80', x: 0, press: true },
-  { value: '80.5', x: 6, press: true },
-  { value: '81', x: 12, press: true },
-  { value: '85', x: 34, press: true },
-  { value: '90', x: 52, press: true },
-  { value: '90', x: 52, press: false },
-  { value: '90', x: 52, press: false },
-];
-
-/** Finger presses a cell and slides right: slow ticks first, then a fast flick jumps ahead. */
-export function DragDemo() {
-  const frame = DRAG_FRAMES[useLoop(DRAG_FRAMES.length, 450, 4)] ?? DRAG_FRAMES[0];
-  return (
-    <div aria-hidden='true' className={css.stage}>
-      <div className={clsx(css.fakeCell, frame?.press && css.fakeCellActive)}>
-        <ChevronLeftIcon />
-        <span>{frame?.value}</span>
-        <ChevronRightIcon />
-      </div>
-      <PointerIcon
-        className={clsx(css.finger, frame?.press && css.fingerPressed)}
-        style={{ translate: `${(frame?.x ?? 0) - 20}px 0.6rem` }}
-      />
-    </div>
-  );
+/** Value shown for a given drag distance: 0.5 steps while slow, then 2.5 and 5 when flicked. */
+function demoValue(slow: number, fast: number) {
+  if (fast <= 0) return 80 + Math.round(slow * 3) * 0.5;
+  if (fast < 0.35) return 82.5;
+  if (fast < 0.7) return 85;
+  return 90;
 }
 
-/** Tap a number, the big editor drops from the top. */
-export function TapSheetDemo() {
-  const frame = useLoop(6, 600, 3);
-  const open = frame >= 2 && frame <= 4;
+/**
+ * Pointer presses a cell, drags slowly (80 → 81.5), then flicks (→ 90). On touch the finger moves
+ * left to increase, like pulling a ruler; on desktop the cursor moves right.
+ */
+export function DragDemo() {
+  const progress = useTimeline(4200, 0.6);
+  const coarse = useCoarsePointer();
+  const direction = coarse ? -1 : 1;
+
+  const approach = phase(progress, 0, 0.12);
+  const slow = phase(progress, 0.18, 0.5);
+  const fast = phase(progress, 0.55, 0.66);
+  const pressed = progress > 0.14 && progress < 0.72;
+  const travel = (slow * 14 + fast * 46) * direction;
+  const value = progress < 0.18 ? 80 : demoValue(slow, fast);
+
   return (
     <div aria-hidden='true' className={css.stage}>
-      <div className={clsx(css.miniSheet, open && css.miniSheetOpen)}>
-        <span>−</span>
-        <b>82.5</b>
-        <span>+</span>
+      <div className={clsx(css.fakeCell, pressed && css.fakeCellActive)} style={rulerStyle(travel)}>
+        <ChevronLeftIcon />
+        <span>{value}</span>
+        <ChevronRightIcon />
       </div>
-      <div className={css.fakeRowSmall}>
-        <span>2</span>
-        <span className={clsx(css.fakeCellSmall, frame === 1 && css.fakeCellActive)}>80</span>
-        <span className={css.fakeCellSmall}>5</span>
-      </div>
-      <PointerIcon
-        className={clsx(css.finger, frame === 1 && css.fingerPressed)}
-        style={{ opacity: frame <= 1 ? 1 : 0, translate: '-0.2rem 1.4rem' }}
+      <Pointer
+        coarse={coarse}
+        pressed={pressed}
+        x={travel + (1 - approach) * 30}
+        y={(1 - approach) * 24}
       />
     </div>
   );

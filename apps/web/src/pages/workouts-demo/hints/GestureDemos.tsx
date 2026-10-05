@@ -1,38 +1,19 @@
 import clsx from 'clsx';
-import { CheckIcon, CopyIcon, LayersIcon, PointerIcon, Trash2Icon } from 'lucide-react';
-import { useLoop } from './useHints';
+import { CopyIcon, LayersIcon, Trash2Icon } from 'lucide-react';
+import { Pointer } from './Pointer';
+import { phase, useCoarsePointer, useTimeline } from './useHints';
 import css from './Hints.module.css';
 
-/** Tick a set, the rest pill slides up and starts counting. */
-export function TickRestDemo() {
-  const frame = useLoop(8, 500, 4);
-  const done = frame >= 2;
-  return (
-    <div aria-hidden='true' className={css.stage}>
-      <div className={css.fakeRowSmall}>
-        <span>1</span>
-        <span className={css.fakeCellSmall}>80</span>
-        <span className={css.fakeCellSmall}>5</span>
-        <span className={clsx(css.fakeCheck, done && css.fakeCheckDone)}>
-          <CheckIcon />
-        </span>
-      </div>
-      <PointerIcon
-        className={clsx(css.finger, frame === 1 && css.fingerPressed)}
-        style={{ opacity: frame <= 1 ? 1 : 0, translate: '3.2rem 0.9rem' }}
-      />
-      <div className={clsx(css.miniDock, done && css.miniDockShown)}>
-        1:{String(30 - Math.max(0, frame - 2)).padStart(2, '0')}
-      </div>
-    </div>
-  );
-}
-
-/** Hold a row, a ring fills, the menu pops. */
+/** Press and hold a row: a ring fills around the press point, then the menu pops. */
 export function LongPressDemo() {
-  const frame = useLoop(9, 380, 6);
-  const holding = frame >= 1 && frame <= 4;
-  const menu = frame >= 5 && frame <= 7;
+  const progress = useTimeline(3600, 0.6);
+  const coarse = useCoarsePointer();
+  const approach = phase(progress, 0, 0.12);
+  const hold = phase(progress, 0.15, 0.45);
+  const pressed = progress > 0.14 && progress < 0.5;
+  const menu = progress > 0.46 && progress < 0.9;
+  const circumference = 2 * Math.PI * 14;
+
   return (
     <div aria-hidden='true' className={css.stage}>
       <div className={clsx(css.fakeRowSmall, menu && css.fakeRowHighlighted)}>
@@ -40,13 +21,21 @@ export function LongPressDemo() {
         <span className={css.fakeCellSmall}>80</span>
         <span className={css.fakeCellSmall}>5</span>
       </div>
-      <span
-        className={clsx(css.pressRing, holding && css.pressRingGrowing)}
-        style={{ scale: holding ? String(0.4 + frame * 0.2) : '0.3' }}
-      />
-      <PointerIcon
-        className={clsx(css.finger, holding && css.fingerPressed)}
-        style={{ opacity: menu ? 0 : 1, translate: '0 0.9rem' }}
+      <svg className={css.holdRing} style={{ opacity: pressed ? 1 : 0 }} viewBox='0 0 32 32'>
+        <circle
+          cx='16'
+          cy='16'
+          r='14'
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference * (1 - hold)}
+        />
+      </svg>
+      <Pointer
+        coarse={coarse}
+        pressed={pressed}
+        visible={!menu}
+        x={(1 - approach) * 30}
+        y={(1 - approach) * 24}
       />
       <ul className={clsx(css.miniMenu, menu && css.miniMenuShown)}>
         <li>
@@ -67,9 +56,9 @@ const TYPED = '80x5x3';
 
 /** Typewriter: `80x5x3` appears letter by letter, then turns into three set chips. */
 export function TypeSetsDemo() {
-  const frame = useLoop(TYPED.length + 6, 260, TYPED.length + 2);
-  const typed = TYPED.slice(0, frame);
-  const chips = frame > TYPED.length ? Math.min(3, frame - TYPED.length) : 0;
+  const progress = useTimeline(3600, 0.8);
+  const typed = TYPED.slice(0, Math.floor(phase(progress, 0.05, 0.45) * TYPED.length));
+  const chips = Math.floor(phase(progress, 0.5, 0.7) * 3);
   return (
     <div aria-hidden='true' className={css.stageColumn}>
       <span className={css.fakeInput}>
@@ -79,7 +68,7 @@ export function TypeSetsDemo() {
       <span className={css.fakeChips}>
         {Array.from({ length: chips }, (_, index) => (
           <span className={css.fakeChip} key={index}>
-            80 × 5
+            80×5
           </span>
         ))}
       </span>
