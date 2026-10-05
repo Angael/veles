@@ -23,6 +23,8 @@ describe('theme tokens', () => {
       '--card-padding',
       '--card-tone',
       '--toast-',
+      '--rest-',
+      '--superset-',
     ];
     const errors: string[] = [];
 

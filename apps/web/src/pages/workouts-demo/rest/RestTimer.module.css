@@ -1,0 +1,195 @@
+.clock {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+  color: var(--c-text-strong);
+}
+
+.over {
+  color: var(--c-macro-carb);
+}
+
+.dockLabel {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--c-muted);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Variant A: dock pill whose background drains left to right. */
+.dock {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  overflow: hidden;
+  isolation: isolate;
+  animation: rest-in var(--duration-fast) var(--ease-out);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--c-primary-surface-strong);
+    transform: scaleX(var(--rest-progress));
+    transform-origin: left;
+    transition: transform 250ms linear;
+  }
+
+  @media not (--phone) {
+    position: fixed;
+    right: max(var(--space-md), calc((100vw - 1100px) / 2));
+    bottom: var(--space-md);
+    z-index: 2;
+    width: 22rem;
+    padding: 0.25rem;
+    border: var(--border-width) solid var(--c-border-popup);
+    border-radius: var(--radius-pill);
+    background: var(--c-surface-solid);
+    box-shadow: var(--shadow-popup);
+  }
+}
+
+.dockCenter {
+  display: grid;
+  flex: 1;
+  justify-items: center;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+/* Variant B: corner ring. */
+.bubble {
+  position: fixed;
+  right: var(--space-md);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 5rem);
+  z-index: 25;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  width: 5rem;
+  height: 5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--c-surface-solid);
+  box-shadow: var(--shadow-popup);
+  color: inherit;
+  transition:
+    width var(--duration-fast) var(--ease-out),
+    height var(--duration-fast) var(--ease-out);
+
+  & .clock {
+    font-size: var(--text-md);
+  }
+
+  @media not (--phone) {
+    bottom: var(--space-md);
+  }
+}
+
+.bubbleExpanded {
+  width: 8rem;
+  height: 8rem;
+
+  & .clock {
+    font-size: var(--text-xl);
+  }
+
+  & .dockLabel {
+    max-width: 5.5rem;
+  }
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  rotate: -90deg;
+
+  & circle {
+    fill: none;
+    stroke-width: 6;
+  }
+}
+
+.ringTrack {
+  stroke: var(--c-border);
+}
+
+.ringFill {
+  stroke: var(--c-accent);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 250ms linear;
+}
+
+/* Variant C: inline row under the finished set. */
+.inline {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.35rem var(--space-xs);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--c-surface-inset);
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--c-primary-surface);
+    transform: scaleX(var(--rest-progress));
+    transform-origin: left;
+    transition: transform 250ms linear;
+  }
+
+  & > svg {
+    width: 1rem;
+    height: 1rem;
+    color: var(--c-accent);
+  }
+
+  & .clock {
+    font-size: var(--text-sm);
+  }
+}
+
+.inlineActions {
+  display: flex;
+  gap: 0.25rem;
+  margin-inline-start: auto;
+
+  & button {
+    padding: 0.15rem 0.6rem;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--c-muted);
+    font-size: var(--text-xs);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--c-text);
+      background: var(--c-surface-raised);
+    }
+  }
+}
+
+@keyframes rest-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock::before,
+  .inline::before,
+  .ringFill {
+    transition: none;
+  }
+}
