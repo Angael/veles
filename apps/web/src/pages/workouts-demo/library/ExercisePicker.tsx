@@ -1,9 +1,10 @@
-import clsx from 'clsx';
 import { PlusIcon, SearchIcon } from 'lucide-react';
 import { useState } from 'react';
 import { DialogPopup, DialogRoot, DialogTitle } from '@/components/ui/dialog/Dialog';
 import { TextInput } from '@/components/ui/text-input/TextInput';
-import { MEASURE_LABELS, MOCK_EXERCISES, type Measure, type MockExercise } from '../mockData';
+import { MOCK_EXERCISES, type Measure, type MockExercise } from '../mockData';
+import { fuzzySearch, normalize } from './fuzzySearch';
+import { MeasurePicker } from './MeasurePicker';
 import css from './Library.module.css';
 
 /**
@@ -34,13 +35,29 @@ export function ExercisePicker({ onPick }: ExercisePickerProps) {
   const [measureOverride, setMeasureOverride] = useState<Measure | null>(null);
   const measure = measureOverride ?? guessMeasure(trimmed);
 
-  const words = trimmed.toLowerCase().split(/\s+/).filter(Boolean);
-  const matches = MOCK_EXERCISES.filter((exercise) =>
-    words.every((word) => exercise.name.toLowerCase().includes(word)),
-  ).toSorted((a, b) => b.uses - a.uses);
-  const exactMatch = matches.some(
-    (exercise) => exercise.name.toLowerCase() === trimmed.toLowerCase(),
+  const matches = fuzzySearch(
+    trimmed,
+    MOCK_EXERCISES,
+    (exercise) => exercise.name,
+    (exercise) => exercise.uses,
   );
+  const exactMatch = matches.some((exercise) => normalize(exercise.name) === normalize(trimmed));
+  const create =
+    trimmed && !exactMatch ? (
+      <div className={css.create}>
+        <button
+          className={css.createButton}
+          onClick={() => onPick({ measure, name: trimmed })}
+          type='button'
+        >
+          <PlusIcon aria-hidden='true' />
+          <span>
+            Create <strong>“{trimmed}”</strong>
+          </span>
+        </button>
+        <MeasurePicker onChange={setMeasureOverride} value={measure} />
+      </div>
+    ) : null;
 
   return (
     <div className={css.picker}>
@@ -56,34 +73,7 @@ export function ExercisePicker({ onPick }: ExercisePickerProps) {
         value={query}
       />
 
-      {trimmed && !exactMatch ? (
-        <div className={css.create}>
-          <button
-            className={css.createButton}
-            onClick={() => onPick({ measure, name: trimmed })}
-            type='button'
-          >
-            <PlusIcon aria-hidden='true' />
-            <span>
-              Create <strong>“{trimmed}”</strong>
-            </span>
-          </button>
-          <div aria-label='What to track' className={css.measureChips} role='radiogroup'>
-            {(Object.keys(MEASURE_LABELS) as Measure[]).map((option) => (
-              <button
-                aria-checked={option === measure}
-                className={clsx(css.measureChip, option === measure && css.measureChipActive)}
-                key={option}
-                onClick={() => setMeasureOverride(option)}
-                role='radio'
-                type='button'
-              >
-                {MEASURE_LABELS[option]}
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : null}
+      {matches.length === 0 ? create : null}
 
       <ul className={css.results}>
         {matches.map((exercise) => (
@@ -97,6 +87,8 @@ export function ExercisePicker({ onPick }: ExercisePickerProps) {
           </li>
         ))}
       </ul>
+      {/* Typos still list close matches first; creating a near-duplicate is the last option. */}
+      {matches.length > 0 ? create : null}
     </div>
   );
 }

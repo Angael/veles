@@ -22,6 +22,8 @@ export type MockSlot = {
   restSeconds: number | null;
   supersetGroup: number | null;
   note: string;
+  /** Weight change per fine drag step and ± tap; 1 for dumbbells, 2.5 for most barbells. */
+  weightStep: number;
   sets: MockSet[];
 };
 
@@ -70,15 +72,27 @@ export const initialSession = (): MockSlot[] => [
     restSeconds: 120,
     sets: [lifted(40, 10, 'warmup'), lifted(80, 5), lifted(80, 5), lifted(80, 4)],
     supersetGroup: null,
+    weightStep: 2.5,
+  },
+  {
+    id: mockId(),
+    measure: 'weight_reps',
+    name: 'Lateral raise, pink dumbbells',
+    note: '',
+    restSeconds: 60,
+    sets: [lifted(6, 15), lifted(7, 12), lifted(8, 10), lifted(9, 8)],
+    supersetGroup: null,
+    weightStep: 1,
   },
   {
     id: mockId(),
     measure: 'weight_reps',
     name: 'Cable row, the blue handle',
-    note: 'Seat on 4',
+    note: '',
     restSeconds: 90,
     sets: [lifted(55, 10), lifted(55, 10), lifted(55, 9)],
     supersetGroup: 1,
+    weightStep: 2.5,
   },
   {
     id: mockId(),
@@ -91,6 +105,7 @@ export const initialSession = (): MockSlot[] => [
       makeSet({ previous: { ...emptyMetrics, reps: 10 } }),
     ],
     supersetGroup: 1,
+    weightStep: 2.5,
   },
   {
     id: mockId(),
@@ -100,6 +115,7 @@ export const initialSession = (): MockSlot[] => [
     restSeconds: 60,
     sets: [makeSet({ previous: { ...emptyMetrics, durationSeconds: 60 } })],
     supersetGroup: null,
+    weightStep: 2.5,
   },
 ];
 
@@ -238,3 +254,71 @@ export function formatDuration(totalSeconds: number) {
   const seconds = Math.abs(Math.round(totalSeconds));
   return `${sign}${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 }
+
+/** One past appearance of an exercise, for the history sheet and the note placeholder. */
+export type ExerciseHistoryEntry = {
+  id: string;
+  date: string;
+  workoutName: string;
+  /** 1-based order in that workout: "it went great because it was first". */
+  position: number;
+  exerciseCount: number;
+  sets: string[];
+  note: string;
+};
+
+const EXERCISE_HISTORY: Record<string, ExerciseHistoryEntry[]> = {
+  'Bench (the flat one)': [
+    {
+      date: 'Thu 2 Oct',
+      exerciseCount: 5,
+      id: 'b1',
+      note: 'Last set grindy. Try 82.5 next time if sleep was ok.',
+      position: 1,
+      sets: ['W 40×10', '80×5', '80×5', '80×4'],
+      workoutName: 'Push-ish Monday',
+    },
+    {
+      date: 'Mon 22 Sep',
+      exerciseCount: 4,
+      id: 'b2',
+      note: 'Done after squats, felt weak.',
+      position: 3,
+      sets: ['77.5×5', '77.5×5', '77.5×3'],
+      workoutName: 'Legs + the thing Tom showed me',
+    },
+    {
+      date: 'Thu 18 Sep',
+      exerciseCount: 4,
+      id: 'b3',
+      note: '',
+      position: 1,
+      sets: ['77.5×5', '77.5×5', '77.5×5'],
+      workoutName: 'Push-ish Monday',
+    },
+  ],
+  'Cable row, the blue handle': [
+    {
+      date: 'Thu 2 Oct',
+      exerciseCount: 5,
+      id: 'c1',
+      note: 'Seat on 4, chest pad touching.',
+      position: 3,
+      sets: ['55×10', '55×10', '55×9'],
+      workoutName: 'Push-ish Monday',
+    },
+  ],
+  'Lateral raise, pink dumbbells': [
+    {
+      date: 'Thu 2 Oct',
+      exerciseCount: 5,
+      id: 'l1',
+      note: 'Pyramid up, 9s were sloppy.',
+      position: 2,
+      sets: ['6×15', '7×12', '8×10', '9×8'],
+      workoutName: 'Push-ish Monday',
+    },
+  ],
+};
+
+export const historyFor = (exerciseName: string) => EXERCISE_HISTORY[exerciseName] ?? [];

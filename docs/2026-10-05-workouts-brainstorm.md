@@ -15,7 +15,27 @@ Playground: `/demo/workouts` (mock data, nothing saves). Draft schema:
 
 Common pattern: **the set row is a tiny spreadsheet**, and **the rest timer starts itself when you tick a set**. Everything else (type, notes, supersets, reorder) hides behind a tap on the set number or a `⋯`/long press. That maps well onto our existing `ContextMenu`.
 
-## Ideas in the playground
+## Round 2 feedback and changes
+
+Picked so far (★ in the playground):
+
+- **Rest timer A** (dock pill).
+- **Drag sideways** as the main set input, with the **top sheet** as its detail view. Rows stay small, so the whole workout fits on screen.
+
+Changes in round 2:
+
+- **Accelerated drag** (`scrub/useScrub.ts`): pointer speed is measured and smoothed. Slow drag gives less than one step per 14 px, so it is extra precise. A fast flick covers big ranges and snaps to the coarse step (2.5 kg, 5 reps, 15 s). The field shows a live speed bar and `±0.5` / `±2.5`, so the user can see the effect.
+- **Drag hints**: small ‹ › chevrons on touch screens (hover only on desktop). A tick ruler slides under the value while you drag. Android gives a 3 ms haptic tick per step.
+- **Drag cells in the session**: drag a cell to change it, tap it to open the sheet. "Type in cells" stays as the other option.
+- **Top sheet** (`session/SetSheet.tsx`): drops from the top. It has ‹ Set 2 of 4 › navigation, "Last time … use", drag fields with − / +, and a fixed 4-cell **weight step** grid (0.5 / 1 / 1.25 / 2.5). The number box has a fixed width, so 90 → 92.5 does not move anything. The step is saved per exercise (`exercise.weight_step_grams`), so dumbbells can go 6, 7, 8, 9.
+- **Fuzzy exercise search** (`library/fuzzySearch.ts`): typos, swapped letters (`bnech`), missing spaces (`benchpress`), accents (`łąka`), any word order. Close matches come first; "Create" is the last option.
+- **Tracking grid** (`library/MeasurePicker.tsx`): big cells with icons. On phones there are 3 cells on top and 2 wide cells below, so there is no empty space. Wider screens show one row of 5.
+- **Notes per workout per exercise**: note icon in every card header. A dot means last time has a note. Last time's note is the placeholder.
+- **Exercise history**: history icon → earlier sessions, each with a **#2 of 5** badge (position in that workout), sets and note.
+- **Clearer add buttons**: "Add set" (copies the last set) and "Add several…". The second one shows a looping typewriter demo (`80x5x3` → 3 chips) before you type.
+- **First-use tips** (`hints/`): looping mini demos (drag, tick → rest, tap → sheet, hold → menu, type sets). The session shows one tip at a time until it is dismissed. "?" in the header shows them again. The "Hints" tab shows all of them.
+
+## Ideas in the playground (round 1)
 
 ### Live session (tab "Live session")
 
@@ -60,7 +80,7 @@ Four tables. All metric columns are nullable, so changing what an exercise track
 
 ```
 exercise          id, user_id, name (unique per user, case-insensitive), measure, rest_seconds,
-                  notes, archived_at
+                  weight_step_grams, notes, archived_at
 workout           id, user_id, kind ('routine' | 'session'), name, notes, routine_id → workout,
                   date (sessions only), started_at, ended_at, duration_seconds (manual log)
 workout_exercise  id, workout_id, exercise_id (restrict), position, superset_group,
@@ -84,8 +104,9 @@ workout_set       id, workout_exercise_id, position, type ('normal'|'warmup'|'dr
 
 ## Open questions
 
-1. Which rest timer variant (or a mix: dock on phone, inline on desktop)?
-2. Which set input is the default? Proposal: table rows by default, shorthand as the power-user path, stepper sheet maybe later.
-3. Navbar slot: `Workouts` as a 6th item, or group under an existing item?
-4. kg only, or a per-user lb setting?
-5. Keep the live session in `localStorage` until "Finish", or save every set to the server as it's ticked? Saving each set is safer if the phone dies mid-workout.
+1. ~~Which rest timer variant?~~ A (dock pill).
+2. ~~Which set input is the default?~~ Drag cells + top sheet. Keep "Add several…" (shorthand) as the fast path for many sets?
+3. Should a tip auto-hide after the user does the action once, for example hide the drag tip after the first drag?
+4. Navbar slot: `Workouts` as a 6th item, or group under an existing item?
+5. kg only, or a per-user lb setting?
+6. Keep the live session in `localStorage` until "Finish", or save every set to the server as it's ticked? Saving each set is safer if the phone dies mid-workout.

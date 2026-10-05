@@ -3,6 +3,7 @@ import { CornerDownLeftIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { TextInput } from '@/components/ui/text-input/TextInput';
+import { TypeSetsDemo } from '../hints/GestureDemos';
 import { SET_TYPE_LABELS } from '../mockData';
 import { describeSet, parseSetShorthand, type ParsedSet } from '../setShorthand';
 import css from './Inputs.module.css';
@@ -61,6 +62,15 @@ export function ShorthandInput({
         }
         value={text}
       />
+      {compact && !text ? (
+        <div className={css.inlineDemo}>
+          <TypeSetsDemo />
+          <span>
+            Type sets like <code>80x5x3</code> (3 sets), <code>w40x10</code> (warm-up) or{' '}
+            <code>45s</code>.
+          </span>
+        </div>
+      ) : null}
       {sets.length > 0 || errors.length > 0 ? (
         <ul aria-live='polite' className={css.chips}>
           {sets.map((set, index) => (

@@ -34,8 +34,8 @@ export function LibraryDemo() {
       <Card as='section' className={css.section}>
         <h2>Picker</h2>
         <p className={css.hint}>
-          Try “bench”, then a new name like “Morning plank” or “Park run”: the tracking chip is
-          guessed from the name.
+          Fuzzy: try “bnech”, “benchpress”, “latreal” or “pulup”. A new name like “Morning plank”
+          guesses what to track.
         </p>
         <ExercisePicker
           onPick={(exercise) => setPicked(`${exercise.name} (${MEASURE_LABELS[exercise.measure]})`)}

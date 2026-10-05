@@ -1,24 +1,32 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
 import { useState } from 'react';
+import { HintsDemo } from './hints/HintsDemo';
 import { InputsDemo } from './inputs/InputsDemo';
 import { LibraryDemo } from './library/LibraryDemo';
 import type { RestVariant } from './rest/RestTimer';
 import { RoutinesDemo } from './routines/RoutinesDemo';
 import { SessionDemo } from './session/SessionDemo';
+import type { CellMode } from './session/SetRow';
 import css from './WorkoutsDemoPage.module.css';
 
 const TABS = {
+  session: 'Live session',
   home: 'Workouts',
   inputs: 'Set input',
   library: 'Exercises',
-  session: 'Live session',
+  hints: 'Hints',
 } as const;
 
 const REST_VARIANTS: Record<RestVariant, string> = {
+  dock: 'A · Dock pill ★',
   bubble: 'B · Corner ring',
-  dock: 'A · Dock pill',
   inline: 'C · Inline',
+};
+
+const CELL_MODES: Record<CellMode, string> = {
+  drag: 'Drag + top sheet ★',
+  type: 'Type in cells',
 };
 
 type Tab = keyof typeof TABS;
@@ -27,6 +35,7 @@ type Tab = keyof typeof TABS;
 export function WorkoutsDemoPage() {
   const [tab, setTab] = useState<Tab>('session');
   const [restVariant, setRestVariant] = useState<RestVariant>('dock');
+  const [cellMode, setCellMode] = useState<CellMode>('drag');
 
   return (
     <main className={css.page}>
@@ -40,7 +49,15 @@ export function WorkoutsDemoPage() {
       {tab === 'session' ? (
         <>
           <div className={css.restPicker}>
-            <span>Rest timer style</span>
+            <span>Set cells</span>
+            <Segmented
+              label='Set cells'
+              onChange={setCellMode}
+              options={CELL_MODES}
+              small
+              value={cellMode}
+            />
+            <span>Rest timer</span>
             <Segmented
               label='Rest timer style'
               onChange={setRestVariant}
@@ -49,12 +66,13 @@ export function WorkoutsDemoPage() {
               value={restVariant}
             />
           </div>
-          <SessionDemo restVariant={restVariant} />
+          <SessionDemo cellMode={cellMode} restVariant={restVariant} />
         </>
       ) : null}
       {tab === 'home' ? <RoutinesDemo /> : null}
       {tab === 'inputs' ? <InputsDemo /> : null}
       {tab === 'library' ? <LibraryDemo /> : null}
+      {tab === 'hints' ? <HintsDemo /> : null}
     </main>
   );
 }

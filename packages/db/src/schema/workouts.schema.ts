@@ -44,6 +44,8 @@ export const exercises = pgTable(
     measure: text('measure', { enum: exerciseMeasures }).notNull().default('weight_reps'),
     /** Rest timer after a completed set; null turns the timer off for this exercise. */
     restSeconds: integer('rest_seconds').default(120),
+    /** Fine step for drag and ± buttons: 1000 for dumbbells (6, 7, 8 kg), 2500 for barbells. */
+    weightStepGrams: integer('weight_step_grams').notNull().default(2500),
     notes: text('notes').notNull().default(''),
     /** Hidden from the picker but kept so old sessions still resolve their exercise. */
     archivedAt: timestamp('archived_at'),
@@ -120,6 +122,7 @@ export const workoutExercises = pgTable(
     supersetGroup: smallint('superset_group'),
     /** Overrides `exercise.rest_seconds` for this slot only. */
     restSeconds: integer('rest_seconds'),
+    /** Per workout, per exercise. The last session's note is the next session's placeholder. */
     notes: text('notes').notNull().default(''),
   },
   (table) => [

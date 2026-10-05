@@ -9,19 +9,18 @@ import {
   ContextMenuTrigger,
 } from '@/components/ui/context-menu/ContextMenu';
 import { describeSet, SHORTHAND_EXAMPLES, type ParsedSet } from '../setShorthand';
-import { ScrubNumber } from './ScrubNumber';
+import { DragCellsCard, DragFieldCard } from './DragInputsDemo';
 import { ShorthandInput } from './ShorthandInput';
-import { StepperSheet, type StepperValue } from './StepperSheet';
 import css from './Inputs.module.css';
 
-/** Four ways to enter a set, side by side, so the nicest one can be picked. */
+/** Ways to enter a set, side by side, so the nicest one can be picked. Favourites first. */
 export function InputsDemo() {
   return (
     <div className={css.grid}>
+      <DragFieldCard />
+      <DragCellsCard />
       <ShorthandCard />
       <OneTapCard />
-      <StepperCard />
-      <ScrubCard />
     </div>
   );
 }
@@ -31,7 +30,7 @@ function ShorthandCard() {
   const [logged, setLogged] = useState<ParsedSet[]>([]);
   return (
     <Card as='section' className={css.demo}>
-      <h2>A. Type it</h2>
+      <h2>C. Type it</h2>
       <p className={css.hint}>One field, live preview. Fastest on desktop, fine on phones.</p>
       <ShorthandInput defaultValue={example} key={example} onSubmit={setLogged} />
       {logged.length > 0 ? (
@@ -60,7 +59,7 @@ function OneTapCard() {
   const nudge = (patch: Partial<typeof next>) => setNext((current) => ({ ...current, ...patch }));
   return (
     <Card as='section' className={css.demo}>
-      <h2>B. One tap</h2>
+      <h2>D. One tap</h2>
       <p className={css.hint}>
         Tap logs the suggested set. Long press / right click adjusts it first.
       </p>
@@ -104,57 +103,6 @@ function OneTapCard() {
         </ContextMenuPopup>
       </ContextMenuRoot>
       {done.length > 0 ? <p className={css.hint}>Logged: {done.join(' · ')}</p> : null}
-    </Card>
-  );
-}
-
-function StepperCard() {
-  const previous: StepperValue = { reps: 5, weightKg: 80 };
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(previous);
-  const [saved, setSaved] = useState<StepperValue | null>(null);
-  return (
-    <Card as='section' className={css.demo}>
-      <h2>C. Stepper sheet</h2>
-      <p className={css.hint}>Tap a set row; big numbers and thumb-sized steppers.</p>
-      <button className={css.fakeRow} onClick={() => setOpen(true)} type='button'>
-        <span>2</span>
-        <span>{saved ? `${saved.weightKg} kg × ${saved.reps}` : 'Tap to log'}</span>
-      </button>
-      <StepperSheet
-        onChange={setValue}
-        onDone={() => {
-          setSaved(value);
-          setOpen(false);
-        }}
-        onOpenChange={setOpen}
-        open={open}
-        previous={previous}
-        title='Bench, set 2'
-        value={value}
-      />
-    </Card>
-  );
-}
-
-function ScrubCard() {
-  const [weightKg, setWeightKg] = useState(80);
-  const [reps, setReps] = useState(5);
-  return (
-    <Card as='section' className={css.demo}>
-      <h2>D. Scrub</h2>
-      <p className={css.hint}>Drag a number sideways to change it; tap to type.</p>
-      <div className={css.scrubRow}>
-        <ScrubNumber label='Weight' onChange={setWeightKg} step={2.5} unit='kg' value={weightKg} />
-        <ScrubNumber
-          label='Reps'
-          onChange={setReps}
-          pixelsPerStep={18}
-          step={1}
-          unit='reps'
-          value={reps}
-        />
-      </div>
     </Card>
   );
 }

@@ -122,136 +122,49 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Stepper sheet */
-.fakeRow {
-  display: flex;
-  gap: var(--space-sm);
-  padding: var(--space-sm);
-  border: var(--border-width) solid var(--c-border);
-  border-radius: 10px;
-  background: var(--c-surface-inset);
-  color: inherit;
-  cursor: pointer;
-}
-
-.sheet {
-  gap: var(--space-md);
-}
-
-.bigRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-sm);
-}
-
-.times {
-  color: var(--c-muted);
-  font-size: var(--text-xl);
-}
-
-.stepper {
+/* Looping example shown while the "Add several" field is still empty. */
+.inlineDemo {
   display: grid;
-  justify-items: center;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--c-muted);
+  font-size: var(--text-xs);
+
+  & code {
+    color: var(--c-accent);
+    font-family: var(--font-mono);
+  }
+}
+
+/* Drag demos */
+.stepPicker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 0.35rem;
 
   & button {
-    display: grid;
-    place-items: center;
-    width: 4rem;
-    height: 2.75rem;
-    border: var(--border-width) solid var(--c-border-strong);
-    border-radius: var(--radius-pill);
-    background: var(--c-surface-raised);
-    color: var(--c-text);
+    min-height: 2.5rem;
+    border: var(--border-width) solid var(--c-border);
+    border-radius: 10px;
+    background: var(--c-surface-inset);
+    color: var(--c-muted);
+    font-size: var(--text-sm);
     cursor: pointer;
   }
-}
 
-.bigNumber {
-  display: grid;
-  justify-items: center;
-  font-family: var(--font-mono);
-  font-size: 2.6rem;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-
-  & small {
-    color: var(--c-muted);
-    font-family: var(--font-sans);
-    font-size: var(--text-xs);
-  }
-}
-
-.plateRow {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.35rem;
-}
-
-.plate {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  min-width: 3rem;
-  min-height: 2.25rem;
-  padding: 0 0.6rem;
-  border: var(--border-width) solid var(--c-border);
-  border-radius: var(--radius-pill);
-  background: var(--c-surface-inset);
-  color: var(--c-text);
-  font-variant-numeric: tabular-nums;
-  cursor: pointer;
-
-  & svg {
-    width: 0.9rem;
-    height: 0.9rem;
-  }
-}
-
-/* Scrub */
-.scrubRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-sm);
-}
-
-.scrub {
-  display: grid;
-  justify-items: center;
-  padding: var(--space-sm);
-  border: var(--border-width) solid var(--c-border);
-  border-radius: var(--radius-xs);
-  background: var(--c-surface-inset);
-  touch-action: pan-y;
-
-  &[data-scrubbing] {
+  & .stepActive {
     border-color: var(--c-primary-border);
-    background: var(--c-primary-surface);
+    background: var(--c-primary-surface-strong);
+    color: var(--c-text-strong);
   }
 }
 
-.scrubLabel,
-.scrubUnit {
+.cellRow {
+  display: grid;
+  grid-template-columns: 1.5rem repeat(2, 5rem);
+  align-items: center;
+  gap: 0.35rem;
   color: var(--c-muted);
   font-size: var(--text-xs);
-}
-
-.scrubInput {
-  width: 100%;
-  border: 0;
-  background: none;
-  color: var(--c-text-strong);
-  font-family: var(--font-mono);
-  font-size: 2.2rem;
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-  cursor: ew-resize;
-  touch-action: pan-y;
-
-  &:focus {
-    outline: none;
-    cursor: text;
-  }
 }

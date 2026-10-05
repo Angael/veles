@@ -63,28 +63,6 @@
   }
 }
 
-.measureChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-.measureChip {
-  padding: 0.2rem 0.65rem;
-  border: var(--border-width) solid var(--c-border-strong);
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--c-muted);
-  font-size: var(--text-xs);
-  cursor: pointer;
-}
-
-.measureChipActive {
-  border-color: var(--c-primary-border);
-  background: var(--c-primary-surface-strong);
-  color: var(--c-text-strong);
-}
-
 .results {
   display: grid;
   margin: 0;

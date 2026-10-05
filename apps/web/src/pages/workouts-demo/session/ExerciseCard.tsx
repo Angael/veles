@@ -1,13 +1,15 @@
 import clsx from 'clsx';
-import { KeyboardIcon, PlusIcon, TimerIcon } from 'lucide-react';
+import { HistoryIcon, ListPlusIcon, PlusIcon, StickyNoteIcon, TimerIcon } from 'lucide-react';
 import { useState, type CSSProperties } from 'react';
 import { ContextMenuRoot, ContextMenuTrigger } from '@/components/ui/context-menu/ContextMenu';
-import { formatDuration, type MockSet, type MockSlot } from '../mockData';
+import { formatDuration, historyFor, type MockSet, type MockSlot } from '../mockData';
 import type { RestTimer } from '../rest/useRestTimer';
 import { RestInline, type RestVariant } from '../rest/RestTimer';
 import { ShorthandInput } from '../inputs/ShorthandInput';
+import { ExerciseHistoryDialog } from './ExerciseHistoryDialog';
 import { ExerciseMenu, REST_PRESETS } from './ExerciseMenu';
-import { SetRow } from './SetRow';
+import { ExerciseNote } from './ExerciseNote';
+import { SetRow, type CellMode } from './SetRow';
 import type { SessionActions } from './useMockSession';
 import css from './Session.module.css';
 
@@ -18,16 +20,20 @@ const supersetStyle = (slot: MockSlot): CSSProperties & { '--superset-hue': numb
 
 type ExerciseCardProps = {
   actions: SessionActions;
+  cellMode: CellMode;
+  onOpenSheet: (slot: MockSlot, setId: string) => void;
+  onSetCompleted: (slot: MockSlot, set: MockSet) => void;
   restAfterSetId: string | null;
   restVariant: RestVariant;
-  onSetCompleted: (slot: MockSlot, set: MockSet) => void;
   slot: MockSlot;
   timer: RestTimer;
 };
 
-/** One exercise in a session: header with a long-press menu, set rows, and an add-set footer. */
+/** One exercise in a session: header with icons and a long-press menu, set rows, add buttons. */
 export function ExerciseCard({
   actions,
+  cellMode,
+  onOpenSheet,
   onSetCompleted,
   restAfterSetId,
   restVariant,
@@ -35,8 +41,10 @@ export function ExerciseCard({
   timer,
 }: ExerciseCardProps) {
   const [renaming, setRenaming] = useState(false);
-  const [quickText, setQuickText] = useState(false);
-  const [editingNote, setEditingNote] = useState(false);
+  const [addSeveral, setAddSeveral] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(slot.note !== '');
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const hasLastNote = historyFor(slot.name).some((entry) => entry.note);
   const workingSetNumbers = slot.sets.map(
     (_, index) => slot.sets.slice(0, index + 1).filter((set) => set.type === 'normal').length,
   );
@@ -63,7 +71,24 @@ export function ExerciseCard({
           ) : (
             <h3>{slot.name}</h3>
           )}
-          {slot.supersetGroup !== null ? <span className={css.supersetTag}>superset</span> : null}
+          <button
+            aria-label={noteOpen ? 'Hide note' : 'Add note'}
+            aria-pressed={noteOpen}
+            className={clsx(css.iconChip, hasLastNote && !noteOpen && css.hasDot)}
+            onClick={() => setNoteOpen((open) => !open)}
+            title={hasLastNote ? 'Note (last time has one)' : 'Note'}
+            type='button'
+          >
+            <StickyNoteIcon aria-hidden='true' />
+          </button>
+          <button
+            aria-label='Earlier sessions'
+            className={css.iconChip}
+            onClick={() => setHistoryOpen(true)}
+            type='button'
+          >
+            <HistoryIcon aria-hidden='true' />
+          </button>
           <button
             className={css.restChip}
             onClick={() => {
@@ -81,35 +106,25 @@ export function ExerciseCard({
         </ContextMenuTrigger>
         <ExerciseMenu
           actions={actions}
-          onEditNote={() => setEditingNote(true)}
+          onEditNote={() => setNoteOpen(true)}
           onRename={() => setRenaming(true)}
           slot={slot}
         />
       </ContextMenuRoot>
 
-      {editingNote ? (
-        <input
-          aria-label='Note'
-          autoFocus
-          className={css.noteInput}
-          defaultValue={slot.note}
-          onBlur={(event) => {
-            actions.updateSlot(slot.id, { note: event.target.value });
-            setEditingNote(false);
-          }}
-          onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.blur()}
-          placeholder='Seat height, grip, how it felt…'
-        />
+      {noteOpen ? (
+        <ExerciseNote actions={actions} onClose={() => setNoteOpen(false)} slot={slot} />
       ) : null}
-      {!editingNote && slot.note ? <p className={css.note}>{slot.note}</p> : null}
 
       <div className={css.sets} role='table'>
         {slot.sets.map((set, index) => (
           <div key={set.id}>
             <SetRow
               actions={actions}
+              cellMode={cellMode}
               number={workingSetNumbers[index] ?? 0}
               onCompleted={(done) => onSetCompleted(slot, done)}
+              onOpenSheet={() => onOpenSheet(slot, set.id)}
               set={set}
               slot={slot}
             />
@@ -120,29 +135,40 @@ export function ExerciseCard({
         ))}
       </div>
 
-      {quickText ? (
+      {addSeveral ? (
         <ShorthandInput
           compact
           onSubmit={(sets) => {
             actions.addParsedSets(slot.id, sets);
-            setQuickText(false);
+            setAddSeveral(false);
           }}
         />
       ) : null}
       <div className={css.cardFooter}>
-        <button className={css.addSet} onClick={() => actions.addSet(slot.id)} type='button'>
-          <PlusIcon aria-hidden='true' /> Set
-        </button>
         <button
-          aria-pressed={quickText}
           className={css.addSet}
-          onClick={() => setQuickText((value) => !value)}
-          title='Type sets like 80x5x3'
+          onClick={() => actions.addSet(slot.id)}
+          title='Adds one set, copying the last one'
           type='button'
         >
-          <KeyboardIcon aria-hidden='true' /> Type sets
+          <PlusIcon aria-hidden='true' /> Add set
+        </button>
+        <button
+          aria-pressed={addSeveral}
+          className={css.addSet}
+          onClick={() => setAddSeveral((value) => !value)}
+          title='Type many sets at once, like 80x5x3'
+          type='button'
+        >
+          <ListPlusIcon aria-hidden='true' /> Add several…
         </button>
       </div>
+
+      <ExerciseHistoryDialog
+        exerciseName={slot.name}
+        onOpenChange={setHistoryOpen}
+        open={historyOpen}
+      />
     </section>
   );
 }

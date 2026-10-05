@@ -17,7 +17,7 @@ import {
   ContextMenuSubmenuTrigger,
 } from '@/components/ui/context-menu/ContextMenu';
 import { formatDuration, MEASURE_LABELS, type Measure, type MockSlot } from '../mockData';
-import { MEASURE_FIELDS } from './SetRow';
+import { MEASURE_FIELDS } from './metrics';
 import type { SessionActions } from './useMockSession';
 
 export const REST_PRESETS = [null, 45, 60, 90, 120, 180] as const;

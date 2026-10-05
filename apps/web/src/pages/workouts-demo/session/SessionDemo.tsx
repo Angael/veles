@@ -1,29 +1,41 @@
-import { FlagIcon, PlusIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { PlusIcon } from 'lucide-react';
+import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
-import { Card } from '@/components/ui/card/Card';
-import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
-import { toastManager } from '@/components/ui/toast/toastManager';
+import { FeatureTip, HINTS } from '../hints/FeatureTip';
+import { useSeenHints } from '../hints/useHints';
 import { ExercisePickerDialog } from '../library/ExercisePicker';
-import { formatDuration, type MockSet, type MockSlot } from '../mockData';
+import type { MockSet, MockSlot } from '../mockData';
 import { RestBubble, RestDock, type RestVariant } from '../rest/RestTimer';
 import { useRestTimer } from '../rest/useRestTimer';
 import { ExerciseCard } from './ExerciseCard';
+import { SessionHeader } from './SessionHeader';
+import { SetSheet } from './SetSheet';
+import type { CellMode } from './SetRow';
 import { useMockSession } from './useMockSession';
 import css from './Session.module.css';
 
-const startedAt = Date.now() - 23 * 60 * 1000;
+/** Tips shown at the top of a session, one at a time, until each is dismissed. */
+const SESSION_HINTS = ['drag', 'tick', 'sheet', 'longpress'];
+
+type SessionDemoProps = { cellMode: CellMode; restVariant: RestVariant };
 
 /** Live session mock: the screen you stare at between sets. */
-export function SessionDemo({ restVariant }: { restVariant: RestVariant }) {
+export function SessionDemo({ cellMode, restVariant }: SessionDemoProps) {
   const { actions, slots } = useMockSession();
   const timer = useRestTimer();
+  const hints = useSeenHints();
   const [restAfterSetId, setRestAfterSetId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const elapsed = useElapsed();
+  const [sheet, setSheet] = useState<{ slotId: string; setId: string } | null>(null);
 
-  const doneSets = slots.flatMap((slot) => slot.sets.filter((set) => set.done));
-  const volume = doneSets.reduce((sum, set) => sum + (set.weightKg ?? 0) * (set.reps ?? 0), 0);
+  const sheetSlot = slots.find((slot) => slot.id === sheet?.slotId);
+  const nextHint = HINTS.find(
+    (hint) =>
+      SESSION_HINTS.includes(hint.key) &&
+      hints.seen !== null &&
+      !hints.seen.includes(hint.key) &&
+      (cellMode === 'drag' || (hint.key !== 'drag' && hint.key !== 'sheet')),
+  );
 
   function onSetCompleted(slot: MockSlot, set: MockSet) {
     if (slot.restSeconds === null) return;
@@ -33,37 +45,18 @@ export function SessionDemo({ restVariant }: { restVariant: RestVariant }) {
 
   return (
     <div className={css.session}>
-      <Card className={css.sessionHeader}>
-        <SeamlessTextInput aria-label='Workout name' defaultValue='Push-ish Monday' />
-        <dl className={css.stats}>
-          <div>
-            <dt>Time</dt>
-            <dd>{formatDuration(elapsed)}</dd>
-          </div>
-          <div>
-            <dt>Sets</dt>
-            <dd>{doneSets.length}</dd>
-          </div>
-          <div>
-            <dt>Volume</dt>
-            <dd>{volume.toLocaleString()} kg</dd>
-          </div>
-        </dl>
-        <Btn
-          icon={<FlagIcon aria-hidden='true' />}
-          onClick={() => toastManager.add({ title: 'Mock: workout saved', type: 'success' })}
-          radius='pill'
-          size='sm'
-        >
-          Finish
-        </Btn>
-      </Card>
+      <SessionHeader onShowHints={hints.reset} slots={slots} />
+      {nextHint ? (
+        <FeatureTip hint={nextHint} onDismiss={() => hints.markSeen(nextHint.key)} />
+      ) : null}
 
       <div className={css.cards}>
         {slots.map((slot) => (
           <ExerciseCard
             actions={actions}
+            cellMode={cellMode}
             key={slot.id}
+            onOpenSheet={(target, setId) => setSheet({ setId, slotId: target.id })}
             onSetCompleted={onSetCompleted}
             restAfterSetId={restAfterSetId}
             restVariant={restVariant}
@@ -89,19 +82,16 @@ export function SessionDemo({ restVariant }: { restVariant: RestVariant }) {
         }}
         open={pickerOpen}
       />
+      <SetSheet
+        actions={actions}
+        onClose={() => setSheet(null)}
+        onCompleted={onSetCompleted}
+        onNavigate={(setId) => setSheet((current) => current && { ...current, setId })}
+        target={sheetSlot && sheet ? { setId: sheet.setId, slot: sheetSlot } : null}
+      />
 
       {restVariant === 'dock' ? <RestDock timer={timer} /> : null}
       {restVariant === 'bubble' ? <RestBubble timer={timer} /> : null}
     </div>
   );
-}
-
-function useElapsed() {
-  const [now, setNow] = useState(startedAt);
-  useEffect(() => {
-    setNow(Date.now());
-    const interval = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(interval);
-  }, []);
-  return Math.max(0, (now - startedAt) / 1000);
 }

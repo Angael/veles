@@ -1,0 +1,72 @@
+import { formatDuration, type Measure, type MockSet, type MockSlot } from '../mockData';
+
+export type MetricKey = 'weightKg' | 'reps' | 'durationSeconds' | 'distanceKm';
+
+export type MetricField = {
+  key: MetricKey;
+  label: string;
+  unit: string;
+  kind: 'number' | 'time';
+};
+
+const weight: MetricField = { key: 'weightKg', kind: 'number', label: 'Weight', unit: 'kg' };
+const reps: MetricField = { key: 'reps', kind: 'number', label: 'Reps', unit: 'reps' };
+const time: MetricField = { key: 'durationSeconds', kind: 'time', label: 'Time', unit: 'min:s' };
+const distance: MetricField = { key: 'distanceKm', kind: 'number', label: 'Distance', unit: 'km' };
+
+export const MEASURE_FIELDS: Record<Measure, MetricField[]> = {
+  distance_duration: [distance, time],
+  duration: [time],
+  reps: [reps],
+  weight_duration: [weight, time],
+  weight_reps: [weight, reps],
+};
+
+/**
+ * Drag tuning per metric. Fine step is what a slow drag or a ± tap changes; coarse step is what
+ * a fast flick snaps to. Weight uses the exercise's own step so dumbbells can go 6, 7, 8, 9.
+ */
+export function scrubTuning(field: MetricField, slot: Pick<MockSlot, 'weightStep'>) {
+  switch (field.key) {
+    case 'weightKg':
+      return {
+        coarseStep: Math.max(2.5, slot.weightStep * 2),
+        max: 500,
+        min: -200,
+        step: slot.weightStep,
+      };
+    case 'reps':
+      return { coarseStep: 5, max: 200, step: 1 };
+    case 'durationSeconds':
+      return { coarseStep: 15, max: 6 * 3600, pixelsPerStep: 10, step: 5 };
+    case 'distanceKm':
+      return { coarseStep: 0.5, max: 300, step: 0.1 };
+  }
+}
+
+export function formatMetric(field: MetricField, value: number) {
+  return field.kind === 'time' ? formatDuration(value) : String(Number(value.toFixed(2)));
+}
+
+/** Accepts `90`, `1:30` or `1.5m` for time; plain decimals with `,` or `.` for numbers. */
+export function parseMetric(field: MetricField, text: string): number | null {
+  const trimmed = text.trim().replace(',', '.');
+  if (!trimmed) return null;
+  if (field.kind === 'time') {
+    const clock = /^(\d+):(\d{1,2})$/.exec(trimmed);
+    if (clock) return Number(clock[1]) * 60 + Number(clock[2]);
+    const minutes = /^(\d+(?:\.\d+)?)m$/.exec(trimmed);
+    if (minutes) return Math.round(Number(minutes[1]) * 60);
+  }
+  const value = Number(trimmed.replace(/s$/, ''));
+  return Number.isFinite(value) ? value : null;
+}
+
+/** Completing a set with empty cells adopts last time's values (Strong's behaviour). */
+export function completedPatch(set: MockSet, measure: Measure): Partial<MockSet> {
+  const patch: Partial<MockSet> = { done: true };
+  for (const field of MEASURE_FIELDS[measure]) {
+    if (set[field.key] === null) patch[field.key] = set.previous?.[field.key] ?? null;
+  }
+  return patch;
+}

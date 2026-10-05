@@ -49,8 +49,9 @@
 }
 
 .restPicker {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  justify-items: start;
   align-items: center;
   gap: var(--space-xs) var(--space-sm);
   color: var(--c-muted);

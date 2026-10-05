@@ -274,3 +274,44 @@
     background: var(--c-surface-raised);
   }
 }
+
+.iconChip {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--c-muted-strong);
+  cursor: pointer;
+
+  & svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &[aria-pressed='true'] {
+    background: var(--c-primary-surface);
+    color: var(--c-accent);
+  }
+
+  &:hover {
+    color: var(--c-text);
+  }
+}
+
+/* Small dot: last session left a note for this exercise. */
+.hasDot::after {
+  content: '';
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--c-macro-fat);
+}
