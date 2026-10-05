@@ -1,4 +1,5 @@
-import type { SetType } from './mockData';
+import { type } from 'arktype';
+import { MEASURE_LABELS, type Measure, type SetType } from './mockData';
 
 export type ParsedSet = {
   type: SetType;
@@ -34,6 +35,29 @@ const rpe = /^@(\d+(?:[.,]5)?)$/;
 
 const toNumber = (value: string) => Number(value.replace(',', '.'));
 
+export const SHORTHAND_HINTS: Record<Measure, string> = {
+  distance_duration: '5.2km 28:10, 3km 18:00',
+  duration: '45s, 1:30, 2m',
+  reps: 'x12x3, x10',
+  weight_duration: '24kg 45s, 20kg 1:30',
+  weight_reps: '80x5x3, w40x10, x12',
+};
+
+const metricsType = type({
+  distanceKm: 'number.safe >= 0 | null',
+  durationSeconds: 'number.safe >= 0 | null',
+  reps: '(number.safe & number.integer >= 0) | null',
+  weightKg: 'number.safe >= 0 | null',
+});
+
+const measureTypes = {
+  distance_duration: metricsType.merge({ reps: 'null', weightKg: 'null' }),
+  duration: metricsType.merge({ distanceKm: 'null', reps: 'null', weightKg: 'null' }),
+  reps: metricsType.merge({ distanceKm: 'null', durationSeconds: 'null', weightKg: 'null' }),
+  weight_duration: metricsType.merge({ distanceKm: 'null', reps: 'null' }),
+  weight_reps: metricsType.merge({ distanceKm: 'null', durationSeconds: 'null' }),
+};
+
 function parseTime(token: string) {
   const match = time.exec(token);
   if (!match) return null;
@@ -48,17 +72,17 @@ function parseTime(token: string) {
  */
 function parseGroup(group: string): ParsedSet[] | string {
   let text = group.trim().toLowerCase().replaceAll('×', 'x').replaceAll('*', 'x');
-  let type: SetType = 'normal';
-  if (/^w(?=[\d-x])/.test(text)) [type, text] = ['warmup', text.slice(1)];
-  else if (/^d(?=[\d-x])/.test(text)) [type, text] = ['drop', text.slice(1)];
-  if (text.endsWith('!')) [type, text] = ['failure', text.slice(0, -1)];
+  let setType: SetType = 'normal';
+  if (/^w(?=[\d-x])/.test(text)) [setType, text] = ['warmup', text.slice(1)];
+  else if (/^d(?=[\d-x])/.test(text)) [setType, text] = ['drop', text.slice(1)];
+  if (text.endsWith('!')) [setType, text] = ['failure', text.slice(0, -1)];
 
   const set: ParsedSet = {
     distanceKm: null,
     durationSeconds: null,
     reps: null,
     rpe: null,
-    type,
+    type: setType,
     weightKg: null,
   };
   let count = 1;
@@ -84,6 +108,15 @@ function parseGroup(group: string): ParsedSet[] | string {
   }
 
   if (count < 1 || count > 20) return `"${group.trim()}": 1–20 sets`;
+  if (!metricsType.allows(set)) return `"${group.trim()}": invalid values`;
+  if (
+    set.weightKg === null &&
+    set.reps === null &&
+    set.durationSeconds === null &&
+    set.distanceKm === null
+  ) {
+    return `"${group.trim()}": add weight, reps, time or distance`;
+  }
   return Array.from({ length: count }, () => ({ ...set }));
 }
 
@@ -91,12 +124,16 @@ function parseGroup(group: string): ParsedSet[] | string {
  * Turns quick text like `60x8, 70x6, 80x4x2` into sets. Shared idea: the future MCP write tool
  * can accept the same text, so "log bench 80x5x3" means the same thing in the app and to an agent.
  */
-export function parseSetShorthand(input: string): ShorthandResult {
+export function parseSetShorthand(input: string, measure?: Measure): ShorthandResult {
   const result: ShorthandResult = { errors: [], sets: [] };
   for (const group of input.split(/[,;\n]/).filter((part) => part.trim())) {
     const parsed = parseGroup(group);
     if (typeof parsed === 'string') result.errors.push(parsed);
-    else result.sets.push(...parsed);
+    else if (measure && parsed.some((set) => !measureTypes[measure].allows(set))) {
+      result.errors.push(
+        `"${group.trim()}" doesn't fit ${MEASURE_LABELS[measure].toLowerCase()}. Try ${SHORTHAND_HINTS[measure]}.`,
+      );
+    } else result.sets.push(...parsed);
   }
   return result;
 }

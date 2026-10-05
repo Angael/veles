@@ -15,6 +15,15 @@ Playground: `/demo/workouts` (mock data, nothing saves). Draft schema:
 
 Common pattern: **the set row is a tiny spreadsheet**, and **the rest timer starts itself when you tick a set**. Everything else (type, notes, supersets, reorder) hides behind a tap on the set number or a `⋯`/long press. That maps well onto our existing `ContextMenu`.
 
+## Round 4 feedback and fixes
+
+- **Shorthand matches the exercise**: `42s` is invalid for weight × reps and stays valid for time. Unsupported metrics show a red error with examples; Add stays disabled until every group is valid. Changing the tracking mode rechecks the text. Placeholders and the typing animation use that mode's syntax. ArkType checks the parsed metrics; empty groups with only metadata cannot create blank sets.
+- **Ruler marks**: every fifth tick is taller and wider, so fast movement is easier to see. Both layers move together with the pointer.
+- **Touch taps and holds**: taps open the sheet on click, after the touch's pointer-up. Opening the context menu cancels the pending cell gesture, so releasing a long press does not also open the sheet. Dragging, vertical scrolling and canceled pointers do not count as taps. Keyboard activation still works.
+- **Long exercise names**: the title has its own full-width row and wraps, including names without spaces. Note, history and rest controls sit below it. Cards can shrink inside the page grid. The sheet title wraps too.
+
+Validation: `pnpm check:fix`; no new tests, browser checks or dev server.
+
 ## Round 3 feedback and changes
 
 Round 3 made things simpler. Some round 2 items below were changed or removed here.

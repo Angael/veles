@@ -1,17 +1,18 @@
 import clsx from 'clsx';
 import { CornerDownLeftIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TypeSetsDemo } from '../hints/GestureDemos';
-import { SET_TYPE_LABELS } from '../mockData';
-import { describeSet, parseSetShorthand, type ParsedSet } from '../setShorthand';
+import { SET_TYPE_LABELS, type Measure } from '../mockData';
+import { describeSet, parseSetShorthand, SHORTHAND_HINTS, type ParsedSet } from '../setShorthand';
 import css from './Inputs.module.css';
 
 type ShorthandInputProps = {
   /** Smaller variant placed inside an exercise card. */
   compact?: boolean;
   defaultValue?: string;
+  measure?: Measure;
   onSubmit: (sets: ParsedSet[]) => void;
 };
 
@@ -22,10 +23,12 @@ type ShorthandInputProps = {
 export function ShorthandInput({
   compact = false,
   defaultValue = '',
+  measure,
   onSubmit,
 }: ShorthandInputProps) {
   const [text, setText] = useState(defaultValue);
-  const { errors, sets } = parseSetShorthand(text);
+  const previewId = useId();
+  const { errors, sets } = parseSetShorthand(text, measure);
   const canSubmit = sets.length > 0 && errors.length === 0;
 
   function submit() {
@@ -37,7 +40,9 @@ export function ShorthandInput({
   return (
     <div className={clsx(css.shorthand, compact && css.compact)}>
       <TextInput
-        aria-label='Sets, for example 80x5x3'
+        aria-describedby={sets.length > 0 || errors.length > 0 ? previewId : undefined}
+        aria-invalid={errors.length > 0}
+        aria-label={`Sets, for example ${measure ? SHORTHAND_HINTS[measure] : '80x5x3'}`}
         autoCapitalize='off'
         autoComplete='off'
         autoFocus={compact}
@@ -46,7 +51,7 @@ export function ShorthandInput({
         onKeyDown={(event) => {
           if (event.key === 'Enter') submit();
         }}
-        placeholder='80x5x3, w40x10, 45s…'
+        placeholder={measure ? SHORTHAND_HINTS[measure] : '80x5x3, w40x10, 45s…'}
         size={compact ? 'sm' : 'md'}
         spellCheck={false}
         trailing={
@@ -64,15 +69,15 @@ export function ShorthandInput({
       />
       {compact && !text ? (
         <div className={css.inlineDemo}>
-          <TypeSetsDemo />
+          <TypeSetsDemo example={measure ? SHORTHAND_HINTS[measure].split(',')[0] : undefined} />
           <span>
-            Type sets like <code>80x5x3</code> (3 sets), <code>w40x10</code> (warm-up) or{' '}
-            <code>45s</code>.
+            Type sets like <code>{measure ? SHORTHAND_HINTS[measure] : '80x5x3, w40x10, 45s'}</code>
+            .
           </span>
         </div>
       ) : null}
       {sets.length > 0 || errors.length > 0 ? (
-        <ul aria-live='polite' className={css.chips}>
+        <ul aria-live='polite' className={css.chips} id={previewId}>
           {sets.map((set, index) => (
             <li
               className={clsx(css.chip, set.type !== 'normal' && css[`chip_${set.type}`])}

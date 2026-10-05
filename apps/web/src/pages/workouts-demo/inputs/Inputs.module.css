@@ -22,10 +22,16 @@
 /* Shorthand */
 .shorthand {
   display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-xs);
 
   & input {
     font-family: var(--font-mono);
+
+    &[aria-invalid='true'] {
+      border-color: var(--c-danger-border);
+    }
   }
 }
 
@@ -46,6 +52,8 @@
   display: inline-flex;
   align-items: baseline;
   gap: 0.3rem;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   padding: 0.15rem 0.55rem;
   border-radius: var(--radius-pill);
   background: var(--c-primary-surface);

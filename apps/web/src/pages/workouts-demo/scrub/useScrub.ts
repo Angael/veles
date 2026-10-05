@@ -1,4 +1,11 @@
-import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type MouseEvent,
+  type PointerEvent,
+} from 'react';
 
 /** Step used from a given drag speed (px/ms) upward; the first tier must start at 0. */
 export type ScrubTier = { from: number; step: number };
@@ -10,6 +17,8 @@ export type ScrubOptions = {
   /** Slow drag uses the first step; faster drags move to bigger steps and snap to them. */
   tiers: ScrubTier[];
   max?: number;
+  /** Pause cell interactions while its row's context menu is open. */
+  disabled?: boolean;
   /** Pixels of drag per step, at every speed. */
   pixelsPerStep?: number;
   onChange: (value: number) => void;
@@ -33,6 +42,7 @@ const stepAt = (tiers: ScrubTier[], velocity: number) =>
  * Never goes below zero. Vertical movement still scrolls (pair with `touch-action: pan-y`).
  */
 export function useScrub({
+  disabled = false,
   fallback,
   max = 9999,
   onChange,
@@ -45,6 +55,7 @@ export function useScrub({
     id: number;
     direction: 1 | -1;
     startX: number;
+    startY: number;
     lastX: number;
     lastT: number;
     raw: number;
@@ -52,9 +63,18 @@ export function useScrub({
     active: boolean;
   } | null>(null);
   const [offset, setOffset] = useState<number | null>(null);
+  /** Whether the click that follows the current press should count as a tap. */
+  const tapPending = useRef(false);
   const current = value ?? fallback;
   const smallest = tiers[0]?.step ?? 1;
   const largest = tiers.at(-1)?.step ?? smallest;
+
+  useEffect(() => {
+    if (!disabled) return;
+    drag.current = null;
+    tapPending.current = false;
+    setOffset(null);
+  }, [disabled]);
 
   function emit(next: number) {
     const clamped = clamp(next, max);
@@ -65,9 +85,10 @@ export function useScrub({
 
   function end(event: PointerEvent) {
     const state = drag.current;
+    if (!state || state.id !== event.pointerId) return;
     drag.current = null;
     setOffset(null);
-    if (state && !state.active && event.type === 'pointerup') onTap?.();
+    tapPending.current = Boolean(!disabled && !state.active && event.type === 'pointerup');
   }
 
   return {
@@ -75,6 +96,7 @@ export function useScrub({
     offset,
     handlers: {
       onKeyDown(event: KeyboardEvent) {
+        if (disabled) return;
         const step = event.shiftKey ? largest : smallest;
         if (event.key === 'ArrowRight' || event.key === 'ArrowUp') emit(current + step);
         else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') emit(current - step);
@@ -83,7 +105,8 @@ export function useScrub({
         event.preventDefault();
       },
       onPointerDown(event: PointerEvent) {
-        if (event.button !== 0) return;
+        tapPending.current = false;
+        if (disabled || event.button !== 0 || !event.isPrimary) return;
         drag.current = {
           active: false,
           direction: event.pointerType === 'touch' ? -1 : 1,
@@ -92,14 +115,21 @@ export function useScrub({
           lastX: event.clientX,
           raw: current,
           startX: event.clientX,
+          startY: event.clientY,
           velocity: 0,
         };
       },
       onPointerMove(event: PointerEvent<HTMLElement>) {
         const state = drag.current;
-        if (!state || state.id !== event.pointerId) return;
+        if (disabled || !state || state.id !== event.pointerId) return;
         if (!state.active) {
-          if (Math.abs(event.clientX - state.startX) < ACTIVATE_PX) return;
+          const dx = Math.abs(event.clientX - state.startX);
+          const dy = Math.abs(event.clientY - state.startY);
+          if (dy >= ACTIVATE_PX && dy > dx) {
+            drag.current = null;
+            return;
+          }
+          if (dx < ACTIVATE_PX) return;
           state.active = true;
           state.lastX = event.clientX;
           event.currentTarget.setPointerCapture(event.pointerId);
@@ -118,6 +148,26 @@ export function useScrub({
       },
       onPointerUp: end,
       onPointerCancel: end,
+      onPointerLeave() {
+        if (drag.current && !drag.current.active) {
+          drag.current = null;
+          tapPending.current = false;
+        }
+      },
+      onContextMenu() {
+        drag.current = null;
+        tapPending.current = false;
+        setOffset(null);
+      },
+      /**
+       * Taps act on click, not pointerup: on touch, the browser fires its emulated mouse events
+       * after pointerup, and those would land on a just-opened sheet's backdrop and close it.
+       */
+      onClick(event: MouseEvent) {
+        const shouldTap = !disabled && (tapPending.current || event.detail === 0);
+        tapPending.current = false;
+        if (shouldTap) onTap?.();
+      },
     },
   };
 }

@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { CopyIcon, LayersIcon, Trash2Icon } from 'lucide-react';
+import { describeSet, parseSetShorthand } from '../setShorthand';
 import { Pointer } from './Pointer';
 import { phase, useCoarsePointer, useTimeline } from './useHints';
 import css from './Hints.module.css';
@@ -52,13 +53,12 @@ export function LongPressDemo() {
   );
 }
 
-const TYPED = '80x5x3';
-
-/** Typewriter: `80x5x3` appears letter by letter, then turns into three set chips. */
-export function TypeSetsDemo() {
+/** Typewriter: the example appears letter by letter, then turns into its set chips. */
+export function TypeSetsDemo({ example = '80x5x3' }: { example?: string }) {
   const progress = useTimeline(3600, 0.8);
-  const typed = TYPED.slice(0, Math.floor(phase(progress, 0.05, 0.45) * TYPED.length));
-  const chips = Math.floor(phase(progress, 0.5, 0.7) * 3);
+  const typed = example.slice(0, Math.floor(phase(progress, 0.05, 0.45) * example.length));
+  const { sets } = parseSetShorthand(example);
+  const chips = Math.floor(phase(progress, 0.5, 0.7) * sets.length);
   return (
     <div aria-hidden='true' className={css.stageColumn}>
       <span className={css.fakeInput}>
@@ -66,9 +66,9 @@ export function TypeSetsDemo() {
         <span className={css.caret} />
       </span>
       <span className={css.fakeChips}>
-        {Array.from({ length: chips }, (_, index) => (
+        {sets.slice(0, chips).map((set, index) => (
           <span className={css.fakeChip} key={index}>
-            80×5
+            {describeSet(set)}
           </span>
         ))}
       </span>

@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { CheckIcon } from 'lucide-react';
+import { useState } from 'react';
 import { ContextMenuRoot, ContextMenuTrigger } from '@/components/ui/context-menu/ContextMenu';
 import { SET_TYPE_LABELS, type MockSet, type MockSlot } from '../mockData';
 import { ScrubCell } from '../scrub/ScrubCell';
@@ -36,6 +37,7 @@ export function SetRow({
   set,
   slot,
 }: SetRowProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
   const fields = MEASURE_FIELDS[slot.measure];
   const update = (patch: Partial<MockSet>) => actions.updateSet(slot.id, set.id, patch);
 
@@ -52,7 +54,7 @@ export function SetRow({
   }
 
   return (
-    <ContextMenuRoot>
+    <ContextMenuRoot onOpenChange={setMenuOpen}>
       <ContextMenuTrigger
         className={clsx(css.setRow, set.done && css.setDone)}
         data-fields={fields.length}
@@ -70,6 +72,7 @@ export function SetRow({
           cellMode === 'drag' ? (
             <ScrubCell
               aria-label={`${field.label}, drag sideways or tap for details`}
+              disabled={menuOpen}
               format={(value) => formatMetric(field, value)}
               key={field.key}
               onChange={(value) => update({ [field.key]: value })}

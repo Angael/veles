@@ -29,7 +29,7 @@ type ExerciseCardProps = {
   timer: RestTimer;
 };
 
-/** One exercise in a session: header with icons and a long-press menu, set rows, add buttons. */
+/** One exercise in a session: wrapping title, header actions and a long-press menu, set rows. */
 export function ExerciseCard({
   actions,
   cellMode,
@@ -138,6 +138,7 @@ export function ExerciseCard({
       {addSeveral ? (
         <ShorthandInput
           compact
+          measure={slot.measure}
           onSubmit={(sets) => {
             actions.addParsedSets(slot.id, sets);
             setAddSeveral(false);

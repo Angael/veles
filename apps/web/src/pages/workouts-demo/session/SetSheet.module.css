@@ -59,6 +59,7 @@
   flex: 1;
   min-width: 0;
   font-size: var(--text-lg);
+  overflow-wrap: anywhere;
 
   & small {
     color: var(--c-muted);
