@@ -20,7 +20,7 @@
 - DB migrations need to be run before pushing/merging to `main`
 
 ## Pull Requests
-- Start each PR description with a `# TL;DR` markdown heading (a title, not a `#tldr` hashtag), followed by a short summary.
+- Start each PR description with a `# TL;DR` section.
 - When writing PRs, follow ASD-STE100 (Simplified Technical English) and keep it short.
 
 ## Database Scripts
