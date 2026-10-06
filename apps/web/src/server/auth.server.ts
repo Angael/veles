@@ -34,7 +34,7 @@ export const auth = betterAuth({
     },
   }),
   plugins: [
-    // Read-only MCP credentials for agents (see docs/agent-integration.md).
+    // MCP credentials; feature consent is managed in Account (see docs/agent-integration.md).
     apiKey({
       defaultPrefix: 'vls_',
       requireName: true,

@@ -8,6 +8,7 @@ import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { useApiKeysQuery, useCreateApiKeyMutation, useDeleteApiKeyMutation } from './account.query';
 import { FriendRow } from './FriendRow';
+import { AgentPermissions } from './AgentPermissions';
 import css from './AccountPage.module.css';
 
 export function AgentAccessCard() {
@@ -21,9 +22,11 @@ export function AgentAccessCard() {
       <header className={css.sectionHeader}>
         <div>
           <h2>Agent access</h2>
-          <p>Read-only MCP keys for agents like Hermes. Keys expire after 90 days.</p>
+          <p>Choose what agents like Hermes can access through MCP. Keys expire after 90 days.</p>
         </div>
       </header>
+
+      <AgentPermissions />
 
       <TypedForm
         className={css.inviteForm}

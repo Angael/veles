@@ -1,6 +1,8 @@
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 import { sessionUserQueryKey } from '@/lib/auth/session.query';
 import { apiKey, signOut } from '@/lib/auth/client';
+import type { AgentFeature } from '@/lib/agentAccess';
+import { getAgentPermissions, updateAgentPermission } from './agent-access.api';
 import {
   acceptConnectionInvitation,
   disconnectUser,
@@ -110,5 +112,22 @@ export function useDeleteApiKeyMutation() {
   return useMutation({
     meta: { invalidateQueryKey: apiKeysQueryKey },
     mutationFn: async (keyId: string) => unwrap(await apiKey.delete({ keyId })),
+  });
+}
+
+const agentPermissionsQueryKey = ['agentPermissions'] as const;
+
+export function useAgentPermissionsQuery() {
+  return useQuery({
+    queryKey: agentPermissionsQueryKey,
+    queryFn: () => getAgentPermissions(),
+  });
+}
+
+export function useUpdateAgentPermissionMutation() {
+  return useMutation({
+    meta: { invalidateQueryKey: agentPermissionsQueryKey },
+    mutationFn: (data: { feature: AgentFeature; access: 'read' | 'write'; enabled: boolean }) =>
+      updateAgentPermission({ data }),
   });
 }

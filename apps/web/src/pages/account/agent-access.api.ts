@@ -1,0 +1,44 @@
+import { type } from 'arktype';
+import { arkTypeValidator } from '@tanstack/arktype-adapter';
+import { createServerFn } from '@tanstack/react-start';
+import { userAgentPermissions } from '@veles/db/schema';
+import { agentFeatures, agentFeatureType } from '@/lib/agentAccess';
+import { ClientSafeError } from '@/lib/errors/ClientSafeError';
+import { readAgentPermissions } from '@/server/agentAccess.server';
+import { db } from '@/server/db.server';
+import { requireSession } from '@/server/getSession.server';
+import { logMiddleware } from '@/server/middleware/logMiddleware';
+
+export const getAgentPermissions = createServerFn({ method: 'GET' })
+  .middleware([logMiddleware('getAgentPermissions')])
+  .handler(async () => {
+    const session = await requireSession();
+    return readAgentPermissions(session.user.id);
+  });
+
+const updateAgentPermissionInputType = type({
+  '+': 'reject',
+  feature: agentFeatureType,
+  access: "'read' | 'write'",
+  enabled: 'boolean',
+});
+
+/** Saves one consent switch without overwriting other permissions or granting future writes. */
+export const updateAgentPermission = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('updateAgentPermission')])
+  .validator(arkTypeValidator(updateAgentPermissionInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    if (data.access === 'write' && data.enabled && !agentFeatures[data.feature].writeAvailable) {
+      throw new ClientSafeError('Write access for this feature is coming soon.');
+    }
+    const changed =
+      data.access === 'read' ? { readEnabled: data.enabled } : { writeEnabled: data.enabled };
+    await db
+      .insert(userAgentPermissions)
+      .values({ userId: session.user.id, feature: data.feature, ...changed })
+      .onConflictDoUpdate({
+        target: [userAgentPermissions.userId, userAgentPermissions.feature],
+        set: changed,
+      });
+  });

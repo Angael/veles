@@ -3,6 +3,7 @@ import {
   index,
   integer,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -73,7 +74,21 @@ export const verifications = pgTable(
   (table) => [index('verification_identifier_idx').on(table.identifier)],
 );
 
-/** Better Auth API-key plugin table; keys authenticate the read-only MCP endpoint. */
+/** Account-wide AI consent. Missing rows deny access, including for existing API keys. */
+export const userAgentPermissions = pgTable(
+  'user_agent_permission',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    feature: text('feature').notNull(),
+    readEnabled: boolean('read_enabled').notNull().default(false),
+    writeEnabled: boolean('write_enabled').notNull().default(false),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.feature] })],
+);
+
+/** Better Auth API-key plugin table; keys authenticate the MCP endpoint. */
 export const apiKeys = pgTable(
   'apikey',
   {
