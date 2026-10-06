@@ -3,7 +3,39 @@
 Playground: `/demo/workouts` (mock data, nothing saves). Draft schema:
 `packages/db/src/schema/workouts.schema.ts` (not exported, so drizzle-kit ignores it).
 
-## How other apps do it
+## Read first: status and decisions
+
+**Status.** Draft PR #225 (branch `feat/workouts-playground`). Do not merge: it is a mock playground. No server code, no saved data. The MCP plan is posted as a comment on PR #213.
+
+**Before real implementation.**
+
+1. Export `workouts.schema.ts` from `packages/db/src/schema/index.ts`.
+2. The human runs `pnpm db:generate` and the migration on dev and prod before merging to `main`. Agents never run Drizzle commands.
+3. Move the chosen pieces from `pages/workouts-demo` to `pages/workouts` and add real routes under `routes/_authenticated/workouts`.
+4. Delete the variants that were not picked (rest timer B/C, "Type in cells", one-tap, Hints tab).
+
+**Decided (current behaviour wins over older rounds below).**
+
+- Rest timer: **A, dock pill** (takes the phone dock slot like `SelectionBar`). The timer stores `endsAt`.
+- Set input: **drag cells** in compact rows. A whole workout fits on the screen. Tap a cell → **top sheet**.
+- Drag: on touch, finger right = smaller value (ruler). With a mouse, drag right = bigger value. Speed picks the step (weight 0.5 → 1 → 2.5 → 5, reps 1 → 2 → 5, time 5 → 15 → 30 → 60 s). Values stop at 0. The ruler has a taller mark every 5th tick. No visible step, speed or ± indicators.
+- Sheet: exercise name + "Set N", "Last time … use", 1–2 drag fields (tap a number to type), **Save**. Edits a draft. No set navigation, no ± buttons, no step setting. Save does not start the rest timer.
+- Rows: set badge (tap cycles Normal/W/D/F) │ 1–2 cells │ tick. No "previous" column: last time's values are the grey ghost text. Ticking an empty set copies the ghost values and starts the rest timer.
+- Taps act on `click`, not `pointerup`. Long press opens only the context menu, never the sheet.
+- Context menus (long press / right click) hold the rare actions: set type, duplicate, delete, rename, track mode, rest length, superset, reorder.
+- "Add set" copies the last set. "Add several…" takes shorthand (`80x5x3`, `w40x10`, `45s`). It validates the text against the exercise's tracking mode, so `42s` is an error on weight × reps.
+- Exercises: only the user's own names, no global catalog. Fuzzy search (typos, swapped letters, accents, missing spaces). Create from the search text with a guessed tracking mode (grid picker, no empty cells).
+- Notes: one per exercise per workout (`workout_exercise.notes`). Last time's note is the placeholder. The history dialog shows numeric dates (`Thu 02.10`) and a "#2 of 5" position badge.
+- First-use tips: only "drag", "hold for more" and "add several". Smooth demos that show the press. "Tick to finish" and "tap for details" are not needed.
+- Long exercise names wrap on their own row; icons sit below.
+
+**Rejected (do not bring back).** Per-exercise or visible weight-step selection. ± stepper buttons. Speed bar and `±x` badge. Set navigation in the sheet. "Done, start rest" in the sheet. Negative weights (assisted machines log the assist as a positive number). Set-type letters in history. Tips for obvious actions.
+
+**User preferences for this feature.** Mobile first, desktop also important. Few buttons; context menus for extras. The first experience must be clear to a non-technical user. Short demos beat text. Keep exploring in the playground before building the real feature.
+
+**Code map** (`apps/web/src/pages/workouts-demo/`). `scrub/` (drag hook and cells), `session/` (cards, rows, sheet, notes, history, `metrics.ts`), `rest/` (timer), `library/` (picker, fuzzy search, measure grid), `hints/` (tips and demos), `setShorthand.ts` (parser, reusable for an MCP write tool), `mockData.ts`. Route: `routes/demo.workouts.tsx`. Shared change: `ContextMenuSubmenuRoot/Trigger` in `components/ui/context-menu`.
+
+**Not verified.** No browser or phone testing by agents. Gesture feel (speed tiers, long press vs drag) needs a real-device check.
 
 | App                                                                                                                                                               | What to steal                                                                                                                                | What to skip                                    |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
@@ -40,6 +72,8 @@ Round 3 made things simpler. Some round 2 items below were changed or removed he
 
 ## Round 2 feedback and changes
 
+Superseded in part by round 3: step grid, ± buttons, speed bar, set navigation and the tick/sheet tips are removed.
+
 Picked so far (★ in the playground):
 
 - **Rest timer A** (dock pill).
@@ -59,6 +93,8 @@ Changes in round 2:
 - **First-use tips** (`hints/`): looping mini demos (drag, tick → rest, tap → sheet, hold → menu, type sets). The session shows one tip at a time until it is dismissed. "?" in the header shows them again. The "Hints" tab shows all of them.
 
 ## Ideas in the playground (round 1)
+
+The original exploration. See "Read first" for what was kept.
 
 ### Live session (tab "Live session")
 
