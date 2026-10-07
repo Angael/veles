@@ -116,8 +116,6 @@ export const workoutExercises = pgTable(
       .notNull()
       .references(() => exercises.id, { onDelete: 'restrict' }),
     position: integer('position').notNull(),
-    /** Adjacent slots sharing a number form a superset. */
-    supersetGroup: smallint('superset_group'),
     /** Overrides `exercise.rest_seconds` for this slot only. */
     restSeconds: integer('rest_seconds'),
     /** Per workout, per exercise. The last session's note is the next session's placeholder. */

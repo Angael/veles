@@ -12,8 +12,7 @@
   text-wrap: pretty;
 }
 
-.segmented,
-.segmentedSmall {
+.segmented {
   display: flex;
   gap: 0.25rem;
   width: fit-content;
@@ -42,20 +41,4 @@
     background: var(--c-primary-surface-strong);
     color: var(--c-text-strong);
   }
-}
-
-.segmentedSmall .segment {
-  min-height: 1.9rem;
-  padding: 0 0.7rem;
-  font-size: var(--text-xs);
-}
-
-.restPicker {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  justify-items: start;
-  align-items: center;
-  gap: var(--space-xs) var(--space-sm);
-  color: var(--c-muted);
-  font-size: var(--text-sm);
 }

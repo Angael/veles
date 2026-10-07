@@ -4,8 +4,14 @@ import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import type { MockSet, MockSlot } from '../mockData';
 import { ScrubField } from '../scrub/ScrubField';
-import { describeSet } from '../setShorthand';
-import { formatMetric, MEASURE_FIELDS, parseMetric, scrubTuning, type MetricKey } from './metrics';
+import {
+  describeSet,
+  formatMetric,
+  MEASURE_FIELDS,
+  parseMetric,
+  scrubTuning,
+  type MetricKey,
+} from './metrics';
 import css from './SetSheet.module.css';
 
 type Draft = Partial<Record<MetricKey, number | null>>;

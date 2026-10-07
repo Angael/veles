@@ -20,7 +20,6 @@ export type MockSlot = {
   name: string;
   measure: Measure;
   restSeconds: number | null;
-  supersetGroup: number | null;
   note: string;
   sets: MockSet[];
 };
@@ -69,7 +68,6 @@ export const initialSession = (): MockSlot[] => [
     note: '',
     restSeconds: 120,
     sets: [lifted(40, 10, 'warmup'), lifted(80, 5), lifted(80, 5), lifted(80, 4)],
-    supersetGroup: null,
   },
   {
     id: mockId(),
@@ -78,7 +76,6 @@ export const initialSession = (): MockSlot[] => [
     note: '',
     restSeconds: 60,
     sets: [lifted(6, 15), lifted(7, 12), lifted(8, 10), lifted(9, 8)],
-    supersetGroup: null,
   },
   {
     id: mockId(),
@@ -87,7 +84,6 @@ export const initialSession = (): MockSlot[] => [
     note: '',
     restSeconds: 90,
     sets: [lifted(55, 10), lifted(55, 10), lifted(55, 9)],
-    supersetGroup: 1,
   },
   {
     id: mockId(),
@@ -99,7 +95,6 @@ export const initialSession = (): MockSlot[] => [
       makeSet({ previous: { ...emptyMetrics, reps: 12 } }),
       makeSet({ previous: { ...emptyMetrics, reps: 10 } }),
     ],
-    supersetGroup: 1,
   },
   {
     id: mockId(),
@@ -108,7 +103,6 @@ export const initialSession = (): MockSlot[] => [
     note: '',
     restSeconds: 60,
     sets: [makeSet({ previous: { ...emptyMetrics, durationSeconds: 60 } })],
-    supersetGroup: null,
   },
 ];
 

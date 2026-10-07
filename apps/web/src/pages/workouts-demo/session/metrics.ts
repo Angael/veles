@@ -69,3 +69,14 @@ export function completedPatch(set: MockSet, measure: Measure): Partial<MockSet>
   }
   return patch;
 }
+
+/** Short label for a logged set, such as `80 × 5` or `5.2 km · 28:10`. */
+export function describeSet(set: Pick<MockSet, MetricKey>) {
+  const parts: string[] = [];
+  if (set.weightKg !== null && set.reps !== null) parts.push(`${set.weightKg} × ${set.reps}`);
+  else if (set.reps !== null) parts.push(`× ${set.reps}`);
+  else if (set.weightKg !== null) parts.push(`${set.weightKg} kg`);
+  if (set.distanceKm !== null) parts.push(`${set.distanceKm} km`);
+  if (set.durationSeconds !== null) parts.push(formatDuration(set.durationSeconds));
+  return parts.join(' · ') || '—';
+}

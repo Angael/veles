@@ -2,10 +2,8 @@ import {
   ArrowDownIcon,
   ArrowUpIcon,
   CheckIcon,
-  Link2Icon,
   PencilIcon,
   RulerIcon,
-  StickyNoteIcon,
   TimerIcon,
   Trash2Icon,
 } from 'lucide-react';
@@ -24,24 +22,18 @@ export const REST_PRESETS = [null, 45, 60, 90, 120, 180] as const;
 
 type ExerciseMenuProps = {
   actions: SessionActions;
-  onEditNote: () => void;
   onRename: () => void;
   slot: MockSlot;
 };
 
 /**
  * Everything you rarely need mid-set lives here instead of as buttons on the card: rename,
- * tracking mode, rest length, supersets, ordering, removal.
+ * tracking mode, rest length, ordering, removal.
  */
-export function ExerciseMenu({ actions, onEditNote, onRename, slot }: ExerciseMenuProps) {
+export function ExerciseMenu({ actions, onRename, slot }: ExerciseMenuProps) {
   return (
     <ContextMenuPopup aria-label={`${slot.name} actions`}>
       <ContextMenuItem icon={<PencilIcon aria-hidden='true' />} label='Rename' onClick={onRename} />
-      <ContextMenuItem
-        icon={<StickyNoteIcon aria-hidden='true' />}
-        label={slot.note ? 'Edit note' : 'Add note'}
-        onClick={onEditNote}
-      />
       <ContextMenuSubmenuRoot>
         <ContextMenuSubmenuTrigger
           icon={<RulerIcon aria-hidden='true' />}
@@ -71,11 +63,6 @@ export function ExerciseMenu({ actions, onEditNote, onRename, slot }: ExerciseMe
           ))}
         </ContextMenuPopup>
       </ContextMenuSubmenuRoot>
-      <ContextMenuItem
-        icon={<Link2Icon aria-hidden='true' />}
-        label={slot.supersetGroup === null ? 'Superset with next' : 'Leave superset'}
-        onClick={() => actions.toggleSuperset(slot.id)}
-      />
       <ContextMenuItem
         icon={<ArrowUpIcon aria-hidden='true' />}
         label='Move up'

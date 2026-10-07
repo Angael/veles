@@ -1,61 +1,45 @@
-import clsx from 'clsx';
-import { HistoryIcon, ListPlusIcon, PlusIcon, StickyNoteIcon, TimerIcon } from 'lucide-react';
-import { useState, type CSSProperties } from 'react';
+import { HistoryIcon, PlusIcon } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
 import { ContextMenuRoot, ContextMenuTrigger } from '@/components/ui/context-menu/ContextMenu';
-import { formatDuration, historyFor, type MockSet, type MockSlot } from '../mockData';
-import type { RestTimer } from '../rest/useRestTimer';
-import { RestInline, type RestVariant } from '../rest/RestTimer';
-import { ShorthandInput } from '../inputs/ShorthandInput';
+import type { MockSet, MockSlot } from '../mockData';
 import { ExerciseHistoryDialog } from './ExerciseHistoryDialog';
-import { ExerciseMenu, REST_PRESETS } from './ExerciseMenu';
+import { ExerciseMenu } from './ExerciseMenu';
 import { ExerciseNote } from './ExerciseNote';
-import { SetRow, type CellMode } from './SetRow';
+import { SetRow } from './SetRow';
 import type { SessionActions } from './useMockSession';
 import css from './Session.module.css';
 
-/** Gives each superset its own rail color so linked cards read as one group. */
-const supersetStyle = (slot: MockSlot): CSSProperties & { '--superset-hue': number } => ({
-  '--superset-hue': ((slot.supersetGroup ?? 0) * 47) % 360,
-});
-
 type ExerciseCardProps = {
   actions: SessionActions;
-  cellMode: CellMode;
+  /** 1-based position in the workout. */
+  number: number;
   onOpenSheet: (slot: MockSlot, setId: string) => void;
   onSetCompleted: (slot: MockSlot, set: MockSet) => void;
-  restAfterSetId: string | null;
-  restVariant: RestVariant;
   slot: MockSlot;
-  timer: RestTimer;
+  /** First-use tip shown right above the set rows it explains. */
+  tip?: ReactNode;
 };
 
-/** One exercise in a session: wrapping title, header actions and a long-press menu, set rows. */
+/** One exercise in a session: order number, wrapping title with history, note, set rows. */
 export function ExerciseCard({
   actions,
-  cellMode,
+  number,
   onOpenSheet,
   onSetCompleted,
-  restAfterSetId,
-  restVariant,
   slot,
-  timer,
+  tip,
 }: ExerciseCardProps) {
   const [renaming, setRenaming] = useState(false);
-  const [addSeveral, setAddSeveral] = useState(false);
-  const [noteOpen, setNoteOpen] = useState(slot.note !== '');
   const [historyOpen, setHistoryOpen] = useState(false);
-  const hasLastNote = historyFor(slot.name).some((entry) => entry.note);
   const workingSetNumbers = slot.sets.map(
     (_, index) => slot.sets.slice(0, index + 1).filter((set) => set.type === 'normal').length,
   );
 
   return (
-    <section
-      className={clsx(css.card, slot.supersetGroup !== null && css.superset)}
-      style={supersetStyle(slot)}
-    >
+    <section className={css.card}>
       <ContextMenuRoot>
         <ContextMenuTrigger className={css.cardHeader}>
+          <span className={css.exerciseNumber}>{number}</span>
           {renaming ? (
             <input
               aria-label='Exercise name'
@@ -72,79 +56,34 @@ export function ExerciseCard({
             <h3>{slot.name}</h3>
           )}
           <button
-            aria-label={noteOpen ? 'Hide note' : 'Add note'}
-            aria-pressed={noteOpen}
-            className={clsx(css.iconChip, hasLastNote && !noteOpen && css.hasDot)}
-            onClick={() => setNoteOpen((open) => !open)}
-            title={hasLastNote ? 'Note (last time has one)' : 'Note'}
-            type='button'
-          >
-            <StickyNoteIcon aria-hidden='true' />
-          </button>
-          <button
             aria-label='Earlier sessions'
-            className={css.iconChip}
+            className={css.historyButton}
             onClick={() => setHistoryOpen(true)}
             type='button'
           >
             <HistoryIcon aria-hidden='true' />
           </button>
-          <button
-            className={css.restChip}
-            onClick={() => {
-              const index = REST_PRESETS.findIndex((seconds) => seconds === slot.restSeconds);
-              actions.updateSlot(slot.id, {
-                restSeconds: REST_PRESETS[(index + 1) % REST_PRESETS.length] ?? null,
-              });
-            }}
-            title='Rest after each set. Tap to change.'
-            type='button'
-          >
-            <TimerIcon aria-hidden='true' />
-            {slot.restSeconds === null ? 'off' : formatDuration(slot.restSeconds)}
-          </button>
         </ContextMenuTrigger>
-        <ExerciseMenu
-          actions={actions}
-          onEditNote={() => setNoteOpen(true)}
-          onRename={() => setRenaming(true)}
-          slot={slot}
-        />
+        <ExerciseMenu actions={actions} onRename={() => setRenaming(true)} slot={slot} />
       </ContextMenuRoot>
 
-      {noteOpen ? (
-        <ExerciseNote actions={actions} onClose={() => setNoteOpen(false)} slot={slot} />
-      ) : null}
+      <ExerciseNote actions={actions} slot={slot} />
+      {tip}
 
       <div className={css.sets} role='table'>
         {slot.sets.map((set, index) => (
-          <div key={set.id}>
-            <SetRow
-              actions={actions}
-              cellMode={cellMode}
-              number={workingSetNumbers[index] ?? 0}
-              onCompleted={(done) => onSetCompleted(slot, done)}
-              onOpenSheet={() => onOpenSheet(slot, set.id)}
-              set={set}
-              slot={slot}
-            />
-            {restVariant === 'inline' && timer.running && restAfterSetId === set.id ? (
-              <RestInline timer={timer} />
-            ) : null}
-          </div>
+          <SetRow
+            actions={actions}
+            key={set.id}
+            number={workingSetNumbers[index] ?? 0}
+            onCompleted={(done) => onSetCompleted(slot, done)}
+            onOpenSheet={() => onOpenSheet(slot, set.id)}
+            set={set}
+            slot={slot}
+          />
         ))}
       </div>
 
-      {addSeveral ? (
-        <ShorthandInput
-          compact
-          measure={slot.measure}
-          onSubmit={(sets) => {
-            actions.addParsedSets(slot.id, sets);
-            setAddSeveral(false);
-          }}
-        />
-      ) : null}
       <div className={css.cardFooter}>
         <button
           className={css.addSet}
@@ -153,15 +92,6 @@ export function ExerciseCard({
           type='button'
         >
           <PlusIcon aria-hidden='true' /> Add set
-        </button>
-        <button
-          aria-pressed={addSeveral}
-          className={css.addSet}
-          onClick={() => setAddSeveral((value) => !value)}
-          title='Type many sets at once, like 80x5x3'
-          type='button'
-        >
-          <ListPlusIcon aria-hidden='true' /> Add several…
         </button>
       </div>
 

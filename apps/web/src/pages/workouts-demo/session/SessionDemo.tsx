@@ -5,26 +5,22 @@ import { FeatureTip, HINTS } from '../hints/FeatureTip';
 import { useSeenHints } from '../hints/useHints';
 import { ExercisePickerDialog } from '../library/ExercisePicker';
 import type { MockSet, MockSlot } from '../mockData';
-import { RestBubble, RestDock, type RestVariant } from '../rest/RestTimer';
+import { RestDock } from '../rest/RestTimer';
 import { useRestTimer } from '../rest/useRestTimer';
 import { ExerciseCard } from './ExerciseCard';
 import { SessionHeader } from './SessionHeader';
 import { SetSheet } from './SetSheet';
-import type { CellMode } from './SetRow';
 import { useMockSession } from './useMockSession';
 import css from './Session.module.css';
 
-/** Tips shown at the top of a session, one at a time, until each is dismissed. */
+/** Tips shown in the first exercise card, one at a time, until each is dismissed. */
 const SESSION_HINTS = ['drag', 'longpress'];
 
-type SessionDemoProps = { cellMode: CellMode; restVariant: RestVariant };
-
 /** Live session mock: the screen you stare at between sets. */
-export function SessionDemo({ cellMode, restVariant }: SessionDemoProps) {
+export function SessionDemo() {
   const { actions, slots } = useMockSession();
   const timer = useRestTimer();
   const hints = useSeenHints();
-  const [restAfterSetId, setRestAfterSetId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [sheet, setSheet] = useState<{ slotId: string; setId: string } | null>(null);
 
@@ -32,37 +28,38 @@ export function SessionDemo({ cellMode, restVariant }: SessionDemoProps) {
   const sheetSet = sheetSlot?.sets.find((set) => set.id === sheet?.setId);
   const nextHint = HINTS.find(
     (hint) =>
-      SESSION_HINTS.includes(hint.key) &&
-      hints.seen !== null &&
-      !hints.seen.includes(hint.key) &&
-      (cellMode === 'drag' || hint.key !== 'drag'),
+      SESSION_HINTS.includes(hint.key) && hints.seen !== null && !hints.seen.includes(hint.key),
   );
 
+  /**
+   * Starts rest after a ticked set. Ticking a set that sits before an already done one is
+   * catching up on forgotten ticks, so it leaves the running timer alone.
+   */
   function onSetCompleted(slot: MockSlot, set: MockSet) {
     if (slot.restSeconds === null) return;
-    setRestAfterSetId(set.id);
+    const index = slot.sets.findIndex((item) => item.id === set.id);
+    if (slot.sets.slice(index + 1).some((item) => item.done)) return;
     timer.start(slot.restSeconds, slot.name);
   }
 
   return (
     <div className={css.session}>
       <SessionHeader onShowHints={hints.reset} slots={slots} />
-      {nextHint ? (
-        <FeatureTip hint={nextHint} onDismiss={() => hints.markSeen(nextHint.key)} />
-      ) : null}
 
       <div className={css.cards}>
-        {slots.map((slot) => (
+        {slots.map((slot, index) => (
           <ExerciseCard
             actions={actions}
-            cellMode={cellMode}
             key={slot.id}
+            number={index + 1}
             onOpenSheet={(target, setId) => setSheet({ setId, slotId: target.id })}
             onSetCompleted={onSetCompleted}
-            restAfterSetId={restAfterSetId}
-            restVariant={restVariant}
             slot={slot}
-            timer={timer}
+            tip={
+              index === 0 && nextHint ? (
+                <FeatureTip hint={nextHint} onDismiss={() => hints.markSeen(nextHint.key)} />
+              ) : null
+            }
           />
         ))}
       </div>
@@ -95,8 +92,7 @@ export function SessionDemo({ cellMode, restVariant }: SessionDemoProps) {
         }
       />
 
-      {restVariant === 'dock' ? <RestDock timer={timer} /> : null}
-      {restVariant === 'bubble' ? <RestBubble timer={timer} /> : null}
+      <RestDock timer={timer} />
     </div>
   );
 }

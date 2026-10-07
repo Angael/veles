@@ -4,18 +4,13 @@ import { useState } from 'react';
 import { ContextMenuRoot, ContextMenuTrigger } from '@/components/ui/context-menu/ContextMenu';
 import { SET_TYPE_LABELS, type MockSet, type MockSlot } from '../mockData';
 import { ScrubCell } from '../scrub/ScrubCell';
-import { MetricInput } from './MetricInput';
 import { completedPatch, formatMetric, MEASURE_FIELDS, scrubTuning } from './metrics';
 import { SET_BADGE, SET_TYPE_ORDER, SetMenu } from './SetMenu';
 import type { SessionActions } from './useMockSession';
 import css from './Session.module.css';
 
-/** `drag`: cells scrub sideways and tap opens the set sheet. `type`: plain inputs. */
-export type CellMode = 'drag' | 'type';
-
 type SetRowProps = {
   actions: SessionActions;
-  cellMode: CellMode;
   /** Working-set number; warm-ups and drops don't count, like Strong and Hevy. */
   number: number;
   onCompleted: (set: MockSet) => void;
@@ -28,15 +23,7 @@ type SetRowProps = {
  * One set as a spreadsheet-like row. Tap the badge to cycle the set type, tap the check to finish
  * it (empty cells adopt last time's values); everything else hides in the long-press menu.
  */
-export function SetRow({
-  actions,
-  cellMode,
-  number,
-  onCompleted,
-  onOpenSheet,
-  set,
-  slot,
-}: SetRowProps) {
+export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }: SetRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const fields = MEASURE_FIELDS[slot.measure];
   const update = (patch: Partial<MockSet>) => actions.updateSet(slot.id, set.id, patch);
@@ -68,29 +55,19 @@ export function SetRow({
         >
           {set.type === 'normal' ? number : SET_BADGE[set.type]}
         </button>
-        {fields.map((field) =>
-          cellMode === 'drag' ? (
-            <ScrubCell
-              aria-label={`${field.label}, drag sideways or tap for details`}
-              disabled={menuOpen}
-              format={(value) => formatMetric(field, value)}
-              key={field.key}
-              onChange={(value) => update({ [field.key]: value })}
-              onTap={onOpenSheet}
-              placeholder={set.previous?.[field.key] ?? null}
-              value={set[field.key]}
-              {...scrubTuning(field)}
-            />
-          ) : (
-            <MetricInput
-              field={field}
-              key={field.key}
-              onChange={(value) => update({ [field.key]: value })}
-              placeholder={set.previous?.[field.key] ?? null}
-              value={set[field.key]}
-            />
-          ),
-        )}
+        {fields.map((field) => (
+          <ScrubCell
+            aria-label={`${field.label}, drag sideways or tap for details`}
+            disabled={menuOpen}
+            format={(value) => formatMetric(field, value)}
+            key={field.key}
+            onChange={(value) => update({ [field.key]: value })}
+            onTap={onOpenSheet}
+            placeholder={set.previous?.[field.key] ?? null}
+            value={set[field.key]}
+            {...scrubTuning(field)}
+          />
+        ))}
         <button
           aria-label={set.done ? 'Mark set not done' : 'Complete set'}
           aria-pressed={set.done}

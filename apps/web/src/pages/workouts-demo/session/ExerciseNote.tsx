@@ -1,34 +1,27 @@
+import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import { historyFor, type MockSlot } from '../mockData';
 import type { SessionActions } from './useMockSession';
 import css from './ExerciseNotes.module.css';
 
 type ExerciseNoteProps = {
   actions: SessionActions;
-  onClose: () => void;
   slot: MockSlot;
 };
 
 /**
- * Note for this exercise in this workout (`workout_exercise.notes`). Last time's note sits in the
- * placeholder, so "seat on 4" is right there without opening history.
+ * Note for this exercise in this workout (`workout_exercise.notes`). Always present under the
+ * title; last time's note sits in the placeholder, so "seat on 4" is right there.
  */
-export function ExerciseNote({ actions, onClose, slot }: ExerciseNoteProps) {
+export function ExerciseNote({ actions, slot }: ExerciseNoteProps) {
   const last = historyFor(slot.name).find((entry) => entry.note);
 
   return (
-    <textarea
+    <SeamlessTextarea
       aria-label={`Note for ${slot.name}`}
-      autoFocus={!slot.note}
       className={css.note}
       defaultValue={slot.note}
-      onBlur={(event) => {
-        const note = event.target.value.trim();
-        actions.updateSlot(slot.id, { note });
-        if (!note) onClose();
-      }}
-      placeholder={
-        last ? `Last time (${last.date}): ${last.note}` : 'Seat height, grip, how it felt…'
-      }
+      onBlur={(event) => actions.updateSlot(slot.id, { note: event.target.value.trim() })}
+      placeholder={last ? `Last time: ${last.note}` : 'Add a note…'}
       rows={1}
     />
   );

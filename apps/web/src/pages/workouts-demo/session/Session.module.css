@@ -62,79 +62,43 @@
   background: var(--c-surface);
 }
 
-.superset {
-  border-inline-start: 4px solid hsl(var(--superset-hue) 80% 70%);
-}
-
 .cardHeader {
   display: grid;
-  grid-template-columns: 2.5rem 2.5rem minmax(0, 1fr);
-  align-items: center;
+  grid-template-columns: auto minmax(0, 1fr) 2.5rem;
+  align-items: start;
   gap: var(--space-xs);
-  min-height: 2.25rem;
-  margin: calc(var(--space-xs) * -0.5);
-  padding: 0 var(--space-xs);
   border-radius: calc(var(--radius-xs) - 4px);
 
   & h3 {
-    grid-column: 1 / -1;
     min-width: 0;
+    padding-block: 0.45rem;
     color: var(--c-text-strong);
     font-size: var(--text-md);
     overflow-wrap: anywhere;
     text-wrap: pretty;
   }
-
-  & .renameInput {
-    grid-column: 1 / -1;
-    width: 100%;
-  }
-
-  & .restChip {
-    justify-self: end;
-  }
 }
 
-.renameInput,
-.noteInput {
-  flex: 1;
+/* Exercise order in the workout. */
+.exerciseNumber {
+  min-width: 1.75rem;
+  padding-block: 0.45rem;
+  color: var(--c-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-md);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.renameInput {
   min-width: 0;
+  min-height: 2.5rem;
   padding: 0.25rem 0.5rem;
   border: var(--border-width) solid var(--c-primary-border);
   border-radius: 8px;
   background: var(--c-surface-input);
   color: inherit;
   font: inherit;
-}
-
-.supersetTag {
-  color: hsl(var(--superset-hue) 80% 75%);
-  font-size: var(--text-xs);
-}
-
-.restChip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  min-height: 2.5rem;
-  padding: 0.2rem 0.55rem;
-  border: var(--border-width) solid var(--c-border-strong);
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--c-muted);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  cursor: pointer;
-
-  & svg {
-    width: 0.85rem;
-    height: 0.85rem;
-  }
-}
-
-.note {
-  color: var(--c-muted);
-  font-size: var(--text-sm);
 }
 
 .sets {
@@ -159,10 +123,6 @@
 
 .setDone {
   background: var(--c-success-surface);
-
-  & .metric {
-    color: var(--c-success-text);
-  }
 }
 
 .badge {
@@ -198,30 +158,6 @@
   font-size: var(--text-xs);
   font-weight: var(--font-weight-semibold);
   text-align: center;
-}
-
-.metric {
-  width: 100%;
-  min-width: 0;
-  height: 2.25rem;
-  padding: 0 0.4rem;
-  border: var(--border-width) solid transparent;
-  border-radius: 8px;
-  background: var(--c-surface-input);
-  color: var(--c-text-strong);
-  font: inherit;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-
-  &::placeholder {
-    color: var(--c-placeholder);
-  }
-
-  &:focus {
-    border-color: var(--c-primary-border);
-    outline: none;
-  }
 }
 
 .check {
@@ -272,17 +208,14 @@
     height: 1rem;
   }
 
-  &[aria-pressed='true'],
   &:hover {
     color: var(--c-text);
     background: var(--c-surface-raised);
   }
 }
 
-.iconChip {
-  position: relative;
+.historyButton {
   display: grid;
-  flex: none;
   place-items: center;
   width: 2.5rem;
   height: 2.5rem;
@@ -298,24 +231,7 @@
     height: 1rem;
   }
 
-  &[aria-pressed='true'] {
-    background: var(--c-primary-surface);
-    color: var(--c-accent);
-  }
-
   &:hover {
     color: var(--c-text);
   }
-}
-
-/* Small dot: last session left a note for this exercise. */
-.hasDot::after {
-  content: '';
-  position: absolute;
-  top: 0.3rem;
-  right: 0.3rem;
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: var(--c-macro-fat);
 }

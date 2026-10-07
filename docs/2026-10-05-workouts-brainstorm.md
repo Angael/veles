@@ -12,7 +12,7 @@ Playground: `/demo/workouts` (mock data, nothing saves). Draft schema:
 1. Export `workouts.schema.ts` from `packages/db/src/schema/index.ts`.
 2. The human runs `pnpm db:generate` and the migration on dev and prod before merging to `main`. Agents never run Drizzle commands.
 3. Move the chosen pieces from `pages/workouts-demo` to `pages/workouts` and add real routes under `routes/_authenticated/workouts`.
-4. Delete the variants that were not picked (rest timer B/C, "Type in cells", one-tap, Hints tab).
+4. Delete the playground when the real feature covers it. The variants that were not picked are already removed (rest timer B/C, "Type in cells", "Type it", one tap, supersets, "Set input" and "Hints" tabs).
 
 **Decided (current behaviour wins over older rounds below).**
 
@@ -20,20 +20,21 @@ Playground: `/demo/workouts` (mock data, nothing saves). Draft schema:
 - Set input: **drag cells** in compact rows. A whole workout fits on the screen. Tap a cell → **top sheet**.
 - Drag: on touch, finger right = smaller value (ruler). With a mouse, drag right = bigger value. Speed picks the step (weight 0.5 → 1 → 2.5 → 5, reps 1 → 2 → 5, time 5 → 15 → 30 → 60 s). Values stop at 0. The ruler has a taller mark every 5th tick. No visible step, speed or ± indicators.
 - Sheet: exercise name + "Set N", "Last time … use", 1–2 drag fields (tap a number to type), **Save**. Edits a draft. No set navigation, no ± buttons, no step setting. Save does not start the rest timer.
-- Rows: set badge (tap cycles Normal/W/D/F) │ 1–2 cells │ tick. No "previous" column: last time's values are the grey ghost text. Ticking an empty set copies the ghost values and starts the rest timer.
+- Rows: set badge (tap cycles Normal/W/D/F) │ 1–2 cells │ tick. No "previous" column: last time's values are the grey ghost text. Ticking an empty set copies the ghost values and starts the rest timer. Ticking a set above an already done set does not start or restart the timer (the user forgot to tick it).
 - Taps act on `click`, not `pointerup`. Long press opens only the context menu, never the sheet.
-- Context menus (long press / right click) hold the rare actions: set type, duplicate, delete, rename, track mode, rest length, superset, reorder.
-- "Add set" copies the last set. "Add several…" takes shorthand (`80x5x3`, `w40x10`, `45s`). It validates the text against the exercise's tracking mode, so `42s` is an error on weight × reps.
+- Context menus (long press / right click) hold the rare actions: set type, duplicate, delete, rename, track mode, rest length, reorder. The rest length is only in the menu (no chip on the card).
+- "Add set" copies the last set. It is the only add button on the card.
 - Exercises: only the user's own names, no global catalog. Fuzzy search (typos, swapped letters, accents, missing spaces). Create from the search text with a guessed tracking mode (grid picker, no empty cells).
-- Notes: one per exercise per workout (`workout_exercise.notes`). Last time's note is the placeholder. The history dialog shows numeric dates (`Thu 02.10`) and a "#2 of 5" position badge.
-- First-use tips: only "drag", "hold for more" and "add several". Smooth demos that show the press. "Tick to finish" and "tap for details" are not needed.
-- Long exercise names wrap on their own row; icons sit below.
+- Notes: one per exercise per workout (`workout_exercise.notes`). Always visible as a `SeamlessTextarea` under the title, no toggle. Last time's note is the placeholder. The history dialog shows numeric dates (`Thu 02.10`) and a "#2 of 5" position badge.
+- First-use tips: only "drag" and "hold for more". Smooth demos that show the press. "Tick to finish" and "tap for details" are not needed.
+- Card header: the exercise order number (1, 2, 3…), then the title, which wraps. The history button stays at the top right.
+- Tips: a compact strip inside the first exercise card, right above the set rows: small demo, title, close. No description text; the demo shows the gesture.
 
-**Rejected (do not bring back).** Per-exercise or visible weight-step selection. ± stepper buttons. Speed bar and `±x` badge. Set navigation in the sheet. "Done, start rest" in the sheet. Negative weights (assisted machines log the assist as a positive number). Set-type letters in history. Tips for obvious actions.
+**Rejected (do not bring back).** Rest timer B (corner ring) and C (inline). "Type in cells". "Type it" input. One tap input. Tip description text. Supersets. Any typed set shorthand ("Add several…", "Type it"): too much typing on a phone keyboard. Rest chip on the card. Note toggle button. Per-exercise or visible weight-step selection. ± stepper buttons. Speed bar and `±x` badge. Set navigation in the sheet. "Done, start rest" in the sheet. Negative weights (assisted machines log the assist as a positive number). Set-type letters in history. Tips for obvious actions.
 
 **User preferences for this feature.** Mobile first, desktop also important. Few buttons; context menus for extras. The first experience must be clear to a non-technical user. Short demos beat text. Keep exploring in the playground before building the real feature.
 
-**Code map** (`apps/web/src/pages/workouts-demo/`). `scrub/` (drag hook and cells), `session/` (cards, rows, sheet, notes, history, `metrics.ts`), `rest/` (timer), `library/` (picker, fuzzy search, measure grid), `hints/` (tips and demos), `setShorthand.ts` (parser, reusable for an MCP write tool), `mockData.ts`. Route: `routes/demo.workouts.tsx`. Shared change: `ContextMenuSubmenuRoot/Trigger` in `components/ui/context-menu`.
+**Code map** (`apps/web/src/pages/workouts-demo/`). `scrub/` (drag hook and cells), `session/` (cards, rows, sheet, notes, history, `metrics.ts`), `rest/` (timer), `library/` (picker, fuzzy search, measure grid), `hints/` (tips and demos), `mockData.ts`. Route: `routes/demo.workouts.tsx`. Shared change: `ContextMenuSubmenuRoot/Trigger` in `components/ui/context-menu`.
 
 **Not verified.** No browser or phone testing by agents. Gesture feel (speed tiers, long press vs drag) needs a real-device check.
 
@@ -142,8 +143,7 @@ exercise          id, user_id, name (unique per user, case-insensitive), measure
                   notes, archived_at
 workout           id, user_id, kind ('routine' | 'session'), name, notes, routine_id → workout,
                   date (sessions only), started_at, ended_at, duration_seconds (manual log)
-workout_exercise  id, workout_id, exercise_id (restrict), position, superset_group,
-                  rest_seconds (override), notes
+workout_exercise  id, workout_id, exercise_id (restrict), position, rest_seconds (override), notes
 workout_set       id, workout_exercise_id, position, type ('normal'|'warmup'|'drop'|'failure'),
                   weight_grams, reps, duration_seconds, distance_meters,
                   rpe_tenths, completed_at
@@ -159,12 +159,12 @@ workout_set       id, workout_exercise_id, position, type ('normal'|'warmup'|'dr
 
 - Read: add `exercises`, `workouts`, `workout_exercises`, `workout_sets` to the `resources` map in `mcp.api.ts`. Child tables scope through `inArray(… select id from workout where user_id = …)` like `list_items`.
 - Units live in column names (`weight_grams`, `duration_seconds`, `distance_meters`, `rpe_tenths`), so the resource descriptions stay one line.
-- Write (later): one `log_workout` tool that takes `{ date, name, exercises: [{ name, sets: "80x5x3, 85x3" }] }`. It reuses the shorthand parser and finds or creates exercises by case-insensitive name. An agent can then log "bench 3x5 at 80" with no extra API.
+- Write (later): one `log_workout` tool that takes `{ date, name, exercises: [{ name, sets: [{ weight_grams, reps }] }] }`. It finds or creates exercises by case-insensitive name. The shorthand parser was removed with "Type it".
 
 ## Open questions
 
 1. ~~Which rest timer variant?~~ A (dock pill).
-2. ~~Which set input is the default?~~ Drag cells + top sheet. Keep "Add several…" (shorthand) as the fast path for many sets?
+2. ~~Which set input is the default?~~ Drag cells + top sheet. No typed shorthand.
 3. Should a tip auto-hide after the user does the action once, for example hide the drag tip after the first drag?
 4. Navbar slot: `Workouts` as a 6th item, or group under an existing item?
 5. kg only, or a per-user lb setting?

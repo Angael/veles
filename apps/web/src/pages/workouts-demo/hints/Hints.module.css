@@ -1,55 +1,36 @@
+/* Compact strip: fixed-size demo, title, close. Sits inside a card right above the rows. */
 .tip {
-  position: relative;
   display: grid;
-  grid-template-columns: 8.5rem minmax(0, 1fr);
+  grid-template-columns: 9rem minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-sm);
   min-width: 0;
-  padding: var(--space-xs);
-  padding-inline-end: 2.5rem;
-  border: var(--border-width) solid var(--c-primary-border-soft);
-  border-radius: var(--radius-xs);
+  padding: 0.25rem;
+  border-radius: 10px;
   background: var(--c-primary-surface);
   animation: tip-in var(--duration-fast) var(--ease-out);
 }
 
-.tipText {
-  display: grid;
-  gap: 0.15rem;
-  min-width: 0;
+.tipTitle {
+  color: var(--c-text-strong);
   font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
   overflow-wrap: anywhere;
-
-  & p {
-    color: var(--c-muted-soft);
-  }
-}
-
-.tipClose {
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
 }
 
 /* Mini demo stage */
-.stage,
-.stageColumn {
+.stage {
   position: relative;
   display: grid;
   place-items: center;
   min-width: 0;
-  height: 5rem;
+  height: 3.75rem;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--c-surface-inset);
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
-}
-
-.stageColumn {
-  align-content: center;
-  gap: 0.35rem;
 }
 
 /* Pointer: positioned by inline `translate` every animation frame, so no transition on it. */
@@ -239,48 +220,6 @@
   scale: 1;
 }
 
-.fakeInput {
-  min-width: 5rem;
-  padding: 0.2rem 0.45rem;
-  border: var(--border-width) solid var(--c-primary-border);
-  border-radius: 8px;
-  background: var(--c-surface-input);
-  font-size: var(--text-xs);
-}
-
-.caret {
-  display: inline-block;
-  width: 1px;
-  height: 0.9em;
-  margin-inline-start: 1px;
-  background: var(--c-text);
-  vertical-align: middle;
-  animation: blink 1s steps(1) infinite;
-}
-
-.fakeChips {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0.2rem;
-  min-height: 1.1rem;
-}
-
-.fakeChip {
-  padding: 0 0.3rem;
-  border-radius: var(--radius-pill);
-  background: var(--c-primary-surface-strong);
-  font-size: 0.6rem;
-  line-height: 1.1rem;
-  white-space: nowrap;
-  animation: tip-in 200ms var(--ease-out);
-}
-
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
-}
-
 @keyframes tip-in {
   from {
     opacity: 0;
@@ -289,27 +228,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tip,
-  .fakeChip,
-  .caret {
+  .tip {
     animation: none;
   }
-}
-
-.gallery {
-  display: grid;
-  justify-items: start;
-  gap: var(--space-md);
-}
-
-.galleryIntro {
-  color: var(--c-muted);
-  font-size: var(--text-sm);
-}
-
-.galleryGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
-  gap: var(--space-sm);
-  width: 100%;
 }
