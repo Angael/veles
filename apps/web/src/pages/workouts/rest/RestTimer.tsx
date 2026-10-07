@@ -3,7 +3,7 @@ import { XIcon } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import dock from '@/components/ui/mobile-dock/MobileDock.module.css';
-import { formatDuration } from '../mockData';
+import { formatDuration } from '../metrics';
 import type { RestTimer } from './useRestTimer';
 import css from './RestTimer.module.css';
 

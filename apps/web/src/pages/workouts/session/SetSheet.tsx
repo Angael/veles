@@ -2,8 +2,6 @@ import { Dialog } from '@base-ui/react/dialog';
 import { HistoryIcon, XIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
-import type { MockSet, MockSlot } from '../mockData';
-import { ScrubField } from '../../workouts/scrub/ScrubField';
 import {
   describeSet,
   formatMetric,
@@ -11,7 +9,9 @@ import {
   parseMetric,
   scrubTuning,
   type MetricKey,
-} from '../../workouts/metrics';
+} from '../metrics';
+import { ScrubField } from '../scrub/ScrubField';
+import type { WorkoutSetData, WorkoutSlotData } from '../workouts.server';
 import css from './SetSheet.module.css';
 
 type Draft = Partial<Record<MetricKey, number | null>>;
@@ -20,7 +20,7 @@ type SetSheetProps = {
   onClose: () => void;
   onSave: (patch: Draft) => void;
   /** The set being edited; null closes the sheet. */
-  target: { slot: MockSlot; set: MockSet; number: number } | null;
+  target: { slot: WorkoutSlotData; set: WorkoutSetData; number: number } | null;
 };
 
 /**

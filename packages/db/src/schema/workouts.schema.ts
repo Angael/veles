@@ -1,5 +1,3 @@
-// DRAFT for the workouts playground (#177). Not exported from `index.ts` yet, so drizzle-kit
-// ignores it. Export it and generate a migration only after the shape is picked.
 import { sql } from 'drizzle-orm';
 import {
   check,

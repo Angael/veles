@@ -4,6 +4,7 @@ export type NavbarTarget =
   | { to: '/diary' }
   | { to: '/recipes' }
   | { to: '/weight' }
+  | { to: '/workouts' }
   | { params: { id: string }; to: '/recipes/view/$id' }
   | { params: { date: string }; to: '/weight/$date' };
 

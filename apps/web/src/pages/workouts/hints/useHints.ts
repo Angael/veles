@@ -35,7 +35,7 @@ export function phase(progress: number, from: number, to: number) {
   return linear < 0.5 ? 2 * linear * linear : 1 - (-2 * linear + 2) ** 2 / 2;
 }
 
-const STORAGE_KEY = 'veles.workouts-demo.seen-hints';
+const STORAGE_KEY = 'veles.workouts.seen-hints';
 
 /** Which first-use tips were dismissed; kept in localStorage so each shows once per device. */
 export function useSeenHints() {

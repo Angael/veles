@@ -6,27 +6,19 @@ import {
   ContextMenuSubmenuRoot,
   ContextMenuSubmenuTrigger,
 } from '@/components/ui/context-menu/ContextMenu';
-import { SET_TYPE_LABELS, type SetType } from '../../workouts/metrics';
-import type { MockSet, MockSlot } from '../mockData';
-import type { SessionActions } from './useMockSession';
+import { SET_BADGE, SET_TYPE_LABELS, SET_TYPES } from '../metrics';
+import type { WorkoutSetData } from '../workouts.server';
+import type { SessionActions, SetPatch } from './session.query';
 import css from './Session.module.css';
-
-export const SET_TYPE_ORDER: SetType[] = ['normal', 'warmup', 'drop', 'failure'];
-export const SET_BADGE: Record<Exclude<SetType, 'normal'>, string> = {
-  drop: 'D',
-  failure: 'F',
-  warmup: 'W',
-};
 
 type SetMenuProps = {
   actions: SessionActions;
-  set: MockSet;
-  slot: MockSlot;
-  update: (patch: Partial<MockSet>) => void;
+  set: WorkoutSetData;
+  update: (patch: SetPatch) => void;
 };
 
 /** Long-press menu of a set row: type, duplicate, copy last time, delete. */
-export function SetMenu({ actions, set, slot, update }: SetMenuProps) {
+export function SetMenu({ actions, set, update }: SetMenuProps) {
   return (
     <ContextMenuPopup aria-label='Set actions'>
       <ContextMenuSubmenuRoot>
@@ -35,7 +27,7 @@ export function SetMenu({ actions, set, slot, update }: SetMenuProps) {
           label={`Type: ${SET_TYPE_LABELS[set.type]}`}
         />
         <ContextMenuPopup aria-label='Set type'>
-          {SET_TYPE_ORDER.map((type) => (
+          {SET_TYPES.map((type) => (
             <ContextMenuItem
               icon={
                 type === set.type ? (
@@ -54,7 +46,7 @@ export function SetMenu({ actions, set, slot, update }: SetMenuProps) {
       <ContextMenuItem
         icon={<CopyIcon aria-hidden='true' />}
         label='Duplicate set'
-        onClick={() => actions.duplicateSet(slot.id, set.id)}
+        onClick={() => actions.duplicateSet(set.id)}
       />
       <ContextMenuItem
         disabled={!set.previous}
@@ -66,7 +58,7 @@ export function SetMenu({ actions, set, slot, update }: SetMenuProps) {
       <ContextMenuItem
         icon={<Trash2Icon aria-hidden='true' />}
         label='Delete set'
-        onClick={() => actions.removeSet(slot.id, set.id)}
+        onClick={() => actions.removeSet(set.id)}
         variant='danger'
       />
     </ContextMenuPopup>

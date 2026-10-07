@@ -1,12 +1,12 @@
 import { PlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
-import { FeatureTip, HINTS } from '../hints/FeatureTip';
-import { useSeenHints } from '../hints/useHints';
+import { FeatureTip, HINTS } from '../../workouts/hints/FeatureTip';
+import { useSeenHints } from '../../workouts/hints/useHints';
 import { ExercisePickerDialog } from '../library/ExercisePicker';
 import type { MockSet, MockSlot } from '../mockData';
-import { RestDock } from '../rest/RestTimer';
-import { useRestTimer } from '../rest/useRestTimer';
+import { RestDock } from '../../workouts/rest/RestTimer';
+import { useRestTimer } from '../../workouts/rest/useRestTimer';
 import { ExerciseCard } from './ExerciseCard';
 import { SessionHeader } from './SessionHeader';
 import { SetSheet } from './SetSheet';

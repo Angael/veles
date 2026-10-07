@@ -1,18 +1,26 @@
 # Workouts brainstorm (#177)
 
-Playground: `/demo/workouts` (mock data, nothing saves). Draft schema:
-`packages/db/src/schema/workouts.schema.ts` (not exported, so drizzle-kit ignores it).
+Real feature: `/workouts` (list) and `/workouts/$id` (live session). Playground: `/demo/workouts`
+(mock data, nothing saves). Schema: `packages/db/src/schema/workouts.schema.ts`.
 
 ## Read first: status and decisions
 
-**Status.** Draft PR #225 (branch `feat/workouts-playground`). Do not merge: it is a mock playground. No server code, no saved data. The MCP plan is posted as a comment on PR #213.
+**Status.** Draft PR #225 (branch `feat/workouts-playground`). The branch now has the real live session: server functions, queries and routes. The playground stays until the real feature covers it, then it is deleted. The MCP plan is posted as a comment on PR #213.
 
-**Before real implementation.**
+**Before merging.**
 
-1. Export `workouts.schema.ts` from `packages/db/src/schema/index.ts`.
-2. The human runs `pnpm db:generate` and the migration on dev and prod before merging to `main`. Agents never run Drizzle commands.
-3. Move the chosen pieces from `pages/workouts-demo` to `pages/workouts` and add real routes under `routes/_authenticated/workouts`.
-4. Delete the playground when the real feature covers it. The variants that were not picked are already removed (rest timer B/C, "Type in cells", "Type it", one tap, supersets, "Set input" and "Hints" tabs).
+1. The human runs `pnpm db:generate` and the migration on dev and prod before merging to `main`. Agents never run Drizzle commands. The schema is now exported from `packages/db/src/schema/index.ts`.
+2. Delete `pages/workouts-demo` and `routes/demo.workouts.tsx` when the PoC is no longer needed.
+
+**Real feature, first slice.**
+
+- `/workouts`: logged sessions, newest first. "In progress" marks unfinished ones. Long press / right click → Delete. Floating "Start workout" creates a session for today, named after the weekday.
+- `/workouts/$id` (`layout: 'task'`): the live session. Every edit is saved at once. Ticks, set types and structure changes are sent right away; dragged values are sent 600 ms after the drag pauses, and on tab hide or leave. The cache is patched first, and the session refetches when the last request settles.
+- Finish sets `ended_at` and goes back to the list (`replace`). A finished workout shows "Reopen".
+- Rename, tracking mode and rest length are saved on the exercise, so they carry to the next workout. Notes are per workout (`workout_exercise.notes`).
+- "Previous" values and the note placeholder come from the latest earlier session of the same exercise, ordered by `(date, id)` (UUIDv7, so same-day sessions keep creation order). A new exercise in a session starts with as many empty sets as last time.
+- Code: `pages/workouts/` → `workouts.api.ts` / `workouts.query.ts` (list, start, rename, finish, delete), `workouts.server.ts` (ownership checks, unit conversion, session loader), `session/` (live session UI, `session.api.ts`, `session.query.ts`), `exercises/` (picker, fuzzy search, `exercises.api.ts`: list, edit, history), `scrub/`, `rest/`, `hints/`, `metrics.ts`. The playground imports these shared pieces.
+- Not built yet: routines, quick log without sets, the workouts home ideas, MCP tools.
 
 **Decided (current behaviour wins over older rounds below).**
 

@@ -14,28 +14,26 @@ import {
   ContextMenuSubmenuRoot,
   ContextMenuSubmenuTrigger,
 } from '@/components/ui/context-menu/ContextMenu';
-import {
-  formatDuration,
-  MEASURE_FIELDS,
-  MEASURE_LABELS,
-  type Measure,
-} from '../../workouts/metrics';
-import type { MockSlot } from '../mockData';
-import type { SessionActions } from './useMockSession';
+import { formatDuration, MEASURE_LABELS, MEASURES } from '../metrics';
+import type { WorkoutSlotData } from '../workouts.server';
+import type { SessionActions } from './session.query';
 
-export const REST_PRESETS = [null, 45, 60, 90, 120, 180] as const;
+const REST_PRESETS = [null, 45, 60, 90, 120, 180] as const;
 
 type ExerciseMenuProps = {
   actions: SessionActions;
+  isFirst: boolean;
+  isLast: boolean;
   onRename: () => void;
-  slot: MockSlot;
+  slot: WorkoutSlotData;
 };
 
 /**
  * Everything you rarely need mid-set lives here instead of as buttons on the card: rename,
- * tracking mode, rest length, ordering, removal.
+ * tracking mode, rest length, ordering, removal. Name, tracking and rest belong to the exercise,
+ * so they carry over to the next workout.
  */
-export function ExerciseMenu({ actions, onRename, slot }: ExerciseMenuProps) {
+export function ExerciseMenu({ actions, isFirst, isLast, onRename, slot }: ExerciseMenuProps) {
   return (
     <ContextMenuPopup aria-label={`${slot.name} actions`}>
       <ContextMenuItem icon={<PencilIcon aria-hidden='true' />} label='Rename' onClick={onRename} />
@@ -45,12 +43,12 @@ export function ExerciseMenu({ actions, onRename, slot }: ExerciseMenuProps) {
           label={`Track: ${MEASURE_LABELS[slot.measure]}`}
         />
         <ContextMenuPopup aria-label='What to track'>
-          {(Object.keys(MEASURE_FIELDS) as Measure[]).map((measure) => (
+          {MEASURES.map((measure) => (
             <ContextMenuItem
               icon={measure === slot.measure ? <CheckIcon aria-hidden='true' /> : <span />}
               key={measure}
               label={MEASURE_LABELS[measure]}
-              onClick={() => actions.updateSlot(slot.id, { measure })}
+              onClick={() => actions.updateExercise(slot.exerciseId, { measure })}
             />
           ))}
         </ContextMenuPopup>
@@ -63,20 +61,22 @@ export function ExerciseMenu({ actions, onRename, slot }: ExerciseMenuProps) {
               icon={seconds === slot.restSeconds ? <CheckIcon aria-hidden='true' /> : <span />}
               key={seconds ?? 'off'}
               label={seconds === null ? 'Off' : formatDuration(seconds)}
-              onClick={() => actions.updateSlot(slot.id, { restSeconds: seconds })}
+              onClick={() => actions.updateExercise(slot.exerciseId, { restSeconds: seconds })}
             />
           ))}
         </ContextMenuPopup>
       </ContextMenuSubmenuRoot>
       <ContextMenuItem
+        disabled={isFirst}
         icon={<ArrowUpIcon aria-hidden='true' />}
         label='Move up'
-        onClick={() => actions.moveSlot(slot.id, -1)}
+        onClick={() => actions.moveSlot(slot.id, 'up')}
       />
       <ContextMenuItem
+        disabled={isLast}
         icon={<ArrowDownIcon aria-hidden='true' />}
         label='Move down'
-        onClick={() => actions.moveSlot(slot.id, 1)}
+        onClick={() => actions.moveSlot(slot.id, 'down')}
       />
       <ContextMenuSeparator />
       <ContextMenuItem

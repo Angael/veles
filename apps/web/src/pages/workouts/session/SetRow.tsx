@@ -7,22 +7,24 @@ import {
   formatMetric,
   MEASURE_FIELDS,
   scrubTuning,
+  SET_BADGE,
   SET_TYPE_LABELS,
-} from '../../workouts/metrics';
-import { ScrubCell } from '../../workouts/scrub/ScrubCell';
-import type { MockSet, MockSlot } from '../mockData';
-import { SET_BADGE, SET_TYPE_ORDER, SetMenu } from './SetMenu';
-import type { SessionActions } from './useMockSession';
+  SET_TYPES,
+} from '../metrics';
+import { ScrubCell } from '../scrub/ScrubCell';
+import type { WorkoutSetData, WorkoutSlotData } from '../workouts.server';
+import type { SessionActions, SetPatch } from './session.query';
+import { SetMenu } from './SetMenu';
 import css from './Session.module.css';
 
 type SetRowProps = {
   actions: SessionActions;
   /** Working-set number; warm-ups and drops don't count, like Strong and Hevy. */
   number: number;
-  onCompleted: (set: MockSet) => void;
+  onCompleted: (set: WorkoutSetData) => void;
   onOpenSheet: () => void;
-  set: MockSet;
-  slot: MockSlot;
+  set: WorkoutSetData;
+  slot: WorkoutSlotData;
 };
 
 /**
@@ -32,7 +34,7 @@ type SetRowProps = {
 export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }: SetRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const fields = MEASURE_FIELDS[slot.measure];
-  const update = (patch: Partial<MockSet>) => actions.updateSet(slot.id, set.id, patch);
+  const update = (patch: SetPatch) => actions.updateSet(set.id, patch);
 
   function toggleDone() {
     if (set.done) return update({ done: false });
@@ -42,7 +44,7 @@ export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }:
   }
 
   function cycleType() {
-    const next = SET_TYPE_ORDER[(SET_TYPE_ORDER.indexOf(set.type) + 1) % SET_TYPE_ORDER.length];
+    const next = SET_TYPES[(SET_TYPES.indexOf(set.type) + 1) % SET_TYPES.length];
     update({ type: next ?? 'normal' });
   }
 
@@ -84,7 +86,7 @@ export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }:
           <CheckIcon aria-hidden='true' />
         </button>
       </ContextMenuTrigger>
-      <SetMenu actions={actions} set={set} slot={slot} update={update} />
+      <SetMenu actions={actions} set={set} update={update} />
     </ContextMenuRoot>
   );
 }

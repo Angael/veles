@@ -19,7 +19,8 @@ import {
 } from '@/components/ui/context-menu/ContextMenu';
 import { List, ListItem } from '@/components/ui/list/List';
 import { toastManager } from '@/components/ui/toast/toastManager';
-import { MEASURE_LABELS, MOCK_EXERCISES, type Measure, type MockExercise } from '../mockData';
+import { MEASURE_LABELS, type Measure } from '../../workouts/metrics';
+import { MOCK_EXERCISES, type MockExercise } from '../mockData';
 import { ExercisePicker } from './ExercisePicker';
 import css from './Library.module.css';
 

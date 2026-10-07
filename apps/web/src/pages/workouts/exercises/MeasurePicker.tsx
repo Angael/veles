@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { DumbbellIcon, RepeatIcon, RouteIcon, TimerIcon, WeightIcon } from 'lucide-react';
 import type { ComponentType } from 'react';
-import { MEASURE_LABELS, type Measure } from '../mockData';
+import { MEASURE_LABELS, type Measure } from '../metrics';
 import css from './MeasurePicker.module.css';
 
 /** Most common first; the grid gives the first three the top row. */

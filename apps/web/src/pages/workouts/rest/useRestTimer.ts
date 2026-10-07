@@ -13,7 +13,7 @@ export type RestTimer = {
 
 type TimerState = { endsAt: number; total: number; label: string } | null;
 
-const STORAGE_KEY = 'veles.workouts-demo.rest';
+const STORAGE_KEY = 'veles.workouts.rest';
 
 function readStored(): TimerState {
   try {

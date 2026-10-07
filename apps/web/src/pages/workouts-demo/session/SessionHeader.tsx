@@ -4,7 +4,8 @@ import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
 import { toastManager } from '@/components/ui/toast/toastManager';
-import { formatDuration, type MockSlot } from '../mockData';
+import { formatDuration } from '../../workouts/metrics';
+import type { MockSlot } from '../mockData';
 import css from './Session.module.css';
 
 const startedAt = Date.now() - 23 * 60 * 1000;

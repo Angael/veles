@@ -1,6 +1,49 @@
-import { formatDuration, type Measure, type MockSet } from '../mockData';
+import type { exerciseMeasures, workoutSetTypes } from '@veles/db/schema';
+
+export type Measure = (typeof exerciseMeasures)[number];
+export type SetType = (typeof workoutSetTypes)[number];
 
 export type MetricKey = 'weightKg' | 'reps' | 'durationSeconds' | 'distanceKm';
+/** Set values in display units: kg, reps, seconds, km. */
+export type SetMetrics = Record<MetricKey, number | null>;
+
+export const MEASURES: Measure[] = [
+  'weight_reps',
+  'reps',
+  'duration',
+  'weight_duration',
+  'distance_duration',
+];
+
+export const MEASURE_LABELS: Record<Measure, string> = {
+  distance_duration: 'Distance + time',
+  duration: 'Time',
+  reps: 'Reps',
+  weight_duration: 'Weight + time',
+  weight_reps: 'Weight × reps',
+};
+
+export const SET_TYPES: SetType[] = ['normal', 'warmup', 'drop', 'failure'];
+
+export const SET_TYPE_LABELS: Record<SetType, string> = {
+  drop: 'Drop set',
+  failure: 'To failure',
+  normal: 'Normal',
+  warmup: 'Warm-up',
+};
+
+export const SET_BADGE: Record<Exclude<SetType, 'normal'>, string> = {
+  drop: 'D',
+  failure: 'F',
+  warmup: 'W',
+};
+
+export const EMPTY_METRICS: SetMetrics = {
+  distanceKm: null,
+  durationSeconds: null,
+  reps: null,
+  weightKg: null,
+};
 
 export type MetricField = {
   key: MetricKey;
@@ -21,6 +64,12 @@ export const MEASURE_FIELDS: Record<Measure, MetricField[]> = {
   weight_duration: [weight, time],
   weight_reps: [weight, reps],
 };
+
+export function formatDuration(totalSeconds: number) {
+  const sign = totalSeconds < 0 ? '-' : '';
+  const seconds = Math.abs(Math.round(totalSeconds));
+  return `${sign}${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+}
 
 /** Drag speed (px/ms) where each bigger step kicks in. */
 const tiers = (...steps: number[]) =>
@@ -58,12 +107,15 @@ export function parseMetric(field: MetricField, text: string): number | null {
     if (minutes) return Math.round(Number(minutes[1]) * 60);
   }
   const value = Number(trimmed.replace(/s$/, ''));
-  return Number.isFinite(value) ? value : null;
+  return Number.isFinite(value) && value >= 0 ? value : null;
 }
 
 /** Completing a set with empty cells adopts last time's values (Strong's behaviour). */
-export function completedPatch(set: MockSet, measure: Measure): Partial<MockSet> {
-  const patch: Partial<MockSet> = { done: true };
+export function filledFromPrevious(
+  set: SetMetrics & { previous: SetMetrics | null },
+  measure: Measure,
+): Partial<SetMetrics> {
+  const patch: Partial<SetMetrics> = {};
   for (const field of MEASURE_FIELDS[measure]) {
     if (set[field.key] === null) patch[field.key] = set.previous?.[field.key] ?? null;
   }
@@ -71,7 +123,7 @@ export function completedPatch(set: MockSet, measure: Measure): Partial<MockSet>
 }
 
 /** Short label for a logged set, such as `80 × 5` or `5.2 km · 28:10`. */
-export function describeSet(set: Pick<MockSet, MetricKey>) {
+export function describeSet(set: SetMetrics) {
   const parts: string[] = [];
   if (set.weightKg !== null && set.reps !== null) parts.push(`${set.weightKg} × ${set.reps}`);
   else if (set.reps !== null) parts.push(`× ${set.reps}`);
@@ -79,4 +131,10 @@ export function describeSet(set: Pick<MockSet, MetricKey>) {
   if (set.distanceKm !== null) parts.push(`${set.distanceKm} km`);
   if (set.durationSeconds !== null) parts.push(formatDuration(set.durationSeconds));
   return parts.join(' · ') || '—';
+}
+
+/** Working-set number per row; warm-ups and drops don't count, like Strong and Hevy. */
+export function workingSetNumbers(sets: { type: SetType }[]) {
+  let count = 0;
+  return sets.map((set) => (set.type === 'normal' ? ++count : count));
 }

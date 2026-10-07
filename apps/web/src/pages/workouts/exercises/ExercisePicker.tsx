@@ -1,18 +1,24 @@
+import { useQuery } from '@tanstack/react-query';
+import { format, parseISO } from 'date-fns';
 import { PlusIcon, SearchIcon } from 'lucide-react';
 import { useState } from 'react';
 import { DialogPopup, DialogRoot, DialogTitle } from '@/components/ui/dialog/Dialog';
 import { TextInput } from '@/components/ui/text-input/TextInput';
-import { fuzzySearch, normalize } from '../../workouts/exercises/fuzzySearch';
-import { MeasurePicker } from '../../workouts/exercises/MeasurePicker';
-import type { Measure } from '../../workouts/metrics';
-import { MOCK_EXERCISES, type MockExercise } from '../mockData';
-import css from './Library.module.css';
+import { MEASURE_LABELS, type Measure } from '../metrics';
+import { exercisesQueryOptions } from './exercises.query';
+import { fuzzySearch, normalize } from './fuzzySearch';
+import { MeasurePicker } from './MeasurePicker';
+import css from './ExercisePicker.module.css';
+
+export type ExercisePick =
+  | { exerciseId: string }
+  | { newExercise: { name: string; measure: Measure } };
 
 /**
  * Guesses what to track from a user's own name, so creating "Morning plank" needs zero extra taps.
- * The guess is only a default chip; the user can flip it before adding.
+ * The guess is only a default; the user can flip it before adding.
  */
-export function guessMeasure(name: string): Measure {
+function guessMeasure(name: string): Measure {
   const lower = name.toLowerCase();
   if (/run|bike|cycl|row(ing|er)|swim|walk(?!.*farmer)|km/.test(lower)) return 'distance_duration';
   if (/farmer|carry|weighted (hang|hold|plank)/.test(lower)) return 'weight_duration';
@@ -22,15 +28,12 @@ export function guessMeasure(name: string): Measure {
   return 'weight_reps';
 }
 
-type ExercisePickerProps = {
-  onPick: (exercise: Pick<MockExercise, 'measure' | 'name'>) => void;
-};
-
 /**
  * Search over the user's own exercises only. When nothing matches, the query itself becomes the
  * new exercise name; there is no global catalog to fight with.
  */
-export function ExercisePicker({ onPick }: ExercisePickerProps) {
+function ExercisePicker({ onPick }: { onPick: (pick: ExercisePick) => void }) {
+  const exercises = useQuery(exercisesQueryOptions());
   const [query, setQuery] = useState('');
   const trimmed = query.trim();
   const [measureOverride, setMeasureOverride] = useState<Measure | null>(null);
@@ -38,7 +41,7 @@ export function ExercisePicker({ onPick }: ExercisePickerProps) {
 
   const matches = fuzzySearch(
     trimmed,
-    MOCK_EXERCISES,
+    exercises.data ?? [],
     (exercise) => exercise.name,
     (exercise) => exercise.uses,
   );
@@ -48,7 +51,7 @@ export function ExercisePicker({ onPick }: ExercisePickerProps) {
       <div className={css.create}>
         <button
           className={css.createButton}
-          onClick={() => onPick({ measure, name: trimmed })}
+          onClick={() => onPick({ newExercise: { measure, name: trimmed } })}
           type='button'
         >
           <PlusIcon aria-hidden='true' />
@@ -75,14 +78,22 @@ export function ExercisePicker({ onPick }: ExercisePickerProps) {
       />
 
       {matches.length === 0 ? create : null}
+      {exercises.isSuccess && exercises.data.length === 0 && !trimmed ? (
+        <p className={css.hint}>Type a name to create your first exercise.</p>
+      ) : null}
 
       <ul className={css.results}>
         {matches.map((exercise) => (
           <li key={exercise.id}>
-            <button className={css.result} onClick={() => onPick(exercise)} type='button'>
+            <button
+              className={css.result}
+              onClick={() => onPick({ exerciseId: exercise.id })}
+              type='button'
+            >
               <span className={css.resultName}>{exercise.name}</span>
               <span className={css.resultMeta}>
-                {exercise.lastBest} · {exercise.lastDone}
+                {MEASURE_LABELS[exercise.measure]}
+                {exercise.lastDate ? ` · ${format(parseISO(exercise.lastDate), 'EEE dd.MM')}` : ''}
               </span>
             </button>
           </li>
@@ -94,7 +105,8 @@ export function ExercisePicker({ onPick }: ExercisePickerProps) {
   );
 }
 
-type ExercisePickerDialogProps = ExercisePickerProps & {
+type ExercisePickerDialogProps = {
+  onPick: (pick: ExercisePick) => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
@@ -104,7 +116,7 @@ export function ExercisePickerDialog({ onOpenChange, onPick, open }: ExercisePic
     <DialogRoot onOpenChange={onOpenChange} open={open}>
       <DialogPopup className={css.pickerDialog}>
         <DialogTitle>Add exercise</DialogTitle>
-        <ExercisePicker onPick={onPick} />
+        {open ? <ExercisePicker onPick={onPick} /> : null}
       </DialogPopup>
     </DialogRoot>
   );

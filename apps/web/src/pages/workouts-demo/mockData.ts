@@ -1,7 +1,5 @@
 // Mock data for the workouts playground. Shapes mirror the draft `workouts.schema.ts`.
-
-export type Measure = 'weight_reps' | 'reps' | 'duration' | 'weight_duration' | 'distance_duration';
-export type SetType = 'normal' | 'warmup' | 'drop' | 'failure';
+import type { Measure, SetType } from '../workouts/metrics';
 
 export type MockSet = {
   id: string;
@@ -31,21 +29,6 @@ export type MockExercise = {
   lastDone: string;
   lastBest: string;
   uses: number;
-};
-
-export const MEASURE_LABELS: Record<Measure, string> = {
-  distance_duration: 'Distance + time',
-  duration: 'Time',
-  reps: 'Reps',
-  weight_duration: 'Weight + time',
-  weight_reps: 'Weight × reps',
-};
-
-export const SET_TYPE_LABELS: Record<SetType, string> = {
-  drop: 'Drop set',
-  failure: 'To failure',
-  normal: 'Normal',
-  warmup: 'Warm-up',
 };
 
 let idCounter = 0;
@@ -235,12 +218,6 @@ export const MOCK_HISTORY: MockHistoryEntry[] = [
     volumeKg: 6110,
   },
 ];
-
-export function formatDuration(totalSeconds: number) {
-  const sign = totalSeconds < 0 ? '-' : '';
-  const seconds = Math.abs(Math.round(totalSeconds));
-  return `${sign}${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-}
 
 /** One past appearance of an exercise, for the history sheet and the note placeholder. */
 export type ExerciseHistoryEntry = {
