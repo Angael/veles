@@ -16,13 +16,11 @@ type SessionHeaderProps = {
   session: WorkoutSessionData;
 };
 
-/** Workout name, live totals, a "?" to replay the tips, and Finish (Reopen once finished). */
+/** Workout name, elapsed time, a "?" to replay the tips, and Finish (Reopen once finished). */
 export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderProps) {
   const navigate = useNavigate();
   const updateWorkout = useUpdateWorkoutMutation();
   const elapsed = useElapsed(session.startedAt, session.endedAt);
-  const doneSets = session.slots.flatMap((slot) => slot.sets.filter((set) => set.done));
-  const volume = doneSets.reduce((sum, set) => sum + (set.weightKg ?? 0) * (set.reps ?? 0), 0);
   const finished = session.endedAt !== null;
 
   return (
@@ -41,14 +39,6 @@ export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderP
         <div>
           <dt>Time</dt>
           <dd>{elapsed === null ? '—' : formatDuration(elapsed)}</dd>
-        </div>
-        <div>
-          <dt>Sets</dt>
-          <dd>{doneSets.length}</dd>
-        </div>
-        <div>
-          <dt>Volume</dt>
-          <dd>{Math.round(volume).toLocaleString()} kg</dd>
         </div>
       </dl>
       <Btn

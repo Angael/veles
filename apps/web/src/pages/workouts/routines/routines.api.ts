@@ -2,8 +2,9 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
-import { exercises, workoutExercises, workouts } from '@veles/db/schema';
+import { exercises, workoutExercises, workouts, workoutSets } from '@veles/db/schema';
 import { dateOnlyType } from '@/lib/dateOnly';
+import type { Measure, SetType } from '../metrics';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
@@ -21,6 +22,14 @@ export type RoutineSummary = {
   description: string;
   exerciseNames: string[];
   lastUsed: string | null;
+};
+
+export type RoutineDetail = {
+  id: string;
+  name: string;
+  description: string;
+  lastUsed: string | null;
+  exercises: { id: string; name: string; measure: Measure; setTypes: SetType[] }[];
 };
 
 const name = '0 < string <= 200';
@@ -70,6 +79,63 @@ export const getRoutines = createServerFn({ method: 'GET' })
       ...routine,
       exerciseNames: slots.filter((slot) => slot.workoutId === routine.id).map((slot) => slot.name),
     }));
+  });
+
+const routineIdInputType = type({ id: 'string.uuid' });
+
+/** One routine for its page: exercises in order with their set types, and when it was last done. */
+export const getRoutine = createServerFn({ method: 'GET' })
+  .middleware([logMiddleware('getRoutine')])
+  .validator(arkTypeValidator(routineIdInputType))
+  .handler(async ({ data }): Promise<RoutineDetail> => {
+    const session = await requireSession();
+    const userId = session.user.id;
+    const [routine] = await db
+      .select({ description: workouts.notes, id: workouts.id, name: workouts.name })
+      .from(workouts)
+      .where(
+        and(eq(workouts.id, data.id), eq(workouts.userId, userId), eq(workouts.kind, 'routine')),
+      );
+    if (!routine) throw new ClientSafeError('Routine not found.');
+
+    const [slots, [lastUsed]] = await Promise.all([
+      db
+        .select({
+          id: workoutExercises.id,
+          measure: exercises.measure,
+          name: exercises.name,
+        })
+        .from(workoutExercises)
+        .innerJoin(exercises, eq(exercises.id, workoutExercises.exerciseId))
+        .where(eq(workoutExercises.workoutId, routine.id))
+        .orderBy(asc(workoutExercises.position)),
+      db
+        .select({ date: sql<string | null>`max(${workouts.date})::text` })
+        .from(workouts)
+        .where(and(eq(workouts.userId, userId), eq(workouts.routineId, routine.id))),
+    ]);
+    const sets =
+      slots.length > 0
+        ? await db
+            .select({ slotId: workoutSets.workoutExerciseId, type: workoutSets.type })
+            .from(workoutSets)
+            .where(
+              inArray(
+                workoutSets.workoutExerciseId,
+                slots.map((slot) => slot.id),
+              ),
+            )
+            .orderBy(asc(workoutSets.position))
+        : [];
+
+    return {
+      ...routine,
+      exercises: slots.map((slot) => ({
+        ...slot,
+        setTypes: sets.filter((set) => set.slotId === slot.id).map((set) => set.type),
+      })),
+      lastUsed: lastUsed?.date ?? null,
+    };
   });
 
 const saveRoutineInputType = type({ workoutId: 'string.uuid', name, 'description?': description });

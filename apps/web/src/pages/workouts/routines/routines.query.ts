@@ -2,6 +2,7 @@ import { queryOptions, useMutation } from '@tanstack/react-query';
 import { workoutKeys } from '../workouts.query';
 import {
   deleteRoutine,
+  getRoutine,
   getRoutines,
   saveRoutineFromWorkout,
   startRoutine,
@@ -13,6 +14,13 @@ export const routinesKey = ['workouts', 'routines'] as const;
 
 export function routinesQueryOptions() {
   return queryOptions({ queryFn: () => getRoutines(), queryKey: routinesKey });
+}
+
+export function routineQueryOptions(id: string) {
+  return queryOptions({
+    queryFn: () => getRoutine({ data: { id } }),
+    queryKey: [...routinesKey, id],
+  });
 }
 
 export function useStartRoutineMutation() {

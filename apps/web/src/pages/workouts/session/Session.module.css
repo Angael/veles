@@ -4,8 +4,11 @@
   gap: var(--space-md);
   justify-items: stretch;
 
-  & > button {
-    justify-self: start;
+  /* Full-width dashed bar under the cards: reads as "the next card goes here". */
+  & > .addExercise {
+    justify-self: stretch;
+    min-height: 3rem;
+    border-style: dashed;
   }
 }
 

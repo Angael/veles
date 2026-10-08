@@ -84,6 +84,7 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
       )}
 
       <Btn
+        className={css.addExercise}
         icon={<PlusIcon aria-hidden='true' />}
         onClick={() => setPickerOpen(true)}
         radius='pill'

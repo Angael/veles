@@ -4,7 +4,7 @@ import { ArrowRightIcon } from 'lucide-react';
 import { RoutineList } from '../routines/RoutineList';
 import { WorkoutList } from '../WorkoutList';
 import { workoutsQueryOptions } from '../workouts.query';
-import { StartWorkoutMenu } from './StartWorkoutMenu';
+import { StartWorkoutButton } from './StartWorkoutButton';
 import { WorkoutCalendar } from './WorkoutCalendar';
 import { WorkoutStats } from './WorkoutStats';
 import css from './WorkoutsDashboardPage.module.css';
@@ -13,7 +13,7 @@ const RECENT = 10;
 
 /**
  * Workouts home: one list with the open workout (highlighted) on top and recent ones below; the
- * calendar, stats and routines on the side. Starting lives in the floating menu.
+ * calendar, stats and routines on the side. Starting an empty workout lives in the floating button.
  */
 export function WorkoutsDashboardPage() {
   const { data: workouts } = useSuspenseQuery(workoutsQueryOptions());
@@ -44,7 +44,7 @@ export function WorkoutsDashboardPage() {
         <RoutineList />
       </div>
 
-      <StartWorkoutMenu active={active} />
+      <StartWorkoutButton active={active} />
     </main>
   );
 }

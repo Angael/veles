@@ -43,6 +43,7 @@ import { Route as AuthenticatedCaloriesFoodsFoodIdRouteImport } from './routes/_
 import { Route as AuthenticatedCaloriesFoodsNewRouteImport } from './routes/_authenticated/calories_/foods_/new'
 import { Route as AuthenticatedCaloriesLogsLogIdRouteImport } from './routes/_authenticated/calories_/logs_/$logId'
 import { Route as AuthenticatedWeightDateEditRouteImport } from './routes/_authenticated/weight_/$date_.edit'
+import { Route as AuthenticatedWorkoutsRoutinesIdRouteImport } from './routes/_authenticated/workouts/routines.$id'
 import { Route as AuthenticatedRecipesViewIdEditRouteImport } from './routes/_authenticated/recipes/view.$id_.edit'
 
 const IndexRoute = IndexRouteImport.update({
@@ -226,6 +227,12 @@ const AuthenticatedWeightDateEditRoute =
     path: '/weight/$date/edit',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedWorkoutsRoutinesIdRoute =
+  AuthenticatedWorkoutsRoutinesIdRouteImport.update({
+    id: '/workouts/routines/$id',
+    path: '/workouts/routines/$id',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedRecipesViewIdEditRoute =
   AuthenticatedRecipesViewIdEditRouteImport.update({
     id: '/recipes/view/$id_/edit',
@@ -267,6 +274,7 @@ export interface FileRoutesByFullPath {
   '/calories/foods/new': typeof AuthenticatedCaloriesFoodsNewRoute
   '/calories/logs/$logId': typeof AuthenticatedCaloriesLogsLogIdRoute
   '/weight/$date/edit': typeof AuthenticatedWeightDateEditRoute
+  '/workouts/routines/$id': typeof AuthenticatedWorkoutsRoutinesIdRoute
   '/recipes/view/$id/edit': typeof AuthenticatedRecipesViewIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -303,6 +311,7 @@ export interface FileRoutesByTo {
   '/calories/foods/new': typeof AuthenticatedCaloriesFoodsNewRoute
   '/calories/logs/$logId': typeof AuthenticatedCaloriesLogsLogIdRoute
   '/weight/$date/edit': typeof AuthenticatedWeightDateEditRoute
+  '/workouts/routines/$id': typeof AuthenticatedWorkoutsRoutinesIdRoute
   '/recipes/view/$id/edit': typeof AuthenticatedRecipesViewIdEditRoute
 }
 export interface FileRoutesById {
@@ -341,6 +350,7 @@ export interface FileRoutesById {
   '/_authenticated/calories_/foods_/new': typeof AuthenticatedCaloriesFoodsNewRoute
   '/_authenticated/calories_/logs_/$logId': typeof AuthenticatedCaloriesLogsLogIdRoute
   '/_authenticated/weight_/$date_/edit': typeof AuthenticatedWeightDateEditRoute
+  '/_authenticated/workouts/routines/$id': typeof AuthenticatedWorkoutsRoutinesIdRoute
   '/_authenticated/recipes/view/$id_/edit': typeof AuthenticatedRecipesViewIdEditRoute
 }
 export interface FileRouteTypes {
@@ -379,6 +389,7 @@ export interface FileRouteTypes {
     | '/calories/foods/new'
     | '/calories/logs/$logId'
     | '/weight/$date/edit'
+    | '/workouts/routines/$id'
     | '/recipes/view/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -415,6 +426,7 @@ export interface FileRouteTypes {
     | '/calories/foods/new'
     | '/calories/logs/$logId'
     | '/weight/$date/edit'
+    | '/workouts/routines/$id'
     | '/recipes/view/$id/edit'
   id:
     | '__root__'
@@ -452,6 +464,7 @@ export interface FileRouteTypes {
     | '/_authenticated/calories_/foods_/new'
     | '/_authenticated/calories_/logs_/$logId'
     | '/_authenticated/weight_/$date_/edit'
+    | '/_authenticated/workouts/routines/$id'
     | '/_authenticated/recipes/view/$id_/edit'
   fileRoutesById: FileRoutesById
 }
@@ -710,6 +723,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWeightDateEditRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/workouts/routines/$id': {
+      id: '/_authenticated/workouts/routines/$id'
+      path: '/workouts/routines/$id'
+      fullPath: '/workouts/routines/$id'
+      preLoaderRoute: typeof AuthenticatedWorkoutsRoutinesIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/recipes/view/$id_/edit': {
       id: '/_authenticated/recipes/view/$id_/edit'
       path: '/recipes/view/$id/edit'
@@ -743,6 +763,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCaloriesFoodsNewRoute: typeof AuthenticatedCaloriesFoodsNewRoute
   AuthenticatedCaloriesLogsLogIdRoute: typeof AuthenticatedCaloriesLogsLogIdRoute
   AuthenticatedWeightDateEditRoute: typeof AuthenticatedWeightDateEditRoute
+  AuthenticatedWorkoutsRoutinesIdRoute: typeof AuthenticatedWorkoutsRoutinesIdRoute
   AuthenticatedRecipesViewIdEditRoute: typeof AuthenticatedRecipesViewIdEditRoute
 }
 
@@ -769,6 +790,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCaloriesFoodsNewRoute: AuthenticatedCaloriesFoodsNewRoute,
   AuthenticatedCaloriesLogsLogIdRoute: AuthenticatedCaloriesLogsLogIdRoute,
   AuthenticatedWeightDateEditRoute: AuthenticatedWeightDateEditRoute,
+  AuthenticatedWorkoutsRoutinesIdRoute: AuthenticatedWorkoutsRoutinesIdRoute,
   AuthenticatedRecipesViewIdEditRoute: AuthenticatedRecipesViewIdEditRoute,
 }
 
