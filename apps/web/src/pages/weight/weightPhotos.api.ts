@@ -5,21 +5,16 @@ import { eq } from 'drizzle-orm';
 import { uploadObjects, weightEntries, weightEntryPhotos } from '@veles/db/schema';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
-import { readOrderedPhotos } from '@/lib/storage/orderedPhotos';
-import { IMAGE_MAX_INPUT_BYTES } from '@/lib/storage/imageLimits';
 import type { DbTransaction } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { limitRequestSizeMiddleware } from '@/server/middleware/limitRequestSizeMiddleware';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { type PhotoLinkTable, persistWithPhotos } from '@/server/storage/photoSync.server';
 
-// Keep below nginx's client_max_body_size with enough headroom for multipart form overhead.
-const WEIGHT_PHOTO_MAX_REQUEST_BYTES = 85 * 1024 * 1024;
 // Objects live in the public bucket; keys stay random v4 UUIDs (see weightEntryPhotos schema).
 const WEIGHT_PHOTO_KEY_PREFIX = 'weight-photos';
 
 export const WEIGHT_PHOTO_MAX_COUNT = 6;
-export const WEIGHT_PHOTO_MAX_BYTES = IMAGE_MAX_INPUT_BYTES;
 
 const formDataType = type('FormData');
 const weightEntryFieldsType = type({
@@ -29,10 +24,7 @@ const weightEntryFieldsType = type({
 
 /** Add form: saves the day's weight and appends photos after any the entry already has. */
 export const addWeightEntry = createServerFn({ method: 'POST' })
-  .middleware([
-    logMiddleware('addWeightEntry'),
-    limitRequestSizeMiddleware(WEIGHT_PHOTO_MAX_REQUEST_BYTES),
-  ])
+  .middleware([logMiddleware('addWeightEntry'), limitRequestSizeMiddleware()])
   .validator(arkTypeValidator(formDataType))
   .handler(async ({ data }) => {
     const session = await requireSession();
@@ -41,10 +33,7 @@ export const addWeightEntry = createServerFn({ method: 'POST' })
 
 /** Edit form: saves the weight and replaces the photo list with the submitted order. */
 export const updateWeightEntry = createServerFn({ method: 'POST' })
-  .middleware([
-    logMiddleware('updateWeightEntry'),
-    limitRequestSizeMiddleware(WEIGHT_PHOTO_MAX_REQUEST_BYTES),
-  ])
+  .middleware([logMiddleware('updateWeightEntry'), limitRequestSizeMiddleware()])
   .validator(arkTypeValidator(formDataType))
   .handler(async ({ data }) => {
     const session = await requireSession();
@@ -62,14 +51,10 @@ async function persistWeightEntry(formData: FormData, userId: string, mode: 'app
     throw new ClientSafeError(fields.summary);
   }
 
-  const order = readOrderedPhotos(formData, {
-    maxBytes: WEIGHT_PHOTO_MAX_BYTES,
-    maxCount: WEIGHT_PHOTO_MAX_COUNT,
-  });
   const weightGrams = Math.round(fields.weightKg * 1_000);
 
   await persistWithPhotos(
-    { keyPrefix: WEIGHT_PHOTO_KEY_PREFIX, order, userId },
+    { formData, keyPrefix: WEIGHT_PHOTO_KEY_PREFIX, maxCount: WEIGHT_PHOTO_MAX_COUNT, userId },
     async (tx, photos) => {
       // The upsert locks the entry row, so concurrent saves for one date run one after another.
       const [entry] = await tx
@@ -85,10 +70,7 @@ async function persistWeightEntry(formData: FormData, userId: string, mode: 'app
         throw new Error('Weight entry upsert returned no row');
       }
 
-      await photos.sync(weightEntryPhotoLinks(tx, entry.id), {
-        maxCount: WEIGHT_PHOTO_MAX_COUNT,
-        mode,
-      });
+      await photos.sync(weightEntryPhotoLinks(tx, entry.id), { mode });
     },
   );
 }

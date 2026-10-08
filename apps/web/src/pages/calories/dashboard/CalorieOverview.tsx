@@ -8,6 +8,7 @@ import { LogsDateAction } from './LogsDateAction';
 import { MultiplyLogsAction } from './MultiplyLogsAction';
 import { ReceivedFoodShares } from './ReceivedFoodShares';
 import { ShareLogsAction } from './ShareLogsAction';
+import { useCancelSelectionOnBack } from './useCancelSelectionOnBack';
 import { Btn } from '@/components/ui/btn/Btn';
 import { List } from '@/components/ui/list/List';
 import { SelectionBar } from '@/components/ui/selection-bar/SelectionBar';
@@ -27,6 +28,7 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
   const selecting = selectedLogs.length > 0;
   const allSelected = selectedLogs.length === logs.length;
   const clearSelection = () => setSelectedIds([]);
+  useCancelSelectionOnBack(selecting, clearSelection);
 
   function setSelected(id: string, selected: boolean) {
     setSelectedIds((current) =>

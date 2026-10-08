@@ -4,21 +4,27 @@ import clsx from 'clsx';
 import { ImageOffIcon, XIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
-import type { OrderedPhoto } from '@/lib/storage/orderedPhotos';
-import css from './UploadTileGrid.module.css';
+import { PHOTOS_FORM_FIELD } from '@/lib/storage/imageLimits';
+import css from './PhotosField.module.css';
 
-type UploadTileProps = {
+/** A stored photo has a URL; a newly picked one has the file. */
+export type FieldPhoto = { id: string; url: string | null } | { file: File; id: string };
+
+type PhotoTileProps = {
   label: string;
-  metaLabel: string | null;
   onRemove: (id: string) => void;
-  photo: OrderedPhoto;
+  photo: FieldPhoto;
 };
 
-/** One sortable square tile; drag anywhere on it to reorder, the corner button removes it. */
-export function UploadTile({ label, metaLabel, onRemove, photo }: UploadTileProps) {
+/**
+ * One sortable square tile; drag anywhere on it to reorder, the corner button removes it.
+ * It also renders the photo's form input, so tile order is the submitted order.
+ */
+export function PhotoTile({ label, onRemove, photo }: PhotoTileProps) {
   const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
     id: photo.id,
   });
+  const file = 'file' in photo ? photo.file : null;
   const previewUrl = usePreviewUrl(photo);
 
   return (
@@ -30,10 +36,21 @@ export function UploadTile({ label, metaLabel, onRemove, photo }: UploadTileProp
       ref={setNodeRef}
       style={{ transform: CSS.Translate.toString(transform), transition }}
     >
+      {file ? (
+        <input
+          hidden
+          name={PHOTOS_FORM_FIELD}
+          ref={(input) => setInputFile(input, file)}
+          type='file'
+        />
+      ) : (
+        <input name={PHOTOS_FORM_FIELD} type='hidden' value={photo.id} />
+      )}
+
       {previewUrl ? (
         <img alt='' className={css.preview} draggable={false} src={previewUrl} />
       ) : null}
-      {!previewUrl && photo.kind === 'stored' ? (
+      {!previewUrl && !file ? (
         <ImageOffIcon aria-hidden='true' className={css.missingPreview} />
       ) : null}
 
@@ -54,14 +71,23 @@ export function UploadTile({ label, metaLabel, onRemove, photo }: UploadTileProp
         variant='ghost'
       />
 
-      {metaLabel ? <span className={css.metaBadge}>{metaLabel}</span> : null}
+      {file ? <span className={css.metaBadge}>{formatFileMeta(file)}</span> : null}
     </article>
   );
 }
 
+/** File inputs can't take a `value`; a DataTransfer list is the only way to set their file. */
+function setInputFile(input: HTMLInputElement | null, file: File) {
+  if (input && input.files?.[0] !== file) {
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    input.files = transfer.files;
+  }
+}
+
 /** Stored photos already have a URL; picked files get an object URL revoked on cleanup. */
-function usePreviewUrl(photo: OrderedPhoto) {
-  const file = photo.kind === 'file' ? photo.file : null;
+function usePreviewUrl(photo: FieldPhoto) {
+  const file = 'file' in photo ? photo.file : null;
   const [fileUrl, setFileUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -77,5 +103,11 @@ function usePreviewUrl(photo: OrderedPhoto) {
     };
   }, [file]);
 
-  return photo.kind === 'stored' ? photo.url : fileUrl;
+  return 'url' in photo ? photo.url : fileUrl;
+}
+
+function formatFileMeta(file: File) {
+  const extension = file.name.split('.').pop()?.toUpperCase() ?? 'IMG';
+  const kb = file.size / 1024;
+  return `${extension} • ${kb < 1024 ? `${kb.toFixed(1)} KB` : `${(kb / 1024).toFixed(1)} MB`}`;
 }

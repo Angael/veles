@@ -7,16 +7,12 @@ import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
-import { PhotosField } from '@/components/ui/upload-tile-grid/PhotosField';
-import {
-  appendOrderedPhotos,
-  type OrderedPhoto,
-  toStoredPhotos,
-} from '@/lib/storage/orderedPhotos';
+import type { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
+import { PhotosField } from '@/components/ui/photos-field/PhotosField';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 import type { WeightEntryPhoto } from '../weight.api';
 import { useUpdateWeightEntryMutation } from '../weight.query';
-import { WEIGHT_PHOTO_MAX_BYTES, WEIGHT_PHOTO_MAX_COUNT } from '../weightPhotos.api';
+import { WEIGHT_PHOTO_MAX_COUNT } from '../weightPhotos.api';
 import css from '../WeightEntryPages.module.css';
 
 type EditWeightEntryPageProps = {
@@ -30,20 +26,18 @@ type EditWeightEntryPageProps = {
 export function EditWeightEntryPage({ entry }: EditWeightEntryPageProps) {
   const router = useRouter();
   const [weightKg, setWeightKg] = useState<number | null>(entry.weightKg);
-  const [photos, setPhotos] = useState<OrderedPhoto[]>(() => toStoredPhotos(entry.photos));
   const mutation = useUpdateWeightEntryMutation();
   const { markDirty, markSaved } = useUnsavedChangesGuard();
 
   /** Sends the weight with the full ordered photo list; failures keep picked files for a retry. */
-  async function handleSubmit(_data: unknown, navigate: UseNavigateResult<string>) {
+  async function handleSubmit(data: TypedFormData, navigate: UseNavigateResult<string>) {
     if (weightKg === null) {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('date', entry.date);
-    formData.append('weightKg', String(weightKg));
-    appendOrderedPhotos(formData, photos);
+    const formData = data.raw();
+    formData.set('date', entry.date);
+    formData.set('weightKg', String(weightKg));
 
     try {
       await mutation.mutateAsync({ data: formData });
@@ -81,13 +75,9 @@ export function EditWeightEntryPage({ entry }: EditWeightEntryPageProps) {
             />
           </Label>
           <PhotosField
-            maxItemSize={WEIGHT_PHOTO_MAX_BYTES}
-            maxItems={WEIGHT_PHOTO_MAX_COUNT}
-            onPhotosChange={(nextPhotos) => {
-              markDirty();
-              setPhotos(nextPhotos);
-            }}
-            photos={photos}
+            defaultPhotos={entry.photos}
+            maxCount={WEIGHT_PHOTO_MAX_COUNT}
+            onChange={markDirty}
           />
           <FormSubmitRow>
             <Btn disabled={weightKg === null} loading={mutation.isPending} type='submit'>

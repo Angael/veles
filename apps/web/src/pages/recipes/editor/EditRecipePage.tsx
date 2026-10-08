@@ -3,18 +3,13 @@ import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
-import { PhotosField } from '@/components/ui/upload-tile-grid/PhotosField';
+import { PhotosField } from '@/components/ui/photos-field/PhotosField';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import type { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
-import {
-  appendOrderedPhotos,
-  type OrderedPhoto,
-  toStoredPhotos,
-} from '@/lib/storage/orderedPhotos';
 import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
 import type { RecipeLibraryItem } from '../recipes.api';
 import { useUpdateRecipeMutation } from '../recipes.query';
-import { RECIPE_UPLOAD_MAX_PHOTO_BYTES, RECIPE_UPLOAD_MAX_PHOTO_COUNT } from '../recipeUpload.api';
+import { RECIPE_PHOTO_MAX_COUNT } from '../recipeUpload.api';
 import css from './EditRecipePage.module.css';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 
@@ -25,7 +20,6 @@ type EditRecipePageProps = {
 export function EditRecipePage({ recipe }: EditRecipePageProps) {
   const router = useRouter();
   const [draft, setDraft] = useState<RecipeFormDraft>(() => recipeToDraft(recipe));
-  const [photos, setPhotos] = useState<OrderedPhoto[]>(() => toStoredPhotos(recipe.images));
   const saveMutation = useUpdateRecipeMutation();
   const { markDirty, markSaved } = useUnsavedChangesGuard();
 
@@ -33,7 +27,6 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
   async function handleSubmit(data: TypedFormData, navigate: UseNavigateResult<string>) {
     const formData = data.raw();
     formData.append('id', recipe.id);
-    appendOrderedPhotos(formData, photos);
 
     try {
       await saveMutation.mutateAsync({ data: formData });
@@ -64,13 +57,9 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
           />
 
           <PhotosField
-            maxItemSize={RECIPE_UPLOAD_MAX_PHOTO_BYTES}
-            maxItems={RECIPE_UPLOAD_MAX_PHOTO_COUNT}
-            onPhotosChange={(nextPhotos) => {
-              markDirty();
-              setPhotos(nextPhotos);
-            }}
-            photos={photos}
+            defaultPhotos={recipe.images}
+            maxCount={RECIPE_PHOTO_MAX_COUNT}
+            onChange={markDirty}
           />
 
           <FormSubmitRow>
