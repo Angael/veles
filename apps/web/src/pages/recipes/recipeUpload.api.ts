@@ -6,18 +6,13 @@ import { recipeImages, recipes, uploadObjects } from '@veles/db/schema';
 import type { DbTransaction } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
-import { readOrderedPhotos } from '@/lib/storage/orderedPhotos';
 import { limitRequestSizeMiddleware } from '@/server/middleware/limitRequestSizeMiddleware';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
-import { IMAGE_MAX_INPUT_BYTES } from '@/lib/storage/imageLimits';
 import { type PhotoLinkTable, persistWithPhotos } from '@/server/storage/photoSync.server';
-// Keep below nginx's client_max_body_size with enough headroom for multipart form overhead.
-// If this changes, update the corresponding limit in infra/nginx/nginx.conf.
-const RECIPE_UPLOAD_MAX_REQUEST_BYTES = 85 * 1024 * 1024;
+
 const RECIPE_IMAGE_KEY_PREFIX = 'recipe-images';
 
-export const RECIPE_UPLOAD_MAX_PHOTO_COUNT = 8;
-export const RECIPE_UPLOAD_MAX_PHOTO_BYTES = IMAGE_MAX_INPUT_BYTES;
+export const RECIPE_PHOTO_MAX_COUNT = 8;
 
 const formDataType = type('FormData');
 const recipeIdType = type('string.uuid');
@@ -50,10 +45,7 @@ const uploadRecipeInputType = type({
 });
 
 export const createRecipe = createServerFn({ method: 'POST' })
-  .middleware([
-    logMiddleware('createRecipe'),
-    limitRequestSizeMiddleware(RECIPE_UPLOAD_MAX_REQUEST_BYTES),
-  ])
+  .middleware([logMiddleware('createRecipe'), limitRequestSizeMiddleware()])
   .validator(arkTypeValidator(formDataType))
   .handler(async ({ data }) => {
     const session = await requireSession();
@@ -61,10 +53,7 @@ export const createRecipe = createServerFn({ method: 'POST' })
   });
 
 export const updateRecipe = createServerFn({ method: 'POST' })
-  .middleware([
-    logMiddleware('updateRecipe'),
-    limitRequestSizeMiddleware(RECIPE_UPLOAD_MAX_REQUEST_BYTES),
-  ])
+  .middleware([logMiddleware('updateRecipe'), limitRequestSizeMiddleware()])
   .validator(arkTypeValidator(formDataType))
   .handler(async ({ data }) => {
     const session = await requireSession();
@@ -77,19 +66,12 @@ export const updateRecipe = createServerFn({ method: 'POST' })
     return persistRecipeUpload(data, session.user.id, recipeId);
   });
 
-/**
- * Validates fields and the ordered photo list, then creates or updates the recipe and rewrites
- * its image links in one transaction.
- */
+/** Validates fields, then creates or updates the recipe and rewrites its image links together. */
 async function persistRecipeUpload(formData: FormData, userId: string, existingRecipeId?: string) {
   const fields = validateRecipeFields(formData);
-  const order = readOrderedPhotos(formData, {
-    maxBytes: RECIPE_UPLOAD_MAX_PHOTO_BYTES,
-    maxCount: RECIPE_UPLOAD_MAX_PHOTO_COUNT,
-  });
 
   return persistWithPhotos(
-    { keyPrefix: RECIPE_IMAGE_KEY_PREFIX, order, userId },
+    { formData, keyPrefix: RECIPE_IMAGE_KEY_PREFIX, maxCount: RECIPE_PHOTO_MAX_COUNT, userId },
     async (tx, photos) => {
       const [recipe] = existingRecipeId
         ? await tx
@@ -106,9 +88,7 @@ async function persistRecipeUpload(formData: FormData, userId: string, existingR
         throw new ClientSafeError('Recipe not found.');
       }
 
-      await photos.sync(recipeImageLinks(tx, recipe.id), {
-        maxCount: RECIPE_UPLOAD_MAX_PHOTO_COUNT,
-      });
+      await photos.sync(recipeImageLinks(tx, recipe.id));
 
       return { id: recipe.id };
     },
