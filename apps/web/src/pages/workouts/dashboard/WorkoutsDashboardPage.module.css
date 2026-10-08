@@ -1,0 +1,80 @@
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-xl);
+  padding-bottom: var(--space-xl);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.title {
+  font-size: var(--text-lg);
+}
+
+.subtitle {
+  margin-top: var(--space-xs);
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.empty {
+  justify-self: start;
+}
+
+/* An unfinished workout is the most likely next action, so it gets the biggest target. */
+.continue {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border: var(--border-width) solid var(--c-primary-border);
+  border-radius: var(--radius-xs);
+  background: var(--c-primary-surface-strong);
+  color: var(--c-text-strong);
+  text-decoration: none;
+
+  & span {
+    display: grid;
+    overflow-wrap: anywhere;
+  }
+
+  & small {
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+  }
+
+  & svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--c-accent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 3px;
+  }
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 0.3rem;
+  color: var(--c-accent);
+  font-size: var(--text-sm);
+  text-decoration: none;
+
+  & svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

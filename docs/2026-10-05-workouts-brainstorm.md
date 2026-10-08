@@ -12,15 +12,20 @@ Real feature: `/workouts` (list) and `/workouts/$id` (live session). Playground:
 1. The human runs `pnpm db:generate` and the migration on dev and prod before merging to `main`. Agents never run Drizzle commands. The schema is now exported from `packages/db/src/schema/index.ts`.
 2. Delete `pages/workouts-demo` and `routes/demo.workouts.tsx` when the PoC is no longer needed.
 
-**Real feature, first slice.**
+**Real feature.**
 
-- `/workouts`: logged sessions, newest first. "In progress" marks unfinished ones. Long press / right click → Delete. Floating "Start workout" creates a session for today, named after the weekday.
+- `/workouts` is a dashboard: "Continue" card for an unfinished workout, "Empty workout", routine cards (tap = start; long press = edit name and description, or delete), a 26-week calendar, the last 5 workouts with "All workouts →" (`/workouts/history`), and an "Exercises" list (last best set and a sparkline of the best per session). The recent list and the exercise list may overlap; the user will pick one later.
+- Calendar: one hue, brightness by training time per day, full at 2 h. An unfinished workout counts until its last ticked set. Tap a square to open that day's workout.
 - `/workouts/$id` (`layout: 'task'`): the live session. Every edit is saved at once. Ticks, set types and structure changes are sent right away; dragged values are sent 600 ms after the drag pauses, and on tab hide or leave. The cache is patched first, and the session refetches when the last request settles.
-- Finish sets `ended_at` and goes back to the list (`replace`). A finished workout shows "Reopen".
-- Rename, tracking mode and rest length are saved on the exercise, so they carry to the next workout. Notes are per workout (`workout_exercise.notes`).
-- "Previous" values and the note placeholder come from the latest earlier session of the same exercise, ordered by `(date, id)` (UUIDv7, so same-day sessions keep creation order). A new exercise in a session starts with as many empty sets as last time.
-- Code: `pages/workouts/` → `workouts.api.ts` / `workouts.query.ts` (list, start, rename, finish, delete), `workouts.server.ts` (ownership checks, unit conversion, session loader), `session/` (live session UI, `session.api.ts`, `session.query.ts`), `exercises/` (picker, fuzzy search, `exercises.api.ts`: list, edit, history), `scrub/`, `rest/`, `hints/`, `metrics.ts`. The playground imports these shared pieces.
-- Not built yet: routines, quick log without sets, the workouts home ideas, MCP tools.
+- Session "⋯" menu: "Save as new routine" (name + optional description, links the session) and "Update routine 'X'" (overwrites the linked routine).
+- Routines store exercises in order, set count and set types only. No target weights or reps: last time's values are the goal. The description lives in `workout.notes`.
+- Set cells show a grey unit (`kg`, `reps`, `km`). With no last time, empty cells show 40 kg / 12 reps / 1:00 / 5 km. Ticking a set with an empty cell and no last time opens the sheet; Save logs the shown values and finishes the set.
+- Exercise picker: ↑/↓ through results and the Create row, ←/→ change the tracking type on the Create row, Enter picks. Clicking a tracking type creates the exercise. The tracking guess knows common Polish names (pompki, podciąganie, deska, bieg, spacer farmera…); loaded variants stay weight × reps.
+- Finish sets `ended_at` and goes back to `/workouts` (`replace`). A finished workout shows "Reopen".
+- Rename, tracking mode and rest length are saved on the exercise. Notes are per workout (`workout_exercise.notes`).
+- "Previous" values and the note placeholder come from the latest earlier session of the same exercise, ordered by `(date, id)` (UUIDv7). A new exercise in a session starts with as many empty sets as last time.
+- Code: `pages/workouts/` → `workouts.*` (list, start, rename, finish, delete, session loader), `WorkoutList.tsx`, `dashboard/`, `history/`, `routines/`, `session/`, `exercises/`, `scrub/`, `rest/`, `hints/`, `metrics.ts`.
+- Not built yet: editing a routine's exercises outside a session, quick log without sets, MCP tools.
 
 **Decided (current behaviour wins over older rounds below).**
 

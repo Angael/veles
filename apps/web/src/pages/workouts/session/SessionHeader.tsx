@@ -7,6 +7,7 @@ import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessT
 import { formatDuration } from '../metrics';
 import { useUpdateWorkoutMutation } from '../workouts.query';
 import type { WorkoutSessionData } from '../workouts.server';
+import { SessionMenu } from './SessionMenu';
 import css from './Session.module.css';
 
 type SessionHeaderProps = { onShowHints: () => void; session: WorkoutSessionData };
@@ -55,6 +56,7 @@ export function SessionHeader({ onShowHints, session }: SessionHeaderProps) {
         size='sm'
         variant='ghost'
       />
+      <SessionMenu session={session} />
       {finished ? (
         <Btn
           disabled={updateWorkout.isPending}

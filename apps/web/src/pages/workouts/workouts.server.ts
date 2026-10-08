@@ -30,6 +30,8 @@ export type WorkoutSessionData = {
   date: string;
   startedAt: string | null;
   endedAt: string | null;
+  /** Routine this session started from or was saved as; offers "Update routine". */
+  routine: { id: string; name: string } | null;
   slots: WorkoutSlotData[];
 };
 
@@ -201,9 +203,14 @@ export async function loadWorkoutSession(
   ]);
   const previousSlotByExercise = new Map(previousSlots.map((slot) => [slot.exerciseId, slot.id]));
   const noteByExercise = new Map(previousNotes.map((slot) => [slot.exerciseId, slot.notes]));
-  const sets = await setsBySlot([
-    ...slots.map((slot) => slot.id),
-    ...previousSlots.map((slot) => slot.id),
+  const [sets, [routine]] = await Promise.all([
+    setsBySlot([...slots.map((slot) => slot.id), ...previousSlots.map((slot) => slot.id)]),
+    workout.routineId
+      ? db
+          .select({ id: workouts.id, name: workouts.name })
+          .from(workouts)
+          .where(and(eq(workouts.id, workout.routineId), eq(workouts.userId, userId)))
+      : [],
   ]);
 
   return {
@@ -211,6 +218,7 @@ export async function loadWorkoutSession(
     endedAt: workout.endedAt?.toISOString() ?? null,
     id: workout.id,
     name: workout.name,
+    routine: routine ?? null,
     slots: slots.map((slot) => {
       const previousSlotId = previousSlotByExercise.get(slot.exerciseId);
       const previousSets = previousSlotId ? (sets.get(previousSlotId) ?? []) : [];
