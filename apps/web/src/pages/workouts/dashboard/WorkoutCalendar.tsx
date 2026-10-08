@@ -22,6 +22,19 @@ export function calendarStart(today = todayLocalDate()) {
 const levelOf = (seconds: number) =>
   seconds <= 0 ? 0 : Math.min(4, Math.ceil((Math.min(seconds, FULL_SECONDS) / FULL_SECONDS) * 4));
 
+/**
+ * Month name above the first week that holds the 1st of that month. Week 0 is labelled only if
+ * no other label follows within two weeks, so "Apr May" never overlap.
+ */
+function monthLabels(start: string) {
+  const labels = Array.from({ length: WEEKS }, (_, week) => {
+    const sunday = addDays(parseISO(start), week * 7 + 6);
+    return week === 0 || sunday.getDate() <= 7 ? format(sunday, 'MMM') : '';
+  });
+  if (labels[1] || labels[2]) labels[0] = '';
+  return labels;
+}
+
 const formatMinutes = (seconds: number) =>
   seconds >= 3600
     ? `${Math.floor(seconds / 3600)} h ${Math.round((seconds % 3600) / 60)} min`
@@ -47,17 +60,16 @@ export function WorkoutCalendar() {
       <header className={css.header}>
         <h2 id='workout-calendar-title'>Last 6 months</h2>
         <p className={css.summary}>
-          {trainingDays} {trainingDays === 1 ? 'day' : 'days'} · {formatMinutes(totalSeconds)}
+          {trainingDays === 0
+            ? 'No workouts yet'
+            : `${trainingDays} ${trainingDays === 1 ? 'day' : 'days'} · ${formatMinutes(totalSeconds)}`}
         </p>
       </header>
 
       <div className={css.months} aria-hidden='true'>
-        {Array.from({ length: WEEKS }, (_, week) => {
-          const monday = parseISO(days[week * 7] ?? start);
-          const sunday = addDays(monday, 6);
-          const newMonth = week === 0 || sunday.getDate() <= 7;
-          return <span key={week}>{newMonth ? format(sunday, 'MMM') : ''}</span>;
-        })}
+        {monthLabels(start).map((label, week) => (
+          <span key={week}>{label}</span>
+        ))}
       </div>
 
       <ol aria-label='Training days' className={css.grid}>
@@ -67,11 +79,11 @@ export function WorkoutCalendar() {
       </ol>
 
       <div aria-hidden='true' className={css.legend}>
-        <span>0</span>
+        <span>Less</span>
         {[0, 1, 2, 3, 4].map((level) => (
           <span className={clsx(css.square, css[`level${level}`])} key={level} />
         ))}
-        <span>2 h+</span>
+        <span>More</span>
       </div>
     </Card>
   );

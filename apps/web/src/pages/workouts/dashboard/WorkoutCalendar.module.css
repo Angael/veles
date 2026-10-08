@@ -1,8 +1,6 @@
 .card {
   display: grid;
   gap: var(--space-xs);
-  /* Caps square size on wide screens; 26 columns still fit a 320 px phone. */
-  max-width: 34rem;
 }
 
 .header {

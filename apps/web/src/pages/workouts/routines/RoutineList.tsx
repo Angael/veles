@@ -1,7 +1,8 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
+import { format, parseISO } from 'date-fns';
 import { PencilIcon, PlayIcon, Trash2Icon } from 'lucide-react';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import {
   ContextMenuItem,
   ContextMenuPopup,
@@ -22,9 +23,16 @@ import css from './Routines.module.css';
 /**
  * Routine cards: tap starts a workout with the routine's exercises, long press or right click
  * edits the name and description or deletes it. While a workout is open, cards only show what
- * the routine holds; starting waits until that workout is finished.
+ * the routine holds; starting waits until that workout is finished. `children` are extra tiles
+ * placed before the routines, such as "Empty workout".
  */
-export function RoutineList({ startBlocked }: { startBlocked: boolean }) {
+export function RoutineList({
+  children,
+  startBlocked,
+}: {
+  children?: ReactNode;
+  startBlocked: boolean;
+}) {
   const { data: routines } = useSuspenseQuery(routinesQueryOptions());
   const navigate = useNavigate();
   const startRoutine = useStartRoutineMutation();
@@ -32,17 +40,15 @@ export function RoutineList({ startBlocked }: { startBlocked: boolean }) {
   const deleteRoutine = useDeleteRoutineMutation();
   const [editing, setEditing] = useState<RoutineSummary | null>(null);
 
-  if (routines.length === 0) {
-    return (
-      <p className={css.hint}>
-        Finish a workout you like, then use its ⋯ menu to save it as a routine.
-      </p>
-    );
-  }
-
   return (
     <>
       <ul aria-label='Routines' className={css.list}>
+        {children}
+        {routines.length === 0 ? (
+          <li className={css.hint}>
+            Finish a workout you like, then use its ⋯ menu to save it as a routine.
+          </li>
+        ) : null}
         {routines.map((routine) => (
           <li key={routine.id}>
             <ContextMenuRoot>
@@ -69,15 +75,24 @@ export function RoutineList({ startBlocked }: { startBlocked: boolean }) {
                   />
                 }
               >
-                <span className={css.cardTitle}>
-                  {startBlocked ? null : <PlayIcon aria-hidden='true' />}
-                  {routine.name}
+                <span className={css.cardHead}>
+                  <span className={css.cardTitle}>{routine.name}</span>
+                  {startBlocked ? null : (
+                    <span className={css.play}>
+                      <PlayIcon aria-hidden='true' />
+                    </span>
+                  )}
                 </span>
                 {routine.description ? (
                   <span className={css.description}>{routine.description}</span>
                 ) : null}
                 <span className={css.exercises}>
                   {routine.exerciseNames.join(' · ') || 'No exercises'}
+                </span>
+                <span className={css.lastUsed}>
+                  {routine.lastUsed
+                    ? `Last done ${format(parseISO(routine.lastUsed), 'EEE dd.MM')}`
+                    : 'Not done yet'}
                 </span>
               </ContextMenuTrigger>
               <ContextMenuPopup aria-label={`${routine.name} actions`}>
