@@ -44,7 +44,7 @@ export function ScrubField({
           inputMode='decimal'
           onBlur={(event) => {
             const parsed = parse(event.target.value);
-            if (parsed !== null) options.onChange(parsed);
+            if (parsed !== null) options.onChange(Math.min(parsed, options.max ?? parsed));
             setTyping(false);
           }}
           onFocus={(event) => event.target.select()}

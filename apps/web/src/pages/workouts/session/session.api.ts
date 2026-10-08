@@ -16,6 +16,7 @@ import {
   toSetColumns,
   touchWorkout,
 } from '../workouts.server';
+import { MAX_WEIGHT_KG } from '../metrics';
 
 const idInputType = type({ id: 'string.uuid' });
 
@@ -230,7 +231,7 @@ const metric = 'number >= 0 | null';
 const updateWorkoutSetInputType = type({
   id: 'string.uuid',
   'type?': "'normal' | 'warmup' | 'drop' | 'failure'",
-  'weightKg?': metric,
+  'weightKg?': `(0 <= number <= ${MAX_WEIGHT_KG}) | null`,
   'reps?': '(number.integer >= 0) | null',
   'durationSeconds?': metric,
   'distanceKm?': metric,

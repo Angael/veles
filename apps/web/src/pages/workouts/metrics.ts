@@ -56,6 +56,9 @@ export const DEFAULT_METRICS: Record<MetricKey, number> = {
   weightKg: 40,
 };
 
+/** Heaviest weight a set can log; anything above is a typo. */
+export const MAX_WEIGHT_KG = 200;
+
 export type MetricField = {
   key: MetricKey;
   label: string;
@@ -113,7 +116,7 @@ const tiers = (...steps: number[]) =>
 export function scrubTuning(field: MetricField) {
   switch (field.key) {
     case 'weightKg':
-      return { max: 500, tiers: tiers(0.5, 1, 2.5, 5) };
+      return { max: MAX_WEIGHT_KG, tiers: tiers(0.5, 1, 2.5, 5) };
     case 'reps':
       return { max: 200, pixelsPerStep: 16, tiers: tiers(1, 1, 2, 5) };
     case 'durationSeconds':
