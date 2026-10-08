@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { PlusIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { ExercisePickerDialog } from '../exercises/ExercisePicker';
 import { FeatureTip, HINTS } from '../hints/FeatureTip';
@@ -32,6 +32,13 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
   const sheetSlot = session.slots.find((slot) => slot.id === sheet?.slotId);
   const sheetSet = sheetSlot?.sets.find((set) => set.id === sheet?.setId);
   const nextHint = HINTS.find((hint) => hints.seen !== null && !hints.seen.includes(hint.key));
+  const ownsTimer = timer.running && timer.ownerId === workoutId;
+  const finished = session.endedAt !== null;
+
+  // A finished workout (by hand or after two idle hours) has no rest left to count.
+  useEffect(() => {
+    if (finished && ownsTimer) timer.skip();
+  }, [finished, ownsTimer, timer]);
 
   /**
    * Starts rest after a ticked set. Ticking a set that sits before an already done one is
@@ -41,12 +48,13 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
     if (slot.restSeconds === null) return;
     const index = slot.sets.findIndex((item) => item.id === set.id);
     if (slot.sets.slice(index + 1).some((item) => item.done)) return;
-    timer.start(slot.restSeconds, slot.name);
+    if (finished) return;
+    timer.start(slot.restSeconds, slot.name, workoutId);
   }
 
   return (
     <div className={css.session}>
-      <SessionHeader onShowHints={hints.reset} session={session} />
+      <SessionHeader onFinish={timer.skip} onShowHints={hints.reset} session={session} />
 
       {session.slots.length === 0 ? (
         <p className={css.empty}>Add the first exercise to start logging sets.</p>
@@ -105,7 +113,7 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
             : null
         }
       />
-      <RestDock timer={timer} />
+      {ownsTimer && !finished ? <RestDock timer={timer} /> : null}
     </div>
   );
 }

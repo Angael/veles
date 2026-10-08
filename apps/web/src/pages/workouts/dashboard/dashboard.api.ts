@@ -8,7 +8,7 @@ import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { describeSet, type Measure, type SetMetrics } from '../metrics';
-import { toMetrics } from '../workouts.server';
+import { autoFinishIdleWorkouts, toMetrics } from '../workouts.server';
 
 /** One training day; `workoutId` is that day's first workout, opened on tap. */
 export type CalendarDay = {
@@ -41,6 +41,7 @@ export const getWorkoutCalendar = createServerFn({ method: 'GET' })
   .validator(arkTypeValidator(sinceInputType))
   .handler(async ({ data }): Promise<CalendarDay[]> => {
     const session = await requireSession();
+    await autoFinishIdleWorkouts(db, session.user.id);
     const rows = await db
       .select({
         date: workouts.date,

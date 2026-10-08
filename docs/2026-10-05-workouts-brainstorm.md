@@ -22,6 +22,10 @@ Real feature: `/workouts` (list) and `/workouts/$id` (live session). Playground:
 - Set cells show a grey unit (`kg`, `reps`, `km`). With no last time, empty cells show 40 kg / 12 reps / 1:00 / 5 km. Ticking a set with an empty cell and no last time opens the sheet; Save logs the shown values and finishes the set.
 - Exercise picker: ↑/↓ through results and the Create row, ←/→ change the tracking type on the Create row, Enter picks. Clicking a tracking type creates the exercise. The tracking guess knows common Polish names (pompki, podciąganie, deska, bieg, spacer farmera…); loaded variants stay weight × reps.
 - Finish sets `ended_at` and goes back to `/workouts` (`replace`). A finished workout shows "Reopen".
+- One open workout at a time. The server refuses to start or reopen another; the dashboard shows only "Continue" and routine cards cannot start while a workout is open.
+- Auto-finish: every session edit bumps `workout.updated_at`. On read (list, session, calendar) and before starting or reopening, a workout with no edit for 2 h gets `ended_at = updated_at`, so its length stops at the last edit. No worker job; the result is the same whenever the user next opens the app.
+- The rest timer stores the workout that started it. Finishing stops it, and a finished workout never shows it.
+- Workout rows (recent and history): long press → "Save as routine" or "Delete".
 - Rename, tracking mode and rest length are saved on the exercise. Notes are per workout (`workout_exercise.notes`).
 - "Previous" values and the note placeholder come from the latest earlier session of the same exercise, ordered by `(date, id)` (UUIDv7). A new exercise in a session starts with as many empty sets as last time.
 - Code: `pages/workouts/` → `workouts.*` (list, start, rename, finish, delete, session loader), `WorkoutList.tsx`, `dashboard/`, `history/`, `routines/`, `session/`, `exercises/`, `scrub/`, `rest/`, `hints/`, `metrics.ts`.

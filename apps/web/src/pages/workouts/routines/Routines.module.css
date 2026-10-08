@@ -42,8 +42,8 @@
     outline-offset: 3px;
   }
 
-  &:disabled {
-    cursor: progress;
+  &[aria-disabled='true'] {
+    cursor: default;
   }
 
   &[aria-busy='true'] {
@@ -51,7 +51,7 @@
   }
 
   @media (hover: hover) and (pointer: fine) {
-    &:hover {
+    &:not([aria-disabled='true']):hover {
       border-color: var(--c-primary-border);
       background: color-mix(in srgb, var(--c-surface) 88%, var(--c-primary) 12%);
     }

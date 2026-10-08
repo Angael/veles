@@ -8,7 +8,11 @@ import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
-import { requireOwnedWorkout } from '../workouts.server';
+import {
+  autoFinishIdleWorkouts,
+  requireNoOpenWorkout,
+  requireOwnedWorkout,
+} from '../workouts.server';
 import { copyWorkoutStructure, requireOwnedRoutine } from './routines.server';
 
 export type RoutineSummary = {
@@ -129,6 +133,8 @@ export const startRoutine = createServerFn({ method: 'POST' })
     const userId = session.user.id;
     return db.transaction(async (tx) => {
       const routine = await requireOwnedRoutine(tx, userId, data.routineId);
+      await autoFinishIdleWorkouts(tx, userId);
+      await requireNoOpenWorkout(tx, userId);
       const [workout] = await tx
         .insert(workouts)
         .values({

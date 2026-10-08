@@ -6,12 +6,14 @@ export type RestTimer = {
   total: number;
   running: boolean;
   label: string;
-  start: (seconds: number, label: string) => void;
+  /** Workout that started the timer, so another or a finished workout never shows it. */
+  ownerId: string | null;
+  start: (seconds: number, label: string, ownerId?: string) => void;
   adjust: (deltaSeconds: number) => void;
   skip: () => void;
 };
 
-type TimerState = { endsAt: number; total: number; label: string } | null;
+type TimerState = { endsAt: number; total: number; label: string; ownerId?: string } | null;
 
 const STORAGE_KEY = 'veles.workouts.rest';
 
@@ -67,12 +69,13 @@ export function useRestTimer(): RestTimer {
           : current,
       ),
     label: state?.label ?? '',
+    ownerId: state?.ownerId ?? null,
     remaining,
     running: state !== null,
     skip: () => setState(null),
-    start: (seconds, label) => {
+    start: (seconds, label, ownerId) => {
       setNow(Date.now());
-      setState({ endsAt: Date.now() + seconds * 1000, label, total: seconds });
+      setState({ endsAt: Date.now() + seconds * 1000, label, ownerId, total: seconds });
     },
     total: state?.total ?? 0,
   };

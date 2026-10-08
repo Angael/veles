@@ -14,13 +14,6 @@
   font-size: var(--text-lg);
 }
 
-.subtitle {
-  margin-top: var(--space-xs);
-  color: var(--c-muted);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
-}
-
 .empty {
   justify-self: start;
 }

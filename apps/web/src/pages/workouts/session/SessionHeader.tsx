@@ -10,10 +10,14 @@ import type { WorkoutSessionData } from '../workouts.server';
 import { SessionMenu } from './SessionMenu';
 import css from './Session.module.css';
 
-type SessionHeaderProps = { onShowHints: () => void; session: WorkoutSessionData };
+type SessionHeaderProps = {
+  onFinish: () => void;
+  onShowHints: () => void;
+  session: WorkoutSessionData;
+};
 
 /** Workout name, live totals, a "?" to replay the tips, and Finish (Reopen once finished). */
-export function SessionHeader({ onShowHints, session }: SessionHeaderProps) {
+export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderProps) {
   const navigate = useNavigate();
   const updateWorkout = useUpdateWorkoutMutation();
   const elapsed = useElapsed(session.startedAt, session.endedAt);
@@ -75,7 +79,12 @@ export function SessionHeader({ onShowHints, session }: SessionHeaderProps) {
           onClick={() =>
             updateWorkout.mutate(
               { finished: true, id: session.id },
-              { onSuccess: () => void navigate({ replace: true, to: '/workouts' }) },
+              {
+                onSuccess: () => {
+                  onFinish();
+                  void navigate({ replace: true, to: '/workouts' });
+                },
+              },
             )
           }
           radius='pill'

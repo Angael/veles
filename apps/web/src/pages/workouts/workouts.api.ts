@@ -8,7 +8,12 @@ import { dateOnlyType } from '@/lib/dateOnly';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
-import { loadWorkoutSession, requireOwnedWorkout } from './workouts.server';
+import {
+  autoFinishIdleWorkouts,
+  loadWorkoutSession,
+  requireNoOpenWorkout,
+  requireOwnedWorkout,
+} from './workouts.server';
 
 export type WorkoutSummary = {
   id: string;
@@ -27,6 +32,7 @@ export const getWorkouts = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getWorkouts')])
   .handler(async (): Promise<WorkoutSummary[]> => {
     const session = await requireSession();
+    await autoFinishIdleWorkouts(db, session.user.id);
     const done = sql`${workoutSets.completedAt} IS NOT NULL`;
     const rows = await db
       .select({
@@ -64,6 +70,7 @@ export const getWorkoutSession = createServerFn({ method: 'GET' })
   .validator(arkTypeValidator(idInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
+    await autoFinishIdleWorkouts(db, session.user.id);
     return loadWorkoutSession(session.user.id, data.id);
   });
 
@@ -75,6 +82,8 @@ export const startWorkout = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(startWorkoutInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
+    await autoFinishIdleWorkouts(db, session.user.id);
+    await requireNoOpenWorkout(db, session.user.id);
     const [workout] = await db
       .insert(workouts)
       .values({
@@ -95,13 +104,17 @@ const updateWorkoutInputType = type({
   'finished?': 'boolean',
 });
 
-/** Renames a session, or finishes / reopens it. */
+/** Renames a session, or finishes / reopens it. Reopening is refused while another is open. */
 export const updateWorkout = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateWorkout')])
   .validator(arkTypeValidator(updateWorkoutInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
     await requireOwnedWorkout(db, session.user.id, data.id);
+    if (data.finished === false) {
+      await autoFinishIdleWorkouts(db, session.user.id);
+      await requireNoOpenWorkout(db, session.user.id, data.id);
+    }
     await db
       .update(workouts)
       .set({

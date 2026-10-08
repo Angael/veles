@@ -21,9 +21,10 @@ import css from './Routines.module.css';
 
 /**
  * Routine cards: tap starts a workout with the routine's exercises, long press or right click
- * edits the name and description or deletes it.
+ * edits the name and description or deletes it. While a workout is open, cards only show what
+ * the routine holds; starting waits until that workout is finished.
  */
-export function RoutineList() {
+export function RoutineList({ startBlocked }: { startBlocked: boolean }) {
   const { data: routines } = useSuspenseQuery(routinesQueryOptions());
   const navigate = useNavigate();
   const startRoutine = useStartRoutineMutation();
@@ -51,9 +52,11 @@ export function RoutineList() {
                     aria-busy={
                       startRoutine.isPending && startRoutine.variables.routineId === routine.id
                     }
+                    aria-disabled={startBlocked || startRoutine.isPending}
                     className={css.card}
-                    disabled={startRoutine.isPending}
                     onClick={() =>
+                      !startBlocked &&
+                      !startRoutine.isPending &&
                       startRoutine.mutate(
                         { date: todayLocalDate(), routineId: routine.id },
                         {
@@ -67,7 +70,7 @@ export function RoutineList() {
                 }
               >
                 <span className={css.cardTitle}>
-                  <PlayIcon aria-hidden='true' />
+                  {startBlocked ? null : <PlayIcon aria-hidden='true' />}
                   {routine.name}
                 </span>
                 {routine.description ? (

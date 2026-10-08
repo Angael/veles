@@ -39,24 +39,23 @@ export function WorkoutsDashboardPage() {
             </span>
             <ArrowRightIcon aria-hidden='true' />
           </Link>
-        ) : null}
-        <Btn
-          className={css.empty}
-          icon={<PlusIcon aria-hidden='true' />}
-          loading={startWorkout.isPending}
-          onClick={() =>
-            startWorkout.mutate(
-              { date: todayLocalDate() },
-              { onSuccess: ({ id }) => void navigate({ params: { id }, to: '/workouts/$id' }) },
-            )
-          }
-          radius='pill'
-          variant={active ? 'outlineMain' : 'main'}
-        >
-          Empty workout
-        </Btn>
-        <h3 className={css.subtitle}>Routines</h3>
-        <RoutineList />
+        ) : (
+          <Btn
+            className={css.empty}
+            icon={<PlusIcon aria-hidden='true' />}
+            loading={startWorkout.isPending}
+            onClick={() =>
+              startWorkout.mutate(
+                { date: todayLocalDate() },
+                { onSuccess: ({ id }) => void navigate({ params: { id }, to: '/workouts/$id' }) },
+              )
+            }
+            radius='pill'
+          >
+            Empty workout
+          </Btn>
+        )}
+        <RoutineList startBlocked={active !== undefined} />
       </section>
 
       <WorkoutCalendar />

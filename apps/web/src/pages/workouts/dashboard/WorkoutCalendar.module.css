@@ -106,4 +106,8 @@ a.square:focus-visible {
   & .square {
     width: 0.7rem;
   }
+
+  @media (--phone) {
+    display: none;
+  }
 }

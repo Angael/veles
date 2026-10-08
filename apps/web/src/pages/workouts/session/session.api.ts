@@ -14,6 +14,7 @@ import {
   requireOwnedSlot,
   requireOwnedWorkout,
   toSetColumns,
+  touchWorkout,
 } from '../workouts.server';
 
 const idInputType = type({ id: 'string.uuid' });
@@ -63,6 +64,7 @@ export const addWorkoutExercise = createServerFn({ method: 'POST' })
     const userId = session.user.id;
     await db.transaction(async (tx) => {
       const workout = await requireOwnedWorkout(tx, userId, data.workoutId);
+      await touchWorkout(tx, workout.id);
       let exerciseId: string;
       if (data.exerciseId) {
         exerciseId = (await requireOwnedExercise(tx, userId, data.exerciseId)).id;
@@ -99,7 +101,8 @@ export const updateWorkoutExercise = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(updateWorkoutExerciseInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    await requireOwnedSlot(db, session.user.id, data.id);
+    const slot = await requireOwnedSlot(db, session.user.id, data.id);
+    await touchWorkout(db, slot.workoutId);
     await db
       .update(workoutExercises)
       .set({ notes: data.notes.trim() })
@@ -119,6 +122,7 @@ export const moveWorkoutExercise = createServerFn({ method: 'POST' })
     const session = await requireSession();
     await db.transaction(async (tx) => {
       const slot = await requireOwnedSlot(tx, session.user.id, data.id);
+      await touchWorkout(tx, slot.workoutId);
       const up = data.direction === 'up';
       const [neighbour] = await tx
         .select({ id: workoutExercises.id, position: workoutExercises.position })
@@ -147,7 +151,8 @@ export const removeWorkoutExercise = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(idInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    await requireOwnedSlot(db, session.user.id, data.id);
+    const slot = await requireOwnedSlot(db, session.user.id, data.id);
+    await touchWorkout(db, slot.workoutId);
     await db.delete(workoutExercises).where(eq(workoutExercises.id, data.id));
   });
 
@@ -161,6 +166,7 @@ export const addWorkoutSet = createServerFn({ method: 'POST' })
     const session = await requireSession();
     await db.transaction(async (tx) => {
       const slot = await requireOwnedSlot(tx, session.user.id, data.workoutExerciseId);
+      await touchWorkout(tx, slot.workoutId);
       const [last] = await tx
         .select()
         .from(workoutSets)
@@ -187,6 +193,7 @@ export const duplicateWorkoutSet = createServerFn({ method: 'POST' })
     const session = await requireSession();
     await db.transaction(async (tx) => {
       const owned = await requireOwnedSet(tx, session.user.id, data.id);
+      await touchWorkout(tx, owned.workoutId);
       const [source] = await tx.select().from(workoutSets).where(eq(workoutSets.id, owned.id));
       if (!source) return;
       const later = and(
@@ -235,7 +242,8 @@ export const updateWorkoutSet = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(updateWorkoutSetInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    await requireOwnedSet(db, session.user.id, data.id);
+    const owned = await requireOwnedSet(db, session.user.id, data.id);
+    await touchWorkout(db, owned.workoutId);
     const { done, id, type: setType, ...metrics } = data;
     const values = {
       ...toSetColumns(metrics),
@@ -251,6 +259,7 @@ export const deleteWorkoutSet = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(idInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    await requireOwnedSet(db, session.user.id, data.id);
+    const owned = await requireOwnedSet(db, session.user.id, data.id);
+    await touchWorkout(db, owned.workoutId);
     await db.delete(workoutSets).where(eq(workoutSets.id, data.id));
   });
