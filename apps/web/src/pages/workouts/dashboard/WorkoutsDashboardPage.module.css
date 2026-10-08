@@ -1,4 +1,4 @@
-/* Main column for actions and history; a narrower side column for the overview cards. */
+/* Main column for workouts; a narrower side column for the overview. */
 .page {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(20rem, 24rem);
@@ -12,59 +12,21 @@
   }
 }
 
-.main,
-.side {
+.main {
   display: grid;
-  gap: var(--space-xl);
+  gap: var(--space-sm);
   min-width: 0;
 }
 
 .side {
-  gap: var(--space-md);
-}
-
-.section {
   display: grid;
-  gap: var(--space-sm);
+  gap: var(--space-lg);
+  min-width: 0;
 }
 
-.title {
-  font-size: var(--text-md);
-}
-
-/* An unfinished workout is the most likely next action, so it gets the biggest target. */
-.continue {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-md);
-  border: var(--border-width) solid var(--c-primary-border);
-  border-radius: var(--radius-xs);
-  background: var(--c-primary-surface-strong);
-  color: var(--c-text-strong);
-  text-decoration: none;
-
-  & span {
-    display: grid;
-    overflow-wrap: anywhere;
-  }
-
-  & small {
-    color: var(--c-muted);
-    font-size: var(--text-sm);
-  }
-
-  & svg {
-    width: 1.25rem;
-    height: 1.25rem;
-    color: var(--c-accent);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--c-primary-focus);
-    outline-offset: 3px;
-  }
+.hint {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
 }
 
 .more {

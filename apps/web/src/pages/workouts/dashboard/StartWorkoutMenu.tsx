@@ -12,12 +12,14 @@ import {
 } from '@/components/ui/menu-btn/MenuBtn';
 import { todayLocalDate } from '@/lib/dateOnly';
 import { routinesQueryOptions, useStartRoutineMutation } from '../routines/routines.query';
+import { ElapsedTime } from '../ElapsedTime';
 import type { WorkoutSummary } from '../workouts.api';
 import { useStartWorkoutMutation } from '../workouts.query';
 
 /**
- * Floating start button: a menu with an empty workout and every routine. While a workout is
- * open it only links back to it, because the server allows one open workout at a time.
+ * Floating start button: a hover/tap menu with an empty workout and every routine. While a
+ * workout is open it turns into a "Continue" link with the live clock, because only one workout
+ * can be open at a time.
  */
 export function StartWorkoutMenu({ active }: { active: WorkoutSummary | undefined }) {
   const { data: routines } = useSuspenseQuery(routinesQueryOptions());
@@ -33,7 +35,7 @@ export function StartWorkoutMenu({ active }: { active: WorkoutSummary | undefine
         icon={<PlayIcon aria-hidden='true' />}
         render={<Link params={{ id: active.id }} to='/workouts/$id' />}
       >
-        Continue workout
+        Continue · {active.startedAt ? <ElapsedTime startedAt={active.startedAt} /> : active.name}
       </FloatingButton>
     );
   }
@@ -43,7 +45,7 @@ export function StartWorkoutMenu({ active }: { active: WorkoutSummary | undefine
       <FloatingButton
         icon={<PlusIcon aria-hidden='true' />}
         loading={startWorkout.isPending || startRoutine.isPending}
-        render={<MenuBtn />}
+        render={<MenuBtn openOnHover />}
       >
         Start workout
         <MenuBtnChevron />

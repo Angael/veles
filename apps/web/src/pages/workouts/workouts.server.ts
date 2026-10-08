@@ -111,21 +111,36 @@ const AUTO_FINISH_MS = 2 * 60 * 60 * 1000;
 
 /**
  * Finishes the user's workouts that nobody touched for two hours, ending them at the last edit,
- * so a forgotten Finish never turns 30 minutes of training into a five-hour session. Runs on
- * read and before starting a workout, so no background job is needed.
+ * so a forgotten Finish never turns 30 minutes of training into a five-hour session. Also
+ * finishes every open workout except the newest, which repairs rows from before the one-open
+ * rule. Runs on read and before starting a workout, so no background job is needed.
  */
 export async function autoFinishIdleWorkouts(tx: Db, userId: string) {
+  const open = and(
+    eq(workouts.userId, userId),
+    eq(workouts.kind, 'session'),
+    isNull(workouts.endedAt),
+  );
   await tx
     .update(workouts)
     .set({ endedAt: sql`${workouts.updatedAt}` })
-    .where(
-      and(
-        eq(workouts.userId, userId),
-        eq(workouts.kind, 'session'),
-        isNull(workouts.endedAt),
-        lt(workouts.updatedAt, new Date(Date.now() - AUTO_FINISH_MS)),
-      ),
-    );
+    .where(and(open, lt(workouts.updatedAt, new Date(Date.now() - AUTO_FINISH_MS))));
+  const [, ...older] = await tx
+    .select({ id: workouts.id })
+    .from(workouts)
+    .where(open)
+    .orderBy(desc(workouts.id));
+  if (older.length > 0) {
+    await tx
+      .update(workouts)
+      .set({ endedAt: sql`${workouts.updatedAt}` })
+      .where(
+        inArray(
+          workouts.id,
+          older.map((row) => row.id),
+        ),
+      );
+  }
 }
 
 /** Records an edit; `updated_at` is the "last edit" that auto-finish ends a workout at. */

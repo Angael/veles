@@ -1,6 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { format, parseISO, startOfWeek, subWeeks } from 'date-fns';
-import { Card } from '@/components/ui/card/Card';
 import { todayLocalDate } from '@/lib/dateOnly';
 import type { WorkoutSummary } from '../workouts.api';
 import { workoutsQueryOptions } from '../workouts.query';
@@ -56,37 +55,34 @@ function computeStats(workouts: WorkoutSummary[], today: string) {
 
 const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? '' : 's'}`;
 
-/** Small grid of headline numbers beside the calendar. */
+/** 2×2 grid of headline numbers beside the calendar. */
 export function WorkoutStats() {
   const { data: workouts } = useSuspenseQuery(workoutsQueryOptions());
   const stats = computeStats(workouts, todayLocalDate());
 
   return (
-    <Card as='section' aria-labelledby='workout-stats-title' className={css.card}>
-      <h2 id='workout-stats-title'>Stats</h2>
-      <dl className={css.grid}>
-        <div>
-          <dt>This week</dt>
-          <dd>{plural(stats.weekCount, 'workout')}</dd>
-          <dd className={css.sub}>{plural(stats.weekSets, 'set')}</dd>
-        </div>
-        <div>
-          <dt>This month</dt>
-          <dd>{plural(stats.monthCount, 'workout')}</dd>
-          {stats.monthVolumeKg > 0 ? (
-            <dd className={css.sub}>{stats.monthVolumeKg.toLocaleString()} kg lifted</dd>
-          ) : null}
-        </div>
-        <div>
-          <dt>Streak</dt>
-          <dd>{plural(stats.streak, 'week')}</dd>
-          <dd className={css.sub}>with a workout</dd>
-        </div>
-        <div>
-          <dt>Average length</dt>
-          <dd>{stats.averageSeconds === null ? '—' : formatLength(stats.averageSeconds)}</dd>
-        </div>
-      </dl>
-    </Card>
+    <dl aria-label='Workout stats' className={css.grid}>
+      <div>
+        <dt>This week</dt>
+        <dd>{plural(stats.weekCount, 'workout')}</dd>
+        <dd className={css.sub}>{plural(stats.weekSets, 'set')}</dd>
+      </div>
+      <div>
+        <dt>This month</dt>
+        <dd>{plural(stats.monthCount, 'workout')}</dd>
+        {stats.monthVolumeKg > 0 ? (
+          <dd className={css.sub}>{stats.monthVolumeKg.toLocaleString()} kg lifted</dd>
+        ) : null}
+      </div>
+      <div>
+        <dt>Streak</dt>
+        <dd>{plural(stats.streak, 'week')}</dd>
+        <dd className={css.sub}>with a workout</dd>
+      </div>
+      <div>
+        <dt>Average length</dt>
+        <dd>{stats.averageSeconds === null ? '—' : formatLength(stats.averageSeconds)}</dd>
+      </div>
+    </dl>
   );
 }

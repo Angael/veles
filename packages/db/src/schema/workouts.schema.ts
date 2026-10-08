@@ -94,6 +94,10 @@ export const workouts = pgTable(
   (table) => [
     index('workout_user_id_kind_date_idx').on(table.userId, table.kind, table.date),
     index('workout_routine_id_idx').on(table.routineId),
+    /** At most one open session per user; the server also checks before starting or reopening. */
+    uniqueIndex('workout_one_open_session_idx')
+      .on(table.userId)
+      .where(sql`${table.kind} = 'session' AND ${table.endedAt} IS NULL`),
     check('workout_kind_check', sql`${table.kind} IN ('routine', 'session')`),
     check('workout_session_date_check', sql`(${table.kind} = 'routine') = (${table.date} IS NULL)`),
   ],

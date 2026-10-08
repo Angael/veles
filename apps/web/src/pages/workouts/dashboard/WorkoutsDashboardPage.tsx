@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { ArrowRightIcon, PlayIcon } from 'lucide-react';
+import { ArrowRightIcon } from 'lucide-react';
 import { RoutineList } from '../routines/RoutineList';
 import { WorkoutList } from '../WorkoutList';
 import { workoutsQueryOptions } from '../workouts.query';
@@ -12,53 +12,36 @@ import css from './WorkoutsDashboardPage.module.css';
 const RECENT = 10;
 
 /**
- * Workouts home: the open workout and routines, then recent workouts in the main column; the
- * training calendar and stats on the side. Starting lives in the floating menu.
+ * Workouts home: one list with the open workout (highlighted) on top and recent ones below; the
+ * calendar, stats and routines on the side. Starting lives in the floating menu.
  */
 export function WorkoutsDashboardPage() {
   const { data: workouts } = useSuspenseQuery(workoutsQueryOptions());
   const active = workouts.find((workout) => workout.endedAt === null);
+  const shown = [
+    ...(active ? [active] : []),
+    ...workouts.filter((workout) => workout !== active).slice(0, RECENT),
+  ];
 
   return (
     <main className={css.page}>
-      <div className={css.main}>
-        <section aria-labelledby='current-title' className={css.section}>
-          <h2 className={css.title} id='current-title'>
-            Current workouts
-          </h2>
-          {active ? (
-            <Link className={css.continue} params={{ id: active.id }} to='/workouts/$id'>
-              <PlayIcon aria-hidden='true' />
-              <span>
-                Continue <strong>{active.name}</strong>
-                <small>
-                  {active.doneSets} sets · {active.exerciseCount} exercises
-                </small>
-              </span>
-              <ArrowRightIcon aria-hidden='true' />
-            </Link>
-          ) : null}
-          <RoutineList startBlocked={active !== undefined} />
-        </section>
-
-        {workouts.length > 0 ? (
-          <section aria-labelledby='recent-title' className={css.section}>
-            <h2 className={css.title} id='recent-title'>
-              Recent workouts
-            </h2>
-            <WorkoutList workouts={workouts.slice(0, RECENT)} />
-            {workouts.length > RECENT ? (
-              <Link className={css.more} to='/workouts/history'>
-                All workouts <ArrowRightIcon aria-hidden='true' />
-              </Link>
-            ) : null}
-          </section>
+      <section aria-label='Workouts' className={css.main}>
+        {shown.length > 0 ? (
+          <WorkoutList workouts={shown} />
+        ) : (
+          <p className={css.hint}>No workouts yet. Start one with the button below.</p>
+        )}
+        {workouts.length > shown.length ? (
+          <Link className={css.more} to='/workouts/history'>
+            All workouts <ArrowRightIcon aria-hidden='true' />
+          </Link>
         ) : null}
-      </div>
+      </section>
 
       <div className={css.side}>
         <WorkoutCalendar />
         <WorkoutStats />
+        <RoutineList />
       </div>
 
       <StartWorkoutMenu active={active} />

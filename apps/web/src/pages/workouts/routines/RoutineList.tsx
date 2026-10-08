@@ -1,128 +1,74 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
 import { format, parseISO } from 'date-fns';
-import { PencilIcon, PlayIcon, Trash2Icon } from 'lucide-react';
+import { ChevronRightIcon } from 'lucide-react';
 import { useState } from 'react';
-import {
-  ContextMenuItem,
-  ContextMenuPopup,
-  ContextMenuRoot,
-  ContextMenuTrigger,
-} from '@/components/ui/context-menu/ContextMenu';
-import { todayLocalDate } from '@/lib/dateOnly';
 import type { RoutineSummary } from './routines.api';
 import { RoutineDialog } from './RoutineDialog';
 import {
   routinesQueryOptions,
   useDeleteRoutineMutation,
-  useStartRoutineMutation,
   useUpdateRoutineMutation,
 } from './routines.query';
 import css from './Routines.module.css';
 
 /**
- * Routine cards: tap starts a workout with the routine's exercises, long press or right click
- * edits the name and description or deletes it. While a workout is open, cards only show what
- * the routine holds; starting waits until that workout is finished.
+ * Routines panel: each row shows what the routine holds and opens it to view its exercises, edit
+ * the name and description, or delete it. Starting a routine lives in the floating start menu.
  */
-export function RoutineList({ startBlocked }: { startBlocked: boolean }) {
+export function RoutineList() {
   const { data: routines } = useSuspenseQuery(routinesQueryOptions());
-  const navigate = useNavigate();
-  const startRoutine = useStartRoutineMutation();
   const updateRoutine = useUpdateRoutineMutation();
   const deleteRoutine = useDeleteRoutineMutation();
-  const [editing, setEditing] = useState<RoutineSummary | null>(null);
-
-  if (routines.length === 0) {
-    return (
-      <p className={css.hint}>
-        Finish a workout you like, then use its ⋯ menu to save it as a routine.
-      </p>
-    );
-  }
+  const [viewing, setViewing] = useState<RoutineSummary | null>(null);
 
   return (
-    <>
-      <ul aria-label='Routines' className={css.list}>
-        {routines.map((routine) => (
-          <li key={routine.id}>
-            <ContextMenuRoot>
-              <ContextMenuTrigger
-                render={
-                  <button
-                    aria-busy={
-                      startRoutine.isPending && startRoutine.variables.routineId === routine.id
-                    }
-                    aria-disabled={startBlocked || startRoutine.isPending}
-                    className={css.card}
-                    onClick={() =>
-                      !startBlocked &&
-                      !startRoutine.isPending &&
-                      startRoutine.mutate(
-                        { date: todayLocalDate(), routineId: routine.id },
-                        {
-                          onSuccess: ({ id }) =>
-                            void navigate({ params: { id }, to: '/workouts/$id' }),
-                        },
-                      )
-                    }
-                    type='button'
-                  />
-                }
-              >
-                <span className={css.cardHead}>
-                  <span className={css.cardTitle}>{routine.name}</span>
-                  {startBlocked ? null : (
-                    <span className={css.play}>
-                      <PlayIcon aria-hidden='true' />
-                    </span>
-                  )}
+    <section aria-labelledby='routines-title' className={css.panel}>
+      <h2 id='routines-title'>Routines</h2>
+      {routines.length === 0 ? (
+        <p className={css.hint}>
+          Finish a workout you like, then use its ⋯ menu to save it as a routine.
+        </p>
+      ) : (
+        <ul className={css.list}>
+          {routines.map((routine) => (
+            <li key={routine.id}>
+              <button className={css.row} onClick={() => setViewing(routine)} type='button'>
+                <span className={css.rowText}>
+                  <span className={css.rowName}>{routine.name}</span>
+                  <span className={css.exercises}>
+                    {routine.exerciseNames.join(' · ') || 'No exercises'}
+                  </span>
+                  <span className={css.lastUsed}>
+                    {routine.lastUsed
+                      ? `Last done ${format(parseISO(routine.lastUsed), 'EEE dd.MM')}`
+                      : 'Not done yet'}
+                  </span>
                 </span>
-                {routine.description ? (
-                  <span className={css.description}>{routine.description}</span>
-                ) : null}
-                <span className={css.exercises}>
-                  {routine.exerciseNames.join(' · ') || 'No exercises'}
-                </span>
-                <span className={css.lastUsed}>
-                  {routine.lastUsed
-                    ? `Last done ${format(parseISO(routine.lastUsed), 'EEE dd.MM')}`
-                    : 'Not done yet'}
-                </span>
-              </ContextMenuTrigger>
-              <ContextMenuPopup aria-label={`${routine.name} actions`}>
-                <ContextMenuItem
-                  icon={<PencilIcon aria-hidden='true' />}
-                  label='Edit name and description'
-                  onClick={() => setEditing(routine)}
-                />
-                <ContextMenuItem
-                  icon={<Trash2Icon aria-hidden='true' />}
-                  label='Delete routine'
-                  onClick={() => {
-                    if (window.confirm(`Delete routine “${routine.name}”? Past workouts stay.`)) {
-                      deleteRoutine.mutate({ id: routine.id });
-                    }
-                  }}
-                  variant='danger'
-                />
-              </ContextMenuPopup>
-            </ContextMenuRoot>
-          </li>
-        ))}
-      </ul>
+                <ChevronRightIcon aria-hidden='true' />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
       <RoutineDialog
-        defaults={{ description: editing?.description ?? '', name: editing?.name ?? '' }}
-        key={editing?.id}
-        onOpenChange={(open) => !open && setEditing(null)}
+        defaults={{ description: viewing?.description ?? '', name: viewing?.name ?? '' }}
+        exerciseNames={viewing?.exerciseNames}
+        key={viewing?.id}
+        onDelete={() => {
+          if (viewing && window.confirm(`Delete routine “${viewing.name}”? Past workouts stay.`)) {
+            deleteRoutine.mutate({ id: viewing.id });
+            setViewing(null);
+          }
+        }}
+        onOpenChange={(open) => !open && setViewing(null)}
         onSubmit={(values) =>
-          editing ? updateRoutine.mutateAsync({ id: editing.id, ...values }) : Promise.resolve()
+          viewing ? updateRoutine.mutateAsync({ id: viewing.id, ...values }) : Promise.resolve()
         }
-        open={editing !== null}
+        open={viewing !== null}
         pending={updateRoutine.isPending}
         submitLabel='Save'
-        title='Edit routine'
+        title='Routine'
       />
-    </>
+    </section>
   );
 }
