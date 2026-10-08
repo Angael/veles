@@ -14,7 +14,7 @@ Real feature: `/workouts` (list) and `/workouts/$id` (live session). Playground:
 
 **Real feature.**
 
-- `/workouts` is a dashboard: "Continue" card for an unfinished workout, "Empty workout", routine cards (tap = start; long press = edit name and description, or delete), a 26-week calendar, the last 5 workouts with "All workouts →" (`/workouts/history`), and an "Exercises" list (last best set and a sparkline of the best per session). The recent list and the exercise list may overlap; the user will pick one later.
+- `/workouts` is a dashboard. Main column: "Current workouts" ("Continue" card for an unfinished workout, then routine cards: tap = start; long press = edit name and description, or delete), then the last 10 workouts with "All workouts →" (`/workouts/history`). Side column: a 26-week calendar and a "Stats" card (this week, this month, week streak, average length). A floating "Start workout" menu holds "Empty workout" and every routine; while a workout is open it becomes "Continue workout". The per-exercise progress list was removed in favour of recent workouts.
 - Calendar: one hue, brightness by training time per day, full at 2 h. An unfinished workout counts until its last ticked set. Tap a square to open that day's workout.
 - `/workouts/$id` (`layout: 'task'`): the live session. Every edit is saved at once. Ticks, set types and structure changes are sent right away; dragged values are sent 600 ms after the drag pauses, and on tab hide or leave. The cache is patched first, and the session refetches when the last request settles.
 - Session "⋯" menu: "Save as new routine" (name + optional description, links the session) and "Update routine 'X'" (overwrites the linked routine).
