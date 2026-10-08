@@ -1,0 +1,43 @@
+.card {
+  display: grid;
+  gap: var(--space-sm);
+
+  & h2 {
+    font-size: var(--text-md);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+  margin: 0;
+
+  & > div {
+    display: grid;
+    align-content: start;
+    gap: 0.15rem;
+    padding: var(--space-sm);
+    border-radius: var(--radius-xs);
+    background: var(--c-surface-inset);
+  }
+
+  & dt {
+    color: var(--c-muted);
+    font-size: var(--text-xs);
+  }
+
+  & dd {
+    margin: 0;
+    color: var(--c-text-strong);
+    font-size: var(--text-lg);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  & .sub {
+    color: var(--c-muted);
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-regular);
+  }
+}

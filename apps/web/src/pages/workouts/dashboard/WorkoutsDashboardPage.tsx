@@ -1,19 +1,19 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { ArrowRightIcon, LoaderCircleIcon, PlayIcon, PlusIcon } from 'lucide-react';
-import { todayLocalDate } from '@/lib/dateOnly';
+import { Link } from '@tanstack/react-router';
+import { ArrowRightIcon, PlayIcon } from 'lucide-react';
 import { RoutineList } from '../routines/RoutineList';
 import { WorkoutList } from '../WorkoutList';
-import { useStartWorkoutMutation, workoutsQueryOptions } from '../workouts.query';
-import { ExerciseProgressList } from './ExerciseProgressList';
+import { workoutsQueryOptions } from '../workouts.query';
+import { StartWorkoutMenu } from './StartWorkoutMenu';
 import { WorkoutCalendar } from './WorkoutCalendar';
+import { WorkoutStats } from './WorkoutStats';
 import css from './WorkoutsDashboardPage.module.css';
 
-const RECENT = 5;
+const RECENT = 10;
 
 /**
- * Workouts home: continue or start (empty or from a routine) and recent workouts in the main
- * column; the training calendar and how each exercise is going on the side.
+ * Workouts home: the open workout and routines, then recent workouts in the main column; the
+ * training calendar and stats on the side. Starting lives in the floating menu.
  */
 export function WorkoutsDashboardPage() {
   const { data: workouts } = useSuspenseQuery(workoutsQueryOptions());
@@ -22,7 +22,10 @@ export function WorkoutsDashboardPage() {
   return (
     <main className={css.page}>
       <div className={css.main}>
-        <section aria-label='Start a workout' className={css.section}>
+        <section aria-labelledby='current-title' className={css.section}>
+          <h2 className={css.title} id='current-title'>
+            Current workouts
+          </h2>
           {active ? (
             <Link className={css.continue} params={{ id: active.id }} to='/workouts/$id'>
               <PlayIcon aria-hidden='true' />
@@ -35,9 +38,7 @@ export function WorkoutsDashboardPage() {
               <ArrowRightIcon aria-hidden='true' />
             </Link>
           ) : null}
-          <RoutineList startBlocked={active !== undefined}>
-            {active ? null : <EmptyWorkoutTile />}
-          </RoutineList>
+          <RoutineList startBlocked={active !== undefined} />
         </section>
 
         {workouts.length > 0 ? (
@@ -57,43 +58,10 @@ export function WorkoutsDashboardPage() {
 
       <div className={css.side}>
         <WorkoutCalendar />
-        <ExerciseProgressList />
+        <WorkoutStats />
       </div>
+
+      <StartWorkoutMenu active={active} />
     </main>
-  );
-}
-
-/** First start tile: a blank workout, styled as a dashed sibling of the routine tiles. */
-function EmptyWorkoutTile() {
-  const navigate = useNavigate();
-  const startWorkout = useStartWorkoutMutation();
-
-  return (
-    <li>
-      <button
-        aria-busy={startWorkout.isPending}
-        className={css.emptyTile}
-        onClick={() =>
-          !startWorkout.isPending &&
-          startWorkout.mutate(
-            { date: todayLocalDate() },
-            { onSuccess: ({ id }) => void navigate({ params: { id }, to: '/workouts/$id' }) },
-          )
-        }
-        type='button'
-      >
-        <span className={css.emptyIcon}>
-          {startWorkout.isPending ? (
-            <LoaderCircleIcon aria-hidden='true' className={css.spin} />
-          ) : (
-            <PlusIcon aria-hidden='true' />
-          )}
-        </span>
-        <span className={css.emptyText}>
-          <strong>Empty workout</strong>
-          <small>Add exercises as you go</small>
-        </span>
-      </button>
-    </li>
   );
 }

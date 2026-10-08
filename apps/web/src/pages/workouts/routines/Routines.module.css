@@ -4,7 +4,6 @@
 }
 
 .hint {
-  align-self: center;
   color: var(--c-muted);
   font-size: var(--text-sm);
   text-wrap: pretty;
