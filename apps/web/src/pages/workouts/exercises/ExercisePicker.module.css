@@ -23,23 +23,23 @@
 .create {
   display: grid;
   gap: var(--space-xs);
+  margin-top: var(--space-xs);
   padding: var(--space-sm);
   border: var(--border-width) dashed var(--c-primary-border-soft);
   border-radius: var(--radius-xs);
   background: var(--c-primary-surface);
+
+  &.active {
+    border-style: solid;
+    border-color: var(--c-primary-border);
+  }
 }
 
-.createButton {
+.createLabel {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  padding: 0;
-  border: 0;
-  background: none;
   color: var(--c-text-strong);
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
 
   & svg {
     flex: none;
@@ -49,6 +49,7 @@
 
 .results {
   display: grid;
+  gap: 2px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -56,18 +57,11 @@
 
 .result {
   display: grid;
-  width: 100%;
-  padding: var(--space-xs) var(--space-xs);
-  border: 0;
+  padding: var(--space-xs);
   border-radius: var(--radius-xs);
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-align: start;
   cursor: pointer;
 
-  &:hover,
-  &:focus-visible {
+  &.active {
     background: var(--c-surface-raised);
   }
 }

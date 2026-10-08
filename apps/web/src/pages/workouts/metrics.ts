@@ -45,17 +45,48 @@ export const EMPTY_METRICS: SetMetrics = {
   weightKg: null,
 };
 
+/**
+ * Grey starting values when an exercise has no last time, so an empty row still reads as
+ * "weight here, reps there". They are never saved unless the user picks them.
+ */
+export const DEFAULT_METRICS: Record<MetricKey, number> = {
+  distanceKm: 5,
+  durationSeconds: 60,
+  reps: 12,
+  weightKg: 40,
+};
+
 export type MetricField = {
   key: MetricKey;
   label: string;
   unit: string;
+  /** Unit shown inside a compact cell; time needs none because `1:30` is clear. */
+  cellUnit?: string;
   kind: 'number' | 'time';
 };
 
-const weight: MetricField = { key: 'weightKg', kind: 'number', label: 'Weight', unit: 'kg' };
-const reps: MetricField = { key: 'reps', kind: 'number', label: 'Reps', unit: 'reps' };
+const weight: MetricField = {
+  cellUnit: 'kg',
+  key: 'weightKg',
+  kind: 'number',
+  label: 'Weight',
+  unit: 'kg',
+};
+const reps: MetricField = {
+  cellUnit: 'reps',
+  key: 'reps',
+  kind: 'number',
+  label: 'Reps',
+  unit: 'reps',
+};
 const time: MetricField = { key: 'durationSeconds', kind: 'time', label: 'Time', unit: 'min:s' };
-const distance: MetricField = { key: 'distanceKm', kind: 'number', label: 'Distance', unit: 'km' };
+const distance: MetricField = {
+  cellUnit: 'km',
+  key: 'distanceKm',
+  kind: 'number',
+  label: 'Distance',
+  unit: 'km',
+};
 
 export const MEASURE_FIELDS: Record<Measure, MetricField[]> = {
   distance_duration: [distance, time],
@@ -110,14 +141,20 @@ export function parseMetric(field: MetricField, text: string): number | null {
   return Number.isFinite(value) && value >= 0 ? value : null;
 }
 
-/** Completing a set with empty cells adopts last time's values (Strong's behaviour). */
+/**
+ * Completing a set with empty cells adopts last time's values (Strong's behaviour). Returns null
+ * when a cell is empty and there is no last time to copy, so the caller can ask instead.
+ */
 export function filledFromPrevious(
   set: SetMetrics & { previous: SetMetrics | null },
   measure: Measure,
-): Partial<SetMetrics> {
+): Partial<SetMetrics> | null {
   const patch: Partial<SetMetrics> = {};
   for (const field of MEASURE_FIELDS[measure]) {
-    if (set[field.key] === null) patch[field.key] = set.previous?.[field.key] ?? null;
+    if (set[field.key] !== null) continue;
+    const previous = set.previous?.[field.key] ?? null;
+    if (previous === null) return null;
+    patch[field.key] = previous;
   }
   return patch;
 }

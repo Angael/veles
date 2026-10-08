@@ -16,7 +16,7 @@ type ExerciseCardProps = {
   isLast: boolean;
   /** 1-based position in the workout. */
   number: number;
-  onOpenSheet: (setId: string) => void;
+  onOpenSheet: (setId: string, complete?: boolean) => void;
   onSetCompleted: (slot: WorkoutSlotData, set: WorkoutSetData) => void;
   slot: WorkoutSlotData;
   /** First-use tip shown right above the set rows it explains. */
@@ -89,7 +89,7 @@ export function ExerciseCard({
             key={set.id}
             number={numbers[index] ?? 0}
             onCompleted={(done) => onSetCompleted(slot, done)}
-            onOpenSheet={() => onOpenSheet(set.id)}
+            onOpenSheet={(complete) => onOpenSheet(set.id, complete)}
             set={set}
             slot={slot}
           />

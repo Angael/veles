@@ -13,22 +13,35 @@ const OPTIONS: { measure: Measure; Icon: ComponentType<{ 'aria-hidden': 'true' }
   { Icon: RouteIcon, measure: 'distance_duration' },
 ];
 
-type MeasurePickerProps = { onChange: (measure: Measure) => void; value: Measure };
+type MeasurePickerProps = {
+  onChange: (measure: Measure) => void;
+  value: Measure;
+  /**
+   * Turns the cells into action buttons ("Create as Reps") instead of a radio group; `value` is
+   * then only the highlighted cell.
+   */
+  actionLabel?: (measureLabel: string) => string;
+};
 
 /**
  * What an exercise tracks, as a grid of big cells instead of wrapping pills: 3 + 2 on phones
  * (the bottom two stretch to fill the row), one row of 5 on wider screens.
  */
-export function MeasurePicker({ onChange, value }: MeasurePickerProps) {
+export function MeasurePicker({ actionLabel, onChange, value }: MeasurePickerProps) {
   return (
-    <div aria-label='What to track' className={css.grid} role='radiogroup'>
+    <div
+      aria-label='What to track'
+      className={css.grid}
+      role={actionLabel ? 'group' : 'radiogroup'}
+    >
       {OPTIONS.map(({ Icon, measure }) => (
         <button
-          aria-checked={measure === value}
+          aria-checked={actionLabel ? undefined : measure === value}
+          aria-label={actionLabel?.(MEASURE_LABELS[measure])}
           className={clsx(css.cell, measure === value && css.active)}
           key={measure}
           onClick={() => onChange(measure)}
-          role='radio'
+          role={actionLabel ? undefined : 'radio'}
           type='button'
         >
           <Icon aria-hidden='true' />

@@ -95,6 +95,13 @@
   white-space: nowrap;
 }
 
+.cellUnit {
+  margin-inline-start: 0.2em;
+  color: var(--c-muted-strong);
+  font-family: var(--font-sans);
+  font-size: 0.7em;
+}
+
 /* Big field */
 .field {
   display: grid;

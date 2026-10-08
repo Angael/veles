@@ -3,6 +3,7 @@ import { HistoryIcon, XIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import {
+  DEFAULT_METRICS,
   describeSet,
   formatMetric,
   MEASURE_FIELDS,
@@ -68,7 +69,7 @@ export function SetSheet({ onClose, onSave, target }: SetSheetProps) {
                 <div className={css.fields}>
                   {MEASURE_FIELDS[target.slot.measure].map((field) => (
                     <ScrubField
-                      fallback={set.previous?.[field.key] ?? 0}
+                      fallback={set.previous?.[field.key] ?? DEFAULT_METRICS[field.key]}
                       format={(value) => formatMetric(field, value)}
                       key={field.key}
                       label={field.label}
@@ -85,7 +86,17 @@ export function SetSheet({ onClose, onSave, target }: SetSheetProps) {
 
                 <Btn
                   onClick={() => {
-                    onSave(draft);
+                    // Empty fields save what the sheet shows, so Save always logs visible values.
+                    const shown = Object.fromEntries(
+                      MEASURE_FIELDS[target.slot.measure].map((field) => [
+                        field.key,
+                        draft[field.key] ??
+                          set[field.key] ??
+                          set.previous?.[field.key] ??
+                          DEFAULT_METRICS[field.key],
+                      ]),
+                    );
+                    onSave(shown);
                     onClose();
                   }}
                   radius='pill'

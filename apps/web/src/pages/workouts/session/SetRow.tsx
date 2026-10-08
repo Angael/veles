@@ -3,6 +3,7 @@ import { CheckIcon } from 'lucide-react';
 import { useState } from 'react';
 import { ContextMenuRoot, ContextMenuTrigger } from '@/components/ui/context-menu/ContextMenu';
 import {
+  DEFAULT_METRICS,
   filledFromPrevious,
   formatMetric,
   MEASURE_FIELDS,
@@ -22,7 +23,8 @@ type SetRowProps = {
   /** Working-set number; warm-ups and drops don't count, like Strong and Hevy. */
   number: number;
   onCompleted: (set: WorkoutSetData) => void;
-  onOpenSheet: () => void;
+  /** `complete`: the tick opened the sheet, so Save also finishes the set. */
+  onOpenSheet: (complete?: boolean) => void;
   set: WorkoutSetData;
   slot: WorkoutSlotData;
 };
@@ -38,7 +40,9 @@ export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }:
 
   function toggleDone() {
     if (set.done) return update({ done: false });
-    const patch = { ...filledFromPrevious(set, slot.measure), done: true };
+    const filled = filledFromPrevious(set, slot.measure);
+    if (!filled) return onOpenSheet(true);
+    const patch = { ...filled, done: true };
     update(patch);
     onCompleted({ ...set, ...patch });
   }
@@ -70,8 +74,9 @@ export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }:
             format={(value) => formatMetric(field, value)}
             key={field.key}
             onChange={(value) => update({ [field.key]: value })}
-            onTap={onOpenSheet}
-            placeholder={set.previous?.[field.key] ?? null}
+            onTap={() => onOpenSheet()}
+            placeholder={set.previous?.[field.key] ?? DEFAULT_METRICS[field.key]}
+            unit={field.cellUnit}
             value={set[field.key]}
             {...scrubTuning(field)}
           />

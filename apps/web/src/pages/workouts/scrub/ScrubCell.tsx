@@ -9,6 +9,8 @@ type ScrubCellProps = Omit<ScrubOptions, 'fallback'> & {
   format: (value: number) => string;
   /** Last time's value: shown as a ghost and used as the drag start when empty. */
   placeholder: number | null;
+  /** Small grey unit after the number, so weight and reps never get mixed up. */
+  unit?: string;
 };
 
 export const rulerStyle = (offset: number): CSSProperties & { '--scrub-offset': string } => ({
@@ -23,6 +25,7 @@ export function ScrubCell({
   'aria-label': ariaLabel,
   format,
   placeholder,
+  unit,
   ...options
 }: ScrubCellProps) {
   const { handlers, offset } = useScrub({ ...options, fallback: placeholder ?? 0 });
@@ -43,7 +46,10 @@ export function ScrubCell({
       {...handlers}
     >
       <ChevronLeftIcon aria-hidden='true' className={css.hintChevron} />
-      <span className={css.cellValue}>{shown === null ? '' : format(shown)}</span>
+      <span className={css.cellValue}>
+        {shown === null ? '' : format(shown)}
+        {unit ? <small className={css.cellUnit}>{unit}</small> : null}
+      </span>
       <ChevronRightIcon aria-hidden='true' className={css.hintChevron} />
     </div>
   );

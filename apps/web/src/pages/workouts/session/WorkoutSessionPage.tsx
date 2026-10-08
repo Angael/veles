@@ -25,7 +25,9 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
   const timer = useRestTimer();
   const hints = useSeenHints();
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [sheet, setSheet] = useState<{ slotId: string; setId: string } | null>(null);
+  const [sheet, setSheet] = useState<{ slotId: string; setId: string; complete: boolean } | null>(
+    null,
+  );
 
   const sheetSlot = session.slots.find((slot) => slot.id === sheet?.slotId);
   const sheetSet = sheetSlot?.sets.find((set) => set.id === sheet?.setId);
@@ -57,7 +59,9 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
               isLast={index === session.slots.length - 1}
               key={slot.id}
               number={index + 1}
-              onOpenSheet={(setId) => setSheet({ setId, slotId: slot.id })}
+              onOpenSheet={(setId, complete = false) =>
+                setSheet({ complete, setId, slotId: slot.id })
+              }
               onSetCompleted={onSetCompleted}
               slot={slot}
               tip={
@@ -89,7 +93,12 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
       />
       <SetSheet
         onClose={() => setSheet(null)}
-        onSave={(patch) => sheetSet && actions.updateSet(sheetSet.id, patch)}
+        onSave={(patch) => {
+          if (!sheetSlot || !sheetSet) return;
+          if (!sheet?.complete) return actions.updateSet(sheetSet.id, patch);
+          actions.updateSet(sheetSet.id, { ...patch, done: true });
+          onSetCompleted(sheetSlot, { ...sheetSet, ...patch, done: true });
+        }}
         target={
           sheetSlot && sheetSet
             ? { number: sheetSlot.sets.indexOf(sheetSet) + 1, set: sheetSet, slot: sheetSlot }
