@@ -32,6 +32,13 @@ export const SET_TYPE_LABELS: Record<SetType, string> = {
   warmup: 'Warm-up',
 };
 
+/** What each marked set type means, shown on hover over the set badge. */
+export const SET_TYPE_DESCRIPTIONS: Record<Exclude<SetType, 'normal'>, string> = {
+  drop: 'Drop set: lighter weight right after the previous set, no rest',
+  failure: 'To failure: reps until you can’t do another one',
+  warmup: 'Warm-up: light set before working sets, not counted',
+};
+
 export const SET_BADGE: Record<Exclude<SetType, 'normal'>, string> = {
   drop: 'D',
   failure: 'F',

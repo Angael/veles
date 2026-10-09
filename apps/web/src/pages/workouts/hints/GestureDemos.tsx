@@ -51,3 +51,28 @@ export function LongPressDemo() {
     </div>
   );
 }
+
+const SET_TYPE_STEPS = [
+  { badge: '1', className: undefined, label: 'Normal' },
+  { badge: 'W', className: css.typeBadgeWarmup, label: 'Warm-up' },
+  { badge: 'D', className: css.typeBadgeDrop, label: 'Drop set' },
+  { badge: 'F', className: css.typeBadgeFailure, label: 'To failure' },
+];
+
+/** Taps the set number four times, cycling normal → warm-up → drop → failure → normal. */
+export function SetTypeDemo() {
+  const progress = useTimeline(5200, 0.45);
+  const coarse = useCoarsePointer();
+  const approach = phase(progress, 0, 0.1);
+  const taps = [0.2, 0.4, 0.6, 0.8];
+  const pressed = taps.some((at) => progress > at - 0.03 && progress < at + 0.02);
+  const step = SET_TYPE_STEPS[taps.filter((at) => progress >= at).length % SET_TYPE_STEPS.length];
+
+  return (
+    <div aria-hidden='true' className={css.stage}>
+      <span className={clsx(css.typeBadge, step?.className)}>{step?.badge}</span>
+      <span className={css.typeLabel}>{step?.label}</span>
+      <Pointer coarse={coarse} pressed={pressed} x={(1 - approach) * 30} y={(1 - approach) * 24} />
+    </div>
+  );
+}

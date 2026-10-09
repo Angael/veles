@@ -2,7 +2,7 @@ import { XIcon } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { DragDemo } from './DragDemos';
-import { LongPressDemo } from './GestureDemos';
+import { LongPressDemo, SetTypeDemo } from './GestureDemos';
 import css from './Hints.module.css';
 
 export type Hint = { key: string; title: string; Demo: ComponentType };
@@ -18,6 +18,11 @@ export const HINTS: Hint[] = [
     Demo: LongPressDemo,
     key: 'longpress',
     title: 'Hold for more',
+  },
+  {
+    Demo: SetTypeDemo,
+    key: 'settype',
+    title: 'Tap set number for warm-up, drop set or failure',
   },
 ];
 
