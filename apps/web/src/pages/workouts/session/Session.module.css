@@ -205,6 +205,26 @@
   }
 }
 
+.typeFlashClosing {
+  animation: type-flash-roll-in 180ms var(--ease-out) forwards;
+
+  & .typeFlashText {
+    animation: type-flash-text-out 120ms var(--ease-out) forwards;
+  }
+}
+
+@keyframes type-flash-roll-in {
+  to {
+    clip-path: inset(0 calc(100% - 1.75rem) 0 0 round 8px);
+  }
+}
+
+@keyframes type-flash-text-out {
+  to {
+    opacity: 0;
+  }
+}
+
 @keyframes type-flash-unroll {
   0% {
     clip-path: inset(0 calc(100% - 1.75rem) 0 0 round 8px);
@@ -247,6 +267,16 @@
 
   .typeFlashText {
     animation: none;
+  }
+
+  .typeFlashClosing {
+    animation: type-flash-fade-out 120ms forwards;
+  }
+}
+
+@keyframes type-flash-fade-out {
+  to {
+    opacity: 0;
   }
 }
 
