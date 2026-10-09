@@ -56,7 +56,12 @@ export function WorkoutCalendar() {
   const trainingDays = data.filter((day) => day.date <= today).length;
 
   return (
-    <Card as='section' aria-labelledby='workout-calendar-title' className={css.card}>
+    <Card
+      as='section'
+      aria-labelledby='workout-calendar-title'
+      className={css.card}
+      data-appear='1'
+    >
       <header className={css.header}>
         <h2 id='workout-calendar-title'>Last 6 months</h2>
         <p className={css.summary}>

@@ -20,7 +20,7 @@ export function RoutineList() {
   const deleteRoutine = useDeleteRoutineMutation();
 
   return (
-    <section aria-labelledby='routines-title' className={css.panel}>
+    <section aria-labelledby='routines-title' className={css.panel} data-appear='3'>
       <h2 id='routines-title'>Routines</h2>
       {routines.length === 0 ? (
         <p className={css.hint}>

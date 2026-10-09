@@ -61,7 +61,7 @@ export function WorkoutStats() {
   const stats = computeStats(workouts, todayLocalDate());
 
   return (
-    <dl aria-label='Workout stats' className={css.grid}>
+    <dl aria-label='Workout stats' className={css.grid} data-appear='2'>
       <div>
         <dt>This week</dt>
         <dd>{plural(stats.weekCount, 'workout')}</dd>

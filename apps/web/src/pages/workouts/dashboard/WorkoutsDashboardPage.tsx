@@ -25,7 +25,7 @@ export function WorkoutsDashboardPage() {
 
   return (
     <main className={css.page}>
-      <section aria-label='Workouts' className={css.main}>
+      <section aria-label='Workouts' className={css.main} data-appear>
         {shown.length > 0 ? (
           <WorkoutList workouts={shown} />
         ) : (
