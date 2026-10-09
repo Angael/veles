@@ -54,7 +54,6 @@ import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { Toggle } from '@/components/ui/toggle/Toggle';
 import css from './ComponentsDemoPage.module.css';
 import { PhotosFieldDemo } from './PhotosFieldDemo';
-import { TooltipDemo } from './TooltipDemo';
 
 const SELECT_OPTIONS = [
   { label: 'Less than or equal', value: 'lte' },
@@ -317,7 +316,6 @@ export function ComponentsDemoPage() {
       </section>
 
       <PhotosFieldDemo />
-      <TooltipDemo />
 
       <section>
         <h2>TextInput</h2>

@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import { CheckIcon } from 'lucide-react';
 import { useState } from 'react';
 import { ContextMenuRoot, ContextMenuTrigger } from '@/components/ui/context-menu/ContextMenu';
-import { Tooltip } from '@/components/ui/tooltip/Tooltip';
 import {
   DEFAULT_METRICS,
   filledFromPrevious,
@@ -10,14 +9,15 @@ import {
   MEASURE_FIELDS,
   scrubTuning,
   SET_BADGE,
-  SET_TYPE_DESCRIPTIONS,
   SET_TYPE_LABELS,
+  SET_TYPE_NOTES,
   SET_TYPES,
 } from '../metrics';
 import { ScrubCell } from '../scrub/ScrubCell';
 import type { WorkoutSetData, WorkoutSlotData } from '../workouts.server';
 import type { SessionActions, SetPatch } from './session.query';
 import { SetMenu } from './SetMenu';
+import { SetTypeFlash } from './SetTypeFlash';
 import css from './Session.module.css';
 
 type SetRowProps = {
@@ -37,6 +37,8 @@ type SetRowProps = {
  */
 export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }: SetRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  /** Bumped on every badge tap so the type label replays its animation. */
+  const [flash, setFlash] = useState(0);
   const fields = MEASURE_FIELDS[slot.measure];
   const update = (patch: SetPatch) => actions.updateSet(set.id, patch);
 
@@ -52,6 +54,7 @@ export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }:
   function cycleType() {
     const next = SET_TYPES[(SET_TYPES.indexOf(set.type) + 1) % SET_TYPES.length];
     update({ type: next ?? 'normal' });
+    setFlash((count) => count + 1);
   }
 
   return (
@@ -61,19 +64,23 @@ export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }:
         data-fields={fields.length}
         render={<div role='row' />}
       >
-        <Tooltip
-          content={set.type === 'normal' ? null : SET_TYPE_DESCRIPTIONS[set.type]}
-          disabled={set.type === 'normal'}
+        <button
+          aria-label={`Set type: ${SET_TYPE_LABELS[set.type]}. Tap to change.`}
+          className={clsx(css.badge, css[`badge_${set.type}`])}
+          onClick={cycleType}
+          type='button'
         >
-          <button
-            aria-label={`Set type: ${SET_TYPE_LABELS[set.type]}. Tap to change.`}
-            className={clsx(css.badge, css[`badge_${set.type}`])}
-            onClick={cycleType}
-            type='button'
-          >
-            {set.type === 'normal' ? number : SET_BADGE[set.type]}
-          </button>
-        </Tooltip>
+          {set.type === 'normal' ? number : SET_BADGE[set.type]}
+          {flash > 0 ? (
+            <SetTypeFlash
+              badge={set.type === 'normal' ? number : SET_BADGE[set.type]}
+              key={flash}
+              label={SET_TYPE_LABELS[set.type]}
+              note={SET_TYPE_NOTES[set.type]}
+              onDone={() => setFlash(0)}
+            />
+          ) : null}
+        </button>
         {fields.map((field) => (
           <ScrubCell
             aria-label={`${field.label}, drag sideways or tap for details`}
