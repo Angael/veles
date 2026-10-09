@@ -14,19 +14,18 @@ function demoValue(slow: number, fast: number) {
 }
 
 /**
- * Pointer presses a cell, drags slowly (80 → 81.5), then flicks (→ 90). On touch the finger moves
- * left to increase, like pulling a ruler; on desktop the cursor moves right.
+ * Pointer presses a cell, drags slowly (80 → 81.5), then flicks (→ 90). The pointer moves left to
+ * increase, like pulling a ruler.
  */
 export function DragDemo() {
   const progress = useTimeline(4200, 0.6);
   const coarse = useCoarsePointer();
-  const direction = coarse ? -1 : 1;
 
   const approach = phase(progress, 0, 0.12);
   const slow = phase(progress, 0.18, 0.5);
   const fast = phase(progress, 0.55, 0.66);
   const pressed = progress > 0.14 && progress < 0.72;
-  const travel = (slow * 14 + fast * 46) * direction;
+  const travel = -(slow * 14 + fast * 46);
   const value = progress < 0.18 ? 80 : demoValue(slow, fast);
 
   return (

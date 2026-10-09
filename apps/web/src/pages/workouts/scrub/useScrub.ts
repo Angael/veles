@@ -38,7 +38,7 @@ const stepAt = (tiers: ScrubTier[], velocity: number) =>
 /**
  * Drag-sideways number editing where speed picks the step: slow drags move by the smallest
  * step, faster ones jump to bigger steps and snap to them, so no step setting is needed.
- * Touch follows the finger like a ruler (finger right = smaller), mouse drags right = bigger.
+ * Follows the pointer like a ruler on touch and mouse alike: dragging left = bigger.
  * Never goes below zero. Vertical movement still scrolls (pair with `touch-action: pan-y`).
  */
 export function useScrub({
@@ -53,7 +53,6 @@ export function useScrub({
 }: ScrubOptions) {
   const drag = useRef<{
     id: number;
-    direction: 1 | -1;
     startX: number;
     startY: number;
     lastX: number;
@@ -109,7 +108,6 @@ export function useScrub({
         if (disabled || event.button !== 0 || !event.isPrimary) return;
         drag.current = {
           active: false,
-          direction: event.pointerType === 'touch' ? -1 : 1,
           id: event.pointerId,
           lastT: event.timeStamp,
           lastX: event.clientX,
@@ -142,7 +140,7 @@ export function useScrub({
         state.lastT = event.timeStamp;
 
         const step = stepAt(tiers, state.velocity);
-        state.raw = clamp(state.raw + (dx / pixelsPerStep) * step * state.direction, max);
+        state.raw = clamp(state.raw - (dx / pixelsPerStep) * step, max);
         emit(roundTo(state.raw, step));
         setOffset(event.clientX - state.startX);
       },
