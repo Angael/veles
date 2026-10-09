@@ -2,7 +2,7 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { and, asc, eq, gte, max } from 'drizzle-orm';
-import { workoutExercises, workouts, workoutSets } from '@veles/db/schema';
+import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db/schema';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
@@ -31,28 +31,23 @@ export const getWorkoutCalendar = createServerFn({ method: 'GET' })
     await autoFinishIdleWorkouts(db, session.user.id);
     const rows = await db
       .select({
-        date: workouts.date,
-        endedAt: workouts.endedAt,
-        id: workouts.id,
+        date: workoutSessions.date,
+        endedAt: workoutSessions.endedAt,
+        id: workoutSessions.id,
         lastSetAt: max(workoutSets.completedAt),
-        startedAt: workouts.startedAt,
+        startedAt: workoutSessions.startedAt,
       })
-      .from(workouts)
-      .leftJoin(workoutExercises, eq(workoutExercises.workoutId, workouts.id))
-      .leftJoin(workoutSets, eq(workoutSets.workoutExerciseId, workoutExercises.id))
+      .from(workoutSessions)
+      .leftJoin(workoutSessionExercises, eq(workoutSessionExercises.sessionId, workoutSessions.id))
+      .leftJoin(workoutSets, eq(workoutSets.sessionExerciseId, workoutSessionExercises.id))
       .where(
-        and(
-          eq(workouts.userId, session.user.id),
-          eq(workouts.kind, 'session'),
-          gte(workouts.date, data.since),
-        ),
+        and(eq(workoutSessions.userId, session.user.id), gte(workoutSessions.date, data.since)),
       )
-      .groupBy(workouts.id)
-      .orderBy(asc(workouts.id));
+      .groupBy(workoutSessions.id)
+      .orderBy(asc(workoutSessions.id));
 
     const byDate = new Map<string, CalendarDay>();
     for (const row of rows) {
-      if (!row.date) continue;
       const start = row.startedAt?.getTime();
       const end = (row.endedAt ?? row.lastSetAt)?.getTime();
       const seconds = start && end && end > start ? (end - start) / 1000 : 0;

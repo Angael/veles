@@ -99,7 +99,7 @@ export function useSessionActions(workoutId: string) {
   });
   const addSet = useSessionMutation(workoutId, hasPendingEdits, {
     error: 'Set was not added',
-    mutationFn: (workoutExerciseId: string) => addWorkoutSet({ data: { workoutExerciseId } }),
+    mutationFn: (sessionExerciseId: string) => addWorkoutSet({ data: { sessionExerciseId } }),
   });
   const duplicateSet = useSessionMutation(workoutId, hasPendingEdits, {
     error: 'Set was not copied',

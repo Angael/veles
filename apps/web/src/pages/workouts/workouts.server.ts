@@ -1,5 +1,11 @@
 import { and, asc, desc, eq, inArray, isNull, lt, ne, sql } from 'drizzle-orm';
-import { exercises, workoutExercises, workouts, workoutSets } from '@veles/db/schema';
+import {
+  workoutExercises,
+  workoutRoutines,
+  workoutSessionExercises,
+  workoutSessions,
+  workoutSets,
+} from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db, type DbTransaction } from '@/server/db.server';
 import type { Measure, SetMetrics, SetType } from './metrics';
@@ -66,26 +72,24 @@ export function toSetColumns(patch: Partial<SetMetrics>) {
 
 export async function requireOwnedWorkout(tx: Db, userId: string, workoutId: string) {
   const [workout] = await tx
-    .select({ date: workouts.date, id: workouts.id })
-    .from(workouts)
-    .where(
-      and(eq(workouts.id, workoutId), eq(workouts.userId, userId), eq(workouts.kind, 'session')),
-    );
-  if (!workout?.date) throw new ClientSafeError('Workout not found.');
-  return { ...workout, date: workout.date };
+    .select({ date: workoutSessions.date, id: workoutSessions.id })
+    .from(workoutSessions)
+    .where(and(eq(workoutSessions.id, workoutId), eq(workoutSessions.userId, userId)));
+  if (!workout) throw new ClientSafeError('Workout not found.');
+  return workout;
 }
 
 export async function requireOwnedSlot(tx: Db, userId: string, slotId: string) {
   const [slot] = await tx
     .select({
-      exerciseId: workoutExercises.exerciseId,
-      id: workoutExercises.id,
-      position: workoutExercises.position,
-      workoutId: workoutExercises.workoutId,
+      exerciseId: workoutSessionExercises.exerciseId,
+      id: workoutSessionExercises.id,
+      position: workoutSessionExercises.position,
+      workoutId: workoutSessionExercises.sessionId,
     })
-    .from(workoutExercises)
-    .innerJoin(workouts, eq(workouts.id, workoutExercises.workoutId))
-    .where(and(eq(workoutExercises.id, slotId), eq(workouts.userId, userId)));
+    .from(workoutSessionExercises)
+    .innerJoin(workoutSessions, eq(workoutSessions.id, workoutSessionExercises.sessionId))
+    .where(and(eq(workoutSessionExercises.id, slotId), eq(workoutSessions.userId, userId)));
   if (!slot) throw new ClientSafeError('Exercise not found in this workout.');
   return slot;
 }
@@ -95,13 +99,16 @@ export async function requireOwnedSet(tx: Db, userId: string, setId: string) {
     .select({
       id: workoutSets.id,
       position: workoutSets.position,
-      workoutExerciseId: workoutSets.workoutExerciseId,
-      workoutId: workouts.id,
+      sessionExerciseId: workoutSets.sessionExerciseId,
+      workoutId: workoutSessions.id,
     })
     .from(workoutSets)
-    .innerJoin(workoutExercises, eq(workoutExercises.id, workoutSets.workoutExerciseId))
-    .innerJoin(workouts, eq(workouts.id, workoutExercises.workoutId))
-    .where(and(eq(workoutSets.id, setId), eq(workouts.userId, userId)));
+    .innerJoin(
+      workoutSessionExercises,
+      eq(workoutSessionExercises.id, workoutSets.sessionExerciseId),
+    )
+    .innerJoin(workoutSessions, eq(workoutSessions.id, workoutSessionExercises.sessionId))
+    .where(and(eq(workoutSets.id, setId), eq(workoutSessions.userId, userId)));
   if (!set) throw new ClientSafeError('Set not found.');
   return set;
 }
@@ -116,27 +123,23 @@ const AUTO_FINISH_MS = 2 * 60 * 60 * 1000;
  * rule. Runs on read and before starting a workout, so no background job is needed.
  */
 export async function autoFinishIdleWorkouts(tx: Db, userId: string) {
-  const open = and(
-    eq(workouts.userId, userId),
-    eq(workouts.kind, 'session'),
-    isNull(workouts.endedAt),
-  );
+  const open = and(eq(workoutSessions.userId, userId), isNull(workoutSessions.endedAt));
   await tx
-    .update(workouts)
-    .set({ endedAt: sql`${workouts.updatedAt}` })
-    .where(and(open, lt(workouts.updatedAt, new Date(Date.now() - AUTO_FINISH_MS))));
+    .update(workoutSessions)
+    .set({ endedAt: sql`${workoutSessions.updatedAt}` })
+    .where(and(open, lt(workoutSessions.updatedAt, new Date(Date.now() - AUTO_FINISH_MS))));
   const [, ...older] = await tx
-    .select({ id: workouts.id })
-    .from(workouts)
+    .select({ id: workoutSessions.id })
+    .from(workoutSessions)
     .where(open)
-    .orderBy(desc(workouts.id));
+    .orderBy(desc(workoutSessions.id));
   if (older.length > 0) {
     await tx
-      .update(workouts)
-      .set({ endedAt: sql`${workouts.updatedAt}` })
+      .update(workoutSessions)
+      .set({ endedAt: sql`${workoutSessions.updatedAt}` })
       .where(
         inArray(
-          workouts.id,
+          workoutSessions.id,
           older.map((row) => row.id),
         ),
       );
@@ -145,20 +148,22 @@ export async function autoFinishIdleWorkouts(tx: Db, userId: string) {
 
 /** Records an edit; `updated_at` is the "last edit" that auto-finish ends a workout at. */
 export async function touchWorkout(tx: Db, workoutId: string) {
-  await tx.update(workouts).set({ updatedAt: new Date() }).where(eq(workouts.id, workoutId));
+  await tx
+    .update(workoutSessions)
+    .set({ updatedAt: new Date() })
+    .where(eq(workoutSessions.id, workoutId));
 }
 
 /** Only one workout can be open at a time; call after `autoFinishIdleWorkouts`. */
 export async function requireNoOpenWorkout(tx: Db, userId: string, exceptId?: string) {
   const [open] = await tx
-    .select({ id: workouts.id })
-    .from(workouts)
+    .select({ id: workoutSessions.id })
+    .from(workoutSessions)
     .where(
       and(
-        eq(workouts.userId, userId),
-        eq(workouts.kind, 'session'),
-        isNull(workouts.endedAt),
-        exceptId ? ne(workouts.id, exceptId) : undefined,
+        eq(workoutSessions.userId, userId),
+        isNull(workoutSessions.endedAt),
+        exceptId ? ne(workoutSessions.id, exceptId) : undefined,
       ),
     )
     .limit(1);
@@ -167,9 +172,9 @@ export async function requireNoOpenWorkout(tx: Db, userId: string, exceptId?: st
 
 export async function requireOwnedExercise(tx: Db, userId: string, exerciseId: string) {
   const [exercise] = await tx
-    .select({ id: exercises.id })
-    .from(exercises)
-    .where(and(eq(exercises.id, exerciseId), eq(exercises.userId, userId)));
+    .select({ id: workoutExercises.id })
+    .from(workoutExercises)
+    .where(and(eq(workoutExercises.id, exerciseId), eq(workoutExercises.userId, userId)));
   if (!exercise) throw new ClientSafeError('Exercise not found.');
   return exercise;
 }
@@ -180,9 +185,8 @@ export async function requireOwnedExercise(tx: Db, userId: string, exerciseId: s
  */
 export function sessionsBefore(userId: string, workout: { date: string; id: string }) {
   return and(
-    eq(workouts.userId, userId),
-    eq(workouts.kind, 'session'),
-    sql`(${workouts.date}, ${workouts.id}) < (${workout.date}::date, ${workout.id}::uuid)`,
+    eq(workoutSessions.userId, userId),
+    sql`(${workoutSessions.date}, ${workoutSessions.id}) < (${workout.date}::date, ${workout.id}::uuid)`,
   );
 }
 
@@ -195,21 +199,25 @@ async function latestEarlierSlots(
 ) {
   if (exerciseIds.length === 0) return [];
   return db
-    .selectDistinctOn([workoutExercises.exerciseId], {
-      exerciseId: workoutExercises.exerciseId,
-      id: workoutExercises.id,
-      notes: workoutExercises.notes,
+    .selectDistinctOn([workoutSessionExercises.exerciseId], {
+      exerciseId: workoutSessionExercises.exerciseId,
+      id: workoutSessionExercises.id,
+      notes: workoutSessionExercises.notes,
     })
-    .from(workoutExercises)
-    .innerJoin(workouts, eq(workouts.id, workoutExercises.workoutId))
+    .from(workoutSessionExercises)
+    .innerJoin(workoutSessions, eq(workoutSessions.id, workoutSessionExercises.sessionId))
     .where(
       and(
         sessionsBefore(userId, workout),
-        inArray(workoutExercises.exerciseId, exerciseIds),
-        withNote ? ne(workoutExercises.notes, '') : undefined,
+        inArray(workoutSessionExercises.exerciseId, exerciseIds),
+        withNote ? ne(workoutSessionExercises.notes, '') : undefined,
       ),
     )
-    .orderBy(workoutExercises.exerciseId, desc(workouts.date), desc(workouts.id));
+    .orderBy(
+      workoutSessionExercises.exerciseId,
+      desc(workoutSessions.date),
+      desc(workoutSessions.id),
+    );
 }
 
 async function setsBySlot(slotIds: string[]) {
@@ -219,11 +227,11 @@ async function setsBySlot(slotIds: string[]) {
       : await db
           .select()
           .from(workoutSets)
-          .where(inArray(workoutSets.workoutExerciseId, slotIds))
+          .where(inArray(workoutSets.sessionExerciseId, slotIds))
           .orderBy(asc(workoutSets.position));
   const map = new Map<string, (typeof rows)[number][]>();
   for (const row of rows) {
-    map.set(row.workoutExerciseId, [...(map.get(row.workoutExerciseId) ?? []), row]);
+    map.set(row.sessionExerciseId, [...(map.get(row.sessionExerciseId) ?? []), row]);
   }
   return map;
 }
@@ -235,26 +243,24 @@ export async function loadWorkoutSession(
 ): Promise<WorkoutSessionData> {
   const [workout] = await db
     .select()
-    .from(workouts)
-    .where(
-      and(eq(workouts.id, workoutId), eq(workouts.userId, userId), eq(workouts.kind, 'session')),
-    );
-  if (!workout?.date) throw new ClientSafeError('Workout not found.');
+    .from(workoutSessions)
+    .where(and(eq(workoutSessions.id, workoutId), eq(workoutSessions.userId, userId)));
+  if (!workout) throw new ClientSafeError('Workout not found.');
   const current = { date: workout.date, id: workout.id };
 
   const slots = await db
     .select({
-      exerciseId: workoutExercises.exerciseId,
-      id: workoutExercises.id,
-      measure: exercises.measure,
-      name: exercises.name,
-      notes: workoutExercises.notes,
-      restSeconds: exercises.restSeconds,
+      exerciseId: workoutSessionExercises.exerciseId,
+      id: workoutSessionExercises.id,
+      measure: workoutExercises.measure,
+      name: workoutExercises.name,
+      notes: workoutSessionExercises.notes,
+      restSeconds: workoutExercises.restSeconds,
     })
-    .from(workoutExercises)
-    .innerJoin(exercises, eq(exercises.id, workoutExercises.exerciseId))
-    .where(eq(workoutExercises.workoutId, workoutId))
-    .orderBy(asc(workoutExercises.position));
+    .from(workoutSessionExercises)
+    .innerJoin(workoutExercises, eq(workoutExercises.id, workoutSessionExercises.exerciseId))
+    .where(eq(workoutSessionExercises.sessionId, workoutId))
+    .orderBy(asc(workoutSessionExercises.position));
 
   const exerciseIds = [...new Set(slots.map((slot) => slot.exerciseId))];
   const [previousSlots, previousNotes] = await Promise.all([
@@ -267,9 +273,9 @@ export async function loadWorkoutSession(
     setsBySlot([...slots.map((slot) => slot.id), ...previousSlots.map((slot) => slot.id)]),
     workout.routineId
       ? db
-          .select({ id: workouts.id, name: workouts.name })
-          .from(workouts)
-          .where(and(eq(workouts.id, workout.routineId), eq(workouts.userId, userId)))
+          .select({ id: workoutRoutines.id, name: workoutRoutines.name })
+          .from(workoutRoutines)
+          .where(and(eq(workoutRoutines.id, workout.routineId), eq(workoutRoutines.userId, userId)))
       : [],
   ]);
 
@@ -314,17 +320,17 @@ export async function previousSetCount(
   exerciseId: string,
 ) {
   const [previous] = await tx
-    .select({ id: workoutExercises.id })
-    .from(workoutExercises)
-    .innerJoin(workouts, eq(workouts.id, workoutExercises.workoutId))
-    .where(and(sessionsBefore(userId, workout), eq(workoutExercises.exerciseId, exerciseId)))
-    .orderBy(desc(workouts.date), desc(workouts.id))
+    .select({ id: workoutSessionExercises.id })
+    .from(workoutSessionExercises)
+    .innerJoin(workoutSessions, eq(workoutSessions.id, workoutSessionExercises.sessionId))
+    .where(and(sessionsBefore(userId, workout), eq(workoutSessionExercises.exerciseId, exerciseId)))
+    .orderBy(desc(workoutSessions.date), desc(workoutSessions.id))
     .limit(1);
   if (!previous) return 1;
   const [row] = await tx
     .select({ count: sql<number>`count(*)::int` })
     .from(workoutSets)
-    .where(eq(workoutSets.workoutExerciseId, previous.id));
+    .where(eq(workoutSets.sessionExerciseId, previous.id));
   return Math.min(20, Math.max(1, row?.count ?? 1));
 }
 

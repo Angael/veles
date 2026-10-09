@@ -5,12 +5,10 @@ import {
   index,
   integer,
   pgTable,
-  smallint,
   text,
   timestamp,
   uniqueIndex,
   uuid,
-  type AnyPgColumn,
 } from 'drizzle-orm/pg-core';
 import { users } from './auth.schema.ts';
 
@@ -29,8 +27,8 @@ export const exerciseMeasures = [
 export const workoutSetTypes = ['normal', 'warmup', 'drop', 'failure'] as const;
 
 /** User-named exercise. There is no shared catalog: "Bench (the flat one)" is a valid name. */
-export const exercises = pgTable(
-  'exercise',
+export const workoutExercises = pgTable(
+  'workout_exercise',
   {
     id: uuid('id')
       .primaryKey()
@@ -49,21 +47,20 @@ export const exercises = pgTable(
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
   },
   (table) => [
-    uniqueIndex('exercise_user_id_name_idx').on(table.userId, sql`lower(${table.name})`),
+    uniqueIndex('workout_exercise_user_id_name_idx').on(table.userId, sql`lower(${table.name})`),
     check(
-      'exercise_measure_check',
+      'workout_exercise_measure_check',
       sql`${table.measure} IN ('weight_reps', 'reps', 'duration', 'weight_duration', 'distance_duration')`,
     ),
   ],
 );
 
 /**
- * One table for routines and logged sessions. A routine is a reusable, user-named plan; a session
- * is what happened on a date. Starting a routine copies its exercises and sets into a new session,
+ * Reusable, user-named plan. Starting it copies its exercises and set types into a new session,
  * so editing the routine later never rewrites history.
  */
-export const workouts = pgTable(
-  'workout',
+export const workoutRoutines = pgTable(
+  'workout_routine',
   {
     id: uuid('id')
       .primaryKey()
@@ -71,15 +68,62 @@ export const workouts = pgTable(
     userId: text('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    kind: text('kind', { enum: ['routine', 'session'] }).notNull(),
     name: text('name').notNull(),
-    notes: text('notes').notNull().default(''),
-    /** Routine this session started from; drives the "previous" column. */
-    routineId: uuid('routine_id').references((): AnyPgColumn => workouts.id, {
-      onDelete: 'set null',
-    }),
-    /** Session day, like `food_log.log_date`; null for routines. */
-    date: date('date', { mode: 'string' }),
+    description: text('description').notNull().default(''),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (table) => [index('workout_routine_user_id_idx').on(table.userId)],
+);
+
+/**
+ * An exercise slot inside a routine. Routines keep no target values: last session's numbers are
+ * the goal, so only the set count and types are stored.
+ */
+export const workoutRoutineExercises = pgTable(
+  'workout_routine_exercise',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`uuidv7()`),
+    routineId: uuid('routine_id')
+      .notNull()
+      .references(() => workoutRoutines.id, { onDelete: 'cascade' }),
+    exerciseId: uuid('exercise_id')
+      .notNull()
+      .references(() => workoutExercises.id, { onDelete: 'cascade' }),
+    position: integer('position').notNull(),
+    /** One entry per set, in order. */
+    setTypes: text('set_types', { enum: workoutSetTypes }).array().notNull(),
+  },
+  (table) => [
+    uniqueIndex('workout_routine_exercise_routine_position_idx').on(
+      table.routineId,
+      table.position,
+    ),
+    index('workout_routine_exercise_exercise_id_idx').on(table.exerciseId),
+    check(
+      'workout_routine_exercise_set_types_check',
+      sql`cardinality(${table.setTypes}) >= 1 AND ${table.setTypes} <@ ARRAY['normal', 'warmup', 'drop', 'failure']::text[]`,
+    ),
+  ],
+);
+
+/** What happened on a date: a logged or in-progress workout. */
+export const workoutSessions = pgTable(
+  'workout_session',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`uuidv7()`),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    /** Routine this session started from or was saved as; offers "Update routine". */
+    routineId: uuid('routine_id').references(() => workoutRoutines.id, { onDelete: 'set null' }),
+    /** Session day, like `food_log.log_date`. */
+    date: date('date', { mode: 'string' }).notNull(),
     startedAt: timestamp('started_at'),
     /** Null while the session is in progress. */
     endedAt: timestamp('ended_at'),
@@ -92,49 +136,48 @@ export const workouts = pgTable(
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
   },
   (table) => [
-    index('workout_user_id_kind_date_idx').on(table.userId, table.kind, table.date),
-    index('workout_routine_id_idx').on(table.routineId),
+    index('workout_session_user_id_date_idx').on(table.userId, table.date),
+    index('workout_session_routine_id_idx').on(table.routineId),
     /** At most one open session per user; the server also checks before starting or reopening. */
-    uniqueIndex('workout_one_open_session_idx')
+    uniqueIndex('workout_session_one_open_idx')
       .on(table.userId)
-      .where(sql`${table.kind} = 'session' AND ${table.endedAt} IS NULL`),
-    check('workout_kind_check', sql`${table.kind} IN ('routine', 'session')`),
-    check('workout_session_date_check', sql`(${table.kind} = 'routine') = (${table.date} IS NULL)`),
+      .where(sql`${table.endedAt} IS NULL`),
   ],
 );
 
-/** An exercise slot inside a routine or session. */
-export const workoutExercises = pgTable(
-  'workout_exercise',
+/** An exercise slot inside a session. */
+export const workoutSessionExercises = pgTable(
+  'workout_session_exercise',
   {
     id: uuid('id')
       .primaryKey()
       .default(sql`uuidv7()`),
-    workoutId: uuid('workout_id')
+    sessionId: uuid('session_id')
       .notNull()
-      .references(() => workouts.id, { onDelete: 'cascade' }),
+      .references(() => workoutSessions.id, { onDelete: 'cascade' }),
     /**
      * Cascade so deleting a user works (restrict blocks the user → exercise cascade). The app
      * archives exercises instead of deleting them, so history is never removed from under a session.
      */
     exerciseId: uuid('exercise_id')
       .notNull()
-      .references(() => exercises.id, { onDelete: 'cascade' }),
+      .references(() => workoutExercises.id, { onDelete: 'cascade' }),
     position: integer('position').notNull(),
-    /** Overrides `exercise.rest_seconds` for this slot only. */
-    restSeconds: integer('rest_seconds'),
-    /** Per workout, per exercise. The last session's note is the next session's placeholder. */
+    /** Per session, per exercise. The last session's note is the next session's placeholder. */
     notes: text('notes').notNull().default(''),
   },
   (table) => [
-    uniqueIndex('workout_exercise_workout_position_idx').on(table.workoutId, table.position),
-    index('workout_exercise_exercise_id_idx').on(table.exerciseId),
+    uniqueIndex('workout_session_exercise_session_position_idx').on(
+      table.sessionId,
+      table.position,
+    ),
+    index('workout_session_exercise_exercise_id_idx').on(table.exerciseId),
   ],
 );
 
 /**
- * One set. Every metric is nullable so any exercise can mix kinds (a timed hold after weighted
- * reps). In a routine these are targets; in a session `completedAt` marks a done set.
+ * One logged set. Every metric is nullable so any exercise can mix kinds (a timed hold after
+ * weighted reps). `completedAt` marks a done set.
  */
 export const workoutSets = pgTable(
   'workout_set',
@@ -142,29 +185,26 @@ export const workoutSets = pgTable(
     id: uuid('id')
       .primaryKey()
       .default(sql`uuidv7()`),
-    workoutExerciseId: uuid('workout_exercise_id')
+    sessionExerciseId: uuid('session_exercise_id')
       .notNull()
-      .references(() => workoutExercises.id, { onDelete: 'cascade' }),
+      .references(() => workoutSessionExercises.id, { onDelete: 'cascade' }),
     position: integer('position').notNull(),
     type: text('type', { enum: workoutSetTypes }).notNull().default('normal'),
     weightGrams: integer('weight_grams'),
     reps: integer('reps'),
     durationSeconds: integer('duration_seconds'),
     distanceMeters: integer('distance_meters'),
-    /** RPE × 10, so 8.5 is stored as 85. */
-    rpeTenths: smallint('rpe_tenths'),
     completedAt: timestamp('completed_at'),
   },
   (table) => [
-    uniqueIndex('workout_set_exercise_position_idx').on(table.workoutExerciseId, table.position),
+    uniqueIndex('workout_set_session_exercise_position_idx').on(
+      table.sessionExerciseId,
+      table.position,
+    ),
     check('workout_set_type_check', sql`${table.type} IN ('normal', 'warmup', 'drop', 'failure')`),
     check(
       'workout_set_non_negative_check',
       sql`coalesce(${table.weightGrams}, 0) >= 0 AND coalesce(${table.reps}, 0) >= 0 AND coalesce(${table.durationSeconds}, 0) >= 0 AND coalesce(${table.distanceMeters}, 0) >= 0`,
-    ),
-    check(
-      'workout_set_rpe_check',
-      sql`${table.rpeTenths} IS NULL OR ${table.rpeTenths} BETWEEN 10 AND 100`,
     ),
   ],
 );

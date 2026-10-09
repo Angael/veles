@@ -2,7 +2,12 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
-import { exercises, workoutExercises, workouts, workoutSets } from '@veles/db/schema';
+import {
+  workoutExercises,
+  workoutRoutineExercises,
+  workoutRoutines,
+  workoutSessions,
+} from '@veles/db/schema';
 import { dateOnlyType } from '@/lib/dateOnly';
 import type { Measure, SetType } from '../metrics';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
@@ -14,7 +19,7 @@ import {
   requireNoOpenWorkout,
   requireOwnedWorkout,
 } from '../workouts.server';
-import { copyWorkoutStructure, requireOwnedRoutine } from './routines.server';
+import { copyRoutineToSession, copySessionToRoutine, requireOwnedRoutine } from './routines.server';
 
 export type RoutineSummary = {
   id: string;
@@ -43,41 +48,41 @@ export const getRoutines = createServerFn({ method: 'GET' })
     const userId = session.user.id;
     const lastUsed = db
       .select({
-        date: sql<string>`max(${workouts.date})::text`.as('last_date'),
-        routineId: workouts.routineId,
+        date: sql<string>`max(${workoutSessions.date})::text`.as('last_date'),
+        routineId: workoutSessions.routineId,
       })
-      .from(workouts)
-      .where(and(eq(workouts.userId, userId), eq(workouts.kind, 'session')))
-      .groupBy(workouts.routineId)
+      .from(workoutSessions)
+      .where(eq(workoutSessions.userId, userId))
+      .groupBy(workoutSessions.routineId)
       .as('last_used');
     const routines = await db
       .select({
-        description: workouts.notes,
-        id: workouts.id,
+        description: workoutRoutines.description,
+        id: workoutRoutines.id,
         lastUsed: lastUsed.date,
-        name: workouts.name,
+        name: workoutRoutines.name,
       })
-      .from(workouts)
-      .leftJoin(lastUsed, eq(lastUsed.routineId, workouts.id))
-      .where(and(eq(workouts.userId, userId), eq(workouts.kind, 'routine')))
-      .orderBy(sql`${lastUsed.date} DESC NULLS LAST`, desc(workouts.createdAt));
+      .from(workoutRoutines)
+      .leftJoin(lastUsed, eq(lastUsed.routineId, workoutRoutines.id))
+      .where(eq(workoutRoutines.userId, userId))
+      .orderBy(sql`${lastUsed.date} DESC NULLS LAST`, desc(workoutRoutines.createdAt));
     if (routines.length === 0) return [];
 
     const slots = await db
-      .select({ name: exercises.name, workoutId: workoutExercises.workoutId })
-      .from(workoutExercises)
-      .innerJoin(exercises, eq(exercises.id, workoutExercises.exerciseId))
+      .select({ name: workoutExercises.name, routineId: workoutRoutineExercises.routineId })
+      .from(workoutRoutineExercises)
+      .innerJoin(workoutExercises, eq(workoutExercises.id, workoutRoutineExercises.exerciseId))
       .where(
         inArray(
-          workoutExercises.workoutId,
+          workoutRoutineExercises.routineId,
           routines.map((routine) => routine.id),
         ),
       )
-      .orderBy(asc(workoutExercises.position));
+      .orderBy(asc(workoutRoutineExercises.position));
 
     return routines.map((routine) => ({
       ...routine,
-      exerciseNames: slots.filter((slot) => slot.workoutId === routine.id).map((slot) => slot.name),
+      exerciseNames: slots.filter((slot) => slot.routineId === routine.id).map((slot) => slot.name),
     }));
   });
 
@@ -91,51 +96,34 @@ export const getRoutine = createServerFn({ method: 'GET' })
     const session = await requireSession();
     const userId = session.user.id;
     const [routine] = await db
-      .select({ description: workouts.notes, id: workouts.id, name: workouts.name })
-      .from(workouts)
-      .where(
-        and(eq(workouts.id, data.id), eq(workouts.userId, userId), eq(workouts.kind, 'routine')),
-      );
+      .select({
+        description: workoutRoutines.description,
+        id: workoutRoutines.id,
+        name: workoutRoutines.name,
+      })
+      .from(workoutRoutines)
+      .where(and(eq(workoutRoutines.id, data.id), eq(workoutRoutines.userId, userId)));
     if (!routine) throw new ClientSafeError('Routine not found.');
 
     const [slots, [lastUsed]] = await Promise.all([
       db
         .select({
-          id: workoutExercises.id,
-          measure: exercises.measure,
-          name: exercises.name,
+          id: workoutRoutineExercises.id,
+          measure: workoutExercises.measure,
+          name: workoutExercises.name,
+          setTypes: workoutRoutineExercises.setTypes,
         })
-        .from(workoutExercises)
-        .innerJoin(exercises, eq(exercises.id, workoutExercises.exerciseId))
-        .where(eq(workoutExercises.workoutId, routine.id))
-        .orderBy(asc(workoutExercises.position)),
+        .from(workoutRoutineExercises)
+        .innerJoin(workoutExercises, eq(workoutExercises.id, workoutRoutineExercises.exerciseId))
+        .where(eq(workoutRoutineExercises.routineId, routine.id))
+        .orderBy(asc(workoutRoutineExercises.position)),
       db
-        .select({ date: sql<string | null>`max(${workouts.date})::text` })
-        .from(workouts)
-        .where(and(eq(workouts.userId, userId), eq(workouts.routineId, routine.id))),
+        .select({ date: sql<string | null>`max(${workoutSessions.date})::text` })
+        .from(workoutSessions)
+        .where(and(eq(workoutSessions.userId, userId), eq(workoutSessions.routineId, routine.id))),
     ]);
-    const sets =
-      slots.length > 0
-        ? await db
-            .select({ slotId: workoutSets.workoutExerciseId, type: workoutSets.type })
-            .from(workoutSets)
-            .where(
-              inArray(
-                workoutSets.workoutExerciseId,
-                slots.map((slot) => slot.id),
-              ),
-            )
-            .orderBy(asc(workoutSets.position))
-        : [];
 
-    return {
-      ...routine,
-      exercises: slots.map((slot) => ({
-        ...slot,
-        setTypes: sets.filter((set) => set.slotId === slot.id).map((set) => set.type),
-      })),
-      lastUsed: lastUsed?.date ?? null,
-    };
+    return { ...routine, exercises: slots, lastUsed: lastUsed?.date ?? null };
   });
 
 const saveRoutineInputType = type({ workoutId: 'string.uuid', name, 'description?': description });
@@ -150,17 +138,19 @@ export const saveRoutineFromWorkout = createServerFn({ method: 'POST' })
     return db.transaction(async (tx) => {
       const workout = await requireOwnedWorkout(tx, userId, data.workoutId);
       const [routine] = await tx
-        .insert(workouts)
+        .insert(workoutRoutines)
         .values({
-          kind: 'routine',
+          description: data.description?.trim() ?? '',
           name: data.name.trim(),
-          notes: data.description?.trim() ?? '',
           userId,
         })
-        .returning({ id: workouts.id });
+        .returning({ id: workoutRoutines.id });
       if (!routine) throw new Error('Routine insert returned no row.');
-      await copyWorkoutStructure(tx, workout.id, routine.id);
-      await tx.update(workouts).set({ routineId: routine.id }).where(eq(workouts.id, workout.id));
+      await copySessionToRoutine(tx, workout.id, routine.id);
+      await tx
+        .update(workoutSessions)
+        .set({ routineId: routine.id })
+        .where(eq(workoutSessions.id, workout.id));
       return { id: routine.id };
     });
   });
@@ -177,14 +167,19 @@ export const updateRoutineFromWorkout = createServerFn({ method: 'POST' })
     await db.transaction(async (tx) => {
       const workout = await requireOwnedWorkout(tx, userId, data.workoutId);
       const [linked] = await tx
-        .select({ routineId: workouts.routineId })
-        .from(workouts)
-        .where(eq(workouts.id, workout.id));
+        .select({ routineId: workoutSessions.routineId })
+        .from(workoutSessions)
+        .where(eq(workoutSessions.id, workout.id));
       if (!linked?.routineId) throw new ClientSafeError('This workout has no routine.');
       const routine = await requireOwnedRoutine(tx, userId, linked.routineId);
-      await tx.delete(workoutExercises).where(eq(workoutExercises.workoutId, routine.id));
-      await copyWorkoutStructure(tx, workout.id, routine.id);
-      await tx.update(workouts).set({ updatedAt: new Date() }).where(eq(workouts.id, routine.id));
+      await tx
+        .delete(workoutRoutineExercises)
+        .where(eq(workoutRoutineExercises.routineId, routine.id));
+      await copySessionToRoutine(tx, workout.id, routine.id);
+      await tx
+        .update(workoutRoutines)
+        .set({ updatedAt: new Date() })
+        .where(eq(workoutRoutines.id, routine.id));
     });
   });
 
@@ -202,18 +197,17 @@ export const startRoutine = createServerFn({ method: 'POST' })
       await autoFinishIdleWorkouts(tx, userId);
       await requireNoOpenWorkout(tx, userId);
       const [workout] = await tx
-        .insert(workouts)
+        .insert(workoutSessions)
         .values({
           date: data.date,
-          kind: 'session',
           name: routine.name,
           routineId: routine.id,
           startedAt: new Date(),
           userId,
         })
-        .returning({ id: workouts.id });
+        .returning({ id: workoutSessions.id });
       if (!workout) throw new Error('Workout insert returned no row.');
-      await copyWorkoutStructure(tx, routine.id, workout.id);
+      await copyRoutineToSession(tx, routine.id, workout.id);
       return { id: workout.id };
     });
   });
@@ -232,13 +226,13 @@ export const updateRoutine = createServerFn({ method: 'POST' })
     await db.transaction(async (tx) => {
       await requireOwnedRoutine(tx, session.user.id, data.id);
       await tx
-        .update(workouts)
+        .update(workoutRoutines)
         .set({
           ...(data.name?.trim() ? { name: data.name.trim() } : {}),
-          ...(data.description === undefined ? {} : { notes: data.description.trim() }),
+          ...(data.description === undefined ? {} : { description: data.description.trim() }),
           updatedAt: new Date(),
         })
-        .where(eq(workouts.id, data.id));
+        .where(eq(workoutRoutines.id, data.id));
     });
   });
 
@@ -252,6 +246,6 @@ export const deleteRoutine = createServerFn({ method: 'POST' })
     const session = await requireSession();
     await db.transaction(async (tx) => {
       await requireOwnedRoutine(tx, session.user.id, data.id);
-      await tx.delete(workouts).where(eq(workouts.id, data.id));
+      await tx.delete(workoutRoutines).where(eq(workoutRoutines.id, data.id));
     });
   });

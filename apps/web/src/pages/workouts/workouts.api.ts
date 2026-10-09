@@ -3,7 +3,7 @@ import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { format, parseISO } from 'date-fns';
 import { and, desc, eq, sql } from 'drizzle-orm';
-import { workoutExercises, workouts, workoutSets } from '@veles/db/schema';
+import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db/schema';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
@@ -36,25 +36,25 @@ export const getWorkouts = createServerFn({ method: 'GET' })
     const done = sql`${workoutSets.completedAt} IS NOT NULL`;
     const rows = await db
       .select({
-        date: workouts.date,
+        date: workoutSessions.date,
         doneSets: sql<number>`count(${workoutSets.id}) FILTER (WHERE ${done})::int`,
-        endedAt: workouts.endedAt,
-        exerciseCount: sql<number>`count(DISTINCT ${workoutExercises.id})::int`,
-        id: workouts.id,
-        name: workouts.name,
-        startedAt: workouts.startedAt,
+        endedAt: workoutSessions.endedAt,
+        exerciseCount: sql<number>`count(DISTINCT ${workoutSessionExercises.id})::int`,
+        id: workoutSessions.id,
+        name: workoutSessions.name,
+        startedAt: workoutSessions.startedAt,
         volumeGrams: sql<number>`coalesce(sum(${workoutSets.weightGrams}::bigint * ${workoutSets.reps}) FILTER (WHERE ${done}), 0)::float8`,
       })
-      .from(workouts)
-      .leftJoin(workoutExercises, eq(workoutExercises.workoutId, workouts.id))
-      .leftJoin(workoutSets, eq(workoutSets.workoutExerciseId, workoutExercises.id))
-      .where(and(eq(workouts.userId, session.user.id), eq(workouts.kind, 'session')))
-      .groupBy(workouts.id)
-      .orderBy(desc(workouts.date), desc(workouts.id))
+      .from(workoutSessions)
+      .leftJoin(workoutSessionExercises, eq(workoutSessionExercises.sessionId, workoutSessions.id))
+      .leftJoin(workoutSets, eq(workoutSets.sessionExerciseId, workoutSessionExercises.id))
+      .where(and(eq(workoutSessions.userId, session.user.id)))
+      .groupBy(workoutSessions.id)
+      .orderBy(desc(workoutSessions.date), desc(workoutSessions.id))
       .limit(200);
 
     return rows.map((row) => ({
-      date: row.date ?? '',
+      date: row.date,
       doneSets: row.doneSets,
       endedAt: row.endedAt?.toISOString() ?? null,
       exerciseCount: row.exerciseCount,
@@ -85,15 +85,14 @@ export const startWorkout = createServerFn({ method: 'POST' })
     await autoFinishIdleWorkouts(db, session.user.id);
     await requireNoOpenWorkout(db, session.user.id);
     const [workout] = await db
-      .insert(workouts)
+      .insert(workoutSessions)
       .values({
         date: data.date,
-        kind: 'session',
         name: `${format(parseISO(data.date), 'EEEE')} workout`,
         startedAt: new Date(),
         userId: session.user.id,
       })
-      .returning({ id: workouts.id });
+      .returning({ id: workoutSessions.id });
     if (!workout) throw new Error('Workout insert returned no row.');
     return { id: workout.id };
   });
@@ -116,13 +115,13 @@ export const updateWorkout = createServerFn({ method: 'POST' })
       await requireNoOpenWorkout(db, session.user.id, data.id);
     }
     await db
-      .update(workouts)
+      .update(workoutSessions)
       .set({
         ...(data.name?.trim() ? { name: data.name.trim() } : {}),
         ...(data.finished === undefined ? {} : { endedAt: data.finished ? new Date() : null }),
         updatedAt: new Date(),
       })
-      .where(eq(workouts.id, data.id));
+      .where(eq(workoutSessions.id, data.id));
   });
 
 export const deleteWorkout = createServerFn({ method: 'POST' })
@@ -131,5 +130,5 @@ export const deleteWorkout = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const session = await requireSession();
     await requireOwnedWorkout(db, session.user.id, data.id);
-    await db.delete(workouts).where(eq(workouts.id, data.id));
+    await db.delete(workoutSessions).where(eq(workoutSessions.id, data.id));
   });

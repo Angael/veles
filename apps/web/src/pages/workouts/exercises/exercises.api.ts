@@ -4,9 +4,9 @@ import { createServerFn } from '@tanstack/react-start';
 import { and, asc, desc, eq, inArray, isNotNull, isNull, ne, sql } from 'drizzle-orm';
 import {
   exerciseMeasures,
-  exercises,
   workoutExercises,
-  workouts,
+  workoutSessionExercises,
+  workoutSessions,
   workoutSets,
 } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
@@ -43,18 +43,21 @@ export const getExercises = createServerFn({ method: 'GET' })
     const session = await requireSession();
     const rows = await db
       .select({
-        id: exercises.id,
-        lastDate: sql<string | null>`max(${workouts.date})::text`,
-        measure: exercises.measure,
-        name: exercises.name,
-        uses: sql<number>`count(${workoutExercises.id})::int`,
+        id: workoutExercises.id,
+        lastDate: sql<string | null>`max(${workoutSessions.date})::text`,
+        measure: workoutExercises.measure,
+        name: workoutExercises.name,
+        uses: sql<number>`count(${workoutSessionExercises.id})::int`,
       })
-      .from(exercises)
-      .leftJoin(workoutExercises, eq(workoutExercises.exerciseId, exercises.id))
-      .leftJoin(workouts, eq(workouts.id, workoutExercises.workoutId))
-      .where(and(eq(exercises.userId, session.user.id), isNull(exercises.archivedAt)))
-      .groupBy(exercises.id)
-      .orderBy(asc(exercises.name));
+      .from(workoutExercises)
+      .leftJoin(
+        workoutSessionExercises,
+        eq(workoutSessionExercises.exerciseId, workoutExercises.id),
+      )
+      .leftJoin(workoutSessions, eq(workoutSessions.id, workoutSessionExercises.sessionId))
+      .where(and(eq(workoutExercises.userId, session.user.id), isNull(workoutExercises.archivedAt)))
+      .groupBy(workoutExercises.id)
+      .orderBy(asc(workoutExercises.name));
     return rows;
   });
 
@@ -76,26 +79,26 @@ export const updateExercise = createServerFn({ method: 'POST' })
     const name = data.name?.trim();
     if (name) {
       const [clash] = await db
-        .select({ id: exercises.id })
-        .from(exercises)
+        .select({ id: workoutExercises.id })
+        .from(workoutExercises)
         .where(
           and(
-            eq(exercises.userId, userId),
-            ne(exercises.id, data.id),
-            sql`lower(${exercises.name}) = lower(${name})`,
+            eq(workoutExercises.userId, userId),
+            ne(workoutExercises.id, data.id),
+            sql`lower(${workoutExercises.name}) = lower(${name})`,
           ),
         );
       if (clash) throw new ClientSafeError(`You already have an exercise called “${name}”.`);
     }
     await db
-      .update(exercises)
+      .update(workoutExercises)
       .set({
         ...(name ? { name } : {}),
         ...(data.measure === undefined ? {} : { measure: data.measure }),
         ...(data.restSeconds === undefined ? {} : { restSeconds: data.restSeconds }),
         updatedAt: new Date(),
       })
-      .where(eq(exercises.id, data.id));
+      .where(eq(workoutExercises.id, data.id));
   });
 
 const exerciseHistoryInputType = type({
@@ -111,34 +114,36 @@ export const getExerciseHistory = createServerFn({ method: 'GET' })
     const session = await requireSession();
     const entries = await db
       .select({
-        date: workouts.date,
-        id: workoutExercises.id,
-        notes: workoutExercises.notes,
-        position: workoutExercises.position,
-        workoutId: workouts.id,
-        workoutName: workouts.name,
+        date: workoutSessions.date,
+        id: workoutSessionExercises.id,
+        notes: workoutSessionExercises.notes,
+        position: workoutSessionExercises.position,
+        workoutId: workoutSessions.id,
+        workoutName: workoutSessions.name,
       })
-      .from(workoutExercises)
-      .innerJoin(workouts, eq(workouts.id, workoutExercises.workoutId))
+      .from(workoutSessionExercises)
+      .innerJoin(workoutSessions, eq(workoutSessions.id, workoutSessionExercises.sessionId))
       .where(
         and(
-          eq(workouts.userId, session.user.id),
-          eq(workouts.kind, 'session'),
-          eq(workoutExercises.exerciseId, data.exerciseId),
-          data.excludeWorkoutId ? ne(workouts.id, data.excludeWorkoutId) : undefined,
+          eq(workoutSessions.userId, session.user.id),
+          eq(workoutSessionExercises.exerciseId, data.exerciseId),
+          data.excludeWorkoutId ? ne(workoutSessions.id, data.excludeWorkoutId) : undefined,
         ),
       )
-      .orderBy(desc(workouts.date), desc(workouts.id))
+      .orderBy(desc(workoutSessions.date), desc(workoutSessions.id))
       .limit(20);
     if (entries.length === 0) return [];
 
     const [siblings, sets] = await Promise.all([
       db
-        .select({ position: workoutExercises.position, workoutId: workoutExercises.workoutId })
-        .from(workoutExercises)
+        .select({
+          position: workoutSessionExercises.position,
+          workoutId: workoutSessionExercises.sessionId,
+        })
+        .from(workoutSessionExercises)
         .where(
           inArray(
-            workoutExercises.workoutId,
+            workoutSessionExercises.sessionId,
             entries.map((entry) => entry.workoutId),
           ),
         ),
@@ -148,7 +153,7 @@ export const getExerciseHistory = createServerFn({ method: 'GET' })
         .where(
           and(
             inArray(
-              workoutSets.workoutExerciseId,
+              workoutSets.sessionExerciseId,
               entries.map((entry) => entry.id),
             ),
             isNotNull(workoutSets.completedAt),
@@ -160,13 +165,13 @@ export const getExerciseHistory = createServerFn({ method: 'GET' })
     return entries.map((entry) => {
       const positions = siblings.filter((slot) => slot.workoutId === entry.workoutId);
       return {
-        date: entry.date ?? '',
+        date: entry.date,
         exerciseCount: positions.length,
         id: entry.id,
         note: entry.notes,
         position: positions.filter((slot) => slot.position <= entry.position).length,
         sets: sets
-          .filter((set) => set.workoutExerciseId === entry.id)
+          .filter((set) => set.sessionExerciseId === entry.id)
           .map((set) => describeSet(toMetrics(set))),
         workoutName: entry.workoutName,
       };

@@ -17,11 +17,11 @@ Real feature: `/workouts` (list) and `/workouts/$id` (live session). Playground:
 - `/workouts` is a dashboard. Main column: one workout list (same row component as history). The open workout sits on top, highlighted and animated, with a live clock; then the last 10 workouts and "All workouts →" (`/workouts/history`). Side column: the 26-week calendar, a 2×2 stats grid (this week, this month, week streak, average length) and "Routines" (tap opens `/workouts/routines/$id`; long press or right click = delete). A floating "Empty workout" button starts a blank workout; while a workout is open it becomes "Continue · 12:34".
 - `/workouts/routines/$id` (`layout: 'task'`): name and description edited in place, exercises in order with set chips (1, 2, W, D, F), "Delete routine", and a floating "Start routine" ("Continue open workout" while one is open). Changing exercises still goes through a session and "Update routine".
 - Session header shows only the elapsed time (no sets or volume totals). "Add exercise" is a full-width dashed bar under the cards.
-- One open workout: the server checks before start and reopen, a partial unique index (`workout_one_open_session_idx`) enforces it in the DB, and auto-finish also closes every open workout except the newest.
+- One open workout: the server checks before start and reopen, a partial unique index (`workout_session_one_open_idx`) enforces it in the DB, and auto-finish also closes every open workout except the newest.
 - Calendar: one hue, brightness by training time per day, full at 2 h. An unfinished workout counts until its last ticked set. Tap a square to open that day's workout.
 - `/workouts/$id` (`layout: 'task'`): the live session. Every edit is saved at once. Ticks, set types and structure changes are sent right away; dragged values are sent 600 ms after the drag pauses, and on tab hide or leave. The cache is patched first, and the session refetches when the last request settles.
 - Session "⋯" menu: "Save as new routine" (name + optional description, links the session) and "Update routine 'X'" (overwrites the linked routine).
-- Routines store exercises in order, set count and set types only. No target weights or reps: last time's values are the goal. The description lives in `workout.notes`.
+- Routines store exercises in order, set count and set types only. No target weights or reps: last time's values are the goal. The description lives in `workout_routine.description`.
 - Set cells show a grey unit (`kg`, `reps`, `km`). With no last time, empty cells show 40 kg / 12 reps / 1:00 / 5 km. Ticking a set with an empty cell and no last time opens the sheet; Save logs the shown values and finishes the set.
 - Exercise picker: ↑/↓ through results and the Create row, ←/→ change the tracking type on the Create row, Enter picks. Clicking a tracking type creates the exercise. The tracking guess knows common Polish names (pompki, podciąganie, deska, bieg, spacer farmera…); loaded variants stay weight × reps.
 - Finish sets `ended_at` and goes back to `/workouts` (`replace`). A finished workout shows "Reopen".
@@ -29,7 +29,7 @@ Real feature: `/workouts` (list) and `/workouts/$id` (live session). Playground:
 - Auto-finish: every session edit bumps `workout.updated_at`. On read (list, session, calendar) and before starting or reopening, a workout with no edit for 2 h gets `ended_at = updated_at`, so its length stops at the last edit. No worker job; the result is the same whenever the user next opens the app.
 - The rest timer stores the workout that started it. Finishing stops it, and a finished workout never shows it.
 - Workout rows (recent and history): long press → "Save as routine" or "Delete".
-- Rename, tracking mode and rest length are saved on the exercise. Notes are per workout (`workout_exercise.notes`).
+- Rename, tracking mode and rest length are saved on the exercise. Notes are per workout (`workout_session_exercise.notes`).
 - "Previous" values and the note placeholder come from the latest earlier session of the same exercise, ordered by `(date, id)` (UUIDv7). A new exercise in a session starts with as many empty sets as last time.
 - Code: `pages/workouts/` → `workouts.*` (list, start, rename, finish, delete, session loader), `WorkoutList.tsx`, `dashboard/`, `history/`, `routines/`, `session/`, `exercises/`, `scrub/`, `rest/`, `hints/`, `metrics.ts`.
 - Not built yet: editing a routine's exercises outside a session, quick log without sets, MCP tools.
@@ -45,7 +45,7 @@ Real feature: `/workouts` (list) and `/workouts/$id` (live session). Playground:
 - Context menus (long press / right click) hold the rare actions: set type, duplicate, delete, rename, track mode, rest length, reorder. The rest length is only in the menu (no chip on the card).
 - "Add set" copies the last set. It is the only add button on the card.
 - Exercises: only the user's own names, no global catalog. Fuzzy search (typos, swapped letters, accents, missing spaces). Create from the search text with a guessed tracking mode (grid picker, no empty cells).
-- Notes: one per exercise per workout (`workout_exercise.notes`). Always visible as a `SeamlessTextarea` under the title, no toggle. Last time's note is the placeholder. The history dialog shows numeric dates (`Thu 02.10`) and a "#2 of 5" position badge.
+- Notes: one per exercise per workout (`workout_session_exercise.notes`). Always visible as a `SeamlessTextarea` under the title, no toggle. Last time's note is the placeholder. The history dialog shows numeric dates (`Thu 02.10`) and a "#2 of 5" position badge.
 - First-use tips: only "drag" and "hold for more". Smooth demos that show the press. "Tick to finish" and "tap for details" are not needed.
 - Card header: the exercise order number (1, 2, 3…), then the title, which wraps. The history button stays at the top right.
 - Tips: a compact strip inside the first exercise card, right above the set rows: small demo, title, close. No description text; the demo shows the gesture.
@@ -154,31 +154,33 @@ The original exploration. See "Read first" for what was kept.
 - History list; long press = edit, **Repeat today**, **Save as routine**, delete.
 - **Log activity**: the original #177 scope. Name + duration chips + note, no sets ("Football, 90 min").
 
-## Schema proposal
+## Schema
 
-Four tables. All metric columns are nullable, so changing what an exercise tracks never loses data.
+Six tables, all with the `workout_` prefix. All metric columns are nullable, so changing what an exercise tracks never loses data.
 
 ```
-exercise          id, user_id, name (unique per user, case-insensitive), measure, rest_seconds,
-                  notes, archived_at
-workout           id, user_id, kind ('routine' | 'session'), name, notes, routine_id → workout,
-                  date (sessions only), started_at, ended_at, duration_seconds (manual log)
-workout_exercise  id, workout_id, exercise_id (cascade), position, rest_seconds (override), notes
-workout_set       id, workout_exercise_id, position, type ('normal'|'warmup'|'drop'|'failure'),
-                  weight_grams, reps, duration_seconds, distance_meters,
-                  rpe_tenths, completed_at
+workout_exercise          id, user_id, name (unique per user, case-insensitive), measure,
+                          rest_seconds (null = timer off), notes, archived_at
+workout_routine           id, user_id, name, description
+workout_routine_exercise  id, routine_id, exercise_id, position, set_types[]
+workout_session           id, user_id, name, routine_id → workout_routine, date, started_at,
+                          ended_at, duration_seconds (manual log)
+workout_session_exercise  id, session_id, exercise_id, position, notes
+workout_set               id, session_exercise_id, position, type ('normal'|'warmup'|'drop'|'failure'),
+                          weight_grams, reps, duration_seconds, distance_meters, completed_at
 ```
 
-- **One `workout` table for routines and sessions.** Starting a routine copies its rows into a new session. Editing a routine never rewrites history. A routine's sets are targets; a session's sets are actuals.
-- "Previous" column: last session's set at the same position for the same `exercise_id`.
-- `weight_grams` follows `weight_entry.weight_grams`. `rpe_tenths` follows the `*_hundredths` integer style.
-- Ownership: `exercise` and `workout` have `user_id`; child rows inherit via joins (same as `list_item` in the MCP PR).
-- Alternative: store sets as `jsonb` on `workout_exercise`. Fewer rows and simpler writes, but harder SQL for progress charts and the MCP list/get tools. I prefer real rows.
+- **Routines and sessions are separate tables.** A routine stores only exercises in order and one set type per set. Starting a routine copies them into a new session with empty sets. "Save as routine" and "Update routine" copy the other way. Editing a routine never rewrites history.
+- "Previous" values: last session's set at the same position for the same `exercise_id`.
+- `weight_grams` follows `weight_entry.weight_grams`.
+- `exercise_id` cascades so deleting a user works. The app archives exercises and never deletes them.
+- Ownership: `workout_exercise`, `workout_routine` and `workout_session` have `user_id`; child rows inherit via joins (same as `list_item` in the MCP PR).
+- Alternative: store sets as `jsonb` on `workout_session_exercise`. Fewer rows and simpler writes, but harder SQL for progress charts and the MCP list/get tools. I prefer real rows.
 
 ## MCP (#188 / #213)
 
-- Read: add `exercises`, `workouts`, `workout_exercises`, `workout_sets` to the `resources` map in `mcp.api.ts`. Child tables scope through `inArray(… select id from workout where user_id = …)` like `list_items`.
-- Units live in column names (`weight_grams`, `duration_seconds`, `distance_meters`, `rpe_tenths`), so the resource descriptions stay one line.
+- Read: add the six `workout_*` tables to the `resources` map in `mcp.api.ts`. Child tables scope through `inArray(… select id from workout_session where user_id = …)` like `list_items`.
+- Units live in column names (`weight_grams`, `duration_seconds`, `distance_meters`), so the resource descriptions stay one line.
 - Write (later): one `log_workout` tool that takes `{ date, name, exercises: [{ name, sets: [{ weight_grams, reps }] }] }`. It finds or creates exercises by case-insensitive name. The shorthand parser was removed with "Type it".
 
 ## Open questions
