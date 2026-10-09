@@ -1,0 +1,54 @@
+/* Six-column grid: three cells of span 2, then two of span 3, so both rows are full. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.35rem;
+
+  @media not (--phone) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.cell {
+  display: grid;
+  grid-column: span 2;
+  justify-items: center;
+  align-content: center;
+  gap: 0.2rem;
+  min-height: 3.5rem;
+  padding: 0.35rem;
+  border: var(--border-width) solid var(--c-border-strong);
+  border-radius: 12px;
+  background: var(--c-surface-inset);
+  color: var(--c-muted);
+  font-size: var(--text-xs);
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+
+  &:nth-child(n + 4) {
+    grid-column: span 3;
+  }
+
+  @media not (--phone) {
+    &,
+    &:nth-child(n + 4) {
+      grid-column: span 1;
+    }
+  }
+
+  & svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+}
+
+.active {
+  border-color: var(--c-primary-border);
+  background: var(--c-primary-surface-strong);
+  color: var(--c-text-strong);
+
+  & svg {
+    color: var(--c-accent);
+  }
+}

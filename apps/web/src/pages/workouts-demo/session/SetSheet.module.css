@@ -1,0 +1,99 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.55);
+  transition: opacity var(--duration-fast) var(--ease-out);
+
+  &[data-starting-style],
+  &[data-ending-style] {
+    opacity: 0;
+  }
+}
+
+/* Top-anchored on phones, centered card on desktop. */
+.viewport {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  padding: calc(env(safe-area-inset-top, 0px) + var(--space-xs)) var(--space-xs) 0;
+
+  @media not (--phone) {
+    align-items: center;
+    padding: var(--space-lg);
+  }
+}
+
+.sheet {
+  display: grid;
+  gap: var(--space-sm);
+  width: min(26rem, 100%);
+  max-height: calc(100dvh - 2 * var(--space-xs));
+  overflow-y: auto;
+  padding: var(--space-md);
+  border: var(--border-width) solid var(--c-border-popup);
+  border-radius: var(--radius-md);
+  background: var(--c-surface-solid);
+  box-shadow: var(--shadow-popup);
+  outline: none;
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+
+  &[data-starting-style],
+  &[data-ending-style] {
+    opacity: 0;
+    transform: translateY(-1.5rem);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.title {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-lg);
+  overflow-wrap: anywhere;
+
+  & small {
+    color: var(--c-muted);
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-regular);
+  }
+}
+
+.previous {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border: var(--border-width) dashed var(--c-border-strong);
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--c-muted-soft);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+
+  & svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  & span {
+    margin-inline-start: auto;
+    color: var(--c-accent);
+  }
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--space-md);
+}

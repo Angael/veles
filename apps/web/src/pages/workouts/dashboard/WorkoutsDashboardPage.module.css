@@ -1,0 +1,49 @@
+/* Main column for workouts; a narrower side column for the overview. */
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 24rem);
+  align-items: start;
+  gap: var(--space-xl);
+  /* Room for the floating start button. */
+  padding-bottom: 5rem;
+
+  @media (--tablet) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.main {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.side {
+  display: grid;
+  gap: var(--space-lg);
+  min-width: 0;
+}
+
+.hint {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 0.3rem;
+  color: var(--c-accent);
+  font-size: var(--text-sm);
+  text-decoration: none;
+
+  & svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
