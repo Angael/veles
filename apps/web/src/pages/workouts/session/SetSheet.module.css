@@ -1,51 +1,5 @@
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(2, 6, 23, 0.55);
-  transition: opacity var(--duration-fast) var(--ease-out);
-
-  &[data-starting-style],
-  &[data-ending-style] {
-    opacity: 0;
-  }
-}
-
-/* Top-anchored on phones, centered card on desktop. */
-.viewport {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  align-items: start;
-  justify-items: center;
-  padding: calc(env(safe-area-inset-top, 0px) + var(--space-xs)) var(--space-xs) 0;
-
-  @media not (--phone) {
-    align-items: center;
-    padding: var(--space-lg);
-  }
-}
-
 .sheet {
-  display: grid;
   gap: var(--space-sm);
-  width: min(26rem, 100%);
-  max-height: calc(100dvh - 2 * var(--space-xs));
-  overflow-y: auto;
-  padding: var(--space-md);
-  border: var(--border-width) solid var(--c-border-popup);
-  border-radius: var(--radius-md);
-  background: var(--c-surface-solid);
-  box-shadow: var(--shadow-popup);
-  outline: none;
-  transition:
-    opacity var(--duration-fast) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
-
-  &[data-starting-style],
-  &[data-ending-style] {
-    opacity: 0;
-    transform: translateY(-1.5rem);
-  }
 }
 
 .header {
