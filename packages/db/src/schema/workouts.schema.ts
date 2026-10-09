@@ -113,10 +113,13 @@ export const workoutExercises = pgTable(
     workoutId: uuid('workout_id')
       .notNull()
       .references(() => workouts.id, { onDelete: 'cascade' }),
-    /** Restrict: archive exercises instead of deleting them out from under history. */
+    /**
+     * Cascade so deleting a user works (restrict blocks the user → exercise cascade). The app
+     * archives exercises instead of deleting them, so history is never removed from under a session.
+     */
     exerciseId: uuid('exercise_id')
       .notNull()
-      .references(() => exercises.id, { onDelete: 'restrict' }),
+      .references(() => exercises.id, { onDelete: 'cascade' }),
     position: integer('position').notNull(),
     /** Overrides `exercise.rest_seconds` for this slot only. */
     restSeconds: integer('rest_seconds'),

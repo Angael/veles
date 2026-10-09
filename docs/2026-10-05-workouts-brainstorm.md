@@ -163,7 +163,7 @@ exercise          id, user_id, name (unique per user, case-insensitive), measure
                   notes, archived_at
 workout           id, user_id, kind ('routine' | 'session'), name, notes, routine_id → workout,
                   date (sessions only), started_at, ended_at, duration_seconds (manual log)
-workout_exercise  id, workout_id, exercise_id (restrict), position, rest_seconds (override), notes
+workout_exercise  id, workout_id, exercise_id (cascade), position, rest_seconds (override), notes
 workout_set       id, workout_exercise_id, position, type ('normal'|'warmup'|'drop'|'failure'),
                   weight_grams, reps, duration_seconds, distance_meters,
                   rpe_tenths, completed_at
