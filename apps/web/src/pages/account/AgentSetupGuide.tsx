@@ -21,7 +21,13 @@ function serverName(userName: string) {
 export function AgentSetupGuide({ apiKey, userName }: AgentSetupGuideProps) {
   const url = new URL('/api/mcp', window.location.origin).href;
   const name = serverName(userName);
-  const prompt = `Please connect to my Veles account. Add an HTTP MCP server named "${name}" with URL ${url} and header "Authorization: Bearer ${apiKey}". This key belongs to ${userName}; use it only for ${userName}'s requests. Then restart or reload your MCP tools and call get_access to confirm.`;
+  const prompt = [
+    `Please connect to my Veles account. Add an HTTP MCP server named "${name}" with URL ${url} and header "Authorization: Bearer ${apiKey}".`,
+    `This key belongs to ${userName}; use it only for ${userName}'s requests.`,
+    'Then reload your MCP tools and call get_access to confirm.',
+    'After setup, remove every trace of this key outside the MCP config: do not save it to memory or notes, and delete or redact it from session logs, transcripts, and history.',
+    'Finally, remind me to delete this message or thread from the chat.',
+  ].join(' ');
   const configs = [
     {
       label: 'Hermes (~/.hermes/config.yaml)',
