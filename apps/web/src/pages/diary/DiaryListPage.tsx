@@ -7,6 +7,7 @@ import { TextInput } from '@/components/ui/text-input/TextInput';
 import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
 import { type DiaryEntrySummary, formatDiaryDate } from './diary.api';
 import { useCreateDiaryEntryMutation } from './diary.query';
+import { DiaryBackupActions } from './DiaryBackupActions';
 import css from './DiaryListPage.module.css';
 
 type DiaryListPageProps = {
@@ -27,6 +28,8 @@ export function DiaryListPage({ entries }: DiaryListPageProps) {
 
   return (
     <main className={css.page}>
+      <DiaryBackupActions canExport={entries.length > 0} />
+
       {createMutation.isError ? (
         <p className={css.createError} role='alert'>
           The entry could not be created. Try again.
