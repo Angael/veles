@@ -2,13 +2,17 @@ import { type } from 'arktype';
 
 /** Feature permissions are shared by all of an account's agent keys; writes roll out individually. */
 export const agentFeatures = {
-  diary: { label: 'Diary', description: 'Diary entries and their content', writeAvailable: false },
   notes: {
     label: 'Notes and shopping lists',
     description: 'Notes, list items, and sharing settings',
     writeAvailable: true,
   },
   weight: { label: 'Weight', description: 'Weight history', writeAvailable: false },
+  workouts: {
+    label: 'Workouts',
+    description: 'Exercises, routines, and logged sessions',
+    writeAvailable: false,
+  },
   recipes: { label: 'Recipes', description: 'Saved recipes and nutrition', writeAvailable: false },
   calories: {
     label: 'Food diary',
@@ -35,9 +39,9 @@ export type AgentPermissions = Record<AgentFeature, { read: boolean; write: bool
 
 export function defaultAgentPermissions(): AgentPermissions {
   return {
-    diary: { read: false, write: false },
     notes: { read: false, write: false },
     weight: { read: false, write: false },
+    workouts: { read: false, write: false },
     recipes: { read: false, write: false },
     calories: { read: false, write: false },
     calorie_goals: { read: false, write: false },

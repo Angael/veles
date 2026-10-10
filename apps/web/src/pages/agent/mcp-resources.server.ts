@@ -1,130 +1,84 @@
 import { type } from 'arktype';
-import { and, eq, getTableColumns, gt, inArray, type SQL } from 'drizzle-orm';
-import type { PgColumn, PgTable } from 'drizzle-orm/pg-core';
-import {
-  calorieGoals,
-  diaryEntries,
-  foodLogs,
-  foodProducts,
-  listItems,
-  notes,
-  recipes,
-  weightEntries,
-} from '@veles/db/schema';
 import type { AgentFeature } from '@/lib/agentAccess';
-import { db } from '@/server/db.server';
+import { readFoodDays, readCalorieGoals, readFoodProducts } from './mcp-read-nutrition.server';
+import { readNotes, readRecipes, readWeights } from './mcp-read-personal.server';
+import { isoDate, type ReadPage, type ReadQuery } from './mcp-read.server';
+import {
+  readWorkoutExercises,
+  readWorkoutRoutines,
+  readWorkoutSessions,
+} from './mcp-read-workouts.server';
 
-interface AgentResource {
+export interface AgentResource {
   feature: AgentFeature;
-  table: PgTable;
-  id: PgColumn;
   description: string;
-  /** Rows the user may read; `undefined` means the collection is global. */
-  scope: (userId: string) => SQL | undefined;
-  /** Attaches related rows so agents get one nested result instead of joining ids themselves. */
-  nest?: (rows: Row[]) => Promise<Row[]>;
+  /** Accepts `from`/`to` date filters. */
+  dated: boolean;
+  /** Owner-scoped read that returns nested, readable records; `query.id` selects one. */
+  read: (userId: string, query: ReadQuery) => Promise<ReadPage>;
 }
 
-type Row = Record<string, unknown>;
-
-/** Loads items of the given shopping lists in one query and nests them under each list. */
-async function nestListItems(rows: Row[]) {
-  const listIds = rows.filter((row) => row.type === 'shopping_list').map((row) => String(row.id));
-  const items = listIds.length
-    ? await db
-        .select({
-          id: listItems.id,
-          noteId: listItems.noteId,
-          name: listItems.name,
-          checked: listItems.checked,
-        })
-        .from(listItems)
-        .where(inArray(listItems.noteId, listIds))
-        .orderBy(listItems.id)
-    : [];
-  return rows.map((row) =>
-    row.type === 'shopping_list'
-      ? {
-          ...row,
-          items: items
-            .filter((item) => item.noteId === row.id)
-            .map(({ noteId: _noteId, ...item }) => item),
-        }
-      : row,
-  );
-}
-
-/** Converts stored fixed-point fields (`*Hundredths`, `weightGrams`) into plain numbers agents can read. */
-function toReadable(row: Row): Row {
-  return Object.fromEntries(
-    Object.entries(row).map(([key, value]) => {
-      if (key === 'weightGrams')
-        return ['weightKg', typeof value === 'number' ? value / 1000 : value];
-      if (key.endsWith('Hundredths')) {
-        return [
-          key.slice(0, -'Hundredths'.length),
-          typeof value === 'number' ? value / 100 : value,
-        ];
-      }
-      return [key, value];
-    }),
-  );
-}
-
-const ownedBy = (column: PgColumn) => (userId: string) => eq(column, userId);
+const kcalAndMacros = 'kcal is energy; macros are protein, fat, carbs in grams';
+const setFields =
+  'Sets: type (normal, warmup, drop, failure), done, weightKg, reps, durationSeconds, distanceKm; measure says which apply.';
 
 export const resources = {
-  diary_entries: {
-    feature: 'diary',
-    table: diaryEntries,
-    id: diaryEntries.id,
-    description: 'Diary entries with Markdown content.',
-    scope: ownedBy(diaryEntries.userId),
-  },
   notes: {
     feature: 'notes',
-    table: notes,
-    id: notes.id,
+    dated: false,
     description:
-      'Notes and shopping lists (type "shopping_list"). Shopping lists include their items (id, name, checked) in creation order.',
-    scope: ownedBy(notes.ownerId),
-    nest: nestListItems,
+      'Notes and shopping lists. Notes have content; shopping lists (type "shopping_list") have items (id, name, checked) in list order instead.',
+    read: readNotes,
   },
   weights: {
     feature: 'weight',
-    table: weightEntries,
-    id: weightEntries.id,
-    description: 'Weight history in kg.',
-    scope: ownedBy(weightEntries.userId),
+    dated: true,
+    description: 'Weight history in kg, newest date first. Cursor and from/to are dates.',
+    read: readWeights,
   },
   recipes: {
     feature: 'recipes',
-    table: recipes,
-    id: recipes.id,
-    description: 'Recipes. kcal is energy; protein, fats, carbs are grams for all portions.',
-    scope: ownedBy(recipes.userId),
+    dated: false,
+    description: `Recipes with ingredients and tags. total is for all portions, perPortion for one; ${kcalAndMacros}.`,
+    read: readRecipes,
   },
-  food_logs: {
+  food_days: {
     feature: 'calories',
-    table: foodLogs,
-    id: foodLogs.id,
-    description: 'Food diary by logDate. kcal is energy; grams, protein, fat, carbs in grams.',
-    scope: ownedBy(foodLogs.userId),
+    dated: true,
+    description: `Food diary, one item per logged day (id is the date), newest first. Each day has entries, total, and goal (the nutrition goal in effect; null without a goal or without Nutrition goals consent); ${kcalAndMacros}.`,
+    read: readFoodDays,
   },
   calorie_goals: {
     feature: 'calorie_goals',
-    table: calorieGoals,
-    id: calorieGoals.id,
-    description:
-      'Nutrition goals by effectiveDate: kcal limit, then protein, fat, carbs limits in grams.',
-    scope: ownedBy(calorieGoals.userId),
+    dated: true,
+    description: `Nutrition goal history by effectiveDate, newest first; each goal applies until the next one. ${kcalAndMacros} (limits).`,
+    read: readCalorieGoals,
   },
   food_products: {
     feature: 'food_products',
-    table: foodProducts,
-    id: foodProducts.id,
-    description: 'Shared food catalog; kcal and macros are per 100 g, product size in grams.',
-    scope: () => undefined,
+    dated: false,
+    description: `Shared food catalog. per100g nutrition: ${kcalAndMacros}. productSizeGrams is one package.`,
+    read: readFoodProducts,
+  },
+  workout_sessions: {
+    feature: 'workouts',
+    dated: true,
+    description: `Workout sessions, newest first, each with its exercises (name, measure, notes) and their sets. ${setFields} durationSeconds is manual or end minus start.`,
+    read: readWorkoutSessions,
+  },
+  workout_routines: {
+    feature: 'workouts',
+    dated: false,
+    description:
+      'Reusable workout plans, each with ordered exercises (name, measure, restSeconds) and setTypes, one per planned set.',
+    read: readWorkoutRoutines,
+  },
+  workout_exercises: {
+    feature: 'workouts',
+    dated: false,
+    description:
+      'Exercise list with measure, restSeconds, notes, archived, lastDoneOn, and sessionCount.',
+    read: readWorkoutExercises,
   },
 } satisfies Record<string, AgentResource>;
 
@@ -133,36 +87,12 @@ type ResourceName = keyof typeof resources;
 const resourceName = type.enumerated(...(Object.keys(resources) as ResourceName[]));
 export const listInput = type({
   resource: resourceName,
-  'cursor?': type('string.uuid').describe('nextCursor from the previous page'),
+  'cursor?': type('string > 0').describe('nextCursor from the previous page'),
   'limit?': '1 <= number.integer <= 100',
+  'from?': isoDate.describe('earliest date, inclusive (dated resources only)'),
+  'to?': isoDate.describe('latest date, inclusive (dated resources only)'),
 });
-export const getInput = type({ resource: resourceName, id: 'string.uuid' });
-
-/** Reads one owner-scoped page in creation order, with owner columns omitted, relations nested, and units converted. */
-export async function readRecords(
-  userId: string,
-  resource: AgentResource,
-  { cursor, id, limit }: { cursor?: string; id?: string; limit: number },
-) {
-  const columns = Object.fromEntries(
-    Object.entries(getTableColumns(resource.table)).filter(
-      ([key]) => key !== 'userId' && key !== 'ownerId',
-    ),
-  );
-  const rows = await db
-    .select(columns)
-    .from(resource.table)
-    .where(
-      and(
-        resource.scope(userId),
-        cursor ? gt(resource.id, cursor) : undefined,
-        id ? eq(resource.id, id) : undefined,
-      ),
-    )
-    .orderBy(resource.id)
-    .limit(limit + 1);
-  const page = rows.slice(0, limit);
-  const nextCursor = rows.length > limit ? String(page.at(-1)?.id) : null;
-  const items = (resource.nest ? await resource.nest(page) : page).map(toReadable);
-  return { items, nextCursor };
-}
+export const getInput = type({
+  resource: resourceName,
+  id: type('string > 0').describe('record UUID; a YYYY-MM-DD date for food_days'),
+});
