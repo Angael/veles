@@ -11,10 +11,6 @@ export const diaryEntries = pgTable(
     userId: text('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    /** Legacy plaintext; cleared when the browser encrypts the entry. Drop after migration. */
-    title: text('title'),
-    /** Legacy plaintext; cleared when the browser encrypts the entry. Drop after migration. */
-    markdown: text('markdown'),
     /** AES-GCM sealed `{ title, markdown }`, encrypted in the browser. Null means empty entry. */
     ciphertext: text('ciphertext'),
     entryDate: date('entry_date', { mode: 'string' }).notNull(),

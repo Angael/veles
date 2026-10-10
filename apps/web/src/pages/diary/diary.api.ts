@@ -2,7 +2,7 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { notFound } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
-import { and, desc, eq, isNotNull, isNull, or } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { format, parseISO } from 'date-fns';
 import { diaryEntries, diaryKeys } from '@veles/db/schema';
 import { db } from '@/server/db.server';
@@ -33,10 +33,6 @@ const updateDiaryEntryInputType = type({
   ciphertext: ciphertextType,
   entryDate: dateOnlyType,
   id: 'string.uuid',
-});
-const setupDiaryKeyInputType = type({
-  entries: type({ ciphertext: ciphertextType, id: 'string.uuid' }).array(),
-  key: keyRecordType,
 });
 
 /** Formats a server-validated diary date for display. */
@@ -109,62 +105,18 @@ export const getDiaryEntryById = createServerFn({ method: 'GET' })
     return { entry, keyRecord };
   });
 
-/** Returns entries still stored as plaintext, so the browser can encrypt them during setup. */
-export const getLegacyDiaryEntries = createServerFn({ method: 'GET' })
-  .middleware([logMiddleware('getLegacyDiaryEntries')])
-  .handler(async () => {
-    const session = await requireSession();
-    const rows = await db
-      .select({ id: diaryEntries.id, markdown: diaryEntries.markdown, title: diaryEntries.title })
-      .from(diaryEntries)
-      .where(and(eq(diaryEntries.userId, session.user.id), isNull(diaryEntries.ciphertext)));
-
-    return rows.map((row) => ({
-      id: row.id,
-      markdown: row.markdown ?? '',
-      title: row.title ?? '',
-    }));
-  });
-
-/**
- * Stores the wrapped diary key and swaps every plaintext entry for its browser-encrypted
- * version in one transaction. Fails if any plaintext entry would stay readable.
- */
+/** Stores the user's wrapped diary key. Fails when a passphrase is already set. */
 export const setupDiaryKey = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('setupDiaryKey')])
-  .validator(arkTypeValidator(setupDiaryKeyInputType))
+  .validator(arkTypeValidator(keyRecordType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const userId = session.user.id;
-
-    await db.transaction(async (tx) => {
-      const inserted = await tx
-        .insert(diaryKeys)
-        .values({ ...data.key, userId })
-        .onConflictDoNothing()
-        .returning({ userId: diaryKeys.userId });
-      invariant(inserted[0], 'Diary passphrase is already set.');
-
-      for (const entry of data.entries) {
-        await tx
-          .update(diaryEntries)
-          .set({ ciphertext: entry.ciphertext, markdown: null, title: null })
-          .where(and(eq(diaryEntries.id, entry.id), eq(diaryEntries.userId, userId)));
-      }
-
-      const leftovers = await tx
-        .select({ id: diaryEntries.id })
-        .from(diaryEntries)
-        .where(
-          and(
-            eq(diaryEntries.userId, userId),
-            isNull(diaryEntries.ciphertext),
-            or(isNotNull(diaryEntries.title), isNotNull(diaryEntries.markdown)),
-          ),
-        )
-        .limit(1);
-      invariant(leftovers.length === 0, 'Some diary entries were not encrypted. Try again.');
-    });
+    const inserted = await db
+      .insert(diaryKeys)
+      .values({ ...data, userId: session.user.id })
+      .onConflictDoNothing()
+      .returning({ userId: diaryKeys.userId });
+    invariant(inserted[0], 'Diary passphrase is already set.');
   });
 
 export const createDiaryEntry = createServerFn({ method: 'POST' })
@@ -193,8 +145,6 @@ export const updateDiaryEntry = createServerFn({ method: 'POST' })
       .set({
         ciphertext: data.ciphertext,
         entryDate: data.entryDate,
-        markdown: null,
-        title: null,
         updatedAt: new Date(),
       })
       .where(and(eq(diaryEntries.id, data.id), eq(diaryEntries.userId, session.user.id)));

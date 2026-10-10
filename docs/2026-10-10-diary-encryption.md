@@ -39,12 +39,11 @@ Requirements:
 - "Lock" and sign-out delete the key from memory and IndexedDB.
 - Cookies were rejected because they are sent to the server automatically.
 
-### Migration of existing plaintext entries
+### No migration of existing plaintext entries
 
-- `title` and `markdown` became nullable legacy columns.
-- On first visit, the diary asks the user to set a passphrase. The browser loads the legacy plaintext, encrypts every entry, and sends the wrapped key and ciphertexts in one request.
-- `setupDiaryKey` stores the key, writes the ciphertexts, and clears the plaintext in one transaction. The transaction rolls back if any entry would keep readable text.
-- Every save writes `title = null, markdown = null`.
+- Existing plaintext entries are dropped, not converted. Only one user had entries, and they were exported first.
+- The `title` and `markdown` columns are removed. After setting a passphrase, the user imports the backup, and the import encrypts each entry in the browser.
+- This removes a one-time conversion path (load plaintext, bulk encrypt, swap in one transaction) that would only ever run once.
 
 ### Backups (export / import)
 
@@ -64,4 +63,3 @@ Requirements:
 
 - Change passphrase (rewrap the data key).
 - "Forgot passphrase": delete all entries and start over.
-- After production data is migrated, drop `diary_entry.title` and `diary_entry.markdown`.

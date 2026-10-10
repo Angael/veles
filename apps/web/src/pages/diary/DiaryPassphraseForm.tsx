@@ -25,7 +25,7 @@ export function DiaryPassphraseForm({ keyRecord, onUnlocked }: DiaryPassphraseFo
   let errorMsg: string | undefined;
   if (mismatch) errorMsg = 'Passphrases do not match.';
   else if (mutation.isError) {
-    errorMsg = isSetup ? 'The diary could not be encrypted. Try again.' : 'Wrong passphrase.';
+    errorMsg = isSetup ? 'The passphrase could not be saved. Try again.' : 'Wrong passphrase.';
   }
 
   return (
@@ -78,7 +78,7 @@ export function DiaryPassphraseForm({ keyRecord, onUnlocked }: DiaryPassphraseFo
             Remember on this device
           </label>
           <Btn loading={mutation.isPending} type='submit' variant='main'>
-            {isSetup ? 'Encrypt diary' : 'Unlock'}
+            {isSetup ? 'Set passphrase' : 'Unlock'}
           </Btn>
         </TypedForm>
       </Card>

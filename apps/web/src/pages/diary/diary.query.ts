@@ -1,13 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import { saveDiaryKey } from '@/lib/diaryKeyVault';
-import {
-  createDiaryEntry,
-  deleteDiaryEntry,
-  getLegacyDiaryEntries,
-  setupDiaryKey,
-  updateDiaryEntry,
-} from './diary.api';
+import { createDiaryEntry, deleteDiaryEntry, setupDiaryKey, updateDiaryEntry } from './diary.api';
 import { parseDiaryBackup, selectNewBackupEntries } from './diaryBackup';
 import { importDiaryEntries } from './diaryBackup.api';
 import {
@@ -47,10 +41,7 @@ export function useUpdateDiaryEntryMutation(key: CryptoKey) {
   });
 }
 
-/**
- * Unlocks the diary with an existing key record, or, when there is none, creates a key and
- * encrypts every legacy plaintext entry before the server stores the wrapped key.
- */
+/** Unlocks the diary with an existing key record, or creates and stores a new one. */
 export function useDiaryPassphraseMutation(keyRecord: DiaryKeyRecord | null) {
   return useMutation({
     mutationFn: async ({ passphrase, remember }: PassphraseInput) => {
@@ -61,14 +52,7 @@ export function useDiaryPassphraseMutation(keyRecord: DiaryKeyRecord | null) {
       }
 
       const { key, record } = await createDiaryKey(passphrase);
-      const legacyEntries = await getLegacyDiaryEntries();
-      const entries = await Promise.all(
-        legacyEntries.map(async ({ id, markdown, title }) => ({
-          ciphertext: await encryptDiaryEntry(key, id, { markdown, title }),
-          id,
-        })),
-      );
-      await setupDiaryKey({ data: { entries, key: record } });
+      await setupDiaryKey({ data: record });
       await saveDiaryKey(record.wrappedKey, key, remember);
       return key;
     },
