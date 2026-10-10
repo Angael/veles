@@ -1,16 +1,19 @@
-import { format } from 'date-fns';
-import { KeyRoundIcon, TrashIcon } from 'lucide-react';
+import { BotIcon, ChevronDownIcon, PlusIcon, ShieldCheckIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
-import { Label } from '@/components/ui/label/Label';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
-import { useApiKeysQuery, useCreateApiKeyMutation, useDeleteApiKeyMutation } from './account.query';
-import { FriendRow } from './FriendRow';
+import { agentFeatureNames, agentFeatures } from '@/lib/agentAccess';
+import {
+  useAgentPermissionsQuery,
+  useApiKeysQuery,
+  useCreateApiKeyMutation,
+} from './account.query';
+import { AgentKeyList } from './AgentKeyList';
 import { AgentPermissions } from './AgentPermissions';
 import { AgentSetupGuide } from './AgentSetupGuide';
-import css from './AccountPage.module.css';
+import css from './AgentAccessCard.module.css';
 
 interface AgentAccessCardProps {
   userName: string;
@@ -20,78 +23,99 @@ export function AgentAccessCard({ userName }: AgentAccessCardProps) {
   const [newKey, setNewKey] = useState<string | null>(null);
   const keysQuery = useApiKeysQuery();
   const createMutation = useCreateApiKeyMutation();
-  const deleteMutation = useDeleteApiKeyMutation();
+  const keyCount = keysQuery.data?.length ?? 0;
 
   return (
-    <Card aria-busy={keysQuery.isPending} as='section' className={css.friendsCard} data-appear='1'>
-      <header className={css.sectionHeader}>
+    <Card
+      aria-busy={keysQuery.isPending}
+      as='section'
+      className={css.card}
+      data-appear='1'
+      tone='primary'
+    >
+      <header className={css.header}>
+        <span aria-hidden='true' className={css.badge}>
+          <BotIcon />
+        </span>
         <div>
           <h2>AI Agent access</h2>
           <p>Let an AI assistant like Hermes read or update your Veles data.</p>
         </div>
+        {keysQuery.data ? (
+          <span className={css.status} data-active={keyCount > 0 || undefined}>
+            {keyCount > 0 ? `${keyCount} active ${keyCount === 1 ? 'key' : 'keys'}` : 'Off'}
+          </span>
+        ) : null}
       </header>
 
-      <details className={css.disclosure}>
-        <summary>What AI can access</summary>
-        <AgentPermissions />
-      </details>
+      {newKey ? (
+        <AgentSetupGuide apiKey={newKey} onDone={() => setNewKey(null)} userName={userName} />
+      ) : null}
 
-      <details className={css.disclosure} open>
-        <summary>Keys</summary>
-        <p className={css.disclosureHint}>
-          One key per person. Keys expire after 90 days. Revoke a key to cut off access at once.
-        </p>
+      <section aria-labelledby='agent-keys-title' className={css.block}>
+        <div className={css.blockHead}>
+          <h3 id='agent-keys-title'>Keys</h3>
+          <p>Give each agent its own key. Keys do not expire; revoke one to cut off access.</p>
+        </div>
+
+        <AgentKeyList />
+
         <TypedForm
-          className={css.inviteForm}
+          className={css.createForm}
           onSubmit={async (form) => {
             const created = await createMutation.mutateAsync(form.string('name'));
             setNewKey(created.key);
           }}
         >
-          <Label text='Key name'>
-            <TextInput defaultValue='Hermes' maxLength={32} name='name' required />
-          </Label>
+          <TextInput
+            aria-label='Key name'
+            defaultValue='Hermes'
+            maxLength={32}
+            name='name'
+            placeholder='Agent name'
+            required
+          />
           <Btn
-            icon={<KeyRoundIcon aria-hidden='true' />}
+            icon={<PlusIcon aria-hidden='true' />}
             loading={createMutation.isPending}
             type='submit'
           >
-            Create key
+            New key
           </Btn>
         </TypedForm>
 
         {createMutation.error ? (
-          <p className={css.feedback} role='alert'>
+          <p className={css.error} role='alert'>
             {createMutation.error.message}
           </p>
         ) : null}
+      </section>
 
-        {newKey ? <AgentSetupGuide apiKey={newKey} userName={userName} /> : null}
-
-        {keysQuery.data?.length ? (
-          <ul>
-            {keysQuery.data.map((key) => (
-              <FriendRow
-                actions={
-                  <Btn
-                    aria-label={`Revoke ${key.name ?? 'key'}`}
-                    icon={<TrashIcon aria-hidden='true' />}
-                    iconOnly
-                    loading={deleteMutation.isPending && deleteMutation.variables === key.id}
-                    onClick={() => deleteMutation.mutate(key.id)}
-                    variant='ghostDanger'
-                  />
-                }
-                detail={`${key.start ?? ''}… · expires ${key.expiresAt ? format(key.expiresAt, 'yyyy-MM-dd') : 'never'}`}
-                key={key.id}
-                name={key.name ?? 'Unnamed key'}
-              />
-            ))}
-          </ul>
-        ) : null}
-
-        {keysQuery.data?.length === 0 ? <p className={css.emptyState}>No agent keys yet.</p> : null}
+      <details className={css.disclosure}>
+        <summary>
+          <ShieldCheckIcon aria-hidden='true' />
+          <span>What AI can access</span>
+          <PermissionSummary />
+          <ChevronDownIcon aria-hidden='true' className={css.chevron} />
+        </summary>
+        <AgentPermissions />
       </details>
     </Card>
+  );
+}
+
+/** Shows how many features are open so the collapsed permissions row still says something useful. */
+function PermissionSummary() {
+  const permissions = useAgentPermissionsQuery().data;
+  if (!permissions) return <small />;
+  const reads = agentFeatureNames.filter((feature) => permissions[feature].read).length;
+  const writes = agentFeatureNames.filter(
+    (feature) => agentFeatures[feature].writeAvailable && permissions[feature].write,
+  ).length;
+  if (!reads && !writes) return <small>Nothing shared</small>;
+  return (
+    <small>
+      {reads}/{agentFeatureNames.length} read · {writes} write
+    </small>
   );
 }

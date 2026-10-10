@@ -3,7 +3,7 @@
 Veles exposes a permission-controlled [MCP](https://modelcontextprotocol.io) server at `/api/mcp` so an agent (e.g. Hermes on a VPS) can read and change allowed parts of the key owner's data without database access.
 
 - Transport: stateless Streamable HTTP via `@modelcontextprotocol/server` (`createMcpHandler`); 2025 and 2026 protocol clients both work.
-- Auth: Better Auth API keys (`@better-auth/api-key`). Keys are hashed at rest, expire after 90 days, are rate-limited to 120 requests/minute, and are checked on every request. Revoking a key cuts the agent off right away.
+- Auth: Better Auth API keys (`@better-auth/api-key`). Keys are hashed at rest, do not expire, are rate-limited to 120 requests/minute, and are checked on every request. Revoking a key cuts the agent off right away.
 - Code: `apps/web/src/pages/agent/mcp.api.ts`.
 
 ## Setup

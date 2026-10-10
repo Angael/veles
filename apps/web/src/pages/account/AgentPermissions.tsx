@@ -36,7 +36,10 @@ export function AgentPermissions() {
           <span>Write</span>
         </div>
         <div className={css.allRow}>
-          <strong>Allow all</strong>
+          <span>
+            <strong>Allow all</strong>
+            <small>Turns every feature on or off</small>
+          </span>
           <Toggle
             aria-label='Allow AI to read everything'
             checked={allOn('read', agentFeatureNames)}
@@ -54,7 +57,10 @@ export function AgentPermissions() {
           const option = agentFeatures[feature];
           return (
             <div className={css.row} key={feature}>
-              <span>{option.label}</span>
+              <span>
+                <strong>{option.label}</strong>
+                <small>{option.description}</small>
+              </span>
               <Toggle
                 aria-label={`Allow AI to read ${option.label}`}
                 checked={permissions?.[feature].read ?? false}
@@ -73,14 +79,14 @@ export function AgentPermissions() {
                   }
                 />
               ) : (
-                <small>Soon</small>
+                <span className={css.soon}>Soon</span>
               )}
             </div>
           );
         })}
       </div>
       {error ? (
-        <div role='alert'>
+        <div className={css.error} role='alert'>
           <p>Could not save AI permissions: {error.message}</p>
           {permissionsQuery.error ? (
             <Btn onClick={() => void permissionsQuery.refetch()} size='sm' variant='outlineMain'>

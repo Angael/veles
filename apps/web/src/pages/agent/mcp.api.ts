@@ -113,7 +113,7 @@ const requireApiKey = requireBearerAuth({
     /** Maps a Better Auth API key to MCP auth info; revoked/expired keys and rate limits fail here. */
     async verifyAccessToken(token) {
       const { valid, key } = await auth.api.verifyApiKey({ body: { key: token } });
-      if (!valid || !key?.expiresAt) {
+      if (!valid || !key) {
         throw new OAuthError(OAuthErrorCode.InvalidToken, 'Invalid or expired API key');
       }
       return {
@@ -121,7 +121,10 @@ const requireApiKey = requireBearerAuth({
         clientId: key.id,
         // Consent is checked per feature, not granted by possession of a key.
         scopes: [],
-        expiresAt: Math.floor(new Date(key.expiresAt).getTime() / 1000),
+        // The SDK requires a numeric expiry; keys without one never expire.
+        expiresAt: key.expiresAt
+          ? Math.floor(new Date(key.expiresAt).getTime() / 1000)
+          : Number.POSITIVE_INFINITY,
         extra: { userId: key.referenceId },
       };
     },

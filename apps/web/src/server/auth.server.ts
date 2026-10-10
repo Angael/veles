@@ -38,7 +38,7 @@ export const auth = betterAuth({
     apiKey({
       defaultPrefix: 'vls_',
       requireName: true,
-      keyExpiration: { defaultExpiresIn: 60 * 60 * 24 * 90, disableCustomExpiresTime: true },
+      keyExpiration: { defaultExpiresIn: null, disableCustomExpiresTime: true },
       rateLimit: { timeWindow: 60_000, maxRequests: 120 },
     }),
     tanstackStartCookies(),

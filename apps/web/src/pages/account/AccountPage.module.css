@@ -280,21 +280,3 @@
     }
   }
 }
-
-.disclosure {
-  display: grid;
-  gap: var(--space-sm);
-  padding-block: var(--space-sm);
-  border-top: 1px solid var(--c-border);
-
-  & > summary {
-    color: var(--c-text-strong);
-    font-weight: var(--font-weight-semibold);
-    cursor: pointer;
-  }
-}
-
-.disclosureHint {
-  color: var(--c-muted);
-  font-size: var(--text-sm);
-}
