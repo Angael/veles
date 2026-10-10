@@ -1,14 +1,6 @@
-@import '../../styles/breakpoints.css';
-
 .section {
   display: grid;
   gap: var(--space-sm);
-  padding-bottom: var(--space-lg);
-
-  & h3 {
-    color: var(--c-text-strong);
-    font-size: var(--text-md);
-  }
 
   & p {
     color: var(--c-muted);
@@ -17,51 +9,38 @@
   }
 }
 
-.features {
+.table {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-sm);
+  font-size: var(--text-sm);
 }
 
-.feature {
-  min-width: 0;
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-xs);
-  background: var(--c-surface-inset);
-
-  & legend {
-    padding-inline: var(--space-xs);
-    color: var(--c-text-strong);
-    font-size: var(--text-sm);
-    font-weight: var(--font-weight-semibold);
-  }
-}
-
-.controls {
+.head,
+.allRow,
+.row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-sm);
-  margin-top: var(--space-xs);
+  grid-template-columns: 1fr 4rem 4rem;
+  align-items: center;
+  justify-items: center;
+  gap: var(--space-xs);
+  min-height: 2.75rem;
 
-  & label {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-xs);
-    min-height: 2.75rem;
-    font-size: var(--text-sm);
-  }
-
-  & small {
-    display: block;
-    color: var(--c-muted-strong);
-    font-size: var(--text-xs);
+  & > :first-child {
+    justify-self: start;
   }
 }
 
-@media (--phone) {
-  .features {
-    grid-template-columns: 1fr;
-  }
+.head {
+  min-height: auto;
+  color: var(--c-muted);
+  font-size: var(--text-xs);
+}
+
+.allRow {
+  border-bottom: 1px solid var(--c-border);
+  color: var(--c-text-strong);
+}
+
+.row small {
+  color: var(--c-muted-strong);
+  font-size: var(--text-xs);
 }

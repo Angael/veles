@@ -26,67 +26,72 @@ export function AgentAccessCard({ userName }: AgentAccessCardProps) {
     <Card aria-busy={keysQuery.isPending} as='section' className={css.friendsCard} data-appear='1'>
       <header className={css.sectionHeader}>
         <div>
-          <h2>Agent access</h2>
-          <p>Choose what agents like Hermes can access through MCP. Keys expire after 90 days.</p>
-          <p>
-            Each person creates their own key. One agent can hold keys from several people; it adds
-            one connection per key.
-          </p>
+          <h2>AI Agent access</h2>
+          <p>Let an AI assistant like Hermes read or update your Veles data.</p>
         </div>
       </header>
 
-      <AgentPermissions />
+      <details className={css.disclosure}>
+        <summary>What AI can access</summary>
+        <AgentPermissions />
+      </details>
 
-      <TypedForm
-        className={css.inviteForm}
-        onSubmit={async (form) => {
-          const created = await createMutation.mutateAsync(form.string('name'));
-          setNewKey(created.key);
-        }}
-      >
-        <Label text='Key name'>
-          <TextInput defaultValue='Hermes' maxLength={32} name='name' required />
-        </Label>
-        <Btn
-          icon={<KeyRoundIcon aria-hidden='true' />}
-          loading={createMutation.isPending}
-          type='submit'
-        >
-          Create key
-        </Btn>
-      </TypedForm>
-
-      {createMutation.error ? (
-        <p className={css.feedback} role='alert'>
-          {createMutation.error.message}
+      <details className={css.disclosure} open>
+        <summary>Keys</summary>
+        <p className={css.disclosureHint}>
+          One key per person. Keys expire after 90 days. Revoke a key to cut off access at once.
         </p>
-      ) : null}
+        <TypedForm
+          className={css.inviteForm}
+          onSubmit={async (form) => {
+            const created = await createMutation.mutateAsync(form.string('name'));
+            setNewKey(created.key);
+          }}
+        >
+          <Label text='Key name'>
+            <TextInput defaultValue='Hermes' maxLength={32} name='name' required />
+          </Label>
+          <Btn
+            icon={<KeyRoundIcon aria-hidden='true' />}
+            loading={createMutation.isPending}
+            type='submit'
+          >
+            Create key
+          </Btn>
+        </TypedForm>
 
-      {newKey ? <AgentSetupGuide apiKey={newKey} userName={userName} /> : null}
+        {createMutation.error ? (
+          <p className={css.feedback} role='alert'>
+            {createMutation.error.message}
+          </p>
+        ) : null}
 
-      {keysQuery.data?.length ? (
-        <ul>
-          {keysQuery.data.map((key) => (
-            <FriendRow
-              actions={
-                <Btn
-                  aria-label={`Revoke ${key.name ?? 'key'}`}
-                  icon={<TrashIcon aria-hidden='true' />}
-                  iconOnly
-                  loading={deleteMutation.isPending && deleteMutation.variables === key.id}
-                  onClick={() => deleteMutation.mutate(key.id)}
-                  variant='ghostDanger'
-                />
-              }
-              detail={`${key.start ?? ''}… · expires ${key.expiresAt ? format(key.expiresAt, 'yyyy-MM-dd') : 'never'}`}
-              key={key.id}
-              name={key.name ?? 'Unnamed key'}
-            />
-          ))}
-        </ul>
-      ) : null}
+        {newKey ? <AgentSetupGuide apiKey={newKey} userName={userName} /> : null}
 
-      {keysQuery.data?.length === 0 ? <p className={css.emptyState}>No agent keys yet.</p> : null}
+        {keysQuery.data?.length ? (
+          <ul>
+            {keysQuery.data.map((key) => (
+              <FriendRow
+                actions={
+                  <Btn
+                    aria-label={`Revoke ${key.name ?? 'key'}`}
+                    icon={<TrashIcon aria-hidden='true' />}
+                    iconOnly
+                    loading={deleteMutation.isPending && deleteMutation.variables === key.id}
+                    onClick={() => deleteMutation.mutate(key.id)}
+                    variant='ghostDanger'
+                  />
+                }
+                detail={`${key.start ?? ''}… · expires ${key.expiresAt ? format(key.expiresAt, 'yyyy-MM-dd') : 'never'}`}
+                key={key.id}
+                name={key.name ?? 'Unnamed key'}
+              />
+            ))}
+          </ul>
+        ) : null}
+
+        {keysQuery.data?.length === 0 ? <p className={css.emptyState}>No agent keys yet.</p> : null}
+      </details>
     </Card>
   );
 }

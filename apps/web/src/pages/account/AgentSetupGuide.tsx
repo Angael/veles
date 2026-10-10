@@ -1,8 +1,5 @@
-import { CopyIcon } from 'lucide-react';
+import { CheckIcon, CopyIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Btn } from '@/components/ui/btn/Btn';
-import { Label } from '@/components/ui/label/Label';
-import { TextInput } from '@/components/ui/text-input/TextInput';
 import css from './AgentSetupGuide.module.css';
 
 interface AgentSetupGuideProps {
@@ -20,11 +17,12 @@ function serverName(userName: string) {
   return slug ? `veles-${slug}` : 'veles';
 }
 
-/** Shows ready-to-paste MCP configs for common agents right after a key is created. */
+/** Shows one copy-on-press prompt the user sends to their AI agent, plus manual configs. */
 export function AgentSetupGuide({ apiKey, userName }: AgentSetupGuideProps) {
   const url = new URL('/api/mcp', window.location.origin).href;
   const name = serverName(userName);
-  const snippets = [
+  const prompt = `Please connect to my Veles account. Add an HTTP MCP server named "${name}" with URL ${url} and header "Authorization: Bearer ${apiKey}". This key belongs to ${userName}; use it only for ${userName}'s requests. Then restart or reload your MCP tools and call get_access to confirm.`;
+  const configs = [
     {
       label: 'Hermes (~/.hermes/config.yaml)',
       code: `mcp_servers:\n  ${name}:\n    url: "${url}"\n    headers:\n      Authorization: "Bearer ${apiKey}"`,
@@ -41,41 +39,43 @@ export function AgentSetupGuide({ apiKey, userName }: AgentSetupGuideProps) {
 
   return (
     <div className={css.guide}>
-      <Label text='Copy this key now, it is shown only once'>
-        <TextInput onFocus={(event) => event.target.select()} readOnly value={apiKey} />
-      </Label>
       <p>
-        Add Veles to your agent with one of the configs below, then restart the agent. If the agent
-        already has a Veles connection for another person, keep it and add this one beside it.
+        <strong>Key created. It is shown only once.</strong> Send this prompt to your AI agent, or
+        to the person who runs it.
       </p>
-      {snippets.map((snippet) => (
-        <Snippet code={snippet.code} key={snippet.label} label={snippet.label} />
-      ))}
-      <p>
-        Other agents: use HTTP MCP endpoint {url} with header Authorization: Bearer &lt;key&gt;.
-      </p>
+      <CopyBlock code={prompt} label='Prompt for your AI agent' />
+      <details>
+        <summary>Manual setup</summary>
+        {configs.map((config) => (
+          <CopyBlock code={config.code} key={config.label} label={config.label} />
+        ))}
+      </details>
     </div>
   );
 }
 
-function Snippet({ code, label }: { code: string; label: string }) {
+/** Copies on pointer down so one tap or click is enough, including on touch screens. */
+function CopyBlock({ code, label }: { code: string; label: string }) {
   const [copied, setCopied] = useState(false);
+  const copy = () => void navigator.clipboard.writeText(code).then(() => setCopied(true));
   return (
-    <section className={css.snippet}>
-      <header>
-        <h3>{label}</h3>
-        <Btn
-          icon={<CopyIcon aria-hidden='true' />}
-          onClick={() => {
-            void navigator.clipboard.writeText(code).then(() => setCopied(true));
-          }}
-          size='sm'
-          variant='ghost'
-        >
-          {copied ? 'Copied' : 'Copy'}
-        </Btn>
-      </header>
+    <button
+      className={css.copyBlock}
+      data-copied={copied || undefined}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') copy();
+      }}
+      onPointerDown={copy}
+      type='button'
+    >
+      <span className={css.copyLabel}>
+        <span>{label}</span>
+        <span>
+          {copied ? <CheckIcon aria-hidden='true' /> : <CopyIcon aria-hidden='true' />}
+          {copied ? 'Copied' : 'Tap to copy'}
+        </span>
+      </span>
       <pre>{code}</pre>
-    </section>
+    </button>
   );
 }

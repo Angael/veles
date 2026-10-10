@@ -2,7 +2,11 @@ import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 import { sessionUserQueryKey } from '@/lib/auth/session.query';
 import { apiKey, signOut } from '@/lib/auth/client';
 import type { AgentFeature } from '@/lib/agentAccess';
-import { getAgentPermissions, updateAgentPermission } from './agent-access.api';
+import {
+  getAgentPermissions,
+  setAllAgentPermissions,
+  updateAgentPermission,
+} from './agent-access.api';
 import {
   acceptConnectionInvitation,
   disconnectUser,
@@ -129,5 +133,13 @@ export function useUpdateAgentPermissionMutation() {
     meta: { invalidateQueryKey: agentPermissionsQueryKey },
     mutationFn: (data: { feature: AgentFeature; access: 'read' | 'write'; enabled: boolean }) =>
       updateAgentPermission({ data }),
+  });
+}
+
+export function useSetAllAgentPermissionsMutation() {
+  return useMutation({
+    meta: { invalidateQueryKey: agentPermissionsQueryKey },
+    mutationFn: (data: { access: 'read' | 'write'; enabled: boolean }) =>
+      setAllAgentPermissions({ data }),
   });
 }

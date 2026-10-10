@@ -1,78 +1,94 @@
 import { Btn } from '@/components/ui/btn/Btn';
 import { Toggle } from '@/components/ui/toggle/Toggle';
-import { agentFeatureNames, agentFeatures } from '@/lib/agentAccess';
-import { useAgentPermissionsQuery, useUpdateAgentPermissionMutation } from './account.query';
+import { type AgentFeature, agentFeatureNames, agentFeatures } from '@/lib/agentAccess';
+import {
+  useAgentPermissionsQuery,
+  useSetAllAgentPermissionsMutation,
+  useUpdateAgentPermissionMutation,
+} from './account.query';
 import css from './AgentPermissions.module.css';
 
+const writableFeatures = agentFeatureNames.filter(
+  (feature) => agentFeatures[feature].writeAvailable,
+);
+
+/** Account-wide AI consent: one "all" row plus a flat per-feature list; applies to every key live. */
 export function AgentPermissions() {
   const permissionsQuery = useAgentPermissionsQuery();
   const updateMutation = useUpdateAgentPermissionMutation();
-  const disabled = !permissionsQuery.data || permissionsQuery.isError || updateMutation.isPending;
+  const setAllMutation = useSetAllAgentPermissionsMutation();
+  const permissions = permissionsQuery.data;
+  const disabled = !permissions || updateMutation.isPending || setAllMutation.isPending;
+  const allOn = (access: 'read' | 'write', features: AgentFeature[]) =>
+    !!permissions && features.every((feature) => permissions[feature][access]);
+  const error = permissionsQuery.error ?? updateMutation.error ?? setAllMutation.error;
 
   return (
-    <section
-      aria-busy={permissionsQuery.isPending || updateMutation.isPending}
-      className={css.section}
-    >
-      <h3>I allow AI to access these parts</h3>
+    <div aria-busy={permissionsQuery.isPending} className={css.section}>
       <p>
-        Read lets AI view data. Write lets AI create, edit, and delete data. Each switch applies to
-        all your agent keys. Both start off and can be changed independently.
+        Read lets AI view data. Write lets AI add, edit, and delete it. Changes apply to all your
+        keys right away.
       </p>
-      <p>Writes start with notes and shopping lists. Other features will follow.</p>
-      <div className={css.features}>
+      <div className={css.table} role='group' aria-label='AI permissions'>
+        <div className={css.head}>
+          <span />
+          <span>Read</span>
+          <span>Write</span>
+        </div>
+        <div className={css.allRow}>
+          <strong>Allow all</strong>
+          <Toggle
+            aria-label='Allow AI to read everything'
+            checked={allOn('read', agentFeatureNames)}
+            disabled={disabled}
+            onCheckedChange={(enabled) => setAllMutation.mutate({ access: 'read', enabled })}
+          />
+          <Toggle
+            aria-label='Allow AI to write everything available'
+            checked={allOn('write', writableFeatures)}
+            disabled={disabled}
+            onCheckedChange={(enabled) => setAllMutation.mutate({ access: 'write', enabled })}
+          />
+        </div>
         {agentFeatureNames.map((feature) => {
           const option = agentFeatures[feature];
           return (
-            <fieldset className={css.feature} key={feature}>
-              <legend>{option.label}</legend>
-              <p>{option.description}</p>
-              <div className={css.controls}>
-                <label>
-                  <span>Read</span>
-                  <Toggle
-                    aria-label={`Allow AI to read ${option.label}`}
-                    checked={permissionsQuery.data?.[feature].read ?? false}
-                    disabled={disabled}
-                    onCheckedChange={(enabled) =>
-                      updateMutation.mutate({ feature, access: 'read', enabled })
-                    }
-                  />
-                </label>
-                <label>
-                  <span>
-                    Write
-                    {!option.writeAvailable ? <small>Coming soon</small> : null}
-                  </span>
-                  <Toggle
-                    aria-label={`Allow AI to write ${option.label}`}
-                    checked={permissionsQuery.data?.[feature].write ?? false}
-                    disabled={disabled || !option.writeAvailable}
-                    onCheckedChange={(enabled) =>
-                      updateMutation.mutate({ feature, access: 'write', enabled })
-                    }
-                  />
-                </label>
-              </div>
-            </fieldset>
+            <div className={css.row} key={feature}>
+              <span>{option.label}</span>
+              <Toggle
+                aria-label={`Allow AI to read ${option.label}`}
+                checked={permissions?.[feature].read ?? false}
+                disabled={disabled}
+                onCheckedChange={(enabled) =>
+                  updateMutation.mutate({ feature, access: 'read', enabled })
+                }
+              />
+              {option.writeAvailable ? (
+                <Toggle
+                  aria-label={`Allow AI to write ${option.label}`}
+                  checked={permissions?.[feature].write ?? false}
+                  disabled={disabled}
+                  onCheckedChange={(enabled) =>
+                    updateMutation.mutate({ feature, access: 'write', enabled })
+                  }
+                />
+              ) : (
+                <small>Soon</small>
+              )}
+            </div>
           );
         })}
       </div>
-      {permissionsQuery.error ? (
+      {error ? (
         <div role='alert'>
-          <p>Could not load AI permissions: {permissionsQuery.error.message}</p>
-          <Btn onClick={() => void permissionsQuery.refetch()} size='sm' variant='outlineMain'>
-            Retry
-          </Btn>
+          <p>Could not save AI permissions: {error.message}</p>
+          {permissionsQuery.error ? (
+            <Btn onClick={() => void permissionsQuery.refetch()} size='sm' variant='outlineMain'>
+              Retry
+            </Btn>
+          ) : null}
         </div>
       ) : null}
-      {updateMutation.error ? (
-        <p role='alert'>Could not save: {updateMutation.error.message}</p>
-      ) : null}
-      <p aria-live='polite'>
-        {updateMutation.isPending ? 'Saving permissions…' : ''}
-        {updateMutation.isSuccess ? 'Permissions saved.' : ''}
-      </p>
-    </section>
+    </div>
   );
 }

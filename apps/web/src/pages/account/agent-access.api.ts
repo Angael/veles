@@ -2,7 +2,7 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { userAgentPermissions } from '@veles/db/schema';
-import { agentFeatures, agentFeatureType } from '@/lib/agentAccess';
+import { agentFeatureNames, agentFeatures, agentFeatureType } from '@/lib/agentAccess';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { readAgentPermissions } from '@/server/agentAccess.server';
 import { db } from '@/server/db.server';
@@ -37,6 +37,32 @@ export const updateAgentPermission = createServerFn({ method: 'POST' })
     await db
       .insert(userAgentPermissions)
       .values({ userId: session.user.id, feature: data.feature, ...changed })
+      .onConflictDoUpdate({
+        target: [userAgentPermissions.userId, userAgentPermissions.feature],
+        set: changed,
+      });
+  });
+
+const setAllAgentPermissionsInputType = type({
+  '+': 'reject',
+  access: "'read' | 'write'",
+  enabled: 'boolean',
+});
+
+/** Flips read or write for every feature at once; write skips features whose writes are not live yet. */
+export const setAllAgentPermissions = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('setAllAgentPermissions')])
+  .validator(arkTypeValidator(setAllAgentPermissionsInputType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    const features = agentFeatureNames.filter(
+      (feature) => data.access === 'read' || agentFeatures[feature].writeAvailable,
+    );
+    const changed =
+      data.access === 'read' ? { readEnabled: data.enabled } : { writeEnabled: data.enabled };
+    await db
+      .insert(userAgentPermissions)
+      .values(features.map((feature) => ({ userId: session.user.id, feature, ...changed })))
       .onConflictDoUpdate({
         target: [userAgentPermissions.userId, userAgentPermissions.feature],
         set: changed,

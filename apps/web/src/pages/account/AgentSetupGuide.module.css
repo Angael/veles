@@ -7,30 +7,64 @@
   background: var(--c-primary-surface);
   font-size: var(--text-sm);
   text-wrap: pretty;
-}
 
-.snippet {
-  display: grid;
-  gap: var(--space-xs);
-  min-width: 0;
-
-  & header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  & details {
+    display: grid;
     gap: var(--space-xs);
   }
 
-  & h3 {
-    color: var(--c-text-strong);
-    font-size: var(--text-sm);
+  & summary {
+    color: var(--c-muted);
+    cursor: pointer;
+  }
+}
+
+.copyBlock {
+  display: grid;
+  gap: var(--space-xs);
+  width: 100%;
+  min-width: 0;
+  margin-top: var(--space-xs);
+  padding: var(--space-sm);
+  border: 1px dashed var(--c-primary-border-soft);
+  border-radius: var(--radius-xs);
+  background: var(--c-surface-inset);
+  color: var(--c-text);
+  text-align: start;
+  cursor: copy;
+
+  &[data-copied] {
+    border-style: solid;
   }
 
   & pre {
-    overflow-x: auto;
-    padding: var(--space-sm);
-    border-radius: var(--radius-xs);
-    background: var(--c-surface-inset);
     font-size: var(--text-xs);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
+.copyLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  color: var(--c-text-strong);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+
+  & > span:last-child {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--c-muted);
+    font-weight: normal;
+    text-transform: none;
+  }
+
+  & svg {
+    width: 0.9rem;
+    height: 0.9rem;
   }
 }
