@@ -1,7 +1,27 @@
 import { useMutation } from '@tanstack/react-query';
 import { toastManager } from '@/components/ui/toast/toastManager';
-import { createDiaryEntry, deleteDiaryEntry, updateDiaryEntry } from './diary.api';
-import { exportDiaryEntries, importDiaryEntries } from './diaryBackup.api';
+import { saveDiaryKey } from '@/lib/diaryKeyVault';
+import { createDiaryEntry, deleteDiaryEntry, setupDiaryKey, updateDiaryEntry } from './diary.api';
+import { parseDiaryBackup, selectNewBackupEntries } from './diaryBackup';
+import { importDiaryEntries } from './diaryBackup.api';
+import {
+  createDiaryKey,
+  type DiaryEntryContent,
+  type DiaryKeyRecord,
+  encryptDiaryEntry,
+  unlockDiaryKey,
+} from './diaryCrypto';
+import type { DiaryEntrySummary } from './useDecryptedEntries';
+
+type DiaryEntryDraft = DiaryEntryContent & {
+  entryDate: string;
+  id: string;
+};
+
+type PassphraseInput = {
+  passphrase: string;
+  remember: boolean;
+};
 
 export function useCreateDiaryEntryMutation() {
   return useMutation({ mutationFn: createDiaryEntry });
@@ -11,20 +31,57 @@ export function useDeleteDiaryEntryMutation() {
   return useMutation({ mutationFn: deleteDiaryEntry });
 }
 
-export function useUpdateDiaryEntryMutation() {
-  return useMutation({ mutationFn: updateDiaryEntry });
-}
-
-export function useExportDiaryEntriesMutation() {
+/** Encrypts the draft in the browser before it is sent to the server. */
+export function useUpdateDiaryEntryMutation(key: CryptoKey) {
   return useMutation({
-    meta: { error: { title: 'Diary could not be exported' } },
-    mutationFn: () => exportDiaryEntries(),
+    mutationFn: async ({ entryDate, id, markdown, title }: DiaryEntryDraft) =>
+      updateDiaryEntry({
+        data: { ciphertext: await encryptDiaryEntry(key, id, { markdown, title }), entryDate, id },
+      }),
   });
 }
 
-export function useImportDiaryEntriesMutation() {
+/** Unlocks the diary with an existing key record, or creates and stores a new one. */
+export function useDiaryPassphraseMutation(keyRecord: DiaryKeyRecord | null) {
   return useMutation({
-    mutationFn: importDiaryEntries,
+    mutationFn: async ({ passphrase, remember }: PassphraseInput) => {
+      if (keyRecord) {
+        const key = await unlockDiaryKey(passphrase, keyRecord);
+        await saveDiaryKey(keyRecord.wrappedKey, key, remember);
+        return key;
+      }
+
+      const { key, record } = await createDiaryKey(passphrase);
+      await setupDiaryKey({ data: record });
+      await saveDiaryKey(record.wrappedKey, key, remember);
+      return key;
+    },
+  });
+}
+
+/** Parses a backup file, skips entries that already exist, and encrypts the rest before upload. */
+export function useImportDiaryEntriesMutation(key: CryptoKey, existing: DiaryEntrySummary[]) {
+  return useMutation({
+    mutationFn: async (json: string) => {
+      const backup = parseDiaryBackup(json);
+      const entries = await Promise.all(
+        selectNewBackupEntries(existing, backup.entries).map(
+          async ({ markdown, title, ...entry }) => {
+            const id = crypto.randomUUID();
+            return {
+              ...entry,
+              ciphertext: await encryptDiaryEntry(key, id, { markdown, title }),
+              id,
+            };
+          },
+        ),
+      );
+      await importDiaryEntries({ data: { entries } });
+      return {
+        importedCount: entries.length,
+        skippedCount: backup.entries.length - entries.length,
+      };
+    },
     onError: (error) => {
       toastManager.add({
         description: error.message,
