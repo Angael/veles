@@ -10,6 +10,7 @@
 }
 
 .cell {
+  font: var(--type-caption);
   display: grid;
   grid-column: span 2;
   justify-items: center;
@@ -21,8 +22,6 @@
   border-radius: 12px;
   background: var(--c-surface-inset);
   color: var(--c-muted);
-  font-size: var(--text-xs);
-  line-height: 1.2;
   text-align: center;
   cursor: pointer;
 
@@ -46,7 +45,7 @@
 .active {
   border-color: var(--c-primary-border);
   background: var(--c-primary-surface-strong);
-  color: var(--c-text-strong);
+  color: var(--c-text);
 
   & svg {
     color: var(--c-accent);

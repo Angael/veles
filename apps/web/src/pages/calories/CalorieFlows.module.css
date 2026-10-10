@@ -54,13 +54,13 @@
 }
 
 .barcodeInput input {
+  font: var(--type-input);
   min-width: 0;
   min-height: 44px;
   flex: 1;
   border: 0;
   background: transparent;
   color: inherit;
-  font: inherit;
 }
 
 .missingProduct {

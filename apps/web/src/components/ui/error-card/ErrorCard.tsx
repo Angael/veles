@@ -20,7 +20,7 @@ export const ErrorCard = memo(function ErrorCard({
       <CircleAlertIcon aria-hidden='true' className={css.icon} size={22} strokeWidth={1.9} />
 
       <div className={css.content}>
-        <p className={css.eyebrow}>{title}</p>
+        <p className={css.title}>{title}</p>
         <p className={css.message}>{message}</p>
       </div>
     </Card>

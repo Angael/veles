@@ -49,20 +49,17 @@
 }
 
 .heroContent h1 {
+  font: var(--type-display);
   margin: 0;
-  color: var(--c-text-strong);
-  font-size: var(--text-hero);
-  font-weight: 700;
-  letter-spacing: -0.055em;
-  line-height: 0.9;
+  color: var(--c-text);
   text-wrap: balance;
 }
 
 .heroContent p {
+  font: var(--type-body);
   max-width: 29rem;
   margin: var(--space-lg) 0 0;
   color: var(--c-muted);
-  font-size: var(--text-lg-dynamic);
   text-wrap: pretty;
 }
 
@@ -83,7 +80,8 @@
   right: var(--space-lg);
   z-index: 0;
   color: color-mix(in srgb, var(--c-accent) 15%, transparent);
-  font-family: var(--font-mono);
+  /* Branding artwork, not UI text: intentionally oversized Geist Sans monogram. */
+  font-family: var(--font-sans);
   font-size: clamp(13rem, 25vw, 20rem);
   font-weight: 700;
   line-height: 1;
@@ -164,11 +162,9 @@
 }
 
 .tileHeading h2 {
+  font: var(--type-title);
   margin: 0;
-  color: var(--c-text-strong);
-  font-size: var(--text-xl);
-  letter-spacing: -0.025em;
-  line-height: 1.1;
+  color: var(--c-text);
 }
 
 .workoutTile > p,
@@ -181,15 +177,13 @@
 }
 
 .setSequence {
+  font: var(--type-caption);
   display: grid;
   grid-template-columns: auto 1fr auto 1fr auto;
   align-items: center;
   gap: var(--space-xs);
   margin-top: var(--space-xl);
   color: var(--c-accent-soft);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: 0.08em;
 }
 
 .setSequence i {
@@ -201,22 +195,18 @@
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: baseline;
-  color: var(--c-text-strong);
+  color: var(--c-text);
 }
 
 .trendValue {
-  font-family: var(--font-mono);
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
-  font-weight: 650;
-  letter-spacing: -0.08em;
-  line-height: 0.9;
+  font: var(--type-metric);
   font-variant-numeric: tabular-nums;
 }
 
 .trendUnit {
+  font: var(--type-body);
   margin-left: var(--space-xs);
   color: var(--c-muted);
-  font-size: var(--text-sm);
 }
 
 .trend svg {
@@ -236,15 +226,21 @@
 
 .macros {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-xs);
   margin: var(--space-xl) 0 0;
 }
 
 .macros div {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   padding-top: var(--space-sm);
   border-top: 2px solid var(--c-border-strong);
+}
+
+.macros div:first-child {
+  grid-column: 1 / -1;
 }
 
 .macros div:nth-child(2) {
@@ -260,17 +256,17 @@
 }
 
 .macros dt {
+  order: 1;
+  font: var(--type-caption);
   overflow: hidden;
-  color: var(--c-muted-strong);
-  font-size: var(--text-xs);
+  color: var(--c-muted);
   text-overflow: ellipsis;
 }
 
 .macros dd {
-  margin: var(--space-xs) 0 0;
-  color: var(--c-text-strong);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
+  font: var(--type-subtitle);
+  margin: 0 0 var(--space-xs);
+  color: var(--c-text);
   font-variant-numeric: tabular-nums;
 }
 
@@ -281,6 +277,7 @@
 }
 
 .fileStack span {
+  font: var(--type-caption);
   display: block;
   padding: var(--space-sm) var(--space-md);
   border: var(--border-width) solid var(--c-primary-border-soft);
@@ -288,8 +285,6 @@
   background: var(--c-surface-solid);
   color: var(--c-accent-soft);
   box-shadow: var(--shadow-card);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
 }
 
 .fileStack span:nth-child(2) {
@@ -353,10 +348,6 @@
     width: 100%;
   }
 
-  .heroContent h1 {
-    font-size: clamp(2.9rem, 16vw, 4.2rem);
-  }
-
   .monogram {
     top: calc(var(--space-lg) * -1);
     right: calc(var(--space-md) * -1);
@@ -385,10 +376,6 @@
 
   .trend {
     margin-top: var(--space-lg);
-  }
-
-  .macros {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .fileStack {

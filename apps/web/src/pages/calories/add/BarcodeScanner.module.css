@@ -9,13 +9,13 @@
   gap: var(--space-sm);
 
   & h1 {
-    font-size: var(--text-lg-dynamic);
+    font: var(--type-display);
     text-wrap: balance;
   }
 
   & p {
+    font: var(--type-body);
     color: var(--c-muted);
-    font-size: var(--text-sm);
     text-wrap: pretty;
   }
 }
@@ -49,6 +49,7 @@
 }
 
 .cameraNotice {
+  font: var(--type-body);
   padding: var(--space-xs) var(--space-sm);
   visibility: hidden;
   border: var(--border-width) solid var(--c-primary-border-soft);
@@ -56,7 +57,6 @@
   opacity: 0;
   background: color-mix(in srgb, var(--c-surface-solid) 90%, transparent);
   color: var(--c-text);
-  font-size: var(--text-sm);
   transform: translateX(0.5rem);
   transition:
     opacity 120ms ease-in,
@@ -83,13 +83,13 @@
 }
 
 .cameraHint {
+  font: var(--type-caption);
   position: absolute;
   z-index: 2;
   top: calc(var(--space-sm) + 44px + var(--space-xs));
   right: var(--space-sm);
   width: min(14rem, calc(100% - (2 * var(--space-sm))));
   padding: var(--space-xs) var(--space-sm);
-  font-size: var(--text-xs);
   text-wrap: pretty;
 }
 
@@ -110,8 +110,8 @@
   }
 
   & span {
+    font: var(--type-body);
     color: var(--c-muted);
-    font-size: var(--text-sm);
     text-wrap: pretty;
   }
 }
@@ -127,8 +127,8 @@
 }
 
 .status {
+  font: var(--type-body);
   color: var(--c-muted);
-  font-size: var(--text-sm);
   text-align: center;
 }
 

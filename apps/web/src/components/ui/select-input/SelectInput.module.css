@@ -10,7 +10,7 @@
   background: rgba(2, 6, 23, 0.4);
   color: var(--c-text);
   padding: 0 0.85rem 0 1rem;
-  font: inherit;
+  font: var(--type-body);
   text-align: left;
   transition:
     border-color 180ms var(--ease-out),
@@ -50,7 +50,7 @@ label:has(.trigger[data-required]) > span:first-child::after {
   white-space: nowrap;
 
   &[data-placeholder] {
-    color: var(--c-placeholder);
+    color: var(--c-muted);
   }
 }
 
@@ -59,7 +59,7 @@ label:has(.trigger[data-required]) > span:first-child::after {
   align-items: center;
   justify-content: center;
   flex: none;
-  color: var(--c-muted-strong);
+  color: var(--c-muted);
   transition:
     color 180ms var(--ease-out),
     transform 180ms var(--ease-out);
@@ -76,6 +76,7 @@ label:has(.trigger[data-required]) > span:first-child::after {
 }
 
 .popup {
+  font: var(--type-body);
   min-width: var(--anchor-width);
   max-height: min(20rem, var(--available-height));
   overflow: hidden;
@@ -128,7 +129,7 @@ label:has(.trigger[data-required]) > span:first-child::after {
   }
 
   &[data-selected] {
-    color: var(--c-text-strong);
+    color: var(--c-text);
   }
 }
 

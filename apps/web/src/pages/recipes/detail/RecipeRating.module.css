@@ -18,7 +18,7 @@
   margin: 0;
   border-radius: var(--radius-pill);
   background: transparent;
-  color: var(--c-muted-strong);
+  color: var(--c-muted);
   transition:
     background-color 140ms var(--ease-out),
     color 140ms var(--ease-out),
@@ -46,6 +46,6 @@
 @media (hover: hover) and (pointer: fine) {
   .starButton:not(:disabled):hover {
     background: var(--c-primary-surface);
-    color: var(--c-text-strong);
+    color: var(--c-text);
   }
 }

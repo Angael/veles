@@ -19,29 +19,27 @@
   }
 
   pre {
+    font: var(--type-body);
     width: 100%;
     padding: var(--space-sm);
     overflow-x: auto;
     border-radius: var(--radius-xs);
     background: color-mix(in srgb, var(--c-surface-solid) 75%, transparent);
     color: var(--c-text);
-    font: inherit;
-    font-size: var(--text-sm);
-    line-height: 1.55;
     white-space: pre-wrap;
   }
 }
 
 .importInput {
+  font: var(--type-input);
   min-height: 14rem;
-  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 
 .importStatus {
   min-height: 1.25rem;
   color: var(--c-muted);
-  font-size: var(--text-sm);
+  font: var(--type-body);
 
   &[data-error] {
     color: var(--c-danger-text);
@@ -49,6 +47,6 @@
 }
 
 .date {
+  font: var(--type-body);
   color: var(--c-muted);
-  font-size: var(--text-sm);
 }

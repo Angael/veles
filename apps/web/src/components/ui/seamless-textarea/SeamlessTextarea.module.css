@@ -3,12 +3,16 @@
   min-height: 1lh;
   border: 0;
   background: transparent;
-  color: inherit;
+  color: var(--c-text);
   field-sizing: content;
-  font: inherit;
+  font: var(--type-input);
   overflow: hidden;
   padding: 0;
   resize: none;
+
+  &::placeholder {
+    color: var(--c-muted);
+  }
 
   &:focus-visible {
     outline: 2px solid var(--c-primary-border);

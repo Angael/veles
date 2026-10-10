@@ -19,16 +19,14 @@
   min-width: 0;
 }
 
-.eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: var(--text-xs);
+.title {
+  font: var(--type-subtitle);
   color: var(--c-danger-text);
 }
 
 .message {
   color: var(--c-text);
-  font-size: var(--text-xs);
+  font: var(--type-body);
 }
 
 @media (--phone) {

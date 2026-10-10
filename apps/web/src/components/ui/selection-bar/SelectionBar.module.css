@@ -10,8 +10,8 @@
   min-width: 0;
   padding-inline-end: var(--space-sm);
   overflow: hidden;
-  color: var(--c-text-strong);
-  font-size: var(--text-sm);
+  color: var(--c-text);
+  font: var(--type-body);
   font-variant-numeric: tabular-nums;
   text-overflow: ellipsis;
   white-space: nowrap;

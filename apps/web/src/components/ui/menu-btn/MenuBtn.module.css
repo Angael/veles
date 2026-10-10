@@ -82,13 +82,13 @@
 }
 
 .itemCopy strong {
-  font-size: var(--text-sm);
+  font: var(--type-subtitle);
 }
 
 .itemCopy > span {
   overflow: hidden;
   color: var(--c-muted);
-  font-size: var(--text-xs);
+  font: var(--type-caption);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -157,12 +157,12 @@
   }
 
   .mobileHeading strong {
-    font-size: var(--text-lg);
+    font: var(--type-title);
   }
 
   .mobileHeading span {
     color: var(--c-muted);
-    font-size: var(--text-sm);
+    font: var(--type-body);
   }
 
   .item {

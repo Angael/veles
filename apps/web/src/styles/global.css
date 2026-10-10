@@ -3,7 +3,7 @@
 
 :root {
   font-family: var(--font-sans);
-  line-height: var(--line-height-body);
+  line-height: 1.5;
   font-weight: var(--font-weight-regular);
   scrollbar-gutter: stable;
   -webkit-font-smoothing: antialiased;
@@ -28,11 +28,23 @@ html {
 
 body {
   min-width: 320px;
+  color: var(--c-text);
+  font: var(--type-body);
 }
 
-button,
-input {
+button {
   font: inherit;
+}
+
+input,
+textarea,
+select {
+  font: var(--type-input);
+}
+
+::placeholder {
+  color: var(--c-muted);
+  opacity: 1;
 }
 
 h1,
@@ -60,9 +72,42 @@ a {
   color: inherit;
 }
 
+h1 {
+  font: var(--type-display);
+}
+
+h2 {
+  font: var(--type-title);
+}
+
+h3,
+h4,
+h5,
+h6 {
+  font: var(--type-subtitle);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+strong,
+b {
+  font-weight: var(--font-weight-semibold);
+}
+
+small {
+  font: var(--type-caption);
+}
+
 p {
-  font-family: var(--font-sans);
-  font-weight: var(--font-weight-regular);
+  font: var(--type-body);
+  text-wrap: pretty;
 }
 
 [data-appear] {

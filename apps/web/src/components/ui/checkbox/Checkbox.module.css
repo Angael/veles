@@ -4,7 +4,7 @@
   width: 1.375rem;
   height: 1.375rem;
   place-items: center;
-  border: 2px solid var(--c-muted-strong);
+  border: 2px solid var(--c-muted);
   border-radius: 0.4rem;
   background: var(--c-surface-input);
   color: var(--c-primary-contrast);

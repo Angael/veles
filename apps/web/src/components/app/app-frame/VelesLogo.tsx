@@ -52,7 +52,7 @@ export function VelesLogo() {
       <defs>
         <path d='M284 55a134 32 0 1 1-268 0a134 32 0 1 1 268 0' id={orbitPath} pathLength='100' />
         <radialGradient id={planet} cx='30%' cy='25%' r='80%'>
-          <stop offset='0' stopColor='var(--c-text-strong)' />
+          <stop offset='0' stopColor='var(--c-text)' />
           <stop offset='.35' stopColor='var(--c-accent)' />
           <stop offset='1' stopColor='var(--c-primary)' />
         </radialGradient>

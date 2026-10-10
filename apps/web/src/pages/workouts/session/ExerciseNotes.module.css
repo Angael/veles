@@ -1,9 +1,9 @@
 .note {
+  font: var(--type-input);
   color: var(--c-muted);
-  font-size: var(--text-sm);
 
   &::placeholder {
-    color: var(--c-placeholder);
+    color: var(--c-muted);
     font-style: italic;
   }
 }
@@ -23,20 +23,18 @@
 }
 
 .position {
+  font: var(--type-subtitle);
   display: grid;
   place-content: center;
   height: 3rem;
   border-radius: var(--radius-xs);
   background: var(--c-primary-surface);
-  color: var(--c-text-strong);
-  font-weight: var(--font-weight-semibold);
-  line-height: 1.1;
+  color: var(--c-text);
   text-align: center;
 
   & small {
+    font: var(--type-caption);
     color: var(--c-muted);
-    font-size: 0.65rem;
-    font-weight: var(--font-weight-regular);
   }
 }
 
@@ -46,18 +44,19 @@
 }
 
 .historyMeta {
+  font: var(--type-caption);
   color: var(--c-muted);
-  font-size: var(--text-xs);
 }
 
 .historySets {
+  font: var(--type-body);
   font-family: var(--font-mono);
-  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
   word-spacing: 0.3em;
 }
 
 .historyNote {
-  color: var(--c-muted-soft);
-  font-size: var(--text-sm);
+  font: var(--type-body);
+  color: var(--c-muted);
   font-style: italic;
 }

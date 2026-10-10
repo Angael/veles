@@ -25,28 +25,26 @@
   white-space: nowrap;
 
   dt {
+    font: var(--type-caption);
     order: 2;
     overflow: hidden;
-    color: var(--c-muted-strong);
-    font-size: 0.6875rem;
+    color: var(--c-muted);
     text-overflow: ellipsis;
   }
 
   dd {
+    font: var(--type-subtitle);
     order: 1;
     overflow: hidden;
     max-width: 100%;
-    font-size: 0.8125rem;
-    font-weight: var(--font-weight-semibold);
     font-variant-numeric: tabular-nums;
     text-overflow: ellipsis;
   }
 }
 
 .kcal dd {
-  color: var(--c-text-strong);
-  font-size: var(--text-lg);
-  letter-spacing: -0.04em;
+  font: var(--type-metric);
+  color: var(--c-text);
 }
 
 .protein dd {

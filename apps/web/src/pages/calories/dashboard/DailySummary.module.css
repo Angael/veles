@@ -36,45 +36,42 @@
   gap: 0.2rem 0.4rem;
   min-width: 0;
   font-variant-numeric: tabular-nums;
-  line-height: 1;
 
   & strong {
-    color: var(--c-text-strong);
-    font-size: clamp(2.2rem, 4vw, 2.75rem);
-    font-weight: 650;
-    letter-spacing: -0.055em;
+    font: var(--type-metric);
+    font-variant-numeric: tabular-nums;
+    color: var(--c-text);
   }
 
   & span {
-    color: var(--c-muted-strong);
-    font-size: var(--text-md);
-    letter-spacing: -0.01em;
+    font: var(--type-body);
+    color: var(--c-muted);
   }
 }
 
 .energyHint {
+  font: var(--type-body);
   color: var(--c-muted);
-  font-size: var(--text-sm);
   text-wrap: pretty;
 }
 
 .energyStatus {
+  font: var(--type-body);
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: var(--space-xs);
   color: var(--c-muted);
-  font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
-  line-height: 1.25;
 
   & strong {
-    color: var(--c-text-strong);
-    font-weight: var(--font-weight-semibold);
+    font: var(--type-subtitle);
+    font-variant-numeric: tabular-nums;
+    color: var(--c-text);
   }
 
   & > span:last-child {
-    color: var(--c-muted-strong);
+    color: var(--c-muted);
   }
 
   &[data-over] strong {
@@ -109,21 +106,21 @@
   }
 
   & dt {
-    font-size: var(--text-sm);
-    font-weight: var(--font-weight-semibold);
+    font: var(--type-subtitle);
+    font-variant-numeric: tabular-nums;
   }
 }
 
 .macroValue {
-  color: var(--c-muted-strong);
-  font-size: var(--text-sm);
+  font: var(--type-body);
+  color: var(--c-muted);
   font-variant-numeric: tabular-nums;
-  line-height: 1.25;
   white-space: nowrap;
 
   & strong {
-    color: var(--c-text-strong);
-    font-weight: var(--font-weight-semibold);
+    font: var(--type-subtitle);
+    font-variant-numeric: tabular-nums;
+    color: var(--c-text);
   }
 
   [data-over] > & strong {
@@ -154,7 +151,7 @@
 
   &[data-over] .meterFill {
     border-radius: 0;
-    background: color-mix(in srgb, currentColor 55%, var(--c-muted-strong));
+    background: color-mix(in srgb, currentColor 55%, var(--c-muted));
   }
 }
 

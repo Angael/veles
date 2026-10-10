@@ -17,18 +17,16 @@
 }
 
 .content h1 {
+  font: var(--type-display);
   max-width: 19ch;
-  color: var(--c-text-strong);
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
-  letter-spacing: -0.045em;
-  line-height: 1.05;
+  color: var(--c-text);
   text-wrap: balance;
 }
 
 .message {
+  font: var(--type-body);
   max-width: 42rem;
   color: var(--c-muted);
-  font-size: var(--text-md-dynamic);
   text-wrap: pretty;
 }
 

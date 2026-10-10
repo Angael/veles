@@ -19,8 +19,8 @@
 }
 
 .packageLabel {
+  font: var(--type-body);
   color: var(--c-muted);
-  font-size: var(--text-sm);
 }
 
 .packageButtons {
@@ -51,18 +51,18 @@
 .goalMessage,
 .goalResult,
 .goalResultOver {
+  font: var(--type-body);
   color: var(--c-muted);
-  font-size: var(--text-sm);
   text-wrap: pretty;
 }
 
 .goalCaption {
+  font: var(--type-body);
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-sm);
   color: var(--c-muted);
-  font-size: var(--text-sm);
 
   & span {
     display: inline-flex;
@@ -72,8 +72,8 @@
   }
 
   & strong {
-    color: var(--c-text-strong);
-    font-weight: var(--font-weight-semibold);
+    font: var(--type-subtitle);
+    color: var(--c-text);
   }
 }
 

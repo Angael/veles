@@ -41,8 +41,7 @@
 
 .title {
   min-width: 0;
-  font-size: clamp(1.4rem, 1.1rem + 1.5vw, 1.9rem);
-  line-height: 1.15;
+  font: var(--type-display);
   text-wrap: balance;
   transform-origin: left center;
   transition: transform 180ms var(--ease-out);

@@ -25,14 +25,14 @@
 }
 
 .logHeading h2 {
-  font-size: var(--text-lg-dynamic);
+  font: var(--type-title);
   text-wrap: balance;
 }
 
 .emptyLog {
+  font: var(--type-body);
   padding: var(--space-md) var(--space-lg);
   color: var(--c-muted);
-  font-size: var(--text-sm);
   text-align: center;
   text-wrap: pretty;
 }
@@ -106,20 +106,17 @@
   transition:
     background-color var(--duration-fast) var(--ease-out),
     border-color var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out),
-    opacity var(--duration-fast) var(--ease-out);
+    color var(--duration-fast) var(--ease-out);
 }
 
 .day span {
-  font-size: var(--text-xs);
-  line-height: 1.15;
+  font: var(--type-caption);
 }
 
 .day strong {
+  font: var(--type-subtitle);
   color: var(--c-text);
-  font-size: var(--text-md);
   font-variant-numeric: tabular-nums;
-  line-height: 1.2;
 }
 
 .dayProgress {
@@ -153,11 +150,11 @@
 }
 
 .dayProgressToday {
-  background: var(--c-muted-soft);
+  background: var(--c-muted);
 }
 
 .dayProgressFuture {
-  background: var(--c-muted-strong);
+  background: var(--c-muted);
 }
 
 .dayProgressOver {
@@ -181,24 +178,23 @@
 
 .day.todayDay {
   background: var(--c-surface-raised);
-  color: var(--c-text-strong);
+  color: var(--c-text);
 }
 
 .day.todayDay strong {
-  color: var(--c-text-strong);
+  color: var(--c-text);
 }
 
 .day.futureDay {
-  opacity: 0.48;
-  color: var(--c-placeholder);
+  color: var(--c-muted);
 }
 
 .day.futureDay strong {
-  color: var(--c-muted-strong);
+  color: var(--c-muted);
 }
 
 .day[data-pressed] {
-  border-color: var(--c-text-strong);
+  border-color: var(--c-text);
   background: var(--c-surface-raised);
 }
 
@@ -246,17 +242,16 @@
 
   .dayOverGoal:hover {
     background-color: var(--c-surface-raised);
-    color: var(--c-text-strong);
+    color: var(--c-text);
   }
 
   .day.todayDay:hover {
     background-color: var(--c-surface-raised);
-    color: var(--c-text-strong);
+    color: var(--c-text);
   }
 
   .day.futureDay:hover {
-    opacity: 0.65;
-    color: var(--c-placeholder);
+    color: var(--c-muted);
   }
 }
 

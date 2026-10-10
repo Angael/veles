@@ -9,13 +9,13 @@
 }
 
 .searchLabel {
+  font: var(--type-body);
   color: var(--c-muted);
-  font-size: var(--text-sm);
 }
 
 .createError {
+  font: var(--type-body);
   color: var(--c-danger-text);
-  font-size: var(--text-sm);
   text-wrap: pretty;
 }
 
@@ -37,6 +37,7 @@
     border-color 180ms var(--ease-out);
 
   & h2 {
+    font: var(--type-title);
     text-wrap: balance;
   }
 }
@@ -55,14 +56,15 @@
 }
 
 .date {
-  color: var(--c-accent-strong);
-  font-size: var(--text-sm);
+  font: var(--type-caption);
+  color: var(--c-muted);
   font-variant-numeric: tabular-nums;
 }
 
 .preview {
+  font: var(--type-body);
   display: -webkit-box;
-  max-height: calc(1.5em * 2);
+  max-height: calc(var(--leading-body) * 2);
   overflow: hidden;
   color: var(--c-muted);
   white-space: pre-wrap;
@@ -74,6 +76,10 @@
 .emptyState {
   display: grid;
   gap: var(--space-xs);
+
+  & h2 {
+    font: var(--type-title);
+  }
 
   & p {
     color: var(--c-muted);

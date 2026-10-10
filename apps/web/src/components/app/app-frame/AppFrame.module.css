@@ -88,14 +88,13 @@
   gap: var(--space-xs);
 
   & strong {
-    font-size: var(--text-lg);
+    font: var(--type-title);
   }
 }
 
 .routeLabelTitle {
   min-width: 0;
-  font-size: var(--text-lg);
-  line-height: 1.1;
+  font: var(--type-title);
 }
 
 /* The sticky task header owns top spacing and the safe-area inset on phones. */

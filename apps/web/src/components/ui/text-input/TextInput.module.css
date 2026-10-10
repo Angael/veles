@@ -6,9 +6,7 @@
   background: rgba(2, 6, 23, 0.4);
   color: var(--c-text);
   padding: 0 1rem;
-  font: inherit;
-  font-size: var(--input-font-size);
-  font-weight: var(--input-font-weight);
+  font: var(--type-input);
   transition:
     border-color 180ms var(--ease-out),
     box-shadow 180ms var(--ease-out),
@@ -21,7 +19,7 @@
   }
 
   &::placeholder {
-    color: var(--c-placeholder);
+    color: var(--c-muted);
   }
 
   &:focus-visible {
@@ -32,20 +30,14 @@
 /* Heights mirror Btn sizes so inputs and buttons line up in the same row. */
 .sm {
   --input-height: 2.35rem;
-  --input-font-size: var(--text-sm);
-  --input-font-weight: var(--font-weight-regular);
 }
 
 .md {
   --input-height: var(--button-min-height);
-  --input-font-size: var(--text-md);
-  --input-font-weight: var(--font-weight-regular);
 }
 
 .lg {
   --input-height: 3.25rem;
-  --input-font-size: var(--text-lg);
-  --input-font-weight: var(--font-weight-semibold);
 }
 
 .field {

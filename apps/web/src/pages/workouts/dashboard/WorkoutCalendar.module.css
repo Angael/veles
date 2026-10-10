@@ -11,13 +11,13 @@
   gap: var(--space-xs);
 
   & h2 {
-    font-size: var(--text-md);
+    font: var(--type-title);
   }
 }
 
 .summary {
+  font: var(--type-body);
   color: var(--c-muted);
-  font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
 }
 
@@ -29,8 +29,8 @@
 }
 
 .months {
+  font: var(--type-caption);
   color: var(--c-muted);
-  font-size: 0.65rem;
   white-space: nowrap;
 
   & span {
@@ -89,17 +89,17 @@ a.square:focus-visible {
 
 @media (hover: hover) and (pointer: fine) {
   a.square:hover {
-    outline: 1px solid var(--c-text-strong);
+    outline: 1px solid var(--c-text);
   }
 }
 
 .legend {
+  font: var(--type-caption);
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 3px;
   color: var(--c-muted);
-  font-size: var(--text-xs);
 
   & .square {
     width: 0.7rem;

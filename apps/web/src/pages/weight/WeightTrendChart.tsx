@@ -157,6 +157,7 @@ export function WeightTrendChart({ entries, initialRange }: WeightTrendChartProp
                 allowDecimals={false}
                 axisLine={false}
                 domain={domain}
+                tick={{ className: css.dateTick }}
                 tickFormatter={(value: number) => `${value} kg`}
                 tickLine={false}
                 width={58}

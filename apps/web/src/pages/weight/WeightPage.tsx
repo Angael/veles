@@ -144,8 +144,11 @@ function SummaryStat({ label, value }: { label: string; value: string }) {
 
   return (
     <div className={css.summaryStat}>
+      <div className={isImprovement ? css.deltaBetter : css.deltaNeutral}>
+        <strong>{value.replace(/ kg$/, '')}</strong>
+        {value.endsWith(' kg') ? <span className={css.statUnit}> kg</span> : null}
+      </div>
       <span className={css.statLabel}>{label}</span>
-      <strong className={isImprovement ? css.deltaBetter : css.deltaNeutral}>{value}</strong>
     </div>
   );
 }

@@ -13,18 +13,17 @@
 
 .methodHeading {
   h2 {
+    font: var(--type-title);
     display: flex;
     align-items: baseline;
     gap: var(--space-xs);
-    color: var(--c-text-strong);
-    font-size: var(--text-lg-dynamic);
+    color: var(--c-text);
     text-wrap: balance;
   }
 
   span {
-    color: var(--c-muted-strong);
-    font-family: inherit;
-    font-size: inherit;
+    color: var(--c-muted);
+    font: var(--type-body);
     font-variant-numeric: tabular-nums;
   }
 }
@@ -40,8 +39,8 @@
 }
 
 .formulaNote {
-  color: var(--c-muted-strong);
-  font-size: var(--text-xs);
+  font: var(--type-caption);
+  color: var(--c-muted);
   text-wrap: pretty;
 }
 
@@ -59,8 +58,8 @@
 
 .validTotal,
 .invalidTotal {
+  font: var(--type-body);
   justify-self: end;
-  font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
 }
 
@@ -74,18 +73,17 @@
 
 .currentGoalsHeading {
   h2 {
+    font: var(--type-title);
     display: flex;
     align-items: baseline;
     gap: var(--space-xs);
-    color: var(--c-text-strong);
-    font-size: var(--text-xl-dynamic);
+    color: var(--c-text);
     text-wrap: balance;
   }
 
   span {
-    color: var(--c-muted-strong);
-    font-family: inherit;
-    font-size: inherit;
+    color: var(--c-muted);
+    font: var(--type-body);
     font-variant-numeric: tabular-nums;
   }
 }

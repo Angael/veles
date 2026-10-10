@@ -51,25 +51,40 @@
   --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
   --font-weight-regular: 400;
   --font-weight-semibold: 600;
-  --line-height-body: 1.5;
+  --font-weight-bold: 700;
 
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-md: 1rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.5rem;
-  --text-sm-dynamic: clamp(0.8125rem, 0.78rem + 0.16vw, 0.875rem);
-  --text-md-dynamic: clamp(0.9375rem, 0.9rem + 0.2vw, 1rem);
-  --text-lg-dynamic: clamp(1.08rem, 2vw, 1.35rem);
-  --text-xl-dynamic: clamp(1.25rem, 1.05rem + 1vw, 1.5rem);
-  --text-hero: clamp(2.7rem, 7vw, 4.8rem);
+  /* Five UI roles: each font token pairs size, line height, weight, and family. */
+  --text-display: 1.75rem;
+  --text-title: 1rem;
+  --text-subtitle: 0.875rem;
+  --text-body: 0.875rem;
+  --text-caption: 0.75rem;
+  --leading-display: 2.125rem;
+  --leading-title: 1.375rem;
+  --leading-subtitle: 1.25rem;
+  --leading-body: 1.25rem;
+  --leading-caption: 1rem;
+  --type-display: var(--font-weight-bold) var(--text-display) / var(--leading-display)
+    var(--font-sans);
+  --type-title: var(--font-weight-semibold) var(--text-title) / var(--leading-title)
+    var(--font-sans);
+  --type-subtitle: var(--font-weight-semibold) var(--text-subtitle) / var(--leading-subtitle)
+    var(--font-sans);
+  --type-body: var(--font-weight-regular) var(--text-body) / var(--leading-body) var(--font-sans);
+  --type-caption: var(--font-weight-regular) var(--text-caption) / var(--leading-caption)
+    var(--font-sans);
+
+  /* Exceptions: primary numeric readouts and 16px editable controls (avoid iOS zoom). */
+  --text-metric: clamp(2rem, 1.5rem + 2vw, 3rem);
+  --leading-metric: 1.1;
+  --type-metric: var(--font-weight-semibold) var(--text-metric) / var(--leading-metric)
+    var(--font-mono);
+  --text-input: 1rem;
+  --leading-input: 1.5rem;
+  --type-input: var(--font-weight-regular) var(--text-input) / var(--leading-input) var(--font-sans);
 
   --c-text: #e8ecf7;
-  --c-text-strong: #f8fafc;
   --c-muted: #b5c0d9;
-  --c-muted-strong: #94a3b8;
-  --c-placeholder: rgba(148, 163, 184, 0.72);
-  --c-muted-soft: rgba(226, 232, 240, 0.82);
 
   --c-accent: #7dd3fc;
   --c-accent-soft: #bfdbfe;

@@ -19,6 +19,6 @@
   font-variant-numeric: tabular-nums;
 
   & strong {
-    color: var(--c-text-strong);
+    color: var(--c-text);
   }
 }

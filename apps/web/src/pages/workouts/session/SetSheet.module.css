@@ -9,20 +9,20 @@
 }
 
 .title {
+  font: var(--type-title);
   display: grid;
   flex: 1;
   min-width: 0;
-  font-size: var(--text-lg);
   overflow-wrap: anywhere;
 
   & small {
+    font: var(--type-caption);
     color: var(--c-muted);
-    font-size: var(--text-xs);
-    font-weight: var(--font-weight-regular);
   }
 }
 
 .previous {
+  font: var(--type-body);
   display: flex;
   align-items: center;
   gap: var(--space-xs);
@@ -30,8 +30,7 @@
   border: var(--border-width) dashed var(--c-border-strong);
   border-radius: var(--radius-xs);
   background: transparent;
-  color: var(--c-muted-soft);
-  font-size: var(--text-sm);
+  color: var(--c-muted);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
 

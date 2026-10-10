@@ -12,14 +12,13 @@
 }
 
 .name {
-  font-size: var(--text-lg);
-  font-weight: var(--font-weight-semibold);
+  font: var(--type-input);
 }
 
 .meta,
 .hint {
+  font: var(--type-body);
   color: var(--c-muted);
-  font-size: var(--text-sm);
   text-wrap: pretty;
 }
 
@@ -44,6 +43,7 @@
 }
 
 .number {
+  font: var(--type-body);
   min-width: 1.5rem;
   color: var(--c-muted);
   font-family: var(--font-mono);
@@ -56,13 +56,14 @@
   min-width: 0;
 
   & strong {
-    color: var(--c-text-strong);
+    font: var(--type-subtitle);
+    color: var(--c-text);
     overflow-wrap: anywhere;
   }
 
   & small {
+    font: var(--type-body);
     color: var(--c-muted);
-    font-size: var(--text-sm);
   }
 }
 
@@ -75,6 +76,7 @@
 }
 
 .set {
+  font: var(--type-caption);
   display: grid;
   place-items: center;
   width: 1.5rem;
@@ -82,8 +84,6 @@
   border-radius: 6px;
   background: var(--c-surface-raised);
   color: var(--c-muted);
-  font-size: var(--text-xs);
-  font-weight: var(--font-weight-semibold);
 }
 
 .set_warmup {

@@ -6,7 +6,7 @@
 }
 
 .wordmark {
-  fill: var(--c-text-strong);
+  fill: var(--c-text);
   font-family: var(--font-sans);
   font-size: 78px;
   font-weight: 650;

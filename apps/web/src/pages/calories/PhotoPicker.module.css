@@ -7,9 +7,9 @@
 }
 
 .legend {
+  font: var(--type-subtitle);
   padding: 0;
-  color: var(--c-text-strong);
-  font-weight: var(--font-weight-semibold);
+  color: var(--c-text);
 }
 
 .card {
@@ -44,22 +44,23 @@
 }
 
 .placeholder {
+  font: var(--type-body);
   display: grid;
   place-items: center;
   gap: var(--space-xs);
   padding: var(--space-xl);
   color: var(--c-muted);
-  font-size: var(--text-sm);
   text-align: center;
 }
 
 .placeholderIcon {
   width: 2.75rem;
   height: 2.75rem;
-  color: var(--c-muted-strong);
+  color: var(--c-muted);
 }
 
 .status {
+  font: var(--type-caption);
   position: absolute;
   top: var(--space-sm);
   left: var(--space-sm);
@@ -71,7 +72,6 @@
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--c-surface-solid) 84%, transparent);
   color: var(--c-text);
-  font-size: var(--text-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
   backdrop-filter: var(--blur-surface);

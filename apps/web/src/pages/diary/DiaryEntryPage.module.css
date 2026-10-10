@@ -24,16 +24,14 @@
 }
 
 .dateInput {
+  font: var(--type-input);
   width: auto;
   min-height: 2.35rem;
-  color: var(--c-accent-strong);
-  font-size: var(--text-sm);
+  color: var(--c-text);
 }
 
 .titleInput {
-  font: inherit;
-  font-weight: inherit;
-  letter-spacing: inherit;
+  font: var(--type-input);
 }
 
 .body {
@@ -50,9 +48,8 @@
   background: transparent;
   padding: 0;
   color: var(--c-text);
-  font-family: var(--font-sans);
-  font-size: var(--text-md);
-  line-height: 1.7;
+  /* Editable plain text uses the shared 16px input role, not rendered Markdown. */
+  font: var(--type-input);
   overflow-wrap: anywhere;
 
   &:focus {
@@ -61,9 +58,8 @@
 }
 
 .saveState {
+  font: var(--type-body);
   min-height: 1.25rem;
   margin-top: var(--space-sm);
-  color: var(--c-text);
-  font-size: var(--text-sm);
-  opacity: 0.72;
+  color: var(--c-muted);
 }

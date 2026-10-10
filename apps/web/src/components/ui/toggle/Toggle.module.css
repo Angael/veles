@@ -4,7 +4,7 @@
   min-width: 3.25rem;
   height: 2.75rem;
   border-radius: var(--radius-pill);
-  color: var(--c-text-strong);
+  color: var(--c-text);
 
   &::before {
     position: absolute;

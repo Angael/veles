@@ -58,15 +58,15 @@
 }
 
 .title {
-  color: var(--c-text-strong);
-  font-size: var(--text-xl-dynamic);
-  font-weight: var(--font-weight-semibold);
+  color: var(--c-text);
+  font: var(--type-title);
   text-wrap: balance;
 }
 
 .description {
+  font: var(--type-body);
   min-width: 0;
-  color: var(--c-muted-soft);
+  color: var(--c-muted);
   text-wrap: pretty;
 }
 

@@ -21,8 +21,9 @@
 }
 
 .description {
+  font: var(--type-body);
   display: -webkit-box;
-  max-height: calc(1.5em * 3);
+  max-height: calc(var(--leading-body) * 3);
   overflow: hidden;
   color: var(--c-muted);
   text-wrap: pretty;
@@ -119,9 +120,9 @@
   flex-direction: column;
   align-items: baseline;
   gap: 0.25rem;
-  line-height: 1.6rem;
 
   & h2 {
+    font: var(--type-title);
     text-wrap: balance;
   }
 }
@@ -133,8 +134,8 @@
 }
 
 .tag {
-  color: var(--c-muted-strong);
-  font-size: var(--text-xs);
+  font: var(--type-caption);
+  color: var(--c-muted);
 }
 
 .recipeFooter {
@@ -146,9 +147,8 @@
 }
 
 .footerItem {
-  color: var(--c-accent-strong);
-  letter-spacing: 0.14em;
-  font-size: var(--text-sm);
+  font: var(--type-body);
+  color: var(--c-text);
   font-variant-numeric: tabular-nums;
 }
 

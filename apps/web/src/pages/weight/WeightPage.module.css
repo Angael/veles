@@ -10,7 +10,7 @@
 }
 
 .emptyState h1 {
-  font-size: var(--text-xl-dynamic);
+  font: var(--type-display);
   text-wrap: balance;
 }
 
@@ -62,18 +62,26 @@
 }
 
 .summaryStat strong {
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font: var(--type-metric);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.statLabel,
-.captureField span {
+.statUnit {
+  font: var(--type-body);
+  color: var(--c-muted);
+}
+
+.statLabel {
+  font: var(--type-caption);
   margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: var(--text-xs);
-  color: var(--c-accent-strong);
+  color: var(--c-muted);
+}
+
+.captureField span {
+  font: var(--type-body);
+  margin: 0;
+  color: var(--c-text);
 }
 
 .deltaBetter {
@@ -123,7 +131,7 @@
   align-items: center;
   gap: 0.2rem;
   color: var(--c-muted);
-  font-size: var(--text-xs);
+  font: var(--type-caption);
 
   svg {
     width: 0.9rem;
@@ -137,6 +145,7 @@
 }
 
 .entriesTable {
+  font: var(--type-body);
   width: 100%;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
@@ -150,11 +159,8 @@
   }
 
   & th {
+    font: var(--type-caption);
     color: var(--c-muted);
-    font-size: var(--text-xs);
-    font-weight: var(--font-weight-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
   }
 
   & th:first-child,
@@ -187,21 +193,18 @@
   }
 
   .summaryGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .summaryStat {
     gap: 0.2rem;
     padding: var(--space-md) var(--space-sm);
+    border-right: 0;
+    border-bottom: var(--border-width) solid var(--c-border);
   }
 
-  .summaryStat strong {
-    font-size: clamp(1rem, 5vw, 1.45rem);
-  }
-
-  .statLabel {
-    letter-spacing: 0.08em;
-    font-size: 0.65rem;
+  .summaryStat:last-child {
+    border-bottom: 0;
   }
 
   .entryForm {

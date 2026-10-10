@@ -6,7 +6,7 @@
   background: rgba(2, 6, 23, 0.4);
   color: var(--c-text);
   padding: 0.9rem 1rem;
-  font: inherit;
+  font: var(--type-input);
   resize: vertical;
   transition:
     border-color 180ms var(--ease-out),
@@ -20,7 +20,7 @@
   }
 
   &::placeholder {
-    color: var(--c-placeholder);
+    color: var(--c-muted);
   }
 
   &:focus-visible {

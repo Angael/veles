@@ -1,6 +1,7 @@
 /* Shared by the compact cell and the big field. */
 .cell,
 .fieldValue {
+  font: var(--type-body);
   position: relative;
   display: flex;
   align-items: center;
@@ -8,7 +9,7 @@
   overflow: hidden;
   border: var(--border-width) solid transparent;
   background: var(--c-surface-input);
-  color: var(--c-text-strong);
+  color: var(--c-text);
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   cursor: ew-resize;
@@ -23,8 +24,8 @@
     inset: auto 0 0;
     height: 0.65rem;
     background-image:
-      repeating-linear-gradient(90deg, var(--c-muted-strong) 0 2px, transparent 2px 35px),
-      repeating-linear-gradient(90deg, var(--c-muted-strong) 0 1px, transparent 1px 7px);
+      repeating-linear-gradient(90deg, var(--c-muted) 0 2px, transparent 2px 35px),
+      repeating-linear-gradient(90deg, var(--c-muted) 0 1px, transparent 1px 7px);
     background-size:
       35px 100%,
       7px 0.3rem;
@@ -57,7 +58,7 @@
 
 .empty .cellValue,
 .empty .fieldNumber {
-  color: var(--c-placeholder);
+  color: var(--c-muted);
 }
 
 /* Chevrons say "this slides" on touch screens; desktop shows them on hover only. */
@@ -65,7 +66,7 @@
   flex: none;
   width: 0.75rem;
   height: 0.75rem;
-  color: var(--c-muted-strong);
+  color: var(--c-muted);
   opacity: 0.45;
   transition: opacity var(--duration-fast) var(--ease-out);
 }
@@ -96,10 +97,9 @@
 }
 
 .cellUnit {
+  font: var(--type-caption);
   margin-inline-start: 0.2em;
-  color: var(--c-muted-strong);
-  font-family: var(--font-sans);
-  font-size: 0.7em;
+  color: var(--c-muted);
 }
 
 /* Big field */
@@ -109,13 +109,13 @@
 }
 
 .fieldLabel {
+  font: var(--type-caption);
   color: var(--c-muted);
-  font-size: var(--text-xs);
 }
 
 .fieldUnit {
+  font: var(--type-caption);
   color: var(--c-muted);
-  font-size: var(--text-xs);
   text-align: center;
 }
 
@@ -135,20 +135,20 @@
 }
 
 .fieldNumber {
+  font: var(--type-metric);
+  font-variant-numeric: tabular-nums;
   flex: 1;
-  font-size: 2.2rem;
-  line-height: 1;
   text-align: center;
 }
 
 .fieldInput {
+  font: var(--type-input);
+  font-variant-numeric: tabular-nums;
   width: 100%;
   min-width: 0;
   border: var(--border-width) solid var(--c-primary-border);
   background: var(--c-surface-input);
-  color: var(--c-text-strong);
-  font-family: var(--font-mono);
-  font-size: 2.2rem;
+  color: var(--c-text);
   text-align: center;
 
   &:focus {

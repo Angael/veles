@@ -4,5 +4,5 @@
 }
 
 .empty h1 {
-  font-size: var(--text-lg);
+  font: var(--type-display);
 }

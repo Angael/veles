@@ -32,13 +32,13 @@
   min-width: 0;
 
   & strong {
-    color: var(--c-text-strong);
+    color: var(--c-text);
     overflow-wrap: anywhere;
   }
 
   & span {
+    font: var(--type-body);
     color: var(--c-muted);
-    font-size: var(--text-sm);
     font-variant-numeric: tabular-nums;
   }
 }
@@ -53,9 +53,9 @@
 }
 
 .custom {
+  font: var(--type-body);
   flex: none;
   color: var(--c-muted);
-  font-size: var(--text-sm);
 }
 
 .friend {
@@ -73,6 +73,7 @@
 }
 
 .avatar {
+  font: var(--type-subtitle);
   display: grid;
   flex: none;
   width: 2.25rem;
@@ -81,9 +82,7 @@
   overflow: hidden;
   border-radius: var(--radius-pill);
   background: var(--c-surface-raised);
-  color: var(--c-text-strong);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
+  color: var(--c-text);
 }
 
 .avatarImage {

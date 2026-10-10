@@ -12,14 +12,15 @@
 }
 
 .tipTitle {
-  color: var(--c-text-strong);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
+  font: var(--type-subtitle);
+  color: var(--c-text);
   overflow-wrap: anywhere;
 }
 
 /* Mini demo stage */
 .stage {
+  font: var(--type-body);
+  font-family: var(--font-mono);
   position: relative;
   display: grid;
   place-items: center;
@@ -28,8 +29,6 @@
   overflow: hidden;
   border-radius: 8px;
   background: var(--c-surface-inset);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
 }
 
@@ -63,8 +62,8 @@
   width: 1.2rem;
   height: 1.2rem;
   translate: 0.35rem 0.35rem;
-  color: var(--c-text-strong);
-  fill: var(--c-text-strong);
+  color: var(--c-text);
+  fill: var(--c-text);
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
   transition: scale 120ms var(--ease-out);
 }
@@ -111,7 +110,7 @@
   & svg {
     width: 0.7rem;
     height: 0.7rem;
-    color: var(--c-muted-strong);
+    color: var(--c-muted);
   }
 
   & span {
@@ -124,11 +123,7 @@
     position: absolute;
     inset: auto 0 0;
     height: 0.3rem;
-    background-image: repeating-linear-gradient(
-      90deg,
-      var(--c-muted-strong) 0 1px,
-      transparent 1px 6px
-    );
+    background-image: repeating-linear-gradient(90deg, var(--c-muted) 0 1px, transparent 1px 6px);
     background-position-x: var(--scrub-offset);
     opacity: 0;
     transition: opacity 150ms;
@@ -145,13 +140,13 @@
 }
 
 .fakeRowSmall {
+  font: var(--type-caption);
   display: flex;
   align-items: center;
   gap: 0.25rem;
   padding: 0.2rem;
   border-radius: 8px;
   color: var(--c-muted);
-  font-size: var(--text-xs);
   transition: background-color 200ms;
 }
 
@@ -185,6 +180,7 @@
 }
 
 .miniMenu {
+  font: var(--type-caption);
   position: absolute;
   right: 0.4rem;
   display: grid;
@@ -194,8 +190,6 @@
   border: var(--border-width) solid var(--c-border-popup);
   border-radius: 8px;
   background: var(--c-surface-solid);
-  font-family: var(--font-sans);
-  font-size: 0.65rem;
   list-style: none;
   opacity: 0;
   scale: 0.9;
@@ -222,6 +216,7 @@
 
 /* Set type demo: badge stays centred under the pointer, label floats to its right. */
 .typeBadge {
+  font: var(--type-caption);
   display: grid;
   place-items: center;
   width: 1.5rem;
@@ -229,8 +224,6 @@
   border-radius: 6px;
   background: var(--c-surface-raised);
   color: var(--c-muted);
-  font-size: var(--text-xs);
-  font-weight: var(--font-weight-semibold);
 }
 
 .typeBadgeWarmup {
@@ -247,11 +240,10 @@
 }
 
 .typeLabel {
+  font: var(--type-caption);
   position: absolute;
   left: calc(50% + 1.1rem);
-  color: var(--c-muted-strong);
-  font-family: var(--font-sans);
-  font-size: 0.65rem;
+  color: var(--c-muted);
   white-space: nowrap;
 }
 

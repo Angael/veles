@@ -13,6 +13,7 @@
 .listCard h2,
 .noteCard h2,
 .emptyState h2 {
+  font: var(--type-title);
   margin: 0;
   text-wrap: balance;
 }
@@ -29,14 +30,14 @@
 }
 
 .titleInput {
+  font: var(--type-input);
   grid-column: 1 / -1;
-  font-size: var(--text-xl-dynamic);
-  font-weight: var(--font-weight-semibold);
 }
 
 .contentInput {
+  font: var(--type-input);
   min-height: 5rem;
-  color: var(--c-muted-soft);
+  color: var(--c-muted);
 }
 
 .listGrid {
@@ -72,8 +73,8 @@
 }
 
 .sharedBy {
-  color: var(--c-muted-strong);
-  font-size: var(--text-sm);
+  font: var(--type-body);
+  color: var(--c-muted);
 }
 
 .items {
@@ -94,6 +95,10 @@
   border-radius: var(--radius-xs);
 }
 
+.item input:not([type='checkbox']) {
+  font: var(--type-input);
+}
+
 .item input[type='checkbox'] {
   width: 1.25rem;
   height: 1.25rem;
@@ -112,13 +117,13 @@
 }
 
 .done {
-  color: var(--c-muted-strong);
+  color: var(--c-muted);
   text-decoration: line-through;
 }
 
 .emptyList {
   margin: 0;
-  color: var(--c-muted-strong);
+  color: var(--c-muted);
 }
 
 .addItem {

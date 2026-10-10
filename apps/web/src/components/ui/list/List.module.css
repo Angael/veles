@@ -19,6 +19,7 @@
   transition: background-color var(--duration-fast) var(--ease-out);
 
   &[data-selected] {
+    font-weight: var(--font-weight-semibold);
     background-color: var(--c-primary-surface);
   }
 

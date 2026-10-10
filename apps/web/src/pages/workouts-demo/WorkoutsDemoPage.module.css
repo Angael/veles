@@ -8,7 +8,7 @@
 
 .intro {
   color: var(--c-muted);
-  font-size: var(--text-sm);
+  font: var(--type-body);
   text-wrap: pretty;
 }
 
@@ -33,12 +33,13 @@
   border-radius: var(--radius-pill);
   background: transparent;
   color: var(--c-muted);
-  font-size: var(--text-sm);
+  font: var(--type-body);
   white-space: nowrap;
   cursor: pointer;
 
   &[data-pressed] {
+    font-weight: var(--font-weight-semibold);
     background: var(--c-primary-surface-strong);
-    color: var(--c-text-strong);
+    color: var(--c-text);
   }
 }

@@ -49,11 +49,11 @@ export function HomePage() {
         </div>
         <p>Track sessions, exercises, and notes across training blocks.</p>
         <div aria-hidden='true' className={css.setSequence}>
-          <span>WARM</span>
+          <span>Warm up</span>
           <i />
-          <span>WORK</span>
+          <span>Work</span>
           <i />
-          <span>LOG</span>
+          <span>Log</span>
         </div>
       </Card>
 

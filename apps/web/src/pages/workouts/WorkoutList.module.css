@@ -29,7 +29,7 @@
     border-color 180ms var(--ease-out);
 
   & h3 {
-    font-size: var(--text-md);
+    font: var(--type-subtitle);
     overflow-wrap: anywhere;
     text-wrap: balance;
   }
@@ -66,7 +66,7 @@
     open-glow 2.5s ease-in-out infinite alternate;
 
   & h3 {
-    font-size: var(--text-lg);
+    font: var(--type-title);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -106,33 +106,32 @@
 }
 
 .date {
+  font: var(--type-body);
   color: var(--c-accent-strong);
-  font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
 }
 
 .meta {
+  font: var(--type-body);
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem var(--space-sm);
   color: var(--c-muted);
-  font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
 
   & time {
-    color: var(--c-text-strong);
-    font-weight: var(--font-weight-semibold);
+    font: var(--type-subtitle);
+    color: var(--c-text);
   }
 }
 
 /* Pulsing dot before the label, like a "recording" light. */
 .live {
+  font: var(--type-subtitle);
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   color: var(--c-success-text);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-semibold);
 
   &::before {
     width: 0.5rem;

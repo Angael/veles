@@ -4,8 +4,8 @@
 }
 
 .hint {
+  font: var(--type-body);
   color: var(--c-muted);
-  font-size: var(--text-sm);
   text-wrap: pretty;
 }
 
@@ -14,7 +14,7 @@
   gap: var(--space-sm);
 
   & h2 {
-    font-size: var(--text-md);
+    font: var(--type-title);
   }
 }
 
@@ -71,23 +71,23 @@
 }
 
 .rowName {
-  color: var(--c-text-strong);
-  font-weight: var(--font-weight-semibold);
+  font: var(--type-subtitle);
+  color: var(--c-text);
   overflow-wrap: anywhere;
 }
 
 .exercises {
+  font: var(--type-body);
   display: -webkit-box;
   overflow: hidden;
   color: var(--c-muted);
-  font-size: var(--text-sm);
   text-wrap: pretty;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
 .lastUsed {
-  color: var(--c-muted-strong);
-  font-size: var(--text-xs);
+  font: var(--type-caption);
+  color: var(--c-muted);
   font-variant-numeric: tabular-nums;
 }

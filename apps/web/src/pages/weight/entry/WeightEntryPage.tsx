@@ -20,8 +20,10 @@ export function WeightEntryPage({ entry }: WeightEntryPageProps) {
     <main className={css.page}>
       <Card as='section' aria-label='Weight' className={css.summary}>
         <div className={css.summaryText}>
+          <div>
+            <strong>{entry.weightKg.toFixed(1)}</strong> <span className={css.unit}>kg</span>
+          </div>
           <time dateTime={entry.date}>{format(parseISO(entry.date), 'EEEE, MMM d, yyyy')}</time>
-          <strong>{entry.weightKg.toFixed(1)} kg</strong>
         </div>
         <Btn
           icon={<PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />}

@@ -129,6 +129,22 @@ export function ComponentsDemoPage() {
     <main className={css.page}>
       <h1>Components</h1>
 
+      <section aria-labelledby='typography-demo-title'>
+        <h2 id='typography-demo-title'>Typography</h2>
+        <div className={css.typeSamples}>
+          <p className={css.displaySample}>Display — page titles</p>
+          <p className={css.titleSample}>Title — section headings</p>
+          <p className={css.subtitleSample}>Subtitle — card headings</p>
+          <p>Body — labels, menus, and paragraphs use the same Geist style.</p>
+          <p className={css.captionSample}>Caption — descriptions and metadata</p>
+          <p className={css.metricSample}>1,840 kcal</p>
+          <p className={css.captionSample}>
+            Numeric readouts use Geist Mono. Editable fields stay at 16px to avoid mobile zoom.
+          </p>
+          <TextInput aria-label='Typography input sample' defaultValue='Editable text — 16px' />
+        </div>
+      </section>
+
       <section>
         <h2>Btn</h2>
         <label className={css.loaderToggle}>

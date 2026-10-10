@@ -15,17 +15,15 @@
 
 .copy {
   & h1 {
-    color: var(--c-text-strong);
-    font-size: var(--text-xl-dynamic);
-    font-weight: var(--font-weight-semibold);
-    line-height: 1.15;
+    color: var(--c-text);
+    font: var(--type-display);
     text-wrap: balance;
   }
 }
 
 .message {
-  color: var(--c-muted-soft);
-  font-size: var(--text-md);
+  color: var(--c-muted);
+  font: var(--type-body);
   text-wrap: pretty;
 }
 

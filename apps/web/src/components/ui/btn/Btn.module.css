@@ -12,10 +12,7 @@
   background: var(--btn-bg);
   color: var(--btn-color);
   box-shadow: var(--btn-shadow, none);
-  font: inherit;
-  font-size: var(--btn-font-size);
-  font-weight: var(--btn-font-weight, 500);
-  line-height: 1;
+  font: var(--type-body);
   text-decoration: none;
   white-space: nowrap;
   user-select: none;
@@ -34,6 +31,11 @@
 
 .link {
   cursor: pointer;
+}
+
+.root[aria-pressed='true'],
+.root[aria-current] {
+  font-weight: var(--font-weight-semibold);
 }
 
 .root[data-disabled] {
@@ -70,7 +72,7 @@
   --btn-border: var(--c-border-strong);
   --btn-border-hover: var(--c-primary-border-soft);
   --btn-color: var(--c-text);
-  --btn-color-hover: var(--c-text-strong);
+  --btn-color-hover: var(--c-text);
 }
 
 .outlineSuccess {
@@ -140,8 +142,7 @@
   --btn-border-hover: transparent;
   --btn-border-width: 0;
   --btn-color: var(--c-accent-soft);
-  --btn-color-hover: var(--c-text-strong);
-  --btn-font-weight: var(--font-weight-semibold);
+  --btn-color-hover: var(--c-text);
   --btn-padding-x: 0;
   text-decoration: underline;
   text-decoration-color: transparent;
@@ -153,12 +154,11 @@
 }
 
 .text .content > svg {
-  width: var(--text-lg);
-  height: var(--text-lg);
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .sm {
-  --btn-font-size: var(--text-sm);
   --btn-height: 2.35rem;
   --btn-icon-size: 0.95rem;
   --btn-padding-x: 0.8rem;
@@ -166,7 +166,6 @@
 }
 
 .md {
-  --btn-font-size: var(--text-md);
   --btn-height: var(--button-min-height);
   --btn-icon-size: 1.1rem;
   --btn-padding-x: 1.05rem;
@@ -174,7 +173,6 @@
 }
 
 .lg {
-  --btn-font-size: var(--text-lg);
   --btn-height: 3.25rem;
   --btn-icon-size: 1.25rem;
   --btn-padding-x: 1.35rem;
@@ -255,5 +253,13 @@
 
   .loader {
     animation-duration: 1.4s;
+  }
+}
+
+/* Trim only the single-line label; flex centering and hit areas remain unchanged. */
+@supports (text-box-trim: trim-both) {
+  .content {
+    text-box-trim: trim-both;
+    text-box-edge: cap alphabetic;
   }
 }

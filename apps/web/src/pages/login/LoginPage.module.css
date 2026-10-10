@@ -8,11 +8,8 @@
 }
 
 .authTitle {
-  color: color-mix(in srgb, var(--c-text-strong) 78%, var(--c-muted) 22%);
-  font-size: clamp(2rem, 5vw, 3.35rem);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: -0.045em;
-  line-height: 1.05;
+  font: var(--type-display);
+  color: var(--c-text);
   text-align: center;
   text-wrap: balance;
 }
@@ -39,16 +36,11 @@
   background: var(--c-danger-surface);
   border: var(--border-width) solid var(--c-danger-border);
 }
-
 @media (--phone) {
   .authShell {
     align-content: start;
     gap: var(--space-md);
     min-height: calc(100vh - 8rem);
     padding-top: var(--space-xl);
-  }
-
-  .authTitle {
-    font-size: 2.25rem;
   }
 }

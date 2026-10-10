@@ -16,10 +16,9 @@
 }
 
 .heading {
+  font: var(--type-subtitle);
   padding: var(--space-sm) var(--space-md);
-  color: var(--c-text-strong);
-  font-size: var(--text-md);
-  font-weight: var(--font-weight-semibold);
+  color: var(--c-text);
   text-wrap: balance;
 }
 
