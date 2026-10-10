@@ -76,6 +76,7 @@
 
 ## Agent MCP
 - The MCP server (`apps/web/src/pages/agent`) must cover every user-facing feature: agents can read it, and modify it once its writes ship.
+- Perform joins and calculations on the server; return readable, nested results so agents do not have to reconstruct relationships from raw table rows.
 - When you add, rename, or change a feature or its data, update the MCP in the same change:
   - `apps/web/src/lib/agentAccess.ts`: add the feature, its label, and `writeAvailable`.
   - `mcp-resources.server.ts`: add or update its read resource and field description (units, scaling).
