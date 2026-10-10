@@ -2,6 +2,7 @@ import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 import { sessionUserQueryKey } from '@/lib/auth/session.query';
 import { apiKey, signOut } from '@/lib/auth/client';
 import type { AgentFeature } from '@/lib/agentAccess';
+import { clearDiaryKey } from '@/lib/diaryKeyVault';
 import {
   getAgentPermissions,
   setAllAgentPermissions,
@@ -26,6 +27,7 @@ export function useSignOutMutation() {
     onSuccess: (result, _variables, _onMutateResult, context) => {
       if (!result.error) {
         context.client.removeQueries({ queryKey: sessionUserQueryKey });
+        void clearDiaryKey();
       }
     },
   });

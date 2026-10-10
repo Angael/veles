@@ -9,14 +9,12 @@ export const Route = createFileRoute('/_authenticated/diary/$id')({
     return getDiaryEntryById({ data: { id: params.id } });
   },
   component: RouteComponent,
-  head: ({ loaderData }) => ({
-    meta: [{ title: loaderData?.title || 'Untitled entry' }],
-  }),
+  head: () => ({ meta: [{ title: 'Diary entry' }] }),
   staticData: { navbar: { backFallback: { to: '/diary' }, label: 'Diary entry' } },
 });
 
 function RouteComponent() {
-  const entry = Route.useLoaderData();
+  const { entry, keyRecord } = Route.useLoaderData();
   const search = Route.useSearch();
-  return <DiaryEntryPage entry={entry} focusTitle={search.created === '1'} />;
+  return <DiaryEntryPage entry={entry} focusTitle={search.created === '1'} keyRecord={keyRecord} />;
 }

@@ -10,7 +10,7 @@ export const Route = createFileRoute('/_authenticated/diary/')({
 });
 
 function RouteComponent() {
-  const entries = Route.useLoaderData();
+  const { entries, keyRecord } = Route.useLoaderData();
 
-  return <DiaryListPage entries={entries} />;
+  return <DiaryListPage entries={entries} keyRecord={keyRecord} />;
 }

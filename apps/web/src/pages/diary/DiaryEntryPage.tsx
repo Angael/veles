@@ -1,25 +1,72 @@
 import { useNavigate, useRouter } from '@tanstack/react-router';
-import { Trash2Icon } from 'lucide-react';
+import { LockIcon, Trash2Icon } from 'lucide-react';
+import { useMemo } from 'react';
 import { Card } from '@/components/ui/card/Card';
 import { Btn } from '@/components/ui/btn/Btn';
 import { DateInput } from '@/components/ui/date-input/DateInput';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
 import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import { useAutoSaveState } from './useAutoSaveState';
-import type { DiaryEntrySummary } from './diary.api';
+import type { EncryptedDiaryEntry } from './diary.api';
 import { useDeleteDiaryEntryMutation, useUpdateDiaryEntryMutation } from './diary.query';
+import type { DiaryKeyRecord } from './diaryCrypto';
+import { DiaryLockGate } from './DiaryLockGate';
+import { type DiaryEntrySummary, useDecryptedEntries } from './useDecryptedEntries';
 import css from './DiaryEntryPage.module.css';
 
 type DiaryEntryPageProps = {
-  entry: DiaryEntrySummary;
+  entry: EncryptedDiaryEntry;
   focusTitle?: boolean;
+  keyRecord: DiaryKeyRecord | null;
 };
 
-export function DiaryEntryPage({ entry, focusTitle = false }: DiaryEntryPageProps) {
+type DiaryEntryEditorProps = {
+  diaryKey: CryptoKey;
+  entry: DiaryEntrySummary;
+  focusTitle: boolean;
+  onLock: () => void;
+};
+
+export function DiaryEntryPage({ entry, focusTitle = false, keyRecord }: DiaryEntryPageProps) {
+  const encryptedEntries = useMemo(() => [entry], [entry]);
+
+  return (
+    <DiaryLockGate keyRecord={keyRecord}>
+      {(diaryKey, lock) => (
+        <DecryptedDiaryEntry
+          diaryKey={diaryKey}
+          encryptedEntries={encryptedEntries}
+          focusTitle={focusTitle}
+          onLock={lock}
+        />
+      )}
+    </DiaryLockGate>
+  );
+}
+
+function DecryptedDiaryEntry({
+  encryptedEntries,
+  ...props
+}: Omit<DiaryEntryEditorProps, 'entry'> & { encryptedEntries: EncryptedDiaryEntry[] }) {
+  const decrypted = useDecryptedEntries(props.diaryKey, encryptedEntries);
+  const entry = decrypted?.entries[0];
+
+  if (!decrypted) return null;
+  if (!entry) {
+    return (
+      <p className={css.decryptError} role='alert'>
+        This entry could not be decrypted.
+      </p>
+    );
+  }
+  return <DiaryEntryEditor {...props} entry={entry} />;
+}
+
+function DiaryEntryEditor({ diaryKey, entry, focusTitle, onLock }: DiaryEntryEditorProps) {
   const navigate = useNavigate();
   const router = useRouter();
 
-  const saveMutation = useUpdateDiaryEntryMutation();
+  const saveMutation = useUpdateDiaryEntryMutation(diaryKey);
   const deleteMutation = useDeleteDiaryEntryMutation();
 
   const [draft, setDraft] = useAutoSaveState(
@@ -29,7 +76,7 @@ export function DiaryEntryPage({ entry, focusTitle = false }: DiaryEntryPageProp
       markdown: entry.markdown,
       title: entry.title,
     },
-    (nextDraft) => saveMutation.mutate({ data: nextDraft }),
+    (nextDraft) => saveMutation.mutate(nextDraft),
     {
       debounceMs: 400,
       deps: [entry.entryDate, entry.id, entry.markdown, entry.title],
@@ -63,33 +110,44 @@ export function DiaryEntryPage({ entry, focusTitle = false }: DiaryEntryPageProp
               required
               value={draft.entryDate}
             />
-            <Btn
-              aria-label='Delete diary entry'
-              icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
-              iconOnly
-              loading={deleteMutation.isPending}
-              onClick={() => {
-                if (
-                  window.confirm(
-                    `Delete “${draft.title || 'Untitled entry'}”? This cannot be undone.`,
-                  )
-                ) {
-                  deleteMutation.mutate(
-                    { data: { id: entry.id } },
-                    {
-                      onSuccess: () => {
-                        void navigate({ replace: true, to: '/diary' })
-                          .then(() => router.invalidate())
-                          .catch(() => undefined);
+            <div className={css.headerButtons}>
+              <Btn
+                aria-label='Lock diary'
+                icon={<LockIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
+                iconOnly
+                onClick={onLock}
+                size='sm'
+                type='button'
+                variant='ghost'
+              />
+              <Btn
+                aria-label='Delete diary entry'
+                icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
+                iconOnly
+                loading={deleteMutation.isPending}
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      `Delete “${draft.title || 'Untitled entry'}”? This cannot be undone.`,
+                    )
+                  ) {
+                    deleteMutation.mutate(
+                      { data: { id: entry.id } },
+                      {
+                        onSuccess: () => {
+                          void navigate({ replace: true, to: '/diary' })
+                            .then(() => router.invalidate())
+                            .catch(() => undefined);
+                        },
                       },
-                    },
-                  );
-                }
-              }}
-              size='sm'
-              type='button'
-              variant='ghostDanger'
-            />
+                    );
+                  }
+                }}
+                size='sm'
+                type='button'
+                variant='ghostDanger'
+              />
+            </div>
           </div>
           <h1>
             <SeamlessTextInput
