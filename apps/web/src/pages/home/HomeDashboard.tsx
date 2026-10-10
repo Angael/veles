@@ -147,11 +147,11 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
 
         <Card as='article' className={css.todosTile} data-appear='3' shadow={false}>
           <div className={css.tileHeading}>
-            <h2>Todos</h2>
+            <h2>Notes</h2>
             <CheckIcon aria-hidden='true' />
           </div>
           <p>View your list</p>
-          <Link aria-label='Open Todos' className={css.cardLink} to='/todos' />
+          <Link aria-label='Open Notes' className={css.cardLink} to='/todos' />
         </Card>
 
         <Card as='article' className={css.diaryTile} data-appear='4' shadow={false}>

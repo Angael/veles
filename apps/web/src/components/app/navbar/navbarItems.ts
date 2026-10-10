@@ -17,7 +17,7 @@ export const NAVBAR_ITEMS = [
   },
   {
     key: 'todos',
-    label: 'Todos',
+    label: 'Notes',
     link: '/todos',
     matchPrefixes: ['/todos'],
     icon: ListTodoIcon,
