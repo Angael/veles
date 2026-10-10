@@ -23,6 +23,11 @@ export class TypedFormData {
     return value.trim();
   }
 
+  /** Reads a checkbox field; unchecked checkboxes are absent from the submission. */
+  checked(name: string): boolean {
+    return this.data.has(name);
+  }
+
   /** Reads and converts a required numeric field, preserving Number semantics. */
   number(name: string): number {
     return Number(this.string(name));

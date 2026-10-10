@@ -4,29 +4,27 @@ import { useRef } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { todayLocalDate } from '@/lib/dateOnly';
 import { downloadTextFile } from '@/lib/downloadTextFile';
-import { useExportDiaryEntriesMutation, useImportDiaryEntriesMutation } from './diary.query';
+import { useImportDiaryEntriesMutation } from './diary.query';
+import { createDiaryBackup } from './diaryBackup';
+import type { DiaryEntrySummary } from './useDecryptedEntries';
 import css from './DiaryBackupActions.module.css';
 
 type DiaryBackupActionsProps = {
-  canExport: boolean;
+  diaryKey: CryptoKey;
+  entries: DiaryEntrySummary[];
 };
 
-export function DiaryBackupActions({ canExport }: DiaryBackupActionsProps) {
+export function DiaryBackupActions({ diaryKey, entries }: DiaryBackupActionsProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const exportMutation = useExportDiaryEntriesMutation();
-  const importMutation = useImportDiaryEntriesMutation();
+  const importMutation = useImportDiaryEntriesMutation(diaryKey, entries);
 
   function handleExport() {
-    exportMutation.mutate(undefined, {
-      onSuccess: (backup) => {
-        downloadTextFile(
-          `veles-diary-${todayLocalDate()}.json`,
-          JSON.stringify(backup, null, 2),
-          'application/json',
-        );
-      },
-    });
+    downloadTextFile(
+      `veles-diary-${todayLocalDate()}.json`,
+      JSON.stringify(createDiaryBackup(entries), null, 2),
+      'application/json',
+    );
   }
 
   async function handleFileChange(file: File | undefined) {
@@ -35,18 +33,16 @@ export function DiaryBackupActions({ canExport }: DiaryBackupActionsProps) {
     }
 
     const json = await file.text();
-    importMutation.mutate(
-      { data: { json } },
-      { onSuccess: () => void router.invalidate().catch(() => undefined) },
-    );
+    importMutation.mutate(json, {
+      onSuccess: () => void router.invalidate().catch(() => undefined),
+    });
   }
 
   return (
     <div className={css.actions}>
-      {canExport ? (
+      {entries.length > 0 ? (
         <Btn
           icon={<DownloadIcon aria-hidden='true' />}
-          loading={exportMutation.isPending}
           onClick={handleExport}
           size='sm'
           variant='ghost'

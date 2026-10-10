@@ -78,6 +78,13 @@
       "when": 1791588386133,
       "tag": "0010_chubby_wendell_rand",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791670221473,
+      "tag": "0011_thick_gamora",
+      "breakpoints": true
     }
   ]
 }

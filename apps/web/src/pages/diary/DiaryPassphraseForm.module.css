@@ -1,0 +1,36 @@
+.page {
+  display: grid;
+  justify-items: center;
+}
+
+.card {
+  display: grid;
+  width: min(100%, 28rem);
+  gap: var(--space-sm);
+
+  & h1 {
+    text-wrap: balance;
+  }
+}
+
+.icon {
+  color: var(--c-accent-strong);
+}
+
+.text {
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-sm);
+}
