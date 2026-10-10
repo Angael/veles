@@ -1,5 +1,6 @@
 // This component catalog may remain intentionally long; keep all component demos together rather than splitting it needlessly.
 import { CopyPlusIcon, PlusIcon, SearchIcon, SendIcon, Trash2Icon } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Btn, type BtnSize, type BtnVariant } from '@/components/ui/btn/Btn';
@@ -128,6 +129,7 @@ export function ComponentsDemoPage() {
   return (
     <main className={css.page}>
       <h1>Components</h1>
+      <Link to='/demo/tanstack-db'>TanStack DB walkthrough</Link>
 
       <section>
         <h2>Btn</h2>

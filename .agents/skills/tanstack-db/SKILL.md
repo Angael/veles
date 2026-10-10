@@ -7,7 +7,7 @@ description: Use when building or changing client data flows in apps/web that ne
 
 TanStack DB is a reactive in-browser store on top of TanStack Query. A **collection** holds typed rows keyed by id; **live queries** read them incrementally; `collection.insert/update/delete` apply optimistically, then call the collection's `onInsert/onUpdate/onDelete` handlers, which persist via server functions. A throwing handler rolls the change back. A successful one refetches the collection.
 
-Reference implementation: `apps/web/src/pages/todos/listItems.collection.ts` and its consumers (`CheckedNoteCard.tsx`, `TodosPage.tsx`, `routes/_authenticated/todos.tsx`). Copy its shape.
+Reference implementation: `apps/web/src/pages/todos/listItems.collection.ts` and its consumers (`CheckedNoteCard.tsx`, `TodosPage.tsx`, `routes/_authenticated/todos.tsx`). Copy its shape. A guided walkthrough with a React Query vs TanStack DB playground lives at `/demo/tanstack-db` (`apps/web/src/pages/tanstack-db-demo`).
 
 ## When to use it
 
@@ -17,6 +17,8 @@ Reference implementation: `apps/web/src/pages/todos/listItems.collection.ts` and
 ## Veles rules
 
 - **Client-only.** Collections do not support SSR. The route needs `ssr: false`, and its loader must `await getXCollection(queryClient).preload()` so the first render has data.
+- **Split the loader.** TanStack Router code-splits `component` but keeps `loader` in the main bundle, so a loader that imports a collection ships TanStack DB (~97 kB gzip) to every page. Routes that preload a collection need `codeSplitGroupings: [['loader'], ['component']]`.
+- **Auto refetch is deprecated.** Query collection handlers still refetch after they resolve, but this goes away in v1.0. When you upgrade, `await collection.utils.refetch()` in the handler and return `{ refetch: false }`.
 - **One collection per QueryClient.** Never `createCollection` at module scope or in render. Use a `WeakMap<QueryClient, Collection>` getter plus a `useXCollection()` hook (`useQueryClient()`), as in `listItems.collection.ts`.
 - **File:** `<feature>/<rows>.collection.ts` beside the owning page. It owns the `queryCollectionOptions` config and handlers.
 - **Server stays the same.** Reads: a `GET` server function returning **flat rows** (no nesting; group/join in live queries). Writes: existing feature server functions with `logMiddleware` + arktype validators. Handlers call them; keep business rules and access checks on the server.

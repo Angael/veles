@@ -20,6 +20,7 @@ import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as AuthErrorRouteImport } from './routes/auth.error'
 import { Route as AuthGoogleRouteImport } from './routes/auth.google'
 import { Route as DemoComponentsRouteImport } from './routes/demo.components'
+import { Route as DemoTanstackDbRouteImport } from './routes/demo.tanstack-db'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as AuthenticatedCaloriesAddRouteImport } from './routes/_authenticated/calories_/add'
 import { Route as AuthenticatedCaloriesGoalsRouteImport } from './routes/_authenticated/calories_/goals'
@@ -93,6 +94,11 @@ const AuthGoogleRoute = AuthGoogleRouteImport.update({
 const DemoComponentsRoute = DemoComponentsRouteImport.update({
   id: '/demo/components',
   path: '/demo/components',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoTanstackDbRoute = DemoTanstackDbRouteImport.update({
+  id: '/demo/tanstack-db',
+  path: '/demo/tanstack-db',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/auth/error': typeof AuthErrorRoute
   '/auth/google': typeof AuthGoogleRoute
   '/demo/components': typeof DemoComponentsRoute
+  '/demo/tanstack-db': typeof DemoTanstackDbRoute
   '/invite/$token': typeof InviteTokenRoute
   '/calories/add': typeof AuthenticatedCaloriesAddRoute
   '/calories/goals': typeof AuthenticatedCaloriesGoalsRoute
@@ -250,6 +257,7 @@ export interface FileRoutesByTo {
   '/auth/error': typeof AuthErrorRoute
   '/auth/google': typeof AuthGoogleRoute
   '/demo/components': typeof DemoComponentsRoute
+  '/demo/tanstack-db': typeof DemoTanstackDbRoute
   '/invite/$token': typeof InviteTokenRoute
   '/calories/add': typeof AuthenticatedCaloriesAddRoute
   '/calories/goals': typeof AuthenticatedCaloriesGoalsRoute
@@ -284,6 +292,7 @@ export interface FileRoutesById {
   '/auth/error': typeof AuthErrorRoute
   '/auth/google': typeof AuthGoogleRoute
   '/demo/components': typeof DemoComponentsRoute
+  '/demo/tanstack-db': typeof DemoTanstackDbRoute
   '/invite/$token': typeof InviteTokenRoute
   '/_authenticated/calories_/add': typeof AuthenticatedCaloriesAddRoute
   '/_authenticated/calories_/goals': typeof AuthenticatedCaloriesGoalsRoute
@@ -318,6 +327,7 @@ export interface FileRouteTypes {
     | '/auth/error'
     | '/auth/google'
     | '/demo/components'
+    | '/demo/tanstack-db'
     | '/invite/$token'
     | '/calories/add'
     | '/calories/goals'
@@ -350,6 +360,7 @@ export interface FileRouteTypes {
     | '/auth/error'
     | '/auth/google'
     | '/demo/components'
+    | '/demo/tanstack-db'
     | '/invite/$token'
     | '/calories/add'
     | '/calories/goals'
@@ -383,6 +394,7 @@ export interface FileRouteTypes {
     | '/auth/error'
     | '/auth/google'
     | '/demo/components'
+    | '/demo/tanstack-db'
     | '/invite/$token'
     | '/_authenticated/calories_/add'
     | '/_authenticated/calories_/goals'
@@ -413,6 +425,7 @@ export interface RootRouteChildren {
   AuthErrorRoute: typeof AuthErrorRoute
   AuthGoogleRoute: typeof AuthGoogleRoute
   DemoComponentsRoute: typeof DemoComponentsRoute
+  DemoTanstackDbRoute: typeof DemoTanstackDbRoute
   InviteTokenRoute: typeof InviteTokenRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDemoPingRoute: typeof ApiDemoPingRoute
@@ -496,6 +509,13 @@ declare module '@tanstack/react-router' {
       path: '/demo/components'
       fullPath: '/demo/components'
       preLoaderRoute: typeof DemoComponentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/tanstack-db': {
+      id: '/demo/tanstack-db'
+      path: '/demo/tanstack-db'
+      fullPath: '/demo/tanstack-db'
+      preLoaderRoute: typeof DemoTanstackDbRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite/$token': {
@@ -699,6 +719,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthErrorRoute: AuthErrorRoute,
   AuthGoogleRoute: AuthGoogleRoute,
   DemoComponentsRoute: DemoComponentsRoute,
+  DemoTanstackDbRoute: DemoTanstackDbRoute,
   InviteTokenRoute: InviteTokenRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDemoPingRoute: ApiDemoPingRoute,
