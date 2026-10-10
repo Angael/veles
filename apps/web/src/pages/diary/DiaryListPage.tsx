@@ -9,6 +9,7 @@ import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/fil
 import { type EncryptedDiaryEntry, formatDiaryDate } from './diary.api';
 import { useCreateDiaryEntryMutation } from './diary.query';
 import type { DiaryKeyRecord } from './diaryCrypto';
+import { DiaryBackupActions } from './DiaryBackupActions';
 import { DiaryLockGate } from './DiaryLockGate';
 import { type DiaryEntrySummary, useDecryptedEntries } from './useDecryptedEntries';
 import css from './DiaryListPage.module.css';
@@ -53,6 +54,7 @@ function DiaryList({ diaryKey, encryptedEntries, onLock }: DiaryListProps) {
   return (
     <main className={css.page}>
       <div className={css.toolbar}>
+        <DiaryBackupActions diaryKey={diaryKey} entries={entries} />
         <Btn icon={<LockIcon aria-hidden='true' />} onClick={onLock} size='sm' variant='ghost'>
           Lock
         </Btn>

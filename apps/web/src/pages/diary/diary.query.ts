@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { toastManager } from '@/components/ui/toast/toastManager';
 import { saveDiaryKey } from '@/lib/diaryKeyVault';
 import {
   createDiaryEntry,
@@ -7,6 +8,8 @@ import {
   setupDiaryKey,
   updateDiaryEntry,
 } from './diary.api';
+import { parseDiaryBackup, selectNewBackupEntries } from './diaryBackup';
+import { importDiaryEntries } from './diaryBackup.api';
 import {
   createDiaryKey,
   type DiaryEntryContent,
@@ -14,6 +17,7 @@ import {
   encryptDiaryEntry,
   unlockDiaryKey,
 } from './diaryCrypto';
+import type { DiaryEntrySummary } from './useDecryptedEntries';
 
 type DiaryEntryDraft = DiaryEntryContent & {
   entryDate: string;
@@ -67,6 +71,47 @@ export function useDiaryPassphraseMutation(keyRecord: DiaryKeyRecord | null) {
       await setupDiaryKey({ data: { entries, key: record } });
       await saveDiaryKey(record.wrappedKey, key, remember);
       return key;
+    },
+  });
+}
+
+/** Parses a backup file, skips entries that already exist, and encrypts the rest before upload. */
+export function useImportDiaryEntriesMutation(key: CryptoKey, existing: DiaryEntrySummary[]) {
+  return useMutation({
+    mutationFn: async (json: string) => {
+      const backup = parseDiaryBackup(json);
+      const entries = await Promise.all(
+        selectNewBackupEntries(existing, backup.entries).map(
+          async ({ markdown, title, ...entry }) => {
+            const id = crypto.randomUUID();
+            return {
+              ...entry,
+              ciphertext: await encryptDiaryEntry(key, id, { markdown, title }),
+              id,
+            };
+          },
+        ),
+      );
+      await importDiaryEntries({ data: { entries } });
+      return {
+        importedCount: entries.length,
+        skippedCount: backup.entries.length - entries.length,
+      };
+    },
+    onError: (error) => {
+      toastManager.add({
+        description: error.message,
+        priority: 'high',
+        title: 'Diary could not be imported',
+        type: 'error',
+      });
+    },
+    onSuccess: ({ importedCount, skippedCount }) => {
+      toastManager.add({
+        description: skippedCount > 0 ? `Skipped ${skippedCount} existing.` : undefined,
+        title: `Imported ${importedCount} ${importedCount === 1 ? 'entry' : 'entries'}`,
+        type: 'success',
+      });
     },
   });
 }

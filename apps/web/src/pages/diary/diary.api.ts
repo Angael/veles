@@ -14,8 +14,10 @@ import type { DiaryKeyRecord } from './diaryCrypto';
 
 export type EncryptedDiaryEntry = {
   ciphertext: string | null;
+  createdAt: Date;
   entryDate: string;
   id: string;
+  updatedAt: Date;
 };
 
 // Sealed JSON of a 160-char title and 16000-char body, with room for escapes, UTF-8, and base64.
@@ -57,8 +59,10 @@ async function getKeyRecord(userId: string): Promise<DiaryKeyRecord | null> {
 
 const encryptedEntryColumns = {
   ciphertext: diaryEntries.ciphertext,
+  createdAt: diaryEntries.createdAt,
   entryDate: diaryEntries.entryDate,
   id: diaryEntries.id,
+  updatedAt: diaryEntries.updatedAt,
 };
 
 export const getDiaryEntries = createServerFn({ method: 'GET' })

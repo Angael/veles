@@ -2,10 +2,7 @@ import { useEffect, useState } from 'react';
 import type { EncryptedDiaryEntry } from './diary.api';
 import { decryptDiaryEntry, type DiaryEntryContent } from './diaryCrypto';
 
-export type DiaryEntrySummary = DiaryEntryContent & {
-  entryDate: string;
-  id: string;
-};
+export type DiaryEntrySummary = DiaryEntryContent & Omit<EncryptedDiaryEntry, 'ciphertext'>;
 
 type DecryptionResult = { entries: DiaryEntrySummary[]; error: boolean } | null;
 
@@ -16,10 +13,9 @@ export function useDecryptedEntries(key: CryptoKey, entries: EncryptedDiaryEntry
   useEffect(() => {
     let active = true;
     Promise.all(
-      entries.map(async (entry) => ({
-        ...(await decryptDiaryEntry(key, entry.id, entry.ciphertext)),
-        entryDate: entry.entryDate,
-        id: entry.id,
+      entries.map(async ({ ciphertext, ...entry }) => ({
+        ...entry,
+        ...(await decryptDiaryEntry(key, entry.id, ciphertext)),
       })),
     ).then(
       (decrypted) => {
