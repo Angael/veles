@@ -9,6 +9,13 @@ import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 
+/** Write needs read: granting write also grants read, and revoking read also revokes write. */
+function consentChange(access: 'read' | 'write', enabled: boolean) {
+  if (access === 'read')
+    return enabled ? { readEnabled: true } : { readEnabled: false, writeEnabled: false };
+  return enabled ? { readEnabled: true, writeEnabled: true } : { writeEnabled: false };
+}
+
 export const getAgentPermissions = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getAgentPermissions')])
   .handler(async () => {
@@ -32,8 +39,7 @@ export const updateAgentPermission = createServerFn({ method: 'POST' })
     if (data.access === 'write' && data.enabled && !agentFeatures[data.feature].writeAvailable) {
       throw new ClientSafeError('Write access for this feature is coming soon.');
     }
-    const changed =
-      data.access === 'read' ? { readEnabled: data.enabled } : { writeEnabled: data.enabled };
+    const changed = consentChange(data.access, data.enabled);
     await db
       .insert(userAgentPermissions)
       .values({ userId: session.user.id, feature: data.feature, ...changed })
@@ -58,8 +64,7 @@ export const setAllAgentPermissions = createServerFn({ method: 'POST' })
     const features = agentFeatureNames.filter(
       (feature) => data.access === 'read' || agentFeatures[feature].writeAvailable,
     );
-    const changed =
-      data.access === 'read' ? { readEnabled: data.enabled } : { writeEnabled: data.enabled };
+    const changed = consentChange(data.access, data.enabled);
     await db
       .insert(userAgentPermissions)
       .values(features.map((feature) => ({ userId: session.user.id, feature, ...changed })))

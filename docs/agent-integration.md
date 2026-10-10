@@ -42,7 +42,7 @@ Read resources: `diary_entries`, `notes`, `list_items`, `weights`, `recipes`, `f
 
 ## Consent and writes
 
-Read and write consent are independent, apply to all keys owned by the account, and are checked at each tool call. Write-only access returns mutation acknowledgements or new IDs, not record contents. Turning off a switch cuts off that operation for existing keys. Refresh `tools/list` after a change to discover the available tools.
+Write consent needs read consent: granting write also grants read, and revoking read also revokes write. Consent applies to all keys owned by the account and is checked at each tool call. Turning off a switch cuts off that operation for existing keys. Refresh `tools/list` after a change to discover the available tools.
 
 The first write feature is **Notes and shopping lists**. With its Write switch on, agents can use:
 

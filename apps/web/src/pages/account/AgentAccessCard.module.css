@@ -10,7 +10,7 @@
 
 .header {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   align-items: center;
   gap: var(--space-md);
 
@@ -49,42 +49,17 @@
   }
 }
 
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.7rem;
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-pill);
-  color: var(--c-muted-strong);
-  font-size: var(--text-xs);
-  white-space: nowrap;
-
-  &::before {
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 50%;
-    background: currentColor;
-    content: '';
-  }
-
-  &[data-active] {
-    border-color: var(--c-success-border);
-    background: var(--c-success-surface);
-    color: var(--c-success-text);
-
-    &::before {
-      box-shadow: 0 0 8px currentColor;
-    }
-  }
-}
-
 .block {
   display: grid;
   gap: var(--space-sm);
 }
 
 .blockHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+
   & h3 {
     color: var(--c-text-strong);
     font-size: var(--text-md);
@@ -188,10 +163,14 @@
   }
 }
 
-.createForm {
+.dialogHead {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--space-xs);
+  gap: 0.25rem;
+}
+
+.dialogForm {
+  display: grid;
+  gap: var(--space-lg);
 }
 
 .error {
@@ -250,15 +229,6 @@
 }
 
 @media (--phone) {
-  .header {
-    grid-template-columns: auto 1fr;
-
-    & > .status {
-      grid-column: 1 / -1;
-      justify-self: start;
-    }
-  }
-
   .badge {
     width: 2.5rem;
     height: 2.5rem;

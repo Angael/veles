@@ -22,23 +22,11 @@
   align-items: center;
   justify-items: center;
   gap: var(--space-xs);
-  min-height: 3.25rem;
+  min-height: 2.75rem;
 
   & > :first-child {
-    display: grid;
     justify-self: start;
     min-width: 0;
-  }
-
-  & strong {
-    color: var(--c-text);
-    font-weight: var(--font-weight-regular);
-  }
-
-  & small {
-    color: var(--c-muted-strong);
-    font-size: var(--text-xs);
-    text-wrap: pretty;
   }
 }
 

@@ -26,8 +26,8 @@ export function AgentPermissions() {
   return (
     <div aria-busy={permissionsQuery.isPending} className={css.section}>
       <p>
-        Read lets AI view data. Write lets AI add, edit, and delete it. Changes apply to all your
-        keys right away.
+        Read lets AI view data. Write lets AI add, edit, and delete it, and needs read. Changes
+        apply to all your keys right away.
       </p>
       <div className={css.table} role='group' aria-label='AI permissions'>
         <div className={css.head}>
@@ -36,10 +36,7 @@ export function AgentPermissions() {
           <span>Write</span>
         </div>
         <div className={css.allRow}>
-          <span>
-            <strong>Allow all</strong>
-            <small>Turns every feature on or off</small>
-          </span>
+          <strong>Allow all</strong>
           <Toggle
             aria-label='Allow AI to read everything'
             checked={allOn('read', agentFeatureNames)}
@@ -57,10 +54,7 @@ export function AgentPermissions() {
           const option = agentFeatures[feature];
           return (
             <div className={css.row} key={feature}>
-              <span>
-                <strong>{option.label}</strong>
-                <small>{option.description}</small>
-              </span>
+              <span>{option.label}</span>
               <Toggle
                 aria-label={`Allow AI to read ${option.label}`}
                 checked={permissions?.[feature].read ?? false}

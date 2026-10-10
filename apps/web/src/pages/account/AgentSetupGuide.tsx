@@ -1,11 +1,9 @@
-import { CheckIcon, CircleCheckIcon, CopyIcon } from 'lucide-react';
+import { CheckIcon, CopyIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Btn } from '@/components/ui/btn/Btn';
 import css from './AgentSetupGuide.module.css';
 
 interface AgentSetupGuideProps {
   apiKey: string;
-  onDone: () => void;
   userName: string;
 }
 
@@ -20,7 +18,7 @@ function serverName(userName: string) {
 }
 
 /** Shows one copy-on-press prompt the user sends to their AI agent, plus manual configs. */
-export function AgentSetupGuide({ apiKey, onDone, userName }: AgentSetupGuideProps) {
+export function AgentSetupGuide({ apiKey, userName }: AgentSetupGuideProps) {
   const url = new URL('/api/mcp', window.location.origin).href;
   const name = serverName(userName);
   const prompt = `Please connect to my Veles account. Add an HTTP MCP server named "${name}" with URL ${url} and header "Authorization: Bearer ${apiKey}". This key belongs to ${userName}; use it only for ${userName}'s requests. Then restart or reload your MCP tools and call get_access to confirm.`;
@@ -40,16 +38,7 @@ export function AgentSetupGuide({ apiKey, onDone, userName }: AgentSetupGuidePro
   ];
 
   return (
-    <div aria-live='polite' className={css.guide}>
-      <div className={css.head}>
-        <CircleCheckIcon aria-hidden='true' />
-        <div>
-          <strong>Key created</strong>
-          <p>
-            It is shown only once. Send this prompt to your AI agent, or to the person who runs it.
-          </p>
-        </div>
-      </div>
+    <div className={css.guide}>
       <CopyBlock code={prompt} label='Prompt for your AI agent' />
       <details>
         <summary>Manual setup</summary>
@@ -57,9 +46,6 @@ export function AgentSetupGuide({ apiKey, onDone, userName }: AgentSetupGuidePro
           <CopyBlock code={config.code} key={config.label} label={config.label} />
         ))}
       </details>
-      <Btn className={css.done} onClick={onDone} size='sm' variant='outlineSuccess'>
-        Done
-      </Btn>
     </div>
   );
 }

@@ -20,13 +20,13 @@ export async function readAgentPermissions(userId: string) {
     if (!agentFeatureType.allows(row.feature)) continue;
     permissions[row.feature] = {
       read: row.readEnabled,
-      write: row.writeEnabled && agentFeatures[row.feature].writeAvailable,
+      write: row.readEnabled && row.writeEnabled && agentFeatures[row.feature].writeAvailable,
     };
   }
   return permissions;
 }
 
-/** Rechecks the requested operation at tool execution; write consent never grants read access. */
+/** Rechecks the requested operation at tool execution; write also needs read consent. */
 export async function requireAgentAccess(
   userId: string,
   feature: AgentFeature,
@@ -40,7 +40,7 @@ export async function requireAgentAccess(
   const allowed =
     access === 'read'
       ? row?.readEnabled
-      : row?.writeEnabled && agentFeatures[feature].writeAvailable;
+      : row?.readEnabled && row.writeEnabled && agentFeatures[feature].writeAvailable;
   if (!allowed) {
     throw new ClientSafeError(
       `${agentFeatures[feature].label} ${access} access is disabled in Account.`,
