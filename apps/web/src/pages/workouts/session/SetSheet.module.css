@@ -1,0 +1,53 @@
+.sheet {
+  gap: var(--space-sm);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.title {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-lg);
+  overflow-wrap: anywhere;
+
+  & small {
+    color: var(--c-muted);
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-regular);
+  }
+}
+
+.previous {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border: var(--border-width) dashed var(--c-border-strong);
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--c-muted-soft);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+
+  & svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  & span {
+    margin-inline-start: auto;
+    color: var(--c-accent);
+  }
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--space-md);
+}

@@ -7,3 +7,4 @@ export * from './calories.schema.ts';
 export * from './notes.schema.ts';
 export * from './connections.schema.ts';
 export * from './sharing.schema.ts';
+export * from './workouts.schema.ts';

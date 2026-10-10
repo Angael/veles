@@ -1,0 +1,63 @@
+.note {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+
+  &::placeholder {
+    color: var(--c-placeholder);
+    font-style: italic;
+  }
+}
+
+.history {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.historyEntry {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: var(--space-sm);
+}
+
+.position {
+  display: grid;
+  place-content: center;
+  height: 3rem;
+  border-radius: var(--radius-xs);
+  background: var(--c-primary-surface);
+  color: var(--c-text-strong);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.1;
+  text-align: center;
+
+  & small {
+    color: var(--c-muted);
+    font-size: 0.65rem;
+    font-weight: var(--font-weight-regular);
+  }
+}
+
+.historyBody {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.historyMeta {
+  color: var(--c-muted);
+  font-size: var(--text-xs);
+}
+
+.historySets {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  word-spacing: 0.3em;
+}
+
+.historyNote {
+  color: var(--c-muted-soft);
+  font-size: var(--text-sm);
+  font-style: italic;
+}
