@@ -3,7 +3,7 @@ import { DownloadIcon, UploadIcon } from 'lucide-react';
 import { useRef } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { todayLocalDate } from '@/lib/dateOnly';
-import { downloadTextFile } from '@/lib/downloadFile.client';
+import { downloadTextFile } from '@/lib/downloadTextFile';
 import { useExportDiaryEntriesMutation, useImportDiaryEntriesMutation } from './diary.query';
 import css from './DiaryBackupActions.module.css';
 
