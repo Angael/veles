@@ -3,6 +3,11 @@
   gap: var(--space-lg);
 }
 
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .searchField {
   display: grid;
   gap: var(--space-xs);
