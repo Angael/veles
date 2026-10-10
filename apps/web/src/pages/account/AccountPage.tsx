@@ -57,7 +57,7 @@ export function AccountPage({ user }: AccountPageProps) {
 
       <FriendsCard />
 
-      <AgentAccessCard />
+      <AgentAccessCard userName={user.name} />
     </main>
   );
 }

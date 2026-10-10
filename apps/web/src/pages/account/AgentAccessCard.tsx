@@ -9,9 +9,14 @@ import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { useApiKeysQuery, useCreateApiKeyMutation, useDeleteApiKeyMutation } from './account.query';
 import { FriendRow } from './FriendRow';
 import { AgentPermissions } from './AgentPermissions';
+import { AgentSetupGuide } from './AgentSetupGuide';
 import css from './AccountPage.module.css';
 
-export function AgentAccessCard() {
+interface AgentAccessCardProps {
+  userName: string;
+}
+
+export function AgentAccessCard({ userName }: AgentAccessCardProps) {
   const [newKey, setNewKey] = useState<string | null>(null);
   const keysQuery = useApiKeysQuery();
   const createMutation = useCreateApiKeyMutation();
@@ -23,6 +28,10 @@ export function AgentAccessCard() {
         <div>
           <h2>Agent access</h2>
           <p>Choose what agents like Hermes can access through MCP. Keys expire after 90 days.</p>
+          <p>
+            Each person creates their own key. One agent can hold keys from several people; it adds
+            one connection per key.
+          </p>
         </div>
       </header>
 
@@ -53,14 +62,7 @@ export function AgentAccessCard() {
         </p>
       ) : null}
 
-      {newKey ? (
-        <div className={css.feedback}>
-          <Label text='Copy this key now, it is shown only once'>
-            <TextInput onFocus={(event) => event.target.select()} readOnly value={newKey} />
-          </Label>
-          <p>Endpoint: {new URL('/api/mcp', window.location.origin).href}</p>
-        </div>
-      ) : null}
+      {newKey ? <AgentSetupGuide apiKey={newKey} userName={userName} /> : null}
 
       {keysQuery.data?.length ? (
         <ul>

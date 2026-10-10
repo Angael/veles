@@ -1,0 +1,36 @@
+.guide {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--c-primary-border-soft);
+  border-radius: var(--radius-md);
+  background: var(--c-primary-surface);
+  font-size: var(--text-sm);
+  text-wrap: pretty;
+}
+
+.snippet {
+  display: grid;
+  gap: var(--space-xs);
+  min-width: 0;
+
+  & header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+  }
+
+  & h3 {
+    color: var(--c-text-strong);
+    font-size: var(--text-sm);
+  }
+
+  & pre {
+    overflow-x: auto;
+    padding: var(--space-sm);
+    border-radius: var(--radius-xs);
+    background: var(--c-surface-inset);
+    font-size: var(--text-xs);
+  }
+}
