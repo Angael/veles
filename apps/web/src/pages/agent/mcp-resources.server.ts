@@ -21,6 +21,54 @@ interface AgentResource {
   description: string;
   /** Rows the user may read; `undefined` means the collection is global. */
   scope: (userId: string) => SQL | undefined;
+  /** Attaches related rows so agents get one nested result instead of joining ids themselves. */
+  nest?: (rows: Row[]) => Promise<Row[]>;
+}
+
+type Row = Record<string, unknown>;
+
+/** Loads items of the given shopping lists in one query and nests them under each list. */
+async function nestListItems(rows: Row[]) {
+  const listIds = rows.filter((row) => row.type === 'shopping_list').map((row) => String(row.id));
+  const items = listIds.length
+    ? await db
+        .select({
+          id: listItems.id,
+          noteId: listItems.noteId,
+          name: listItems.name,
+          checked: listItems.checked,
+        })
+        .from(listItems)
+        .where(inArray(listItems.noteId, listIds))
+        .orderBy(listItems.id)
+    : [];
+  return rows.map((row) =>
+    row.type === 'shopping_list'
+      ? {
+          ...row,
+          items: items
+            .filter((item) => item.noteId === row.id)
+            .map(({ noteId: _noteId, ...item }) => item),
+        }
+      : row,
+  );
+}
+
+/** Converts stored fixed-point fields (`*Hundredths`, `weightGrams`) into plain numbers agents can read. */
+function toReadable(row: Row): Row {
+  return Object.fromEntries(
+    Object.entries(row).map(([key, value]) => {
+      if (key === 'weightGrams')
+        return ['weightKg', typeof value === 'number' ? value / 1000 : value];
+      if (key.endsWith('Hundredths')) {
+        return [
+          key.slice(0, -'Hundredths'.length),
+          typeof value === 'number' ? value / 100 : value,
+        ];
+      }
+      return [key, value];
+    }),
+  );
 }
 
 const ownedBy = (column: PgColumn) => (userId: string) => eq(column, userId);
@@ -37,25 +85,16 @@ export const resources = {
     feature: 'notes',
     table: notes,
     id: notes.id,
-    description: 'Notes and shopping lists (type "shopping_list"); list items live in list_items.',
+    description:
+      'Notes and shopping lists (type "shopping_list"). Shopping lists include their items (id, name, checked) in creation order.',
     scope: ownedBy(notes.ownerId),
-  },
-  list_items: {
-    feature: 'notes',
-    table: listItems,
-    id: listItems.id,
-    description: 'Shopping list items, linked by noteId.',
-    scope: (userId) =>
-      inArray(
-        listItems.noteId,
-        db.select({ id: notes.id }).from(notes).where(eq(notes.ownerId, userId)),
-      ),
+    nest: nestListItems,
   },
   weights: {
     feature: 'weight',
     table: weightEntries,
     id: weightEntries.id,
-    description: 'Weight history; weightGrams / 1000 = kg.',
+    description: 'Weight history in kg.',
     scope: ownedBy(weightEntries.userId),
   },
   recipes: {
@@ -69,21 +108,22 @@ export const resources = {
     feature: 'calories',
     table: foodLogs,
     id: foodLogs.id,
-    description: 'Food diary by logDate. Divide *Hundredths by 100 (kcal or grams).',
+    description: 'Food diary by logDate. kcal is energy; grams, protein, fat, carbs in grams.',
     scope: ownedBy(foodLogs.userId),
   },
   calorie_goals: {
     feature: 'calorie_goals',
     table: calorieGoals,
     id: calorieGoals.id,
-    description: 'Nutrition goals by effectiveDate. Divide *Hundredths by 100.',
+    description:
+      'Nutrition goals by effectiveDate: kcal limit, then protein, fat, carbs limits in grams.',
     scope: ownedBy(calorieGoals.userId),
   },
   food_products: {
     feature: 'food_products',
     table: foodProducts,
     id: foodProducts.id,
-    description: 'Shared food catalog, per 100 g. Divide *Hundredths by 100.',
+    description: 'Shared food catalog; kcal and macros are per 100 g, product size in grams.',
     scope: () => undefined,
   },
 } satisfies Record<string, AgentResource>;
@@ -98,7 +138,7 @@ export const listInput = type({
 });
 export const getInput = type({ resource: resourceName, id: 'string.uuid' });
 
-/** Reads one owner-scoped page, ordered by uuidv7 id (creation order); owner columns are omitted. */
+/** Reads one owner-scoped page in creation order, with owner columns omitted, relations nested, and units converted. */
 export async function readRecords(
   userId: string,
   resource: AgentResource,
@@ -121,7 +161,8 @@ export async function readRecords(
     )
     .orderBy(resource.id)
     .limit(limit + 1);
-  const items = rows.slice(0, limit);
-  const nextCursor = rows.length > limit ? String(items.at(-1)?.id) : null;
+  const page = rows.slice(0, limit);
+  const nextCursor = rows.length > limit ? String(page.at(-1)?.id) : null;
+  const items = (resource.nest ? await resource.nest(page) : page).map(toReadable);
   return { items, nextCursor };
 }

@@ -72,3 +72,30 @@
     height: 0.9rem;
   }
 }
+
+.promptBox {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  border: 2px solid var(--c-primary);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+
+  & h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--c-text-strong);
+    font-size: var(--text-md);
+
+    & svg {
+      width: 1.1rem;
+      height: 1.1rem;
+      color: var(--c-primary);
+    }
+  }
+
+  & p {
+    color: var(--c-text);
+  }
+}

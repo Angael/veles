@@ -1,4 +1,4 @@
-import { CheckIcon, CopyIcon } from 'lucide-react';
+import { CheckIcon, CopyIcon, SparklesIcon } from 'lucide-react';
 import { useState } from 'react';
 import css from './AgentSetupGuide.module.css';
 
@@ -45,7 +45,15 @@ export function AgentSetupGuide({ apiKey, userName }: AgentSetupGuideProps) {
 
   return (
     <div className={css.guide}>
-      <CopyBlock code={prompt} label='Prompt for your AI agent' />
+      <section className={css.promptBox}>
+        <h3>
+          <SparklesIcon aria-hidden='true' />
+          Prompt for your AI agent
+        </h3>
+        <p>It is shown only once. Send this prompt to your AI agent.</p>
+        <CopyBlock code={prompt} label='Prompt' />
+        <p>After the agent confirms, delete the message or thread that contains the key.</p>
+      </section>
       <details>
         <summary>Manual setup</summary>
         {configs.map((config) => (
