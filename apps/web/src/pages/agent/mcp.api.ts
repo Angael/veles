@@ -29,7 +29,7 @@ async function createServer(userId: string) {
   const server = new McpServer(
     { name: 'veles', version: '2.0.0' },
     {
-      instructions: `This connection reads and writes the Veles account of ${ownerName} only. Other people need their own Veles connection.`,
+      instructions: `This connection reads and writes the Veles account of ${ownerName} only. Other people's Veles accounts use separate connections, usually named veles-<first name>. Save changes to the account of the person who asks, unless they clearly name another person.`,
     },
   );
   const permissions = await readAgentPermissions(userId);

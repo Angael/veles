@@ -23,7 +23,9 @@ export function AgentSetupGuide({ apiKey, userName }: AgentSetupGuideProps) {
   const name = serverName(userName);
   const prompt = [
     `Please connect to my Veles account. Add an HTTP MCP server named "${name}" with URL ${url} and header "Authorization: Bearer ${apiKey}".`,
-    `This key belongs to ${userName}; use it only for ${userName}'s requests.`,
+    `Other "veles-*" servers can already exist: each one is a different person's account, so keep them. If "${name}" already exists, replace only its key.`,
+    `Remember that I, the sender of this message, am ${userName} and my Veles server is "${name}".`,
+    `Use "${name}" for my requests and for questions about ${userName}. Save changes to the sender's own server, unless they clearly name another person.`,
     'Then reload your MCP tools and call get_access to confirm.',
     'Keep this key only in the MCP config: do not save it to memory or notes, and redact it from logs and history that you control.',
     'Finally, remind me to delete this message or thread from the chat.',
