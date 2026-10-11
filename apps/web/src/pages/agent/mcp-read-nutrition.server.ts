@@ -1,8 +1,9 @@
 import { and, asc, desc, eq, inArray, lt, lte } from 'drizzle-orm';
-import { calorieGoals, foodLogs, foodProducts } from '@veles/db/schema';
+import { calorieGoals, foodLogs, foodProducts, uploadObjects } from '@veles/db/schema';
 import { fromHundredths } from '@/lib/nutrition';
 import { readAgentPermissions } from '@/server/agentAccess.server';
 import { db } from '@/server/db.server';
+import { storagePathToUrl } from '@/server/storage/config.server';
 import {
   byIdDesc,
   inDateRange,
@@ -47,8 +48,9 @@ export async function readFoodDays(userId: string, query: ReadQuery) {
   const canReadGoals = (await readAgentPermissions(userId)).calorie_goals.read;
   const [logs, goals] = await Promise.all([
     db
-      .select()
+      .select({ log: foodLogs, imageKey: uploadObjects.key })
       .from(foodLogs)
+      .leftJoin(uploadObjects, eq(uploadObjects.id, foodLogs.imageUploadObjectId))
       .where(and(eq(foodLogs.userId, userId), inArray(foodLogs.logDate, dates)))
       .orderBy(asc(foodLogs.consumedAt), asc(foodLogs.id)),
     canReadGoals
@@ -59,16 +61,17 @@ export async function readFoodDays(userId: string, query: ReadQuery) {
           .orderBy(desc(calorieGoals.effectiveDate))
       : [],
   ]);
-  const logsByDate = Map.groupBy(logs, (log) => log.logDate);
+  const logsByDate = Map.groupBy(logs, ({ log }) => log.logDate);
 
   return {
     nextCursor: page.nextCursor,
     items: dates.map((date) => {
       const dayLogs = logsByDate.get(date) ?? [];
-      const sum = (pick: (log: (typeof logs)[number]) => number | null) =>
-        dayLogs.reduce((total, log) => total + (pick(log) ?? 0), 0);
+      const sum = (pick: (log: (typeof logs)[number]['log']) => number | null) =>
+        dayLogs.reduce((total, { log }) => total + (pick(log) ?? 0), 0);
       const goal = goals.find((candidate) => candidate.effectiveDate <= date);
       return {
+        id: date,
         date,
         total: toNutrition({
           kcal: sum((log) => log.kcalHundredths),
@@ -77,11 +80,12 @@ export async function readFoodDays(userId: string, query: ReadQuery) {
           carbs: sum((log) => log.carbsHundredths),
         }),
         goal: goal ? { effectiveDate: goal.effectiveDate, ...goalNutrition(goal) } : null,
-        entries: dayLogs.map((log) => ({
+        entries: dayLogs.map(({ log, imageKey }) => ({
           id: log.id,
           name: log.name,
           consumedAt: log.consumedAt,
           grams: fromHundredths(log.gramsHundredths),
+          imageUrl: storagePathToUrl(imageKey),
           ...toNutrition({
             kcal: log.kcalHundredths,
             protein: log.proteinHundredths,
@@ -123,20 +127,22 @@ export async function readCalorieGoals(userId: string, query: ReadQuery) {
 /** Shared catalog, newest first; not owner-scoped because every account reads the same rows. */
 export async function readFoodProducts(_userId: string, query: ReadQuery) {
   const rows = await db
-    .select()
+    .select({ product: foodProducts, imageKey: uploadObjects.key })
     .from(foodProducts)
+    .leftJoin(uploadObjects, eq(uploadObjects.id, foodProducts.imageUploadObjectId))
     .where(byIdDesc(foodProducts.id, query))
     .orderBy(desc(foodProducts.id))
     .limit(query.limit + 1);
-  const page = toPage(rows, query.limit, (product) => product.id);
+  const page = toPage(rows, query.limit, ({ product }) => product.id);
   return {
     nextCursor: page.nextCursor,
-    items: page.items.map((product) => ({
+    items: page.items.map(({ product, imageKey }) => ({
       id: product.id,
       name: product.name,
       namePl: product.namePl,
       barcode: product.barcode,
       productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
+      imageUrl: storagePathToUrl(imageKey),
       per100g: toNutrition({
         kcal: product.kcalPer100gHundredths,
         protein: product.proteinPer100gHundredths,

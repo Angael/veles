@@ -1,7 +1,22 @@
 import { and, asc, desc, eq, inArray, lt } from 'drizzle-orm';
-import { listItems, notes, recipes, weightEntries } from '@veles/db/schema';
+import {
+  listItems,
+  notes,
+  recipeImages,
+  recipes,
+  uploadObjects,
+  weightEntries,
+  weightEntryPhotos,
+} from '@veles/db/schema';
 import { db } from '@/server/db.server';
-import { byIdDesc, inDateRange, parseKey, type ReadQuery, toPage } from './mcp-read.server';
+import {
+  byIdDesc,
+  groupImageUrls,
+  inDateRange,
+  parseKey,
+  type ReadQuery,
+  toPage,
+} from './mcp-read.server';
 
 /** Owned notes, newest first; shopping lists carry their items instead of text content. */
 export async function readNotes(userId: string, query: ReadQuery) {
@@ -50,7 +65,7 @@ export async function readNotes(userId: string, query: ReadQuery) {
   };
 }
 
-/** Owned weight entries, newest date first, in kg. */
+/** Owned weight entries, newest date first, in kg, with progress photo URLs. */
 export async function readWeights(userId: string, query: ReadQuery) {
   const rows = await db
     .select({
@@ -70,11 +85,23 @@ export async function readWeights(userId: string, query: ReadQuery) {
     .orderBy(desc(weightEntries.date))
     .limit(query.limit + 1);
   const page = toPage(rows, query.limit, (entry) => entry.date);
+  const entryIds = page.items.map((entry) => entry.id);
+  const photoUrls = groupImageUrls(
+    entryIds.length
+      ? await db
+          .select({ parentId: weightEntryPhotos.weightEntryId, key: uploadObjects.key })
+          .from(weightEntryPhotos)
+          .innerJoin(uploadObjects, eq(uploadObjects.id, weightEntryPhotos.uploadObjectId))
+          .where(inArray(weightEntryPhotos.weightEntryId, entryIds))
+          .orderBy(asc(weightEntryPhotos.position))
+      : [],
+  );
   return {
     nextCursor: page.nextCursor,
     items: page.items.map(({ weightGrams, ...entry }) => ({
       ...entry,
       weightKg: weightGrams / 1000,
+      photoUrls: photoUrls.get(entry.id) ?? [],
     })),
   };
 }
@@ -82,7 +109,7 @@ export async function readWeights(userId: string, query: ReadQuery) {
 const perPortion = (value: number | null, portions: number) =>
   value === null ? null : Math.round((value / portions) * 100) / 100;
 
-/** Owned recipes, newest first, with whole-recipe and per-portion nutrition. */
+/** Owned recipes, newest first, with whole-recipe and per-portion nutrition and image URLs. */
 export async function readRecipes(userId: string, query: ReadQuery) {
   const rows = await db
     .select({
@@ -105,10 +132,22 @@ export async function readRecipes(userId: string, query: ReadQuery) {
     .orderBy(desc(recipes.id))
     .limit(query.limit + 1);
   const page = toPage(rows, query.limit, (recipe) => recipe.id);
+  const recipeIds = page.items.map((recipe) => recipe.id);
+  const imageUrls = groupImageUrls(
+    recipeIds.length
+      ? await db
+          .select({ parentId: recipeImages.recipeId, key: uploadObjects.key })
+          .from(recipeImages)
+          .innerJoin(uploadObjects, eq(uploadObjects.id, recipeImages.uploadObjectId))
+          .where(inArray(recipeImages.recipeId, recipeIds))
+          .orderBy(asc(recipeImages.position))
+      : [],
+  );
   return {
     nextCursor: page.nextCursor,
     items: page.items.map(({ kcal, protein, fat, carbs, ...recipe }) => ({
       ...recipe,
+      imageUrls: imageUrls.get(recipe.id) ?? [],
       total: { kcal, macros: { protein, fat, carbs } },
       perPortion: {
         kcal: perPortion(kcal, recipe.portions),

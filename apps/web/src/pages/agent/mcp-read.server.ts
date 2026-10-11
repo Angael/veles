@@ -1,8 +1,10 @@
 import { type } from 'arktype';
 import { and, eq, gte, lt, lte } from 'drizzle-orm';
 import type { PgColumn } from 'drizzle-orm/pg-core';
+import { dateOnlyType } from '@/lib/dateOnly';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { fromHundredths, HUNDREDTHS } from '@/lib/nutrition';
+import { storagePathToUrl } from '@/server/storage/config.server';
 
 export interface ReadQuery {
   limit: number;
@@ -17,7 +19,7 @@ export interface ReadPage {
   nextCursor: string | null;
 }
 
-export const isoDate = type(/^\d{4}-\d{2}-\d{2}$/).describe('a YYYY-MM-DD date');
+export const isoDate = dateOnlyType.describe('a real YYYY-MM-DD date');
 const uuid = type('string.uuid');
 
 /** Rejects ids and cursors in the wrong format before Postgres tries to cast them. */
@@ -43,6 +45,9 @@ export function byIdDesc(column: PgColumn, query: ReadQuery) {
 
 /** Inclusive `from`/`to` filter for dated resources. */
 export function inDateRange(column: PgColumn, query: ReadQuery) {
+  if (query.from && query.to && query.from > query.to) {
+    throw new ClientSafeError('from must be on or before to.');
+  }
   return and(
     query.from ? gte(column, query.from) : undefined,
     query.to ? lte(column, query.to) : undefined,
@@ -64,4 +69,14 @@ export function toNutrition(value: {
       carbs: fromHundredths(value.carbs),
     },
   };
+}
+
+/** Public download URLs grouped by parent record, in display order. */
+export function groupImageUrls(rows: { parentId: string; key: string }[]) {
+  const urls = new Map<string, string[]>();
+  for (const { parentId, key } of rows) {
+    const url = storagePathToUrl(key);
+    if (url) urls.set(parentId, [...(urls.get(parentId) ?? []), url]);
+  }
+  return urls;
 }

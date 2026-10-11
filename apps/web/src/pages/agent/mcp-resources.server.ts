@@ -33,19 +33,20 @@ export const resources = {
   weights: {
     feature: 'weight',
     dated: true,
-    description: 'Weight history in kg, newest date first. Cursor and from/to are dates.',
+    description:
+      'Weight history in kg, newest date first, with photoUrls (progress photos). Cursor and from/to are dates.',
     read: readWeights,
   },
   recipes: {
     feature: 'recipes',
     dated: false,
-    description: `Recipes with ingredients and tags. total is for all portions, perPortion for one; ${kcalAndMacros}.`,
+    description: `Recipes with ingredients, tags, and imageUrls. total is for all portions, perPortion for one; ${kcalAndMacros}.`,
     read: readRecipes,
   },
   food_days: {
     feature: 'calories',
     dated: true,
-    description: `Food diary, one item per logged day (id is the date), newest first. Each day has entries, total, and goal (the nutrition goal in effect; null without a goal or without Nutrition goals consent); ${kcalAndMacros}.`,
+    description: `Food diary, one item per logged day, newest first; id and date are the same YYYY-MM-DD. Each day has entries (with imageUrl or null), total, and goal (the nutrition goal in effect; null without a goal or without Nutrition goals consent); ${kcalAndMacros}.`,
     read: readFoodDays,
   },
   calorie_goals: {
@@ -57,7 +58,7 @@ export const resources = {
   food_products: {
     feature: 'food_products',
     dated: false,
-    description: `Shared food catalog. per100g nutrition: ${kcalAndMacros}. productSizeGrams is one package.`,
+    description: `Shared food catalog with imageUrl or null. per100g nutrition: ${kcalAndMacros}. productSizeGrams is one package.`,
     read: readFoodProducts,
   },
   workout_sessions: {

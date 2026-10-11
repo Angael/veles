@@ -21,7 +21,24 @@ export function AgentKeyList() {
     );
   }
 
-  if (!keysQuery.data?.length) {
+  if (keysQuery.isError) {
+    return (
+      <div className={css.empty} role='alert'>
+        <KeyRoundIcon aria-hidden='true' />
+        Could not load your keys.
+        <Btn
+          loading={keysQuery.isFetching}
+          onClick={() => void keysQuery.refetch()}
+          size='sm'
+          variant='outlineMain'
+        >
+          Try again
+        </Btn>
+      </div>
+    );
+  }
+
+  if (!keysQuery.data.length) {
     return (
       <p className={css.empty}>
         <KeyRoundIcon aria-hidden='true' />

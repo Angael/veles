@@ -38,19 +38,19 @@ curl -s https://<veles-host>/api/mcp \
 | `list_records` | `resource`, `cursor?`, `limit?` (≤100), `from?`, `to?` | `{ items, nextCursor }`; repeat until `null`  |
 | `get_record`   | `resource`, `id`                                       | the record, or `null` if missing or not yours |
 
-Read resources. Each record is complete: related rows are nested, so agents never match children to parents by id.
+Read resources. Related rows are nested, so agents never match children to parents by id. Photos and images are public URLs that agents can download.
 
-| Resource            | Feature consent | One record                                                                               |
-| ------------------- | --------------- | ---------------------------------------------------------------------------------------- |
-| `notes`             | Notes           | Note with `content`, or shopping list with its `items`                                   |
-| `weights`           | Weight          | `date`, `weightKg`                                                                       |
-| `recipes`           | Recipes         | Recipe with `total` and `perPortion` nutrition                                           |
-| `food_days`         | Food diary      | One logged day (`id` is the date): `entries`, `total`, and the `goal` in effect that day |
-| `calorie_goals`     | Nutrition goals | Goal by `effectiveDate`                                                                  |
-| `food_products`     | Food catalog    | Shared product with `per100g` nutrition                                                  |
-| `workout_sessions`  | Workouts        | Session with its routine, exercises, and sets                                            |
-| `workout_routines`  | Workouts        | Routine with its exercises and planned set types                                         |
-| `workout_exercises` | Workouts        | Exercise with `lastDoneOn` and `sessionCount`                                            |
+| Resource            | Feature consent | One record                                                                            |
+| ------------------- | --------------- | ------------------------------------------------------------------------------------- |
+| `notes`             | Notes           | Note with `content`, or shopping list with its `items`                                |
+| `weights`           | Weight          | `date`, `weightKg`, `photoUrls`                                                       |
+| `recipes`           | Recipes         | Recipe with `total` and `perPortion` nutrition, `imageUrls`                           |
+| `food_days`         | Food diary      | One logged day (`id` = `date`): `entries`, `total`, and the `goal` in effect that day |
+| `calorie_goals`     | Nutrition goals | Goal by `effectiveDate`                                                               |
+| `food_products`     | Food catalog    | Shared product with `per100g` nutrition, `imageUrl`                                   |
+| `workout_sessions`  | Workouts        | Session with its routine, exercises, and sets                                         |
+| `workout_routines`  | Workouts        | Routine with its exercises and planned set types                                      |
+| `workout_exercises` | Workouts        | Exercise with `lastDoneOn` and `sessionCount`                                         |
 
 Lists are newest first. `weights`, `food_days`, `calorie_goals`, and `workout_sessions` accept inclusive `from`/`to` dates (`YYYY-MM-DD`). Nutrition is `{ kcal, macros: { protein, fat, carbs } }` in kcal and grams. `food_days.goal` is `null` unless Nutrition goals read consent is on. Diary entries are not available: they are end-to-end encrypted in the browser.
 

@@ -25,7 +25,7 @@ export function AgentSetupGuide({ apiKey, userName }: AgentSetupGuideProps) {
     `Please connect to my Veles account. Add an HTTP MCP server named "${name}" with URL ${url} and header "Authorization: Bearer ${apiKey}".`,
     `This key belongs to ${userName}; use it only for ${userName}'s requests.`,
     'Then reload your MCP tools and call get_access to confirm.',
-    'After setup, remove every trace of this key outside the MCP config: do not save it to memory or notes, and delete or redact it from session logs, transcripts, and history.',
+    'Keep this key only in the MCP config: do not save it to memory or notes, and redact it from logs and history that you control.',
     'Finally, remind me to delete this message or thread from the chat.',
   ].join(' ');
   const configs = [
@@ -52,7 +52,10 @@ export function AgentSetupGuide({ apiKey, userName }: AgentSetupGuideProps) {
         </h3>
         <p>It is shown only once. Send this prompt to your AI agent.</p>
         <CopyBlock code={prompt} label='Prompt' />
-        <p>After the agent confirms, delete the message or thread that contains the key.</p>
+        <p>
+          After the agent confirms, delete the message or thread that contains the key. This reduces
+          exposure, but your AI provider can keep copies. Manual setup keeps the key out of chat.
+        </p>
       </section>
       <details>
         <summary>Manual setup</summary>

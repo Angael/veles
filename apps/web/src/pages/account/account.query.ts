@@ -116,7 +116,10 @@ export function useCreateApiKeyMutation() {
 
 export function useDeleteApiKeyMutation() {
   return useMutation({
-    meta: { invalidateQueryKey: apiKeysQueryKey },
+    meta: {
+      error: { title: 'Could not revoke the key', message: 'The key still works. Try again.' },
+      invalidateQueryKey: apiKeysQueryKey,
+    },
     mutationFn: async (keyId: string) => unwrap(await apiKey.delete({ keyId })),
   });
 }
