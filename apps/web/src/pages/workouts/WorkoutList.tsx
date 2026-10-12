@@ -81,7 +81,6 @@ export function WorkoutList({ workouts }: { workouts: WorkoutSummary[] }) {
 
 function WorkoutRow({ workout }: { workout: WorkoutSummary }) {
   const open = workout.endedAt === null;
-  const duration = workout.durationSeconds;
 
   return (
     <Card as='article' className={clsx(css.row, open && css.open)}>
@@ -95,7 +94,9 @@ function WorkoutRow({ workout }: { workout: WorkoutSummary }) {
         <h3>{workout.name}</h3>
         <p className={css.meta}>
           {open && workout.startedAt ? <ElapsedTime startedAt={workout.startedAt} /> : null}
-          {duration === null ? null : <span>{formatElapsed(duration)}</span>}
+          {workout.durationSeconds === null ? null : (
+            <span>{formatElapsed(workout.durationSeconds)}</span>
+          )}
           <span>
             {workout.exerciseCount} {workout.exerciseCount === 1 ? 'exercise' : 'exercises'}
           </span>

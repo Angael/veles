@@ -34,7 +34,7 @@ function computeStats(workouts: WorkoutSummary[], today: string) {
   }
 
   const lengths = workouts.flatMap((workout) =>
-    workout.endedAt && workout.durationSeconds !== null ? [workout.durationSeconds] : [],
+    workout.durationSeconds === null ? [] : [workout.durationSeconds],
   );
 
   return {
