@@ -20,10 +20,10 @@ type SessionHeaderProps = {
 export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderProps) {
   const navigate = useNavigate();
   const updateWorkout = useUpdateWorkoutMutation();
-  const completedSeconds = session.slots
+  const setSeconds = session.slots
     .flatMap((slot) => slot.sets)
-    .reduce((sum, set) => sum + (set.done ? (set.durationSeconds ?? 0) : 0), 0);
-  const elapsed = floorDuration(useElapsed(session.startedAt, session.endedAt), completedSeconds);
+    .reduce((sum, set) => sum + (set.durationSeconds ?? 0), 0);
+  const elapsed = floorDuration(useElapsed(session.startedAt, session.endedAt), setSeconds);
   const finished = session.endedAt !== null;
 
   return (

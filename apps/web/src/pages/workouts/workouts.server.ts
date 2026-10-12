@@ -146,8 +146,8 @@ export async function autoFinishIdleWorkouts(tx: Db, userId: string) {
   }
 }
 
-/** Seconds of completed sets, for queries joined to sets and grouped by session. */
-export const completedSecondsSql = sql<number>`coalesce(sum(${workoutSets.durationSeconds}) FILTER (WHERE ${workoutSets.completedAt} IS NOT NULL), 0)::float8`;
+/** Seconds entered on sets, ticked or not, for queries joined to sets and grouped by session. */
+export const setSecondsSql = sql<number>`coalesce(sum(${workoutSets.durationSeconds}), 0)::float8`;
 
 /** Records an edit; `updated_at` is the "last edit" that auto-finish ends a workout at. */
 export async function touchWorkout(tx: Db, workoutId: string) {

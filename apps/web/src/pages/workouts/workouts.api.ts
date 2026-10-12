@@ -11,7 +11,7 @@ import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { floorDuration } from './metrics';
 import {
   autoFinishIdleWorkouts,
-  completedSecondsSql,
+  setSecondsSql,
   loadWorkoutSession,
   requireNoOpenWorkout,
   requireOwnedWorkout,
@@ -23,7 +23,7 @@ export type WorkoutSummary = {
   date: string;
   startedAt: string | null;
   endedAt: string | null;
-  /** Finished duration, floored at completed set time. Null while open. */
+  /** Finished duration, floored at time entered on sets. Null while open. */
   durationSeconds: number | null;
   exerciseCount: number;
   doneSets: number;
@@ -40,7 +40,7 @@ export const getWorkouts = createServerFn({ method: 'GET' })
     const done = sql`${workoutSets.completedAt} IS NOT NULL`;
     const rows = await db
       .select({
-        completedSeconds: completedSecondsSql,
+        setSeconds: setSecondsSql,
         date: workoutSessions.date,
         doneSets: sql<number>`count(${workoutSets.id}) FILTER (WHERE ${done})::int`,
         endedAt: workoutSessions.endedAt,
@@ -64,7 +64,7 @@ export const getWorkouts = createServerFn({ method: 'GET' })
       durationSeconds: row.endedAt
         ? floorDuration(
             row.startedAt ? (row.endedAt.getTime() - row.startedAt.getTime()) / 1000 : null,
-            row.completedSeconds,
+            row.setSeconds,
           )
         : null,
       endedAt: row.endedAt?.toISOString() ?? null,

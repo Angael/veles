@@ -7,7 +7,7 @@ import { dateOnlyType } from '@/lib/dateOnly';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
-import { autoFinishIdleWorkouts, completedSecondsSql } from '../workouts.server';
+import { autoFinishIdleWorkouts, setSecondsSql } from '../workouts.server';
 
 /** One training day; `workoutId` is that day's first workout, opened on tap. */
 export type CalendarDay = {
@@ -31,7 +31,7 @@ export const getWorkoutCalendar = createServerFn({ method: 'GET' })
     await autoFinishIdleWorkouts(db, session.user.id);
     const rows = await db
       .select({
-        completedSeconds: completedSecondsSql,
+        setSeconds: setSecondsSql,
         date: workoutSessions.date,
         endedAt: workoutSessions.endedAt,
         id: workoutSessions.id,
@@ -52,7 +52,7 @@ export const getWorkoutCalendar = createServerFn({ method: 'GET' })
       const start = row.startedAt?.getTime();
       const end = (row.endedAt ?? row.lastSetAt)?.getTime();
       const elapsed = start && end && end > start ? (end - start) / 1000 : 0;
-      const seconds = Math.max(elapsed, row.completedSeconds);
+      const seconds = Math.max(elapsed, row.setSeconds);
       const day = byDate.get(row.date);
       byDate.set(row.date, {
         date: row.date,

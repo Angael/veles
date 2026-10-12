@@ -113,11 +113,9 @@ export function formatDuration(totalSeconds: number) {
   return `${sign}${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 }
 
-/** Floors elapsed seconds at completed set time, so a short or missing timer never hides logged work. */
-export function floorDuration(elapsed: number | null, completedSeconds: number) {
-  return elapsed === null && completedSeconds === 0
-    ? null
-    : Math.max(0, elapsed ?? 0, completedSeconds);
+/** Floors elapsed seconds at the time entered on sets, so a short or missing timer never hides logged work. */
+export function floorDuration(elapsed: number | null, setSeconds: number) {
+  return elapsed === null && setSeconds === 0 ? null : Math.max(0, elapsed ?? 0, setSeconds);
 }
 
 /** Drag speed (px/ms) where each bigger step kicks in. */
