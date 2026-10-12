@@ -63,6 +63,7 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
           {session.slots.map((slot, index) => (
             <ExerciseCard
               actions={actions}
+              finished={finished}
               isFirst={index === 0}
               isLast={index === session.slots.length - 1}
               key={slot.id}
