@@ -81,10 +81,7 @@ export function WorkoutList({ workouts }: { workouts: WorkoutSummary[] }) {
 
 function WorkoutRow({ workout }: { workout: WorkoutSummary }) {
   const open = workout.endedAt === null;
-  const duration =
-    workout.startedAt && workout.endedAt
-      ? (Date.parse(workout.endedAt) - Date.parse(workout.startedAt)) / 1000
-      : null;
+  const duration = workout.durationSeconds;
 
   return (
     <Card as='article' className={clsx(css.row, open && css.open)}>

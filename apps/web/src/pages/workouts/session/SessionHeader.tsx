@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
+import { completedSetDuration, elapsedSeconds, workoutDuration } from '../duration';
 import { formatDuration } from '../metrics';
 import { useUpdateWorkoutMutation } from '../workouts.query';
 import type { WorkoutSessionData } from '../workouts.server';
@@ -20,7 +21,10 @@ type SessionHeaderProps = {
 export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderProps) {
   const navigate = useNavigate();
   const updateWorkout = useUpdateWorkoutMutation();
-  const elapsed = useElapsed(session.startedAt, session.endedAt);
+  const elapsed = workoutDuration(
+    useElapsed(session.startedAt, session.endedAt),
+    completedSetDuration(session.slots),
+  );
   const finished = session.endedAt !== null;
 
   return (
@@ -96,7 +100,5 @@ function useElapsed(startedAt: string | null, endedAt: string | null) {
     const interval = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(interval);
   }, [endedAt]);
-  if (!startedAt) return null;
-  const end = endedAt ? Date.parse(endedAt) : now;
-  return end === null ? null : Math.max(0, (end - Date.parse(startedAt)) / 1000);
+  return elapsedSeconds(startedAt, endedAt ?? (now === null ? null : new Date(now).toISOString()));
 }

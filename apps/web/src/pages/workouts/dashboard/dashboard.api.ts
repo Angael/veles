@@ -7,6 +7,8 @@ import { dateOnlyType } from '@/lib/dateOnly';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
+import { elapsedSeconds, workoutDuration } from '../duration';
+import { completedSetDurationSql } from '../duration.server';
 import { autoFinishIdleWorkouts } from '../workouts.server';
 
 /** One training day; `workoutId` is that day's first workout, opened on tap. */
@@ -31,6 +33,7 @@ export const getWorkoutCalendar = createServerFn({ method: 'GET' })
     await autoFinishIdleWorkouts(db, session.user.id);
     const rows = await db
       .select({
+        completedSeconds: completedSetDurationSql,
         date: workoutSessions.date,
         endedAt: workoutSessions.endedAt,
         id: workoutSessions.id,
@@ -48,9 +51,14 @@ export const getWorkoutCalendar = createServerFn({ method: 'GET' })
 
     const byDate = new Map<string, CalendarDay>();
     for (const row of rows) {
-      const start = row.startedAt?.getTime();
-      const end = (row.endedAt ?? row.lastSetAt)?.getTime();
-      const seconds = start && end && end > start ? (end - start) / 1000 : 0;
+      const seconds =
+        workoutDuration(
+          elapsedSeconds(
+            row.startedAt?.toISOString() ?? null,
+            (row.endedAt ?? row.lastSetAt)?.toISOString() ?? null,
+          ),
+          row.completedSeconds,
+        ) ?? 0;
       const day = byDate.get(row.date);
       byDate.set(row.date, {
         date: row.date,

@@ -8,6 +8,8 @@ import { dateOnlyType } from '@/lib/dateOnly';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
+import { elapsedSeconds, workoutDuration } from './duration';
+import { completedSetDurationSql } from './duration.server';
 import {
   autoFinishIdleWorkouts,
   loadWorkoutSession,
@@ -21,6 +23,8 @@ export type WorkoutSummary = {
   date: string;
   startedAt: string | null;
   endedAt: string | null;
+  /** Finished duration derived from persisted timestamps and completed sets. Null while open. */
+  durationSeconds: number | null;
   exerciseCount: number;
   doneSets: number;
   volumeKg: number;
@@ -36,6 +40,7 @@ export const getWorkouts = createServerFn({ method: 'GET' })
     const done = sql`${workoutSets.completedAt} IS NOT NULL`;
     const rows = await db
       .select({
+        completedSeconds: completedSetDurationSql,
         date: workoutSessions.date,
         doneSets: sql<number>`count(${workoutSets.id}) FILTER (WHERE ${done})::int`,
         endedAt: workoutSessions.endedAt,
@@ -56,6 +61,12 @@ export const getWorkouts = createServerFn({ method: 'GET' })
     return rows.map((row) => ({
       date: row.date,
       doneSets: row.doneSets,
+      durationSeconds: row.endedAt
+        ? workoutDuration(
+            elapsedSeconds(row.startedAt?.toISOString() ?? null, row.endedAt.toISOString()),
+            row.completedSeconds,
+          )
+        : null,
       endedAt: row.endedAt?.toISOString() ?? null,
       exerciseCount: row.exerciseCount,
       id: row.id,
