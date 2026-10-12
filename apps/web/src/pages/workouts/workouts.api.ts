@@ -11,6 +11,7 @@ import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { floorDuration } from './metrics';
 import {
   autoFinishIdleWorkouts,
+  completeFilledSets,
   setSecondsSql,
   loadWorkoutSession,
   requireNoOpenWorkout,
@@ -133,6 +134,7 @@ export const updateWorkout = createServerFn({ method: 'POST' })
         updatedAt: new Date(),
       })
       .where(eq(workoutSessions.id, data.id));
+    if (data.finished) await completeFilledSets(db, [data.id]);
   });
 
 export const deleteWorkout = createServerFn({ method: 'POST' })

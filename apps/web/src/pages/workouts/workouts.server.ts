@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, isNull, lt, ne, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNotNull, isNull, lt, ne, or, sql } from 'drizzle-orm';
 import {
   workoutExercises,
   workoutRoutines,
@@ -124,10 +124,15 @@ const AUTO_FINISH_MS = 2 * 60 * 60 * 1000;
  */
 export async function autoFinishIdleWorkouts(tx: Db, userId: string) {
   const open = and(eq(workoutSessions.userId, userId), isNull(workoutSessions.endedAt));
-  await tx
+  const idle = await tx
     .update(workoutSessions)
     .set({ endedAt: sql`${workoutSessions.updatedAt}` })
-    .where(and(open, lt(workoutSessions.updatedAt, new Date(Date.now() - AUTO_FINISH_MS))));
+    .where(and(open, lt(workoutSessions.updatedAt, new Date(Date.now() - AUTO_FINISH_MS))))
+    .returning({ id: workoutSessions.id });
+  await completeFilledSets(
+    tx,
+    idle.map((row) => row.id),
+  );
   const [, ...older] = await tx
     .select({ id: workoutSessions.id })
     .from(workoutSessions)
@@ -143,7 +148,37 @@ export async function autoFinishIdleWorkouts(tx: Db, userId: string) {
           older.map((row) => row.id),
         ),
       );
+    await completeFilledSets(
+      tx,
+      older.map((row) => row.id),
+    );
   }
+}
+
+/** Ticks every filled set when workouts end; ticks only track progress during a session. */
+export async function completeFilledSets(tx: Db, workoutIds: string[]) {
+  if (workoutIds.length === 0) return;
+  await tx
+    .update(workoutSets)
+    .set({ completedAt: new Date() })
+    .where(
+      and(
+        isNull(workoutSets.completedAt),
+        or(
+          isNotNull(workoutSets.weightGrams),
+          isNotNull(workoutSets.reps),
+          isNotNull(workoutSets.durationSeconds),
+          isNotNull(workoutSets.distanceMeters),
+        ),
+        inArray(
+          workoutSets.sessionExerciseId,
+          tx
+            .select({ id: workoutSessionExercises.id })
+            .from(workoutSessionExercises)
+            .where(inArray(workoutSessionExercises.sessionId, workoutIds)),
+        ),
+      ),
+    );
 }
 
 /** Seconds entered on sets, ticked or not, for queries joined to sets and grouped by session. */
