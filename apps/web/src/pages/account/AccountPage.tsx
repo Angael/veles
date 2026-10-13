@@ -7,8 +7,8 @@ import { Card } from '@/components/ui/card/Card';
 import type { SessionUser } from '@/lib/auth/session.api';
 import { getInitials } from '@/lib/getInitials';
 import { useSignOutMutation } from './account.query';
+import { AgentAccessCard } from './AgentAccessCard';
 import { FriendsCard } from './FriendsCard';
-import { SharingSettingsCard } from './SharingSettingsCard';
 import css from './AccountPage.module.css';
 
 interface AccountPageProps {
@@ -52,9 +52,9 @@ export function AccountPage({ user }: AccountPageProps) {
         </Btn>
       </Card>
 
-      <SharingSettingsCard />
-
       <FriendsCard />
+
+      <AgentAccessCard userName={user.name} />
     </main>
   );
 }

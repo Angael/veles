@@ -74,6 +74,16 @@
 - Keep demo route code outside reusable `apps/web/src/components`.
 - For icons use `lucide-react`, always renaming imports with an `Icon` suffix to avoid naming conflicts.
 
+## Agent MCP
+- The MCP server (`apps/web/src/pages/agent`) must cover every user-facing feature: agents can read it, and modify it once its writes ship.
+- Perform joins and calculations on the server; return readable, nested results so agents do not have to reconstruct relationships from raw table rows.
+- Never make agents list parents, then fetch children and match them by parent id. Nest children in the parent (list items in their list, sets in their exercise, goal in its day), and return related names instead of bare foreign keys.
+- When you add, rename, or change a feature or its data, update the MCP in the same change:
+  - `apps/web/src/lib/agentAccess.ts`: add the feature, its label, and `writeAvailable`.
+  - `mcp-read-*.server.ts`: add or update its reader; register it with its field description (units, scaling) in `mcp-resources.server.ts`.
+  - Write tools: add them beside `mcp-notes.server.ts`; wrap each in `runAgentTool(userId, feature, 'write', ...)` so live consent is checked per call.
+- Every MCP query must filter by the key owner's `userId`. Shared data (e.g. food catalog) stays read-only unless the user says otherwise.
+
 ## TS
 - Avoid `as any`, `as unknown`, and `as never`; if one is necessary, ask the user for approval.
 - Medium to longer functions that contain logic should have a tl;dr short JSDoc that explains what they do and why they are needed.

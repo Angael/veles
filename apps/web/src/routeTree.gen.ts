@@ -17,6 +17,7 @@ import { Route as AuthenticatedCaloriesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedTodosRouteImport } from './routes/_authenticated/todos'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as ApiMcpRouteImport } from './routes/api/mcp'
 import { Route as AuthErrorRouteImport } from './routes/auth.error'
 import { Route as AuthGoogleRouteImport } from './routes/auth.google'
 import { Route as DemoComponentsRouteImport } from './routes/demo.components'
@@ -83,6 +84,11 @@ const AuthenticatedWeightRoute = AuthenticatedWeightRouteImport.update({
 const ApiHealthRoute = ApiHealthRouteImport.update({
   id: '/api/health',
   path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMcpRoute = ApiMcpRouteImport.update({
+  id: '/api/mcp',
+  path: '/api/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthErrorRoute = AuthErrorRouteImport.update({
@@ -248,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/todos': typeof AuthenticatedTodosRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/api/health': typeof ApiHealthRoute
+  '/api/mcp': typeof ApiMcpRoute
   '/auth/error': typeof AuthErrorRoute
   '/auth/google': typeof AuthGoogleRoute
   '/demo/components': typeof DemoComponentsRoute
@@ -285,6 +292,7 @@ export interface FileRoutesByTo {
   '/todos': typeof AuthenticatedTodosRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/api/health': typeof ApiHealthRoute
+  '/api/mcp': typeof ApiMcpRoute
   '/auth/error': typeof AuthErrorRoute
   '/auth/google': typeof AuthGoogleRoute
   '/demo/components': typeof DemoComponentsRoute
@@ -324,6 +332,7 @@ export interface FileRoutesById {
   '/_authenticated/todos': typeof AuthenticatedTodosRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/api/health': typeof ApiHealthRoute
+  '/api/mcp': typeof ApiMcpRoute
   '/auth/error': typeof AuthErrorRoute
   '/auth/google': typeof AuthGoogleRoute
   '/demo/components': typeof DemoComponentsRoute
@@ -363,6 +372,7 @@ export interface FileRouteTypes {
     | '/todos'
     | '/weight'
     | '/api/health'
+    | '/api/mcp'
     | '/auth/error'
     | '/auth/google'
     | '/demo/components'
@@ -400,6 +410,7 @@ export interface FileRouteTypes {
     | '/todos'
     | '/weight'
     | '/api/health'
+    | '/api/mcp'
     | '/auth/error'
     | '/auth/google'
     | '/demo/components'
@@ -438,6 +449,7 @@ export interface FileRouteTypes {
     | '/_authenticated/todos'
     | '/_authenticated/weight'
     | '/api/health'
+    | '/api/mcp'
     | '/auth/error'
     | '/auth/google'
     | '/demo/components'
@@ -473,6 +485,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   ApiHealthRoute: typeof ApiHealthRoute
+  ApiMcpRoute: typeof ApiMcpRoute
   AuthErrorRoute: typeof AuthErrorRoute
   AuthGoogleRoute: typeof AuthGoogleRoute
   DemoComponentsRoute: typeof DemoComponentsRoute
@@ -539,6 +552,13 @@ declare module '@tanstack/react-router' {
       path: '/api/health'
       fullPath: '/api/health'
       preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mcp': {
+      id: '/api/mcp'
+      path: '/api/mcp'
+      fullPath: '/api/mcp'
+      preLoaderRoute: typeof ApiMcpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/error': {
@@ -803,6 +823,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   ApiHealthRoute: ApiHealthRoute,
+  ApiMcpRoute: ApiMcpRoute,
   AuthErrorRoute: AuthErrorRoute,
   AuthGoogleRoute: AuthGoogleRoute,
   DemoComponentsRoute: DemoComponentsRoute,
