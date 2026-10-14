@@ -100,6 +100,30 @@ Atwater calculation.
 - **Coconut milk, canned / Mleczko kokosowe z puszki** — [FDC 170173](https://fdc.nal.usda.gov/food-details/170173/nutrients): Nuts, coconut milk, canned (liquid expressed from grated meat and water). Default 100 g.
 - **Barbecue sauce / Sos barbecue** — [FDC 174523](https://fdc.nal.usda.gov/food-details/174523/nutrients): Sauce, barbecue. Default 30 g.
 
+- **Beer, light / Piwo o obniżonej kaloryczności** — [FDC 168749](https://fdc.nal.usda.gov/food-details/168749/nutrients): Alcoholic beverage, beer, light. Default 500 g.
+- **Rosé wine / Wino różowe** — [FDC 171908](https://fdc.nal.usda.gov/food-details/171908/nutrients): Alcoholic beverages, wine, rose. Default 150 g.
+- **Dessert wine, sweet / Wino deserowe słodkie** — [FDC 173176](https://fdc.nal.usda.gov/food-details/173176/nutrients): Alcoholic beverage, wine, dessert, sweet. Default 100 g.
+- **Vodka, 40% alcohol / Wódka 40%** — [FDC 174818](https://fdc.nal.usda.gov/food-details/174818/nutrients): Alcoholic beverage, distilled, vodka, 80 proof. Default 40 g.
+- **Rum, 40% alcohol / Rum 40%** — [FDC 174817](https://fdc.nal.usda.gov/food-details/174817/nutrients): Alcoholic beverage, distilled, rum, 80 proof. Default 40 g.
+- **Gin, 40% alcohol / Gin 40%** — [FDC 174815](https://fdc.nal.usda.gov/food-details/174815/nutrients): Alcoholic beverage, distilled, all (gin, rum, vodka, whiskey) 80 proof. Default 40 g.
+- **Whiskey, 43% alcohol / Whisky 43%** — [FDC 174819](https://fdc.nal.usda.gov/food-details/174819/nutrients): Alcoholic beverage, distilled, whiskey, 86 proof. Default 40 g.
+- **Coffee cream liqueur, 17% alcohol / Likier kawowy ze śmietanką 17%** — [FDC 175098](https://fdc.nal.usda.gov/food-details/175098/nutrients): Alcoholic beverage, liqueur, coffee with cream, 34 proof. Default 40 g.
+- **Piña colada, prepared / Piña colada gotowa** — [FDC 168752](https://fdc.nal.usda.gov/food-details/168752/nutrients): Alcoholic beverage, pina colada, prepared-from-recipe. Default 200 g.
+- **Whiskey sour, prepared / Whiskey sour gotowy** — [FDC 173662](https://fdc.nal.usda.gov/food-details/173662/nutrients): Alcoholic beverage, whiskey sour. Default 150 g.
+- **Sake / Sake** — [FDC 167723](https://fdc.nal.usda.gov/food-details/167723/nutrients): Alcoholic beverage, rice (sake). Default 100 g.
+
+## Alcoholic drinks
+
+Spirit strength uses alcohol by volume (US proof divided by two). The generic
+80-proof distilled-spirit record is used as a representative unflavored gin,
+not sweetened or flavored gin. Light beer means lower-calorie beer, not alcohol-free
+beer. Cocktail entries are representative ready-to-drink recipes; mixers and
+sweeteners vary. Coffee cream liqueur is the generic USDA 34-proof record,
+not a claim about a specific brand. Default portions remain **grams**, not ml;
+a 40 g spirit portion is not an exact 40 ml shot. Alcohol contributes energy
+that is not captured in the protein/fat/carbohydrate fields. Never recalculate
+these entries' kcal from those three macros alone.
+
 ## Derived hot dog estimate
 
 **Hot dog, plain, no sauces / Hot dog bez sosów**: 50 g of boiled frankfurter

@@ -3742,4 +3742,127 @@ export const foodProductSeeds = [
     fatPer100gHundredths: 63,
     carbsPer100gHundredths: 4_077,
   },
+
+  // Alcoholic drinks: strengths refer to alcohol by volume; portions remain in grams.
+  // USDA SR Legacy, FDC 168749.
+  {
+    barcode: null,
+    name_en: 'Beer, light',
+    name_pl: 'Piwo o obniżonej kaloryczności',
+    productSizeGramsHundredths: 50_000,
+    kcalPer100gHundredths: 2_900,
+    proteinPer100gHundredths: 24,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 164,
+  },
+  // USDA SR Legacy, FDC 171908.
+  {
+    barcode: null,
+    name_en: 'Rosé wine',
+    name_pl: 'Wino różowe',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 8_300,
+    proteinPer100gHundredths: 36,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 380,
+  },
+  // USDA SR Legacy, FDC 173176.
+  {
+    barcode: null,
+    name_en: 'Dessert wine, sweet',
+    name_pl: 'Wino deserowe słodkie',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 16_000,
+    proteinPer100gHundredths: 20,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 1_369,
+  },
+  // USDA SR Legacy, FDC 174818.
+  {
+    barcode: null,
+    name_en: 'Vodka, 40% alcohol',
+    name_pl: 'Wódka 40%',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 23_100,
+    proteinPer100gHundredths: 0,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 0,
+  },
+  // USDA SR Legacy, FDC 174817.
+  {
+    barcode: null,
+    name_en: 'Rum, 40% alcohol',
+    name_pl: 'Rum 40%',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 23_100,
+    proteinPer100gHundredths: 0,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 0,
+  },
+  // USDA SR Legacy, FDC 174815.
+  {
+    barcode: null,
+    name_en: 'Gin, 40% alcohol',
+    name_pl: 'Gin 40%',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 23_100,
+    proteinPer100gHundredths: 0,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 0,
+  },
+  // USDA SR Legacy, FDC 174819.
+  {
+    barcode: null,
+    name_en: 'Whiskey, 43% alcohol',
+    name_pl: 'Whisky 43%',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 25_000,
+    proteinPer100gHundredths: 0,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 10,
+  },
+  // USDA SR Legacy, FDC 175098.
+  {
+    barcode: null,
+    name_en: 'Coffee cream liqueur, 17% alcohol',
+    name_pl: 'Likier kawowy ze śmietanką 17%',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 32_700,
+    proteinPer100gHundredths: 280,
+    fatPer100gHundredths: 1_570,
+    carbsPer100gHundredths: 2_090,
+  },
+  // USDA SR Legacy, FDC 168752.
+  {
+    barcode: null,
+    name_en: 'Piña colada, prepared',
+    name_pl: 'Piña colada gotowa',
+    productSizeGramsHundredths: 20_000,
+    kcalPer100gHundredths: 17_400,
+    proteinPer100gHundredths: 42,
+    fatPer100gHundredths: 188,
+    carbsPer100gHundredths: 2_266,
+  },
+  // USDA SR Legacy, FDC 173662.
+  {
+    barcode: null,
+    name_en: 'Whiskey sour, prepared',
+    name_pl: 'Whiskey sour gotowy',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 14_900,
+    proteinPer100gHundredths: 0,
+    fatPer100gHundredths: 3,
+    carbsPer100gHundredths: 1_317,
+  },
+  // USDA SR Legacy, FDC 167723.
+  {
+    barcode: null,
+    name_en: 'Sake',
+    name_pl: 'Sake',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 13_400,
+    proteinPer100gHundredths: 50,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 500,
+  },
 ];
