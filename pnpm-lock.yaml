@@ -108,7 +108,7 @@ settings:
 overrides:
   brace-expansion@^1.1.7: 1.1.21
   brace-expansion@^5.0.2: 5.0.12
-  seroval: 1.6.3
+  seroval: 1.6.7
   seroval-plugins@^1.6.7: 1.6.7
   source-map-js@1.2.1: 1.2.2
   fast-copy@4.0.4: 4.1.0
@@ -3753,8 +3753,8 @@ packages:
     peerDependencies:
       seroval: 1.6.3
 
-  seroval@1.6.3:
-    resolution: {integrity: sha512-5PwLbVPpT4DEki1hYVSSsoxWY6xCNMVucAVLK/CH0mXSDfp/I4KaAex72q80GNt5hpn7CCMGdSpIg4YGqH/wXQ==}
+  seroval@1.6.7:
+    resolution: {integrity: sha512-AeDcLh0yO2SFm9W71essgnSzLV9DI8ZH0x0knXn2DMnUZj728mpLbxjlbB6IqKCmqh8JA3cEqRyGoNkt584JcQ==}
     engines: {node: '>=10'}
 
   set-cookie-parser@3.1.2:
@@ -5656,8 +5656,8 @@ snapshots:
     dependencies:
       '@tanstack/history': 1.162.4
       cookie-es: 3.1.1
-      seroval: 1.6.3
-      seroval-plugins: 1.6.7(seroval@1.6.3)
+      seroval: 1.6.7
+      seroval-plugins: 1.6.7(seroval@1.6.7)
 
   '@tanstack/router-devtools-core@1.168.2(@tanstack/router-core@1.171.34)(csstype@3.2.3)':
     dependencies:
@@ -5727,7 +5727,7 @@ snapshots:
       '@tanstack/router-core': 1.171.34
       '@tanstack/start-fn-stubs': 1.162.0
       '@tanstack/start-storage-context': 1.167.36
-      seroval: 1.6.3
+      seroval: 1.6.7
 
   '@tanstack/start-fn-stubs@1.162.0': {}
 
@@ -5746,7 +5746,7 @@ snapshots:
       lightningcss: 1.33.0
       pathe: 2.0.3
       picomatch: 4.0.4
-      seroval: 1.6.3
+      seroval: 1.6.7
       source-map: 0.7.6
       srvx: 0.11.22
       tinyglobby: 0.2.17
@@ -5778,7 +5778,7 @@ snapshots:
       '@tanstack/start-storage-context': 1.167.36
       fetchdts: 0.1.7
       h3-v2: h3@2.0.1-rc.20(crossws@0.4.10(srvx@0.11.22))
-      seroval: 1.6.3
+      seroval: 1.6.7
     transitivePeerDependencies:
       - crossws
 
@@ -7390,15 +7390,15 @@ snapshots:
 
   semver@7.8.5: {}
 
-  seroval-plugins@1.5.6(seroval@1.6.3):
+  seroval-plugins@1.5.6(seroval@1.6.7):
     dependencies:
-      seroval: 1.6.3
+      seroval: 1.6.7
 
-  seroval-plugins@1.6.7(seroval@1.6.3):
+  seroval-plugins@1.6.7(seroval@1.6.7):
     dependencies:
-      seroval: 1.6.3
+      seroval: 1.6.7
 
-  seroval@1.6.3: {}
+  seroval@1.6.7: {}
 
   set-cookie-parser@3.1.2: {}
 
@@ -7488,8 +7488,8 @@ snapshots:
   solid-js@1.9.15:
     dependencies:
       csstype: 3.2.3
-      seroval: 1.6.3
-      seroval-plugins: 1.5.6(seroval@1.6.3)
+      seroval: 1.6.7
+      seroval-plugins: 1.5.6(seroval@1.6.7)
 
   solid-presence@0.2.0(solid-js@1.9.15):
     dependencies:
