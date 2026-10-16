@@ -13,9 +13,9 @@ import { todayLocalDate } from '@/lib/dateOnly';
 import { Btn } from '@/components/ui/btn/Btn';
 import css from './CaloriesPage.module.css';
 
-type CaloriesPageProps = { dashboard: CalorieDashboard; date: string };
+type CaloriesPageProps = { dashboard: CalorieDashboard; date: string; linkedFoodId?: string };
 
-export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
+export function CaloriesPage({ dashboard, date, linkedFoodId }: CaloriesPageProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const todayDate = todayLocalDate();
@@ -132,6 +132,7 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
         date={date}
         goal={selectedDay.goal}
         key={date}
+        linkedFoodId={linkedFoodId}
         logs={selectedDay.logs}
         totals={selectedDay.totals}
       />

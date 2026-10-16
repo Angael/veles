@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { CalorieGoal, CalorieLog, CalorieTotals } from '../calories.api';
 import { DailySummary } from './DailySummary';
 import { DeleteLogsAction } from './DeleteLogsAction';
+import { FoodSearch } from './FoodSearch';
 import { LogFoodMenu } from './LogFoodMenu';
 import { LoggedFood } from './LoggedFood';
 import { LogsDateAction } from './LogsDateAction';
@@ -17,12 +18,14 @@ import css from './CaloriesPage.module.css';
 type Props = {
   date: string;
   goal: CalorieGoal | null;
+  /** Food to open in the add dialog, e.g. after scanning or creating it. */
+  linkedFoodId?: string;
   logs: CalorieLog[];
   totals: CalorieTotals;
 };
 
 /** Day overview; selecting logs via their images swaps the Log food button for bulk actions. */
-export function CalorieOverview({ date, goal, logs, totals }: Props) {
+export function CalorieOverview({ date, goal, linkedFoodId, logs, totals }: Props) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const selectedLogs = logs.filter((entry) => selectedIds.includes(entry.id));
   const selecting = selectedLogs.length > 0;
@@ -68,6 +71,7 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
             </Btn>
           ) : null}
         </div>
+        <FoodSearch date={date} linkedFoodId={linkedFoodId} />
         <ReceivedFoodShares date={date} />
         {logs.length ? (
           <List as='ol' data-selecting={selecting || undefined}>

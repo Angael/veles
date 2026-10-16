@@ -7,7 +7,7 @@ import { Btn } from '@/components/ui/btn/Btn';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import css from '../CalorieFlows.module.css';
 
-/** Camera-first barcode lookup; a match opens the Add food confirm step as a new history entry. */
+/** Camera-first barcode lookup; a match opens the diary's Add food dialog for that food. */
 export function ScanFoodPage({ initialDate }: { initialDate: string }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -29,7 +29,11 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
       const result = await lookupMutation.mutateAsync({ data: { barcode: code } });
       if (result.status === 'found') {
         queryClient.setQueryData(calorieFoodQueryOptions(result.food.id).queryKey, result.food);
-        await navigate({ search: { date, foodId: result.food.id }, to: '/calories/add' });
+        await navigate({
+          replace: true,
+          search: { date, foodId: result.food.id },
+          to: '/calories',
+        });
       } else {
         setMissing(code);
       }

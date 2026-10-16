@@ -1,0 +1,17 @@
+@import '../../../styles/breakpoints.css';
+
+.popup {
+  align-content: start;
+
+  /* Phones get a full-height sheet so the keyboard and goal preview have room. */
+  @media (--phone) {
+    height: calc(100dvh - 2 * var(--space-sm));
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
