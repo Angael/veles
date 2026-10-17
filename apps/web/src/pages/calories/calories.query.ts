@@ -190,6 +190,9 @@ export function useRecordFoodMutation() {
     meta: { invalidateQueryKey: calorieDashboardKey },
     mutationFn: (variables: RecordFoodVariables) =>
       recordFood({ data: toMultipartFormData({ ...variables }) }),
+    // Refresh last-logged times so this food ranks first in the next search.
+    onSuccess: (_data, _variables, _onMutateResult, context) =>
+      context.client.invalidateQueries({ queryKey: calorieFoodsKey }),
   });
 }
 

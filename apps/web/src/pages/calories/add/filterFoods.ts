@@ -1,4 +1,4 @@
-import type { CalorieFood } from '../calories.api';
+import type { CalorieFood, CalorieFoodSuggestion } from '../calories.api';
 
 function fuzzyTermScore(value: string, term: string) {
   const substringIndex = value.indexOf(term);
@@ -37,10 +37,27 @@ function foodNameScore(food: CalorieFood, terms: string[]) {
   return bestScore;
 }
 
-type RankedFood = { food: CalorieFood; score: number };
+type RankedFood = { food: CalorieFoodSuggestion; score: number };
 
-/** Finds the best catalog matches in one pass while retaining only the requested result count. */
-export function filterFoods(foods: CalorieFood[], query: string, limit: number) {
+/** Orders recently logged matches first, then by name relevance, with a stable name/ID tie-break. */
+function compareRankedFoods(a: RankedFood, b: RankedFood) {
+  const aLoggedAt = a.food.lastLoggedAt;
+  const bLoggedAt = b.food.lastLoggedAt;
+  if (aLoggedAt !== bLoggedAt) {
+    if (aLoggedAt === null) return 1;
+    if (bLoggedAt === null) return -1;
+    return aLoggedAt < bLoggedAt ? 1 : -1;
+  }
+  const order = a.score - b.score || a.food.name.localeCompare(b.food.name);
+  if (order !== 0 || a.food.id === b.food.id) return order;
+  return a.food.id < b.food.id ? -1 : 1;
+}
+
+/**
+ * Finds the best catalog matches in one pass while retaining only the requested result count.
+ * An empty query keeps the server order, which already lists recently logged foods first.
+ */
+export function filterFoods(foods: CalorieFoodSuggestion[], query: string, limit: number) {
   if (limit <= 0) return [];
 
   const normalizedQuery = query.trim().toLocaleLowerCase();
@@ -53,24 +70,19 @@ export function filterFoods(foods: CalorieFood[], query: string, limit: number) 
     const score = foodNameScore(food, terms);
     if (score === null) continue;
 
+    const candidate = { food, score };
     let insertionIndex = 0;
     for (const rankedFood of rankedFoods) {
-      const scoreComparison = score - rankedFood.score;
-      if (
-        scoreComparison < 0 ||
-        (scoreComparison === 0 && food.name.localeCompare(rankedFood.food.name) < 0)
-      ) {
-        break;
-      }
+      if (compareRankedFoods(candidate, rankedFood) < 0) break;
       insertionIndex += 1;
     }
 
     if (insertionIndex >= limit) continue;
-    rankedFoods.splice(insertionIndex, 0, { food, score });
+    rankedFoods.splice(insertionIndex, 0, candidate);
     if (rankedFoods.length > limit) rankedFoods.pop();
   }
 
-  const matches: CalorieFood[] = [];
+  const matches: CalorieFoodSuggestion[] = [];
   for (const rankedFood of rankedFoods) matches.push(rankedFood.food);
   return matches;
 }

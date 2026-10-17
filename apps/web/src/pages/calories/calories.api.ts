@@ -334,6 +334,9 @@ export type CalorieFood = {
   carbsPer100g: number | null;
 };
 
+/** Catalog food with the current user's latest log time, used to rank add-food suggestions. */
+export type CalorieFoodSuggestion = CalorieFood & { lastLoggedAt: string | null };
+
 export type CalorieGoal = {
   id: string;
   date: string;
@@ -366,12 +369,39 @@ export type CalorieTotals = {
 
 export const getFoodProducts = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getFoodProducts')])
-  .handler(async () => {
-    await requireSession();
+  .handler(async (): Promise<CalorieFoodSuggestion[]> => {
+    const session = await requireSession();
 
-    const foods = await db.select().from(foodProducts).orderBy(desc(foodProducts.updatedAt));
-    const assetsById = await getFoodImageAssets(foods.map((food) => food.imageUploadObjectId));
-    return foods.map((food) => toFoodProduct(food, assetsById.get(food.imageUploadObjectId ?? '')));
+    // Aggregate in the DB so only one last-use timestamp per product reaches the browser.
+    const lastLogged = db
+      .select({
+        productId: foodLogs.productId,
+        // Fixed-width text sorts like the timestamp; null when a product has no logs.
+        lastLoggedAt: sql<
+          string | null
+        >`to_char(max(${foodLogs.createdAt}), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
+          'last_logged_at',
+        ),
+      })
+      .from(foodLogs)
+      .where(and(eq(foodLogs.userId, session.user.id), isNotNull(foodLogs.productId)))
+      .groupBy(foodLogs.productId)
+      .as('last_logged');
+
+    const rows = await db
+      .select({ food: foodProducts, lastLoggedAt: lastLogged.lastLoggedAt })
+      .from(foodProducts)
+      .leftJoin(lastLogged, eq(lastLogged.productId, foodProducts.id))
+      .orderBy(
+        sql`${lastLogged.lastLoggedAt} desc nulls last`,
+        desc(foodProducts.updatedAt),
+        foodProducts.id,
+      );
+    const assetsById = await getFoodImageAssets(rows.map(({ food }) => food.imageUploadObjectId));
+    return rows.map(({ food, lastLoggedAt }) => ({
+      ...toFoodProduct(food, assetsById.get(food.imageUploadObjectId ?? '')),
+      lastLoggedAt,
+    }));
   });
 
 export const getFoodProduct = createServerFn({ method: 'GET' })

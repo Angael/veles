@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import type { CalorieFood } from '../calories.api';
+import type { CalorieFoodSuggestion } from '../calories.api';
 import { filterFoods } from './filterFoods';
 
-const foods: CalorieFood[] = [
+const foods: CalorieFoodSuggestion[] = [
   {
     id: '1',
     name: 'Oat milk (Oatly)',
@@ -14,6 +14,7 @@ const foods: CalorieFood[] = [
     proteinPer100g: 1,
     fatPer100g: 2,
     carbsPer100g: 4,
+    lastLoggedAt: null,
   },
   {
     id: '2',
@@ -26,6 +27,7 @@ const foods: CalorieFood[] = [
     proteinPer100g: 1,
     fatPer100g: 0,
     carbsPer100g: 23,
+    lastLoggedAt: null,
   },
 ];
 
@@ -44,7 +46,7 @@ describe('filterFoods', () => {
   });
 
   it('caps both unfiltered and ranked results', () => {
-    const catalog: CalorieFood[] = Array.from({ length: 12 }, (_, index) => ({
+    const catalog: CalorieFoodSuggestion[] = Array.from({ length: 12 }, (_, index) => ({
       id: String(index),
       name: `Oat milk ${String(11 - index).padStart(2, '0')}`,
       namePl: null,
@@ -55,6 +57,7 @@ describe('filterFoods', () => {
       proteinPer100g: 1,
       fatPer100g: 2,
       carbsPer100g: 4,
+      lastLoggedAt: null,
     }));
 
     expect(filterFoods(catalog, '', 10)).toHaveLength(10);
@@ -70,5 +73,29 @@ describe('filterFoods', () => {
       '3',
       '2',
     ]);
+  });
+
+  it('ranks recently logged matches above generic matches', () => {
+    const food = (id: string, name: string, lastLoggedAt: string | null) => ({
+      id,
+      name,
+      namePl: null,
+      barcode: null,
+      imageUrl: null,
+      productSizeGrams: null,
+      kcalPer100g: 52,
+      proteinPer100g: 0,
+      fatPer100g: 0,
+      carbsPer100g: 14,
+      lastLoggedAt,
+    });
+    const catalog = [
+      food('apple', 'Apple', null),
+      food('pie', 'Apple Pie', '2026-10-10T12:00:00.000Z'),
+      food('juice', 'Apple juice', '2026-10-01T12:00:00.000Z'),
+      food('pear', 'Pear', '2026-10-16T12:00:00.000Z'),
+    ];
+
+    expect(filterFoods(catalog, 'Appl', 10).map(({ id }) => id)).toEqual(['pie', 'juice', 'apple']);
   });
 });
