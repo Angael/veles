@@ -13,7 +13,6 @@ type ExerciseCardProps = {
   actions: SessionActions;
   /** 1-based position in the workout. */
   number: number;
-  onOpenSheet: (slot: MockSlot, setId: string) => void;
   onSetCompleted: (slot: MockSlot, set: MockSet) => void;
   slot: MockSlot;
   /** First-use tip shown right above the set rows it explains. */
@@ -21,14 +20,7 @@ type ExerciseCardProps = {
 };
 
 /** One exercise in a session: order number, wrapping title with history, note, set rows. */
-export function ExerciseCard({
-  actions,
-  number,
-  onOpenSheet,
-  onSetCompleted,
-  slot,
-  tip,
-}: ExerciseCardProps) {
+export function ExerciseCard({ actions, number, onSetCompleted, slot, tip }: ExerciseCardProps) {
   const [renaming, setRenaming] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const workingSetNumbers = slot.sets.map(
@@ -77,7 +69,6 @@ export function ExerciseCard({
             key={set.id}
             number={workingSetNumbers[index] ?? 0}
             onCompleted={(done) => onSetCompleted(slot, done)}
-            onOpenSheet={() => onOpenSheet(slot, set.id)}
             set={set}
             slot={slot}
           />
