@@ -113,6 +113,11 @@ export function formatDuration(totalSeconds: number) {
   return `${sign}${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 }
 
+/** Floors elapsed seconds at the time entered on sets, so a short or missing timer never hides logged work. */
+export function floorDuration(elapsed: number | null, setSeconds: number) {
+  return elapsed === null && setSeconds === 0 ? null : Math.max(0, elapsed ?? 0, setSeconds);
+}
+
 /** Drag speed (px/ms) where each bigger step kicks in. */
 const tiers = (...steps: number[]) =>
   steps.map((step, index) => ({ from: [0, 0.3, 0.65, 1.1][index] ?? 2, step }));

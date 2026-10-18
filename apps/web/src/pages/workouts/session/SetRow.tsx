@@ -22,6 +22,7 @@ import css from './Session.module.css';
 
 type SetRowProps = {
   actions: SessionActions;
+  finished: boolean;
   /** Working-set number; warm-ups and drops don't count, like Strong and Hevy. */
   number: number;
   onCompleted: (set: WorkoutSetData) => void;
@@ -35,7 +36,15 @@ type SetRowProps = {
  * One set as a spreadsheet-like row. Tap the badge to cycle the set type, tap the check to finish
  * it (empty cells adopt last time's values); everything else hides in the long-press menu.
  */
-export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }: SetRowProps) {
+export function SetRow({
+  actions,
+  finished,
+  number,
+  onCompleted,
+  onOpenSheet,
+  set,
+  slot,
+}: SetRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   /** Bumped on every badge tap so the type label replays its animation. */
   const [flash, setFlash] = useState(0);
@@ -60,8 +69,9 @@ export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }:
   return (
     <ContextMenuRoot onOpenChange={setMenuOpen}>
       <ContextMenuTrigger
-        className={clsx(css.setRow, set.done && css.setDone)}
+        className={clsx(css.setRow, set.done && !finished && css.setDone)}
         data-fields={fields.length}
+        data-finished={finished || undefined}
         render={<div role='row' />}
       >
         <button
@@ -95,15 +105,17 @@ export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }:
             {...scrubTuning(field)}
           />
         ))}
-        <button
-          aria-label={set.done ? 'Mark set not done' : 'Complete set'}
-          aria-pressed={set.done}
-          className={css.check}
-          onClick={toggleDone}
-          type='button'
-        >
-          <CheckIcon aria-hidden='true' />
-        </button>
+        {finished ? null : (
+          <button
+            aria-label={set.done ? 'Mark set not done' : 'Complete set'}
+            aria-pressed={set.done}
+            className={css.check}
+            onClick={toggleDone}
+            type='button'
+          >
+            <CheckIcon aria-hidden='true' />
+          </button>
+        )}
       </ContextMenuTrigger>
       <SetMenu actions={actions} set={set} update={update} />
     </ContextMenuRoot>

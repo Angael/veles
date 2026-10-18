@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
-import { formatDuration } from '../metrics';
+import { floorDuration, formatDuration } from '../metrics';
 import { useUpdateWorkoutMutation } from '../workouts.query';
 import type { WorkoutSessionData } from '../workouts.server';
 import { SessionMenu } from './SessionMenu';
@@ -20,7 +20,10 @@ type SessionHeaderProps = {
 export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderProps) {
   const navigate = useNavigate();
   const updateWorkout = useUpdateWorkoutMutation();
-  const elapsed = useElapsed(session.startedAt, session.endedAt);
+  const setSeconds = session.slots
+    .flatMap((slot) => slot.sets)
+    .reduce((sum, set) => sum + (set.durationSeconds ?? 0), 0);
+  const elapsed = floorDuration(useElapsed(session.startedAt, session.endedAt), setSeconds);
   const finished = session.endedAt !== null;
 
   return (

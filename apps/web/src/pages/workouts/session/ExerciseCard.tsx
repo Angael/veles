@@ -12,6 +12,8 @@ import css from './Session.module.css';
 
 type ExerciseCardProps = {
   actions: SessionActions;
+  /** Finished workouts hide set ticks; they only matter while training. */
+  finished: boolean;
   isFirst: boolean;
   isLast: boolean;
   /** 1-based position in the workout. */
@@ -27,6 +29,7 @@ type ExerciseCardProps = {
 /** One exercise in a session: order number, wrapping title with history, note, set rows. */
 export function ExerciseCard({
   actions,
+  finished,
   isFirst,
   isLast,
   number,
@@ -86,6 +89,7 @@ export function ExerciseCard({
         {slot.sets.map((set, index) => (
           <SetRow
             actions={actions}
+            finished={finished}
             key={set.id}
             number={numbers[index] ?? 0}
             onCompleted={(done) => onSetCompleted(slot, done)}

@@ -8,8 +8,11 @@ import { dateOnlyType } from '@/lib/dateOnly';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
+import { floorDuration } from './metrics';
 import {
   autoFinishIdleWorkouts,
+  completeFilledSets,
+  setSecondsSql,
   loadWorkoutSession,
   requireNoOpenWorkout,
   requireOwnedWorkout,
@@ -21,6 +24,8 @@ export type WorkoutSummary = {
   date: string;
   startedAt: string | null;
   endedAt: string | null;
+  /** Finished duration, floored at time entered on sets. Null while open. */
+  durationSeconds: number | null;
   exerciseCount: number;
   doneSets: number;
   volumeKg: number;
@@ -36,6 +41,7 @@ export const getWorkouts = createServerFn({ method: 'GET' })
     const done = sql`${workoutSets.completedAt} IS NOT NULL`;
     const rows = await db
       .select({
+        setSeconds: setSecondsSql,
         date: workoutSessions.date,
         doneSets: sql<number>`count(${workoutSets.id}) FILTER (WHERE ${done})::int`,
         endedAt: workoutSessions.endedAt,
@@ -56,6 +62,12 @@ export const getWorkouts = createServerFn({ method: 'GET' })
     return rows.map((row) => ({
       date: row.date,
       doneSets: row.doneSets,
+      durationSeconds: row.endedAt
+        ? floorDuration(
+            row.startedAt ? (row.endedAt.getTime() - row.startedAt.getTime()) / 1000 : null,
+            row.setSeconds,
+          )
+        : null,
       endedAt: row.endedAt?.toISOString() ?? null,
       exerciseCount: row.exerciseCount,
       id: row.id,
@@ -122,6 +134,7 @@ export const updateWorkout = createServerFn({ method: 'POST' })
         updatedAt: new Date(),
       })
       .where(eq(workoutSessions.id, data.id));
+    if (data.finished) await completeFilledSets(db, [data.id]);
   });
 
 export const deleteWorkout = createServerFn({ method: 'POST' })
