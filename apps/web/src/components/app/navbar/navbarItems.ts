@@ -1,4 +1,11 @@
-import { BookOpenIcon, FlameIcon, ListTodoIcon, NotebookPenIcon, ScaleIcon } from 'lucide-react';
+import {
+  BookOpenIcon,
+  DumbbellIcon,
+  FlameIcon,
+  ListTodoIcon,
+  NotebookPenIcon,
+  ScaleIcon,
+} from 'lucide-react';
 
 export const NAVBAR_ITEMS = [
   {
@@ -28,6 +35,13 @@ export const NAVBAR_ITEMS = [
     link: '/weight',
     matchPrefixes: ['/weight'],
     icon: ScaleIcon,
+  },
+  {
+    key: 'workouts',
+    label: 'Workouts',
+    link: '/workouts',
+    matchPrefixes: ['/workouts'],
+    icon: DumbbellIcon,
   },
   {
     key: 'calories',

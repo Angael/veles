@@ -1,0 +1,165 @@
+/* Shared by the compact cell and the big field. */
+.cell,
+.fieldValue {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  border: var(--border-width) solid transparent;
+  background: var(--c-surface-input);
+  color: var(--c-text-strong);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-touch-callout: none;
+
+  /* Tick ruler that slides with the finger while scrubbing. */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 0.65rem;
+    background-image:
+      repeating-linear-gradient(90deg, var(--c-muted-strong) 0 2px, transparent 2px 35px),
+      repeating-linear-gradient(90deg, var(--c-muted-strong) 0 1px, transparent 1px 7px);
+    background-size:
+      35px 100%,
+      7px 0.3rem;
+    background-repeat: repeat-x;
+    background-position-y: bottom;
+    background-position-x: var(--scrub-offset);
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-out);
+  }
+
+  &:focus-visible {
+    border-color: var(--c-primary-border);
+    outline: none;
+  }
+}
+
+.scrubbing {
+  border-color: var(--c-primary-border);
+  background: var(--c-primary-surface);
+
+  &::before {
+    opacity: 0.6;
+  }
+
+  & .hintChevron {
+    color: var(--c-accent);
+    opacity: 1;
+  }
+}
+
+.empty .cellValue,
+.empty .fieldNumber {
+  color: var(--c-placeholder);
+}
+
+/* Chevrons say "this slides" on touch screens; desktop shows them on hover only. */
+.hintChevron {
+  flex: none;
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--c-muted-strong);
+  opacity: 0.45;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cell .hintChevron {
+    opacity: 0;
+  }
+
+  .cell:hover .hintChevron {
+    opacity: 0.6;
+  }
+}
+
+/* Compact cell */
+.cell {
+  height: 2.25rem;
+  padding: 0 0.1rem;
+  border-radius: 8px;
+}
+
+.cellValue {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cellUnit {
+  margin-inline-start: 0.2em;
+  color: var(--c-muted-strong);
+  font-family: var(--font-sans);
+  font-size: 0.7em;
+}
+
+/* Big field */
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.fieldLabel {
+  color: var(--c-muted);
+  font-size: var(--text-xs);
+}
+
+.fieldUnit {
+  color: var(--c-muted);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+.fieldValue,
+.fieldInput {
+  height: 4rem;
+  border-radius: var(--radius-xs);
+}
+
+.fieldValue {
+  padding: 0 0.4rem;
+
+  & .hintChevron {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+.fieldNumber {
+  flex: 1;
+  font-size: 2.2rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.fieldInput {
+  width: 100%;
+  min-width: 0;
+  border: var(--border-width) solid var(--c-primary-border);
+  background: var(--c-surface-input);
+  color: var(--c-text-strong);
+  font-family: var(--font-mono);
+  font-size: 2.2rem;
+  text-align: center;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell::before,
+  .fieldValue::before,
+  .hintChevron {
+    transition: none;
+  }
+}
