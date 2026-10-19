@@ -74,9 +74,8 @@
 - For icons use `lucide-react`, always renaming imports with an `Icon` suffix to avoid naming conflicts.
 
 ## Agent MCP
-- The MCP server (`apps/web/src/pages/agent`) must cover every user-facing feature: agents can read and write it.
-- Perform joins and calculations on the server; return readable, nested results so agents do not have to reconstruct relationships from raw table rows.
-- Never make agents list parents, then fetch children and match them by parent id. Nest children in the parent (list items in their list, sets in their exercise, goal in its day), and return related names instead of bare foreign keys.
+- The MCP server (`apps/web/src/pages/agent`) should cover user-facing features with read and write
+- Perform joins and calculations on the server; return readable, nested results so agents do not have to reconstruct relationships from raw table rows. Never make agents list parents, then fetch children and match them by parent id
 - When you add, rename, or change a feature or its data, update the MCP in the same change:
   - `apps/web/src/lib/agentAccess.ts`: add the feature and its label.
   - `mcp-read-*.server.ts`: add or update its reader; register it with its field description (units, scaling) in `mcp-resources.server.ts`.
