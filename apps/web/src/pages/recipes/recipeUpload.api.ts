@@ -1,14 +1,15 @@
 import { ArkErrors, type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { and, eq } from 'drizzle-orm';
-import { recipeImages, recipes, uploadObjects } from '@veles/db/schema';
+import { eq } from 'drizzle-orm';
+import { recipeImages, uploadObjects } from '@veles/db/schema';
 import type { DbTransaction } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { limitRequestSizeMiddleware } from '@/server/middleware/limitRequestSizeMiddleware';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { type PhotoLinkTable, persistWithPhotos } from '@/server/storage/photoSync.server';
+import { createRecipeRow, updateRecipeRow } from './recipes.server';
 
 const RECIPE_IMAGE_KEY_PREFIX = 'recipe-images';
 
@@ -73,20 +74,9 @@ async function persistRecipeUpload(formData: FormData, userId: string, existingR
   return persistWithPhotos(
     { formData, keyPrefix: RECIPE_IMAGE_KEY_PREFIX, maxCount: RECIPE_PHOTO_MAX_COUNT, userId },
     async (tx, photos) => {
-      const [recipe] = existingRecipeId
-        ? await tx
-            .update(recipes)
-            .set({ ...fields, updatedAt: new Date() })
-            .where(and(eq(recipes.id, existingRecipeId), eq(recipes.userId, userId)))
-            .returning({ id: recipes.id })
-        : await tx
-            .insert(recipes)
-            .values({ ...fields, userId })
-            .returning({ id: recipes.id });
-
-      if (!recipe) {
-        throw new ClientSafeError('Recipe not found.');
-      }
+      const recipe = existingRecipeId
+        ? await updateRecipeRow(tx, userId, existingRecipeId, fields)
+        : await createRecipeRow(tx, userId, fields);
 
       await photos.sync(recipeImageLinks(tx, recipe.id));
 

@@ -3,18 +3,18 @@ import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { and, asc, desc, eq, inArray, isNotNull, isNull, ne, sql } from 'drizzle-orm';
 import {
-  exerciseMeasures,
   workoutExercises,
   workoutSessionExercises,
   workoutSessions,
   workoutSets,
 } from '@veles/db/schema';
-import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { describeSet, type Measure } from '../metrics';
-import { requireOwnedExercise, toMetrics } from '../workouts.server';
+import { toMetrics } from '../workouts.server';
+import { updateExerciseInputType } from '../workouts.validation';
+import { updateExerciseRecord } from './exercises.server';
 
 export type ExerciseOption = {
   id: string;
@@ -61,44 +61,13 @@ export const getExercises = createServerFn({ method: 'GET' })
     return rows;
   });
 
-const updateExerciseInputType = type({
-  id: 'string.uuid',
-  'name?': '0 < string <= 200',
-  'measure?': type.enumerated(...exerciseMeasures),
-  'restSeconds?': '(number.integer >= 0) | null',
-});
-
 /** Rename, tracking mode and rest length belong to the exercise, so they carry to next time. */
 export const updateExercise = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateExercise')])
   .validator(arkTypeValidator(updateExerciseInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const userId = session.user.id;
-    await requireOwnedExercise(db, userId, data.id);
-    const name = data.name?.trim();
-    if (name) {
-      const [clash] = await db
-        .select({ id: workoutExercises.id })
-        .from(workoutExercises)
-        .where(
-          and(
-            eq(workoutExercises.userId, userId),
-            ne(workoutExercises.id, data.id),
-            sql`lower(${workoutExercises.name}) = lower(${name})`,
-          ),
-        );
-      if (clash) throw new ClientSafeError(`You already have an exercise called “${name}”.`);
-    }
-    await db
-      .update(workoutExercises)
-      .set({
-        ...(name ? { name } : {}),
-        ...(data.measure === undefined ? {} : { measure: data.measure }),
-        ...(data.restSeconds === undefined ? {} : { restSeconds: data.restSeconds }),
-        updatedAt: new Date(),
-      })
-      .where(eq(workoutExercises.id, data.id));
+    await updateExerciseRecord(session.user.id, data);
   });
 
 const exerciseHistoryInputType = type({

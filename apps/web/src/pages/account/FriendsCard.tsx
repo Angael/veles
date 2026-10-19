@@ -13,6 +13,7 @@ import {
   useSendConnectionInvitationMutation,
 } from './account.query';
 import { FriendRow, FriendRowSkeleton } from './FriendRow';
+import { SharingSettings } from './SharingSettings';
 import css from './AccountPage.module.css';
 
 export function FriendsCard() {
@@ -51,7 +52,10 @@ export function FriendsCard() {
       data-appear='1'
     >
       <header className={css.sectionHeader}>
-        <h2>Friends</h2>
+        <div>
+          <h2>Friends</h2>
+          <p>Invite friends and choose what they can see.</p>
+        </div>
       </header>
 
       <TypedForm
@@ -168,6 +172,8 @@ export function FriendsCard() {
 
       {loadingState}
       {emptyState}
+
+      <SharingSettings />
     </Card>
   );
 }

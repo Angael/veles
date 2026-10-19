@@ -1,67 +1,50 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createMiddleware, createServerFn } from '@tanstack/react-start';
-import { and, desc, eq, gte, inArray, isNotNull, lte, sql } from 'drizzle-orm';
-import type { AnyPgColumn } from 'drizzle-orm/pg-core';
+import { and, desc, eq, gte, inArray, lte } from 'drizzle-orm';
 import { dateOnlyType } from '@/lib/dateOnly';
-import { calorieGoals, foodLogs, foodProducts, uploadObjects } from '@veles/db/schema';
+import { calorieGoals, foodLogs, foodProducts } from '@veles/db/schema';
 import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
-import { downloadFile } from '@/server/downloadFile.server';
-import { storagePathToUrl } from '@/server/storage/config.server';
-import { log } from '@/server/logger.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
-import { getOpenFoodFactsProduct, type OpenFoodFactsProduct } from './openFoodFacts';
-import { foodBarcodeAliases } from './foodBarcode';
-
+import { fromHundredths, HUNDREDTHS, toCalorieGoal } from '@/lib/nutrition';
+import { calorieWeekDates, isWithinKcalGoal } from './calorieHelpers';
 import {
-  deletePreparedFoodImage,
-  getFoodImageAssets,
-  prepareFoodImage,
-  type PreparedFoodImage,
-} from './foodImages.server';
+  barcodeInputType,
+  createFoodProductValuesType,
+  foodLogIdsInputType,
+  foodLogsDateInputType,
+  multiplyFoodLogsInputType,
+  recordCustomCaloriesValuesType,
+  recordFoodValuesType,
+  updateFoodLogValuesType,
+  updateFoodProductValuesType,
+} from './calories.validation';
+import { getFoodImageAssets } from './foodImages.server';
 import {
-  fromHundredths,
-  HUNDREDTHS,
-  optionalHundredths,
-  toCalorieGoal,
-  toHundredths,
-} from '@/lib/nutrition';
-import { calorieWeekDates, isWithinKcalGoal, MAX_FOOD_LOG_MULTIPLIER } from './calorieHelpers';
+  copyFoodLogsRecord,
+  deleteFoodLogsRecord,
+  moveFoodLogsRecord,
+  multiplyFoodLogsRecord,
+  recordCustomCaloriesRecord,
+  recordFoodRecord,
+  toCalorieLog,
+  updateFoodLogRecord,
+} from './foodLogs.server';
+import {
+  createFoodProductRecord,
+  lookupFoodByBarcodeRecord,
+  toFoodProduct,
+  updateFoodProductRecord,
+} from './foodProducts.server';
 
-const MAX_TEXT_LENGTH = 500;
 const FOOD_UPLOAD_MAX_REQUEST_BYTES = 12 * 1024 * 1024;
 
-const nonNegativeAmountType = type('number >= 0').narrow((value, ctx) =>
-  Number.isFinite(value) && Number.isSafeInteger(Math.round(value * HUNDREDTHS))
-    ? true
-    : ctx.mustBe('a finite number with at most two decimal places'),
-);
-
-const nonEmptyTextType = type(`string.trim |> 1 <= string <= ${MAX_TEXT_LENGTH}`);
-const optionalNonEmptyTextType = nonEmptyTextType.or('null').or('undefined');
-const optionalPositiveAmountType = type('number > 0 | null | undefined');
-const optionalNonNegativeAmountType = nonNegativeAmountType.or('null').or('undefined');
-const imageActionType = type("'keep' | 'replace' | 'remove'");
 const nonEmptyPhotoType = type('File').narrow((photo, ctx) =>
   photo.size > 0 ? true : ctx.mustBe('a non-empty file'),
 );
-
-const createFoodProductValuesType = type({
-  name: nonEmptyTextType,
-  'barcode?': optionalNonEmptyTextType,
-  'productSizeGrams?': optionalPositiveAmountType,
-  kcalPer100g: nonNegativeAmountType,
-  'proteinPer100g?': optionalNonNegativeAmountType,
-  'fatPer100g?': optionalNonNegativeAmountType,
-  'carbsPer100g?': optionalNonNegativeAmountType,
-  'imageAction?': imageActionType,
-});
 const foodLogIdInputType = type({ id: 'string.uuid' });
-
-type CreateFoodProductValues = typeof createFoodProductValuesType.infer;
-type ImageAction = typeof imageActionType.infer;
 
 const limitFoodUploadRequestMiddleware = createMiddleware().server(async ({ next, request }) => {
   const contentLength = type('string.numeric.parse |> number.integer >= 0')(
@@ -72,58 +55,6 @@ const limitFoodUploadRequestMiddleware = createMiddleware().server(async ({ next
   }
   return next();
 });
-
-function productValues(data: CreateFoodProductValues) {
-  return {
-    name: data.name.trim(),
-    barcode: data.barcode?.trim() ?? null,
-    productSizeGramsHundredths: optionalHundredths(data.productSizeGrams ?? undefined),
-    kcalPer100gHundredths: toHundredths(data.kcalPer100g),
-    proteinPer100gHundredths: optionalHundredths(data.proteinPer100g ?? undefined),
-    fatPer100gHundredths: optionalHundredths(data.fatPer100g ?? undefined),
-    carbsPer100gHundredths: optionalHundredths(data.carbsPer100g ?? undefined),
-  };
-}
-
-function toFoodProduct(
-  product: typeof foodProducts.$inferSelect,
-  asset: typeof uploadObjects.$inferSelect | undefined,
-): CalorieFood {
-  return {
-    id: product.id,
-    name: product.name,
-    namePl: product.namePl,
-    barcode: product.barcode,
-    imageUrl: asset ? storagePathToUrl(asset.key) : null,
-    productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
-    kcalPer100g: product.kcalPer100gHundredths / HUNDREDTHS,
-    proteinPer100g: fromHundredths(product.proteinPer100gHundredths),
-    fatPer100g: fromHundredths(product.fatPer100gHundredths),
-    carbsPer100g: fromHundredths(product.carbsPer100gHundredths),
-  };
-}
-
-function toCalorieLog(
-  logEntry: typeof foodLogs.$inferSelect,
-  logAsset: typeof uploadObjects.$inferSelect | undefined,
-  productAsset?: typeof uploadObjects.$inferSelect,
-): CalorieLog {
-  const asset = logAsset ?? productAsset;
-
-  return {
-    id: logEntry.id,
-    name: logEntry.name,
-    productId: logEntry.productId,
-    date: logEntry.logDate,
-    consumedAt: logEntry.consumedAt.toISOString(),
-    grams: fromHundredths(logEntry.gramsHundredths),
-    kcal: logEntry.kcalHundredths / HUNDREDTHS,
-    protein: fromHundredths(logEntry.proteinHundredths),
-    fat: fromHundredths(logEntry.fatHundredths),
-    carbs: fromHundredths(logEntry.carbsHundredths),
-    imageUrl: asset ? storagePathToUrl(asset.key) : null,
-  };
-}
 
 async function getProductImageIds(productIds: Array<string | null>) {
   const ids = [...new Set(productIds.filter((id): id is string => Boolean(id)))];
@@ -157,75 +88,6 @@ function calorieTotalsForLogs(logs: (typeof foodLogs.$inferSelect)[]): CalorieTo
 
 function latestGoalForDate(goals: (typeof calorieGoals.$inferSelect)[], date: string) {
   return goals.find((goal) => goal.effectiveDate <= date);
-}
-
-/** Matches equivalent GTIN padding while preferring the exact barcode if older duplicates exist. */
-async function findFoodProductByBarcode(barcode: string) {
-  const [product] = await db
-    .select()
-    .from(foodProducts)
-    .where(inArray(foodProducts.barcode, foodBarcodeAliases(barcode)))
-    .orderBy(sql`case when ${foodProducts.barcode} = ${barcode} then 0 else 1 end`)
-    .limit(1);
-
-  return product;
-}
-
-/** Imports metadata and its optional photo atomically. */
-async function insertImportedFoodProduct(product: OpenFoodFactsProduct) {
-  let image: PreparedFoodImage | null = null;
-  if (product.imageUrl) {
-    try {
-      image = await prepareFoodImage(await downloadFile(product.imageUrl), null);
-    } catch {}
-  }
-  try {
-    return await db.transaction(async (tx) => {
-      if (image) await tx.insert(uploadObjects).values(image.asset);
-      const [row] = await tx
-        .insert(foodProducts)
-        .values({
-          ...productValues(product),
-          imageUploadObjectId: image?.asset.id ?? null,
-        })
-        .returning();
-      if (!row) throw new Error('A food product could not be created.');
-      return row;
-    });
-  } catch (error) {
-    await rollbackImage(image);
-    throw error;
-  }
-}
-
-async function prepareImageAction(
-  action: ImageAction,
-  photo: File | null,
-  userId: string,
-): Promise<PreparedFoodImage | null> {
-  if (action === 'keep' || action === 'remove') return null;
-  if (!photo) throw new ClientSafeError('Choose a photo before replacing the image.');
-
-  return prepareFoodImage(photo, userId);
-}
-
-/** Never roll back bytes after their asset transaction committed, even if response loading fails. */
-async function rollbackImage(image: PreparedFoodImage | null) {
-  if (!image) return;
-  try {
-    const [saved] = await db
-      .select({ id: uploadObjects.id })
-      .from(uploadObjects)
-      .where(eq(uploadObjects.id, image.asset.id))
-      .limit(1);
-    if (!saved) await deletePreparedFoodImage(image);
-  } catch (error) {
-    log.error('Food image rollback failed', {
-      key: image.key,
-      bucket: image.bucket,
-      error: error instanceof Error ? error.message : String(error),
-    });
-  }
 }
 
 const dashboardInputType = type({ date: dateOnlyType });
@@ -391,35 +253,12 @@ export const getFoodProduct = createServerFn({ method: 'GET' })
     return toFoodProduct(food, assetsById.get(food.imageUploadObjectId ?? ''));
   });
 
-const barcodeInputType = type({ barcode: nonEmptyTextType });
-
 export const lookupFoodByBarcode = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('lookupFoodByBarcode')])
   .validator(arkTypeValidator(barcodeInputType))
   .handler(async ({ data }) => {
-    await requireSession();
-    const barcode = data.barcode.trim();
-    const existingProduct = await findFoodProductByBarcode(barcode);
-    if (existingProduct) {
-      const assetsById = await getFoodImageAssets([existingProduct.imageUploadObjectId]);
-      return {
-        food: toFoodProduct(
-          existingProduct,
-          assetsById.get(existingProduct.imageUploadObjectId ?? ''),
-        ),
-        status: 'found' as const,
-      };
-    }
-
-    const importedProduct = await getOpenFoodFactsProduct(barcode);
-    if (importedProduct === null) return { status: 'notFound' as const };
-
-    const product = await insertImportedFoodProduct(importedProduct);
-    const assetsById = await getFoodImageAssets([product.imageUploadObjectId]);
-    return {
-      food: toFoodProduct(product, assetsById.get(product.imageUploadObjectId ?? '')),
-      status: 'found' as const,
-    };
+    const session = await requireSession();
+    return lookupFoodByBarcodeRecord(session.user.id, data);
   });
 
 const createFoodProductMultipartType = type('FormData.parse').to({
@@ -432,121 +271,22 @@ export const createFoodProduct = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(createFoodProductMultipartType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const { values } = data;
-    const photo = data.photo ?? null;
-    if (values.barcode && (await findFoodProductByBarcode(values.barcode))) {
-      throw new ClientSafeError('A food product with this barcode already exists.');
-    }
-    const action = values.imageAction ?? 'keep';
-    const image = await prepareImageAction(action, photo, session.user.id);
-
-    try {
-      const [product] = await db.transaction(async (tx) => {
-        if (image) await tx.insert(uploadObjects).values(image.asset);
-        return tx
-          .insert(foodProducts)
-          .values({
-            ...productValues(values),
-            imageUploadObjectId: image?.asset.id ?? null,
-          })
-          .returning();
-      });
-      if (!product) throw new Error('A food product could not be created.');
-
-      const assetsById = await getFoodImageAssets([product.imageUploadObjectId]);
-      return toFoodProduct(product, assetsById.get(product.imageUploadObjectId ?? ''));
-    } catch (error) {
-      await rollbackImage(image);
-      throw error;
-    }
+    return createFoodProductRecord(session.user.id, data.values, data.photo ?? null);
   });
 
-const updateFoodProductValuesType = createFoodProductValuesType.merge({
-  id: 'string.uuid',
-  today: dateOnlyType,
-});
 const updateFoodProductMultipartType = type('FormData.parse').to({
   values: type('string.json.parse').to(updateFoodProductValuesType),
   'photo?': nonEmptyPhotoType,
 });
 
-/** Saves the product and refreshes all users' matching logs for the editor's local today atomically. */
 export const updateFoodProduct = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateFoodProduct'), limitFoodUploadRequestMiddleware])
   .validator(arkTypeValidator(updateFoodProductMultipartType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const { values } = data;
-    const photo = data.photo ?? null;
-    const [existing] = await db
-      .select()
-      .from(foodProducts)
-      .where(eq(foodProducts.id, values.id))
-      .limit(1);
-    if (!existing) throw new ClientSafeError('Food product not found.');
-    if (values.barcode) {
-      const barcodeProduct = await findFoodProductByBarcode(values.barcode);
-      if (barcodeProduct && barcodeProduct.id !== values.id) {
-        throw new ClientSafeError('A food product with this barcode already exists.');
-      }
-    }
-
-    const action = values.imageAction ?? 'keep';
-    if (action === 'replace' && existing.imageUploadObjectId) {
-      throw new ClientSafeError('Remove the existing product photo before uploading another.');
-    }
-    const image = await prepareImageAction(action, photo, session.user.id);
-    const imageUploadObjectId = action === 'keep' ? undefined : (image?.asset.id ?? null);
-
-    try {
-      const product = await db.transaction(async (tx) => {
-        if (image) await tx.insert(uploadObjects).values(image.asset);
-        const [updated] = await tx
-          .update(foodProducts)
-          .set({
-            ...productValues(values),
-            imageUploadObjectId,
-            updatedAt: new Date(),
-          })
-          .where(eq(foodProducts.id, values.id))
-          .returning();
-        if (!updated) throw new ClientSafeError('Food product not found.');
-
-        const scale = (value: number | null) =>
-          value === null
-            ? null
-            : sql<number>`round(${value}::numeric * ${foodLogs.gramsHundredths} / ${100 * HUNDREDTHS})`;
-        await tx
-          .update(foodLogs)
-          .set({
-            kcalHundredths: scale(updated.kcalPer100gHundredths) ?? 0,
-            proteinHundredths: scale(updated.proteinPer100gHundredths),
-            fatHundredths: scale(updated.fatPer100gHundredths),
-            carbsHundredths: scale(updated.carbsPer100gHundredths),
-          })
-          .where(
-            and(
-              eq(foodLogs.productId, updated.id),
-              eq(foodLogs.logDate, values.today),
-              isNotNull(foodLogs.gramsHundredths),
-            ),
-          );
-        return updated;
-      });
-
-      const assetsById = await getFoodImageAssets([product.imageUploadObjectId]);
-      return toFoodProduct(product, assetsById.get(product.imageUploadObjectId ?? ''));
-    } catch (error) {
-      await rollbackImage(image);
-      throw error;
-    }
+    return updateFoodProductRecord(session.user.id, data.values, data.photo ?? null);
   });
 
-const recordFoodValuesType = type({
-  date: dateOnlyType,
-  grams: nonNegativeAmountType,
-  productId: 'string.uuid',
-});
 const recordFoodMultipartType = type('FormData.parse').to({
   values: type('string.json.parse').to(recordFoodValuesType),
   'photo?': nonEmptyPhotoType,
@@ -557,57 +297,10 @@ export const recordFood = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(recordFoodMultipartType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const { values } = data;
-    const photo = data.photo ?? null;
-    if (photo) throw new ClientSafeError('Product-backed entries use the product photo.');
-
-    const [product] = await db
-      .select()
-      .from(foodProducts)
-      .where(eq(foodProducts.id, values.productId))
-      .limit(1);
-    if (!product) throw new ClientSafeError('The selected food product no longer exists.');
-
-    const productAssets = await getFoodImageAssets([product.imageUploadObjectId]);
-    const productAsset = productAssets.get(product.imageUploadObjectId ?? '');
-    const imageUploadObjectId = productAsset?.id ?? null;
-
-    const gramsHundredths = toHundredths(values.grams);
-    const scale = (value: number | null) =>
-      value === null ? null : Math.round((value * gramsHundredths) / (100 * HUNDREDTHS));
-
-    const [inserted] = await db
-      .insert(foodLogs)
-      .values({
-        name: product.name,
-        productId: product.id,
-        imageUploadObjectId,
-        gramsHundredths,
-        kcalHundredths: scale(product.kcalPer100gHundredths) ?? 0,
-        proteinHundredths: scale(product.proteinPer100gHundredths),
-        fatHundredths: scale(product.fatPer100gHundredths),
-        carbsHundredths: scale(product.carbsPer100gHundredths),
-        logDate: values.date,
-        consumedAt: new Date(),
-        userId: session.user.id,
-      })
-      .returning();
-
-    if (!inserted) throw new Error('Food log could not be created.');
-    const assetsById = await getFoodImageAssets([inserted.imageUploadObjectId]);
-    return toCalorieLog(inserted, assetsById.get(inserted.imageUploadObjectId ?? ''));
+    if (data.photo) throw new ClientSafeError('Product-backed entries use the product photo.');
+    return recordFoodRecord(session.user.id, data.values);
   });
 
-const recordCustomCaloriesValuesType = type({
-  name: nonEmptyTextType,
-  'grams?': optionalNonNegativeAmountType,
-  kcal: nonNegativeAmountType,
-  'protein?': optionalNonNegativeAmountType,
-  'fat?': optionalNonNegativeAmountType,
-  'carbs?': optionalNonNegativeAmountType,
-  date: dateOnlyType,
-  'imageAction?': imageActionType,
-});
 const recordCustomCaloriesMultipartType = type('FormData.parse').to({
   values: type('string.json.parse').to(recordCustomCaloriesValuesType),
   'photo?': nonEmptyPhotoType,
@@ -618,39 +311,7 @@ export const recordCustomCalories = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(recordCustomCaloriesMultipartType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const { values } = data;
-    const photo = data.photo ?? null;
-    const action = values.imageAction ?? 'keep';
-    const image = await prepareImageAction(action, photo, session.user.id);
-
-    try {
-      const [inserted] = await db.transaction(async (tx) => {
-        if (image) await tx.insert(uploadObjects).values(image.asset);
-        return tx
-          .insert(foodLogs)
-          .values({
-            name: values.name.trim(),
-            productId: null,
-            imageUploadObjectId: action === 'replace' ? (image?.asset.id ?? null) : null,
-            gramsHundredths: optionalHundredths(values.grams ?? undefined),
-            kcalHundredths: toHundredths(values.kcal),
-            proteinHundredths: optionalHundredths(values.protein ?? undefined),
-            fatHundredths: optionalHundredths(values.fat ?? undefined),
-            carbsHundredths: optionalHundredths(values.carbs ?? undefined),
-            logDate: values.date,
-            consumedAt: new Date(),
-            userId: session.user.id,
-          })
-          .returning();
-      });
-
-      if (!inserted) throw new Error('Food log could not be created.');
-      const assetsById = await getFoodImageAssets([inserted.imageUploadObjectId]);
-      return toCalorieLog(inserted, assetsById.get(inserted.imageUploadObjectId ?? ''));
-    } catch (error) {
-      await rollbackImage(image);
-      throw error;
-    }
+    return recordCustomCaloriesRecord(session.user.id, data.values, data.photo ?? null);
   });
 
 export const getFoodLog = createServerFn({ method: 'GET' })
@@ -675,112 +336,17 @@ export const getFoodLog = createServerFn({ method: 'GET' })
     );
   });
 
-const updateFoodLogValuesType = type({
-  id: 'string.uuid',
-  name: nonEmptyTextType,
-  'grams?': optionalNonNegativeAmountType,
-  kcal: nonNegativeAmountType,
-  'protein?': optionalNonNegativeAmountType,
-  'fat?': optionalNonNegativeAmountType,
-  'carbs?': optionalNonNegativeAmountType,
-  date: dateOnlyType,
-  'imageAction?': imageActionType,
-});
 const updateFoodLogMultipartType = type('FormData.parse').to({
   values: type('string.json.parse').to(updateFoodLogValuesType),
   'photo?': nonEmptyPhotoType,
 });
-
-function updateOptionalNutrient(
-  inputValue: number | null | undefined,
-  existingHundredths: number | null,
-  ratio: number | null,
-  isProduct: boolean,
-) {
-  if (!isProduct) return optionalHundredths(inputValue ?? undefined);
-  return existingHundredths === null || ratio === null
-    ? existingHundredths
-    : Math.round(existingHundredths * ratio);
-}
 
 export const updateFoodLog = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateFoodLog'), limitFoodUploadRequestMiddleware])
   .validator(arkTypeValidator(updateFoodLogMultipartType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const { values } = data;
-    const photo = data.photo ?? null;
-
-    const [existing] = await db
-      .select()
-      .from(foodLogs)
-      .where(and(eq(foodLogs.id, values.id), eq(foodLogs.userId, session.user.id)))
-      .limit(1);
-    if (!existing) throw new ClientSafeError('Food log not found.');
-
-    const action = values.imageAction ?? 'keep';
-    if (existing.productId && (action !== 'keep' || photo)) {
-      throw new ClientSafeError('Product-backed entries use the product photo.');
-    }
-    const image = await prepareImageAction(action, photo, session.user.id);
-    let imageUploadObjectId: string | null | undefined;
-    if (action === 'replace') imageUploadObjectId = image?.asset.id ?? null;
-    if (action === 'remove') imageUploadObjectId = null;
-
-    try {
-      const nextGrams = optionalHundredths(values.grams ?? undefined);
-      const isProduct = existing.productId !== null;
-      const ratio =
-        isProduct && existing.gramsHundredths && nextGrams !== null
-          ? nextGrams / existing.gramsHundredths
-          : null;
-
-      let kcalHundredths = toHundredths(values.kcal);
-      if (isProduct) {
-        kcalHundredths = existing.kcalHundredths;
-        if (ratio !== null) kcalHundredths = Math.round(existing.kcalHundredths * ratio);
-      }
-
-      const [updated] = await db.transaction(async (tx) => {
-        if (image) await tx.insert(uploadObjects).values(image.asset);
-        return tx
-          .update(foodLogs)
-          .set({
-            gramsHundredths: nextGrams,
-            kcalHundredths,
-            proteinHundredths: updateOptionalNutrient(
-              values.protein,
-              existing.proteinHundredths,
-              ratio,
-              isProduct,
-            ),
-            fatHundredths: updateOptionalNutrient(
-              values.fat,
-              existing.fatHundredths,
-              ratio,
-              isProduct,
-            ),
-            carbsHundredths: updateOptionalNutrient(
-              values.carbs,
-              existing.carbsHundredths,
-              ratio,
-              isProduct,
-            ),
-            imageUploadObjectId,
-            name: isProduct ? existing.name : values.name.trim(),
-            logDate: values.date,
-          })
-          .where(eq(foodLogs.id, existing.id))
-          .returning();
-      });
-
-      if (!updated) throw new Error('Food log could not be updated.');
-      const assetsById = await getFoodImageAssets([updated.imageUploadObjectId]);
-      return toCalorieLog(updated, assetsById.get(updated.imageUploadObjectId ?? ''));
-    } catch (error) {
-      await rollbackImage(image);
-      throw error;
-    }
+    return updateFoodLogRecord(session.user.id, data.values, data.photo ?? null);
   });
 
 export const deleteFoodLog = createServerFn({ method: 'POST' })
@@ -788,86 +354,37 @@ export const deleteFoodLog = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(foodLogIdInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    await db
-      .delete(foodLogs)
-      .where(and(eq(foodLogs.id, data.id), eq(foodLogs.userId, session.user.id)));
+    await deleteFoodLogsRecord(session.user.id, { ids: [data.id] });
   });
-
-const foodLogIdsType = type('string.uuid[]').atLeastLength(1).atMostLength(200);
 
 export const deleteFoodLogs = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('deleteFoodLogs')])
-  .validator(arkTypeValidator(type({ ids: foodLogIdsType })))
+  .validator(arkTypeValidator(foodLogIdsInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    await db
-      .delete(foodLogs)
-      .where(and(inArray(foodLogs.id, data.ids), eq(foodLogs.userId, session.user.id)));
+    await deleteFoodLogsRecord(session.user.id, data);
   });
 
-const foodLogsDateInputType = type({ date: dateOnlyType, ids: foodLogIdsType });
-
-/** Moves the user's selected logs to another day, e.g. after logging dinner under the wrong date. */
 export const moveFoodLogs = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('moveFoodLogs')])
   .validator(arkTypeValidator(foodLogsDateInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    await db
-      .update(foodLogs)
-      .set({ logDate: data.date })
-      .where(and(inArray(foodLogs.id, data.ids), eq(foodLogs.userId, session.user.id)));
+    await moveFoodLogsRecord(session.user.id, data);
   });
 
-/** Duplicates the user's selected logs onto another day, e.g. repeating yesterday's breakfast. */
 export const copyFoodLogs = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('copyFoodLogs')])
   .validator(arkTypeValidator(foodLogsDateInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const sources = await db
-      .select()
-      .from(foodLogs)
-      .where(and(inArray(foodLogs.id, data.ids), eq(foodLogs.userId, session.user.id)));
-    if (sources.length === 0) throw new ClientSafeError('These products no longer exist.');
-
-    const consumedAt = new Date();
-    await db.insert(foodLogs).values(
-      sources.map((source) => ({
-        userId: session.user.id,
-        productId: source.productId,
-        imageUploadObjectId: source.imageUploadObjectId,
-        name: source.name,
-        gramsHundredths: source.gramsHundredths,
-        kcalHundredths: source.kcalHundredths,
-        proteinHundredths: source.proteinHundredths,
-        fatHundredths: source.fatHundredths,
-        carbsHundredths: source.carbsHundredths,
-        logDate: data.date,
-        consumedAt,
-      })),
-    );
+    await copyFoodLogsRecord(session.user.id, data);
   });
 
-/** Scales grams, kcal, and macros of the user's selected logs, e.g. ×2 after eating a second sandwich logged as ingredients. */
 export const multiplyFoodLogs = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('multiplyFoodLogs')])
-  .validator(
-    arkTypeValidator(
-      type({ ids: foodLogIdsType, factor: `0 < number <= ${MAX_FOOD_LOG_MULTIPLIER}` }),
-    ),
-  )
+  .validator(arkTypeValidator(multiplyFoodLogsInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const scaled = (column: AnyPgColumn) => sql<number>`round(${column} * ${data.factor}::numeric)`;
-    await db
-      .update(foodLogs)
-      .set({
-        gramsHundredths: scaled(foodLogs.gramsHundredths),
-        kcalHundredths: scaled(foodLogs.kcalHundredths),
-        proteinHundredths: scaled(foodLogs.proteinHundredths),
-        fatHundredths: scaled(foodLogs.fatHundredths),
-        carbsHundredths: scaled(foodLogs.carbsHundredths),
-      })
-      .where(and(inArray(foodLogs.id, data.ids), eq(foodLogs.userId, session.user.id)));
+    await multiplyFoodLogsRecord(session.user.id, data);
   });

@@ -10,7 +10,7 @@ import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import css from './WeightEntryPages.module.css';
 import { parseWeightEntries } from './parseWeightEntries';
-import { MAX_WEIGHT_IMPORT_ENTRIES } from './weight.api';
+import { MAX_WEIGHT_IMPORT_ENTRIES } from './weight.validation';
 import { useSaveWeightsMutation } from './weight.query';
 
 const aiPrompt = `Convert my weight history to plain text with exactly one entry per line in this format:

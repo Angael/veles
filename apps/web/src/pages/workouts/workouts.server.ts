@@ -1,5 +1,6 @@
 import { and, asc, desc, eq, inArray, isNotNull, isNull, lt, ne, or, sql } from 'drizzle-orm';
 import {
+  type exerciseMeasures,
   workoutExercises,
   workoutRoutines,
   workoutSessionExercises,
@@ -375,4 +376,47 @@ export async function previousSetCount(
 /** Next free position after the last row, so appends never hit the unique position index. */
 export function nextPosition(rows: { max: number | null }[]) {
   return (rows[0]?.max ?? -1) + 1;
+}
+
+/** Finds the user's exercise with this name (any case) or creates it. */
+async function findOrCreateExercise(
+  tx: Db,
+  userId: string,
+  input: { name: string; measure: (typeof exerciseMeasures)[number] },
+) {
+  const name = input.name.trim();
+  const [existing] = await tx
+    .select({ id: workoutExercises.id })
+    .from(workoutExercises)
+    .where(
+      and(
+        eq(workoutExercises.userId, userId),
+        sql`lower(${workoutExercises.name}) = lower(${name})`,
+      ),
+    );
+  if (existing) {
+    await tx
+      .update(workoutExercises)
+      .set({ archivedAt: null })
+      .where(eq(workoutExercises.id, existing.id));
+    return existing.id;
+  }
+  const [created] = await tx
+    .insert(workoutExercises)
+    .values({ measure: input.measure, name, userId })
+    .returning({ id: workoutExercises.id });
+  if (!created) throw new Error('Exercise insert returned no row.');
+  return created.id;
+}
+
+/** An exercise picked by id, or named so the user's exercise with that name is reused or created. */
+export type ExerciseRef = {
+  exerciseId?: string;
+  newExercise?: { name: string; measure: (typeof exerciseMeasures)[number] };
+};
+
+export async function resolveExerciseId(tx: Db, userId: string, ref: ExerciseRef) {
+  if (ref.exerciseId) return (await requireOwnedExercise(tx, userId, ref.exerciseId)).id;
+  if (ref.newExercise) return findOrCreateExercise(tx, userId, ref.newExercise);
+  throw new ClientSafeError('Pick or name an exercise.');
 }
