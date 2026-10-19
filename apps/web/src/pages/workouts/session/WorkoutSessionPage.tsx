@@ -68,9 +68,7 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
               isLast={index === session.slots.length - 1}
               key={slot.id}
               number={index + 1}
-              onOpenSheet={(setId, complete = false) =>
-                setSheet({ complete, setId, slotId: slot.id })
-              }
+              onOpenSheet={(setId, complete) => setSheet({ complete, setId, slotId: slot.id })}
               onSetCompleted={onSetCompleted}
               slot={slot}
               tip={

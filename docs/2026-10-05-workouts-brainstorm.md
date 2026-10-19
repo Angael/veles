@@ -37,7 +37,7 @@ Real feature: `/workouts` (list) and `/workouts/$id` (live session). Playground:
 **Decided (current behaviour wins over older rounds below).**
 
 - Rest timer: **A, dock pill** (takes the phone dock slot like `SelectionBar`). The timer stores `endsAt`.
-- Set input: **drag cells** in compact rows. A whole workout fits on the screen. Tap a cell → **top sheet**.
+- Set input: **drag cells** in compact rows. A whole workout fits on the screen. Tap a cell → type the value in place.
 - Drag: on touch, finger right = smaller value (ruler). With a mouse, drag right = bigger value. Speed picks the step (weight 0.5 → 1 → 2.5 → 5, reps 1 → 2 → 5, time 5 → 15 → 30 → 60 s). Values stop at 0. The ruler has a taller mark every 5th tick. No visible step, speed or ± indicators.
 - Sheet: exercise name + "Set N", "Last time … use", 1–2 drag fields (tap a number to type), **Save**. Edits a draft. No set navigation, no ± buttons, no step setting. Save does not start the rest timer.
 - Rows: set badge (tap cycles Normal/W/D/F) │ 1–2 cells │ tick. No "previous" column: last time's values are the grey ghost text. Ticking an empty set copies the ghost values and starts the rest timer. Ticking a set above an already done set does not start or restart the timer (the user forgot to tick it).

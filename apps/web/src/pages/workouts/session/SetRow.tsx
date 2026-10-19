@@ -7,6 +7,7 @@ import {
   filledFromPrevious,
   formatMetric,
   MEASURE_FIELDS,
+  parseMetric,
   scrubTuning,
   SET_BADGE,
   SET_TYPE_LABELS,
@@ -26,8 +27,8 @@ type SetRowProps = {
   /** Working-set number; warm-ups and drops don't count, like Strong and Hevy. */
   number: number;
   onCompleted: (set: WorkoutSetData) => void;
-  /** `complete`: the tick opened the sheet, so Save also finishes the set. */
-  onOpenSheet: (complete?: boolean) => void;
+  /** Opened by the tick when a cell has nothing to fill from; Save also finishes the set. */
+  onOpenSheet: (complete: boolean) => void;
   set: WorkoutSetData;
   slot: WorkoutSlotData;
 };
@@ -93,12 +94,12 @@ export function SetRow({
         </button>
         {fields.map((field) => (
           <ScrubCell
-            aria-label={`${field.label}, drag sideways or tap for details`}
+            aria-label={field.label}
             disabled={menuOpen}
             format={(value) => formatMetric(field, value)}
             key={field.key}
             onChange={(value) => update({ [field.key]: value })}
-            onTap={() => onOpenSheet()}
+            parse={(text) => parseMetric(field, text)}
             placeholder={set.previous?.[field.key] ?? DEFAULT_METRICS[field.key]}
             unit={field.cellUnit}
             value={set[field.key]}
