@@ -135,8 +135,8 @@ hot dog record.
 
 ## Applying the catalog
 
-The existing append-only seed command inserts missing bilingual products and
-leaves existing foods and historical logs untouched. Merging this change alone
-does not populate an existing database. The owner can run
-`pnpm --filter @veles/db db:seed:prod` with the repository `.env` configured.
-No schema migration is needed; no database command was run for this PR.
+The worker syncs the catalog each time it starts, so every deploy applies it.
+The sync inserts seeds whose `seedKey` is missing and deletes rows whose key
+is in `retiredFoodProductSeedKeys`. It does not change existing rows, so user
+edits stay. Food logs keep their own nutrition values when a product is deleted.
+Run `pnpm db:seed` to sync the development database by hand.

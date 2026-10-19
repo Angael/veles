@@ -24,8 +24,8 @@
 - When writing PRs, follow ASD-STE100 (Simplified Technical English) and keep it short.
 
 ## Database Scripts
-- `pnpm db:seed` inserts only the shared food products into the development database at `DATABASE_URL`.
-- `pnpm db:seed:prod` inserts only the shared food products into the production database at `PROD_DATABASE_URL`.
+- The worker syncs the shared food products (`packages/db/src/seed/food-products.ts`) on every start, so deploys apply them. To remove a seed, move its `seedKey` to `retiredFoodProductSeedKeys`.
+- `pnpm db:seed` runs the same food product sync on the development database at `DATABASE_URL`.
 - `pnpm db:reset` rebuilds the development database and seeds the development user/account, calorie goal, food products, food logs and weights, and recipes. Diary entries are end-to-end encrypted, so they are not seeded.
 
 ## Structure

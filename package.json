@@ -24,10 +24,7 @@
     "db:reset": "pnpm --filter @veles/db db:reset",
     "db:studio": "pnpm --filter @veles/db db:studio",
     "db:studio:prod": "pnpm --filter @veles/db db:studio:prod",
-    "db:seed": "pnpm --filter @veles/db db:seed",
-    "db:seed:prod": "pnpm --filter @veles/db db:seed:prod",
-    "db:seed-remove": "pnpm --filter @veles/db db:seed-remove",
-    "db:seed-remove:prod": "pnpm --filter @veles/db db:seed-remove:prod"
+    "db:seed": "pnpm --filter @veles/db db:seed"
   },
   "dependencies": {
     "arktype": "2.2.3",
