@@ -7,7 +7,7 @@ description: Use when building or changing client data flows in apps/web that ne
 
 TanStack DB is a reactive in-browser store on top of TanStack Query. A **collection** holds typed rows keyed by id; **live queries** read them incrementally; `collection.insert/update/delete` apply optimistically, then call the collection's `onInsert/onUpdate/onDelete` handlers, which persist via server functions. A throwing handler rolls the change back. A successful one refetches the collection.
 
-Reference implementation: `apps/web/src/pages/todos/listItems.collection.ts` and its consumers (`CheckedNoteCard.tsx`, `TodosPage.tsx`, `routes/_authenticated/todos.tsx`). Copy its shape. A guided walkthrough with a React Query vs TanStack DB playground lives at `/demo/tanstack-db` (`apps/web/src/pages/tanstack-db-demo`).
+Reference implementation: `apps/web/src/pages/todos/listItems.collection.ts` and its consumers (`CheckedNoteCard.tsx`, `TodosPage.tsx`, `routes/_authenticated/todos.tsx`). Copy its shape. A guided walkthrough with a React Query vs TanStack DB playground is at https://artifacts.widacki.me/tanstack-db-walkthrough/.
 
 ## When to use it
 

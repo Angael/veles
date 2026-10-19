@@ -20,7 +20,6 @@ import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as AuthErrorRouteImport } from './routes/auth.error'
 import { Route as AuthGoogleRouteImport } from './routes/auth.google'
 import { Route as DemoComponentsRouteImport } from './routes/demo.components'
-import { Route as DemoTanstackDbRouteImport } from './routes/demo.tanstack-db'
 import { Route as DemoWorkoutsRouteImport } from './routes/demo.workouts'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as AuthenticatedCaloriesAddRouteImport } from './routes/_authenticated/calories_/add'
@@ -99,11 +98,6 @@ const AuthGoogleRoute = AuthGoogleRouteImport.update({
 const DemoComponentsRoute = DemoComponentsRouteImport.update({
   id: '/demo/components',
   path: '/demo/components',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoTanstackDbRoute = DemoTanstackDbRouteImport.update({
-  id: '/demo/tanstack-db',
-  path: '/demo/tanstack-db',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoWorkoutsRoute = DemoWorkoutsRouteImport.update({
@@ -257,7 +251,6 @@ export interface FileRoutesByFullPath {
   '/auth/error': typeof AuthErrorRoute
   '/auth/google': typeof AuthGoogleRoute
   '/demo/components': typeof DemoComponentsRoute
-  '/demo/tanstack-db': typeof DemoTanstackDbRoute
   '/demo/workouts': typeof DemoWorkoutsRoute
   '/invite/$token': typeof InviteTokenRoute
   '/calories/add': typeof AuthenticatedCaloriesAddRoute
@@ -295,7 +288,6 @@ export interface FileRoutesByTo {
   '/auth/error': typeof AuthErrorRoute
   '/auth/google': typeof AuthGoogleRoute
   '/demo/components': typeof DemoComponentsRoute
-  '/demo/tanstack-db': typeof DemoTanstackDbRoute
   '/demo/workouts': typeof DemoWorkoutsRoute
   '/invite/$token': typeof InviteTokenRoute
   '/calories/add': typeof AuthenticatedCaloriesAddRoute
@@ -335,7 +327,6 @@ export interface FileRoutesById {
   '/auth/error': typeof AuthErrorRoute
   '/auth/google': typeof AuthGoogleRoute
   '/demo/components': typeof DemoComponentsRoute
-  '/demo/tanstack-db': typeof DemoTanstackDbRoute
   '/demo/workouts': typeof DemoWorkoutsRoute
   '/invite/$token': typeof InviteTokenRoute
   '/_authenticated/calories_/add': typeof AuthenticatedCaloriesAddRoute
@@ -375,7 +366,6 @@ export interface FileRouteTypes {
     | '/auth/error'
     | '/auth/google'
     | '/demo/components'
-    | '/demo/tanstack-db'
     | '/demo/workouts'
     | '/invite/$token'
     | '/calories/add'
@@ -413,7 +403,6 @@ export interface FileRouteTypes {
     | '/auth/error'
     | '/auth/google'
     | '/demo/components'
-    | '/demo/tanstack-db'
     | '/demo/workouts'
     | '/invite/$token'
     | '/calories/add'
@@ -452,7 +441,6 @@ export interface FileRouteTypes {
     | '/auth/error'
     | '/auth/google'
     | '/demo/components'
-    | '/demo/tanstack-db'
     | '/demo/workouts'
     | '/invite/$token'
     | '/_authenticated/calories_/add'
@@ -488,7 +476,6 @@ export interface RootRouteChildren {
   AuthErrorRoute: typeof AuthErrorRoute
   AuthGoogleRoute: typeof AuthGoogleRoute
   DemoComponentsRoute: typeof DemoComponentsRoute
-  DemoTanstackDbRoute: typeof DemoTanstackDbRoute
   DemoWorkoutsRoute: typeof DemoWorkoutsRoute
   InviteTokenRoute: typeof InviteTokenRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -573,13 +560,6 @@ declare module '@tanstack/react-router' {
       path: '/demo/components'
       fullPath: '/demo/components'
       preLoaderRoute: typeof DemoComponentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/tanstack-db': {
-      id: '/demo/tanstack-db'
-      path: '/demo/tanstack-db'
-      fullPath: '/demo/tanstack-db'
-      preLoaderRoute: typeof DemoTanstackDbRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/workouts': {
@@ -826,7 +806,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthErrorRoute: AuthErrorRoute,
   AuthGoogleRoute: AuthGoogleRoute,
   DemoComponentsRoute: DemoComponentsRoute,
-  DemoTanstackDbRoute: DemoTanstackDbRoute,
   DemoWorkoutsRoute: DemoWorkoutsRoute,
   InviteTokenRoute: InviteTokenRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
