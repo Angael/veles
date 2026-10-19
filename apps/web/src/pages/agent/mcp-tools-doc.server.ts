@@ -66,8 +66,6 @@ const permissionsWith = (access: { read?: boolean; write?: AgentFeature }) =>
     ]),
   ) as AgentPermissions;
 
-const isDate = (schema: JsonSchema) => schema.pattern?.includes('W([0-4]') ?? false;
-
 function numberRange(schema: JsonSchema) {
   const low = schema.minimum ?? schema.exclusiveMinimum;
   const high = schema.maximum;
@@ -84,7 +82,7 @@ function typeLabel(schema: JsonSchema): string {
     const labels = schema.anyOf.filter((branch) => !branch.not).map(typeLabel);
     return [...new Set(labels)].join(' | ');
   }
-  if (isDate(schema)) return 'date YYYY-MM-DD';
+  if (schema.format === 'date') return 'date YYYY-MM-DD';
   if (schema.format === 'uuid') return 'uuid';
   if (schema.type === 'array') return `${schema.items ? typeLabel(schema.items) : 'unknown'}[]`;
   if (schema.type === 'object') {

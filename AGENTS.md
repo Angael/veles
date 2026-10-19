@@ -75,6 +75,7 @@
 
 ## Agent MCP
 - The MCP server (`apps/web/src/pages/agent`) should cover user-facing features with read and write
+- Agents load every listed tool schema into context, also in sessions that never use Veles. Keep the tool count low: one tool per entity with an object or array payload, not one tool per field or per step. Do not add a batch twin of a tool (e.g. `save_weights` next to `save_weight`); a bulk import stays in the app.
 - Perform joins and calculations on the server; return readable, nested results so agents do not have to reconstruct relationships from raw table rows. Never make agents list parents, then fetch children and match them by parent id
 - When you add, rename, or change a feature or its data, update the MCP in the same change:
   - `apps/web/src/lib/agentAccess.ts`: add the feature and its label.

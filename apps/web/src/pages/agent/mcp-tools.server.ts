@@ -46,6 +46,31 @@ const jsonSchemaFallback = {
     context.unit === undefined ? { not: {} } : context.base,
 };
 
+type JsonNode = { [key: string]: unknown };
+
+const isJsonNode = (value: unknown): value is JsonNode =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/**
+ * Shrinks arktype's JSON Schema for agents: a UUID is a three-branch `anyOf` with a regex and an
+ * ISO date is a long regex, together ~40% of `tools/list`. Agents load every listed schema into
+ * context, so these become `format` hints. Validation still runs the full arktype check.
+ */
+function slimSchema(node: unknown): unknown {
+  if (Array.isArray(node)) return node.map(slimSchema);
+  if (!isJsonNode(node)) return node;
+  const description = node.description === 'a UUID' ? undefined : node.description;
+  if (node.format === 'uuid') return { type: 'string', format: 'uuid', description };
+  if (typeof node.pattern === 'string' && node.pattern.includes('W([0-4]')) {
+    return { type: 'string', format: 'date', description };
+  }
+  return Object.fromEntries(
+    Object.entries(node)
+      .filter(([key]) => key !== '$schema')
+      .map(([key, value]) => [key, slimSchema(value)]),
+  );
+}
+
 /**
  * Makes an arktype input schema listable in `tools/list`. Without this, one predicate (e.g. a real
  * calendar date check) or `| undefined` makes the SDK throw for every tool. Validation still runs
@@ -57,11 +82,14 @@ export function agentInput<S extends StandardSchemaWithJSON>(
   const standard = schema['~standard'];
   const withFallback =
     (convert: typeof standard.jsonSchema.input): typeof standard.jsonSchema.input =>
-    (options) =>
-      convert({
+    (options) => {
+      const full = convert({
         ...options,
         libraryOptions: { ...options.libraryOptions, fallback: jsonSchemaFallback },
       });
+      const slim = slimSchema(full);
+      return isJsonNode(slim) ? slim : full;
+    };
   return {
     '~standard': {
       ...standard,

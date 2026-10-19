@@ -19,7 +19,6 @@ Every tool the Veles MCP server (`/api/mcp`) can list, grouped by the consent th
 | [`set_list_item_checked`](#set_list_item_checked)             | Write on Notes and shopping lists | write                      |
 | [`delete_list_item`](#delete_list_item)                       | Write on Notes and shopping lists | write, destructive         |
 | [`save_weight`](#save_weight)                                 | Write on Weight                   | write, destructive         |
-| [`save_weights`](#save_weights)                               | Write on Weight                   | write, destructive         |
 | [`start_workout`](#start_workout)                             | Write on Workouts                 | write                      |
 | [`start_routine`](#start_routine)                             | Write on Workouts                 | write                      |
 | [`update_workout`](#update_workout)                           | Write on Workouts                 | write                      |
@@ -213,16 +212,6 @@ Save the weight in kg for one date. Replaces the weight already saved for that d
 | ---------- | --------------- | -------- | ----- |
 | `date`     | date YYYY-MM-DD | yes      |       |
 | `weightKg` | number 30–300   | yes      |       |
-
-### `save_weights`
-
-_write, destructive_
-
-Save many weights at once, e.g. an import. Each entry replaces the weight already saved for its date.
-
-| Input     | Type                 | Required | Notes          |
-| --------- | -------------------- | -------- | -------------- |
-| `entries` | { date, weightKg }[] | yes      | max 3000 items |
 
 ## Write: Workouts
 

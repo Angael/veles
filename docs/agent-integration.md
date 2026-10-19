@@ -78,7 +78,6 @@ Every feature has write tools. Each feature's tools appear only while its Write 
 **Weight**
 
 - `save_weight`: `date`, `weightKg`; replaces the weight for that date. Photos stay.
-- `save_weights`: `entries` (up to 3,000 `{ date, weightKg }`).
 
 **Recipes**
 

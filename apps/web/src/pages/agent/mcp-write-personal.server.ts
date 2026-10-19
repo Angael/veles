@@ -9,8 +9,8 @@ import {
   updateRecipeFieldsInputType,
   updateRecipeRatingInputType,
 } from '@/pages/recipes/recipes.validation';
-import { saveWeightRecord, saveWeightsRecord } from '@/pages/weight/weight.server';
-import { saveWeightInputType, saveWeightsInputType } from '@/pages/weight/weight.validation';
+import { saveWeightRecord } from '@/pages/weight/weight.server';
+import { saveWeightInputType } from '@/pages/weight/weight.validation';
 import { agentInput, agentWriter, writeAnnotations } from './mcp-tools.server';
 
 const recipeNutrition =
@@ -29,16 +29,6 @@ export function registerWeightTools(server: McpServer, userId: string) {
       annotations: writeAnnotations({ destructive: true, idempotent: true }),
     },
     write(saveWeightRecord),
-  );
-  server.registerTool(
-    'save_weights',
-    {
-      description:
-        'Save many weights at once, e.g. an import. Each entry replaces the weight already saved for its date.',
-      inputSchema: agentInput(saveWeightsInputType),
-      annotations: writeAnnotations({ destructive: true, idempotent: true }),
-    },
-    write(saveWeightsRecord),
   );
 }
 

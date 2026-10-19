@@ -40,6 +40,10 @@ pnpm db:generate -- --name=<migration-name>
 pnpm db:migrate:prod
 ```
 
+### Agent access (MCP)
+
+Agents can read and write allowed Veles data through the MCP server at `/api/mcp`. Setup and consent: [docs/agent-integration.md](docs/agent-integration.md). All tools and inputs: [docs/agent-tools.md](docs/agent-tools.md).
+
 ### Compose
 
 The web and worker Dockerfiles install the root shared dependencies and their own workspace dependency trees (including `packages/db`); the preview controller has a separate filtered image build. A root `pnpm install` still installs the whole workspace.
