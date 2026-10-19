@@ -61,56 +61,21 @@ Read tools appear only when at least one feature permits reads. The `list_record
 
 Write consent needs read consent: granting write also grants read, and revoking read also revokes write. Consent applies to all keys owned by the account and is checked at each tool call. Turning off a switch cuts off that operation for existing keys. Refresh `tools/list` after a change to discover the available tools.
 
-Every feature has write tools. Each feature's tools appear only while its Write switch is on:
+Every feature has write tools. Each feature's tools appear only while its Write switch is on. Inputs: [agent-tools.md](./agent-tools.md).
 
-**Notes and shopping lists**
+| Feature                  | Tools                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------------------- |
+| Notes and shopping lists | `save_note` (fields, sharing, type, and list items in one call), `delete_note`        |
+| Weight                   | `save_weight`                                                                         |
+| Recipes                  | `save_recipe`                                                                         |
+| Food diary               | `log_food` (many entries on one date), `update_food_log`, `change_food_logs`          |
+| Nutrition goals          | `set_calorie_goal`                                                                    |
+| Food catalog (shared)    | `lookup_food_barcode`, `save_food_product`                                            |
+| Workouts                 | `save_workout`, `save_routine`, `update_exercise`, `delete_workout`, `delete_routine` |
 
-- `create_note`: `title`, `content`, `type` (`note` or `shopping_list`). New notes are private. Use empty content for shopping lists, then add list items.
-- `update_note`: `id`, optional `title` and `content`.
-- `delete_note`: `id`; also deletes its list items.
-- `set_note_shared`: `id`, `shared`; shares or unshares an owned note with connected friends.
-- `toggle_note_type`: `id`; converts note content to list items or list items back to text.
-- `create_list_item`: `noteId`, `name`.
-- `update_list_item`: `id`, `name`.
-- `set_list_item_checked`: `id`, `checked`.
-- `delete_list_item`: `id`.
+Tools take whole objects, not one field or step per call. `save_*` tools create without `id` and update with `id`; omitted fields stay. `save_workout` and `save_routine` replace all exercises (and sets) when `exercises` is given, in one transaction. This keeps the tool list short: agents load it into context even in sessions that do not use Veles.
 
-**Weight**
-
-- `save_weight`: `date`, `weightKg`; replaces the weight for that date. Photos stay.
-
-**Recipes**
-
-- `create_recipe`: `name`, optional `description`, `ingredients`, `tags`, `portions`, `rating`, `kcal`, `protein`, `fats`, `carbs` (whole recipe, whole numbers).
-- `update_recipe`: `id` and only the fields to change. Images stay.
-- `rate_recipe`: `id`, `rating` (1–5).
-
-**Food diary**
-
-- `log_food`: `productId` (from `food_products`), `grams`, `date`. Nutrition is copied from the product.
-- `log_custom_food`: `name`, `kcal`, `date`, optional `grams`, `protein`, `fat`, `carbs`.
-- `update_food_log`: `id` and all fields. Entries with a `productId` keep their name and scale nutrition by grams.
-- `delete_food_logs`, `move_food_logs` (`date`), `copy_food_logs` (`date`): `ids` (up to 200).
-- `multiply_food_logs`: `ids`, `factor` (up to 20).
-
-**Nutrition goals**
-
-- `set_calorie_goal`: `date`, `kcal`, optional `protein`, `fat`, `carbs`. The goal applies from `date` until the next goal.
-
-**Food catalog** (shared by all accounts)
-
-- `lookup_food_barcode`: `barcode`; imports a missing product from Open Food Facts.
-- `create_food_product`: `name`, `kcalPer100g`, optional `barcode`, `productSizeGrams`, `proteinPer100g`, `fatPer100g`, `carbsPer100g`.
-- `update_food_product`: `id`, all fields, and `today` (the user's local date). Entries of that product logged on `today` by any account are recalculated.
-
-**Workouts**
-
-- Sessions: `start_workout` (`date`), `start_routine` (`routineId`, `date`), `update_workout` (`id`, `name?`, `finished?`), `delete_workout`. Only one session can be open.
-- Session exercises: `add_workout_exercise` (`workoutId`, `exerciseId` or `newExercise`), `update_workout_exercise` (`notes`), `move_workout_exercise` (`up`/`down`), `remove_workout_exercise`.
-- Sets: `add_workout_set` (`sessionExerciseId`), `duplicate_workout_set`, `update_workout_set` (`type`, `weightKg`, `reps`, `durationSeconds`, `distanceKm`, `done`), `delete_workout_set`.
-- Exercises and routines: `update_exercise`, `save_routine_from_workout`, `update_routine_from_workout`, `update_routine`, `delete_routine`.
-
-Creates return `{ id }` or the saved record; other writes return `{ success: true }`. Permission denials and operation failures are MCP tool errors (`isError: true`). Write tools call the same validators and server operations as the app. MCP can change only data that the key owner owns, plus the shared food catalog. It cannot change a friend's shared note. Ownership, IDs, and timestamps are set by the server. Keys cannot act as browser sessions or change account consent.
+Creates return `{ id }` or the saved record; other writes return `{ success: true }`. Permission denials and operation failures are MCP tool errors (`isError: true`). Write tools call the features' shared validators and server operations. MCP can change only data that the key owner owns, plus the shared food catalog. It cannot change a friend's shared note. Ownership, IDs, and timestamps are set by the server. Keys cannot act as browser sessions or change account consent.
 
 Agents cannot upload or replace photos. Weight photos, recipe images, food log photos, and product images stay as they are, and are managed in the app. The app has no delete for weights, recipes, goals, products, or exercises, so MCP has none either.
 

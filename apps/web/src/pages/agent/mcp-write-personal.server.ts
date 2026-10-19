@@ -1,14 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/server';
-import {
-  createRecipeRecord,
-  updateRecipeRatingRecord,
-  updateRecipeRecord,
-} from '@/pages/recipes/recipes.server';
-import {
-  recipeFieldsType,
-  updateRecipeFieldsInputType,
-  updateRecipeRatingInputType,
-} from '@/pages/recipes/recipes.validation';
+import { saveRecipeRecord } from '@/pages/recipes/recipes.server';
+import { saveRecipeInputType } from '@/pages/recipes/recipes.validation';
 import { saveWeightRecord } from '@/pages/weight/weight.server';
 import { saveWeightInputType } from '@/pages/weight/weight.validation';
 import { agentInput, agentWriter, writeAnnotations } from './mcp-tools.server';
@@ -37,30 +29,12 @@ export function registerRecipeTools(server: McpServer, userId: string) {
   const write = agentWriter(userId, 'recipes');
 
   server.registerTool(
-    'create_recipe',
+    'save_recipe',
     {
-      description: `Create an owned recipe. Returns { id }. ${recipeNutrition}. ingredients is one string per line.`,
-      inputSchema: agentInput(recipeFieldsType),
+      description: `Create (no id; name required) or update (id) an owned recipe. Omitted fields stay; images stay. ${recipeNutrition}. ingredients (one string per line) and tags replace the whole list. rating is 1–5. Returns { id }.`,
+      inputSchema: agentInput(saveRecipeInputType),
       annotations: writeAnnotations({ destructive: false, idempotent: false }),
     },
-    write(createRecipeRecord),
-  );
-  server.registerTool(
-    'update_recipe',
-    {
-      description: `Change only the given fields of an owned recipe; images stay. ${recipeNutrition}. ingredients and tags replace the whole list.`,
-      inputSchema: agentInput(updateRecipeFieldsInputType),
-      annotations: writeAnnotations({ destructive: false, idempotent: true }),
-    },
-    write(updateRecipeRecord),
-  );
-  server.registerTool(
-    'rate_recipe',
-    {
-      description: 'Rate an owned recipe from 1 to 5.',
-      inputSchema: agentInput(updateRecipeRatingInputType),
-      annotations: writeAnnotations({ destructive: false, idempotent: true }),
-    },
-    write(updateRecipeRatingRecord),
+    write(saveRecipeRecord),
   );
 }

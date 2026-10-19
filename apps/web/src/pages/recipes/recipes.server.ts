@@ -1,11 +1,13 @@
+import { type } from 'arktype';
 import { and, eq } from 'drizzle-orm';
 import { recipes } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db, type DbTransaction } from '@/server/db.server';
-import type {
+import {
   recipeFieldsType,
-  updateRecipeFieldsInputType,
-  updateRecipeRatingInputType,
+  type saveRecipeInputType,
+  type updateRecipeFieldsInputType,
+  type updateRecipeRatingInputType,
 } from './recipes.validation';
 
 type Db = typeof db | DbTransaction;
@@ -55,6 +57,17 @@ export async function updateRecipeRecord(
   { id, ...fields }: typeof updateRecipeFieldsInputType.infer,
 ) {
   await updateRecipeRow(db, userId, id, fields);
+}
+
+/** Creates a recipe without id (defaults fill missing fields) or patches the given fields. */
+export async function saveRecipeRecord(
+  userId: string,
+  { id, ...fields }: typeof saveRecipeInputType.infer,
+) {
+  if (id) return updateRecipeRow(db, userId, id, fields);
+  const created = recipeFieldsType(fields);
+  if (created instanceof type.errors) throw new ClientSafeError(created.summary);
+  return createRecipeRow(db, userId, created);
 }
 
 export async function updateRecipeRatingRecord(

@@ -9,6 +9,7 @@ import type { CalorieFood } from './calories.api';
 import type {
   barcodeInputType,
   createFoodProductValuesType,
+  saveFoodProductInputType,
   updateFoodProductValuesType,
 } from './calories.validation';
 import { foodBarcodeAliases } from './foodBarcode';
@@ -210,4 +211,14 @@ export async function updateFoodProductRecord(
     await rollbackImage(image);
     throw error;
   }
+}
+
+/** Creates a product without id, or replaces the product's fields with id (needs `today`). */
+export async function saveFoodProductRecord(
+  userId: string,
+  { id, today, ...values }: typeof saveFoodProductInputType.infer,
+) {
+  if (!id) return createFoodProductRecord(userId, values);
+  if (!today) throw new ClientSafeError('Updating a product needs today.');
+  return updateFoodProductRecord(userId, { ...values, id, today });
 }

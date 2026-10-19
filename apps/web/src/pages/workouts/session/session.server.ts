@@ -1,24 +1,18 @@
 import { format, parseISO } from 'date-fns';
 import { and, asc, desc, eq, gt, lt, sql } from 'drizzle-orm';
-import {
-  type exerciseMeasures,
-  workoutExercises,
-  workoutSessionExercises,
-  workoutSessions,
-  workoutSets,
-} from '@veles/db/schema';
+import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
-import { db, type DbTransaction } from '@/server/db.server';
+import { db } from '@/server/db.server';
 import {
   autoFinishIdleWorkouts,
   completeFilledSets,
   nextPosition,
   previousSetCount,
   requireNoOpenWorkout,
-  requireOwnedExercise,
   requireOwnedSet,
   requireOwnedSlot,
   requireOwnedWorkout,
+  resolveExerciseId,
   toSetColumns,
   touchWorkout,
 } from '../workouts.server';
@@ -78,37 +72,6 @@ export async function deleteWorkoutRecord(userId: string, data: IdInput) {
   await db.delete(workoutSessions).where(eq(workoutSessions.id, data.id));
 }
 
-/** Finds the user's exercise with this name (any case) or creates it. */
-async function findOrCreateExercise(
-  tx: DbTransaction,
-  userId: string,
-  input: { name: string; measure: (typeof exerciseMeasures)[number] },
-) {
-  const name = input.name.trim();
-  const [existing] = await tx
-    .select({ id: workoutExercises.id })
-    .from(workoutExercises)
-    .where(
-      and(
-        eq(workoutExercises.userId, userId),
-        sql`lower(${workoutExercises.name}) = lower(${name})`,
-      ),
-    );
-  if (existing) {
-    await tx
-      .update(workoutExercises)
-      .set({ archivedAt: null })
-      .where(eq(workoutExercises.id, existing.id));
-    return existing.id;
-  }
-  const [created] = await tx
-    .insert(workoutExercises)
-    .values({ measure: input.measure, name, userId })
-    .returning({ id: workoutExercises.id });
-  if (!created) throw new Error('Exercise insert returned no row.');
-  return created.id;
-}
-
 /**
  * Appends an exercise to the session with as many empty sets as it had last time, so last time's
  * values show as ghosts in every row. Returns the new session exercise id.
@@ -120,14 +83,7 @@ export async function addWorkoutExerciseRecord(
   return db.transaction(async (tx) => {
     const workout = await requireOwnedWorkout(tx, userId, data.workoutId);
     await touchWorkout(tx, workout.id);
-    let exerciseId: string;
-    if (data.exerciseId) {
-      exerciseId = (await requireOwnedExercise(tx, userId, data.exerciseId)).id;
-    } else if (data.newExercise) {
-      exerciseId = await findOrCreateExercise(tx, userId, data.newExercise);
-    } else {
-      throw new ClientSafeError('Pick or name an exercise.');
-    }
+    const exerciseId = await resolveExerciseId(tx, userId, data);
 
     const positions = await tx
       .select({ max: sql<number | null>`max(${workoutSessionExercises.position})` })

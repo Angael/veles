@@ -12,10 +12,12 @@ import {
   autoFinishIdleWorkouts,
   requireNoOpenWorkout,
   requireOwnedWorkout,
+  resolveExerciseId,
 } from '../workouts.server';
 import type {
   routineWorkoutIdInputType,
   saveRoutineInputType,
+  saveRoutinePlanInputType,
   startRoutineInputType,
   updateRoutineInputType,
   workoutIdType,
@@ -194,5 +196,51 @@ export async function deleteRoutineRecord(userId: string, data: typeof workoutId
   await db.transaction(async (tx) => {
     await requireOwnedRoutine(tx, userId, data.id);
     await tx.delete(workoutRoutines).where(eq(workoutRoutines.id, data.id));
+  });
+}
+
+/**
+ * Creates or updates a routine with its whole plan in one transaction, so agents can write a
+ * routine directly instead of building a workout and saving it. Omitted fields stay; given
+ * exercises replace the routine's exercises.
+ */
+export async function saveRoutinePlanRecord(
+  userId: string,
+  data: typeof saveRoutinePlanInputType.infer,
+) {
+  return db.transaction(async (tx) => {
+    let routineId: string;
+    if (data.id) {
+      routineId = (await requireOwnedRoutine(tx, userId, data.id)).id;
+      await tx
+        .update(workoutRoutines)
+        .set({
+          ...(data.name?.trim() ? { name: data.name.trim() } : {}),
+          ...(data.description === undefined ? {} : { description: data.description.trim() }),
+          updatedAt: new Date(),
+        })
+        .where(eq(workoutRoutines.id, routineId));
+    } else {
+      if (!data.name?.trim()) throw new ClientSafeError('A new routine needs a name.');
+      const [created] = await tx
+        .insert(workoutRoutines)
+        .values({ description: data.description?.trim() ?? '', name: data.name.trim(), userId })
+        .returning({ id: workoutRoutines.id });
+      if (!created) throw new Error('Routine insert returned no row.');
+      routineId = created.id;
+    }
+
+    if (data.exercises) {
+      await tx
+        .delete(workoutRoutineExercises)
+        .where(eq(workoutRoutineExercises.routineId, routineId));
+      for (const [position, exercise] of data.exercises.entries()) {
+        const exerciseId = await resolveExerciseId(tx, userId, exercise);
+        await tx
+          .insert(workoutRoutineExercises)
+          .values({ exerciseId, position, routineId, setTypes: exercise.setTypes });
+      }
+    }
+    return { id: routineId };
   });
 }

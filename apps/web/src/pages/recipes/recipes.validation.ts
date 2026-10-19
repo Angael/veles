@@ -35,3 +35,8 @@ export const updateRecipeRatingInputType = type({
   id: 'string.uuid',
   rating: '1 <= number.integer <= 5',
 });
+
+/** Create without id (name required), or update only the given fields with id. */
+export const saveRecipeInputType = updateRecipeFieldsInputType
+  .omit('id')
+  .merge({ 'id?': 'string.uuid' });

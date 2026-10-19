@@ -74,3 +74,28 @@ export const multiplyFoodLogsInputType = type({
   ids: foodLogIdsType,
   factor: `0 < number <= ${MAX_FOOD_LOG_MULTIPLIER}`,
 });
+
+/** One day of eaten food: catalog products by grams, or custom foods with their nutrition. */
+export const logFoodEntriesInputType = type({
+  date: dateOnlyType,
+  // One flat shape: arktype cannot union these two because both may carry grams.
+  entries: recordCustomCaloriesValuesType
+    .omit('date', 'imageAction')
+    .partial()
+    .merge({ 'productId?': 'string.uuid' })
+    .array()
+    .atLeastLength(1)
+    .atMostLength(50),
+});
+
+export const changeFoodLogsInputType = type({
+  ids: foodLogIdsType,
+  action: "'delete' | 'move' | 'copy' | 'multiply'",
+  'date?': dateOnlyType,
+  'factor?': `0 < number <= ${MAX_FOOD_LOG_MULTIPLIER}`,
+});
+
+/** Create without id, or replace all fields of the product with id; `today` is needed on update. */
+export const saveFoodProductInputType = createFoodProductValuesType
+  .omit('imageAction')
+  .merge({ 'id?': 'string.uuid', 'today?': dateOnlyType });

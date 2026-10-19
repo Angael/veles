@@ -64,11 +64,18 @@ function slimSchema(node: unknown): unknown {
   if (typeof node.pattern === 'string' && node.pattern.includes('W([0-4]')) {
     return { type: 'string', format: 'date', description };
   }
-  return Object.fromEntries(
+  const slim = Object.fromEntries(
     Object.entries(node)
       .filter(([key]) => key !== '$schema')
       .map(([key, value]) => [key, slimSchema(value)]),
   );
+  // A nullable UUID keeps its three UUID branches; after slimming they are identical.
+  if (Array.isArray(slim.anyOf)) {
+    slim.anyOf = [
+      ...new Map(slim.anyOf.map((branch) => [JSON.stringify(branch), branch])).values(),
+    ];
+  }
+  return slim;
 }
 
 /**

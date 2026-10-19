@@ -2,165 +2,43 @@ import type { McpServer } from '@modelcontextprotocol/server';
 import { updateExerciseRecord } from '@/pages/workouts/exercises/exercises.server';
 import {
   deleteRoutineRecord,
-  saveRoutineFromWorkoutRecord,
-  startRoutineRecord,
-  updateRoutineFromWorkoutRecord,
-  updateRoutineRecord,
+  saveRoutinePlanRecord,
 } from '@/pages/workouts/routines/routines.server';
+import { saveWorkoutRecord } from '@/pages/workouts/session/saveWorkout.server';
+import { deleteWorkoutRecord } from '@/pages/workouts/session/session.server';
 import {
-  addWorkoutExerciseRecord,
-  addWorkoutSetRecord,
-  deleteWorkoutRecord,
-  deleteWorkoutSetRecord,
-  duplicateWorkoutSetRecord,
-  moveWorkoutExerciseRecord,
-  removeWorkoutExerciseRecord,
-  startWorkoutRecord,
-  updateWorkoutExerciseRecord,
-  updateWorkoutRecord,
-  updateWorkoutSetRecord,
-} from '@/pages/workouts/session/session.server';
-import {
-  addWorkoutExerciseInputType,
-  addWorkoutSetInputType,
-  moveWorkoutExerciseInputType,
-  routineWorkoutIdInputType,
-  saveRoutineInputType,
-  startRoutineInputType,
-  startWorkoutInputType,
+  saveRoutinePlanInputType,
+  saveWorkoutInputType,
   updateExerciseInputType,
-  updateRoutineInputType,
-  updateWorkoutExerciseInputType,
-  updateWorkoutInputType,
-  updateWorkoutSetInputType,
   workoutIdType,
 } from '@/pages/workouts/workouts.validation';
 import { agentInput, agentWriter, writeAnnotations } from './mcp-tools.server';
 
-const additive = writeAnnotations({ destructive: false, idempotent: false });
-const edit = writeAnnotations({ destructive: false, idempotent: true });
-const removal = writeAnnotations({ destructive: true, idempotent: false });
+const destructive = writeAnnotations({ destructive: true, idempotent: false });
+const exerciseRef =
+  'Each exercise is exerciseId from workout_exercises (read it first to reuse existing ones), or newExercise { name, measure }, which reuses an exercise with that exact name or creates it.';
 
-/**
- * Workout writes, the same steps as the app: start a session, add exercises (each gets empty
- * sets), fill the sets, then finish. Only one session can be open at a time.
- */
+/** Workout writes: whole sessions and routines in one call each, not step by step. */
 export function registerWorkoutTools(server: McpServer, userId: string) {
   const write = agentWriter(userId, 'workouts');
 
   server.registerTool(
-    'start_workout',
+    'save_workout',
     {
-      description:
-        'Start an empty workout session on a date (YYYY-MM-DD). Fails while another session is open; finish it with update_workout first. Returns { id }.',
-      inputSchema: agentInput(startWorkoutInputType),
-      annotations: additive,
+      description: `Create (no id; date required) or update (id) a workout session. Omitted fields stay; exercises, when given, replace all exercises and sets in order. ${exerciseRef} A new session is finished unless finished is false (only one open session at a time); with routineId and no exercises it copies the routine. Returns { id }.`,
+      inputSchema: agentInput(saveWorkoutInputType),
+      annotations: destructive,
     },
-    write(startWorkoutRecord),
+    write(saveWorkoutRecord),
   );
   server.registerTool(
-    'start_routine',
+    'save_routine',
     {
-      description:
-        'Start a workout session on a date from a workout_routines id, with its exercises and one empty set per planned set. Same open-session rule as start_workout. Returns { id }.',
-      inputSchema: agentInput(startRoutineInputType),
-      annotations: additive,
+      description: `Create (no id; name required) or update (id) a workout routine. Omitted fields stay; exercises, when given, replace the plan. setTypes has one entry per planned set. ${exerciseRef} Returns { id }.`,
+      inputSchema: agentInput(saveRoutinePlanInputType),
+      annotations: destructive,
     },
-    write(startRoutineRecord),
-  );
-  server.registerTool(
-    'update_workout',
-    {
-      description:
-        'Rename a workout session, or finish (finished: true) or reopen (false) it. Finishing ticks every set that has values.',
-      inputSchema: agentInput(updateWorkoutInputType),
-      annotations: edit,
-    },
-    write(updateWorkoutRecord),
-  );
-  server.registerTool(
-    'delete_workout',
-    {
-      description: 'Delete a workout session with its exercises and sets.',
-      inputSchema: agentInput(workoutIdType),
-      annotations: removal,
-    },
-    write(deleteWorkoutRecord),
-  );
-  server.registerTool(
-    'add_workout_exercise',
-    {
-      description:
-        'Add an exercise to a session: exerciseId from workout_exercises, or newExercise { name, measure } to reuse an exercise with that name or create it. It gets as many empty sets as last time. Returns { id } of the session exercise.',
-      inputSchema: agentInput(addWorkoutExerciseInputType),
-      annotations: additive,
-    },
-    write(addWorkoutExerciseRecord),
-  );
-  server.registerTool(
-    'update_workout_exercise',
-    {
-      description: 'Set the notes of a session exercise (exercises[].id in workout_sessions).',
-      inputSchema: agentInput(updateWorkoutExerciseInputType),
-      annotations: edit,
-    },
-    write(updateWorkoutExerciseRecord),
-  );
-  server.registerTool(
-    'move_workout_exercise',
-    {
-      description: 'Move a session exercise one place up or down in its session.',
-      inputSchema: agentInput(moveWorkoutExerciseInputType),
-      annotations: additive,
-    },
-    write(moveWorkoutExerciseRecord),
-  );
-  server.registerTool(
-    'remove_workout_exercise',
-    {
-      description: 'Remove a session exercise and its sets from the session.',
-      inputSchema: agentInput(workoutIdType),
-      annotations: removal,
-    },
-    write(removeWorkoutExerciseRecord),
-  );
-  server.registerTool(
-    'add_workout_set',
-    {
-      description:
-        'Append a set to a session exercise (sessionExerciseId = exercises[].id), copying the last set. Returns { id }.',
-      inputSchema: agentInput(addWorkoutSetInputType),
-      annotations: additive,
-    },
-    write(addWorkoutSetRecord),
-  );
-  server.registerTool(
-    'duplicate_workout_set',
-    {
-      description: 'Insert a copy of a set right below it. Returns { id }.',
-      inputSchema: agentInput(workoutIdType),
-      annotations: additive,
-    },
-    write(duplicateWorkoutSetRecord),
-  );
-  server.registerTool(
-    'update_workout_set',
-    {
-      description:
-        'Change only the given fields of a set: type (normal, warmup, drop, failure), weightKg, reps, durationSeconds, distanceKm (null clears), done. The exercise measure says which values apply.',
-      inputSchema: agentInput(updateWorkoutSetInputType),
-      annotations: edit,
-    },
-    write(updateWorkoutSetRecord),
-  );
-  server.registerTool(
-    'delete_workout_set',
-    {
-      description: 'Delete a set.',
-      inputSchema: agentInput(workoutIdType),
-      annotations: removal,
-    },
-    write(deleteWorkoutSetRecord),
+    write(saveRoutinePlanRecord),
   );
   server.registerTool(
     'update_exercise',
@@ -168,44 +46,25 @@ export function registerWorkoutTools(server: McpServer, userId: string) {
       description:
         'Rename an exercise or change its measure or restSeconds (null for none); applies to all sessions. Names are unique per account.',
       inputSchema: agentInput(updateExerciseInputType),
-      annotations: edit,
+      annotations: writeAnnotations({ destructive: false, idempotent: true }),
     },
     write(updateExerciseRecord),
   );
   server.registerTool(
-    'save_routine_from_workout',
+    'delete_workout',
     {
-      description:
-        "Save a session's exercises and set types as a new routine and link the session to it. Returns { id }.",
-      inputSchema: agentInput(saveRoutineInputType),
-      annotations: additive,
+      description: 'Delete a workout session with its exercises and sets.',
+      inputSchema: agentInput(workoutIdType),
+      annotations: destructive,
     },
-    write(saveRoutineFromWorkoutRecord),
-  );
-  server.registerTool(
-    'update_routine_from_workout',
-    {
-      description: "Replace the linked routine's exercises with this session's exercises.",
-      inputSchema: agentInput(routineWorkoutIdInputType),
-      annotations: writeAnnotations({ destructive: true, idempotent: true }),
-    },
-    write(updateRoutineFromWorkoutRecord),
-  );
-  server.registerTool(
-    'update_routine',
-    {
-      description: 'Rename a routine or change its description.',
-      inputSchema: agentInput(updateRoutineInputType),
-      annotations: edit,
-    },
-    write(updateRoutineRecord),
+    write(deleteWorkoutRecord),
   );
   server.registerTool(
     'delete_routine',
     {
       description: 'Delete a routine. Sessions started from it stay and lose the link.',
       inputSchema: agentInput(workoutIdType),
-      annotations: removal,
+      annotations: destructive,
     },
     write(deleteRoutineRecord),
   );

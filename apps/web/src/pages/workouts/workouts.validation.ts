@@ -6,6 +6,16 @@ import { MAX_WEIGHT_KG } from './metrics';
 const name = '0 < string <= 200';
 const description = 'string <= 2000';
 const metric = 'number >= 0 | null';
+const setType = "'normal' | 'warmup' | 'drop' | 'failure'";
+const measure = type.enumerated(...exerciseMeasures);
+/** Creates the exercise (or reuses one with the same name) when no id is given. */
+const exerciseRef = { 'exerciseId?': 'string.uuid', 'newExercise?': { name, measure } } as const;
+const setValues = {
+  'weightKg?': `(0 <= number <= ${MAX_WEIGHT_KG}) | null`,
+  'reps?': '(number.integer >= 0) | null',
+  'durationSeconds?': metric,
+  'distanceKm?': metric,
+} as const;
 
 export const workoutIdType = type({ id: 'string.uuid' });
 
@@ -19,12 +29,7 @@ export const updateWorkoutInputType = type({
 
 export const addWorkoutExerciseInputType = type({
   workoutId: 'string.uuid',
-  'exerciseId?': 'string.uuid',
-  /** Creates the exercise (or reuses one with the same name) when no id is given. */
-  'newExercise?': {
-    name,
-    measure: type.enumerated(...exerciseMeasures),
-  },
+  ...exerciseRef,
 });
 
 export const updateWorkoutExerciseInputType = type({ id: 'string.uuid', notes: description });
@@ -38,11 +43,8 @@ export const addWorkoutSetInputType = type({ sessionExerciseId: 'string.uuid' })
 
 export const updateWorkoutSetInputType = type({
   id: 'string.uuid',
-  'type?': "'normal' | 'warmup' | 'drop' | 'failure'",
-  'weightKg?': `(0 <= number <= ${MAX_WEIGHT_KG}) | null`,
-  'reps?': '(number.integer >= 0) | null',
-  'durationSeconds?': metric,
-  'distanceKm?': metric,
+  'type?': setType,
+  ...setValues,
   'done?': 'boolean',
 });
 
@@ -65,6 +67,37 @@ export const updateRoutineInputType = type({
 export const updateExerciseInputType = type({
   id: 'string.uuid',
   'name?': name,
-  'measure?': type.enumerated(...exerciseMeasures),
+  'measure?': measure,
   'restSeconds?': '(number.integer >= 0) | null',
+});
+
+/** A whole session at once; given exercises replace the session's exercises and sets. */
+export const saveWorkoutInputType = type({
+  'id?': 'string.uuid',
+  'date?': dateOnlyType,
+  'name?': name,
+  'routineId?': 'string.uuid | null',
+  'finished?': 'boolean',
+  'exercises?': type({
+    ...exerciseRef,
+    'notes?': description,
+    sets: type({ 'type?': setType, ...setValues, 'done?': 'boolean' })
+      .array()
+      .atMostLength(30),
+  })
+    .array()
+    .atMostLength(40),
+});
+
+/** A whole routine at once; given exercises replace the routine's exercises. */
+export const saveRoutinePlanInputType = type({
+  'id?': 'string.uuid',
+  'name?': name,
+  'description?': description,
+  'exercises?': type({
+    ...exerciseRef,
+    setTypes: type(setType).array().atLeastLength(1).atMostLength(30),
+  })
+    .array()
+    .atMostLength(40),
 });

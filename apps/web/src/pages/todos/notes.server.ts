@@ -2,7 +2,7 @@ import { and, asc, eq, inArray, or } from 'drizzle-orm';
 import { listItems, notes, userConnections } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { invariant } from '@/lib/invariant';
-import { db } from '@/server/db.server';
+import { db, type DbTransaction } from '@/server/db.server';
 import type {
   createNoteInputType,
   updateNoteInputType,
@@ -97,6 +97,42 @@ export async function setNoteSharedRecord(
   if (!updated) throw new ClientSafeError('Note not found.');
 }
 
+/** Turns note lines into list items or list items into note lines, inside the caller's transaction. */
+export async function convertNoteType(
+  tx: DbTransaction,
+  noteId: string,
+  note: { content: string; type: string },
+) {
+  if (note.type === 'shopping_list') {
+    const items = await tx
+      .select({ name: listItems.name })
+      .from(listItems)
+      .where(eq(listItems.noteId, noteId))
+      .orderBy(asc(listItems.createdAt), asc(listItems.id));
+    await tx
+      .update(notes)
+      .set({
+        content: items.map((item) => item.name).join('\n'),
+        type: 'note',
+        updatedAt: new Date(),
+      })
+      .where(eq(notes.id, noteId));
+    await tx.delete(listItems).where(eq(listItems.noteId, noteId));
+  } else if (note.type === 'note') {
+    const names = note.content
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+    await tx
+      .update(notes)
+      .set({ content: '', type: 'shopping_list', updatedAt: new Date() })
+      .where(eq(notes.id, noteId));
+    if (names.length) {
+      await tx.insert(listItems).values(names.map((name) => ({ name, noteId })));
+    }
+  }
+}
+
 /** Converts a note and its items atomically within the caller's scope. */
 export async function toggleNoteTypeRecord(
   userId: string,
@@ -112,34 +148,7 @@ export async function toggleNoteTypeRecord(
 
     if (!note) throw new ClientSafeError('Note not found.');
 
-    if (note.type === 'shopping_list') {
-      const items = await tx
-        .select({ name: listItems.name })
-        .from(listItems)
-        .where(eq(listItems.noteId, data.id))
-        .orderBy(asc(listItems.createdAt), asc(listItems.id));
-      await tx
-        .update(notes)
-        .set({
-          content: items.map((item) => item.name).join('\n'),
-          type: 'note',
-          updatedAt: new Date(),
-        })
-        .where(eq(notes.id, data.id));
-      await tx.delete(listItems).where(eq(listItems.noteId, data.id));
-    } else if (note.type === 'note') {
-      const names = note.content
-        .split('\n')
-        .map((line) => line.trim())
-        .filter(Boolean);
-      await tx
-        .update(notes)
-        .set({ content: '', type: 'shopping_list', updatedAt: new Date() })
-        .where(eq(notes.id, data.id));
-      if (names.length) {
-        await tx.insert(listItems).values(names.map((name) => ({ name, noteId: data.id })));
-      }
-    }
+    await convertNoteType(tx, data.id, note);
   });
 }
 
