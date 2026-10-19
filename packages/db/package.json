@@ -4,7 +4,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./schema": "./src/schema/index.ts"
+    "./schema": "./src/schema/index.ts",
+    "./seed/sync-food-products": "./src/seed/sync-food-products.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",
@@ -15,11 +16,7 @@
     "db:push": "drizzle-kit push",
     "db:reset": "node --env-file=../../.env scripts/db-reset.ts",
     "db:studio": "drizzle-kit studio",
-    "db:studio:prod": "drizzle-kit studio --config=drizzle-prod.config.ts",
-    "db:seed": "node --env-file=../../.env scripts/seed.ts",
-    "db:seed:prod": "node --env-file=../../.env scripts/seed.ts --prod",
-    "db:seed-remove": "node --env-file=../../.env scripts/seed-remove.ts",
-    "db:seed-remove:prod": "node --env-file=../../.env scripts/seed-remove.ts --prod"
+    "db:studio:prod": "drizzle-kit studio --config=drizzle-prod.config.ts"
   },
   "dependencies": {
     "pg": "8.23.0"
