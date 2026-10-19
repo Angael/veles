@@ -25,8 +25,7 @@
 
 ## Database Scripts
 - The worker syncs the shared food products (`packages/db/src/seed/food-products.ts`) on every start, so deploys apply them. To remove a seed, move its `seedKey` to `retiredFoodProductSeedKeys`.
-- `pnpm db:seed` runs the same food product sync on the development database at `DATABASE_URL`.
-- `pnpm db:reset` rebuilds the development database and seeds the development user/account, calorie goal, food products, food logs and weights, and recipes. Diary entries are end-to-end encrypted, so they are not seeded.
+- `pnpm db:reset` rebuilds the development database and seeds the development user/account, calorie goal, food logs and weights, and recipes, then runs the worker's food product sync. Diary entries are end-to-end encrypted, so they are not seeded.
 
 ## Structure
 - There is no root `src/`. Code lives in `apps/web/src`, `apps/worker/src`, `apps/preview/src`, and `packages/db/src`; paths in this section are repository-root-relative.

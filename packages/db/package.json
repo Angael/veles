@@ -16,8 +16,7 @@
     "db:push": "drizzle-kit push",
     "db:reset": "node --env-file=../../.env scripts/db-reset.ts",
     "db:studio": "drizzle-kit studio",
-    "db:studio:prod": "drizzle-kit studio --config=drizzle-prod.config.ts",
-    "db:seed": "node --env-file=../../.env scripts/seed.ts"
+    "db:studio:prod": "drizzle-kit studio --config=drizzle-prod.config.ts"
   },
   "dependencies": {
     "pg": "8.23.0"

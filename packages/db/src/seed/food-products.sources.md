@@ -139,4 +139,4 @@ The worker syncs the catalog each time it starts, so every deploy applies it.
 The sync inserts seeds whose `seedKey` is missing and deletes rows whose key
 is in `retiredFoodProductSeedKeys`. It does not change existing rows, so user
 edits stay. Food logs keep their own nutrition values when a product is deleted.
-Run `pnpm db:seed` to sync the development database by hand.
+`pnpm db:reset` runs the same sync on the development database.
