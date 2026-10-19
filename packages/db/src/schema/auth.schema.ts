@@ -1,4 +1,13 @@
-import { boolean, index, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  index,
+  integer,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uniqueIndex,
+} from 'drizzle-orm/pg-core';
 
 export const users = pgTable('user', {
   id: text('id').primaryKey(),
@@ -63,4 +72,54 @@ export const verifications = pgTable(
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
   },
   (table) => [index('verification_identifier_idx').on(table.identifier)],
+);
+
+/** Account-wide AI consent. Missing rows deny access, including for existing API keys. */
+export const userAgentPermissions = pgTable(
+  'user_agent_permission',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    feature: text('feature').notNull(),
+    readEnabled: boolean('read_enabled').notNull().default(false),
+    writeEnabled: boolean('write_enabled').notNull().default(false),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.feature] })],
+);
+
+/** Better Auth API-key plugin table; keys authenticate the MCP endpoint. */
+export const apiKeys = pgTable(
+  'apikey',
+  {
+    id: text('id').primaryKey(),
+    configId: text('config_id').notNull().default('default'),
+    name: text('name'),
+    start: text('start'),
+    prefix: text('prefix'),
+    key: text('key').notNull(),
+    referenceId: text('reference_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    refillInterval: integer('refill_interval'),
+    refillAmount: integer('refill_amount'),
+    lastRefillAt: timestamp('last_refill_at'),
+    enabled: boolean('enabled').default(true),
+    rateLimitEnabled: boolean('rate_limit_enabled').default(true),
+    rateLimitTimeWindow: integer('rate_limit_time_window'),
+    rateLimitMax: integer('rate_limit_max'),
+    requestCount: integer('request_count').default(0),
+    remaining: integer('remaining'),
+    lastRequest: timestamp('last_request'),
+    expiresAt: timestamp('expires_at'),
+    createdAt: timestamp('created_at').notNull(),
+    updatedAt: timestamp('updated_at').notNull(),
+    permissions: text('permissions'),
+    metadata: text('metadata'),
+  },
+  (table) => [
+    index('apikey_config_id_idx').on(table.configId),
+    index('apikey_reference_id_idx').on(table.referenceId),
+    index('apikey_key_idx').on(table.key),
+  ],
 );

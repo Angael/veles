@@ -1,23 +1,22 @@
-import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { format, parseISO } from 'date-fns';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db/schema';
-import { dateOnlyType } from '@/lib/dateOnly';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { floorDuration } from './metrics';
+import { autoFinishIdleWorkouts, setSecondsSql, loadWorkoutSession } from './workouts.server';
 import {
-  autoFinishIdleWorkouts,
-  completeFilledSets,
-  setSecondsSql,
-  loadWorkoutSession,
-  requireNoOpenWorkout,
-  requireOwnedWorkout,
-} from './workouts.server';
-import { getLocale } from '@/lib/i18n/getLocale';
+  deleteWorkoutRecord,
+  startWorkoutRecord,
+  updateWorkoutRecord,
+} from './session/session.server';
+import {
+  startWorkoutInputType,
+  updateWorkoutInputType,
+  workoutIdType,
+} from './workouts.validation';
 
 export type WorkoutSummary = {
   id: string;
@@ -31,8 +30,6 @@ export type WorkoutSummary = {
   doneSets: number;
   volumeKg: number;
 };
-
-const idInputType = type({ id: 'string.uuid' });
 
 export const getWorkouts = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getWorkouts')])
@@ -80,14 +77,12 @@ export const getWorkouts = createServerFn({ method: 'GET' })
 
 export const getWorkoutSession = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getWorkoutSession')])
-  .validator(arkTypeValidator(idInputType))
+  .validator(arkTypeValidator(workoutIdType))
   .handler(async ({ data }) => {
     const session = await requireSession();
     await autoFinishIdleWorkouts(db, session.user.id);
     return loadWorkoutSession(session.user.id, data.id);
   });
-
-const startWorkoutInputType = type({ date: dateOnlyType });
 
 /** Creates an empty session for the given local day, named after the weekday. */
 export const startWorkout = createServerFn({ method: 'POST' })
@@ -95,26 +90,8 @@ export const startWorkout = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(startWorkoutInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    await autoFinishIdleWorkouts(db, session.user.id);
-    await requireNoOpenWorkout(db, session.user.id);
-    const [workout] = await db
-      .insert(workoutSessions)
-      .values({
-        date: data.date,
-        name: defaultWorkoutName(data.date),
-        startedAt: new Date(),
-        userId: session.user.id,
-      })
-      .returning({ id: workoutSessions.id });
-    if (!workout) throw new Error('Workout insert returned no row.');
-    return { id: workout.id };
+    return startWorkoutRecord(session.user.id, data);
   });
-
-const updateWorkoutInputType = type({
-  id: 'string.uuid',
-  'name?': '0 < string <= 200',
-  'finished?': 'boolean',
-});
 
 /** Renames a session, or finishes / reopens it. Reopening is refused while another is open. */
 export const updateWorkout = createServerFn({ method: 'POST' })
@@ -122,45 +99,13 @@ export const updateWorkout = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(updateWorkoutInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    await requireOwnedWorkout(db, session.user.id, data.id);
-    if (data.finished === false) {
-      await autoFinishIdleWorkouts(db, session.user.id);
-      await requireNoOpenWorkout(db, session.user.id, data.id);
-    }
-    await db
-      .update(workoutSessions)
-      .set({
-        ...(data.name?.trim() ? { name: data.name.trim() } : {}),
-        ...(data.finished === undefined ? {} : { endedAt: data.finished ? new Date() : null }),
-        updatedAt: new Date(),
-      })
-      .where(eq(workoutSessions.id, data.id));
-    if (data.finished) await completeFilledSets(db, [data.id]);
+    await updateWorkoutRecord(session.user.id, data);
   });
 
 export const deleteWorkout = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('deleteWorkout')])
-  .validator(arkTypeValidator(idInputType))
+  .validator(arkTypeValidator(workoutIdType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    await requireOwnedWorkout(db, session.user.id, data.id);
-    await db.delete(workoutSessions).where(eq(workoutSessions.id, data.id));
+    await deleteWorkoutRecord(session.user.id, data);
   });
-
-const POLISH_WEEKDAY_ADJECTIVES = [
-  'Niedzielny',
-  'Poniedziałkowy',
-  'Wtorkowy',
-  'Środowy',
-  'Czwartkowy',
-  'Piątkowy',
-  'Sobotni',
-];
-
-/** "Monday workout" / "Poniedziałkowy trening", in the language of the user who starts it. */
-function defaultWorkoutName(date: string) {
-  const day = parseISO(date);
-  return getLocale() === 'pl'
-    ? `${POLISH_WEEKDAY_ADJECTIVES[day.getDay()]} trening`
-    : `${format(day, 'EEEE')} workout`;
-}

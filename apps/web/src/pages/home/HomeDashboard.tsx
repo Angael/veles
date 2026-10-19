@@ -190,12 +190,12 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
 
         <Card as='article' className={css.todosTile} data-appear='3' shadow={false}>
           <div className={css.tileHeading}>
-            <h2>{t({ en: 'Todos', pl: 'Notatki' })}</h2>
+            <h2>{t({ en: 'Notes', pl: 'Notatki' })}</h2>
             <CheckIcon aria-hidden='true' />
           </div>
           <p>{t({ en: 'View your list', pl: 'Zobacz swoją listę' })}</p>
           <Link
-            aria-label={t({ en: 'Open Todos', pl: 'Otwórz notatki' })}
+            aria-label={t({ en: 'Open Notes', pl: 'Otwórz notatki' })}
             className={css.cardLink}
             to='/todos'
           />

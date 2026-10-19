@@ -6,10 +6,10 @@ import { recipeImages, recipes, uploadObjects, userSharingSettings } from '@vele
 import { db } from '@/server/db.server';
 import { getSessionUserId, requireSession } from '@/server/getSession.server';
 import { getSharingFriendsIds } from '@/server/getSharingFriendsIds.server';
-import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { storagePathToUrl } from '@/server/storage/config.server';
-import { translate } from '@/lib/i18n/getLocale';
+import { updateRecipeRatingRecord } from './recipes.server';
+import { updateRecipeRatingInputType } from './recipes.validation';
 
 type RecipeSelect = typeof recipes.$inferSelect;
 
@@ -79,11 +79,6 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
 
 const recipeByIdInputType = type({ id: 'string.uuid' });
 
-const updateRecipeRatingInputType = type({
-  id: 'string.uuid',
-  rating: '1 <= number.integer <= 5',
-});
-
 export const getRecipeById = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRecipeById')])
   .validator(arkTypeValidator(recipeByIdInputType))
@@ -146,17 +141,7 @@ export const updateRecipeRating = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const session = await requireSession();
 
-    const updatedRows = await db
-      .update(recipes)
-      .set({ rating: data.rating, updatedAt: new Date() })
-      .where(and(eq(recipes.id, data.id), eq(recipes.userId, session.user.id)))
-      .returning({ id: recipes.id });
-
-    if (!updatedRows[0]) {
-      throw new ClientSafeError(
-        translate({ en: 'Recipe not found.', pl: 'Nie znaleziono przepisu.' }),
-      );
-    }
+    await updateRecipeRatingRecord(session.user.id, data);
 
     return { ok: true };
   });

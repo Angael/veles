@@ -13,6 +13,7 @@ import {
   useSendConnectionInvitationMutation,
 } from './account.query';
 import { FriendRow, FriendRowSkeleton } from './FriendRow';
+import { SharingSettings } from './SharingSettings';
 import css from './AccountPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
@@ -56,7 +57,15 @@ export function FriendsCard() {
       data-appear='1'
     >
       <header className={css.sectionHeader}>
-        <h2>{t({ en: 'Friends', pl: 'Znajomi' })}</h2>
+        <div>
+          <h2>{t({ en: 'Friends', pl: 'Znajomi' })}</h2>
+          <p>
+            {t({
+              en: 'Invite friends and choose what they can see.',
+              pl: 'Zaproś znajomych i wybierz, co mogą zobaczyć.',
+            })}
+          </p>
+        </div>
       </header>
 
       <TypedForm
@@ -199,6 +208,8 @@ export function FriendsCard() {
 
       {loadingState}
       {emptyState}
+
+      <SharingSettings />
     </Card>
   );
 }

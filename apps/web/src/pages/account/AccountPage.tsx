@@ -7,9 +7,9 @@ import { Card } from '@/components/ui/card/Card';
 import type { SessionUser } from '@/lib/auth/session.api';
 import { getInitials } from '@/lib/getInitials';
 import { useSignOutMutation } from './account.query';
+import { AgentAccessCard } from './AgentAccessCard';
 import { FriendsCard } from './FriendsCard';
 import { LanguageCard } from './LanguageCard';
-import { SharingSettingsCard } from './SharingSettingsCard';
 import css from './AccountPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
@@ -57,9 +57,9 @@ export function AccountPage({ user }: AccountPageProps) {
 
       <LanguageCard />
 
-      <SharingSettingsCard />
-
       <FriendsCard />
+
+      <AgentAccessCard userName={user.name} />
     </main>
   );
 }

@@ -10,7 +10,7 @@ import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import css from './WeightEntryPages.module.css';
 import { parseWeightEntries } from './parseWeightEntries';
-import { MAX_WEIGHT_IMPORT_ENTRIES } from './weight.api';
+import { MAX_WEIGHT_IMPORT_ENTRIES } from './weight.validation';
 import { useSaveWeightsMutation } from './weight.query';
 import { type I18n, useI18n } from '@/lib/i18n/I18nProvider';
 import { type Localized, pluralEn, pluralPl } from '@/lib/i18n/locale';
