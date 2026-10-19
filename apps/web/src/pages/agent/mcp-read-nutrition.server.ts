@@ -83,6 +83,7 @@ export async function readFoodDays(userId: string, query: ReadQuery) {
         entries: dayLogs.map(({ log, imageKey }) => ({
           id: log.id,
           name: log.name,
+          productId: log.productId,
           consumedAt: log.consumedAt,
           grams: fromHundredths(log.gramsHundredths),
           imageUrl: storagePathToUrl(imageKey),

@@ -2,8 +2,7 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { userAgentPermissions } from '@veles/db/schema';
-import { agentFeatureNames, agentFeatures, agentFeatureType } from '@/lib/agentAccess';
-import { ClientSafeError } from '@/lib/errors/ClientSafeError';
+import { agentFeatureNames, agentFeatureType } from '@/lib/agentAccess';
 import { readAgentPermissions } from '@/server/agentAccess.server';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
@@ -30,15 +29,12 @@ const updateAgentPermissionInputType = type({
   enabled: 'boolean',
 });
 
-/** Saves one consent switch without overwriting other permissions or granting future writes. */
+/** Saves one consent switch without overwriting other permissions. */
 export const updateAgentPermission = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateAgentPermission')])
   .validator(arkTypeValidator(updateAgentPermissionInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    if (data.access === 'write' && data.enabled && !agentFeatures[data.feature].writeAvailable) {
-      throw new ClientSafeError('Write access for this feature is coming soon.');
-    }
     const changed = consentChange(data.access, data.enabled);
     await db
       .insert(userAgentPermissions)
@@ -55,19 +51,18 @@ const setAllAgentPermissionsInputType = type({
   enabled: 'boolean',
 });
 
-/** Flips read or write for every feature at once; write skips features whose writes are not live yet. */
+/** Flips read or write for every feature at once. */
 export const setAllAgentPermissions = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('setAllAgentPermissions')])
   .validator(arkTypeValidator(setAllAgentPermissionsInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const features = agentFeatureNames.filter(
-      (feature) => data.access === 'read' || agentFeatures[feature].writeAvailable,
-    );
     const changed = consentChange(data.access, data.enabled);
     await db
       .insert(userAgentPermissions)
-      .values(features.map((feature) => ({ userId: session.user.id, feature, ...changed })))
+      .values(
+        agentFeatureNames.map((feature) => ({ userId: session.user.id, feature, ...changed })),
+      )
       .onConflictDoUpdate({
         target: [userAgentPermissions.userId, userAgentPermissions.feature],
         set: changed,

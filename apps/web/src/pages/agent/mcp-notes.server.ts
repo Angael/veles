@@ -21,30 +21,18 @@ import {
   setListItemCheckedInputType,
   deleteListItemInputType,
 } from '@/pages/todos/notes.validation';
-import { runAgentTool } from './mcp-tools.server';
+import { agentInput, agentWriter, writeAnnotations } from './mcp-tools.server';
 
-type WriteHints = { destructive: boolean; idempotent: boolean; openWorld?: boolean };
-
-const writeAnnotations = (hints: WriteHints) => ({
-  readOnlyHint: false,
-  destructiveHint: hints.destructive,
-  idempotentHint: hints.idempotent,
-  openWorldHint: hints.openWorld ?? false,
-});
-
-/** Registers the first write feature; each call checks current consent and operates on owned notes. */
+/** Note and shopping list writes; each call checks current consent and operates on owned notes. */
 export function registerNoteTools(server: McpServer, userId: string) {
-  const write =
-    <T>(operation: (userId: string, data: T) => Promise<unknown>) =>
-    async (data: T) =>
-      runAgentTool(userId, 'notes', 'write', () => operation(userId, data));
+  const write = agentWriter(userId, 'notes');
 
   server.registerTool(
     'create_note',
     {
       description:
         'Create an owned note or shopping list. New notes are private. For shopping lists, add items with create_list_item.',
-      inputSchema: createNoteInputType,
+      inputSchema: agentInput(createNoteInputType),
       annotations: writeAnnotations({ destructive: false, idempotent: false }),
     },
     write(createNoteRecord),
@@ -53,7 +41,7 @@ export function registerNoteTools(server: McpServer, userId: string) {
     'update_note',
     {
       description: 'Edit the title or content of an owned note.',
-      inputSchema: updateNoteInputType,
+      inputSchema: agentInput(updateNoteInputType),
       annotations: writeAnnotations({ destructive: false, idempotent: true }),
     },
     write(updateNoteRecord),
@@ -62,7 +50,7 @@ export function registerNoteTools(server: McpServer, userId: string) {
     'delete_note',
     {
       description: 'Delete an owned note and all its list items.',
-      inputSchema: deleteNoteInputType,
+      inputSchema: agentInput(deleteNoteInputType),
       annotations: writeAnnotations({ destructive: true, idempotent: false }),
     },
     write(deleteNoteRecord),
@@ -71,7 +59,7 @@ export function registerNoteTools(server: McpServer, userId: string) {
     'set_note_shared',
     {
       description: 'Share or unshare an owned note with connected friends.',
-      inputSchema: setNoteSharedInputType,
+      inputSchema: agentInput(setNoteSharedInputType),
       annotations: writeAnnotations({ destructive: false, idempotent: true, openWorld: true }),
     },
     write(setNoteSharedRecord),
@@ -81,7 +69,7 @@ export function registerNoteTools(server: McpServer, userId: string) {
     {
       description:
         'Convert an owned note to a shopping list or back; converts content and items atomically.',
-      inputSchema: toggleNoteTypeInputType,
+      inputSchema: agentInput(toggleNoteTypeInputType),
       annotations: writeAnnotations({ destructive: true, idempotent: false }),
     },
     write(toggleNoteTypeRecord),
@@ -90,7 +78,7 @@ export function registerNoteTools(server: McpServer, userId: string) {
     'create_list_item',
     {
       description: 'Add an item to an owned shopping list.',
-      inputSchema: createListItemInputType,
+      inputSchema: agentInput(createListItemInputType),
       annotations: writeAnnotations({ destructive: false, idempotent: false }),
     },
     write(createListItemRecord),
@@ -99,7 +87,7 @@ export function registerNoteTools(server: McpServer, userId: string) {
     'update_list_item',
     {
       description: 'Rename an item in an owned shopping list.',
-      inputSchema: updateListItemInputType,
+      inputSchema: agentInput(updateListItemInputType),
       annotations: writeAnnotations({ destructive: false, idempotent: true }),
     },
     write(updateListItemRecord),
@@ -108,7 +96,7 @@ export function registerNoteTools(server: McpServer, userId: string) {
     'set_list_item_checked',
     {
       description: 'Check or uncheck an item in an owned shopping list.',
-      inputSchema: setListItemCheckedInputType,
+      inputSchema: agentInput(setListItemCheckedInputType),
       annotations: writeAnnotations({ destructive: false, idempotent: true }),
     },
     write(setListItemCheckedRecord),
@@ -117,7 +105,7 @@ export function registerNoteTools(server: McpServer, userId: string) {
     'delete_list_item',
     {
       description: 'Delete an item from an owned shopping list.',
-      inputSchema: deleteListItemInputType,
+      inputSchema: agentInput(deleteListItemInputType),
       annotations: writeAnnotations({ destructive: true, idempotent: false }),
     },
     write(deleteListItemRecord),

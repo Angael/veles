@@ -1,14 +1,14 @@
 import { type } from 'arktype';
 
-/** Feature permissions are shared by all of an account's agent keys; writes roll out individually. */
+/** Feature permissions are shared by all of an account's agent keys. */
 export const agentFeatures = {
-  notes: { label: 'Notes and shopping lists', writeAvailable: true },
-  weight: { label: 'Weight', writeAvailable: false },
-  workouts: { label: 'Workouts', writeAvailable: false },
-  recipes: { label: 'Recipes', writeAvailable: false },
-  calories: { label: 'Food diary', writeAvailable: false },
-  calorie_goals: { label: 'Nutrition goals', writeAvailable: false },
-  food_products: { label: 'Food catalog', writeAvailable: false },
+  notes: { label: 'Notes and shopping lists' },
+  weight: { label: 'Weight' },
+  workouts: { label: 'Workouts' },
+  recipes: { label: 'Recipes' },
+  calories: { label: 'Food diary' },
+  calorie_goals: { label: 'Nutrition goals' },
+  food_products: { label: 'Food catalog' },
 } as const;
 
 export type AgentFeature = keyof typeof agentFeatures;

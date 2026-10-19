@@ -1,6 +1,6 @@
 import { BotIcon, ChevronDownIcon, ShieldCheckIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card/Card';
-import { agentFeatureNames, agentFeatures } from '@/lib/agentAccess';
+import { agentFeatureNames } from '@/lib/agentAccess';
 import { useAgentPermissionsQuery, useApiKeysQuery } from './account.query';
 import { AgentKeyList } from './AgentKeyList';
 import { AgentPermissions } from './AgentPermissions';
@@ -62,9 +62,7 @@ function PermissionSummary() {
   const permissions = useAgentPermissionsQuery().data;
   if (!permissions) return <small />;
   const reads = agentFeatureNames.filter((feature) => permissions[feature].read).length;
-  const writes = agentFeatureNames.filter(
-    (feature) => agentFeatures[feature].writeAvailable && permissions[feature].write,
-  ).length;
+  const writes = agentFeatureNames.filter((feature) => permissions[feature].write).length;
   if (!reads && !writes) return <small>Nothing shared</small>;
   return (
     <small>

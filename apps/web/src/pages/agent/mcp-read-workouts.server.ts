@@ -31,6 +31,7 @@ async function loadSessionExercises(userId: string, sessionIds: string[]) {
       .select({
         id: workoutSessionExercises.id,
         sessionId: workoutSessionExercises.sessionId,
+        exerciseId: workoutSessionExercises.exerciseId,
         name: workoutExercises.name,
         measure: workoutExercises.measure,
         notes: workoutSessionExercises.notes,
@@ -55,11 +56,12 @@ async function loadSessionExercises(userId: string, sessionIds: string[]) {
     sets.map(({ set }) => set),
     (set) => set.sessionExerciseId,
   );
-  const exercises = slots.map(({ id, sessionId, ...slot }) => ({
+  const exercises = slots.map(({ sessionId, ...slot }) => ({
     sessionId,
     exercise: {
       ...slot,
-      sets: (setsBySlot.get(id) ?? []).map((set) => ({
+      sets: (setsBySlot.get(slot.id) ?? []).map((set) => ({
+        id: set.id,
         type: set.type,
         done: set.completedAt !== null,
         ...toMetrics(set),

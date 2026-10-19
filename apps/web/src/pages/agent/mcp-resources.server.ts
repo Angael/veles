@@ -20,7 +20,7 @@ export interface AgentResource {
 
 const kcalAndMacros = 'kcal is energy; macros are protein, fat, carbs in grams';
 const setFields =
-  'Sets: type (normal, warmup, drop, failure), done, weightKg, reps, durationSeconds, distanceKm; measure says which apply.';
+  'Sets: id, type (normal, warmup, drop, failure), done, weightKg, reps, durationSeconds, distanceKm; measure says which apply.';
 
 export const resources = {
   notes: {
@@ -46,7 +46,7 @@ export const resources = {
   food_days: {
     feature: 'calories',
     dated: true,
-    description: `Food diary, one item per logged day, newest first; id and date are the same YYYY-MM-DD. Each day has entries (with imageUrl or null), total, and goal (the nutrition goal in effect; null without a goal or without Nutrition goals consent); ${kcalAndMacros}.`,
+    description: `Food diary, one item per logged day, newest first; id and date are the same YYYY-MM-DD. Each day has entries (with imageUrl or null, and productId when logged from food_products), total, and goal (the nutrition goal in effect; null without a goal or without Nutrition goals consent); ${kcalAndMacros}.`,
     read: readFoodDays,
   },
   calorie_goals: {
@@ -64,7 +64,7 @@ export const resources = {
   workout_sessions: {
     feature: 'workouts',
     dated: true,
-    description: `Workout sessions, newest first, each with its exercises (name, measure, notes) and their sets. ${setFields} durationSeconds is manual or end minus start.`,
+    description: `Workout sessions, newest first, each with its exercises (id of the session exercise, exerciseId from workout_exercises, name, measure, notes) and their sets. ${setFields} durationSeconds is manual or end minus start.`,
     read: readWorkoutSessions,
   },
   workout_routines: {

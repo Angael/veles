@@ -8,10 +8,6 @@ import {
 } from './account.query';
 import css from './AgentPermissions.module.css';
 
-const writableFeatures = agentFeatureNames.filter(
-  (feature) => agentFeatures[feature].writeAvailable,
-);
-
 /** Account-wide AI consent: one "all" row plus a flat per-feature list; applies to every key live. */
 export function AgentPermissions() {
   const permissionsQuery = useAgentPermissionsQuery();
@@ -44,8 +40,8 @@ export function AgentPermissions() {
             onCheckedChange={(enabled) => setAllMutation.mutate({ access: 'read', enabled })}
           />
           <Toggle
-            aria-label='Allow AI to write everything available'
-            checked={allOn('write', writableFeatures)}
+            aria-label='Allow AI to write everything'
+            checked={allOn('write', agentFeatureNames)}
             disabled={disabled}
             onCheckedChange={(enabled) => setAllMutation.mutate({ access: 'write', enabled })}
           />
@@ -63,18 +59,14 @@ export function AgentPermissions() {
                   updateMutation.mutate({ feature, access: 'read', enabled })
                 }
               />
-              {option.writeAvailable ? (
-                <Toggle
-                  aria-label={`Allow AI to write ${option.label}`}
-                  checked={permissions?.[feature].write ?? false}
-                  disabled={disabled}
-                  onCheckedChange={(enabled) =>
-                    updateMutation.mutate({ feature, access: 'write', enabled })
-                  }
-                />
-              ) : (
-                <span className={css.soon}>Soon</span>
-              )}
+              <Toggle
+                aria-label={`Allow AI to write ${option.label}`}
+                checked={permissions?.[feature].write ?? false}
+                disabled={disabled}
+                onCheckedChange={(enabled) =>
+                  updateMutation.mutate({ feature, access: 'write', enabled })
+                }
+              />
             </div>
           );
         })}

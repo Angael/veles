@@ -1,10 +1,13 @@
 import { randomUUID } from 'node:crypto';
-import { inArray } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { uploadObjects } from '@veles/db/schema';
+import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
+import { log } from '@/server/logger.server';
 import { getStorageConfig } from '@/server/storage/config.server';
 import { optimizeImage } from '@/server/storage/image.server';
 import { deleteFileByKey, uploadFileByKey } from '@/server/storage/r2.server';
+import type { imageActionType } from './calories.validation';
 
 export const FOOD_IMAGE_MAX_BYTES = 10 * 1024 * 1024;
 
@@ -62,4 +65,35 @@ export async function prepareFoodImage(
 
 export async function deletePreparedFoodImage(image: PreparedFoodImage) {
   await deleteFileByKey(image.key, 'public');
+}
+
+/** Uploads the photo only when the action replaces the image; keep and remove upload nothing. */
+export async function prepareImageAction(
+  action: typeof imageActionType.infer,
+  photo: File | null,
+  userId: string,
+): Promise<PreparedFoodImage | null> {
+  if (action === 'keep' || action === 'remove') return null;
+  if (!photo) throw new ClientSafeError('Choose a photo before replacing the image.');
+
+  return prepareFoodImage(photo, userId);
+}
+
+/** Never roll back bytes after their asset transaction committed, even if response loading fails. */
+export async function rollbackImage(image: PreparedFoodImage | null) {
+  if (!image) return;
+  try {
+    const [saved] = await db
+      .select({ id: uploadObjects.id })
+      .from(uploadObjects)
+      .where(eq(uploadObjects.id, image.asset.id))
+      .limit(1);
+    if (!saved) await deletePreparedFoodImage(image);
+  } catch (error) {
+    log.error('Food image rollback failed', {
+      key: image.key,
+      bucket: image.bucket,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 }

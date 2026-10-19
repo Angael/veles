@@ -1,3 +1,4 @@
+import type { StandardSchemaV1, StandardSchemaWithJSON } from '@modelcontextprotocol/server';
 import type { AgentFeature } from '@/lib/agentAccess';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { requireAgentAccess } from '@/server/agentAccess.server';
@@ -33,4 +34,57 @@ export async function runAgentTool(
       isError: true,
     };
   }
+}
+
+/**
+ * arktype cannot put these in JSON Schema: a `narrow()` check is advertised as its base type, and
+ * an `| undefined` branch of an optional key as a schema that matches nothing.
+ */
+const jsonSchemaFallback = {
+  predicate: (context: { base: unknown }) => context.base,
+  unit: (context: { base: unknown; unit: unknown }) =>
+    context.unit === undefined ? { not: {} } : context.base,
+};
+
+/**
+ * Makes an arktype input schema listable in `tools/list`. Without this, one predicate (e.g. a real
+ * calendar date check) or `| undefined` makes the SDK throw for every tool. Validation still runs
+ * the full check.
+ */
+export function agentInput<S extends StandardSchemaWithJSON>(
+  schema: S,
+): StandardSchemaWithJSON<StandardSchemaV1.InferInput<S>, StandardSchemaV1.InferOutput<S>> {
+  const standard = schema['~standard'];
+  const withFallback =
+    (convert: typeof standard.jsonSchema.input): typeof standard.jsonSchema.input =>
+    (options) =>
+      convert({
+        ...options,
+        libraryOptions: { ...options.libraryOptions, fallback: jsonSchemaFallback },
+      });
+  return {
+    '~standard': {
+      ...standard,
+      jsonSchema: {
+        input: withFallback(standard.jsonSchema.input),
+        output: withFallback(standard.jsonSchema.output),
+      },
+    },
+  };
+}
+
+type WriteHints = { destructive: boolean; idempotent: boolean; openWorld?: boolean };
+
+export const writeAnnotations = (hints: WriteHints) => ({
+  readOnlyHint: false,
+  destructiveHint: hints.destructive,
+  idempotentHint: hints.idempotent,
+  openWorldHint: hints.openWorld ?? false,
+});
+
+/** Wraps an app operation as a tool handler that rechecks live write consent on every call. */
+export function agentWriter(userId: string, feature: AgentFeature) {
+  return <T>(operation: (userId: string, data: T) => Promise<unknown>) =>
+    async (data: T) =>
+      runAgentTool(userId, feature, 'write', () => operation(userId, data));
 }

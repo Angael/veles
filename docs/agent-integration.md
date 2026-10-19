@@ -34,7 +34,7 @@ curl -s https://<veles-host>/api/mcp \
 
 | Tool           | Input                                                  | Returns                                       |
 | -------------- | ------------------------------------------------------ | --------------------------------------------- |
-| `get_access`   | none                                                   | current consent and write rollout status      |
+| `get_access`   | none                                                   | current read and write consent                |
 | `list_records` | `resource`, `cursor?`, `limit?` (≤100), `from?`, `to?` | `{ items, nextCursor }`; repeat until `null`  |
 | `get_record`   | `resource`, `id`                                       | the record, or `null` if missing or not yours |
 
@@ -60,7 +60,9 @@ Read tools appear only when at least one feature permits reads. The `list_record
 
 Write consent needs read consent: granting write also grants read, and revoking read also revokes write. Consent applies to all keys owned by the account and is checked at each tool call. Turning off a switch cuts off that operation for existing keys. Refresh `tools/list` after a change to discover the available tools.
 
-The first write feature is **Notes and shopping lists**. With its Write switch on, agents can use:
+Every feature has write tools. Each feature's tools appear only while its Write switch is on:
+
+**Notes and shopping lists**
 
 - `create_note`: `title`, `content`, `type` (`note` or `shopping_list`). New notes are private. Use empty content for shopping lists, then add list items.
 - `update_note`: `id`, optional `title` and `content`.
@@ -72,16 +74,52 @@ The first write feature is **Notes and shopping lists**. With its Write switch o
 - `set_list_item_checked`: `id`, `checked`.
 - `delete_list_item`: `id`.
 
-Creates return `{ id }`; other writes return `{ success: true }`. Permission denials and operation failures are MCP tool errors (`isError: true`). Inputs use the same validators and server operations as the app. MCP can change only owned notes and their items; it cannot change a friend's shared note. Ownership, IDs, and timestamps are set by the server. Keys cannot act as browser sessions or change account consent.
+**Weight**
 
-Other Write switches show **Coming soon** and remain disabled. The rollout can add weight writes next, then workouts, recipes, food diary and nutrition goals, and the shared catalog. Each feature must reuse its app operations, including photo handling and nutrition snapshot updates. Future writes do not inherit consent: their switches remain off until the user enables them.
+- `save_weight`: `date`, `weightKg`; replaces the weight for that date. Photos stay.
+- `save_weights`: `entries` (up to 3,000 `{ date, weightKg }`).
+
+**Recipes**
+
+- `create_recipe`: `name`, optional `description`, `ingredients`, `tags`, `portions`, `rating`, `kcal`, `protein`, `fats`, `carbs` (whole recipe, whole numbers).
+- `update_recipe`: `id` and only the fields to change. Images stay.
+- `rate_recipe`: `id`, `rating` (1–5).
+
+**Food diary**
+
+- `log_food`: `productId` (from `food_products`), `grams`, `date`. Nutrition is copied from the product.
+- `log_custom_food`: `name`, `kcal`, `date`, optional `grams`, `protein`, `fat`, `carbs`.
+- `update_food_log`: `id` and all fields. Entries with a `productId` keep their name and scale nutrition by grams.
+- `delete_food_logs`, `move_food_logs` (`date`), `copy_food_logs` (`date`): `ids` (up to 200).
+- `multiply_food_logs`: `ids`, `factor` (up to 20).
+
+**Nutrition goals**
+
+- `set_calorie_goal`: `date`, `kcal`, optional `protein`, `fat`, `carbs`. The goal applies from `date` until the next goal.
+
+**Food catalog** (shared by all accounts)
+
+- `lookup_food_barcode`: `barcode`; imports a missing product from Open Food Facts.
+- `create_food_product`: `name`, `kcalPer100g`, optional `barcode`, `productSizeGrams`, `proteinPer100g`, `fatPer100g`, `carbsPer100g`.
+- `update_food_product`: `id`, all fields, and `today` (the user's local date). Entries of that product logged on `today` by any account are recalculated.
+
+**Workouts**
+
+- Sessions: `start_workout` (`date`), `start_routine` (`routineId`, `date`), `update_workout` (`id`, `name?`, `finished?`), `delete_workout`. Only one session can be open.
+- Session exercises: `add_workout_exercise` (`workoutId`, `exerciseId` or `newExercise`), `update_workout_exercise` (`notes`), `move_workout_exercise` (`up`/`down`), `remove_workout_exercise`.
+- Sets: `add_workout_set` (`sessionExerciseId`), `duplicate_workout_set`, `update_workout_set` (`type`, `weightKg`, `reps`, `durationSeconds`, `distanceKm`, `done`), `delete_workout_set`.
+- Exercises and routines: `update_exercise`, `save_routine_from_workout`, `update_routine_from_workout`, `update_routine`, `delete_routine`.
+
+Creates return `{ id }` or the saved record; other writes return `{ success: true }`. Permission denials and operation failures are MCP tool errors (`isError: true`). Write tools call the same validators and server operations as the app. MCP can change only data that the key owner owns, plus the shared food catalog. It cannot change a friend's shared note. Ownership, IDs, and timestamps are set by the server. Keys cannot act as browser sessions or change account consent.
+
+Agents cannot upload or replace photos. Weight photos, recipe images, food log photos, and product images stay as they are, and are managed in the app. The app has no delete for weights, recipes, goals, products, or exercises, so MCP has none either.
 
 ## Adding a feature
 
-1. Define its label and rollout status in `apps/web/src/lib/agentAccess.ts`.
+1. Define its label in `apps/web/src/lib/agentAccess.ts`.
 2. Add a reader in `mcp-read-*.server.ts` that filters by the owner and nests related rows, then register it in `mcp-resources.server.ts` with its feature and a description of units.
 3. Reuse the feature's validators and server operations for writes. Run every data tool through `runAgentTool` and keep MCP writes scoped to the key owner.
-4. Set `writeAvailable` only when those write tools are implemented and registered. Keep all permissions off by default.
+4. Register the write tools in `mcp.api.ts` behind the feature's write permission. Keep all permissions off by default.
 
 ## Database rollout
 

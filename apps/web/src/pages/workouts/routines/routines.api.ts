@@ -1,4 +1,3 @@
-import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
@@ -8,18 +7,25 @@ import {
   workoutRoutines,
   workoutSessions,
 } from '@veles/db/schema';
-import { dateOnlyType } from '@/lib/dateOnly';
 import type { Measure, SetType } from '../metrics';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import {
-  autoFinishIdleWorkouts,
-  requireNoOpenWorkout,
-  requireOwnedWorkout,
-} from '../workouts.server';
-import { copyRoutineToSession, copySessionToRoutine, requireOwnedRoutine } from './routines.server';
+  routineWorkoutIdInputType,
+  saveRoutineInputType,
+  startRoutineInputType,
+  updateRoutineInputType,
+  workoutIdType,
+} from '../workouts.validation';
+import {
+  deleteRoutineRecord,
+  saveRoutineFromWorkoutRecord,
+  startRoutineRecord,
+  updateRoutineFromWorkoutRecord,
+  updateRoutineRecord,
+} from './routines.server';
 
 export type RoutineSummary = {
   id: string;
@@ -36,9 +42,6 @@ export type RoutineDetail = {
   lastUsed: string | null;
   exercises: { id: string; name: string; measure: Measure; setTypes: SetType[] }[];
 };
-
-const name = '0 < string <= 200';
-const description = 'string <= 2000';
 
 /** Routines with their exercise names, most recently used first. */
 export const getRoutines = createServerFn({ method: 'GET' })
@@ -86,12 +89,10 @@ export const getRoutines = createServerFn({ method: 'GET' })
     }));
   });
 
-const routineIdInputType = type({ id: 'string.uuid' });
-
 /** One routine for its page: exercises in order with their set types, and when it was last done. */
 export const getRoutine = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRoutine')])
-  .validator(arkTypeValidator(routineIdInputType))
+  .validator(arkTypeValidator(workoutIdType))
   .handler(async ({ data }): Promise<RoutineDetail> => {
     const session = await requireSession();
     const userId = session.user.id;
@@ -126,64 +127,23 @@ export const getRoutine = createServerFn({ method: 'GET' })
     return { ...routine, exercises: slots, lastUsed: lastUsed?.date ?? null };
   });
 
-const saveRoutineInputType = type({ workoutId: 'string.uuid', name, 'description?': description });
-
 /** Saves the session's exercises as a new routine and links the session to it. */
 export const saveRoutineFromWorkout = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('saveRoutineFromWorkout')])
   .validator(arkTypeValidator(saveRoutineInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const userId = session.user.id;
-    return db.transaction(async (tx) => {
-      const workout = await requireOwnedWorkout(tx, userId, data.workoutId);
-      const [routine] = await tx
-        .insert(workoutRoutines)
-        .values({
-          description: data.description?.trim() ?? '',
-          name: data.name.trim(),
-          userId,
-        })
-        .returning({ id: workoutRoutines.id });
-      if (!routine) throw new Error('Routine insert returned no row.');
-      await copySessionToRoutine(tx, workout.id, routine.id);
-      await tx
-        .update(workoutSessions)
-        .set({ routineId: routine.id })
-        .where(eq(workoutSessions.id, workout.id));
-      return { id: routine.id };
-    });
+    return saveRoutineFromWorkoutRecord(session.user.id, data);
   });
-
-const workoutIdInputType = type({ workoutId: 'string.uuid' });
 
 /** Overwrites the linked routine's exercises with this session's. */
 export const updateRoutineFromWorkout = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateRoutineFromWorkout')])
-  .validator(arkTypeValidator(workoutIdInputType))
+  .validator(arkTypeValidator(routineWorkoutIdInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const userId = session.user.id;
-    await db.transaction(async (tx) => {
-      const workout = await requireOwnedWorkout(tx, userId, data.workoutId);
-      const [linked] = await tx
-        .select({ routineId: workoutSessions.routineId })
-        .from(workoutSessions)
-        .where(eq(workoutSessions.id, workout.id));
-      if (!linked?.routineId) throw new ClientSafeError('This workout has no routine.');
-      const routine = await requireOwnedRoutine(tx, userId, linked.routineId);
-      await tx
-        .delete(workoutRoutineExercises)
-        .where(eq(workoutRoutineExercises.routineId, routine.id));
-      await copySessionToRoutine(tx, workout.id, routine.id);
-      await tx
-        .update(workoutRoutines)
-        .set({ updatedAt: new Date() })
-        .where(eq(workoutRoutines.id, routine.id));
-    });
+    await updateRoutineFromWorkoutRecord(session.user.id, data);
   });
-
-const startRoutineInputType = type({ routineId: 'string.uuid', date: dateOnlyType });
 
 /** Starts a session for the given day with the routine's exercises and empty sets. */
 export const startRoutine = createServerFn({ method: 'POST' })
@@ -191,61 +151,22 @@ export const startRoutine = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(startRoutineInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const userId = session.user.id;
-    return db.transaction(async (tx) => {
-      const routine = await requireOwnedRoutine(tx, userId, data.routineId);
-      await autoFinishIdleWorkouts(tx, userId);
-      await requireNoOpenWorkout(tx, userId);
-      const [workout] = await tx
-        .insert(workoutSessions)
-        .values({
-          date: data.date,
-          name: routine.name,
-          routineId: routine.id,
-          startedAt: new Date(),
-          userId,
-        })
-        .returning({ id: workoutSessions.id });
-      if (!workout) throw new Error('Workout insert returned no row.');
-      await copyRoutineToSession(tx, routine.id, workout.id);
-      return { id: workout.id };
-    });
+    return startRoutineRecord(session.user.id, data);
   });
-
-const updateRoutineInputType = type({
-  id: 'string.uuid',
-  'name?': name,
-  'description?': description,
-});
 
 export const updateRoutine = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateRoutine')])
   .validator(arkTypeValidator(updateRoutineInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    await db.transaction(async (tx) => {
-      await requireOwnedRoutine(tx, session.user.id, data.id);
-      await tx
-        .update(workoutRoutines)
-        .set({
-          ...(data.name?.trim() ? { name: data.name.trim() } : {}),
-          ...(data.description === undefined ? {} : { description: data.description.trim() }),
-          updatedAt: new Date(),
-        })
-        .where(eq(workoutRoutines.id, data.id));
-    });
+    await updateRoutineRecord(session.user.id, data);
   });
-
-const idInputType = type({ id: 'string.uuid' });
 
 /** Deletes the routine only; sessions started from it keep their sets and lose the link. */
 export const deleteRoutine = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('deleteRoutine')])
-  .validator(arkTypeValidator(idInputType))
+  .validator(arkTypeValidator(workoutIdType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    await db.transaction(async (tx) => {
-      await requireOwnedRoutine(tx, session.user.id, data.id);
-      await tx.delete(workoutRoutines).where(eq(workoutRoutines.id, data.id));
-    });
+    await deleteRoutineRecord(session.user.id, data);
   });
