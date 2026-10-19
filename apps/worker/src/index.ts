@@ -1,4 +1,5 @@
 import { createDatabaseConnection } from '@veles/db';
+import { syncFoodProductSeeds } from '@veles/db/seed/sync-food-products';
 import { errorMessage, startJob } from './job.ts';
 import { createUploadCleanup } from './upload-cleanup.ts';
 
@@ -17,6 +18,13 @@ const uploadCleanup = createUploadCleanup(connection.db, {
   accessKeyId: requireEnv('R2_ACCESS_KEY_ID'),
   secretAccessKey: requireEnv('R2_SECRET_ACCESS_KEY'),
 });
+
+// Each deploy restarts the worker, so this keeps the shared food catalog in step with the seed file.
+try {
+  console.info('food product seeds synced', await syncFoodProductSeeds(connection.db));
+} catch (error) {
+  console.error('food product seed sync failed', { error: errorMessage(error) });
+}
 
 const uploadCleanupJob = startJob({
   name: 'upload cleanup',
