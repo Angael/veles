@@ -38,6 +38,11 @@ export function productCountText(count: number): Localized {
   };
 }
 
+/** Catalog product name per locale; products without a Polish name show their only name. */
+export function foodProductNames(product: { name: string; namePl: string | null }): Localized {
+  return { en: product.name, pl: product.namePl ?? product.name };
+}
+
 export function isWithinKcalGoal(kcalHundredths: number, goalKcalHundredths: number) {
   return Math.abs(kcalHundredths - goalKcalHundredths) * 10 <= goalKcalHundredths;
 }

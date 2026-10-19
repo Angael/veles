@@ -1,4 +1,6 @@
 import type { CalorieFood } from '../calories.api';
+import { foodProductNames } from '../calorieHelpers';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 
 function fuzzyTermScore(value: string, term: string) {
   const substringIndex = value.indexOf(term);
@@ -40,13 +42,19 @@ function foodNameScore(food: CalorieFood, terms: string[]) {
 type RankedFood = { food: CalorieFood; score: number };
 
 /** Finds the best catalog matches in one pass while retaining only the requested result count. */
-export function filterFoods(foods: CalorieFood[], query: string, limit: number) {
+export function filterFoods(
+  foods: CalorieFood[],
+  query: string,
+  limit: number,
+  locale: Locale = DEFAULT_LOCALE,
+) {
   if (limit <= 0) return [];
 
   const normalizedQuery = query.trim().toLocaleLowerCase();
   if (!normalizedQuery) return foods.slice(0, limit);
 
   const terms = normalizedQuery.split(/\s+/);
+  const shownName = (food: CalorieFood) => foodProductNames(food)[locale];
   const rankedFoods: RankedFood[] = [];
 
   for (const food of foods) {
@@ -58,7 +66,8 @@ export function filterFoods(foods: CalorieFood[], query: string, limit: number) 
       const scoreComparison = score - rankedFood.score;
       if (
         scoreComparison < 0 ||
-        (scoreComparison === 0 && food.name.localeCompare(rankedFood.food.name) < 0)
+        (scoreComparison === 0 &&
+          shownName(food).localeCompare(shownName(rankedFood.food), locale) < 0)
       ) {
         break;
       }

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { calorieDashboardQueryOptions, useRecordFoodMutation } from '../calories.query';
 import { SelectedFoodCard } from '../SelectedFoodCard';
+import { foodProductNames } from '../calorieHelpers';
 import { GoalPreview } from './GoalPreview';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
@@ -58,7 +59,7 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
         fat={fat}
         imageUrl={food.imageUrl}
         kcal={kcal}
-        name={food.name}
+        name={t(foodProductNames(food))}
         productId={food.id}
         protein={protein}
       />

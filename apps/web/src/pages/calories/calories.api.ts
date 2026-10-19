@@ -28,7 +28,12 @@ import {
   toCalorieGoal,
   toHundredths,
 } from '@/lib/nutrition';
-import { calorieWeekDates, isWithinKcalGoal, MAX_FOOD_LOG_MULTIPLIER } from './calorieHelpers';
+import {
+  calorieWeekDates,
+  foodProductNames,
+  isWithinKcalGoal,
+  MAX_FOOD_LOG_MULTIPLIER,
+} from './calorieHelpers';
 import { translate } from '@/lib/i18n/getLocale';
 
 const MAX_TEXT_LENGTH = 500;
@@ -624,7 +629,7 @@ export const recordFood = createServerFn({ method: 'POST' })
     const [inserted] = await db
       .insert(foodLogs)
       .values({
-        name: product.name,
+        name: translate(foodProductNames(product)),
         productId: product.id,
         imageUploadObjectId,
         gramsHundredths,

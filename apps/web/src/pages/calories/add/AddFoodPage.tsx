@@ -5,6 +5,7 @@ import { useState, useTransition } from 'react';
 import { FoodSummary } from '../FoodSummary';
 import type { CalorieFood } from '../calories.api';
 import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '../calories.query';
+import { foodProductNames } from '../calorieHelpers';
 import { SelectedFoodForm } from './SelectedFoodForm';
 import { filterFoods } from './filterFoods';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -27,7 +28,7 @@ function nutritionAtGrams(valuePer100g: number | null, grams: number) {
 
 /** Food search; picking a food pushes `?foodId` so back returns from the confirm step to the list. */
 export function AddFoodPage({ date, foodId }: Props) {
-  const { formatNumber, t } = useI18n();
+  const { formatNumber, locale, t } = useI18n();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
@@ -38,7 +39,7 @@ export function AddFoodPage({ date, foodId }: Props) {
     enabled: foodId !== undefined,
   });
   const foodsQuery = useQuery(calorieFoodsQueryOptions());
-  const foods = filterFoods(foodsQuery.data ?? [], filterQuery, MAX_VISIBLE_FOODS);
+  const foods = filterFoods(foodsQuery.data ?? [], filterQuery, MAX_VISIBLE_FOODS, locale);
 
   function selectFood(food: CalorieFood) {
     queryClient.setQueryData(calorieFoodQueryOptions(food.id).queryKey, food);
@@ -94,7 +95,7 @@ export function AddFoodPage({ date, foodId }: Props) {
                     onClick={() => selectFood(food)}
                     type='button'
                   >
-                    {food.name}
+                    {t(foodProductNames(food))}
                   </button>
                 }
                 protein={nutritionAtGrams(food.proteinPer100g, productGrams)}
