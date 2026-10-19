@@ -1,4 +1,5 @@
 import type { exerciseMeasures, workoutSetTypes } from '@veles/db/schema';
+import type { Locale, Localized } from '@/lib/i18n/locale';
 
 export type Measure = (typeof exerciseMeasures)[number];
 export type SetType = (typeof workoutSetTypes)[number];
@@ -15,35 +16,42 @@ export const MEASURES: Measure[] = [
   'distance_duration',
 ];
 
-export const MEASURE_LABELS: Record<Measure, string> = {
-  distance_duration: 'Distance + time',
-  duration: 'Time',
-  reps: 'Reps',
-  weight_duration: 'Weight + time',
-  weight_reps: 'Weight × reps',
+export const MEASURE_LABELS: Record<Measure, Localized> = {
+  distance_duration: { en: 'Distance + time', pl: 'Dystans + czas' },
+  duration: { en: 'Time', pl: 'Czas' },
+  reps: { en: 'Reps', pl: 'Powtórzenia' },
+  weight_duration: { en: 'Weight + time', pl: 'Ciężar + czas' },
+  weight_reps: { en: 'Weight × reps', pl: 'Ciężar × powtórzenia' },
 };
 
 export const SET_TYPES: SetType[] = ['normal', 'warmup', 'drop', 'failure'];
 
-export const SET_TYPE_LABELS: Record<SetType, string> = {
-  drop: 'Drop set',
-  failure: 'To failure',
-  normal: 'Normal',
-  warmup: 'Warm-up',
+export const SET_TYPE_LABELS: Record<SetType, Localized> = {
+  drop: { en: 'Drop set', pl: 'Drop set' },
+  failure: { en: 'To failure', pl: 'Do upadku' },
+  normal: { en: 'Normal', pl: 'Zwykła' },
+  warmup: { en: 'Warm-up', pl: 'Rozgrzewka' },
 };
 
 /** Short note on how each set type counts, flashed next to the badge after a tap. */
-export const SET_TYPE_NOTES: Record<SetType, string> = {
-  drop: 'lighter, no rest',
-  failure: 'until you can’t',
-  normal: 'counted',
-  warmup: 'not counted',
+export const SET_TYPE_NOTES: Record<SetType, Localized> = {
+  drop: { en: 'lighter, no rest', pl: 'lżej, bez przerwy' },
+  failure: { en: 'until you can’t', pl: 'aż nie dasz rady' },
+  normal: { en: 'counted', pl: 'liczona' },
+  warmup: { en: 'not counted', pl: 'nieliczona' },
 };
 
-export const SET_BADGE: Record<Exclude<SetType, 'normal'>, string> = {
-  drop: 'D',
-  failure: 'F',
-  warmup: 'W',
+export const SET_BADGE: Record<Exclude<SetType, 'normal'>, Localized> = {
+  drop: { en: 'D', pl: 'D' },
+  failure: { en: 'F', pl: 'U' },
+  warmup: { en: 'W', pl: 'R' },
+};
+
+/** Short weekday with day and month, e.g. `Mon 06.10`, for workout and routine dates. */
+export const SHORT_DAY: Intl.DateTimeFormatOptions = {
+  day: '2-digit',
+  month: '2-digit',
+  weekday: 'short',
 };
 
 export const EMPTY_METRICS: SetMetrics = {
@@ -69,34 +77,42 @@ export const MAX_WEIGHT_KG = 200;
 
 export type MetricField = {
   key: MetricKey;
-  label: string;
-  unit: string;
+  label: Localized;
+  unit: Localized;
   /** Unit shown inside a compact cell; time needs none because `1:30` is clear. */
-  cellUnit?: string;
+  cellUnit?: Localized;
   kind: 'number' | 'time';
 };
 
+const kg = { en: 'kg', pl: 'kg' };
+const km = { en: 'km', pl: 'km' };
+const repsUnit = { en: 'reps', pl: 'powt.' };
 const weight: MetricField = {
-  cellUnit: 'kg',
+  cellUnit: kg,
   key: 'weightKg',
   kind: 'number',
-  label: 'Weight',
-  unit: 'kg',
+  label: { en: 'Weight', pl: 'Ciężar' },
+  unit: kg,
 };
 const reps: MetricField = {
-  cellUnit: 'reps',
+  cellUnit: repsUnit,
   key: 'reps',
   kind: 'number',
-  label: 'Reps',
-  unit: 'reps',
+  label: { en: 'Reps', pl: 'Powtórzenia' },
+  unit: repsUnit,
 };
-const time: MetricField = { key: 'durationSeconds', kind: 'time', label: 'Time', unit: 'min:s' };
+const time: MetricField = {
+  key: 'durationSeconds',
+  kind: 'time',
+  label: { en: 'Time', pl: 'Czas' },
+  unit: { en: 'min:s', pl: 'min:s' },
+};
 const distance: MetricField = {
-  cellUnit: 'km',
+  cellUnit: km,
   key: 'distanceKm',
   kind: 'number',
-  label: 'Distance',
-  unit: 'km',
+  label: { en: 'Distance', pl: 'Dystans' },
+  unit: km,
 };
 
 export const MEASURE_FIELDS: Record<Measure, MetricField[]> = {
@@ -139,8 +155,15 @@ export function scrubTuning(field: MetricField) {
   }
 }
 
-export function formatMetric(field: MetricField, value: number) {
-  return field.kind === 'time' ? formatDuration(value) : String(Number(value.toFixed(2)));
+/** Plain set number, e.g. `82.5` or `82,5`; no grouping so it stays easy to edit. */
+export function formatSetNumber(value: number, locale: Locale) {
+  return new Intl.NumberFormat(locale, { maximumFractionDigits: 2, useGrouping: false }).format(
+    value,
+  );
+}
+
+export function formatMetric(field: MetricField, value: number, locale: Locale) {
+  return field.kind === 'time' ? formatDuration(value) : formatSetNumber(value, locale);
 }
 
 /** Accepts `90`, `1:30` or `1.5m` for time; plain decimals with `,` or `.` for numbers. */
@@ -176,12 +199,14 @@ export function filledFromPrevious(
 }
 
 /** Short label for a logged set, such as `80 × 5` or `5.2 km · 28:10`. */
-export function describeSet(set: SetMetrics) {
+export function describeSet(set: SetMetrics, locale: Locale) {
+  const num = (value: number) => formatSetNumber(value, locale);
   const parts: string[] = [];
-  if (set.weightKg !== null && set.reps !== null) parts.push(`${set.weightKg} × ${set.reps}`);
-  else if (set.reps !== null) parts.push(`× ${set.reps}`);
-  else if (set.weightKg !== null) parts.push(`${set.weightKg} kg`);
-  if (set.distanceKm !== null) parts.push(`${set.distanceKm} km`);
+  if (set.weightKg !== null && set.reps !== null) {
+    parts.push(`${num(set.weightKg)} × ${set.reps}`);
+  } else if (set.reps !== null) parts.push(`× ${set.reps}`);
+  else if (set.weightKg !== null) parts.push(`${num(set.weightKg)} kg`);
+  if (set.distanceKm !== null) parts.push(`${num(set.distanceKm)} km`);
   if (set.durationSeconds !== null) parts.push(formatDuration(set.durationSeconds));
   return parts.join(' · ') || '—';
 }

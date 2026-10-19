@@ -54,7 +54,7 @@ export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }:
         render={<div role='row' />}
       >
         <button
-          aria-label={`Set type: ${SET_TYPE_LABELS[set.type]}. Tap to change.`}
+          aria-label={`Set type: ${SET_TYPE_LABELS[set.type].en}. Tap to change.`}
           className={clsx(css.badge, css[`badge_${set.type}`])}
           onClick={cycleType}
           type='button'
@@ -63,9 +63,9 @@ export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }:
         </button>
         {fields.map((field) => (
           <ScrubCell
-            aria-label={`${field.label}, drag sideways or tap for details`}
+            aria-label={`${field.label.en}, drag sideways or tap for details`}
             disabled={menuOpen}
-            format={(value) => formatMetric(field, value)}
+            format={(value) => formatMetric(field, value, 'en')}
             key={field.key}
             onChange={(value) => update({ [field.key]: value })}
             onTap={onOpenSheet}

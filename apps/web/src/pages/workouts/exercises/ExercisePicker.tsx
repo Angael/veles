@@ -1,16 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { format, parseISO } from 'date-fns';
 import { PlusIcon, SearchIcon } from 'lucide-react';
 import { useEffect, useId, useState, type KeyboardEvent } from 'react';
 import { DialogPopup, DialogRoot, DialogTitle } from '@/components/ui/dialog/Dialog';
 import { TextInput } from '@/components/ui/text-input/TextInput';
-import { MEASURE_LABELS, MEASURES, type Measure } from '../metrics';
+import { MEASURE_LABELS, MEASURES, SHORT_DAY, type Measure } from '../metrics';
 import { exercisesQueryOptions } from './exercises.query';
 import { fuzzySearch, normalize } from './fuzzySearch';
 import { guessMeasure } from './guessMeasure';
 import { MeasurePicker } from './MeasurePicker';
 import css from './ExercisePicker.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export type ExercisePick =
   | { exerciseId: string }
@@ -22,6 +22,7 @@ export type ExercisePick =
  * options, ←/→ change the tracking type on the Create row, Enter picks.
  */
 function ExercisePicker({ onPick }: { onPick: (pick: ExercisePick) => void }) {
+  const { formatDate, t } = useI18n();
   const exercises = useQuery(exercisesQueryOptions());
   const listId = useId();
   const [query, setQuery] = useState('');
@@ -77,7 +78,10 @@ function ExercisePicker({ onPick }: { onPick: (pick: ExercisePick) => void }) {
         aria-autocomplete='list'
         aria-controls={listId}
         aria-expanded={optionCount > 0}
-        aria-label='Search or name a new exercise'
+        aria-label={t({
+          en: 'Search or name a new exercise',
+          pl: 'Szukaj lub nazwij nowe ćwiczenie',
+        })}
         autoFocus
         onChange={(event) => {
           setQuery(event.target.value);
@@ -85,14 +89,19 @@ function ExercisePicker({ onPick }: { onPick: (pick: ExercisePick) => void }) {
           setActive(0);
         }}
         onKeyDown={onKeyDown}
-        placeholder='Search or type a new name'
+        placeholder={t({ en: 'Search or type a new name', pl: 'Szukaj lub wpisz nową nazwę' })}
         role='combobox'
         trailing={<SearchIcon aria-hidden='true' className={css.searchIcon} />}
         value={query}
       />
 
       {exercises.isSuccess && exercises.data.length === 0 && !trimmed ? (
-        <p className={css.hint}>Type a name to create your first exercise.</p>
+        <p className={css.hint}>
+          {t({
+            en: 'Type a name to create your first exercise.',
+            pl: 'Wpisz nazwę, aby utworzyć pierwsze ćwiczenie.',
+          })}
+        </p>
       ) : null}
 
       <ul className={css.results} id={listId} role='listbox'>
@@ -108,8 +117,8 @@ function ExercisePicker({ onPick }: { onPick: (pick: ExercisePick) => void }) {
           >
             <span className={css.resultName}>{exercise.name}</span>
             <span className={css.resultMeta}>
-              {MEASURE_LABELS[exercise.measure]}
-              {exercise.lastDate ? ` · ${format(parseISO(exercise.lastDate), 'EEE dd.MM')}` : ''}
+              {t(MEASURE_LABELS[exercise.measure])}
+              {exercise.lastDate ? ` · ${formatDate(exercise.lastDate, SHORT_DAY)}` : ''}
             </span>
           </li>
         ))}
@@ -123,11 +132,18 @@ function ExercisePicker({ onPick }: { onPick: (pick: ExercisePick) => void }) {
             <span className={css.createLabel}>
               <PlusIcon aria-hidden='true' />
               <span>
-                Create <strong>“{trimmed}”</strong> as:
+                {t({ en: 'Create', pl: 'Utwórz' })}{' '}
+                <strong>{t({ en: `“${trimmed}”`, pl: `„${trimmed}”` })}</strong>{' '}
+                {t({ en: 'as:', pl: 'jako:' })}
               </span>
             </span>
             <MeasurePicker
-              actionLabel={(label) => `Create “${trimmed}” as ${label}`}
+              actionLabel={(label) =>
+                t({
+                  en: `Create “${trimmed}” as ${label}`,
+                  pl: `Utwórz „${trimmed}” jako ${label}`,
+                })
+              }
               onChange={create}
               value={measure}
             />
@@ -145,10 +161,12 @@ type ExercisePickerDialogProps = {
 };
 
 export function ExercisePickerDialog({ onOpenChange, onPick, open }: ExercisePickerDialogProps) {
+  const { t } = useI18n();
+
   return (
     <DialogRoot onOpenChange={onOpenChange} open={open}>
       <DialogPopup className={css.pickerDialog}>
-        <DialogTitle>Add exercise</DialogTitle>
+        <DialogTitle>{t({ en: 'Add exercise', pl: 'Dodaj ćwiczenie' })}</DialogTitle>
         {open ? <ExercisePicker onPick={onPick} /> : null}
       </DialogPopup>
     </DialogRoot>

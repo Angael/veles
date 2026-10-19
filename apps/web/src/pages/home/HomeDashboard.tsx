@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { differenceInCalendarDays, format, parseISO } from 'date-fns';
+import { differenceInCalendarDays, parseISO } from 'date-fns';
 import {
   BookOpenIcon,
   CheckIcon,
@@ -12,12 +12,17 @@ import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import type { HomeDashboardData } from './home.api';
 import css from './HomeDashboard.module.css';
+import { type I18n, useI18n } from '@/lib/i18n/I18nProvider';
+import { pluralEn, pluralPl } from '@/lib/i18n/locale';
+import { MACRO_LABELS } from '@/lib/nutritionLabels';
 
 type HomeDashboardProps = {
   data: HomeDashboardData;
 };
 
 export function HomeDashboard({ data }: HomeDashboardProps) {
+  const i18n = useI18n();
+  const { formatDate, formatNumber, t } = i18n;
   const latestWeight = data.weightEntries.at(-1);
   const previousWeight = data.weightEntries.at(-2);
   const delta =
@@ -31,16 +36,21 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
       <div className={css.grid}>
         <Card as='article' className={css.foodTile} data-appear shadow={false}>
           <div className={css.tileHeading}>
-            <h2>Today’s food</h2>
+            <h2>{t({ en: 'Today’s food', pl: 'Dzisiejsze jedzenie' })}</h2>
             <FlameIcon aria-hidden='true' />
           </div>
           <div className={css.nutrition}>
             <div className={css.kcal}>
               <div className={css.kcalValue}>
-                <strong>{Math.round(kcal)}</strong>
+                <strong>{formatNumber(Math.round(kcal))}</strong>
                 <span>kcal</span>
                 <small>
-                  {data.nutrition.goal ? `of ${Math.round(data.nutrition.goal.kcal)}` : 'No goal'}
+                  {data.nutrition.goal
+                    ? t({
+                        en: `of ${formatNumber(Math.round(data.nutrition.goal.kcal))}`,
+                        pl: `z ${formatNumber(Math.round(data.nutrition.goal.kcal))}`,
+                      })
+                    : t({ en: 'No goal', pl: 'Brak celu' })}
                 </small>
               </div>
               <NutritionProgress
@@ -67,23 +77,36 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
               />
             </div>
           </div>
-          <Link aria-label='Open Today’s food' className={css.cardLink} to='/calories' />
+          <Link
+            aria-label={t({ en: 'Open Today’s food', pl: 'Otwórz dzisiejsze jedzenie' })}
+            className={css.cardLink}
+            to='/calories'
+          />
         </Card>
 
         <Card as='article' className={css.weightTile} data-appear='1' shadow={false}>
           <div className={css.tileHeading}>
-            <h2>Weight</h2>
+            <h2>{t({ en: 'Weight', pl: 'Waga' })}</h2>
             <ScaleIcon aria-hidden='true' />
           </div>
           {latestWeight ? (
             <>
               <div className={css.weightValue}>
-                <strong>{latestWeight.weightKg.toFixed(1)}</strong>
+                <strong>
+                  {formatNumber(latestWeight.weightKg, {
+                    maximumFractionDigits: 1,
+                    minimumFractionDigits: 1,
+                  })}
+                </strong>
                 <span>kg</span>
               </div>
               <div className={css.chart}>
                 {chartPoints ? (
-                  <svg aria-label='Recent weight trend' role='img' viewBox='0 0 300 96'>
+                  <svg
+                    aria-label={t({ en: 'Recent weight trend', pl: 'Ostatni trend wagi' })}
+                    role='img'
+                    viewBox='0 0 300 96'
+                  >
                     <defs>
                       <linearGradient id='dashboard-weight-fill' x1='0' x2='0' y1='0' y2='1'>
                         <stop offset='0' stopColor='var(--c-accent)' stopOpacity='0.3' />
@@ -98,22 +121,31 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
                 )}
               </div>
               <div className={css.weightMeta}>
-                <span>{format(parseISO(latestWeight.date), 'MMM d')}</span>
-                <span>{formatDelta(delta)}</span>
+                <span>{formatDate(latestWeight.date, { day: 'numeric', month: 'short' })}</span>
+                <span>{formatDelta(delta, i18n)}</span>
               </div>
             </>
           ) : (
             <div className={css.emptyWeight}>
-              <strong>No weight logged yet</strong>
-              <p>Log your first weight to see your trend.</p>
+              <strong>{t({ en: 'No weight logged yet', pl: 'Brak zapisanej wagi' })}</strong>
+              <p>
+                {t({
+                  en: 'Log your first weight to see your trend.',
+                  pl: 'Zapisz pierwszy pomiar, aby zobaczyć trend.',
+                })}
+              </p>
             </div>
           )}
-          <Link aria-label='Open Weight' className={css.cardLink} to='/weight' />
+          <Link
+            aria-label={t({ en: 'Open Weight', pl: 'Otwórz wagę' })}
+            className={css.cardLink}
+            to='/weight'
+          />
         </Card>
 
         <Card as='section' className={css.recipeTile} data-appear='2' shadow={false}>
           <div className={css.tileHeading}>
-            <h2>Recipes for today</h2>
+            <h2>{t({ en: 'Recipes for today', pl: 'Przepisy na dziś' })}</h2>
             <UtensilsIcon aria-hidden='true' />
           </div>
           <div className={css.recipeStack}>
@@ -128,49 +160,78 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
                   <div>
                     <strong>{recipe.name}</strong>
                     <small>
-                      {recipe.kcal === null ? 'Nutrition not set' : `${recipe.kcal} kcal`}
+                      {recipe.kcal === null
+                        ? t({ en: 'Nutrition not set', pl: 'Brak wartości odżywczych' })
+                        : `${formatNumber(recipe.kcal)} kcal`}
                     </small>
                   </div>
                 </Link>
               ))
             ) : (
               <div className={css.emptyRecipes}>
-                <p>Save a recipe to get a fresh daily selection here.</p>
+                <p>
+                  {t({
+                    en: 'Save a recipe to get a fresh daily selection here.',
+                    pl: 'Zapisz przepis, aby codziennie widzieć tu nowy wybór.',
+                  })}
+                </p>
                 <Btn isLink render={<Link to='/recipes/add' />} variant='outlineMain'>
-                  Add the first
+                  {t({ en: 'Add the first', pl: 'Dodaj pierwszy' })}
                 </Btn>
               </div>
             )}
           </div>
-          <Link aria-label='Browse recipes' className={css.cardLink} to='/recipes' />
+          <Link
+            aria-label={t({ en: 'Browse recipes', pl: 'Przeglądaj przepisy' })}
+            className={css.cardLink}
+            to='/recipes'
+          />
         </Card>
 
         <Card as='article' className={css.todosTile} data-appear='3' shadow={false}>
           <div className={css.tileHeading}>
-            <h2>Todos</h2>
+            <h2>{t({ en: 'Todos', pl: 'Notatki' })}</h2>
             <CheckIcon aria-hidden='true' />
           </div>
-          <p>View your list</p>
-          <Link aria-label='Open Todos' className={css.cardLink} to='/todos' />
+          <p>{t({ en: 'View your list', pl: 'Zobacz swoją listę' })}</p>
+          <Link
+            aria-label={t({ en: 'Open Todos', pl: 'Otwórz notatki' })}
+            className={css.cardLink}
+            to='/todos'
+          />
         </Card>
 
         <Card as='article' className={css.diaryTile} data-appear='4' shadow={false}>
           <div className={css.tileHeading}>
-            <h2>Diary</h2>
+            <h2>{t({ en: 'Diary', pl: 'Dziennik' })}</h2>
             <BookOpenIcon aria-hidden='true' />
           </div>
-          <div className={css.diaryReadout}>{formatDiaryDistance(data.lastDiaryEntryDate)}</div>
-          <Link aria-label='Open Diary' className={css.cardLink} to='/diary' />
+          <div className={css.diaryReadout}>
+            {formatDiaryDistance(data.lastDiaryEntryDate, i18n)}
+          </div>
+          <Link
+            aria-label={t({ en: 'Open Diary', pl: 'Otwórz dziennik' })}
+            className={css.cardLink}
+            to='/diary'
+          />
         </Card>
 
         <Card as='article' className={css.familyTile} data-appear='5' shadow={false}>
           <div className={css.tileHeading}>
-            <h2>Family and friends</h2>
+            <h2>{t({ en: 'Family and friends', pl: 'Rodzina i znajomi' })}</h2>
             <UsersRoundIcon aria-hidden='true' />
           </div>
-          <p>Manage your connections in Account</p>
+          <p>
+            {t({
+              en: 'Manage your connections in Account',
+              pl: 'Zarządzaj połączeniami w ustawieniach konta',
+            })}
+          </p>
           <Link
-            aria-label='Open Family and friends in Account'
+            aria-label={t({
+              en: 'Open Family and friends in Account',
+              pl: 'Otwórz rodzinę i znajomych w koncie',
+            })}
             className={css.cardLink}
             to='/account'
           />
@@ -189,12 +250,21 @@ function MacroProgress({
   total: number;
   goal: number | null;
 }) {
+  const { formatNumber, t } = useI18n();
+
   return (
     <div className={css.macroProgress}>
       <div className={css.macroHeading}>
-        <span>{label}</span>
-        <strong>{Math.round(total)}g</strong>
-        <small>{goal === null ? 'No goal' : `of ${Math.round(goal)}g`}</small>
+        <span>{t(MACRO_LABELS[label])}</span>
+        <strong>{formatNumber(Math.round(total))}g</strong>
+        <small>
+          {goal === null
+            ? t({ en: 'No goal', pl: 'Brak celu' })
+            : t({
+                en: `of ${formatNumber(Math.round(goal))}g`,
+                pl: `z ${formatNumber(Math.round(goal))}g`,
+              })}
+        </small>
       </div>
       <NutritionProgress goal={goal} label={label} total={total} />
     </div>
@@ -211,15 +281,21 @@ function NutritionProgress({
   total: number;
   goal: number | null;
 }) {
+  const { formatNumber, t } = useI18n();
   const maximum = goal === null ? Math.max(total, 1) : Math.max(goal, 1);
+  const name = label === 'kcal' ? 'kcal' : t(MACRO_LABELS[label]);
+  const unit = label === 'kcal' ? ' kcal' : 'g';
 
   return (
     <div className={css.progressTrack}>
       <progress
-        aria-label={`${label} progress`}
+        aria-label={t({ en: `${name} progress`, pl: `Postęp: ${name}` })}
         aria-valuetext={
           goal !== null && total > goal
-            ? `${Math.round(total)} of ${Math.round(goal)}${label === 'kcal' ? ' kcal' : 'g'}`
+            ? t({
+                en: `${formatNumber(Math.round(total))} of ${formatNumber(Math.round(goal))}${unit}`,
+                pl: `${formatNumber(Math.round(total))} z ${formatNumber(Math.round(goal))}${unit}`,
+              })
             : undefined
         }
         max={maximum}
@@ -273,17 +349,19 @@ function getChartPoints(entries: HomeDashboardData['weightEntries']) {
     .join(' ');
 }
 
-function formatDelta(delta: number | null) {
-  if (delta === null) return 'First point';
-  if (Math.abs(delta) < 0.05) return 'Steady';
-  return `${delta > 0 ? '+' : ''}${delta.toFixed(1)} kg`;
+function formatDelta(delta: number | null, { formatNumber, t }: I18n) {
+  if (delta === null) return t({ en: 'First point', pl: 'Pierwszy pomiar' });
+  if (Math.abs(delta) < 0.05) return t({ en: 'Steady', pl: 'Bez zmian' });
+  return `${formatNumber(delta, { maximumFractionDigits: 1, minimumFractionDigits: 1, signDisplay: 'always' })} kg`;
 }
 
 /** Turns the latest diary date into a private, content-free activity signal. */
-function formatDiaryDistance(entryDate: string | null) {
-  if (!entryDate) return 'No notes yet';
+function formatDiaryDistance(entryDate: string | null, { t }: I18n) {
+  if (!entryDate) return t({ en: 'No notes yet', pl: 'Brak notatek' });
   const days = differenceInCalendarDays(new Date(), parseISO(entryDate));
-  if (days <= 0) return 'Today';
-  if (days === 1) return '1 day since last note';
-  return `${days} days since last note`;
+  if (days <= 0) return t({ en: 'Today', pl: 'Dzisiaj' });
+  return t({
+    en: `${days} ${pluralEn(days, 'day', 'days')} since last note`,
+    pl: `${days} ${pluralPl(days, 'dzień', 'dni', 'dni')} od ostatniej notatki`,
+  });
 }

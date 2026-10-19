@@ -11,6 +11,7 @@ import { RECIPE_PHOTO_MAX_COUNT } from '../recipeUpload.api';
 import css from './AddRecipePage.module.css';
 import { useCreateRecipeMutation } from '../recipes.query';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 const EMPTY_DRAFT: RecipeFormDraft = {
   carbs: null,
@@ -26,6 +27,7 @@ const EMPTY_DRAFT: RecipeFormDraft = {
 };
 
 export function AddRecipePage() {
+  const { t } = useI18n();
   const createMutation = useCreateRecipeMutation();
   const [draft, setDraft] = useState<RecipeFormDraft>(EMPTY_DRAFT);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +43,11 @@ export function AddRecipePage() {
       markSaved();
       await navigate({ params: { id: result.id }, replace: true, to: '/recipes/view/$id' });
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'Recipe upload failed');
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : t({ en: 'Recipe upload failed', pl: 'Nie udało się przesłać przepisu' }),
+      );
     }
   }
 
@@ -61,7 +67,7 @@ export function AddRecipePage() {
 
           <FormSubmitRow>
             <Btn loading={createMutation.isPending} type='submit'>
-              Add recipe
+              {t({ en: 'Add recipe', pl: 'Dodaj przepis' })}
             </Btn>
           </FormSubmitRow>
         </TypedForm>

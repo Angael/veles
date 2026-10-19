@@ -1,6 +1,7 @@
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { EditRecipePage } from '@/pages/recipes/editor/EditRecipePage';
 import { getOwnedRecipeById } from '@/pages/recipes/recipes.api';
+import { translate } from '@/lib/i18n/getLocale';
 
 export const Route = createFileRoute('/_authenticated/recipes/view/$id_/edit')({
   loader: async ({ params }) => {
@@ -14,12 +15,21 @@ export const Route = createFileRoute('/_authenticated/recipes/view/$id_/edit')({
     return recipe;
   },
   component: RouteComponent,
-  head: ({ loaderData }) => ({ meta: [{ title: `Edit ${loaderData?.name ?? 'recipe'}` }] }),
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: translate({
+          en: `Edit ${loaderData?.name ?? 'recipe'}`,
+          pl: `Edytuj ${loaderData?.name ?? 'przepis'}`,
+        }),
+      },
+    ],
+  }),
   staticData: {
     layout: 'task',
     navbar: {
       backFallback: ({ params }) => ({ params: { id: params.id ?? '' }, to: '/recipes/view/$id' }),
-      label: 'Edit recipe',
+      label: { en: 'Edit recipe', pl: 'Edytuj przepis' },
     },
   },
 });

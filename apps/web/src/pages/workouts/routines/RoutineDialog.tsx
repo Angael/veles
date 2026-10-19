@@ -11,6 +11,7 @@ import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TextareaInput } from '@/components/ui/textarea-input/TextareaInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import css from './Routines.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type RoutineDialogProps = {
   defaults: { name: string; description: string };
@@ -32,6 +33,8 @@ export function RoutineDialog({
   submitLabel,
   title,
 }: RoutineDialogProps) {
+  const { t } = useI18n();
+
   return (
     <DialogRoot onOpenChange={onOpenChange} open={open}>
       <DialogPopup>
@@ -43,20 +46,25 @@ export function RoutineDialog({
             onOpenChange(false);
           }}
         >
-          <Label text='Name'>
+          <Label text={t({ en: 'Name', pl: 'Nazwa' })}>
             <TextInput defaultValue={defaults.name} maxLength={200} name='name' required />
           </Label>
-          <Label text='Description (optional)'>
+          <Label text={t({ en: 'Description (optional)', pl: 'Opis (opcjonalnie)' })}>
             <TextareaInput
               defaultValue={defaults.description}
               maxLength={2000}
               name='description'
-              placeholder='e.g. Heavy day, 2–3 min rest on the big lifts'
+              placeholder={t({
+                en: 'e.g. Heavy day, 2–3 min rest on the big lifts',
+                pl: 'np. Ciężki dzień, 2–3 min przerwy przy głównych ćwiczeniach',
+              })}
               rows={3}
             />
           </Label>
           <DialogActions>
-            <DialogClose render={<Btn variant='ghost' />}>Cancel</DialogClose>
+            <DialogClose render={<Btn variant='ghost' />}>
+              {t({ en: 'Cancel', pl: 'Anuluj' })}
+            </DialogClose>
             <Btn loading={pending} type='submit'>
               {submitLabel}
             </Btn>

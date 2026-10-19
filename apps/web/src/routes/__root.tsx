@@ -4,6 +4,8 @@ import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/De
 import { NotFound } from '@/components/app/not-found/NotFound';
 import { ToastProvider } from '@/components/ui/toast/ToastProvider';
 import { sessionUserQueryOptions } from '@/lib/auth/session.query';
+import { getLocale, translate } from '@/lib/i18n/getLocale';
+import { I18nProvider } from '@/lib/i18n/I18nProvider';
 import globalCss from '@/styles/global.css?url';
 import type { QueryClient } from '@tanstack/react-query';
 import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
@@ -54,8 +56,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: appName },
       {
         name: 'description',
-        content:
-          'Private place for workouts, body weight, food logging, and shared personal files.',
+        content: translate({
+          en: 'Private place for workouts, body weight, food logging, and shared personal files.',
+          pl: 'Prywatne miejsce na treningi, wagę ciała, dziennik jedzenia i wspólne pliki.',
+        }),
       },
     ],
     links: [{ rel: 'stylesheet', href: globalCss }, ...faviconLinks],
@@ -84,14 +88,16 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const locale = getLocale();
+
   return (
-    <html lang='en'>
+    <html lang={locale}>
       <head>
         <HeadContent />
       </head>
       <body>
         {import.meta.env.VITE_APP_ENV === 'localhost' ? <ComponentsDemoLink /> : null}
-        {children}
+        <I18nProvider locale={locale}>{children}</I18nProvider>
         {/* {import.meta.env.DEV ? (
           <>
             <TanStackRouterDevtools position='bottom-right' />

@@ -9,6 +9,7 @@ import { useUpdateWorkoutMutation } from '../workouts.query';
 import type { WorkoutSessionData } from '../workouts.server';
 import { SessionMenu } from './SessionMenu';
 import css from './Session.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type SessionHeaderProps = {
   onFinish: () => void;
@@ -18,6 +19,7 @@ type SessionHeaderProps = {
 
 /** Workout name, elapsed time, a "?" to replay the tips, and Finish (Reopen once finished). */
 export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderProps) {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const updateWorkout = useUpdateWorkoutMutation();
   const setSeconds = session.slots
@@ -29,7 +31,7 @@ export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderP
   return (
     <Card className={css.sessionHeader}>
       <SeamlessTextInput
-        aria-label='Workout name'
+        aria-label={t({ en: 'Workout name', pl: 'Nazwa treningu' })}
         defaultValue={session.name}
         key={session.name}
         onBlur={(event) => {
@@ -40,12 +42,12 @@ export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderP
       />
       <dl className={css.stats}>
         <div>
-          <dt>Time</dt>
+          <dt>{t({ en: 'Time', pl: 'Czas' })}</dt>
           <dd>{elapsed === null ? '—' : formatDuration(elapsed)}</dd>
         </div>
       </dl>
       <Btn
-        aria-label='Show tips again'
+        aria-label={t({ en: 'Show tips again', pl: 'Pokaż wskazówki ponownie' })}
         icon={<CircleHelpIcon aria-hidden='true' />}
         iconOnly
         onClick={onShowHints}
@@ -63,7 +65,7 @@ export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderP
           size='sm'
           variant='outlineMain'
         >
-          Reopen
+          {t({ en: 'Reopen', pl: 'Otwórz ponownie' })}
         </Btn>
       ) : (
         <Btn
@@ -83,7 +85,7 @@ export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderP
           radius='pill'
           size='sm'
         >
-          Finish
+          {t({ en: 'Finish', pl: 'Zakończ' })}
         </Btn>
       )}
     </Card>

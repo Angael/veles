@@ -9,6 +9,7 @@ import { getSharingFriendsIds } from '@/server/getSharingFriendsIds.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { storagePathToUrl } from '@/server/storage/config.server';
+import { translate } from '@/lib/i18n/getLocale';
 
 type RecipeSelect = typeof recipes.$inferSelect;
 
@@ -152,7 +153,9 @@ export const updateRecipeRating = createServerFn({ method: 'POST' })
       .returning({ id: recipes.id });
 
     if (!updatedRows[0]) {
-      throw new ClientSafeError('Recipe not found.');
+      throw new ClientSafeError(
+        translate({ en: 'Recipe not found.', pl: 'Nie znaleziono przepisu.' }),
+      );
     }
 
     return { ok: true };

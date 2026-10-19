@@ -1,5 +1,7 @@
 import { CameraIcon, CameraOffIcon, LoaderCircleIcon, SearchXIcon } from 'lucide-react';
 import css from './BarcodeScanner.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import type { Localized } from '@/lib/i18n/locale';
 
 export type ScannerState =
   | 'starting'
@@ -11,12 +13,16 @@ export type ScannerState =
   | 'error';
 
 export function ScannerMessage({ state }: { state: Exclude<ScannerState, 'scanning'> }) {
+  const { t } = useI18n();
+
   if (state === 'starting') {
     return (
       <div className={css.message}>
         <CameraIcon aria-hidden='true' />
-        <strong>Starting camera…</strong>
-        <span>You may be asked for permission.</span>
+        <strong>{t({ en: 'Starting camera…', pl: 'Uruchamianie kamery…' })}</strong>
+        <span>
+          {t({ en: 'You may be asked for permission.', pl: 'Przeglądarka może poprosić o zgodę.' })}
+        </span>
       </div>
     );
   }
@@ -32,28 +38,46 @@ export function ScannerMessage({ state }: { state: Exclude<ScannerState, 'scanni
   return (
     <div className={css.message} role={state === 'lookingUp' ? 'status' : 'alert'}>
       {icon}
-      <strong>{copy[0]}</strong>
-      <span>{copy[1]}</span>
+      <strong>{t(copy[0])}</strong>
+      <span>{t(copy[1])}</span>
     </div>
   );
 }
 
 const scannerMessageCopy: Record<
   Exclude<ScannerState, 'starting' | 'scanning'>,
-  [string, string]
+  [Localized, Localized]
 > = {
-  lookingUp: ['Looking up product…', 'Checking the product catalog.'],
-  notFound: ['Barcode not found', 'Create this product or scan another barcode.'],
+  lookingUp: [
+    { en: 'Looking up product…', pl: 'Wyszukiwanie produktu…' },
+    { en: 'Checking the product catalog.', pl: 'Sprawdzanie katalogu produktów.' },
+  ],
+  notFound: [
+    { en: 'Barcode not found', pl: 'Nie znaleziono kodu kreskowego' },
+    {
+      en: 'Create this product or scan another barcode.',
+      pl: 'Utwórz ten produkt lub zeskanuj inny kod.',
+    },
+  ],
   permissionDenied: [
-    'Camera permission denied',
-    'Allow camera access in your browser settings, or type the barcode instead.',
+    { en: 'Camera permission denied', pl: 'Brak zgody na użycie kamery' },
+    {
+      en: 'Allow camera access in your browser settings, or type the barcode instead.',
+      pl: 'Zezwól na dostęp do kamery w ustawieniach przeglądarki albo wpisz kod ręcznie.',
+    },
   ],
   unavailable: [
-    'Camera unavailable',
-    'This browser cannot access a camera. You can still type the barcode.',
+    { en: 'Camera unavailable', pl: 'Kamera niedostępna' },
+    {
+      en: 'This browser cannot access a camera. You can still type the barcode.',
+      pl: 'Ta przeglądarka nie ma dostępu do kamery. Nadal możesz wpisać kod.',
+    },
   ],
   error: [
-    'Scanner stopped',
-    'We could not read from the camera. Close it and try again, or type the barcode.',
+    { en: 'Scanner stopped', pl: 'Skaner zatrzymany' },
+    {
+      en: 'We could not read from the camera. Close it and try again, or type the barcode.',
+      pl: 'Nie udało się odczytać obrazu z kamery. Zamknij ją i spróbuj ponownie albo wpisz kod.',
+    },
   ],
 };

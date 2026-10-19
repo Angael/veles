@@ -12,40 +12,67 @@ import css from './WeightEntryPages.module.css';
 import { parseWeightEntries } from './parseWeightEntries';
 import { MAX_WEIGHT_IMPORT_ENTRIES } from './weight.api';
 import { useSaveWeightsMutation } from './weight.query';
+import { type I18n, useI18n } from '@/lib/i18n/I18nProvider';
+import { type Localized, pluralEn, pluralPl } from '@/lib/i18n/locale';
 
-const aiPrompt = `Convert my weight history to plain text with exactly one entry per line in this format:
+const aiPrompt: Localized = {
+  en: `Convert my weight history to plain text with exactly one entry per line in this format:
 YYYY-MM-DD <weight>kg
 
 Use ISO dates, kilograms, and no headings, bullets, notes, or code fences. Convert other weight units to kilograms. Example:
-2026-08-01 78.4kg`;
+2026-08-01 78.4kg`,
+  pl: `Przekształć moją historię wagi w zwykły tekst, dokładnie jeden wpis na linię, w tym formacie:
+RRRR-MM-DD <waga>kg
+
+Użyj dat ISO i kilogramów, bez nagłówków, punktorów, notatek i bloków kodu. Przelicz inne jednostki wagi na kilogramy. Przykład:
+2026-08-01 78.4kg`,
+};
 
 export function ImportWeightPage() {
+  const i18n = useI18n();
+  const { t } = i18n;
   const router = useRouter();
   const navigate = useNavigate();
   const [value, setValue] = useState('');
   const parsed = useMemo(() => parseWeightEntries(value), [value]);
   const hasTooManyEntries = parsed.entries.length > MAX_WEIGHT_IMPORT_ENTRIES;
   const mutation = useSaveWeightsMutation();
-  const importStatus = getImportStatus(parsed.entries.length, parsed.errors, hasTooManyEntries);
+  const hasErrors = parsed.invalidLines.length > 0;
+  const importStatus = getImportStatus(
+    parsed.entries.length,
+    parsed.invalidLines,
+    hasTooManyEntries,
+    i18n,
+  );
 
   return (
     <main className={css.page}>
       <div className={css.promptBlock}>
         <div>
-          <strong>Need help formatting your data?</strong>
-          <p>Give the prompt below and your exported data to your preferred AI assistant.</p>
+          <strong>
+            {t({
+              en: 'Need help formatting your data?',
+              pl: 'Potrzebujesz pomocy z formatem danych?',
+            })}
+          </strong>
+          <p>
+            {t({
+              en: 'Give the prompt below and your exported data to your preferred AI assistant.',
+              pl: 'Przekaż poniższe polecenie i wyeksportowane dane swojemu asystentowi AI.',
+            })}
+          </p>
         </div>
-        <pre>{aiPrompt}</pre>
+        <pre>{t(aiPrompt)}</pre>
         <Btn
           icon={<ClipboardIcon aria-hidden='true' />}
           onClick={() => {
-            void copyPrompt(aiPrompt);
+            void copyPrompt(t(aiPrompt), i18n);
           }}
           size='sm'
           type='button'
           variant='outlineMain'
         >
-          Copy prompt
+          {t({ en: 'Copy prompt', pl: 'Kopiuj polecenie' })}
         </Btn>
       </div>
 
@@ -53,7 +80,7 @@ export function ImportWeightPage() {
         <TypedForm
           className={css.form}
           onSubmit={() => {
-            if (parsed.entries.length > 0 && parsed.errors.length === 0 && !hasTooManyEntries) {
+            if (parsed.entries.length > 0 && !hasErrors && !hasTooManyEntries) {
               mutation.mutate(
                 { data: { entries: parsed.entries } },
                 {
@@ -68,7 +95,7 @@ export function ImportWeightPage() {
             }
           }}
         >
-          <Label text='Weight data'>
+          <Label text={t({ en: 'Weight data', pl: 'Dane wagi' })}>
             <TextareaInput
               aria-describedby='weight-import-status'
               aria-invalid={hasTooManyEntries}
@@ -90,13 +117,11 @@ export function ImportWeightPage() {
           </div>
           <FormSubmitRow>
             <Btn
-              disabled={
-                parsed.entries.length === 0 || parsed.errors.length > 0 || hasTooManyEntries
-              }
+              disabled={parsed.entries.length === 0 || hasErrors || hasTooManyEntries}
               loading={mutation.isPending}
               type='submit'
             >
-              Import {parsed.entries.length || ''}
+              {t({ en: 'Import', pl: 'Importuj' })} {parsed.entries.length || ''}
             </Btn>
           </FormSubmitRow>
         </TypedForm>
@@ -104,23 +129,44 @@ export function ImportWeightPage() {
     </main>
   );
 }
-function getImportStatus(entryCount: number, errors: string[], hasTooManyEntries: boolean) {
+function getImportStatus(
+  entryCount: number,
+  invalidLines: number[],
+  hasTooManyEntries: boolean,
+  { formatNumber, t }: I18n,
+) {
   if (hasTooManyEntries) {
-    return `You can import up to ${MAX_WEIGHT_IMPORT_ENTRIES.toLocaleString()} entries at once.`;
+    const max = formatNumber(MAX_WEIGHT_IMPORT_ENTRIES);
+    return t({
+      en: `You can import up to ${max} entries at once.`,
+      pl: `Jednorazowo możesz zaimportować maksymalnie ${max} wpisów.`,
+    });
   }
-  if (errors.length > 0) return errors.join(' ');
+  if (invalidLines.length > 0) {
+    return invalidLines
+      .map((line) => t({ en: `Line ${line} is invalid.`, pl: `Linia ${line} jest nieprawidłowa.` }))
+      .join(' ');
+  }
   if (entryCount > 0) {
-    const entryLabel = entryCount === 1 ? 'entry' : 'entries';
-    return `${entryCount} ${entryLabel} ready to import.`;
+    return t({
+      en: `${entryCount} ${pluralEn(entryCount, 'entry', 'entries')} ready to import.`,
+      pl: `Gotowe do importu: ${entryCount} ${pluralPl(entryCount, 'wpis', 'wpisy', 'wpisów')}.`,
+    });
   }
-  return 'Format: YYYY-MM-DD 78.4kg';
+  return t({ en: 'Format: YYYY-MM-DD 78.4kg', pl: 'Format: RRRR-MM-DD 78.4kg' });
 }
 
-async function copyPrompt(prompt: string) {
+async function copyPrompt(prompt: string, { t }: I18n) {
   try {
     await navigator.clipboard.writeText(prompt);
-    toastManager.add({ title: 'Prompt copied', type: 'success' });
+    toastManager.add({
+      title: t({ en: 'Prompt copied', pl: 'Skopiowano polecenie' }),
+      type: 'success',
+    });
   } catch {
-    toastManager.add({ title: 'Could not copy prompt', type: 'error' });
+    toastManager.add({
+      title: t({ en: 'Could not copy prompt', pl: 'Nie udało się skopiować polecenia' }),
+      type: 'error',
+    });
   }
 }

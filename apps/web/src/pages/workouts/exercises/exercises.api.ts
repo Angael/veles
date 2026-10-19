@@ -15,6 +15,8 @@ import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { describeSet, type Measure } from '../metrics';
 import { requireOwnedExercise, toMetrics } from '../workouts.server';
+import { translate } from '@/lib/i18n/getLocale';
+import { getLocale } from '@/lib/i18n/getLocale';
 
 export type ExerciseOption = {
   id: string;
@@ -88,7 +90,13 @@ export const updateExercise = createServerFn({ method: 'POST' })
             sql`lower(${workoutExercises.name}) = lower(${name})`,
           ),
         );
-      if (clash) throw new ClientSafeError(`You already have an exercise called “${name}”.`);
+      if (clash)
+        throw new ClientSafeError(
+          translate({
+            en: `You already have an exercise called “${name}”.`,
+            pl: `Masz już ćwiczenie o nazwie „${name}”.`,
+          }),
+        );
     }
     await db
       .update(workoutExercises)
@@ -162,6 +170,7 @@ export const getExerciseHistory = createServerFn({ method: 'GET' })
         .orderBy(asc(workoutSets.position)),
     ]);
 
+    const locale = getLocale();
     return entries.map((entry) => {
       const positions = siblings.filter((slot) => slot.workoutId === entry.workoutId);
       return {
@@ -172,7 +181,7 @@ export const getExerciseHistory = createServerFn({ method: 'GET' })
         position: positions.filter((slot) => slot.position <= entry.position).length,
         sets: sets
           .filter((set) => set.sessionExerciseId === entry.id)
-          .map((set) => describeSet(toMetrics(set))),
+          .map((set) => describeSet(toMetrics(set), locale)),
         workoutName: entry.workoutName,
       };
     });

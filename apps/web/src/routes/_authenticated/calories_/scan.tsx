@@ -8,7 +8,10 @@ export const Route = createFileRoute('/_authenticated/calories_/scan')({
   component: Component,
   staticData: {
     layout: 'immersive',
-    navbar: { backFallback: caloriesDayTarget, label: 'Scan barcode' },
+    navbar: {
+      backFallback: caloriesDayTarget,
+      label: { en: 'Scan barcode', pl: 'Skanuj kod kreskowy' },
+    },
   },
 });
 

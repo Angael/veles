@@ -15,6 +15,7 @@ import {
   WEIGHT_CHART_RANGE_COOKIE,
   WEIGHT_CHART_RANGES,
 } from './weightCalculations';
+import { translate } from '@/lib/i18n/getLocale';
 
 export type WeightEntry = {
   date: string;
@@ -80,7 +81,9 @@ export const getWeightEntry = createServerFn({ method: 'GET' })
       .limit(1);
 
     if (!entry) {
-      throw new ClientSafeError('Weight entry not found.');
+      throw new ClientSafeError(
+        translate({ en: 'Weight entry not found.', pl: 'Nie znaleziono pomiaru wagi.' }),
+      );
     }
 
     const photos = await db

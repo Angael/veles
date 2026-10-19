@@ -60,7 +60,7 @@ export function SetSheet({ onClose, onSave, target }: SetSheetProps) {
                     type='button'
                   >
                     <HistoryIcon aria-hidden='true' />
-                    Last time {describeSet(set.previous)}
+                    Last time {describeSet(set.previous, 'en')}
                     <span>use</span>
                   </button>
                 ) : null}
@@ -69,14 +69,14 @@ export function SetSheet({ onClose, onSave, target }: SetSheetProps) {
                   {MEASURE_FIELDS[target.slot.measure].map((field) => (
                     <ScrubField
                       fallback={set.previous?.[field.key] ?? 0}
-                      format={(value) => formatMetric(field, value)}
+                      format={(value) => formatMetric(field, value, 'en')}
                       key={field.key}
-                      label={field.label}
+                      label={field.label.en}
                       onChange={(value) =>
                         setDraft((current) => ({ ...current, [field.key]: value }))
                       }
                       parse={(text) => parseMetric(field, text)}
-                      unit={field.unit}
+                      unit={field.unit.en}
                       value={field.key in draft ? (draft[field.key] ?? null) : set[field.key]}
                       {...scrubTuning(field)}
                     />

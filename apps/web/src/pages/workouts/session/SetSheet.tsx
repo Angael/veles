@@ -14,6 +14,7 @@ import {
 import { ScrubField } from '../scrub/ScrubField';
 import type { WorkoutSetData, WorkoutSlotData } from '../workouts.server';
 import css from './SetSheet.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type Draft = Partial<Record<MetricKey, number | null>>;
 
@@ -28,6 +29,7 @@ type SetSheetProps = {
  * Helper for filling one set's values with big numbers. Edits a draft; nothing changes until Save.
  */
 export function SetSheet({ onClose, onSave, target }: SetSheetProps) {
+  const { locale, t } = useI18n();
   const [draft, setDraft] = useState<Draft>({});
   const set = target?.set;
   useEffect(() => setDraft({}), [set?.id]);
@@ -40,10 +42,10 @@ export function SetSheet({ onClose, onSave, target }: SetSheetProps) {
             <header className={css.header}>
               <DialogTitle className={css.title}>
                 {target.slot.name}
-                <small>Set {target.number}</small>
+                <small>{t({ en: `Set ${target.number}`, pl: `Seria ${target.number}` })}</small>
               </DialogTitle>
               <DialogClose
-                aria-label='Close'
+                aria-label={t({ en: 'Close', pl: 'Zamknij' })}
                 render={
                   <Btn icon={<XIcon aria-hidden='true' />} iconOnly size='sm' variant='ghost' />
                 }
@@ -57,8 +59,8 @@ export function SetSheet({ onClose, onSave, target }: SetSheetProps) {
                 type='button'
               >
                 <HistoryIcon aria-hidden='true' />
-                Last time {describeSet(set.previous)}
-                <span>use</span>
+                {t({ en: 'Last time', pl: 'Ostatnio' })} {describeSet(set.previous, locale)}
+                <span>{t({ en: 'use', pl: 'użyj' })}</span>
               </button>
             ) : null}
 
@@ -66,12 +68,12 @@ export function SetSheet({ onClose, onSave, target }: SetSheetProps) {
               {MEASURE_FIELDS[target.slot.measure].map((field) => (
                 <ScrubField
                   fallback={set.previous?.[field.key] ?? DEFAULT_METRICS[field.key]}
-                  format={(value) => formatMetric(field, value)}
+                  format={(value) => formatMetric(field, value, locale)}
                   key={field.key}
-                  label={field.label}
+                  label={t(field.label)}
                   onChange={(value) => setDraft((current) => ({ ...current, [field.key]: value }))}
                   parse={(text) => parseMetric(field, text)}
-                  unit={field.unit}
+                  unit={t(field.unit)}
                   value={field.key in draft ? (draft[field.key] ?? null) : set[field.key]}
                   {...scrubTuning(field)}
                 />
@@ -95,7 +97,7 @@ export function SetSheet({ onClose, onSave, target }: SetSheetProps) {
               }}
               radius='pill'
             >
-              Save
+              {t({ en: 'Save', pl: 'Zapisz' })}
             </Btn>
           </>
         ) : null}

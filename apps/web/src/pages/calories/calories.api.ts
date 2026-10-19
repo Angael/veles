@@ -29,6 +29,7 @@ import {
   toHundredths,
 } from '@/lib/nutrition';
 import { calorieWeekDates, isWithinKcalGoal, MAX_FOOD_LOG_MULTIPLIER } from './calorieHelpers';
+import { translate } from '@/lib/i18n/getLocale';
 
 const MAX_TEXT_LENGTH = 500;
 const FOOD_UPLOAD_MAX_REQUEST_BYTES = 12 * 1024 * 1024;
@@ -68,7 +69,9 @@ const limitFoodUploadRequestMiddleware = createMiddleware().server(async ({ next
     request.headers.get('content-length') ?? '',
   );
   if (contentLength instanceof type.errors || contentLength > FOOD_UPLOAD_MAX_REQUEST_BYTES) {
-    throw new ClientSafeError('Upload request is too large.');
+    throw new ClientSafeError(
+      translate({ en: 'Upload request is too large.', pl: 'Przesyłane dane są za duże.' }),
+    );
   }
   return next();
 });
@@ -204,7 +207,13 @@ async function prepareImageAction(
   userId: string,
 ): Promise<PreparedFoodImage | null> {
   if (action === 'keep' || action === 'remove') return null;
-  if (!photo) throw new ClientSafeError('Choose a photo before replacing the image.');
+  if (!photo)
+    throw new ClientSafeError(
+      translate({
+        en: 'Choose a photo before replacing the image.',
+        pl: 'Wybierz zdjęcie przed zamianą obrazu.',
+      }),
+    );
 
   return prepareFoodImage(photo, userId);
 }
@@ -385,7 +394,10 @@ export const getFoodProduct = createServerFn({ method: 'GET' })
       .from(foodProducts)
       .where(eq(foodProducts.id, data.id))
       .limit(1);
-    if (!food) throw new ClientSafeError('Food product not found.');
+    if (!food)
+      throw new ClientSafeError(
+        translate({ en: 'Food product not found.', pl: 'Nie znaleziono produktu.' }),
+      );
 
     const assetsById = await getFoodImageAssets([food.imageUploadObjectId]);
     return toFoodProduct(food, assetsById.get(food.imageUploadObjectId ?? ''));
@@ -435,7 +447,12 @@ export const createFoodProduct = createServerFn({ method: 'POST' })
     const { values } = data;
     const photo = data.photo ?? null;
     if (values.barcode && (await findFoodProductByBarcode(values.barcode))) {
-      throw new ClientSafeError('A food product with this barcode already exists.');
+      throw new ClientSafeError(
+        translate({
+          en: 'A food product with this barcode already exists.',
+          pl: 'Produkt z tym kodem kreskowym już istnieje.',
+        }),
+      );
     }
     const action = values.imageAction ?? 'keep';
     const image = await prepareImageAction(action, photo, session.user.id);
@@ -483,17 +500,30 @@ export const updateFoodProduct = createServerFn({ method: 'POST' })
       .from(foodProducts)
       .where(eq(foodProducts.id, values.id))
       .limit(1);
-    if (!existing) throw new ClientSafeError('Food product not found.');
+    if (!existing)
+      throw new ClientSafeError(
+        translate({ en: 'Food product not found.', pl: 'Nie znaleziono produktu.' }),
+      );
     if (values.barcode) {
       const barcodeProduct = await findFoodProductByBarcode(values.barcode);
       if (barcodeProduct && barcodeProduct.id !== values.id) {
-        throw new ClientSafeError('A food product with this barcode already exists.');
+        throw new ClientSafeError(
+          translate({
+            en: 'A food product with this barcode already exists.',
+            pl: 'Produkt z tym kodem kreskowym już istnieje.',
+          }),
+        );
       }
     }
 
     const action = values.imageAction ?? 'keep';
     if (action === 'replace' && existing.imageUploadObjectId) {
-      throw new ClientSafeError('Remove the existing product photo before uploading another.');
+      throw new ClientSafeError(
+        translate({
+          en: 'Remove the existing product photo before uploading another.',
+          pl: 'Usuń obecne zdjęcie produktu przed przesłaniem nowego.',
+        }),
+      );
     }
     const image = await prepareImageAction(action, photo, session.user.id);
     const imageUploadObjectId = action === 'keep' ? undefined : (image?.asset.id ?? null);
@@ -510,7 +540,10 @@ export const updateFoodProduct = createServerFn({ method: 'POST' })
           })
           .where(eq(foodProducts.id, values.id))
           .returning();
-        if (!updated) throw new ClientSafeError('Food product not found.');
+        if (!updated)
+          throw new ClientSafeError(
+            translate({ en: 'Food product not found.', pl: 'Nie znaleziono produktu.' }),
+          );
 
         const scale = (value: number | null) =>
           value === null
@@ -559,14 +592,26 @@ export const recordFood = createServerFn({ method: 'POST' })
     const session = await requireSession();
     const { values } = data;
     const photo = data.photo ?? null;
-    if (photo) throw new ClientSafeError('Product-backed entries use the product photo.');
+    if (photo)
+      throw new ClientSafeError(
+        translate({
+          en: 'Product-backed entries use the product photo.',
+          pl: 'Wpisy powiązane z produktem używają zdjęcia produktu.',
+        }),
+      );
 
     const [product] = await db
       .select()
       .from(foodProducts)
       .where(eq(foodProducts.id, values.productId))
       .limit(1);
-    if (!product) throw new ClientSafeError('The selected food product no longer exists.');
+    if (!product)
+      throw new ClientSafeError(
+        translate({
+          en: 'The selected food product no longer exists.',
+          pl: 'Wybrany produkt już nie istnieje.',
+        }),
+      );
 
     const productAssets = await getFoodImageAssets([product.imageUploadObjectId]);
     const productAsset = productAssets.get(product.imageUploadObjectId ?? '');
@@ -663,7 +708,10 @@ export const getFoodLog = createServerFn({ method: 'GET' })
       .from(foodLogs)
       .where(and(eq(foodLogs.id, data.id), eq(foodLogs.userId, session.user.id)))
       .limit(1);
-    if (!entry) throw new ClientSafeError('Food log not found.');
+    if (!entry)
+      throw new ClientSafeError(
+        translate({ en: 'Food log not found.', pl: 'Nie znaleziono wpisu.' }),
+      );
 
     const productImageIds = await getProductImageIds([entry.productId]);
     const productImageId = entry.productId ? productImageIds.get(entry.productId) : null;
@@ -716,11 +764,19 @@ export const updateFoodLog = createServerFn({ method: 'POST' })
       .from(foodLogs)
       .where(and(eq(foodLogs.id, values.id), eq(foodLogs.userId, session.user.id)))
       .limit(1);
-    if (!existing) throw new ClientSafeError('Food log not found.');
+    if (!existing)
+      throw new ClientSafeError(
+        translate({ en: 'Food log not found.', pl: 'Nie znaleziono wpisu.' }),
+      );
 
     const action = values.imageAction ?? 'keep';
     if (existing.productId && (action !== 'keep' || photo)) {
-      throw new ClientSafeError('Product-backed entries use the product photo.');
+      throw new ClientSafeError(
+        translate({
+          en: 'Product-backed entries use the product photo.',
+          pl: 'Wpisy powiązane z produktem używają zdjęcia produktu.',
+        }),
+      );
     }
     const image = await prepareImageAction(action, photo, session.user.id);
     let imageUploadObjectId: string | null | undefined;
@@ -829,7 +885,10 @@ export const copyFoodLogs = createServerFn({ method: 'POST' })
       .select()
       .from(foodLogs)
       .where(and(inArray(foodLogs.id, data.ids), eq(foodLogs.userId, session.user.id)));
-    if (sources.length === 0) throw new ClientSafeError('These products no longer exist.');
+    if (sources.length === 0)
+      throw new ClientSafeError(
+        translate({ en: 'These products no longer exist.', pl: 'Te produkty już nie istnieją.' }),
+      );
 
     const consumedAt = new Date();
     await db.insert(foodLogs).values(

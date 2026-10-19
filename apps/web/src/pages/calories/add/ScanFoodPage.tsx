@@ -6,9 +6,11 @@ import { BarcodeScanner, type BarcodeScannerStatus } from './BarcodeScanner';
 import { Btn } from '@/components/ui/btn/Btn';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import css from '../CalorieFlows.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /** Camera-first barcode lookup; a match opens the Add food confirm step as a new history entry. */
 export function ScanFoodPage({ initialDate }: { initialDate: string }) {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const lookingUp = useRef(false);
@@ -44,17 +46,22 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
       <div className={css.scanBottom}>
         {missing ? (
           <div className={css.missingProduct}>
-            <strong>Barcode {missing} was not found</strong>
+            <strong>
+              {t({
+                en: `Barcode ${missing} was not found`,
+                pl: `Nie znaleziono kodu ${missing}`,
+              })}
+            </strong>
             <div className={css.actions}>
               <Btn
                 isLink
                 render={<Link search={{ barcode: missing, date }} to='/calories/foods/new' />}
                 variant='ghost'
               >
-                Add product
+                {t({ en: 'Add product', pl: 'Dodaj produkt' })}
               </Btn>
               <Btn onClick={() => setMissing('')} variant='ghost'>
-                Scan again
+                {t({ en: 'Scan again', pl: 'Skanuj ponownie' })}
               </Btn>
             </div>
           </div>
@@ -62,13 +69,13 @@ export function ScanFoodPage({ initialDate }: { initialDate: string }) {
         {!missing && !lookupMutation.isPending ? (
           <div className={css.barcodeInput}>
             <TextInput
-              aria-label='Enter barcode manually'
+              aria-label={t({ en: 'Enter barcode manually', pl: 'Wpisz kod kreskowy ręcznie' })}
               inputMode='numeric'
               onValueChange={setBarcode}
-              placeholder='Enter barcode'
+              placeholder={t({ en: 'Enter barcode', pl: 'Wpisz kod kreskowy' })}
               value={barcode}
             />
-            <Btn onClick={() => void lookup(barcode)}>Look up</Btn>
+            <Btn onClick={() => void lookup(barcode)}>{t({ en: 'Look up', pl: 'Szukaj' })}</Btn>
           </div>
         ) : null}
       </div>

@@ -5,8 +5,10 @@ import { NoteActions } from './NoteActions';
 import type { NoteSummary } from './notes.api';
 import { useUpdateNoteMutation } from './notes.query';
 import css from './TodosPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export function TextNoteCard({ note }: { note: NoteSummary }) {
+  const { t } = useI18n();
   const updateNote = useUpdateNoteMutation();
 
   return (
@@ -14,7 +16,7 @@ export function TextNoteCard({ note }: { note: NoteSummary }) {
       <div className={css.cardHeader}>
         <h2>
           <SeamlessTextInput
-            aria-label='Note title'
+            aria-label={t({ en: 'Note title', pl: 'Tytuł notatki' })}
             className={css.titleInput}
             defaultValue={note.title}
             maxLength={160}
@@ -29,7 +31,7 @@ export function TextNoteCard({ note }: { note: NoteSummary }) {
         <NoteActions note={note} />
       </div>
       <SeamlessTextarea
-        aria-label='Note content'
+        aria-label={t({ en: 'Note content', pl: 'Treść notatki' })}
         className={css.contentInput}
         defaultValue={note.content}
         maxLength={16000}
@@ -38,7 +40,7 @@ export function TextNoteCard({ note }: { note: NoteSummary }) {
             updateNote.mutate({ id: note.id, content: event.currentTarget.value });
           }
         }}
-        placeholder='Write your note…'
+        placeholder={t({ en: 'Write your note…', pl: 'Napisz notatkę…' })}
         rows={3}
       />
     </Card>

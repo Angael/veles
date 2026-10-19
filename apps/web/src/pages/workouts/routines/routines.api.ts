@@ -20,6 +20,7 @@ import {
   requireOwnedWorkout,
 } from '../workouts.server';
 import { copyRoutineToSession, copySessionToRoutine, requireOwnedRoutine } from './routines.server';
+import { translate } from '@/lib/i18n/getLocale';
 
 export type RoutineSummary = {
   id: string;
@@ -103,7 +104,10 @@ export const getRoutine = createServerFn({ method: 'GET' })
       })
       .from(workoutRoutines)
       .where(and(eq(workoutRoutines.id, data.id), eq(workoutRoutines.userId, userId)));
-    if (!routine) throw new ClientSafeError('Routine not found.');
+    if (!routine)
+      throw new ClientSafeError(
+        translate({ en: 'Routine not found.', pl: 'Nie znaleziono planu.' }),
+      );
 
     const [slots, [lastUsed]] = await Promise.all([
       db
@@ -170,7 +174,10 @@ export const updateRoutineFromWorkout = createServerFn({ method: 'POST' })
         .select({ routineId: workoutSessions.routineId })
         .from(workoutSessions)
         .where(eq(workoutSessions.id, workout.id));
-      if (!linked?.routineId) throw new ClientSafeError('This workout has no routine.');
+      if (!linked?.routineId)
+        throw new ClientSafeError(
+          translate({ en: 'This workout has no routine.', pl: 'Ten trening nie ma planu.' }),
+        );
       const routine = await requireOwnedRoutine(tx, userId, linked.routineId);
       await tx
         .delete(workoutRoutineExercises)

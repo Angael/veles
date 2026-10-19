@@ -5,10 +5,12 @@ import { useMemo } from 'react';
 import { PillBtn } from '@/components/ui/pill-btn/PillBtn';
 import type { SessionUser } from '@/lib/auth/session.api';
 import { getInitials } from '@/lib/getInitials';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 import css from './Navbar.module.css';
 import { NAVBAR_ITEMS } from './navbarItems';
 
 export function Navbar({ user }: { user: SessionUser | null }) {
+  const { t } = useI18n();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
@@ -18,7 +20,10 @@ export function Navbar({ user }: { user: SessionUser | null }) {
   );
 
   return (
-    <nav aria-label='Primary navigation' className={css.navbar}>
+    <nav
+      aria-label={t({ en: 'Primary navigation', pl: 'Główna nawigacja' })}
+      className={css.navbar}
+    >
       {user ? (
         <ul className={css.trackerList}>
           {NAVBAR_ITEMS.map((item) => {
@@ -30,7 +35,7 @@ export function Navbar({ user }: { user: SessionUser | null }) {
                 <PillBtn
                   active={active}
                   collapseLabelAt='tablet'
-                  label={item.label}
+                  label={t(item.label)}
                   to={item.link}
                   visual={<Icon size={16} strokeWidth={1.9} />}
                 />
@@ -43,7 +48,7 @@ export function Navbar({ user }: { user: SessionUser | null }) {
       <PillBtn
         active={pathname.startsWith('/account')}
         collapseLabelAt='phone'
-        label='Account'
+        label={t({ en: 'Account', pl: 'Konto' })}
         to='/account'
         visual={
           <Avatar.Root className={css.accountAvatar}>

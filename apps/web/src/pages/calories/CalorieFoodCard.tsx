@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Card } from '@/components/ui/card/Card';
 import { NutritionInline } from './NutritionInline';
 import css from './CalorieFoodCard.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type CalorieFoodCardProps = {
   action?: ReactNode;
@@ -25,6 +26,8 @@ export function CalorieFoodCard({
   fat,
   carbs,
 }: CalorieFoodCardProps) {
+  const { formatNumber } = useI18n();
+
   return (
     <li className={css.item}>
       <Card as='article' className={css.card}>
@@ -32,7 +35,7 @@ export function CalorieFoodCard({
           <img alt='' aria-hidden='true' className={css.photoWash} loading='lazy' src={imageUrl} />
         ) : null}
         <div aria-hidden='true' className={css.energyTile}>
-          <strong>{Math.round(kcal)}</strong>
+          <strong>{formatNumber(Math.round(kcal))}</strong>
           <span>kcal</span>
         </div>
 

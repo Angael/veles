@@ -7,13 +7,15 @@ import {
 } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import type { DbTransaction } from '@/server/db.server';
+import { translate } from '@/lib/i18n/getLocale';
 
 export async function requireOwnedRoutine(tx: DbTransaction, userId: string, routineId: string) {
   const [routine] = await tx
     .select({ id: workoutRoutines.id, name: workoutRoutines.name })
     .from(workoutRoutines)
     .where(and(eq(workoutRoutines.id, routineId), eq(workoutRoutines.userId, userId)));
-  if (!routine) throw new ClientSafeError('Routine not found.');
+  if (!routine)
+    throw new ClientSafeError(translate({ en: 'Routine not found.', pl: 'Nie znaleziono planu.' }));
   return routine;
 }
 

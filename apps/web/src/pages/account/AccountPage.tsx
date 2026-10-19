@@ -8,14 +8,17 @@ import type { SessionUser } from '@/lib/auth/session.api';
 import { getInitials } from '@/lib/getInitials';
 import { useSignOutMutation } from './account.query';
 import { FriendsCard } from './FriendsCard';
+import { LanguageCard } from './LanguageCard';
 import { SharingSettingsCard } from './SharingSettingsCard';
 import css from './AccountPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 interface AccountPageProps {
   user: SessionUser;
 }
 
 export function AccountPage({ user }: AccountPageProps) {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const router = useRouter();
   const accountInitials = useMemo(() => getInitials(user.name) || 'A', [user.name]);
@@ -39,7 +42,7 @@ export function AccountPage({ user }: AccountPageProps) {
         <div className={css.profileInfo}>
           <h1>{user.name}</h1>
           <p>{user.email}</p>
-          <span>Signed in account</span>
+          <span>{t({ en: 'Signed in account', pl: 'Zalogowane konto' })}</span>
         </div>
         <Btn
           icon={<LogOutIcon aria-hidden='true' />}
@@ -48,9 +51,11 @@ export function AccountPage({ user }: AccountPageProps) {
           size='sm'
           variant='outlineDanger'
         >
-          Log out
+          {t({ en: 'Log out', pl: 'Wyloguj' })}
         </Btn>
       </Card>
+
+      <LanguageCard />
 
       <SharingSettingsCard />
 

@@ -9,59 +9,79 @@ import {
   MenuBtnPopup,
   MenuBtnRoot,
 } from '@/components/ui/menu-btn/MenuBtn';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import type { Localized } from '@/lib/i18n/locale';
 
 type Props = { date: string };
 
 const loggingActions = [
   {
-    description: 'Search your foods and choose a serving',
+    description: {
+      en: 'Search your foods and choose a serving',
+      pl: 'Wyszukaj produkt i wybierz porcję',
+    },
     icon: PlusIcon,
-    label: 'Add food',
+    label: { en: 'Add food', pl: 'Dodaj jedzenie' },
     to: '/calories/add' as const,
   },
   {
-    description: 'Use the camera or enter a barcode',
+    description: {
+      en: 'Use the camera or enter a barcode',
+      pl: 'Użyj kamery lub wpisz kod kreskowy',
+    },
     icon: ScanLineIcon,
-    label: 'Scan barcode',
+    label: { en: 'Scan barcode', pl: 'Skanuj kod kreskowy' },
     to: '/calories/scan' as const,
   },
   {
-    description: 'Enter calories and macros directly',
+    description: {
+      en: 'Enter calories and macros directly',
+      pl: 'Wpisz kalorie i makroskładniki bezpośrednio',
+    },
     icon: SparklesIcon,
-    label: 'Quick add',
+    label: { en: 'Quick add', pl: 'Szybkie dodawanie' },
     to: '/calories/quick-add' as const,
   },
-];
+] satisfies Array<{ description: Localized; label: Localized; [key: string]: unknown }>;
 
 export function LogFoodMenu({ date }: Props) {
+  const { t } = useI18n();
+  const logFood = t({ en: 'Log food', pl: 'Dodaj wpis' });
+
   return (
     <MenuBtnRoot>
       <FloatingButton icon={<PlusIcon aria-hidden='true' />} render={<MenuBtn openOnHover />}>
-        Log food
+        {logFood}
         <MenuBtnChevron />
       </FloatingButton>
       <MenuBtnPopup
-        aria-label='Log food'
-        description='Choose how you want to add this entry.'
-        heading='Log food'
+        aria-label={logFood}
+        description={t({
+          en: 'Choose how you want to add this entry.',
+          pl: 'Wybierz, jak chcesz dodać ten wpis.',
+        })}
+        heading={logFood}
       >
         {loggingActions.map((action) => {
           const ActionIcon = action.icon;
           return (
             <MenuBtnItem
-              description={action.description}
+              description={t(action.description)}
               icon={<ActionIcon aria-hidden='true' />}
               key={action.to}
-              label={action.label}
+              label={t(action.label)}
               render={<Link search={{ date }} to={action.to} />}
             />
           );
         })}
         <MenuBtnDivider />
         <MenuBtnItem
-          description='Save nutrition details for reuse'
+          description={t({
+            en: 'Save nutrition details for reuse',
+            pl: 'Zapisz wartości odżywcze do ponownego użycia',
+          })}
           icon={<BarcodeIcon aria-hidden='true' />}
-          label='Create a new food'
+          label={t({ en: 'Create a new food', pl: 'Utwórz nowy produkt' })}
           render={<Link search={{ date }} to='/calories/foods/new' />}
         />
       </MenuBtnPopup>

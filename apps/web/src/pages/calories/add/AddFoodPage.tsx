@@ -13,6 +13,7 @@ import { List, ListItem } from '@/components/ui/list/List';
 import { Label } from '@/components/ui/label/Label';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import css from './AddFoodPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type Props = { date: string; foodId?: string };
 const MAX_VISIBLE_FOODS = 10;
@@ -26,6 +27,7 @@ function nutritionAtGrams(valuePer100g: number | null, grams: number) {
 
 /** Food search; picking a food pushes `?foodId` so back returns from the confirm step to the list. */
 export function AddFoodPage({ date, foodId }: Props) {
+  const { formatNumber, t } = useI18n();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
@@ -49,17 +51,17 @@ export function AddFoodPage({ date, foodId }: Props) {
 
   return (
     <main className={css.page}>
-      <Label text='Food name'>
+      <Label text={t({ en: 'Food name', pl: 'Nazwa produktu' })}>
         <TextInput
           autoFocus
           onValueChange={(value) => {
             setQuery(value);
             startFiltering(() => setFilterQuery(value));
           }}
-          placeholder='Banana, bread, yoghurt…'
+          placeholder={t({ en: 'Banana, bread, yoghurt…', pl: 'Banan, chleb, jogurt…' })}
           trailing={
             <Btn
-              aria-label='Scan barcode'
+              aria-label={t({ en: 'Scan barcode', pl: 'Skanuj kod kreskowy' })}
               icon={<BarcodeIcon aria-hidden='true' />}
               iconOnly
               isLink
@@ -85,7 +87,7 @@ export function AddFoodPage({ date, foodId }: Props) {
                 fat={nutritionAtGrams(food.fatPer100g, productGrams)}
                 imageUrl={food.imageUrl}
                 kcal={kcal}
-                meta={`${Math.round(productGrams)} g`}
+                meta={`${formatNumber(Math.round(productGrams))} g`}
                 name={
                   <button
                     className={css.selectButton}
@@ -104,14 +106,19 @@ export function AddFoodPage({ date, foodId }: Props) {
 
       {!foodsQuery.isFetching && foods.length === 0 && query.trim() ? (
         <div className={css.empty}>
-          <p>No foods match “{query.trim()}”.</p>
+          <p>
+            {t({
+              en: `No foods match “${query.trim()}”.`,
+              pl: `Brak produktów pasujących do „${query.trim()}”.`,
+            })}
+          </p>
           <div className={css.emptyActions}>
             <Btn
               isLink
               render={<Link search={{ date, name: query.trim() }} to='/calories/foods/new' />}
               variant='text'
             >
-              Create the food
+              {t({ en: 'Create the food', pl: 'Utwórz produkt' })}
             </Btn>
           </div>
         </div>
@@ -121,7 +128,7 @@ export function AddFoodPage({ date, foodId }: Props) {
         icon={<PlusIcon aria-hidden='true' />}
         to={`/calories/foods/new?date=${encodeURIComponent(date)}&name=${encodeURIComponent(query)}`}
       >
-        Create new food
+        {t({ en: 'Create new food', pl: 'Utwórz nowy produkt' })}
       </FloatingButton>
     </main>
   );

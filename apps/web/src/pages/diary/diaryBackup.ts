@@ -1,6 +1,7 @@
 import { type } from 'arktype';
 import { dateOnlyType } from '@/lib/dateOnly';
 import type { DiaryEntrySummary } from './useDecryptedEntries';
+import { translate } from '@/lib/i18n/getLocale';
 
 // Backups are plaintext JSON files built and read in the browser; the server only sees ciphertext.
 
@@ -48,12 +49,19 @@ export function parseDiaryBackup(json: string) {
   try {
     value = JSON.parse(json);
   } catch {
-    throw new Error('The file is not valid JSON.');
+    throw new Error(
+      translate({ en: 'The file is not valid JSON.', pl: 'Plik nie zawiera poprawnego JSON.' }),
+    );
   }
 
   const backup = diaryBackupType(value);
   if (backup instanceof type.errors) {
-    throw new Error(`The file is not a Veles diary export: ${backup.summary}`);
+    throw new Error(
+      translate({
+        en: `The file is not a Veles diary export: ${backup.summary}`,
+        pl: `Plik nie jest eksportem dziennika Veles: ${backup.summary}`,
+      }),
+    );
   }
   return backup;
 }

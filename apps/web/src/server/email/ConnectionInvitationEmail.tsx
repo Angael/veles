@@ -1,41 +1,64 @@
+import type { Locale, Localized } from '@/lib/i18n/locale';
 import { Body, Button, Container, Head, Heading, Hr, Html, Link, Preview, Text } from 'react-email';
 
 interface ConnectionInvitationEmailProps {
   invitationUrl: string;
   inviterName: string;
+  locale: Locale;
   recipientEmail: string;
 }
 
 export function ConnectionInvitationEmail({
   invitationUrl,
   inviterName,
+  locale,
   recipientEmail,
 }: ConnectionInvitationEmailProps) {
+  const t = <T,>(text: Localized<T>) => text[locale];
+
   return (
-    <Html dir='ltr' lang='en'>
+    <Html dir='ltr' lang={locale}>
       <Head />
-      <Preview>{inviterName} invited you to connect on Veles</Preview>
+      <Preview>
+        {t({
+          en: `${inviterName} invited you to connect on Veles`,
+          pl: `${inviterName} zaprasza Cię do połączenia w Veles`,
+        })}
+      </Preview>
       <Body style={bodyStyle}>
         <Container style={containerStyle}>
-          <Heading style={headingStyle}>You have been invited to connect</Heading>
+          <Heading style={headingStyle}>
+            {t({ en: 'You have been invited to connect', pl: 'Masz zaproszenie do połączenia' })}
+          </Heading>
           <Text style={textStyle}>
-            <strong>{inviterName}</strong> invited you to connect on Veles.
+            <strong>{inviterName}</strong>{' '}
+            {t({
+              en: 'invited you to connect on Veles.',
+              pl: 'zaprasza Cię do połączenia w Veles.',
+            })}
           </Text>
           <Text style={textStyle}>
-            Sign in with <strong>{recipientEmail}</strong>, then accept the invitation.
+            {t({ en: 'Sign in with', pl: 'Zaloguj się jako' })} <strong>{recipientEmail}</strong>
+            {t({ en: ', then accept the invitation.', pl: ', a potem przyjmij zaproszenie.' })}
           </Text>
           <Button href={invitationUrl} style={buttonStyle}>
-            Accept invitation
+            {t({ en: 'Accept invitation', pl: 'Przyjmij zaproszenie' })}
           </Button>
           <Hr style={dividerStyle} />
           <Text style={secondaryTextStyle}>
-            If the button does not work, copy and paste this link into your browser:
+            {t({
+              en: 'If the button does not work, copy and paste this link into your browser:',
+              pl: 'Jeśli przycisk nie działa, skopiuj ten link i wklej go w przeglądarce:',
+            })}
           </Text>
           <Link href={invitationUrl} style={linkStyle}>
             {invitationUrl}
           </Link>
           <Text style={secondaryTextStyle}>
-            If you were not expecting this invitation, you can ignore this email.
+            {t({
+              en: 'If you were not expecting this invitation, you can ignore this email.',
+              pl: 'Jeśli nie spodziewasz się tego zaproszenia, zignoruj tę wiadomość.',
+            })}
           </Text>
         </Container>
       </Body>

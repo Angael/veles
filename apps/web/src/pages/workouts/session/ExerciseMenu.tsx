@@ -17,6 +17,7 @@ import {
 import { formatDuration, MEASURE_LABELS, MEASURES } from '../metrics';
 import type { WorkoutSlotData } from '../workouts.server';
 import type { SessionActions } from './session.query';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 const REST_PRESETS = [null, 45, 60, 90, 120, 180] as const;
 
@@ -34,33 +35,43 @@ type ExerciseMenuProps = {
  * so they carry over to the next workout.
  */
 export function ExerciseMenu({ actions, isFirst, isLast, onRename, slot }: ExerciseMenuProps) {
+  const { t } = useI18n();
+  const restLabel = t({ en: 'Rest timer', pl: 'Czas przerwy' });
+
   return (
-    <ContextMenuPopup aria-label={`${slot.name} actions`}>
-      <ContextMenuItem icon={<PencilIcon aria-hidden='true' />} label='Rename' onClick={onRename} />
+    <ContextMenuPopup aria-label={t({ en: `${slot.name} actions`, pl: `Akcje: ${slot.name}` })}>
+      <ContextMenuItem
+        icon={<PencilIcon aria-hidden='true' />}
+        label={t({ en: 'Rename', pl: 'Zmień nazwę' })}
+        onClick={onRename}
+      />
       <ContextMenuSubmenuRoot>
         <ContextMenuSubmenuTrigger
           icon={<RulerIcon aria-hidden='true' />}
-          label={`Track: ${MEASURE_LABELS[slot.measure]}`}
+          label={t({
+            en: `Track: ${t(MEASURE_LABELS[slot.measure])}`,
+            pl: `Mierz: ${t(MEASURE_LABELS[slot.measure])}`,
+          })}
         />
-        <ContextMenuPopup aria-label='What to track'>
+        <ContextMenuPopup aria-label={t({ en: 'What to track', pl: 'Co mierzyć' })}>
           {MEASURES.map((measure) => (
             <ContextMenuItem
               icon={measure === slot.measure ? <CheckIcon aria-hidden='true' /> : <span />}
               key={measure}
-              label={MEASURE_LABELS[measure]}
+              label={t(MEASURE_LABELS[measure])}
               onClick={() => actions.updateExercise(slot.exerciseId, { measure })}
             />
           ))}
         </ContextMenuPopup>
       </ContextMenuSubmenuRoot>
       <ContextMenuSubmenuRoot>
-        <ContextMenuSubmenuTrigger icon={<TimerIcon aria-hidden='true' />} label='Rest timer' />
-        <ContextMenuPopup aria-label='Rest timer'>
+        <ContextMenuSubmenuTrigger icon={<TimerIcon aria-hidden='true' />} label={restLabel} />
+        <ContextMenuPopup aria-label={restLabel}>
           {REST_PRESETS.map((seconds) => (
             <ContextMenuItem
               icon={seconds === slot.restSeconds ? <CheckIcon aria-hidden='true' /> : <span />}
               key={seconds ?? 'off'}
-              label={seconds === null ? 'Off' : formatDuration(seconds)}
+              label={seconds === null ? t({ en: 'Off', pl: 'Wyłączony' }) : formatDuration(seconds)}
               onClick={() => actions.updateExercise(slot.exerciseId, { restSeconds: seconds })}
             />
           ))}
@@ -69,19 +80,19 @@ export function ExerciseMenu({ actions, isFirst, isLast, onRename, slot }: Exerc
       <ContextMenuItem
         disabled={isFirst}
         icon={<ArrowUpIcon aria-hidden='true' />}
-        label='Move up'
+        label={t({ en: 'Move up', pl: 'Przesuń w górę' })}
         onClick={() => actions.moveSlot(slot.id, 'up')}
       />
       <ContextMenuItem
         disabled={isLast}
         icon={<ArrowDownIcon aria-hidden='true' />}
-        label='Move down'
+        label={t({ en: 'Move down', pl: 'Przesuń w dół' })}
         onClick={() => actions.moveSlot(slot.id, 'down')}
       />
       <ContextMenuSeparator />
       <ContextMenuItem
         icon={<Trash2Icon aria-hidden='true' />}
-        label='Remove exercise'
+        label={t({ en: 'Remove exercise', pl: 'Usuń ćwiczenie' })}
         onClick={() => actions.removeSlot(slot.id)}
         variant='danger'
       />

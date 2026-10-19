@@ -10,6 +10,7 @@ import {
   isArithmeticOperator,
 } from './arithmeticExpression';
 import css from './NumberInput.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type NumberInputProps = Omit<NumberFieldRootProps, 'className' | 'step'> & {
   className?: string;
@@ -32,6 +33,7 @@ export function NumberInput({
   onValueChange,
   ...props
 }: NumberInputProps) {
+  const { t } = useI18n();
   // Typed arithmetic such as `10*2`; Base UI only accepts plain numbers, so it's held here until committed.
   const [expression, setExpression] = useState<string | null>(null);
 
@@ -69,7 +71,7 @@ export function NumberInput({
     >
       <NumberField.Group className={css.group}>
         <NumberField.Decrement
-          aria-label='Decrease value'
+          aria-label={t({ en: 'Decrease value', pl: 'Zmniejsz wartość' })}
           className={clsx(css.stepper, css.decrement)}
         >
           <MinusIcon aria-hidden='true' size={16} strokeWidth={1.8} />
@@ -116,7 +118,7 @@ export function NumberInput({
         />
 
         <NumberField.Increment
-          aria-label='Increase value'
+          aria-label={t({ en: 'Increase value', pl: 'Zwiększ wartość' })}
           className={clsx(css.stepper, css.increment)}
         >
           <PlusIcon aria-hidden='true' size={16} strokeWidth={1.8} />

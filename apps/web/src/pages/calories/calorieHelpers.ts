@@ -1,6 +1,7 @@
 import { addDays, format, isMatch, parseISO, startOfWeek } from 'date-fns';
 import { todayLocalDate } from '@/lib/dateOnly';
 import type { NavbarTarget, NavbarTargetMatch } from '@/lib/routing/staticRouteData';
+import { type Localized, pluralEn, pluralPl } from '@/lib/i18n/locale';
 
 export const CALORIE_DATE_FORMAT = 'yyyy-MM-dd';
 /** Upper bound for scaling selected logs; keeps hundredths far from integer overflow. */
@@ -27,6 +28,14 @@ export function calorieWeekDates(selectedDate: string) {
   return Array.from({ length: 7 }, (_, index) =>
     format(addDays(monday, index), CALORIE_DATE_FORMAT),
   );
+}
+
+/** "3 products" in every locale, for selection dialogs and toasts. */
+export function productCountText(count: number): Localized {
+  return {
+    en: `${count} ${pluralEn(count, 'product', 'products')}`,
+    pl: `${count} ${pluralPl(count, 'produkt', 'produkty', 'produktów')}`,
+  };
 }
 
 export function isWithinKcalGoal(kcalHundredths: number, goalKcalHundredths: number) {

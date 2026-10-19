@@ -9,6 +9,7 @@ import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { limitRequestSizeMiddleware } from '@/server/middleware/limitRequestSizeMiddleware';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { type PhotoLinkTable, persistWithPhotos } from '@/server/storage/photoSync.server';
+import { translate } from '@/lib/i18n/getLocale';
 
 const RECIPE_IMAGE_KEY_PREFIX = 'recipe-images';
 
@@ -60,7 +61,9 @@ export const updateRecipe = createServerFn({ method: 'POST' })
     const recipeId = recipeIdType(data.get('id'));
 
     if (recipeId instanceof type.errors) {
-      throw new ClientSafeError('Recipe not found.');
+      throw new ClientSafeError(
+        translate({ en: 'Recipe not found.', pl: 'Nie znaleziono przepisu.' }),
+      );
     }
 
     return persistRecipeUpload(data, session.user.id, recipeId);
@@ -85,7 +88,9 @@ async function persistRecipeUpload(formData: FormData, userId: string, existingR
             .returning({ id: recipes.id });
 
       if (!recipe) {
-        throw new ClientSafeError('Recipe not found.');
+        throw new ClientSafeError(
+          translate({ en: 'Recipe not found.', pl: 'Nie znaleziono przepisu.' }),
+        );
       }
 
       await photos.sync(recipeImageLinks(tx, recipe.id));

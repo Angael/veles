@@ -107,6 +107,11 @@
   }
 }
 
+.languageHeader {
+  align-items: center;
+  padding-bottom: 0;
+}
+
 .sharingSettings {
   display: grid;
   gap: var(--space-xs);

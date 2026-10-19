@@ -19,6 +19,7 @@ import type { SessionActions, SetPatch } from './session.query';
 import { SetMenu } from './SetMenu';
 import { SetTypeFlash } from './SetTypeFlash';
 import css from './Session.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type SetRowProps = {
   actions: SessionActions;
@@ -45,6 +46,7 @@ export function SetRow({
   set,
   slot,
 }: SetRowProps) {
+  const { locale, t } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
   /** Bumped on every badge tap so the type label replays its animation. */
   const [flash, setFlash] = useState(0);
@@ -75,39 +77,49 @@ export function SetRow({
         render={<div role='row' />}
       >
         <button
-          aria-label={`Set type: ${SET_TYPE_LABELS[set.type]}. Tap to change.`}
+          aria-label={t({
+            en: `Set type: ${t(SET_TYPE_LABELS[set.type])}. Tap to change.`,
+            pl: `Typ serii: ${t(SET_TYPE_LABELS[set.type])}. Dotknij, aby zmienić.`,
+          })}
           className={clsx(css.badge, css[`badge_${set.type}`])}
           onClick={cycleType}
           type='button'
         >
-          {set.type === 'normal' ? number : SET_BADGE[set.type]}
+          {set.type === 'normal' ? number : t(SET_BADGE[set.type])}
           {flash > 0 ? (
             <SetTypeFlash
-              badge={set.type === 'normal' ? number : SET_BADGE[set.type]}
+              badge={set.type === 'normal' ? number : t(SET_BADGE[set.type])}
               key={flash}
-              label={SET_TYPE_LABELS[set.type]}
-              note={SET_TYPE_NOTES[set.type]}
+              label={t(SET_TYPE_LABELS[set.type])}
+              note={t(SET_TYPE_NOTES[set.type])}
               onDone={() => setFlash(0)}
             />
           ) : null}
         </button>
         {fields.map((field) => (
           <ScrubCell
-            aria-label={`${field.label}, drag sideways or tap for details`}
+            aria-label={t({
+              en: `${t(field.label)}, drag sideways or tap for details`,
+              pl: `${t(field.label)}, przeciągnij w bok lub dotknij, aby zobaczyć szczegóły`,
+            })}
             disabled={menuOpen}
-            format={(value) => formatMetric(field, value)}
+            format={(value) => formatMetric(field, value, locale)}
             key={field.key}
             onChange={(value) => update({ [field.key]: value })}
             onTap={() => onOpenSheet()}
             placeholder={set.previous?.[field.key] ?? DEFAULT_METRICS[field.key]}
-            unit={field.cellUnit}
+            unit={field.cellUnit && t(field.cellUnit)}
             value={set[field.key]}
             {...scrubTuning(field)}
           />
         ))}
         {finished ? null : (
           <button
-            aria-label={set.done ? 'Mark set not done' : 'Complete set'}
+            aria-label={
+              set.done
+                ? t({ en: 'Mark set not done', pl: 'Oznacz serię jako niewykonaną' })
+                : t({ en: 'Complete set', pl: 'Zakończ serię' })
+            }
             aria-pressed={set.done}
             className={css.check}
             onClick={toggleDone}

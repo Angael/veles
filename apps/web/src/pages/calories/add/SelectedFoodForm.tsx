@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import css from './SelectedFoodForm.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type Props = {
   food: CalorieFood;
@@ -25,6 +26,7 @@ function nutritionAtGrams(valuePer100g: number | null, grams: number) {
 
 /** Confirms a food log while keeping its nutrition preview and daily allowance in sync. */
 export function SelectedFoodForm({ food, initialDate }: Props) {
+  const { formatNumber, t } = useI18n();
   const navigate = useNavigate();
   const recordFoodMutation = useRecordFoodMutation();
   const [date, setDate] = useState(initialDate);
@@ -68,11 +70,16 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
         >
           {packageSizeGrams !== null && packageSizeGrams > 0 ? (
             <div
-              aria-label='Package amount shortcuts'
+              aria-label={t({ en: 'Package amount shortcuts', pl: 'Skróty ilości opakowania' })}
               className={css.packageShortcuts}
               role='group'
             >
-              <span className={css.packageLabel}>1 package ({Math.round(packageSizeGrams)} g)</span>
+              <span className={css.packageLabel}>
+                {t({
+                  en: `1 package (${formatNumber(Math.round(packageSizeGrams))} g)`,
+                  pl: `1 opakowanie (${formatNumber(Math.round(packageSizeGrams))} g)`,
+                })}
+              </span>
               <div className={css.packageButtons}>
                 <Btn
                   onClick={() => setGrams(packageSizeGrams / 2)}
@@ -80,7 +87,7 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
                   type='button'
                   variant='ghost'
                 >
-                  ½ package
+                  {t({ en: '½ package', pl: '½ opakowania' })}
                 </Btn>
                 <Btn
                   onClick={() => setGrams(packageSizeGrams)}
@@ -88,7 +95,7 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
                   type='button'
                   variant='ghost'
                 >
-                  1 package
+                  {t({ en: '1 package', pl: '1 opakowanie' })}
                 </Btn>
                 <Btn
                   onClick={() => setGrams(packageSizeGrams * 2)}
@@ -96,12 +103,12 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
                   type='button'
                   variant='ghost'
                 >
-                  2 packages
+                  {t({ en: '2 packages', pl: '2 opakowania' })}
                 </Btn>
               </div>
             </div>
           ) : null}
-          <Label text='Amount eaten (g)'>
+          <Label text={t({ en: 'Amount eaten (g)', pl: 'Zjedzona ilość (g)' })}>
             <NumberInput
               enterKeyHint='done'
               min={1}
@@ -112,11 +119,11 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
             />
           </Label>
           <FormSubmitRow>
-            <Label text='Date'>
+            <Label text={t({ en: 'Date', pl: 'Data' })}>
               <DateInput name='date' onValueChange={setDate} required value={date} />
             </Label>
             <Btn disabled={selectedGrams < 1} loading={recordFoodMutation.isPending} type='submit'>
-              Add to diary
+              {t({ en: 'Add to diary', pl: 'Dodaj do dziennika' })}
             </Btn>
           </FormSubmitRow>
         </TypedForm>

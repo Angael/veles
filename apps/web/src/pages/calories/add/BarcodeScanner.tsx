@@ -8,6 +8,7 @@ import { getFoodBarcode } from '../foodBarcode';
 import { createDetector } from './barcodeDetector';
 import { ScannerMessage, type ScannerState } from './ScannerMessage';
 import { useCameraPreference } from './useCameraPreference';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export type BarcodeScannerStatus = 'scanning' | 'lookingUp' | 'notFound';
 
@@ -32,6 +33,7 @@ async function enableContinuousFocus(stream: MediaStream) {
 }
 
 export function BarcodeScanner({ onDetected, status }: BarcodeScannerProps) {
+  const { t } = useI18n();
   const videoRef = useRef<HTMLVideoElement>(null);
   const callbackRef = useRef(onDetected);
   callbackRef.current = onDetected;
@@ -203,17 +205,30 @@ export function BarcodeScanner({ onDetected, status }: BarcodeScannerProps) {
   const isScanning = displayState === 'scanning';
 
   return (
-    <section aria-label='Barcode camera scanner' className={css.scanner}>
+    <section
+      aria-label={t({ en: 'Barcode camera scanner', pl: 'Skaner kodów kreskowych' })}
+      className={css.scanner}
+    >
       <div className={css.header}>
         <RouteBackButton variant='ghost' />
         <div>
-          <h1>Scan a barcode</h1>
-          <p>Hold the package steady with the barcode visible.</p>
+          <h1>{t({ en: 'Scan a barcode', pl: 'Zeskanuj kod kreskowy' })}</h1>
+          <p>
+            {t({
+              en: 'Hold the package steady with the barcode visible.',
+              pl: 'Trzymaj opakowanie nieruchomo, z widocznym kodem kreskowym.',
+            })}
+          </p>
         </div>
       </div>
 
       <div aria-busy={status === 'lookingUp' || undefined} className={css.viewport}>
-        <video aria-label='Live camera preview' muted playsInline ref={videoRef} />
+        <video
+          aria-label={t({ en: 'Live camera preview', pl: 'Podgląd z kamery' })}
+          muted
+          playsInline
+          ref={videoRef}
+        />
         {!isScanning ? <ScannerMessage state={displayState} /> : null}
         {isScanning && cameras.length > 1 ? (
           <div className={css.cameraControls}>
@@ -225,7 +240,7 @@ export function BarcodeScanner({ onDetected, status }: BarcodeScannerProps) {
               {cameraNotice}
             </div>
             <Btn
-              aria-label='Switch camera'
+              aria-label={t({ en: 'Switch camera', pl: 'Przełącz kamerę' })}
               className={css.switchCamera}
               icon={<SwitchCameraIcon aria-hidden='true' />}
               iconOnly
@@ -236,13 +251,19 @@ export function BarcodeScanner({ onDetected, status }: BarcodeScannerProps) {
         ) : null}
         {isScanning && cameraHintVisible ? (
           <Card className={css.cameraHint} shadow={false} tone='primary'>
-            If the image looks blurry, try switching to another rear camera.
+            {t({
+              en: 'If the image looks blurry, try switching to another rear camera.',
+              pl: 'Jeśli obraz jest rozmazany, przełącz na inną tylną kamerę.',
+            })}
           </Card>
         ) : null}
       </div>
       {isScanning ? (
         <p aria-live='polite' className={css.status}>
-          Looking for a barcode or 2D food code…
+          {t({
+            en: 'Looking for a barcode or 2D food code…',
+            pl: 'Szukanie kodu kreskowego lub kodu 2D…',
+          })}
         </p>
       ) : null}
     </section>

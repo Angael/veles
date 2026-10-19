@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocalStorageState } from './useLocalStorageState';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 const preferredCameraStorageKey = 'barcodeScanner.preferredCameraId';
 const cameraHintDismissedStorageKey = 'barcodeScanner.cameraHintDismissed';
 
 /** Owns the device-local camera preference and replaces stale selections with the active fallback. */
 export function useCameraPreference() {
+  const { t } = useI18n();
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState('');
   const [cameraPreferenceReady, setCameraPreferenceReady] = useState(false);
@@ -70,7 +72,12 @@ export function useCameraPreference() {
 
     setCurrentDeviceId(nextDeviceId);
     setPreferredCameraId(nextDeviceId);
-    showCameraNotice(`Using camera ${nextIndex + 1}/${cameras.length}`);
+    showCameraNotice(
+      t({
+        en: `Using camera ${nextIndex + 1}/${cameras.length}`,
+        pl: `Używana kamera ${nextIndex + 1}/${cameras.length}`,
+      }),
+    );
     return nextDeviceId;
   }
 

@@ -22,6 +22,8 @@ import {
   touchWorkout,
 } from '../workouts.server';
 import { MAX_WEIGHT_KG } from '../metrics';
+import { ClientSafeError } from '@/lib/errors/ClientSafeError';
+import { translate } from '@/lib/i18n/getLocale';
 
 const idInputType = type({ id: 'string.uuid' });
 
@@ -85,7 +87,9 @@ export const addWorkoutExercise = createServerFn({ method: 'POST' })
       } else if (data.newExercise) {
         exerciseId = await findOrCreateExercise(tx, userId, data.newExercise);
       } else {
-        throw new Error('Pick or name an exercise.');
+        throw new ClientSafeError(
+          translate({ en: 'Pick or name an exercise.', pl: 'Wybierz lub nazwij ćwiczenie.' }),
+        );
       }
 
       const positions = await tx

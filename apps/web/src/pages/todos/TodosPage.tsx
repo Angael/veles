@@ -11,10 +11,11 @@ import { NoteComposer } from './NoteComposer';
 import { notesQueryOptions } from './notes.query';
 import { TextNoteCard } from './TextNoteCard';
 import css from './TodosPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 const noteScopeItems = [
-  { label: 'All notes', value: 'all' },
-  { label: 'Your notes', value: 'owned' },
+  { label: { en: 'All notes', pl: 'Wszystkie notatki' }, value: 'all' },
+  { label: { en: 'Your notes', pl: 'Twoje notatki' }, value: 'owned' },
 ] as const;
 
 const noteSearchFields = [
@@ -24,6 +25,7 @@ const noteSearchFields = [
 ] satisfies RankedSearchFields<NoteSummary>;
 
 export function TodosPage() {
+  const { t } = useI18n();
   const { data: notes, refetch: refetchNotes } = useSuspenseQuery(notesQueryOptions());
   const [noteScope, setNoteScope] = useState<'all' | 'owned'>('all');
   const [searchInputValue, setSearchInputValue] = useState('');
@@ -33,19 +35,23 @@ export function TodosPage() {
 
   return (
     <main className={css.page}>
-      <section aria-label='Filter notes' className={css.controls} data-appear>
+      <section
+        aria-label={t({ en: 'Filter notes', pl: 'Filtruj notatki' })}
+        className={css.controls}
+        data-appear
+      >
         <TextInput
-          aria-label='Search notes'
+          aria-label={t({ en: 'Search notes', pl: 'Szukaj notatek' })}
           autoComplete='off'
           name='search'
           onValueChange={setSearchInputValue}
-          placeholder='Search notes'
+          placeholder={t({ en: 'Search notes', pl: 'Szukaj notatek' })}
           type='search'
           value={searchInputValue}
         />
         <SelectInput
-          aria-label='Note ownership'
-          items={noteScopeItems}
+          aria-label={t({ en: 'Note ownership', pl: 'Właściciel notatki' })}
+          items={noteScopeItems.map((item) => ({ ...item, label: t(item.label) }))}
           onValueChange={(value) => {
             if (!value) return;
             setNoteScope(value);
@@ -56,15 +62,29 @@ export function TodosPage() {
       </section>
       {visibleNotes.length === 0 ? (
         <Card as='section' className={css.emptyState} data-appear='1'>
-          <h2>{notes.length === 0 ? 'No notes yet' : 'No matching notes'}</h2>
+          <h2>
+            {notes.length === 0
+              ? t({ en: 'No notes yet', pl: 'Brak notatek' })
+              : t({ en: 'No matching notes', pl: 'Brak pasujących notatek' })}
+          </h2>
           <p>
             {notes.length === 0
-              ? 'Add your first text note or checklist.'
-              : 'Try another search or ownership filter.'}
+              ? t({
+                  en: 'Add your first text note or checklist.',
+                  pl: 'Dodaj pierwszą notatkę lub listę kontrolną.',
+                })
+              : t({
+                  en: 'Try another search or ownership filter.',
+                  pl: 'Spróbuj innego wyszukiwania lub filtra.',
+                })}
           </p>
         </Card>
       ) : (
-        <section aria-label='Your notes and shared notes' className={css.listGrid} data-appear='1'>
+        <section
+          aria-label={t({ en: 'Your notes and shared notes', pl: 'Twoje i udostępnione notatki' })}
+          className={css.listGrid}
+          data-appear='1'
+        >
           {visibleNotes.map((note) =>
             note.type === 'shopping_list' ? (
               <CheckedNoteCard key={note.id} note={note} />

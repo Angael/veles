@@ -3,6 +3,8 @@ import { useRouter } from '@tanstack/react-router';
 import { StarIcon } from 'lucide-react';
 import css from './RecipeRating.module.css';
 import { useUpdateRecipeRatingMutation } from '../recipes.query';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { pluralEn, pluralPl } from '@/lib/i18n/locale';
 
 type RecipeRatingProps = {
   rating: number | null;
@@ -12,6 +14,7 @@ type RecipeRatingProps = {
 const MAX_RATING = 5;
 
 export function RecipeRating({ rating, recipeId }: RecipeRatingProps) {
+  const { t } = useI18n();
   const router = useRouter();
   const [visibleRating, setVisibleRating] = useState(rating ?? 0);
   const ratingMutation = useUpdateRecipeRatingMutation();
@@ -37,8 +40,8 @@ export function RecipeRating({ rating, recipeId }: RecipeRatingProps) {
   }
 
   return (
-    <section className={css.rating} aria-label='Owner rating'>
-      <div aria-label='Rating' className={css.stars} role='radiogroup'>
+    <section className={css.rating} aria-label={t({ en: 'Owner rating', pl: 'Ocena właściciela' })}>
+      <div aria-label={t({ en: 'Rating', pl: 'Ocena' })} className={css.stars} role='radiogroup'>
         {Array.from({ length: MAX_RATING }, (_, index) => {
           const ratingValue = index + 1;
           const isSelected = ratingValue <= visibleRating;
@@ -46,7 +49,10 @@ export function RecipeRating({ rating, recipeId }: RecipeRatingProps) {
 
           return (
             <button
-              aria-label={`Rate ${ratingValue} ${ratingValue === 1 ? 'star' : 'stars'}`}
+              aria-label={t({
+                en: `Rate ${ratingValue} ${pluralEn(ratingValue, 'star', 'stars')}`,
+                pl: `Oceń na ${ratingValue} ${pluralPl(ratingValue, 'gwiazdkę', 'gwiazdki', 'gwiazdek')}`,
+              })}
               aria-checked={isCurrentRating}
               className={css.starButton}
               disabled={ratingMutation.isPending}

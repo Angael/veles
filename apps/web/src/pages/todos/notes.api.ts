@@ -8,6 +8,7 @@ import { invariant } from '@/lib/invariant';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
+import { translate } from '@/lib/i18n/getLocale';
 
 export type NoteListItem = {
   checked: boolean;
@@ -147,7 +148,10 @@ export const updateNote = createServerFn({ method: 'POST' })
       .where(and(eq(notes.id, data.id), accessibleNote(session.user.id)))
       .returning({ id: notes.id });
 
-    if (!updated) throw new ClientSafeError('Note not found.');
+    if (!updated)
+      throw new ClientSafeError(
+        translate({ en: 'Note not found.', pl: 'Nie znaleziono notatki.' }),
+      );
   });
 
 const deleteNoteInputType = type({ id: 'string.uuid' });
@@ -162,7 +166,10 @@ export const deleteNote = createServerFn({ method: 'POST' })
       .where(and(eq(notes.id, data.id), eq(notes.ownerId, session.user.id)))
       .returning({ id: notes.id });
 
-    if (!deleted) throw new ClientSafeError('Note not found.');
+    if (!deleted)
+      throw new ClientSafeError(
+        translate({ en: 'Note not found.', pl: 'Nie znaleziono notatki.' }),
+      );
   });
 
 const setNoteSharedInputType = type({ id: 'string.uuid', shared: 'boolean' });
@@ -178,7 +185,10 @@ export const setNoteShared = createServerFn({ method: 'POST' })
       .where(and(eq(notes.id, data.id), eq(notes.ownerId, session.user.id)))
       .returning({ id: notes.id });
 
-    if (!updated) throw new ClientSafeError('Note not found.');
+    if (!updated)
+      throw new ClientSafeError(
+        translate({ en: 'Note not found.', pl: 'Nie znaleziono notatki.' }),
+      );
   });
 
 const toggleNoteTypeInputType = type({ id: 'string.uuid' });
@@ -196,7 +206,10 @@ export const toggleNoteType = createServerFn({ method: 'POST' })
         .where(and(eq(notes.id, data.id), accessibleNote(session.user.id)))
         .for('update');
 
-      if (!note) throw new ClientSafeError('Note not found.');
+      if (!note)
+        throw new ClientSafeError(
+          translate({ en: 'Note not found.', pl: 'Nie znaleziono notatki.' }),
+        );
 
       if (note.type === 'shopping_list') {
         const items = await tx
@@ -251,7 +264,10 @@ export const createListItem = createServerFn({ method: 'POST' })
       )
       .limit(1);
 
-    if (!shoppingList) throw new ClientSafeError('Shopping list not found.');
+    if (!shoppingList)
+      throw new ClientSafeError(
+        translate({ en: 'Shopping list not found.', pl: 'Nie znaleziono listy zakupów.' }),
+      );
 
     const [created] = await db
       .insert(listItems)
@@ -282,7 +298,10 @@ export const updateListItem = createServerFn({ method: 'POST' })
       .where(and(eq(listItems.id, data.id), accessibleNote(session.user.id)))
       .limit(1);
 
-    if (!item) throw new ClientSafeError('Product not found.');
+    if (!item)
+      throw new ClientSafeError(
+        translate({ en: 'Product not found.', pl: 'Nie znaleziono produktu.' }),
+      );
 
     await db.update(listItems).set({ name: data.name }).where(eq(listItems.id, item.id));
     await db.update(notes).set({ updatedAt: new Date() }).where(eq(notes.id, item.noteId));
@@ -305,7 +324,10 @@ export const setListItemChecked = createServerFn({ method: 'POST' })
       .where(and(eq(listItems.id, data.id), accessibleNote(session.user.id)))
       .limit(1);
 
-    if (!item) throw new ClientSafeError('Product not found.');
+    if (!item)
+      throw new ClientSafeError(
+        translate({ en: 'Product not found.', pl: 'Nie znaleziono produktu.' }),
+      );
 
     await db.update(listItems).set({ checked: data.checked }).where(eq(listItems.id, item.id));
   });
@@ -324,7 +346,10 @@ export const deleteListItem = createServerFn({ method: 'POST' })
       .where(and(eq(listItems.id, data.id), accessibleNote(session.user.id)))
       .limit(1);
 
-    if (!item) throw new ClientSafeError('Item not found.');
+    if (!item)
+      throw new ClientSafeError(
+        translate({ en: 'Item not found.', pl: 'Nie znaleziono pozycji.' }),
+      );
 
     await db.delete(listItems).where(eq(listItems.id, item.id));
     await db.update(notes).set({ updatedAt: new Date() }).where(eq(notes.id, item.noteId));

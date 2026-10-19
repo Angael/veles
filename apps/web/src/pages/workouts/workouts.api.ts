@@ -17,6 +17,7 @@ import {
   requireNoOpenWorkout,
   requireOwnedWorkout,
 } from './workouts.server';
+import { getLocale } from '@/lib/i18n/getLocale';
 
 export type WorkoutSummary = {
   id: string;
@@ -100,7 +101,7 @@ export const startWorkout = createServerFn({ method: 'POST' })
       .insert(workoutSessions)
       .values({
         date: data.date,
-        name: `${format(parseISO(data.date), 'EEEE')} workout`,
+        name: defaultWorkoutName(data.date),
         startedAt: new Date(),
         userId: session.user.id,
       })
@@ -145,3 +146,21 @@ export const deleteWorkout = createServerFn({ method: 'POST' })
     await requireOwnedWorkout(db, session.user.id, data.id);
     await db.delete(workoutSessions).where(eq(workoutSessions.id, data.id));
   });
+
+const POLISH_WEEKDAY_ADJECTIVES = [
+  'Niedzielny',
+  'Poniedziałkowy',
+  'Wtorkowy',
+  'Środowy',
+  'Czwartkowy',
+  'Piątkowy',
+  'Sobotni',
+];
+
+/** "Monday workout" / "Poniedziałkowy trening", in the language of the user who starts it. */
+function defaultWorkoutName(date: string) {
+  const day = parseISO(date);
+  return getLocale() === 'pl'
+    ? `${POLISH_WEEKDAY_ADJECTIVES[day.getDay()]} trening`
+    : `${format(day, 'EEEE')} workout`;
+}
