@@ -6,6 +6,7 @@ import {
   filledFromPrevious,
   formatMetric,
   MEASURE_FIELDS,
+  parseMetric,
   scrubTuning,
   SET_TYPE_LABELS,
 } from '../../workouts/metrics';
@@ -20,7 +21,6 @@ type SetRowProps = {
   /** Working-set number; warm-ups and drops don't count, like Strong and Hevy. */
   number: number;
   onCompleted: (set: MockSet) => void;
-  onOpenSheet: () => void;
   set: MockSet;
   slot: MockSlot;
 };
@@ -29,7 +29,7 @@ type SetRowProps = {
  * One set as a spreadsheet-like row. Tap the badge to cycle the set type, tap the check to finish
  * it (empty cells adopt last time's values); everything else hides in the long-press menu.
  */
-export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }: SetRowProps) {
+export function SetRow({ actions, number, onCompleted, set, slot }: SetRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const fields = MEASURE_FIELDS[slot.measure];
   const update = (patch: Partial<MockSet>) => actions.updateSet(slot.id, set.id, patch);
@@ -63,12 +63,12 @@ export function SetRow({ actions, number, onCompleted, onOpenSheet, set, slot }:
         </button>
         {fields.map((field) => (
           <ScrubCell
-            aria-label={`${field.label.en}, drag sideways or tap for details`}
+            aria-label={field.label.en}
             disabled={menuOpen}
             format={(value) => formatMetric(field, value, 'en')}
             key={field.key}
             onChange={(value) => update({ [field.key]: value })}
-            onTap={onOpenSheet}
+            parse={(text) => parseMetric(field, text)}
             placeholder={set.previous?.[field.key] ?? null}
             value={set[field.key]}
             {...scrubTuning(field)}

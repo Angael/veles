@@ -102,6 +102,30 @@
   font-size: 0.7em;
 }
 
+/* Typing in place: a plain text field, so the browser handles caret, selection and scroll. */
+.typing {
+  border-color: var(--c-primary-border);
+  cursor: text;
+  touch-action: auto;
+  user-select: text;
+}
+
+.cellInput {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+
+  &:focus {
+    outline: none;
+  }
+}
+
 /* Big field */
 .field {
   display: grid;
