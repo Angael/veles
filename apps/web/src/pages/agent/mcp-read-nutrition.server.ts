@@ -11,7 +11,7 @@ import {
   type ReadQuery,
   toNutrition,
   toPage,
-} from './mcp-read.server';
+} from './mcp-read-helpers.server';
 
 const goalNutrition = (goal: typeof calorieGoals.$inferSelect) =>
   toNutrition({

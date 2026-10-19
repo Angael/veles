@@ -10,7 +10,7 @@ import {
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { sessionsBefore, toMetrics } from '@/pages/workouts/workouts.server';
 import { db } from '@/server/db.server';
-import { byIdDesc, inDateRange, parseKey, type ReadQuery, toPage } from './mcp-read.server';
+import { byIdDesc, inDateRange, parseKey, type ReadQuery, toPage } from './mcp-read-helpers.server';
 
 /** Session cursors are `<date>_<id>` because several sessions can share a date. */
 function parseSessionCursor(cursor: string) {

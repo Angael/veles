@@ -74,13 +74,14 @@
 - For icons use `lucide-react`, always renaming imports with an `Icon` suffix to avoid naming conflicts.
 
 ## Agent MCP
-- The MCP server (`apps/web/src/pages/agent`) must cover every user-facing feature: agents can read it, and modify it once its writes ship.
+- The MCP server (`apps/web/src/pages/agent`) must cover every user-facing feature: agents can read and write it.
 - Perform joins and calculations on the server; return readable, nested results so agents do not have to reconstruct relationships from raw table rows.
 - Never make agents list parents, then fetch children and match them by parent id. Nest children in the parent (list items in their list, sets in their exercise, goal in its day), and return related names instead of bare foreign keys.
 - When you add, rename, or change a feature or its data, update the MCP in the same change:
   - `apps/web/src/lib/agentAccess.ts`: add the feature and its label.
   - `mcp-read-*.server.ts`: add or update its reader; register it with its field description (units, scaling) in `mcp-resources.server.ts`.
-  - Write tools: add them beside `mcp-notes.server.ts` and register them in `mcp.api.ts` behind the feature's write permission; wrap each handler in `agentWriter(userId, feature)` so live consent is checked per call.
+  - `mcp-write-*.server.ts`: add write tools that call the feature's shared `.server.ts` operations and `.validation.ts` types, wrap inputs in `agentInput()` and handlers in `agentWriter(userId, feature)`, and register them in `mcp-server.server.ts` behind the feature's write permission.
+  - Run `pnpm mcp:tools` to regenerate `docs/agent-tools.md`.
 - Every MCP query must filter by the key owner's `userId`.
 
 ## TS

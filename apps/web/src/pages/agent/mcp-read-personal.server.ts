@@ -16,7 +16,7 @@ import {
   parseKey,
   type ReadQuery,
   toPage,
-} from './mcp-read.server';
+} from './mcp-read-helpers.server';
 
 /** Owned notes, newest first; shopping lists carry their items instead of text content. */
 export async function readNotes(userId: string, query: ReadQuery) {

@@ -2,7 +2,7 @@ import { type } from 'arktype';
 import type { AgentFeature } from '@/lib/agentAccess';
 import { readFoodDays, readCalorieGoals, readFoodProducts } from './mcp-read-nutrition.server';
 import { readNotes, readRecipes, readWeights } from './mcp-read-personal.server';
-import { isoDate, type ReadPage, type ReadQuery } from './mcp-read.server';
+import { isoDate, type ReadPage, type ReadQuery } from './mcp-read-helpers.server';
 import {
   readWorkoutExercises,
   readWorkoutRoutines,
