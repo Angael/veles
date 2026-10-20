@@ -9,6 +9,8 @@ import { createDetector } from './barcodeDetector';
 import { ScannerMessage, type ScannerState } from './ScannerMessage';
 import type { LookupState } from './ScanStatusPanel';
 import { useCameraPreference } from './useCameraPreference';
+import { debugLog } from './scanDebug';
+import { ScanDebugPanel } from './ScanDebugPanel';
 
 type BarcodeScannerProps = {
   /** Lookup progress for the last detected barcode; drives the alignment guide state. */
@@ -31,6 +33,7 @@ async function enableContinuousFocus(stream: MediaStream) {
   const track = stream.getVideoTracks()[0];
   if (!track) return;
   const capabilities: MediaTrackCapabilities & { focusMode?: string[] } = track.getCapabilities();
+  debugLog('focus.capabilities', capabilities.focusMode);
   if (!capabilities.focusMode?.includes('continuous')) return;
   const constraints: MediaTrackConstraints & {
     advanced: Array<MediaTrackConstraintSet & { focusMode: string }>;
@@ -55,6 +58,11 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
     selectNextCamera,
   } = useCameraPreference();
   useEffect(() => {
+    debugLog('scanner.state', state);
+  }, [state]);
+
+  useEffect(() => {
+    debugLog('effect.run', { cameraPreferenceReady, preferredCameraId });
     if (!cameraPreferenceReady) return;
     let active = true;
     let animationFrame = 0;
@@ -63,6 +71,7 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
     let lastDetection = 0;
     let lastDetectedBarcode = '';
     let lastDetectedAt = 0;
+    let detectCount = 0;
 
     const stopCamera = () => {
       cancelAnimationFrame(animationFrame);
@@ -81,29 +90,55 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
       }
 
       try {
+        try {
+          const before = await navigator.mediaDevices.enumerateDevices();
+          debugLog(
+            'devices.beforeStart',
+            before.filter((device) => device.kind === 'videoinput'),
+          );
+        } catch (error) {
+          debugLog('devices.beforeStart.error', error);
+        }
+        const videoConstraints: MediaTrackConstraints = preferredCameraId
+          ? {
+              deviceId: { exact: preferredCameraId },
+              height: { ideal: 1080 },
+              width: { ideal: 1920 },
+            }
+          : {
+              facingMode: { ideal: 'environment' },
+              height: { ideal: 1080 },
+              width: { ideal: 1920 },
+            };
+        debugLog('getUserMedia.request', videoConstraints);
+        const gumStartedAt = performance.now();
         const cameraStream = await navigator.mediaDevices.getUserMedia({
           audio: false,
-          video: preferredCameraId
-            ? {
-                deviceId: { exact: preferredCameraId },
-                height: { ideal: 1080 },
-                width: { ideal: 1920 },
-              }
-            : {
-                facingMode: { ideal: 'environment' },
-                height: { ideal: 1080 },
-                width: { ideal: 1920 },
-              },
+          video: videoConstraints,
         });
         stream = cameraStream;
+        const track = cameraStream.getVideoTracks()[0];
+        debugLog('getUserMedia.ok', {
+          ms: Math.round(performance.now() - gumStartedAt),
+          track,
+          tracks: cameraStream.getTracks().length,
+        });
+        if (track) {
+          for (const name of ['ended', 'mute', 'unmute'] as const) {
+            track.addEventListener(name, () => debugLog(`track.${name}`, track));
+          }
+        }
 
         const detector = await createDetector();
+        debugLog('detector.ready', detector.constructor.name);
         if (!active) {
           stopCamera();
           return;
         }
 
-        await enableContinuousFocus(cameraStream).catch(() => undefined);
+        await enableContinuousFocus(cameraStream).catch((error: unknown) =>
+          debugLog('focus.error', error),
+        );
         const videoTrack = cameraStream.getVideoTracks()[0];
         const activeDeviceId = videoTrack?.getSettings().deviceId ?? '';
         const availableCameras = (await navigator.mediaDevices.enumerateDevices()).filter(
@@ -115,6 +150,7 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
           stopCamera();
           return;
         }
+        debugLog('devices.afterStart', { activeDeviceId, availableCameras });
         registerActiveCamera(activeDeviceId, availableCameras);
         const video = videoRef.current;
         if (!video) {
@@ -122,10 +158,37 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
           return;
         }
 
+        for (const name of [
+          'loadedmetadata',
+          'loadeddata',
+          'canplay',
+          'playing',
+          'pause',
+          'waiting',
+          'stalled',
+          'suspend',
+          'emptied',
+          'ended',
+          'error',
+          'resize',
+        ] as const) {
+          video.addEventListener(name, () =>
+            debugLog(`video.${name}`, {
+              error: video.error ? { code: video.error.code, message: video.error.message } : null,
+              paused: video.paused,
+              readyState: video.readyState,
+              size: `${video.videoWidth}x${video.videoHeight}`,
+              box: `${video.clientWidth}x${video.clientHeight}`,
+            }),
+          );
+        }
         video.srcObject = cameraStream;
         // Don't wait for play(): some mobile browsers keep it pending, which stuck the scanner on
         // "Starting camera". autoPlay starts the preview and the loop waits for frames itself.
-        void video.play().catch(() => undefined);
+        video
+          .play()
+          .then(() => debugLog('video.play.ok'))
+          .catch((error: unknown) => debugLog('video.play.error', error));
         setState('scanning');
 
         const scan = async (timestamp: number) => {
@@ -138,7 +201,20 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
             detecting = true;
             lastDetection = timestamp;
             try {
+              const detectStartedAt = performance.now();
               const results = await detector.detect(video);
+              detectCount += 1;
+              if (detectCount <= 3 || detectCount % 40 === 0 || results.length > 0) {
+                debugLog('detect.result', {
+                  count: detectCount,
+                  ms: Math.round(performance.now() - detectStartedAt),
+                  results: results.map((result) => ({
+                    format: result.format,
+                    rawValue: result.rawValue,
+                  })),
+                  size: `${video.videoWidth}x${video.videoHeight}`,
+                });
+              }
               const barcode = results
                 .map((result) => getFoodBarcode(result.rawValue, result.format))
                 .find((value) => value !== null);
@@ -153,7 +229,14 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
               } else if (timestamp - lastDetectedAt >= barcodeAbsentResetMs) {
                 lastDetectedBarcode = '';
               }
-            } catch {
+            } catch (error) {
+              debugLog('detect.error', {
+                count: detectCount,
+                error,
+                readyState: video.readyState,
+                size: `${video.videoWidth}x${video.videoHeight}`,
+                track: stream?.getVideoTracks()[0],
+              });
               stopCamera();
               // Effect cleanup can flip this flag while detector.detect is awaiting the browser.
               // oxlint-disable-next-line typescript/no-unnecessary-condition -- Avoid setting state after scanner unmount.
@@ -165,7 +248,8 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
           }
           // requestAnimationFrame requires a synchronous callback; handle scan rejections here.
           animationFrame = requestAnimationFrame((nextTimestamp) => {
-            void scan(nextTimestamp).catch(() => {
+            void scan(nextTimestamp).catch((error: unknown) => {
+              debugLog('scan.error', error);
               stopCamera();
               if (active) setState('error');
             });
@@ -178,6 +262,7 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
           });
         });
       } catch (error) {
+        debugLog('start.error', { active, error });
         stopCamera();
         if (!active) return;
         if (
@@ -198,13 +283,16 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
 
     void startScanner();
     return () => {
+      debugLog('effect.cleanup', { preferredCameraId });
       active = false;
       stopCamera();
     };
   }, [cameraPreferenceReady, preferredCameraId]);
 
   function switchCamera() {
-    if (!selectNextCamera()) return;
+    const next = selectNextCamera();
+    debugLog('camera.switch', { next });
+    if (!next) return;
     setState('starting');
   }
 
@@ -212,6 +300,7 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
 
   return (
     <section aria-label='Barcode camera scanner' className={css.scanner}>
+      <ScanDebugPanel />
       <div className={css.header}>
         <RouteBackButton variant='ghost' />
         <h1>Scan barcode</h1>
