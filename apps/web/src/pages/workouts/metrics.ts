@@ -35,16 +35,16 @@ export const SET_TYPE_LABELS: Record<SetType, Localized> = {
 
 /** Short note on how each set type counts, flashed next to the badge after a tap. */
 export const SET_TYPE_NOTES: Record<SetType, Localized> = {
-  drop: { en: 'lighter, no rest', pl: 'lżej, bez przerwy' },
-  failure: { en: 'until you can’t', pl: 'aż nie dasz rady' },
+  drop: { en: 'lighter, no rest', pl: 'drop set – lżej, bez przerwy' },
+  failure: { en: 'until you can’t', pl: 'failure – aż nie dasz rady' },
   normal: { en: 'counted', pl: 'liczona' },
-  warmup: { en: 'not counted', pl: 'nieliczona' },
+  warmup: { en: 'not counted', pl: 'warm-up – nieliczona' },
 };
 
 export const SET_BADGE: Record<Exclude<SetType, 'normal'>, Localized> = {
   drop: { en: 'D', pl: 'D' },
-  failure: { en: 'F', pl: 'U' },
-  warmup: { en: 'W', pl: 'R' },
+  failure: { en: 'F', pl: 'F' },
+  warmup: { en: 'W', pl: 'W' },
 };
 
 /** Short weekday with day and month, e.g. `Mon 06.10`, for workout and routine dates. */

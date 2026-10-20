@@ -100,7 +100,7 @@ export function CalorieGoalCalculator({
             max={120}
             min={18}
             onValueChange={setAge}
-            placeholder={t({ en: 'Years', pl: 'Lata' })}
+            placeholder={t({ en: 'Years', pl: 'lat' })}
           />
         </Label>
         <Label text={t({ en: 'Formula sex', pl: 'Płeć we wzorze' })}>

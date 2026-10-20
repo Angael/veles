@@ -26,7 +26,7 @@ export function HomePage() {
           <h1>
             {t({ en: 'Your data.', pl: 'Twoje dane.' })}
             <br />
-            {t({ en: 'In your orbit.', pl: 'Na Twojej orbicie.' })}
+            {t({ en: 'In your orbit.', pl: 'Twoje życie.' })}
           </h1>
           <p>
             {t({
@@ -62,9 +62,9 @@ export function HomePage() {
         <div aria-hidden='true' className={css.setSequence}>
           <span>{t({ en: 'WARM', pl: 'ROZGRZEWKA' })}</span>
           <i />
-          <span>{t({ en: 'WORK', pl: 'PRACA' })}</span>
+          <span>{t({ en: 'WORK', pl: 'SERIE' })}</span>
           <i />
-          <span>{t({ en: 'LOG', pl: 'ZAPIS' })}</span>
+          <span>{t({ en: 'LOG', pl: 'POSTĘP' })}</span>
         </div>
       </Card>
 
