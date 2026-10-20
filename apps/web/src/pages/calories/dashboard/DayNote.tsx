@@ -55,11 +55,11 @@ export function DayNote({ date, note, offPlan }: DayNoteProps) {
         maxLength={NOTE_MAX_LENGTH}
         onBlur={() => noteSaver.flush()}
         onChange={(event) => noteSaver.maybeExecute(event.target.value)}
-        placeholder={t({ en: 'Add a note for this day…', pl: 'Dodaj notatkę do tego dnia…' })}
+        placeholder={t({ en: 'Add a note for this day…', pl: 'Dodaj notatkę dnia' })}
         rows={1}
       />
       <label className={css.offPlan} data-checked={offPlan || undefined}>
-        <span>{t({ en: 'Off plan', pl: 'Poza planem' })}</span>
+        <span>{t({ en: 'Cheat day', pl: 'Cheat day' })}</span>
         <Toggle
           checked={offPlan}
           onCheckedChange={(checked) => setDayNote.mutate({ date, offPlan: checked })}
