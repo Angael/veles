@@ -2,7 +2,6 @@ import type {
   BarcodeDetector as PolyfillBarcodeDetector,
   BarcodeFormat,
 } from 'barcode-detector/pure';
-import { debugLog } from './scanDebug';
 
 type BarcodeDetectorLike = Pick<PolyfillBarcodeDetector, 'detect'>;
 type BarcodeDetectorConstructor = {
@@ -31,18 +30,15 @@ export async function createDetector(): Promise<BarcodeDetectorLike> {
   if (window.BarcodeDetector?.getSupportedFormats) {
     try {
       const supported = await window.BarcodeDetector.getSupportedFormats();
-      debugLog('detector.nativeFormats', supported);
       if (formats.every((format) => supported.includes(format))) {
         return new window.BarcodeDetector({ formats });
       }
-    } catch (error) {
-      debugLog('detector.nativeError', error);
+    } catch {
       // Native support can be partial or unavailable; the WASM decoder supports all requested formats.
     }
   }
 
   // Keep the WASM decoder out of the initial client bundle on browsers with full native support.
-  debugLog('detector.wasm');
   const { BarcodeDetector } = await import('barcode-detector/pure');
   return new BarcodeDetector({ formats });
 }

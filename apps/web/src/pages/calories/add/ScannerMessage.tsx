@@ -1,7 +1,13 @@
 import { CameraIcon, CameraOffIcon } from 'lucide-react';
 import css from './BarcodeScanner.module.css';
 
-export type ScannerState = 'starting' | 'scanning' | 'permissionDenied' | 'unavailable' | 'error';
+export type ScannerState =
+  | 'starting'
+  | 'scanning'
+  | 'permissionDenied'
+  | 'cameraBusy'
+  | 'unavailable'
+  | 'error';
 
 export function ScannerMessage({ state }: { state: Exclude<ScannerState, 'scanning'> }) {
   if (state === 'starting') {
@@ -32,6 +38,10 @@ const scannerMessageCopy: Record<
   permissionDenied: [
     'Camera permission denied',
     'Allow camera access in your browser settings, or type the barcode instead.',
+  ],
+  cameraBusy: [
+    'Camera in use',
+    'Another app or browser tab may be using the camera. Close it and try again, or type the barcode.',
   ],
   unavailable: [
     'Camera unavailable',
