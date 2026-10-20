@@ -13,7 +13,16 @@ export const MAX_DAYS = 31;
 export const dayFeatures = ['calories', 'calorie_goals', 'weight', 'workouts'] as const;
 
 type Nutrition = ReturnType<typeof toNutrition>;
-type FoodDay = { date: string; total: Nutrition; entries: unknown[] };
+type FoodDay = {
+  date: string;
+  offPlan: boolean;
+  note: string | null;
+  total: Nutrition;
+  entries: unknown[];
+};
+
+/** Logged and not a cheat day: the total is the real intake, so it can count in averages. */
+const isCompleteDay = (day: FoodDay) => day.entries.length > 0 && !day.offPlan;
 type Weight = { date: string; weightKg: number };
 type Session = { date: string };
 
@@ -86,14 +95,21 @@ export async function readDays(userId: string, from: string, to: string) {
     return {
       date,
       ...(food && {
-        food: logged ? { total: logged.total, entries: logged.entries } : null,
+        food: logged
+          ? {
+              offPlan: logged.offPlan,
+              note: logged.note,
+              total: logged.total,
+              entries: logged.entries,
+            }
+          : null,
       }),
       ...(goals && { goal }),
-      // Remaining needs both the goal and the intake; an unlogged day has no intake to compare.
+      // Remaining needs the goal and the real intake; unlogged and cheat days have neither.
       ...(food &&
         goals && {
           remaining:
-            goal && logged
+            goal && logged && isCompleteDay(logged)
               ? {
                   kcal: minus(goal.kcal, logged.total.kcal),
                   macros: {
@@ -118,15 +134,19 @@ export async function readDays(userId: string, from: string, to: string) {
   };
 }
 
-/** Period view for weekly reviews: averages over logged days only, so gaps do not read as fasting. */
+/**
+ * Period view for weekly reviews: averages over logged days that are not cheat days, so gaps and
+ * incomplete totals do not read as eating less.
+ */
 function summarize(
   dayCount: number,
   food: FoodDay[] | null,
   weights: Weight[] | null,
   sessions: Session[] | null,
 ) {
+  const completeDays = (food ?? []).filter(isCompleteDay);
   const average = (pick: (total: Nutrition) => number | null) => {
-    const values = (food ?? []).map((day) => pick(day.total)).filter((value) => value !== null);
+    const values = completeDays.map((day) => pick(day.total)).filter((value) => value !== null);
     return values.length
       ? round(values.reduce((sum, value) => sum + value, 0) / values.length)
       : null;
@@ -137,8 +157,9 @@ function summarize(
   return {
     dayCount,
     ...(food && {
-      foodLoggedDays: food.length,
-      averagePerLoggedDay: food.length
+      foodLoggedDays: food.filter((day) => day.entries.length > 0).length,
+      cheatDays: food.filter((day) => day.offPlan).length,
+      averagePerLoggedDay: completeDays.length
         ? {
             kcal: average((total) => total.kcal),
             macros: {
