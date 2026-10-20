@@ -1,6 +1,7 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 import { PlusIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
+import { v7 as uuidv7 } from 'uuid';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
@@ -31,7 +32,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
    * exists before the server answers; no pending state and no waiting for the created id.
    */
   const addItem = () => {
-    const id = crypto.randomUUID();
+    const id = uuidv7();
     listItems.insert({
       checked: false,
       createdAt: new Date().toISOString(),
