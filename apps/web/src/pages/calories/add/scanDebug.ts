@@ -98,7 +98,7 @@ export function buildDebugReport() {
     viewport: { height: window.innerHeight, width: window.innerWidth },
     visibility: document.visibilityState,
   };
-  return JSON.stringify({ entries, environment }, null, 1);
+  return JSON.stringify({ entries, environment });
 }
 
 if (typeof window !== 'undefined') {

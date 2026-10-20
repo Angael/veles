@@ -47,20 +47,25 @@ async function openCamera(preferredCameraId: string) {
   ];
   let lastError: unknown;
   for (const video of attempts) {
-    debugLog('getUserMedia.request', video);
-    try {
-      return await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: video.deviceId || video.facingMode ? video : true,
-      });
-    } catch (error) {
-      debugLog('getUserMedia.error', { constraints: video, error });
-      lastError = error;
-      if (
-        error instanceof DOMException &&
-        (error.name === 'NotAllowedError' || error.name === 'SecurityError')
-      ) {
-        throw error;
+    for (const delayMs of [0, 400, 1200]) {
+      if (delayMs) await new Promise((resolve) => setTimeout(resolve, delayMs));
+      debugLog('getUserMedia.request', { delayMs, video });
+      try {
+        return await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: video.deviceId || video.facingMode ? video : true,
+        });
+      } catch (error) {
+        debugLog('getUserMedia.error', { delayMs, error, video });
+        lastError = error;
+        if (
+          error instanceof DOMException &&
+          (error.name === 'NotAllowedError' || error.name === 'SecurityError')
+        ) {
+          throw error;
+        }
+        // Android reports a camera that is still being released as NotReadableError; wait and retry.
+        if (!(error instanceof DOMException && error.name === 'NotReadableError')) break;
       }
     }
   }
