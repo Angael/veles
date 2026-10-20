@@ -8,8 +8,8 @@
     "./seed/sync-food-products": "./src/seed/sync-food-products.ts"
   },
   "scripts": {
-    "build": "tsc --noEmit",
-    "typecheck": "tsc --noEmit",
+    "build": "tsrs --noEmit",
+    "typecheck": "tsrs --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:migrate:prod": "drizzle-kit migrate --config=drizzle-prod.config.ts",
