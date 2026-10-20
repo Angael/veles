@@ -4,13 +4,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --port 3000",
-    "build": "vite build && tsc --noEmit",
+    "build": "vite build && tsrs --noEmit",
     "start": "node .output/server/index.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "lint:css": "stylelint \"src/**/*.css\"",
     "lint:css:fix": "stylelint \"src/**/*.css\" --fix",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsrs --noEmit",
     "mcp:tools": "node scripts/mcp-tools-doc.ts"
   },
   "dependencies": {

@@ -1,0 +1,58 @@
+.notice {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border: var(--border-width) solid var(--c-primary-border-soft);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-solid);
+
+  &[data-tone='danger'] {
+    border-color: var(--c-danger-border);
+
+    & svg {
+      color: var(--c-danger-text);
+    }
+  }
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+
+  & svg {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--c-accent);
+  }
+
+  & p {
+    overflow-wrap: anywhere;
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+    text-wrap: pretty;
+  }
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs);
+}
+
+.spinner {
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 1.4s;
+  }
+}

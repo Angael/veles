@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { BarcodeIcon, PlusIcon, ScanLineIcon, SparklesIcon } from 'lucide-react';
+import { AppleIcon, PlusIcon, ScanLineIcon, SearchIcon, SparklesIcon } from 'lucide-react';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
 import {
   MenuBtn,
@@ -20,8 +20,8 @@ const loggingActions = [
       en: 'Search your foods and choose a serving',
       pl: 'Wyszukaj produkt i wybierz porcję',
     },
-    icon: PlusIcon,
-    label: { en: 'Add food', pl: 'Dodaj jedzenie' },
+    icon: SearchIcon,
+    label: { en: 'Find food', pl: 'Znajdź jedzenie' },
     to: '/calories/add' as const,
   },
   {
@@ -80,7 +80,7 @@ export function LogFoodMenu({ date }: Props) {
             en: 'Save nutrition details for reuse',
             pl: 'Zapisz wartości odżywcze do ponownego użycia',
           })}
-          icon={<BarcodeIcon aria-hidden='true' />}
+          icon={<AppleIcon aria-hidden='true' />}
           label={t({ en: 'Create a new food', pl: 'Utwórz nowy produkt' })}
           render={<Link search={{ date }} to='/calories/foods/new' />}
         />

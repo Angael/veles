@@ -55,6 +55,7 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
   return (
     <main className={css.page}>
       <SelectedFoodCard
+        addFoodDate={date}
         carbs={carbs}
         fat={fat}
         imageUrl={food.imageUrl}

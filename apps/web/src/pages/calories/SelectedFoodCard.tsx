@@ -8,9 +8,11 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 type SelectedFoodCardProps = Omit<FoodSummaryProps, 'action' | 'meta' | 'name'> & {
   name: string;
   productId: string;
+  /** Set when shown in Add food, so saving the product edit returns to Add food. */
+  addFoodDate?: string;
 };
 
-export function SelectedFoodCard({ productId, ...props }: SelectedFoodCardProps) {
+export function SelectedFoodCard({ addFoodDate, productId, ...props }: SelectedFoodCardProps) {
   const { t } = useI18n();
 
   return (
@@ -27,7 +29,13 @@ export function SelectedFoodCard({ productId, ...props }: SelectedFoodCardProps)
             icon={<PencilIcon aria-hidden='true' />}
             iconOnly
             isLink
-            render={<Link params={{ foodId: productId }} to='/calories/foods/$foodId' />}
+            render={
+              <Link
+                params={{ foodId: productId }}
+                search={addFoodDate ? { date: addFoodDate, from: 'add' } : {}}
+                to='/calories/foods/$foodId'
+              />
+            }
             size='sm'
             variant='ghost'
           />

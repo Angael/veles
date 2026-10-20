@@ -6,7 +6,13 @@ import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 import { todayLocalDate } from '@/lib/dateOnly';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-export function EditFoodPage({ food }: { food: CalorieFood }) {
+type Props = {
+  /** Set when opened from Add food: saving returns there with this product and date. */
+  addFoodDate?: string;
+  food: CalorieFood;
+};
+
+export function EditFoodPage({ addFoodDate, food }: Props) {
   const { t } = useI18n();
   const navigate = useNavigate();
   const updateMutation = useUpdateFoodProductMutation();
@@ -15,6 +21,14 @@ export function EditFoodPage({ food }: { food: CalorieFood }) {
   async function save(value: FoodEditorValue) {
     await updateMutation.mutateAsync({ ...value, id: food.id });
     markSaved();
+    if (addFoodDate) {
+      await navigate({
+        replace: true,
+        search: { date: addFoodDate, foodId: food.id },
+        to: '/calories/add',
+      });
+      return;
+    }
     await navigate({ replace: true, search: { date: todayLocalDate() }, to: '/calories' });
   }
 
