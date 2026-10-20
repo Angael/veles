@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { BarcodeIcon, PlusIcon, ScanLineIcon, SparklesIcon } from 'lucide-react';
+import { AppleIcon, PlusIcon, ScanLineIcon, SearchIcon, SparklesIcon } from 'lucide-react';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
 import {
   MenuBtn,
@@ -15,8 +15,8 @@ type Props = { date: string };
 const loggingActions = [
   {
     description: 'Search your foods and choose a serving',
-    icon: PlusIcon,
-    label: 'Add food',
+    icon: SearchIcon,
+    label: 'Find food',
     to: '/calories/add' as const,
   },
   {
@@ -60,7 +60,7 @@ export function LogFoodMenu({ date }: Props) {
         <MenuBtnDivider />
         <MenuBtnItem
           description='Save nutrition details for reuse'
-          icon={<BarcodeIcon aria-hidden='true' />}
+          icon={<AppleIcon aria-hidden='true' />}
           label='Create a new food'
           render={<Link search={{ date }} to='/calories/foods/new' />}
         />
