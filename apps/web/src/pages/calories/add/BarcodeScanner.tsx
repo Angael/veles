@@ -123,7 +123,9 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
         }
 
         video.srcObject = cameraStream;
-        await video.play();
+        // Don't wait for play(): some mobile browsers keep it pending, which stuck the scanner on
+        // "Starting camera". autoPlay starts the preview and the loop waits for frames itself.
+        void video.play().catch(() => undefined);
         setState('scanning');
 
         const scan = async (timestamp: number) => {
@@ -220,7 +222,7 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
         className={css.viewport}
         data-lookup={lookup}
       >
-        <video aria-label='Live camera preview' muted playsInline ref={videoRef} />
+        <video aria-label='Live camera preview' autoPlay muted playsInline ref={videoRef} />
         {isScanning ? (
           <div className={css.guideLayer}>
             <div className={css.guide}>
