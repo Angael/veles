@@ -1,0 +1,38 @@
+@import '../../../styles/breakpoints.css';
+
+.dayNote {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 0 var(--space-lg);
+}
+
+.note {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+
+  &::placeholder {
+    color: var(--c-placeholder);
+    font-style: italic;
+  }
+}
+
+.offPlan {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  cursor: pointer;
+
+  &[data-checked] {
+    color: var(--c-danger-text);
+  }
+}
+
+@media (--phone) {
+  .dayNote {
+    padding: 0 var(--space-sm);
+  }
+}

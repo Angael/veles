@@ -46,7 +46,7 @@ export const resources = {
   food_days: {
     feature: 'calories',
     dated: true,
-    description: `Food diary, one item per logged day, newest first; id and date are the same YYYY-MM-DD. Each day has entries (with imageUrl or null, and productId when logged from food_products), total, and goal (the nutrition goal in effect; null without a goal or without Nutrition goals consent); ${kcalAndMacros}.`,
+    description: `Food diary, one item per day with entries or a day note, newest first; id and date are the same YYYY-MM-DD. Each day has entries (with imageUrl or null, and productId when logged from food_products), total, goal (the nutrition goal in effect; null without a goal or without Nutrition goals consent), note (the user's free text or null), and offPlan; ${kcalAndMacros}. offPlan true means the user went off the diet and probably overate: total is only what was logged, not the real intake, so use the note to judge how much more was eaten, and leave the day out of averages and trends.`,
     read: readFoodDays,
   },
   calorie_goals: {

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import type { CalorieGoal, CalorieLog, CalorieTotals } from '../calories.api';
+import type { CalorieDashboardDay } from '../calories.api';
 import { DailySummary } from './DailySummary';
+import { DayNote } from './DayNote';
 import { DeleteLogsAction } from './DeleteLogsAction';
 import { LogFoodMenu } from './LogFoodMenu';
 import { LoggedFood } from './LoggedFood';
@@ -15,15 +16,11 @@ import { SelectionBar } from '@/components/ui/selection-bar/SelectionBar';
 import css from './CaloriesPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-type Props = {
-  date: string;
-  goal: CalorieGoal | null;
-  logs: CalorieLog[];
-  totals: CalorieTotals;
-};
+type Props = { day: CalorieDashboardDay };
 
 /** Day overview; selecting logs via their images swaps the Log food button for bulk actions. */
-export function CalorieOverview({ date, goal, logs, totals }: Props) {
+export function CalorieOverview({ day }: Props) {
+  const { date, goal, logs, totals } = day;
   const { t } = useI18n();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const selectedLogs = logs.filter((entry) => selectedIds.includes(entry.id));
@@ -56,6 +53,7 @@ export function CalorieOverview({ date, goal, logs, totals }: Props) {
         <LogFoodMenu date={date} />
       )}
       <DailySummary goal={goal} totals={totals} />
+      <DayNote date={date} note={day.note} offPlan={day.offPlan} />
 
       <section className={css.logSection} data-appear='2'>
         <div className={css.logHeading}>

@@ -97,6 +97,7 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
                     isFuture && css.futureDay,
                     isToday && css.todayDay,
                     statusClass,
+                    dayStatus?.offPlan && css.offPlanDay,
                   )}
                   key={day}
                   value={day}
@@ -134,13 +135,7 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
         </div>
       </div>
 
-      <CalorieOverview
-        date={date}
-        goal={selectedDay.goal}
-        key={date}
-        logs={selectedDay.logs}
-        totals={selectedDay.totals}
-      />
+      <CalorieOverview day={selectedDay} key={date} />
     </main>
   );
 }
