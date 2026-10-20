@@ -16,9 +16,34 @@ type BarcodeScannerOptions = {
   read?: (barcode: DetectedBarcode) => string | null;
 };
 
-const scanIntervalMs = 250;
+const scanIntervalMs = 125;
 /** A barcode out of view for this long is forgotten, so showing it again counts as a new scan. */
 const forgetAfterMs = 750;
+
+/**
+ * Detectors report corners in no fixed order, which makes the outline spin between frames. Sorts
+ * them clockwise, then starts at the corner nearest to the previous start (or the top-left one), so
+ * each corner keeps its place while the barcode moves.
+ */
+function orderCorners(points: Point2D[], previous: Point2D[] | undefined) {
+  const cx = points.reduce((sum, { x }) => sum + x, 0) / points.length;
+  const cy = points.reduce((sum, { y }) => sum + y, 0) / points.length;
+  const sorted = points.toSorted(
+    (a, b) => Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx),
+  );
+
+  const rotations = sorted.map((_, start) => [...sorted.slice(start), ...sorted.slice(0, start)]);
+
+  // Lower is better: distance to the previous corners, or how far up-left the first corner is.
+  const score = (corners: Point2D[]) =>
+    corners.reduce((sum, { x, y }, i) => {
+      if (previous?.length !== corners.length) return i === 0 ? x + y : sum;
+      const target = previous[i] ?? { x, y };
+      return sum + (x - target.x) ** 2 + (y - target.y) ** 2;
+    }, 0);
+
+  return rotations.reduce((best, corners) => (score(corners) < score(best) ? corners : best));
+}
 
 /**
  * Decodes the video a few times per second. Calls `onScan` once each time a barcode comes into
@@ -44,7 +69,8 @@ export function useBarcodeScanner(
         const value = readValue(result);
         if (value) {
           const frame = { height: video.videoHeight, width: video.videoWidth };
-          return { corners: result.cornerPoints, frame, value };
+          const previous = value === current?.value ? current.corners : undefined;
+          return { corners: orderCorners(result.cornerPoints, previous), frame, value };
         }
       }
       return null;

@@ -3,19 +3,76 @@
 
 .guide {
   position: absolute;
-  width: min(55%, 14rem);
+  width: min(65%, 16rem);
   height: auto;
   opacity: 0;
-  color: white;
-  filter: drop-shadow(0 0 0.25rem rgb(0 0 0 / 60%));
+  overflow: visible;
   animation: guide-fade 2.4s ease-in-out;
   pointer-events: none;
+
+  & path,
+  & line {
+    fill: none;
+    stroke-linecap: round;
+  }
+}
+
+.guideBars {
+  opacity: 0.3;
+  fill: white;
+}
+
+.guideCorners {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: guide-snap 2.4s cubic-bezier(0.3, 1.4, 0.5, 1);
+
+  & path {
+    stroke: white;
+    stroke-width: 3;
+  }
+}
+
+.guideLine {
+  animation: guide-sweep 1.2s ease-in-out 2 alternate;
+
+  & line {
+    stroke: var(--c-accent);
+    stroke-width: 1.5;
+  }
+
+  /* The first line is a soft glow under the sharp one. */
+  & line:first-child {
+    opacity: 0.35;
+    stroke-width: 6;
+  }
 }
 
 @keyframes guide-fade {
   15%,
   80% {
-    opacity: 0.9;
+    opacity: 0.75;
+  }
+}
+
+@keyframes guide-snap {
+  0% {
+    transform: scale(1.15);
+  }
+
+  25%,
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes guide-sweep {
+  from {
+    transform: translateY(-16px);
+  }
+
+  to {
+    transform: translateY(16px);
   }
 }
 
@@ -37,12 +94,17 @@
     stroke: var(--c-accent);
     stroke-linejoin: round;
     stroke-width: 3;
-    transition: d 250ms linear;
+    transition: d 125ms linear;
     vector-effect: non-scaling-stroke;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .guideCorners,
+  .guideLine {
+    animation: none;
+  }
+
   .outline path {
     transition: none;
   }
