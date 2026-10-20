@@ -1,30 +1,28 @@
 .scanner {
   display: grid;
-  gap: var(--space-md);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-sm);
+  min-height: 0;
 }
 
 .header {
   display: flex;
-  align-items: start;
-  gap: var(--space-sm);
+  align-items: center;
+  gap: var(--space-xs);
 
   & h1 {
-    font-size: var(--text-lg-dynamic);
-    text-wrap: balance;
-  }
-
-  & p {
-    color: var(--c-muted);
-    font-size: var(--text-sm);
-    text-wrap: pretty;
+    font-size: var(--text-lg);
   }
 }
 
 .viewport {
+  --scan-guide-color: white;
+  --scan-guide-scrim: rgba(2, 6, 23, 0.45);
+
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 18rem;
+  min-height: 0;
   overflow: hidden;
   border: var(--border-width) solid var(--c-border-strong);
   border-radius: var(--radius-sm);
@@ -35,7 +33,100 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: filter var(--duration-fast) ease-out;
   }
+
+  &[data-lookup='lookingUp'] {
+    --scan-guide-color: var(--c-accent);
+    --scan-guide-scrim: rgba(2, 6, 23, 0.7);
+
+    & video {
+      filter: saturate(0.4);
+    }
+  }
+
+  &[data-lookup='notFound'],
+  &[data-lookup='error'] {
+    --scan-guide-color: var(--c-muted-strong);
+  }
+}
+
+.guideLayer {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  pointer-events: none;
+}
+
+/* Corner brackets drawn with gradients; the spread shadow dims the camera outside the frame. */
+.guide {
+  --scan-corner: 1.75rem;
+  --scan-stroke: 3px;
+
+  position: relative;
+  width: min(80%, 22rem);
+  max-height: 60%;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--radius-xs);
+  background:
+    linear-gradient(var(--scan-guide-color) 0 0) top left / var(--scan-corner) var(--scan-stroke),
+    linear-gradient(var(--scan-guide-color) 0 0) top left / var(--scan-stroke) var(--scan-corner),
+    linear-gradient(var(--scan-guide-color) 0 0) top right / var(--scan-corner) var(--scan-stroke),
+    linear-gradient(var(--scan-guide-color) 0 0) top right / var(--scan-stroke) var(--scan-corner),
+    linear-gradient(var(--scan-guide-color) 0 0) bottom left / var(--scan-corner) var(--scan-stroke),
+    linear-gradient(var(--scan-guide-color) 0 0) bottom left / var(--scan-stroke) var(--scan-corner),
+    linear-gradient(var(--scan-guide-color) 0 0) bottom right / var(--scan-corner)
+      var(--scan-stroke),
+    linear-gradient(var(--scan-guide-color) 0 0) bottom right / var(--scan-stroke)
+      var(--scan-corner);
+  background-repeat: no-repeat;
+  box-shadow: 0 0 0 100vmax var(--scan-guide-scrim);
+  transition: box-shadow var(--duration-fast) ease-out;
+
+  [data-lookup='lookingUp'] & {
+    outline: 2px solid var(--scan-guide-color);
+    outline-offset: -1px;
+  }
+}
+
+.scanLine {
+  position: absolute;
+  top: 10%;
+  right: 8%;
+  left: 8%;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--c-accent);
+  box-shadow: 0 0 0.75rem var(--c-accent);
+  animation: scan-sweep 1.6s ease-in-out infinite alternate;
+
+  [data-lookup]:not([data-lookup='idle']) & {
+    display: none;
+  }
+}
+
+@keyframes scan-sweep {
+  to {
+    top: 90%;
+  }
+}
+
+.guideHint {
+  position: relative;
+  padding: var(--space-xs) var(--space-sm);
+  border: var(--border-width) solid var(--c-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--c-surface-solid);
+  color: var(--c-text-strong);
+  font-size: var(--text-sm);
+  text-align: center;
+  text-wrap: balance;
 }
 
 .cameraControls {
@@ -99,8 +190,11 @@
   display: grid;
   justify-items: center;
   gap: var(--space-xs);
-  max-width: 26rem;
-  padding: var(--space-xl);
+  max-width: min(26rem, calc(100% - (2 * var(--space-md))));
+  padding: var(--space-lg);
+  border: var(--border-width) solid var(--c-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-solid);
   text-align: center;
 
   & svg {
@@ -116,39 +210,14 @@
   }
 }
 
-.loadingIcon {
-  animation: spin 700ms linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.status {
-  color: var(--c-muted);
-  font-size: var(--text-sm);
-  text-align: center;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .cameraNotice {
     transform: none;
     transition-property: opacity, visibility;
   }
 
-  .loadingIcon {
-    animation-duration: 1.4s;
-  }
-}
-
-@media (--phone) {
-  .viewport {
-    min-height: 15rem;
-  }
-
-  .message {
-    padding: var(--space-lg);
+  .scanLine {
+    top: 50%;
+    animation: none;
   }
 }

@@ -1,0 +1,14 @@
+.scanPage {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: var(--space-sm);
+  padding: max(var(--space-sm), env(safe-area-inset-top, 0px))
+    max(var(--space-sm), env(safe-area-inset-right, 0px))
+    max(var(--space-sm), env(safe-area-inset-bottom, 0px))
+    max(var(--space-sm), env(safe-area-inset-left, 0px));
+  overflow: hidden;
+  background: #020617;
+}

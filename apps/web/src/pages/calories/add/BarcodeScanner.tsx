@@ -7,13 +7,20 @@ import css from './BarcodeScanner.module.css';
 import { getFoodBarcode } from '../foodBarcode';
 import { createDetector } from './barcodeDetector';
 import { ScannerMessage, type ScannerState } from './ScannerMessage';
+import type { LookupState } from './ScanStatusPanel';
 import { useCameraPreference } from './useCameraPreference';
 
-export type BarcodeScannerStatus = 'scanning' | 'lookingUp' | 'notFound';
-
 type BarcodeScannerProps = {
+  /** Lookup progress for the last detected barcode; drives the alignment guide state. */
+  lookup: LookupState['status'];
   onDetected: (barcode: string) => void;
-  status: BarcodeScannerStatus;
+};
+
+const guideHints: Record<LookupState['status'], string> = {
+  error: 'Point at a barcode to scan it',
+  idle: 'Fit the barcode inside the frame',
+  lookingUp: 'Barcode detected',
+  notFound: 'Point at another barcode',
 };
 
 const detectionIntervalMs = 250;
@@ -31,7 +38,7 @@ async function enableContinuousFocus(stream: MediaStream) {
   await track.applyConstraints(constraints);
 }
 
-export function BarcodeScanner({ onDetected, status }: BarcodeScannerProps) {
+export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const callbackRef = useRef(onDetected);
   callbackRef.current = onDetected;
@@ -199,22 +206,31 @@ export function BarcodeScanner({ onDetected, status }: BarcodeScannerProps) {
     setState('starting');
   }
 
-  const displayState = status === 'scanning' ? state : status;
-  const isScanning = displayState === 'scanning';
+  const isScanning = state === 'scanning';
 
   return (
     <section aria-label='Barcode camera scanner' className={css.scanner}>
       <div className={css.header}>
         <RouteBackButton variant='ghost' />
-        <div>
-          <h1>Scan a barcode</h1>
-          <p>Hold the package steady with the barcode visible.</p>
-        </div>
+        <h1>Scan barcode</h1>
       </div>
 
-      <div aria-busy={status === 'lookingUp' || undefined} className={css.viewport}>
+      <div
+        aria-busy={lookup === 'lookingUp' || undefined}
+        className={css.viewport}
+        data-lookup={lookup}
+      >
         <video aria-label='Live camera preview' muted playsInline ref={videoRef} />
-        {!isScanning ? <ScannerMessage state={displayState} /> : null}
+        {isScanning ? (
+          <div className={css.guideLayer}>
+            <div className={css.guide}>
+              <span className={css.scanLine} />
+            </div>
+            <p className={css.guideHint}>{guideHints[lookup]}</p>
+          </div>
+        ) : (
+          <ScannerMessage state={state} />
+        )}
         {isScanning && cameras.length > 1 ? (
           <div className={css.cameraControls}>
             <div
@@ -240,11 +256,6 @@ export function BarcodeScanner({ onDetected, status }: BarcodeScannerProps) {
           </Card>
         ) : null}
       </div>
-      {isScanning ? (
-        <p aria-live='polite' className={css.status}>
-          Looking for a barcode or 2D food code…
-        </p>
-      ) : null}
     </section>
   );
 }
