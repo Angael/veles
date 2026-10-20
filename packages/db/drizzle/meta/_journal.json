@@ -99,6 +99,13 @@
       "when": 1792408097040,
       "tag": "0013_agent_access",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792525791242,
+      "tag": "0014_calorie_day_notes",
+      "breakpoints": true
     }
   ]
 }

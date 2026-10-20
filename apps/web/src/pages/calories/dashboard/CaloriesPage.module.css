@@ -197,9 +197,24 @@
   color: var(--c-muted-strong);
 }
 
+/* Off plan wins over goal colors on any day, including today and future days. */
+.day.offPlanDay {
+  background: var(--c-danger-surface);
+  color: var(--c-danger-text);
+
+  & strong {
+    color: var(--c-danger-text);
+  }
+}
+
 .day[data-pressed] {
   border-color: var(--c-text-strong);
   background: var(--c-surface-raised);
+
+  &.offPlanDay {
+    border-color: var(--c-danger-text);
+    background: var(--c-danger-surface);
+  }
 }
 
 .day:focus-visible {
@@ -257,6 +272,11 @@
   .day.futureDay:hover {
     opacity: 0.65;
     color: var(--c-placeholder);
+  }
+
+  .day.offPlanDay:hover {
+    background-color: var(--c-danger-surface);
+    color: var(--c-danger-text);
   }
 }
 
