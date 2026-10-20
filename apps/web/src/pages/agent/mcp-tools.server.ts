@@ -8,15 +8,18 @@ export const jsonResult = (value: unknown) => ({
   content: [{ type: 'text' as const, text: JSON.stringify(value) }],
 });
 
-/** Checks live consent and returns safe MCP tool errors without exposing database details. */
+/**
+ * Checks live consent and returns safe MCP tool errors without exposing database details. Pass
+ * `null` as feature only when the operation checks consent per section itself.
+ */
 export async function runAgentTool(
   userId: string,
-  feature: AgentFeature,
+  feature: AgentFeature | null,
   access: 'read' | 'write',
   operation: () => Promise<unknown>,
 ) {
   try {
-    await requireAgentAccess(userId, feature, access);
+    if (feature) await requireAgentAccess(userId, feature, access);
     const result = await operation();
     return jsonResult(result === undefined ? { success: true } : result);
   } catch (error) {
