@@ -7,7 +7,7 @@ import { SelectInput } from '@/components/ui/select-input/SelectInput';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
 import { CheckedNoteCard } from './CheckedNoteCard';
-import { useListItemsCollection } from './listItems.collection';
+import { listItemsCollection } from './listItems.collection';
 import type { NoteSummary } from './notes.api';
 import { NoteComposer } from './NoteComposer';
 import { notesQueryOptions } from './notes.query';
@@ -32,9 +32,8 @@ export function TodosPage() {
   const [noteScope, setNoteScope] = useState<'all' | 'owned'>('all');
   const [searchInputValue, setSearchInputValue] = useState('');
   const [search] = useThrottledValue(searchInputValue, { wait: 200 });
-  const listItems = useListItemsCollection();
   // Same collection the cards write to, so search sees renamed or added items immediately.
-  const { data: items } = useLiveQuery((q) => q.from({ item: listItems }), [listItems]);
+  const { data: items } = useLiveQuery({ query: (q) => q.from({ item: listItemsCollection }) });
   const searchableNotes = useMemo(
     () =>
       notes.map((note) => ({

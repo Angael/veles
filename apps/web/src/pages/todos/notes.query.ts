@@ -1,5 +1,5 @@
 import { queryOptions, useMutation } from '@tanstack/react-query';
-import { getListItemsCollection } from './listItems.collection';
+import { useListItemsCollection } from './listItems.collection';
 import {
   createNote,
   deleteNote,
@@ -32,21 +32,21 @@ export function useCreateNoteMutation() {
 
 /** Converting a note creates or removes list items on the server, so the collection refetches. */
 export function useToggleNoteTypeMutation() {
+  const listItems = useListItemsCollection();
   return useMutation({
     meta: { invalidateQueryKey: notesQueryKey },
     mutationFn: (variables: { id: string }) => toggleNoteType({ data: variables }),
-    onSuccess: (_data, _variables, _onMutateResult, context) =>
-      getListItemsCollection(context.client).utils.refetch(),
+    onSuccess: () => listItems.utils.refetch(),
   });
 }
 
 /** Deleting a note cascades to its list items on the server, so the collection refetches. */
 export function useDeleteNoteMutation() {
+  const listItems = useListItemsCollection();
   return useMutation({
     meta: { invalidateQueryKey: notesQueryKey },
     mutationFn: (variables: { id: string }) => deleteNote({ data: variables }),
-    onSuccess: (_data, _variables, _onMutateResult, context) =>
-      getListItemsCollection(context.client).utils.refetch(),
+    onSuccess: () => listItems.utils.refetch(),
   });
 }
 

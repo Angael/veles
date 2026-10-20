@@ -5,7 +5,7 @@ import { v7 as uuidv7 } from 'uuid';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
-import { useListItemsCollection } from './listItems.collection';
+import { listItemsCollection, useListItemsCollection } from './listItems.collection';
 import { NoteActions } from './NoteActions';
 import type { NoteListItem, NoteSummary } from './notes.api';
 import { useUpdateNoteMutation } from './notes.query';
@@ -17,15 +17,15 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
   const updateNote = useUpdateNoteMutation();
   // Live query: re-runs incrementally whenever a row in the collection changes, including
   // optimistic writes from this card, another card, or a background refetch.
-  const { data: items } = useLiveQuery(
-    (q) =>
+  // No dependency array: TanStack DB derives the query identity, including `note.id`, from the query.
+  const { data: items } = useLiveQuery({
+    query: (q) =>
       q
-        .from({ item: listItems })
+        .from({ item: listItemsCollection })
         .where(({ item }) => eq(item.noteId, note.id))
         .orderBy(({ item }) => item.createdAt)
         .orderBy(({ item }) => item.id),
-    [listItems, note.id],
-  );
+  });
 
   /**
    * Appends a placeholder item and focuses it at once. The client picks the id, so the row
