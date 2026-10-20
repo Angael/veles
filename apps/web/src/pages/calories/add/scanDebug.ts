@@ -51,6 +51,10 @@ export function describe(value: unknown): unknown {
     }
     return info;
   }
+  if (Array.isArray(value)) return value.map(describe);
+  if (value && typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype) {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, describe(item)]));
+  }
   return value;
 }
 

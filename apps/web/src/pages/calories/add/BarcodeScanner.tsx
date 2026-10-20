@@ -26,6 +26,46 @@ const guideHints: Record<LookupState['status'], string> = {
 };
 
 const detectionIntervalMs = 250;
+const fullHd = { height: { ideal: 1080 }, width: { ideal: 1920 } };
+
+/**
+ * Opens the saved camera, then rear cameras, with looser settings on each failure. Some phones
+ * (Samsung S21+) reject a specific back camera with NotReadableError, so one failed request must
+ * not stop the scanner.
+ */
+async function openCamera(preferredCameraId: string) {
+  const attempts: MediaTrackConstraints[] = [
+    ...(preferredCameraId
+      ? [
+          { deviceId: { exact: preferredCameraId }, ...fullHd },
+          { deviceId: { exact: preferredCameraId } },
+        ]
+      : []),
+    { facingMode: { ideal: 'environment' }, ...fullHd },
+    { facingMode: { ideal: 'environment' } },
+    {},
+  ];
+  let lastError: unknown;
+  for (const video of attempts) {
+    debugLog('getUserMedia.request', video);
+    try {
+      return await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: video.deviceId || video.facingMode ? video : true,
+      });
+    } catch (error) {
+      debugLog('getUserMedia.error', { constraints: video, error });
+      lastError = error;
+      if (
+        error instanceof DOMException &&
+        (error.name === 'NotAllowedError' || error.name === 'SecurityError')
+      ) {
+        throw error;
+      }
+    }
+  }
+  throw lastError;
+}
 const barcodeAbsentResetMs = 1000;
 
 /** Requests continuous autofocus on browsers that expose the camera focus controls. */
@@ -99,23 +139,8 @@ export function BarcodeScanner({ lookup, onDetected }: BarcodeScannerProps) {
         } catch (error) {
           debugLog('devices.beforeStart.error', error);
         }
-        const videoConstraints: MediaTrackConstraints = preferredCameraId
-          ? {
-              deviceId: { exact: preferredCameraId },
-              height: { ideal: 1080 },
-              width: { ideal: 1920 },
-            }
-          : {
-              facingMode: { ideal: 'environment' },
-              height: { ideal: 1080 },
-              width: { ideal: 1920 },
-            };
-        debugLog('getUserMedia.request', videoConstraints);
         const gumStartedAt = performance.now();
-        const cameraStream = await navigator.mediaDevices.getUserMedia({
-          audio: false,
-          video: videoConstraints,
-        });
+        const cameraStream = await openCamera(preferredCameraId);
         stream = cameraStream;
         const track = cameraStream.getVideoTracks()[0];
         debugLog('getUserMedia.ok', {
