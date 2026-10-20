@@ -1,0 +1,42 @@
+.view {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  overflow: hidden;
+  border: var(--border-width) solid var(--c-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-inset);
+
+  & video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.message {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-xs);
+  max-width: min(26rem, calc(100% - (2 * var(--space-md))));
+  padding: var(--space-lg);
+  border: var(--border-width) solid var(--c-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-solid);
+  text-align: center;
+
+  & svg {
+    width: 2rem;
+    height: 2rem;
+    color: var(--c-accent);
+  }
+
+  & span {
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+    text-wrap: pretty;
+  }
+}
