@@ -1,23 +1,15 @@
-.panel {
+.notice {
   display: grid;
   gap: var(--space-sm);
   padding: var(--space-sm);
-  border: var(--border-width) solid var(--c-border-strong);
+  border: var(--border-width) solid var(--c-primary-border-soft);
   border-radius: var(--radius-sm);
   background: var(--c-surface-solid);
 
-  &[data-status='idle'] > [aria-live]:empty {
-    display: none;
-  }
-
-  &[data-status='notFound'] {
-    border-color: var(--c-primary-border-soft);
-  }
-
-  &[data-status='error'] {
+  &[data-tone='danger'] {
     border-color: var(--c-danger-border);
 
-    & .message svg {
+    & svg {
       color: var(--c-danger-text);
     }
   }
@@ -27,7 +19,6 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  min-height: var(--button-min-height);
 
   & svg {
     flex: none;
@@ -44,6 +35,12 @@
   }
 }
 
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs);
+}
+
 .spinner {
   animation: spin 700ms linear infinite;
 }
@@ -52,22 +49,6 @@
   to {
     transform: rotate(360deg);
   }
-}
-
-.manualEntry {
-  display: flex;
-  gap: var(--space-xs);
-
-  & > :first-child {
-    flex: 1;
-    min-width: 0;
-  }
-}
-
-.actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-xs);
 }
 
 @media (prefers-reduced-motion: reduce) {

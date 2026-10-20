@@ -162,3 +162,8 @@
   border-radius: var(--radius-sm);
   color: var(--c-muted);
 }
+
+.cameraDemo {
+  display: grid;
+  height: 20rem;
+}

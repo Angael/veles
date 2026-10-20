@@ -3,7 +3,7 @@
   z-index: 30;
   inset: 0;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: var(--space-sm);
   padding: max(var(--space-sm), env(safe-area-inset-top, 0px))
     max(var(--space-sm), env(safe-area-inset-right, 0px))
@@ -11,4 +11,24 @@
     max(var(--space-sm), env(safe-area-inset-left, 0px));
   overflow: hidden;
   background: #020617;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+
+  & h1 {
+    font-size: var(--text-lg);
+  }
+}
+
+.manualEntry {
+  display: flex;
+  gap: var(--space-xs);
+
+  & > :first-child {
+    flex: 1;
+    min-width: 0;
+  }
 }
