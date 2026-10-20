@@ -1,5 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { Client } from 'pg';
+import { createDatabaseConnection } from '../src/index.ts';
+import { syncFoodProductSeeds } from '../src/seed/sync-food-products.ts';
 
 const expectedDatabaseName = 'veles_dev';
 const databaseUrl = process.env.DATABASE_URL;
@@ -129,8 +131,19 @@ async function resetDatabase(connectionString: string) {
   runPnpmScript('db:migrate');
   runPnpmScript('db:push');
   await seedDatabase(connectionString);
+  await syncFoodProductCatalog(connectionString);
 
   console.info(`Reset and seeded ${expectedDatabaseName}.`);
+}
+
+/** Adds the shared food catalog the same way the worker does on deploy. */
+async function syncFoodProductCatalog(connectionString: string) {
+  const connection = createDatabaseConnection({ connectionString, maxConnections: 1 });
+  try {
+    console.info('Synced food product seeds.', await syncFoodProductSeeds(connection.db));
+  } finally {
+    await connection.close();
+  }
 }
 
 async function resetSchemas(connectionString: string) {

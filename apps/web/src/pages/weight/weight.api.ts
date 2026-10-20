@@ -2,9 +2,11 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { getCookie } from '@tanstack/react-start/server';
-import { and, asc, count, eq, sql } from 'drizzle-orm';
+import { and, asc, count, eq } from 'drizzle-orm';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { uploadObjects, weightEntries, weightEntryPhotos } from '@veles/db/schema';
+import { saveWeightRecord, saveWeightsRecord } from './weight.server';
+import { saveWeightInputType, saveWeightsInputType } from './weight.validation';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
@@ -30,18 +32,7 @@ export type WeightEntryPhoto = {
   url: string | null;
 };
 
-export const MAX_WEIGHT_IMPORT_ENTRIES = 3_000;
-
-const saveWeightInputType = type({
-  date: dateOnlyType,
-  weightKg: '30 <= number <= 300',
-});
-
 const weightEntryDateInputType = type({ date: dateOnlyType });
-
-const saveWeightsInputType = type({
-  entries: saveWeightInputType.array().atLeastLength(1).atMostLength(MAX_WEIGHT_IMPORT_ENTRIES),
-});
 
 export const getWeightEntries = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getWeightEntries')])
@@ -113,19 +104,7 @@ export const saveWeight = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(saveWeightInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    const weightGrams = Math.round(data.weightKg * 1_000);
-
-    await db
-      .insert(weightEntries)
-      .values({
-        date: data.date,
-        userId: session.user.id,
-        weightGrams,
-      })
-      .onConflictDoUpdate({
-        set: { weightGrams },
-        target: [weightEntries.userId, weightEntries.date],
-      });
+    await saveWeightRecord(session.user.id, data);
   });
 
 export const saveWeights = createServerFn({ method: 'POST' })
@@ -133,18 +112,5 @@ export const saveWeights = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(saveWeightsInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-
-    await db
-      .insert(weightEntries)
-      .values(
-        data.entries.map((entry) => ({
-          date: entry.date,
-          userId: session.user.id,
-          weightGrams: Math.round(entry.weightKg * 1_000),
-        })),
-      )
-      .onConflictDoUpdate({
-        set: { weightGrams: sql`excluded.${sql.identifier(weightEntries.weightGrams.name)}` },
-        target: [weightEntries.userId, weightEntries.date],
-      });
+    await saveWeightsRecord(session.user.id, data);
   });

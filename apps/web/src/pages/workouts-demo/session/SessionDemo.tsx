@@ -9,7 +9,6 @@ import { RestDock } from '../../workouts/rest/RestTimer';
 import { useRestTimer } from '../../workouts/rest/useRestTimer';
 import { ExerciseCard } from './ExerciseCard';
 import { SessionHeader } from './SessionHeader';
-import { SetSheet } from './SetSheet';
 import { useMockSession } from './useMockSession';
 import css from './Session.module.css';
 
@@ -22,10 +21,6 @@ export function SessionDemo() {
   const timer = useRestTimer();
   const hints = useSeenHints();
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [sheet, setSheet] = useState<{ slotId: string; setId: string } | null>(null);
-
-  const sheetSlot = slots.find((slot) => slot.id === sheet?.slotId);
-  const sheetSet = sheetSlot?.sets.find((set) => set.id === sheet?.setId);
   const nextHint = HINTS.find(
     (hint) =>
       SESSION_HINTS.includes(hint.key) && hints.seen !== null && !hints.seen.includes(hint.key),
@@ -52,7 +47,6 @@ export function SessionDemo() {
             actions={actions}
             key={slot.id}
             number={index + 1}
-            onOpenSheet={(target, setId) => setSheet({ setId, slotId: target.id })}
             onSetCompleted={onSetCompleted}
             slot={slot}
             tip={
@@ -79,17 +73,6 @@ export function SessionDemo() {
           setPickerOpen(false);
         }}
         open={pickerOpen}
-      />
-      <SetSheet
-        onClose={() => setSheet(null)}
-        onSave={(patch) =>
-          sheetSlot && sheetSet && actions.updateSet(sheetSlot.id, sheetSet.id, patch)
-        }
-        target={
-          sheetSlot && sheetSet
-            ? { number: sheetSlot.sets.indexOf(sheetSet) + 1, set: sheetSet, slot: sheetSlot }
-            : null
-        }
       />
 
       <RestDock timer={timer} />

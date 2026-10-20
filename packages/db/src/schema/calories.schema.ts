@@ -20,6 +20,8 @@ export const foodProducts = pgTable(
       .primaryKey()
       .default(sql`uuidv7()`),
     barcode: text('barcode'),
+    /** Stable key of a catalog seed; the deploy sync owns rows that have one. */
+    seedKey: text('seed_key'),
     name: text('name').notNull(),
     /** Optional Polish search alias populated by seeds; product create/edit flows must not write it. */
     namePl: text('name_pl'),
@@ -36,6 +38,7 @@ export const foodProducts = pgTable(
   },
   (table) => [
     uniqueIndex('food_product_barcode_idx').on(table.barcode),
+    uniqueIndex('food_product_seed_key_idx').on(table.seedKey),
     index('food_product_name_idx').on(table.name),
     index('food_product_image_upload_object_id_idx').on(table.imageUploadObjectId),
   ],
