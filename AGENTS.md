@@ -62,6 +62,7 @@
 - Forms that take effort to fill in use `useUnsavedChangesGuard`; call `markSaved()` right before the post-save navigation.
 
 ## UI
+- Keep the logged-in dashboard and logged-out home page up to date with cards showcasing all user-facing app features and pages.
 - Prefer css modules, prefer syntax `import css from ...`
 - In css modules, prefer nested selectors when it keeps related styles together.
 - This app uses css reset and theme.css
