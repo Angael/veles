@@ -12,6 +12,8 @@ import {
   unlockDiaryKey,
 } from './diaryCrypto';
 import type { DiaryEntrySummary } from './useDecryptedEntries';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { pluralEn, pluralPl } from '@/lib/i18n/locale';
 
 type DiaryEntryDraft = DiaryEntryContent & {
   entryDate: string;
@@ -61,6 +63,8 @@ export function useDiaryPassphraseMutation(keyRecord: DiaryKeyRecord | null) {
 
 /** Parses a backup file, skips entries that already exist, and encrypts the rest before upload. */
 export function useImportDiaryEntriesMutation(key: CryptoKey, existing: DiaryEntrySummary[]) {
+  const { t } = useI18n();
+
   return useMutation({
     mutationFn: async (json: string) => {
       const backup = parseDiaryBackup(json);
@@ -86,14 +90,23 @@ export function useImportDiaryEntriesMutation(key: CryptoKey, existing: DiaryEnt
       toastManager.add({
         description: error.message,
         priority: 'high',
-        title: 'Diary could not be imported',
+        title: t({ en: 'Diary could not be imported', pl: 'Nie udało się zaimportować dziennika' }),
         type: 'error',
       });
     },
     onSuccess: ({ importedCount, skippedCount }) => {
       toastManager.add({
-        description: skippedCount > 0 ? `Skipped ${skippedCount} existing.` : undefined,
-        title: `Imported ${importedCount} ${importedCount === 1 ? 'entry' : 'entries'}`,
+        description:
+          skippedCount > 0
+            ? t({
+                en: `Skipped ${skippedCount} existing.`,
+                pl: `Pominięto istniejące: ${skippedCount}.`,
+              })
+            : undefined,
+        title: t({
+          en: `Imported ${importedCount} ${pluralEn(importedCount, 'entry', 'entries')}`,
+          pl: `Zaimportowano ${importedCount} ${pluralPl(importedCount, 'wpis', 'wpisy', 'wpisów')}`,
+        }),
         type: 'success',
       });
     },

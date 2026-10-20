@@ -1,5 +1,6 @@
 import { useBlocker } from '@tanstack/react-router';
 import { useCallback, useRef } from 'react';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /**
  * Asks with a native `confirm()` before leaving a form with unsaved edits, including reloads and
@@ -7,11 +8,14 @@ import { useCallback, useRef } from 'react';
  * Call `markSaved()` before navigating away after a successful save.
  */
 export function useUnsavedChangesGuard() {
+  const { t } = useI18n();
   const dirty = useRef(false);
 
   useBlocker({
     enableBeforeUnload: () => dirty.current,
-    shouldBlockFn: () => dirty.current && !window.confirm('Discard unsaved changes?'),
+    shouldBlockFn: () =>
+      dirty.current &&
+      !window.confirm(t({ en: 'Discard unsaved changes?', pl: 'Odrzucić niezapisane zmiany?' })),
   });
 
   const markDirty = useCallback(() => {

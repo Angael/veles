@@ -12,6 +12,7 @@ import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import { useState } from 'react';
 import css from '../CalorieFlows.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export type FoodEditorValue = {
   barcode?: string;
@@ -45,6 +46,7 @@ export function FoodEditor({
   pending,
   submitLabel,
 }: Props) {
+  const { t } = useI18n();
   const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
 
   async function handleSubmit(formData: TypedFormData) {
@@ -68,18 +70,18 @@ export function FoodEditor({
         onChange={onDirty}
         onSubmit={handleSubmit}
       >
-        <Label text='Food name'>
+        <Label text={t({ en: 'Food name', pl: 'Nazwa produktu' })}>
           <TextInput defaultValue={food?.name ?? initialName} name='name' required />
         </Label>
         <div className={css.grid}>
-          <Label text='Barcode'>
+          <Label text={t({ en: 'Barcode', pl: 'Kod kreskowy' })}>
             <TextInput
               defaultValue={food?.barcode ?? initialBarcode}
               inputMode='numeric'
               name='barcode'
             />
           </Label>
-          <Label text='Product size (g)'>
+          <Label text={t({ en: 'Product size (g)', pl: 'Wielkość opakowania (g)' })}>
             <NumberInput defaultValue={food?.productSizeGrams ?? undefined} min={1} name='size' />
           </Label>
         </div>
@@ -102,7 +104,12 @@ export function FoodEditor({
           }}
           value={photo}
         />
-        <p>This changes the shared catalog photo for everyone.</p>
+        <p>
+          {t({
+            en: 'This changes the shared catalog photo for everyone.',
+            pl: 'To zmienia wspólne zdjęcie w katalogu dla wszystkich.',
+          })}
+        </p>
         <FormSubmitRow>
           <Btn loading={pending} type='submit'>
             {submitLabel}

@@ -1,26 +1,34 @@
 import { Link } from '@tanstack/react-router';
-import { format, parseISO } from 'date-fns';
 import { ImageIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card/Card';
 import css from './WeightPage.module.css';
 import type { WeightHistoryEntry } from './weight.api';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { pluralEn, pluralPl } from '@/lib/i18n/locale';
 
 type RecentWeightEntriesProps = {
   entries: WeightHistoryEntry[];
 };
 
 export function RecentWeightEntries({ entries }: RecentWeightEntriesProps) {
+  const { formatDate, formatNumber, t } = useI18n();
   const recentEntries = entries.slice(-8).toReversed();
+  const kg = (value: number, signDisplay: 'auto' | 'exceptZero' = 'auto') =>
+    `${formatNumber(value, { maximumFractionDigits: 1, minimumFractionDigits: 1, signDisplay })} kg`;
 
   return (
-    <Card as='section' aria-label='Recent weight entries' className={css.entriesCard}>
+    <Card
+      as='section'
+      aria-label={t({ en: 'Recent weight entries', pl: 'Ostatnie pomiary wagi' })}
+      className={css.entriesCard}
+    >
       <div className={css.tableFrame}>
         <table className={css.entriesTable}>
           <thead>
             <tr>
-              <th scope='col'>Date</th>
-              <th scope='col'>Weight</th>
-              <th scope='col'>Change</th>
+              <th scope='col'>{t({ en: 'Date', pl: 'Data' })}</th>
+              <th scope='col'>{t({ en: 'Weight', pl: 'Waga' })}</th>
+              <th scope='col'>{t({ en: 'Change', pl: 'Zmiana' })}</th>
             </tr>
           </thead>
           <tbody>
@@ -29,7 +37,6 @@ export function RecentWeightEntries({ entries }: RecentWeightEntriesProps) {
               const change = previousEntry
                 ? Math.round((entry.weightKg - previousEntry.weightKg) * 10) / 10
                 : undefined;
-              const changePrefix = change !== undefined && change > 0 ? '+' : '';
 
               return (
                 <tr key={entry.date}>
@@ -40,11 +47,18 @@ export function RecentWeightEntries({ entries }: RecentWeightEntriesProps) {
                       to='/weight/$date'
                     >
                       <time dateTime={entry.date}>
-                        {format(parseISO(entry.date), 'MMM d, yyyy')}
+                        {formatDate(entry.date, {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
                       </time>
                       {entry.photoCount > 0 ? (
                         <span
-                          aria-label={`${entry.photoCount} ${entry.photoCount === 1 ? 'photo' : 'photos'}`}
+                          aria-label={t({
+                            en: `${entry.photoCount} ${pluralEn(entry.photoCount, 'photo', 'photos')}`,
+                            pl: `${entry.photoCount} ${pluralPl(entry.photoCount, 'zdjęcie', 'zdjęcia', 'zdjęć')}`,
+                          })}
                           className={css.photoBadge}
                         >
                           <ImageIcon aria-hidden='true' />
@@ -53,13 +67,13 @@ export function RecentWeightEntries({ entries }: RecentWeightEntriesProps) {
                       ) : null}
                     </Link>
                   </td>
-                  <td>{entry.weightKg.toFixed(1)} kg</td>
+                  <td>{kg(entry.weightKg)}</td>
                   <td
                     className={
                       change !== undefined && change < 0 ? css.deltaBetter : css.deltaNeutral
                     }
                   >
-                    {change === undefined ? '—' : `${changePrefix}${change.toFixed(1)} kg`}
+                    {change === undefined ? '—' : kg(change, 'exceptZero')}
                   </td>
                 </tr>
               );

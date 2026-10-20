@@ -1,3 +1,5 @@
+import { translate } from '@/lib/i18n/getLocale';
+import type { Localized } from '@/lib/i18n/locale';
 import { collectionOptions, useDbClient } from '@tanstack/react-db';
 import { queryCollectionOptions, type QueryCollectionUtils } from '@tanstack/query-db-collection';
 import type { QueryClient } from '@tanstack/react-query';
@@ -36,7 +38,7 @@ export const listItemsCollection = collectionOptions('list-items', (client) =>
     onInsert: ({ collection, transaction }) =>
       persist(
         collection,
-        'Item could not be added',
+        { en: 'Item could not be added', pl: 'Nie udało się dodać pozycji' },
         transaction.mutations.map(({ modified: { id, name, noteId } }) =>
           createListItem({ data: { id, name, noteId } }),
         ),
@@ -44,7 +46,7 @@ export const listItemsCollection = collectionOptions('list-items', (client) =>
     onUpdate: ({ collection, transaction }) =>
       persist(
         collection,
-        'Item could not be saved',
+        { en: 'Item could not be saved', pl: 'Nie udało się zapisać pozycji' },
         transaction.mutations.flatMap(({ changes: { checked, name }, key: id }) => [
           ...(checked === undefined ? [] : [setListItemChecked({ data: { checked, id } })]),
           ...(name === undefined ? [] : [updateListItem({ data: { id, name } })]),
@@ -53,7 +55,7 @@ export const listItemsCollection = collectionOptions('list-items', (client) =>
     onDelete: ({ collection, transaction }) =>
       persist(
         collection,
-        'Item could not be deleted',
+        { en: 'Item could not be deleted', pl: 'Nie udało się usunąć pozycji' },
         transaction.mutations.map(({ key: id }) => deleteListItem({ data: { id } })),
       ),
   }),
@@ -65,13 +67,13 @@ export const listItemsCollection = collectionOptions('list-items', (client) =>
  */
 async function persist(
   collection: { utils: { refetch: () => Promise<unknown> } },
-  errorTitle: string,
+  errorTitle: Localized<string>,
   requests: Promise<unknown>[],
 ) {
   try {
     await Promise.all(requests);
   } catch (error) {
-    toastManager.add({ priority: 'high', title: errorTitle, type: 'error' });
+    toastManager.add({ priority: 'high', title: translate(errorTitle), type: 'error' });
     throw error;
   }
   await collection.utils.refetch();

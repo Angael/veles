@@ -4,8 +4,10 @@ import {
   changeFoodLogsInputType,
   logFoodEntriesInputType,
   saveFoodProductInputType,
+  setFoodDayNoteInputType,
   updateFoodLogValuesType,
 } from '@/pages/calories/calories.validation';
+import { setFoodDayNoteRecord } from '@/pages/calories/foodDayNotes.server';
 import { changeFoodLogsRecord, logFoodEntriesRecord } from '@/pages/calories/foodLogBatch.server';
 import { updateFoodLogRecord } from '@/pages/calories/foodLogs.server';
 import {
@@ -49,6 +51,16 @@ export function registerFoodDiaryTools(server: McpServer, userId: string) {
       annotations: writeAnnotations({ destructive: true, idempotent: false }),
     },
     write(changeFoodLogsRecord),
+  );
+  server.registerTool(
+    'set_food_day_note',
+    {
+      description:
+        'Set the note (free text, max 500 characters; null or "" clears it) and offPlan flag (the user went off the diet / overate) of a food_days date (YYYY-MM-DD). Omitted fields stay. Returns { date, offPlan, note }.',
+      inputSchema: agentInput(setFoodDayNoteInputType),
+      annotations: writeAnnotations({ destructive: true, idempotent: true }),
+    },
+    write(setFoodDayNoteRecord),
   );
 }
 

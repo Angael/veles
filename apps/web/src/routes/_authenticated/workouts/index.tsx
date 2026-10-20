@@ -4,6 +4,7 @@ import { workoutCalendarQueryOptions } from '@/pages/workouts/dashboard/dashboar
 import { WorkoutsDashboardPage } from '@/pages/workouts/dashboard/WorkoutsDashboardPage';
 import { routinesQueryOptions } from '@/pages/workouts/routines/routines.query';
 import { workoutsQueryOptions } from '@/pages/workouts/workouts.query';
+import { translate } from '@/lib/i18n/getLocale';
 
 export const Route = createFileRoute('/_authenticated/workouts/')({
   loader: ({ context: { queryClient } }) =>
@@ -13,6 +14,6 @@ export const Route = createFileRoute('/_authenticated/workouts/')({
       queryClient.ensureQueryData(workoutCalendarQueryOptions(calendarStart())),
     ]),
   component: WorkoutsDashboardPage,
-  head: () => ({ meta: [{ title: 'Workouts' }] }),
-  staticData: { navbar: { label: 'Workouts' } },
+  head: () => ({ meta: [{ title: translate({ en: 'Workouts', pl: 'Treningi' }) }] }),
+  staticData: { navbar: { label: { en: 'Workouts', pl: 'Treningi' } } },
 });

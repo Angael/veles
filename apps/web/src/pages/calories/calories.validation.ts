@@ -99,3 +99,11 @@ export const changeFoodLogsInputType = type({
 export const saveFoodProductInputType = createFoodProductValuesType
   .omit('imageAction')
   .merge({ 'id?': 'string.uuid', 'today?': dateOnlyType });
+
+/** Day note and off-plan flag; omitted fields stay, and an empty or null note clears it. */
+export const setFoodDayNoteInputType = type({
+  '+': 'reject',
+  date: dateOnlyType,
+  'offPlan?': 'boolean',
+  'note?': type(`string.trim |> string <= ${MAX_TEXT_LENGTH}`).or('null'),
+});

@@ -1,5 +1,11 @@
 import { and, asc, desc, eq, inArray, lt, lte } from 'drizzle-orm';
-import { calorieGoals, foodLogs, foodProducts, uploadObjects } from '@veles/db/schema';
+import {
+  calorieDayNotes,
+  calorieGoals,
+  foodLogs,
+  foodProducts,
+  uploadObjects,
+} from '@veles/db/schema';
 import { fromHundredths } from '@/lib/nutrition';
 import { readAgentPermissions } from '@/server/agentAccess.server';
 import { db } from '@/server/db.server';
@@ -21,24 +27,44 @@ const goalNutrition = (goal: typeof calorieGoals.$inferSelect) =>
     carbs: goal.carbsLimitHundredths,
   });
 
-/**
- * One item per logged day, newest first: entries, day totals, and the goal in effect that day.
- * Agents get the same daily view as the app instead of summing logs and matching goal dates.
- */
-export async function readFoodDays(userId: string, query: ReadQuery) {
-  const days = await db
-    .selectDistinct({ date: foodLogs.logDate })
-    .from(foodLogs)
+/** Owned dates of one dated table, newest first, filtered like a food_days page. */
+function pageDates(
+  [userIdColumn, dateColumn]:
+    | [typeof foodLogs.userId, typeof foodLogs.logDate]
+    | [typeof calorieDayNotes.userId, typeof calorieDayNotes.date],
+  userId: string,
+  query: ReadQuery,
+) {
+  return db
+    .selectDistinct({ date: dateColumn })
+    .from(dateColumn.table)
     .where(
       and(
-        eq(foodLogs.userId, userId),
-        query.id ? eq(foodLogs.logDate, parseKey(query.id, 'date')) : undefined,
-        query.cursor ? lt(foodLogs.logDate, parseKey(query.cursor, 'date')) : undefined,
-        inDateRange(foodLogs.logDate, query),
+        eq(userIdColumn, userId),
+        query.id ? eq(dateColumn, parseKey(query.id, 'date')) : undefined,
+        query.cursor ? lt(dateColumn, parseKey(query.cursor, 'date')) : undefined,
+        inDateRange(dateColumn, query),
       ),
     )
-    .orderBy(desc(foodLogs.logDate))
+    .orderBy(desc(dateColumn))
     .limit(query.limit + 1);
+}
+
+/**
+ * One item per day with food logs or a day note, newest first: entries, day totals, the off-plan
+ * flag and note, and the goal in effect that day. Agents get the same daily view as the app
+ * instead of summing logs and matching goal dates.
+ */
+export async function readFoodDays(userId: string, query: ReadQuery) {
+  // The newest limit + 1 dates of the union are within the newest limit + 1 of each table.
+  const [loggedDates, notedDates] = await Promise.all([
+    pageDates([foodLogs.userId, foodLogs.logDate], userId, query),
+    pageDates([calorieDayNotes.userId, calorieDayNotes.date], userId, query),
+  ]);
+  const days = [...new Set([...loggedDates, ...notedDates].map((day) => day.date))]
+    .toSorted((a, b) => b.localeCompare(a))
+    .slice(0, query.limit + 1)
+    .map((date) => ({ date }));
   const page = toPage(days, query.limit, (day) => day.date);
   const dates = page.items.map((day) => day.date);
   const newest = dates[0];
@@ -46,13 +72,17 @@ export async function readFoodDays(userId: string, query: ReadQuery) {
 
   // Goals are a separate consent; days still load without them.
   const canReadGoals = (await readAgentPermissions(userId)).calorie_goals.read;
-  const [logs, goals] = await Promise.all([
+  const [logs, dayNotes, goals] = await Promise.all([
     db
       .select({ log: foodLogs, imageKey: uploadObjects.key })
       .from(foodLogs)
       .leftJoin(uploadObjects, eq(uploadObjects.id, foodLogs.imageUploadObjectId))
       .where(and(eq(foodLogs.userId, userId), inArray(foodLogs.logDate, dates)))
       .orderBy(asc(foodLogs.consumedAt), asc(foodLogs.id)),
+    db
+      .select()
+      .from(calorieDayNotes)
+      .where(and(eq(calorieDayNotes.userId, userId), inArray(calorieDayNotes.date, dates))),
     canReadGoals
       ? db
           .select()
@@ -70,9 +100,12 @@ export async function readFoodDays(userId: string, query: ReadQuery) {
       const sum = (pick: (log: (typeof logs)[number]['log']) => number | null) =>
         dayLogs.reduce((total, { log }) => total + (pick(log) ?? 0), 0);
       const goal = goals.find((candidate) => candidate.effectiveDate <= date);
+      const dayNote = dayNotes.find((entry) => entry.date === date);
       return {
         id: date,
         date,
+        offPlan: dayNote?.offPlan ?? false,
+        note: dayNote?.note ?? null,
         total: toNutrition({
           kcal: sum((log) => log.kcalHundredths),
           protein: sum((log) => log.proteinHundredths),

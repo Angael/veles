@@ -6,13 +6,14 @@ import { Card } from '@/components/ui/card/Card';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
-import { type EncryptedDiaryEntry, formatDiaryDate } from './diary.api';
+import type { EncryptedDiaryEntry } from './diary.api';
 import { useCreateDiaryEntryMutation } from './diary.query';
 import type { DiaryKeyRecord } from './diaryCrypto';
 import { DiaryBackupActions } from './DiaryBackupActions';
 import { DiaryLockGate } from './DiaryLockGate';
 import { type DiaryEntrySummary, useDecryptedEntries } from './useDecryptedEntries';
 import css from './DiaryListPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type DiaryListPageProps = {
   entries: EncryptedDiaryEntry[];
@@ -41,6 +42,7 @@ export function DiaryListPage({ entries, keyRecord }: DiaryListPageProps) {
 }
 
 function DiaryList({ diaryKey, encryptedEntries, onLock }: DiaryListProps) {
+  const { formatDate, t } = useI18n();
   const navigate = useNavigate();
   const router = useRouter();
   const [searchInputValue, setSearchInputValue] = useState('');
@@ -56,37 +58,48 @@ function DiaryList({ diaryKey, encryptedEntries, onLock }: DiaryListProps) {
       <div className={css.toolbar}>
         <DiaryBackupActions diaryKey={diaryKey} entries={entries} />
         <Btn icon={<LockIcon aria-hidden='true' />} onClick={onLock} size='sm' variant='ghost'>
-          Lock
+          {t({ en: 'Lock', pl: 'Zablokuj' })}
         </Btn>
       </div>
 
       {decrypted.error ? (
         <p className={css.createError} role='alert'>
-          Your entries could not be decrypted.
+          {t({
+            en: 'Your entries could not be decrypted.',
+            pl: 'Nie udało się odszyfrować wpisów.',
+          })}
         </p>
       ) : null}
 
       {createMutation.isError ? (
         <p className={css.createError} role='alert'>
-          The entry could not be created. Try again.
+          {t({
+            en: 'The entry could not be created. Try again.',
+            pl: 'Nie udało się utworzyć wpisu. Spróbuj ponownie.',
+          })}
         </p>
       ) : null}
 
       {!decrypted.error &&
         (entries.length === 0 ? (
           <Card as='section' className={css.emptyState} data-appear>
-            <h1>No diary entries yet</h1>
+            <h1>{t({ en: 'No diary entries yet', pl: 'Brak wpisów w dzienniku' })}</h1>
           </Card>
         ) : (
           <>
             <label className={css.searchField} data-appear>
-              <span className={css.searchLabel}>Search entries</span>
+              <span className={css.searchLabel}>
+                {t({ en: 'Search entries', pl: 'Szukaj wpisów' })}
+              </span>
               <TextInput
-                aria-label='Search diary entries'
+                aria-label={t({ en: 'Search diary entries', pl: 'Szukaj wpisów w dzienniku' })}
                 autoComplete='off'
                 name='search'
                 onValueChange={setSearchInputValue}
-                placeholder='Search titles and entries'
+                placeholder={t({
+                  en: 'Search titles and entries',
+                  pl: 'Szukaj w tytułach i treści',
+                })}
                 type='search'
                 value={searchInputValue}
               />
@@ -94,11 +107,20 @@ function DiaryList({ diaryKey, encryptedEntries, onLock }: DiaryListProps) {
 
             {visibleEntries.length === 0 ? (
               <Card as='section' className={css.emptyState} data-appear='1'>
-                <h1>No matching entries</h1>
-                <p>Try a different title or phrase from an entry.</p>
+                <h1>{t({ en: 'No matching entries', pl: 'Brak pasujących wpisów' })}</h1>
+                <p>
+                  {t({
+                    en: 'Try a different title or phrase from an entry.',
+                    pl: 'Spróbuj innego tytułu lub frazy z wpisu.',
+                  })}
+                </p>
               </Card>
             ) : (
-              <section aria-label='Diary entries' className={css.list} data-appear='1'>
+              <section
+                aria-label={t({ en: 'Diary entries', pl: 'Wpisy w dzienniku' })}
+                className={css.list}
+                data-appear='1'
+              >
                 {visibleEntries.map((entry) => (
                   <Link
                     className={css.entryLink}
@@ -108,9 +130,13 @@ function DiaryList({ diaryKey, encryptedEntries, onLock }: DiaryListProps) {
                   >
                     <Card as='article' className={css.entry}>
                       <time className={css.date} dateTime={entry.entryDate}>
-                        {formatDiaryDate(entry.entryDate)}
+                        {formatDate(entry.entryDate, {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })}
                       </time>
-                      <h2>{entry.title || 'Untitled entry'}</h2>
+                      <h2>{entry.title || t({ en: 'Untitled entry', pl: 'Wpis bez tytułu' })}</h2>
                       {entry.markdown ? <p className={css.preview}>{entry.markdown}</p> : null}
                     </Card>
                   </Link>
@@ -140,7 +166,7 @@ function DiaryList({ diaryKey, encryptedEntries, onLock }: DiaryListProps) {
           );
         }}
       >
-        New entry
+        {t({ en: 'New entry', pl: 'Nowy wpis' })}
       </FloatingButton>
     </main>
   );

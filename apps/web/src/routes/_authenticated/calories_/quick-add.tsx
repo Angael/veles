@@ -15,7 +15,13 @@ const quickAddSearchType = type({
 export const Route = createFileRoute('/_authenticated/calories_/quick-add')({
   validateSearch: quickAddSearchType,
   component: Component,
-  staticData: { layout: 'task', navbar: { backFallback: caloriesDayTarget, label: 'Quick add' } },
+  staticData: {
+    layout: 'task',
+    navbar: {
+      backFallback: caloriesDayTarget,
+      label: { en: 'Quick add', pl: 'Szybkie dodawanie' },
+    },
+  },
 });
 
 function Component() {

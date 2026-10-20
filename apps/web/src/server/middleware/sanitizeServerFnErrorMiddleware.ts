@@ -1,6 +1,7 @@
 import { isNotFound, isRedirect } from '@tanstack/react-router';
 import { createMiddleware } from '@tanstack/react-start';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
+import { translate } from '@/lib/i18n/getLocale';
 
 export const sanitizeServerFnErrorMiddleware = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
@@ -11,7 +12,12 @@ export const sanitizeServerFnErrorMiddleware = createMiddleware({ type: 'functio
         throw error;
       }
 
-      throw new ClientSafeError('The request could not be completed. Please try again.');
+      throw new ClientSafeError(
+        translate({
+          en: 'The request could not be completed. Please try again.',
+          pl: 'Nie udało się wykonać żądania. Spróbuj ponownie.',
+        }),
+      );
     }
   },
 );

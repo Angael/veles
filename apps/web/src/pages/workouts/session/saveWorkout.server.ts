@@ -1,4 +1,3 @@
-import { format, parseISO } from 'date-fns';
 import { eq } from 'drizzle-orm';
 import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
@@ -7,6 +6,7 @@ import { copyRoutineToSession, requireOwnedRoutine } from '../routines/routines.
 import {
   autoFinishIdleWorkouts,
   completeFilledSets,
+  defaultWorkoutName,
   requireNoOpenWorkout,
   requireOwnedWorkout,
   resolveExerciseId,
@@ -83,8 +83,7 @@ export async function saveWorkoutRecord(userId: string, data: SaveWorkoutInput) 
         .values({
           date: data.date,
           endedAt: opening ? null : now,
-          name:
-            data.name?.trim() || routine?.name || `${format(parseISO(data.date), 'EEEE')} workout`,
+          name: data.name?.trim() || routine?.name || defaultWorkoutName(data.date),
           routineId: routine?.id ?? null,
           startedAt: opening ? now : null,
           userId,

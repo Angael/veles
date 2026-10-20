@@ -14,7 +14,9 @@ import type {
   recordFoodValuesType,
   updateFoodLogValuesType,
 } from './calories.validation';
+import { foodProductNames } from './calorieHelpers';
 import { getFoodImageAssets, prepareImageAction, rollbackImage } from './foodImages.server';
+import { translate } from '@/lib/i18n/getLocale';
 
 export function toCalorieLog(
   logEntry: typeof foodLogs.$inferSelect,
@@ -50,7 +52,13 @@ export async function recordFoodRecord(userId: string, values: typeof recordFood
     .from(foodProducts)
     .where(eq(foodProducts.id, values.productId))
     .limit(1);
-  if (!product) throw new ClientSafeError('The selected food product no longer exists.');
+  if (!product)
+    throw new ClientSafeError(
+      translate({
+        en: 'The selected food product no longer exists.',
+        pl: 'Wybrany produkt już nie istnieje.',
+      }),
+    );
 
   const productAssets = await getFoodImageAssets([product.imageUploadObjectId]);
   const productAsset = productAssets.get(product.imageUploadObjectId ?? '');
@@ -63,7 +71,7 @@ export async function recordFoodRecord(userId: string, values: typeof recordFood
   const [inserted] = await db
     .insert(foodLogs)
     .values({
-      name: product.name,
+      name: translate(foodProductNames(product)),
       productId: product.id,
       imageUploadObjectId,
       gramsHundredths,
@@ -145,11 +153,19 @@ export async function updateFoodLogRecord(
     .from(foodLogs)
     .where(and(eq(foodLogs.id, values.id), eq(foodLogs.userId, userId)))
     .limit(1);
-  if (!existing) throw new ClientSafeError('Food log not found.');
+  if (!existing)
+    throw new ClientSafeError(
+      translate({ en: 'Food log not found.', pl: 'Nie znaleziono wpisu.' }),
+    );
 
   const action = values.imageAction ?? 'keep';
   if (existing.productId && (action !== 'keep' || photo)) {
-    throw new ClientSafeError('Product-backed entries use the product photo.');
+    throw new ClientSafeError(
+      translate({
+        en: 'Product-backed entries use the product photo.',
+        pl: 'Wpisy powiązane z produktem używają zdjęcia produktu.',
+      }),
+    );
   }
   const image = await prepareImageAction(action, photo, userId);
   let imageUploadObjectId: string | null | undefined;
@@ -229,7 +245,10 @@ export async function copyFoodLogsRecord(userId: string, data: typeof foodLogsDa
     .select()
     .from(foodLogs)
     .where(and(inArray(foodLogs.id, data.ids), eq(foodLogs.userId, userId)));
-  if (sources.length === 0) throw new ClientSafeError('These products no longer exist.');
+  if (sources.length === 0)
+    throw new ClientSafeError(
+      translate({ en: 'These products no longer exist.', pl: 'Te produkty już nie istnieją.' }),
+    );
 
   const consumedAt = new Date();
   await db.insert(foodLogs).values(

@@ -10,6 +10,7 @@ import type { ReactNode } from 'react';
 import { MobileNavbar } from '@/components/app/navbar/MobileNavbar';
 import { Navbar } from '@/components/app/navbar/Navbar';
 import type { SessionUser } from '@/lib/auth/session.api';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 import css from './AppFrame.module.css';
 import { RouteBackButton } from './RouteBackButton';
 import { TaskHeader } from './TaskHeader';
@@ -26,21 +27,27 @@ export function AppFrame({
   children?: ReactNode;
   user?: SessionUser | null;
 }) {
+  const { t } = useI18n();
   const { layout, navbar } = useRouterState(routeMatchOptions) ?? {};
+  const label = navbar ? t(navbar.label) : undefined;
 
   return (
     <div className={css.page}>
       <div className={clsx(css.shell, layout && 'focusShell', layout === 'task' && css.taskShell)}>
-        {layout === 'task' ? <TaskHeader label={navbar?.label} /> : null}
+        {layout === 'task' ? <TaskHeader label={label} /> : null}
         {layout ? null : (
           <header className={css.header}>
             {navbar ? (
               <div className={css.brand}>
                 <RouteBackButton />
-                <strong className={css.routeLabelTitle}>{navbar.label}</strong>
+                <strong className={css.routeLabelTitle}>{label}</strong>
               </div>
             ) : (
-              <Link aria-label='Veles home' className={css.logoLink} to='/'>
+              <Link
+                aria-label={t({ en: 'Veles home', pl: 'Strona główna Veles' })}
+                className={css.logoLink}
+                to='/'
+              >
                 <VelesLogo />
               </Link>
             )}

@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router';
-import { format, parseISO } from 'date-fns';
 import clsx from 'clsx';
 import { ArrowRightIcon, BookmarkPlusIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
@@ -16,19 +15,23 @@ import { useSaveRoutineFromWorkoutMutation } from './routines/routines.query';
 import type { WorkoutSummary } from './workouts.api';
 import { useDeleteWorkoutMutation } from './workouts.query';
 import css from './WorkoutList.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { pluralEn, pluralPl } from '@/lib/i18n/locale';
+import { SHORT_DAY } from './metrics';
 
 /**
  * Workout rows that open the session; long press or right click to save as a routine or delete.
  * An open workout gets a highlighted, animated row with a live clock.
  */
 export function WorkoutList({ workouts }: { workouts: WorkoutSummary[] }) {
+  const { t } = useI18n();
   const deleteWorkout = useDeleteWorkoutMutation();
   const saveRoutine = useSaveRoutineFromWorkoutMutation();
   const [savingFrom, setSavingFrom] = useState<WorkoutSummary | null>(null);
 
   return (
     <>
-      <ul aria-label='Workouts' className={css.list}>
+      <ul aria-label={t({ en: 'Workouts', pl: 'Treningi' })} className={css.list}>
         {workouts.map((workout) => (
           <li key={workout.id}>
             <ContextMenuRoot>
@@ -39,18 +42,27 @@ export function WorkoutList({ workouts }: { workouts: WorkoutSummary[] }) {
               >
                 <WorkoutRow workout={workout} />
               </ContextMenuTrigger>
-              <ContextMenuPopup aria-label={`${workout.name} actions`}>
+              <ContextMenuPopup
+                aria-label={t({ en: `${workout.name} actions`, pl: `Akcje: ${workout.name}` })}
+              >
                 <ContextMenuItem
                   disabled={workout.exerciseCount === 0}
                   icon={<BookmarkPlusIcon aria-hidden='true' />}
-                  label='Save as routine'
+                  label={t({ en: 'Save as routine', pl: 'Zapisz jako plan' })}
                   onClick={() => setSavingFrom(workout)}
                 />
                 <ContextMenuItem
                   icon={<Trash2Icon aria-hidden='true' />}
-                  label='Delete workout'
+                  label={t({ en: 'Delete workout', pl: 'Usuń trening' })}
                   onClick={() => {
-                    if (window.confirm(`Delete “${workout.name}” and its sets?`)) {
+                    if (
+                      window.confirm(
+                        t({
+                          en: `Delete “${workout.name}” and its sets?`,
+                          pl: `Usunąć „${workout.name}” razem z seriami?`,
+                        }),
+                      )
+                    ) {
                       deleteWorkout.mutate({ id: workout.id });
                     }
                   }}
@@ -72,14 +84,15 @@ export function WorkoutList({ workouts }: { workouts: WorkoutSummary[] }) {
         }
         open={savingFrom !== null}
         pending={saveRoutine.isPending}
-        submitLabel='Save routine'
-        title='Save as routine'
+        submitLabel={t({ en: 'Save routine', pl: 'Zapisz plan' })}
+        title={t({ en: 'Save as routine', pl: 'Zapisz jako plan' })}
       />
     </>
   );
 }
 
 function WorkoutRow({ workout }: { workout: WorkoutSummary }) {
+  const { formatDate, formatNumber, t } = useI18n();
   const open = workout.endedAt === null;
 
   return (
@@ -87,9 +100,11 @@ function WorkoutRow({ workout }: { workout: WorkoutSummary }) {
       <div className={css.text}>
         <p className={css.top}>
           <time className={css.date} dateTime={workout.date}>
-            {format(parseISO(workout.date), 'EEE dd.MM')}
+            {formatDate(workout.date, SHORT_DAY)}
           </time>
-          {open ? <span className={css.live}>In progress</span> : null}
+          {open ? (
+            <span className={css.live}>{t({ en: 'In progress', pl: 'W trakcie' })}</span>
+          ) : null}
         </p>
         <h3>{workout.name}</h3>
         <p className={css.meta}>
@@ -98,10 +113,18 @@ function WorkoutRow({ workout }: { workout: WorkoutSummary }) {
             <span>{formatElapsed(workout.durationSeconds)}</span>
           )}
           <span>
-            {workout.exerciseCount} {workout.exerciseCount === 1 ? 'exercise' : 'exercises'}
+            {t({
+              en: `${workout.exerciseCount} ${pluralEn(workout.exerciseCount, 'exercise', 'exercises')}`,
+              pl: `${workout.exerciseCount} ${pluralPl(workout.exerciseCount, 'ćwiczenie', 'ćwiczenia', 'ćwiczeń')}`,
+            })}
           </span>
-          <span>{workout.doneSets} sets</span>
-          {workout.volumeKg > 0 ? <span>{workout.volumeKg.toLocaleString()} kg</span> : null}
+          <span>
+            {t({
+              en: `${workout.doneSets} sets`,
+              pl: `${workout.doneSets} ${pluralPl(workout.doneSets, 'seria', 'serie', 'serii')}`,
+            })}
+          </span>
+          {workout.volumeKg > 0 ? <span>{formatNumber(workout.volumeKg)} kg</span> : null}
         </p>
       </div>
       {open ? <ArrowRightIcon aria-hidden='true' className={css.arrow} /> : null}

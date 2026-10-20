@@ -9,8 +9,12 @@ import {
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import css from './HomePage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { MACRO_LABELS } from '@/lib/nutritionLabels';
 
 export function HomePage() {
+  const { formatNumber, t } = useI18n();
+
   return (
     <main className={css.layout}>
       <Card as='article' className={css.hero} data-appear tone='primary'>
@@ -20,13 +24,15 @@ export function HomePage() {
         <div aria-hidden='true' className={css.energyLine} />
         <div className={css.heroContent}>
           <h1>
-            Your data.
+            {t({ en: 'Your data.', pl: 'Twoje dane.' })}
             <br />
-            In your orbit.
+            {t({ en: 'In your orbit.', pl: 'Twoje życie.' })}
           </h1>
           <p>
-            Veles keeps workouts, body weight, food logging, and shared personal files together in
-            one private hub.
+            {t({
+              en: 'Veles keeps workouts, body weight, food logging, and shared personal files together in one private hub.',
+              pl: 'Veles trzyma treningi, wagę ciała, dziennik jedzenia i wspólne pliki w jednym prywatnym miejscu.',
+            })}
           </p>
           <div className={css.buttonRow}>
             <Btn
@@ -36,7 +42,7 @@ export function HomePage() {
               size='lg'
               variant='main'
             >
-              Log in
+              {t({ en: 'Log in', pl: 'Zaloguj się' })}
             </Btn>
           </div>
         </div>
@@ -45,15 +51,20 @@ export function HomePage() {
       <Card as='article' className={css.workoutTile} data-appear='1' shadow={false}>
         <div className={css.tileHeading}>
           <DumbbellIcon aria-hidden='true' size={22} />
-          <h2>Workouts</h2>
+          <h2>{t({ en: 'Workouts', pl: 'Treningi' })}</h2>
         </div>
-        <p>Track sessions, exercises, and notes across training blocks.</p>
+        <p>
+          {t({
+            en: 'Track sessions, exercises, and notes across training blocks.',
+            pl: 'Zapisuj treningi, ćwiczenia i notatki w kolejnych blokach treningowych.',
+          })}
+        </p>
         <div aria-hidden='true' className={css.setSequence}>
-          <span>WARM</span>
+          <span>{t({ en: 'WARM', pl: 'ROZGRZEWKA' })}</span>
           <i />
-          <span>WORK</span>
+          <span>{t({ en: 'WORK', pl: 'SERIE' })}</span>
           <i />
-          <span>LOG</span>
+          <span>{t({ en: 'LOG', pl: 'POSTĘP' })}</span>
         </div>
       </Card>
 
@@ -61,12 +72,17 @@ export function HomePage() {
         <div className={css.weightCopy}>
           <div className={css.tileHeading}>
             <ScaleIcon aria-hidden='true' size={22} />
-            <h2>Body weight</h2>
+            <h2>{t({ en: 'Body weight', pl: 'Waga ciała' })}</h2>
           </div>
-          <p>Log privately and see long-term direction without losing the daily detail.</p>
+          <p>
+            {t({
+              en: 'Log privately and see long-term direction without losing the daily detail.',
+              pl: 'Zapisuj prywatnie i obserwuj długoterminowy kierunek bez utraty codziennych szczegółów.',
+            })}
+          </p>
         </div>
         <div aria-hidden='true' className={css.trend}>
-          <span className={css.trendValue}>72.4</span>
+          <span className={css.trendValue}>{formatNumber(72.4)}</span>
           <span className={css.trendUnit}>kg</span>
           <svg viewBox='0 0 180 54'>
             <path d='M2 42 C28 35, 38 45, 61 31 S102 35, 123 20 S153 22, 178 8' />
@@ -77,24 +93,29 @@ export function HomePage() {
       <Card as='article' className={css.foodTile} data-appear='3' shadow={false}>
         <div className={css.tileHeading}>
           <UtensilsIcon aria-hidden='true' size={22} />
-          <h2>Food logging</h2>
+          <h2>{t({ en: 'Food logging', pl: 'Dziennik jedzenia' })}</h2>
         </div>
-        <p>Record meals, calories, and macros with a compact daily view.</p>
+        <p>
+          {t({
+            en: 'Record meals, calories, and macros with a compact daily view.',
+            pl: 'Zapisuj posiłki, kalorie i makroskładniki w zwięzłym widoku dnia.',
+          })}
+        </p>
         <dl className={css.macros}>
           <div>
             <dt>kcal</dt>
-            <dd>2,180</dd>
+            <dd>{formatNumber(2180)}</dd>
           </div>
           <div>
-            <dt>protein</dt>
+            <dt>{t(MACRO_LABELS.protein)}</dt>
             <dd>148g</dd>
           </div>
           <div>
-            <dt>fat</dt>
+            <dt>{t(MACRO_LABELS.fat)}</dt>
             <dd>72g</dd>
           </div>
           <div>
-            <dt>carbs</dt>
+            <dt>{t(MACRO_LABELS.carbs)}</dt>
             <dd>224g</dd>
           </div>
         </dl>
@@ -104,9 +125,14 @@ export function HomePage() {
         <div className={css.filesCopy}>
           <div className={css.tileHeading}>
             <FolderLockIcon aria-hidden='true' size={22} />
-            <h2>Shared personal files</h2>
+            <h2>{t({ en: 'Shared personal files', pl: 'Wspólne pliki' })}</h2>
           </div>
-          <p>Keep important files together in private, upload-ready storage.</p>
+          <p>
+            {t({
+              en: 'Keep important files together in private, upload-ready storage.',
+              pl: 'Trzymaj ważne pliki razem w prywatnym miejscu.',
+            })}
+          </p>
         </div>
         <div aria-hidden='true' className={css.fileStack}>
           <span>health.pdf</span>

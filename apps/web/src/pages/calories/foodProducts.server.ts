@@ -21,6 +21,7 @@ import {
   rollbackImage,
 } from './foodImages.server';
 import { getOpenFoodFactsProduct, type OpenFoodFactsProduct } from './openFoodFacts';
+import { translate } from '@/lib/i18n/getLocale';
 
 function productValues(data: typeof createFoodProductValuesType.infer) {
   return {
@@ -119,7 +120,12 @@ export async function createFoodProductRecord(
   photo: File | null = null,
 ) {
   if (values.barcode && (await findFoodProductByBarcode(values.barcode))) {
-    throw new ClientSafeError('A food product with this barcode already exists.');
+    throw new ClientSafeError(
+      translate({
+        en: 'A food product with this barcode already exists.',
+        pl: 'Produkt z tym kodem kreskowym już istnieje.',
+      }),
+    );
   }
   const action = values.imageAction ?? 'keep';
   const image = await prepareImageAction(action, photo, userId);
@@ -155,17 +161,30 @@ export async function updateFoodProductRecord(
     .from(foodProducts)
     .where(eq(foodProducts.id, values.id))
     .limit(1);
-  if (!existing) throw new ClientSafeError('Food product not found.');
+  if (!existing)
+    throw new ClientSafeError(
+      translate({ en: 'Food product not found.', pl: 'Nie znaleziono produktu.' }),
+    );
   if (values.barcode) {
     const barcodeProduct = await findFoodProductByBarcode(values.barcode);
     if (barcodeProduct && barcodeProduct.id !== values.id) {
-      throw new ClientSafeError('A food product with this barcode already exists.');
+      throw new ClientSafeError(
+        translate({
+          en: 'A food product with this barcode already exists.',
+          pl: 'Produkt z tym kodem kreskowym już istnieje.',
+        }),
+      );
     }
   }
 
   const action = values.imageAction ?? 'keep';
   if (action === 'replace' && existing.imageUploadObjectId) {
-    throw new ClientSafeError('Remove the existing product photo before uploading another.');
+    throw new ClientSafeError(
+      translate({
+        en: 'Remove the existing product photo before uploading another.',
+        pl: 'Usuń obecne zdjęcie produktu przed przesłaniem nowego.',
+      }),
+    );
   }
   const image = await prepareImageAction(action, photo, userId);
   const imageUploadObjectId = action === 'keep' ? undefined : (image?.asset.id ?? null);
@@ -182,7 +201,10 @@ export async function updateFoodProductRecord(
         })
         .where(eq(foodProducts.id, values.id))
         .returning();
-      if (!updated) throw new ClientSafeError('Food product not found.');
+      if (!updated)
+        throw new ClientSafeError(
+          translate({ en: 'Food product not found.', pl: 'Nie znaleziono produktu.' }),
+        );
 
       const scale = (value: number | null) =>
         value === null

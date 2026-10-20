@@ -1,5 +1,6 @@
 import type { calorieGoals } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
+import { translate } from '@/lib/i18n/getLocale';
 
 export const HUNDREDTHS = 100;
 
@@ -7,7 +8,12 @@ export function toHundredths(value: number): number {
   const scaled = Math.round(value * HUNDREDTHS);
 
   if (!Number.isSafeInteger(scaled)) {
-    throw new ClientSafeError('Nutrition values are outside the supported range.');
+    throw new ClientSafeError(
+      translate({
+        en: 'Nutrition values are outside the supported range.',
+        pl: 'Wartości odżywcze są poza obsługiwanym zakresem.',
+      }),
+    );
   }
 
   return scaled;

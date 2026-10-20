@@ -39,7 +39,9 @@ export function LibraryDemo() {
           guesses what to track.
         </p>
         <ExercisePicker
-          onPick={(exercise) => setPicked(`${exercise.name} (${MEASURE_LABELS[exercise.measure]})`)}
+          onPick={(exercise) =>
+            setPicked(`${exercise.name} (${MEASURE_LABELS[exercise.measure].en})`)
+          }
         />
         {picked ? <p className={css.hint}>Picked: {picked}</p> : null}
       </Card>
@@ -63,7 +65,7 @@ function ExerciseRow({ exercise }: { exercise: MockExercise }) {
       <ContextMenuTrigger render={<ListItem className={css.libraryRow} interactive />}>
         <span className={css.resultName}>{exercise.name}</span>
         <span className={css.resultMeta}>
-          {MEASURE_LABELS[exercise.measure]} · {exercise.uses}× · best {exercise.lastBest}
+          {MEASURE_LABELS[exercise.measure].en} · {exercise.uses}× · best {exercise.lastBest}
         </span>
       </ContextMenuTrigger>
       <ContextMenuPopup aria-label={`${exercise.name} actions`}>
@@ -84,8 +86,8 @@ function ExerciseRow({ exercise }: { exercise: MockExercise }) {
               <ContextMenuItem
                 icon={measure === exercise.measure ? <CheckIcon aria-hidden='true' /> : <span />}
                 key={measure}
-                label={MEASURE_LABELS[measure]}
-                onClick={() => mock(`track ${MEASURE_LABELS[measure]}`)}
+                label={MEASURE_LABELS[measure].en}
+                onClick={() => mock(`track ${MEASURE_LABELS[measure].en}`)}
               />
             ))}
           </ContextMenuPopup>

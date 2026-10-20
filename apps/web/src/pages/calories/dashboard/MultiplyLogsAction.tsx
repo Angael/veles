@@ -1,7 +1,6 @@
 import { CopyPlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
-import { MAX_FOOD_LOG_MULTIPLIER } from '../calorieHelpers';
 import { useMultiplyFoodLogsMutation } from '../calories.query';
 import { Btn } from '@/components/ui/btn/Btn';
 import {
@@ -15,6 +14,8 @@ import {
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { SelectionBarAction } from '@/components/ui/selection-bar/SelectionBar';
 import css from './MultiplyLogsAction.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { MAX_FOOD_LOG_MULTIPLIER, productCountText } from '../calorieHelpers';
 
 /** ×½ covers the opposite case: half a portion eaten but a full one logged. */
 const presets = [
@@ -30,13 +31,14 @@ type Props = {
 
 /** Selection bar Multiply action opening the multiply dialog for every selected log. */
 export function MultiplyLogsAction({ logs, onMultiplied }: Props) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <SelectionBarAction
         icon={<CopyPlusIcon aria-hidden='true' />}
-        label='Multiply'
+        label={t({ en: 'Multiply', pl: 'Pomnóż' })}
         onClick={() => setOpen(true)}
       />
       <MultiplyLogsDialog
@@ -58,14 +60,18 @@ type DialogProps = {
 
 /** Scales the logs' amounts, e.g. ×2 when a second sandwich was eaten but logged as ingredients. */
 export function MultiplyLogsDialog({ logs, onMultiplied, onOpenChange, open }: DialogProps) {
-  const products = `${logs.length} ${logs.length === 1 ? 'product' : 'products'}`;
+  const { t } = useI18n();
+  const products = t(productCountText(logs.length));
 
   return (
     <DialogRoot onOpenChange={onOpenChange} open={open}>
       <DialogPopup>
-        <DialogTitle>Multiply {products}</DialogTitle>
+        <DialogTitle>{t({ en: `Multiply ${products}`, pl: `Pomnóż ${products}` })}</DialogTitle>
         <DialogDescription>
-          Grams, kcal, and macros of each product are multiplied.
+          {t({
+            en: 'Grams, kcal, and macros of each product are multiplied.',
+            pl: 'Gramy, kcal i makroskładniki każdego produktu zostaną pomnożone.',
+          })}
         </DialogDescription>
         <MultiplyForm
           logs={logs}
@@ -81,6 +87,7 @@ export function MultiplyLogsDialog({ logs, onMultiplied, onOpenChange, open }: D
 
 /** Mounts with the popup, so the factor resets to ×2 every time the dialog opens. */
 function MultiplyForm({ logs, onMultiplied }: Props) {
+  const { formatNumber, t } = useI18n();
   const [factor, setFactor] = useState<number | null>(2);
   const multiplyMutation = useMultiplyFoodLogsMutation();
   const valid = factor !== null && factor > 0 && factor <= MAX_FOOD_LOG_MULTIPLIER;
@@ -115,7 +122,7 @@ function MultiplyForm({ logs, onMultiplied }: Props) {
           </Btn>
         ))}
         <NumberInput
-          aria-label='Multiply by'
+          aria-label={t({ en: 'Multiply by', pl: 'Pomnóż przez' })}
           className={css.factorInput}
           enterKeyHint='done'
           max={MAX_FOOD_LOG_MULTIPLIER}
@@ -125,17 +132,20 @@ function MultiplyForm({ logs, onMultiplied }: Props) {
         />
       </div>
       <p className={css.kcalPreview}>
-        {Math.round(kcal)} kcal → <strong>{valid ? Math.round(kcal * factor) : '–'} kcal</strong>
+        {formatNumber(Math.round(kcal))} kcal →{' '}
+        <strong>{valid ? formatNumber(Math.round(kcal * factor)) : '–'} kcal</strong>
       </p>
       <DialogActions>
-        <DialogClose render={<Btn type='button' variant='ghost' />}>Cancel</DialogClose>
+        <DialogClose render={<Btn type='button' variant='ghost' />}>
+          {t({ en: 'Cancel', pl: 'Anuluj' })}
+        </DialogClose>
         <Btn
           disabled={!valid}
           icon={<CopyPlusIcon aria-hidden='true' />}
           loading={multiplyMutation.isPending}
           type='submit'
         >
-          Multiply
+          {t({ en: 'Multiply', pl: 'Pomnóż' })}
         </Btn>
       </DialogActions>
     </form>

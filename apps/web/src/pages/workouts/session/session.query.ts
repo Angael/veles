@@ -15,6 +15,8 @@ import {
   updateWorkoutExercise,
   updateWorkoutSet,
 } from './session.api';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import type { Localized } from '@/lib/i18n/locale';
 
 export type SetPatch = Partial<SetMetrics & { type: SetType; done: boolean }>;
 export type ExercisePatch = { name?: string; measure?: Measure; restSeconds?: number | null };
@@ -42,7 +44,7 @@ const mapSet = (
   }));
 
 type SessionMutationOptions<V> = {
-  error: string;
+  error: Localized;
   mutationFn: (variables: V) => Promise<unknown>;
   /** Applied to the cached session before the request, so the screen reacts at once. */
   optimistic?: (session: WorkoutSessionData, variables: V) => WorkoutSessionData;
@@ -58,10 +60,11 @@ function useSessionMutation<V>(
   hasPendingEdits: () => boolean,
   options: SessionMutationOptions<V>,
 ) {
+  const { t } = useI18n();
   const queryKey = workoutKeys.session(workoutId);
   const mutationKey = ['workouts', 'session-mutation', workoutId];
   return useMutation({
-    meta: { error: { title: options.error } },
+    meta: { error: { title: t(options.error) } },
     mutationFn: options.mutationFn,
     mutationKey,
     onMutate: async (variables, context) => {
@@ -94,38 +97,38 @@ export function useSessionActions(workoutId: string) {
   const hasPendingEdits = () => pending.current.size > 0;
 
   const setMutation = useSessionMutation(workoutId, hasPendingEdits, {
-    error: 'Set was not saved',
+    error: { en: 'Set was not saved', pl: 'Nie udało się zapisać serii' },
     mutationFn: (variables: SetPatch & { id: string }) => updateWorkoutSet({ data: variables }),
   });
   const addSet = useSessionMutation(workoutId, hasPendingEdits, {
-    error: 'Set was not added',
+    error: { en: 'Set was not added', pl: 'Nie udało się dodać serii' },
     mutationFn: (sessionExerciseId: string) => addWorkoutSet({ data: { sessionExerciseId } }),
   });
   const duplicateSet = useSessionMutation(workoutId, hasPendingEdits, {
-    error: 'Set was not copied',
+    error: { en: 'Set was not copied', pl: 'Nie udało się skopiować serii' },
     mutationFn: (id: string) => duplicateWorkoutSet({ data: { id } }),
   });
   const removeSet = useSessionMutation(workoutId, hasPendingEdits, {
-    error: 'Set was not deleted',
+    error: { en: 'Set was not deleted', pl: 'Nie udało się usunąć serii' },
     mutationFn: (id: string) => deleteWorkoutSet({ data: { id } }),
     optimistic: (session, id) => mapSet(session, id, () => null),
   });
   const addExercise = useSessionMutation(workoutId, hasPendingEdits, {
-    error: 'Exercise was not added',
+    error: { en: 'Exercise was not added', pl: 'Nie udało się dodać ćwiczenia' },
     invalidateExercises: true,
     mutationFn: (
       variables: { exerciseId: string } | { newExercise: { name: string; measure: Measure } },
     ) => addWorkoutExercise({ data: { workoutId, ...variables } }),
   });
   const updateNote = useSessionMutation(workoutId, hasPendingEdits, {
-    error: 'Note was not saved',
+    error: { en: 'Note was not saved', pl: 'Nie udało się zapisać notatki' },
     mutationFn: (variables: { id: string; notes: string }) =>
       updateWorkoutExercise({ data: variables }),
     optimistic: (session, { id, notes }) =>
       mapSlots(session, (slot) => (slot.id === id ? { ...slot, note: notes } : slot)),
   });
   const moveSlot = useSessionMutation(workoutId, hasPendingEdits, {
-    error: 'Exercise was not moved',
+    error: { en: 'Exercise was not moved', pl: 'Nie udało się przesunąć ćwiczenia' },
     mutationFn: (variables: { id: string; direction: 'up' | 'down' }) =>
       moveWorkoutExercise({ data: variables }),
     optimistic: (session, { direction, id }) => {
@@ -139,12 +142,12 @@ export function useSessionActions(workoutId: string) {
     },
   });
   const removeSlot = useSessionMutation(workoutId, hasPendingEdits, {
-    error: 'Exercise was not removed',
+    error: { en: 'Exercise was not removed', pl: 'Nie udało się usunąć ćwiczenia' },
     mutationFn: (id: string) => removeWorkoutExercise({ data: { id } }),
     optimistic: (session, id) => mapSlots(session, (slot) => (slot.id === id ? null : slot)),
   });
   const exerciseMutation = useSessionMutation(workoutId, hasPendingEdits, {
-    error: 'Exercise was not saved',
+    error: { en: 'Exercise was not saved', pl: 'Nie udało się zapisać ćwiczenia' },
     invalidateExercises: true,
     mutationFn: (variables: ExercisePatch & { id: string }) => updateExercise({ data: variables }),
     optimistic: (session, { id, ...patch }) =>

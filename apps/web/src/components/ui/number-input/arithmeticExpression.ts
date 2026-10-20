@@ -6,7 +6,7 @@ export function isArithmeticOperator(key: string) {
 
 /** True when text contains an operator beyond a leading sign, i.e. Base UI can't parse it as a number. */
 export function isArithmeticExpression(text: string) {
-  return /[*/]|[\d.]\s*[+-]/.test(text);
+  return /[*/]|[\d.,]\s*[+-]/.test(text);
 }
 
 /**

@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { listItemsCollection } from '@/pages/todos/listItems.collection';
 import { notesQueryOptions } from '@/pages/todos/notes.query';
 import { TodosPage } from '@/pages/todos/TodosPage';
+import { translate } from '@/lib/i18n/getLocale';
 
 export const Route = createFileRoute('/_authenticated/todos')({
   // Loaders are bundled with the route tree by default; split this one so the collection config stays lazy.
@@ -13,6 +14,6 @@ export const Route = createFileRoute('/_authenticated/todos')({
       dbClient.collection(listItemsCollection).preload(),
     ]),
   component: TodosPage,
-  head: () => ({ meta: [{ title: 'Notes' }] }),
-  staticData: { navbar: { label: 'Notes' } },
+  head: () => ({ meta: [{ title: translate({ en: 'Notes', pl: 'Notatki' }) }] }),
+  staticData: { navbar: { label: { en: 'Notes', pl: 'Notatki' } } },
 });

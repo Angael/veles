@@ -1,4 +1,5 @@
 import css from './SelectedFoodForm.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type GoalPreviewProps = {
   consumedKcal: number;
@@ -9,10 +10,15 @@ type GoalPreviewProps = {
 
 /** Previews how the selected food changes the day's calorie goal. */
 export function GoalPreview({ consumedKcal, foodKcal, goalKcal, pending }: GoalPreviewProps) {
+  const { formatNumber, t } = useI18n();
+  const kcal = (value: number) => `${formatNumber(Math.round(value))} kcal`;
+
   if (pending) {
     return (
       <div aria-live='polite' className={css.goalPreview}>
-        <p className={css.goalMessage}>Checking daily calories…</p>
+        <p className={css.goalMessage}>
+          {t({ en: 'Checking daily calories…', pl: 'Sprawdzanie dziennych kalorii…' })}
+        </p>
       </div>
     );
   }
@@ -20,7 +26,12 @@ export function GoalPreview({ consumedKcal, foodKcal, goalKcal, pending }: GoalP
   if (goalKcal === null) {
     return (
       <div aria-live='polite' className={css.goalPreview}>
-        <p className={css.goalMessage}>Set a calorie goal to preview this day.</p>
+        <p className={css.goalMessage}>
+          {t({
+            en: 'Set a calorie goal to preview this day.',
+            pl: 'Ustaw cel kaloryczny, aby zobaczyć podgląd dnia.',
+          })}
+        </p>
       </div>
     );
   }
@@ -35,15 +46,18 @@ export function GoalPreview({ consumedKcal, foodKcal, goalKcal, pending }: GoalP
       <div className={css.goalCaption}>
         <span>
           <i aria-hidden='true' className={css.dotConsumed} />
-          <strong>{Math.round(consumedKcal)} kcal</strong> eaten
+          <strong>{kcal(consumedKcal)}</strong> {t({ en: 'eaten', pl: 'zjedzone' })}
         </span>
         <span>
           <i aria-hidden='true' className={wouldExceedGoal ? css.dotAddedOver : css.dotAdded} />
-          <strong>+{Math.round(foodKcal)} kcal</strong> this food
+          <strong>+{kcal(foodKcal)}</strong> {t({ en: 'this food', pl: 'ten produkt' })}
         </span>
       </div>
       <div
-        aria-label={`${Math.round(projectedKcal)} of ${Math.round(goalKcal)} kcal after adding this food${wouldExceedGoal ? ', over goal' : ''}`}
+        aria-label={t({
+          en: `${formatNumber(Math.round(projectedKcal))} of ${kcal(goalKcal)} after adding this food${wouldExceedGoal ? ', over goal' : ''}`,
+          pl: `${formatNumber(Math.round(projectedKcal))} z ${kcal(goalKcal)} po dodaniu tego produktu${wouldExceedGoal ? ', ponad cel' : ''}`,
+        })}
         aria-valuemax={goalKcal}
         aria-valuemin={0}
         aria-valuenow={Math.min(projectedKcal, goalKcal)}
@@ -57,7 +71,7 @@ export function GoalPreview({ consumedKcal, foodKcal, goalKcal, pending }: GoalP
         />
       </div>
       <p className={wouldExceedGoal ? css.goalResultOver : css.goalResult}>
-        {Math.round(projectedKcal)} kcal / {Math.round(goalKcal)} kcal
+        {kcal(projectedKcal)} / {kcal(goalKcal)}
       </p>
     </div>
   );

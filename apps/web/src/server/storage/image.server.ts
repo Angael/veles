@@ -3,22 +3,32 @@ import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { log } from '@/server/logger.server';
 
 import { IMAGE_MAX_INPUT_BYTES, IMAGE_MAX_INPUT_PIXELS } from '@/lib/storage/imageLimits';
+import { translate } from '@/lib/i18n/getLocale';
 
 /** Converts a validated image into a metadata-free, consistently sized WebP. */
 export async function optimizeImage(file: File): Promise<{ buffer: Buffer; type: string }> {
   if (!file.type.startsWith('image/')) {
-    throw new ClientSafeError('Only image files can be uploaded.');
+    throw new ClientSafeError(
+      translate({
+        en: 'Only image files can be uploaded.',
+        pl: 'Można przesyłać tylko pliki graficzne.',
+      }),
+    );
   }
 
   if (file.size > IMAGE_MAX_INPUT_BYTES) {
-    throw new ClientSafeError('A photo is too large.');
+    throw new ClientSafeError(
+      translate({ en: 'A photo is too large.', pl: 'Zdjęcie jest za duże.' }),
+    );
   }
 
   try {
     const input = Buffer.from(await file.arrayBuffer());
 
     if (input.byteLength > IMAGE_MAX_INPUT_BYTES) {
-      throw new ClientSafeError('A photo is too large.');
+      throw new ClientSafeError(
+        translate({ en: 'A photo is too large.', pl: 'Zdjęcie jest za duże.' }),
+      );
     }
 
     const buffer = await sharp(input, {
@@ -46,6 +56,11 @@ export async function optimizeImage(file: File): Promise<{ buffer: Buffer; type:
       stack: error instanceof Error ? error.stack?.split('\n') : undefined,
     });
 
-    throw new ClientSafeError('A photo could not be processed.');
+    throw new ClientSafeError(
+      translate({
+        en: 'A photo could not be processed.',
+        pl: 'Nie udało się przetworzyć zdjęcia.',
+      }),
+    );
   }
 }

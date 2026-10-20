@@ -6,6 +6,7 @@ import {
   startWorkout,
   updateWorkout,
 } from './workouts.api';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export const workoutKeys = {
   all: ['workouts'] as const,
@@ -25,9 +26,13 @@ export function workoutSessionQueryOptions(id: string) {
 }
 
 export function useStartWorkoutMutation() {
+  const { t } = useI18n();
+
   return useMutation({
     meta: {
-      error: { title: 'Could not start a workout' },
+      error: {
+        title: t({ en: 'Could not start a workout', pl: 'Nie udało się rozpocząć treningu' }),
+      },
       invalidateQueryKey: workoutKeys.list,
     },
     mutationFn: (variables: { date: string }) => startWorkout({ data: variables }),
@@ -35,9 +40,11 @@ export function useStartWorkoutMutation() {
 }
 
 export function useUpdateWorkoutMutation() {
+  const { t } = useI18n();
+
   return useMutation({
     meta: {
-      error: { title: 'Workout was not saved' },
+      error: { title: t({ en: 'Workout was not saved', pl: 'Nie udało się zapisać treningu' }) },
       invalidateQueryKey: workoutKeys.all,
     },
     mutationFn: (variables: { id: string; name?: string; finished?: boolean }) =>
@@ -46,11 +53,13 @@ export function useUpdateWorkoutMutation() {
 }
 
 export function useDeleteWorkoutMutation() {
+  const { t } = useI18n();
+
   return useMutation({
     meta: {
-      error: { title: 'Workout was not deleted' },
+      error: { title: t({ en: 'Workout was not deleted', pl: 'Nie udało się usunąć treningu' }) },
       invalidateQueryKey: workoutKeys.list,
-      success: { title: 'Workout deleted' },
+      success: { title: t({ en: 'Workout deleted', pl: 'Usunięto trening' }) },
     },
     mutationFn: (variables: { id: string }) => deleteWorkout({ data: variables }),
   });

@@ -4,6 +4,7 @@ import type { ComponentProps, ReactNode } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import dock from '@/components/ui/mobile-dock/MobileDock.module.css';
 import css from './SelectionBar.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type SelectionBarProps = {
   'aria-label': string;
@@ -24,6 +25,8 @@ export function SelectionBar({
   count,
   onClear,
 }: SelectionBarProps) {
+  const { t } = useI18n();
+
   return (
     // `floatingButton` keeps AppFrame's bottom clearance so the swap doesn't resize the page;
     // `selectionBar` hides the mobile navbar while this bar owns the dock.
@@ -33,7 +36,7 @@ export function SelectionBar({
       role='toolbar'
     >
       <Btn
-        aria-label='Clear selection'
+        aria-label={t({ en: 'Clear selection', pl: 'Wyczyść zaznaczenie' })}
         icon={<XIcon aria-hidden='true' />}
         iconOnly
         onClick={onClear}
@@ -41,7 +44,7 @@ export function SelectionBar({
         variant='ghost'
       />
       <span aria-live='polite' className={css.count}>
-        {count} selected
+        {t({ en: `${count} selected`, pl: `Zaznaczono: ${count}` })}
       </span>
       {children}
     </div>

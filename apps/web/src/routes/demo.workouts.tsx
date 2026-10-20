@@ -6,7 +6,7 @@ export const Route = createFileRoute('/demo/workouts')({
   head: () => ({ meta: [{ title: 'Workouts playground' }] }),
   staticData: {
     navbar: {
-      label: 'Workouts playground',
+      label: { en: 'Workouts playground', pl: 'Plac treningowy' },
       backFallback: { to: '/' },
     },
   },

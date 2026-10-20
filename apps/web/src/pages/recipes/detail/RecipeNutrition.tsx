@@ -5,8 +5,10 @@ import clsx from 'clsx';
 import { SliderInput } from '@/components/ui/slider-input/SliderInput';
 import type { RecipeLibraryItem } from '../recipes.api';
 import css from './RecipeNutrition.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export function RecipeNutrition({ recipe }: { recipe: RecipeLibraryItem }) {
+  const { t } = useI18n();
   const basePortions = Math.max(1, recipe.portions);
   const [portions, setPortions] = useState(basePortions);
   const scale = portions / basePortions;
@@ -18,10 +20,13 @@ export function RecipeNutrition({ recipe }: { recipe: RecipeLibraryItem }) {
   };
 
   return (
-    <section className={css.nutrition} aria-label='Recipe nutrition and portions'>
+    <section
+      className={css.nutrition}
+      aria-label={t({ en: 'Recipe nutrition and portions', pl: 'Wartości odżywcze i porcje' })}
+    >
       <SliderInput
         className={css.portionSlider}
-        label='Portions'
+        label={t({ en: 'Portions', pl: 'Porcje' })}
         max={Math.max(8, basePortions)}
         min={0}
         onValueChange={setPortions}
@@ -36,12 +41,22 @@ export function RecipeNutrition({ recipe }: { recipe: RecipeLibraryItem }) {
         <dl className={css.macros}>
           <NutritionItem
             className={css.protein}
-            label='Protein'
+            label={t({ en: 'Protein', pl: 'Białko' })}
             unit='g'
             value={nutrition.protein}
           />
-          <NutritionItem className={css.fat} label='Fat' unit='g' value={nutrition.fat} />
-          <NutritionItem className={css.carb} label='Carb' unit='g' value={nutrition.carbs} />
+          <NutritionItem
+            className={css.fat}
+            label={t({ en: 'Fat', pl: 'Tłuszcz' })}
+            unit='g'
+            value={nutrition.fat}
+          />
+          <NutritionItem
+            className={css.carb}
+            label={t({ en: 'Carb', pl: 'Węglowodany' })}
+            unit='g'
+            value={nutrition.carbs}
+          />
         </dl>
       </div>
       {nutrition.kcal !== null ? (
@@ -53,7 +68,10 @@ export function RecipeNutrition({ recipe }: { recipe: RecipeLibraryItem }) {
                 carbs: nutrition.carbs ?? undefined,
                 fat: nutrition.fat ?? undefined,
                 kcal: nutrition.kcal,
-                name: `${recipe.name} (quick add)`,
+                name: t({
+                  en: `${recipe.name} (quick add)`,
+                  pl: `${recipe.name} (szybkie dodanie)`,
+                }),
                 protein: nutrition.protein ?? undefined,
               }}
               to='/calories/quick-add'
@@ -61,7 +79,7 @@ export function RecipeNutrition({ recipe }: { recipe: RecipeLibraryItem }) {
           }
           variant='outlineMain'
         >
-          Quick add kcal
+          {t({ en: 'Quick add kcal', pl: 'Szybko dodaj kcal' })}
         </Btn>
       ) : null}
     </section>
@@ -83,11 +101,13 @@ function NutritionItem({
   unit?: string;
   value: number | null;
 }) {
+  const { formatNumber } = useI18n();
+
   if (value === null) {
     return null;
   }
 
-  const formattedValue = Number.isInteger(value) ? value : Number(value.toFixed(1));
+  const formattedValue = formatNumber(value, { maximumFractionDigits: 1 });
 
   return (
     <div className={clsx(css.nutritionItem, className)}>

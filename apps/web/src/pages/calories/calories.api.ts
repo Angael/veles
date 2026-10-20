@@ -3,7 +3,7 @@ import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createMiddleware, createServerFn } from '@tanstack/react-start';
 import { and, desc, eq, gte, inArray, lte } from 'drizzle-orm';
 import { dateOnlyType } from '@/lib/dateOnly';
-import { calorieGoals, foodLogs, foodProducts } from '@veles/db/schema';
+import { calorieDayNotes, calorieGoals, foodLogs, foodProducts } from '@veles/db/schema';
 import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
@@ -38,6 +38,7 @@ import {
   toFoodProduct,
   updateFoodProductRecord,
 } from './foodProducts.server';
+import { translate } from '@/lib/i18n/getLocale';
 
 const FOOD_UPLOAD_MAX_REQUEST_BYTES = 12 * 1024 * 1024;
 
@@ -51,7 +52,9 @@ const limitFoodUploadRequestMiddleware = createMiddleware().server(async ({ next
     request.headers.get('content-length') ?? '',
   );
   if (contentLength instanceof type.errors || contentLength > FOOD_UPLOAD_MAX_REQUEST_BYTES) {
-    throw new ClientSafeError('Upload request is too large.');
+    throw new ClientSafeError(
+      translate({ en: 'Upload request is too large.', pl: 'Przesyłane dane są za duże.' }),
+    );
   }
   return next();
 });
@@ -102,7 +105,7 @@ export const getCalorieDashboard = createServerFn({ method: 'GET' })
 
     if (!weekStart || !weekEnd) throw new Error('A calorie week must contain at least one day.');
 
-    const [goals, logs] = await Promise.all([
+    const [goals, logs, dayNotes] = await Promise.all([
       db
         .select()
         .from(calorieGoals)
@@ -121,6 +124,16 @@ export const getCalorieDashboard = createServerFn({ method: 'GET' })
           ),
         )
         .orderBy(desc(foodLogs.consumedAt)),
+      db
+        .select()
+        .from(calorieDayNotes)
+        .where(
+          and(
+            eq(calorieDayNotes.userId, session.user.id),
+            gte(calorieDayNotes.date, weekStart),
+            lte(calorieDayNotes.date, weekEnd),
+          ),
+        ),
     ]);
     const productImageIds = await getProductImageIds(logs.map((entry) => entry.productId));
     const assetsById = await getFoodImageAssets([
@@ -138,6 +151,7 @@ export const getCalorieDashboard = createServerFn({ method: 'GET' })
     const days = weekDates.map((date): CalorieDashboardDay => {
       const dayLogs = logsByDate.get(date) ?? [];
       const goal = latestGoalForDate(goals, date);
+      const dayNote = dayNotes.find((entry) => entry.date === date);
       const kcalHundredths = dayLogs.reduce(
         (total, logEntry) => total + logEntry.kcalHundredths,
         0,
@@ -162,6 +176,8 @@ export const getCalorieDashboard = createServerFn({ method: 'GET' })
             : null,
         overKcalGoal:
           dayLogs.length > 0 && goal ? kcalHundredths > goal.kcalLimitHundredths : false,
+        offPlan: dayNote?.offPlan ?? false,
+        note: dayNote?.note ?? null,
       };
     });
 
@@ -181,6 +197,8 @@ export type CalorieDashboardDay = {
   hasLogs: boolean;
   withinKcalGoal: boolean | null;
   overKcalGoal: boolean;
+  offPlan: boolean;
+  note: string | null;
 };
 
 export type CalorieFood = {
@@ -247,7 +265,10 @@ export const getFoodProduct = createServerFn({ method: 'GET' })
       .from(foodProducts)
       .where(eq(foodProducts.id, data.id))
       .limit(1);
-    if (!food) throw new ClientSafeError('Food product not found.');
+    if (!food)
+      throw new ClientSafeError(
+        translate({ en: 'Food product not found.', pl: 'Nie znaleziono produktu.' }),
+      );
 
     const assetsById = await getFoodImageAssets([food.imageUploadObjectId]);
     return toFoodProduct(food, assetsById.get(food.imageUploadObjectId ?? ''));
@@ -297,7 +318,13 @@ export const recordFood = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(recordFoodMultipartType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    if (data.photo) throw new ClientSafeError('Product-backed entries use the product photo.');
+    if (data.photo)
+      throw new ClientSafeError(
+        translate({
+          en: 'Product-backed entries use the product photo.',
+          pl: 'Wpisy powiązane z produktem używają zdjęcia produktu.',
+        }),
+      );
     return recordFoodRecord(session.user.id, data.values);
   });
 
@@ -324,7 +351,10 @@ export const getFoodLog = createServerFn({ method: 'GET' })
       .from(foodLogs)
       .where(and(eq(foodLogs.id, data.id), eq(foodLogs.userId, session.user.id)))
       .limit(1);
-    if (!entry) throw new ClientSafeError('Food log not found.');
+    if (!entry)
+      throw new ClientSafeError(
+        translate({ en: 'Food log not found.', pl: 'Nie znaleziono wpisu.' }),
+      );
 
     const productImageIds = await getProductImageIds([entry.productId]);
     const productImageId = entry.productId ? productImageIds.get(entry.productId) : null;

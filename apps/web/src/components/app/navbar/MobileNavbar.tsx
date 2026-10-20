@@ -4,10 +4,12 @@ import { Link, useRouterState } from '@tanstack/react-router';
 import clsx from 'clsx';
 import dock from '@/components/ui/mobile-dock/MobileDock.module.css';
 import type { SessionUser } from '@/lib/auth/session.api';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 import css from './MobileNavbar.module.css';
 import { NAVBAR_ITEMS } from './navbarItems';
 
 export function MobileNavbar({ user }: { user: SessionUser | null }) {
+  const { t } = useI18n();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
@@ -20,10 +22,12 @@ export function MobileNavbar({ user }: { user: SessionUser | null }) {
     return null;
   }
 
+  const navLabel = t({ en: 'Primary mobile navigation', pl: 'Główna nawigacja mobilna' });
+
   return (
-    <nav aria-label='Primary mobile navigation' className={clsx(dock.dock, css.wrapper)}>
+    <nav aria-label={navLabel} className={clsx(dock.dock, css.wrapper)}>
       <ToggleGroup
-        aria-label='Primary mobile navigation'
+        aria-label={navLabel}
         className={css.group}
         value={activeValue ? [activeValue] : []}
       >
@@ -32,7 +36,7 @@ export function MobileNavbar({ user }: { user: SessionUser | null }) {
           return (
             <Toggle
               key={item.key}
-              aria-label={item.label}
+              aria-label={t(item.label)}
               className={css.item}
               nativeButton={false}
               render={<Link to={item.link} />}

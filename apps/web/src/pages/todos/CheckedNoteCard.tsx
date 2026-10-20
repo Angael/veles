@@ -10,8 +10,10 @@ import { NoteActions } from './NoteActions';
 import type { NoteListItem, NoteSummary } from './notes.api';
 import { useUpdateNoteMutation } from './notes.query';
 import css from './TodosPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export function CheckedNoteCard({ note }: { note: NoteSummary }) {
+  const { t } = useI18n();
   const [newItemId, setNewItemId] = useState<string | null>(null);
   const listItems = useListItemsCollection();
   const updateNote = useUpdateNoteMutation();
@@ -37,7 +39,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
       checked: false,
       createdAt: new Date().toISOString(),
       id,
-      name: 'New item',
+      name: t({ en: 'New item', pl: 'Nowa pozycja' }),
       noteId: note.id,
     });
     setNewItemId(id);
@@ -48,7 +50,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
       <div className={css.cardHeader}>
         <h2>
           <SeamlessTextInput
-            aria-label='Checklist title'
+            aria-label={t({ en: 'Checklist title', pl: 'Tytuł listy' })}
             className={css.titleInput}
             defaultValue={note.title}
             enterKeyHint='next'
@@ -69,7 +71,9 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
         </h2>
         <NoteActions note={note} />
       </div>
-      {items.length === 0 ? <p className={css.emptyList}>No items yet.</p> : null}
+      {items.length === 0 ? (
+        <p className={css.emptyList}>{t({ en: 'No items yet.', pl: 'Brak pozycji.' })}</p>
+      ) : null}
       <ul className={css.items}>
         {items.map((item) => (
           <CheckedNoteItem
@@ -81,7 +85,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
         ))}
       </ul>
       <Btn
-        aria-label='Add item'
+        aria-label={t({ en: 'Add item', pl: 'Dodaj pozycję' })}
         className={css.addItem}
         icon={<PlusIcon aria-hidden='true' />}
         onClick={addItem}
@@ -89,7 +93,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
         type='button'
         variant='outlineMain'
       >
-        Add item
+        {t({ en: 'Add item', pl: 'Dodaj pozycję' })}
       </Btn>
     </Card>
   );
@@ -104,6 +108,7 @@ function CheckedNoteItem({
   item: NoteListItem;
   onEnter: () => void;
 }) {
+  const { t } = useI18n();
   // No local state, effects, pending flags, or manual rollback: `item` is already optimistic.
   const listItems = useListItemsCollection();
   const deleteItem = () => listItems.delete(item.id);
@@ -111,7 +116,14 @@ function CheckedNoteItem({
   return (
     <li className={css.item}>
       <input
-        aria-label={`Mark ${item.name} as ${item.checked ? 'incomplete' : 'complete'}`}
+        aria-label={
+          item.checked
+            ? t({
+                en: `Mark ${item.name} as incomplete`,
+                pl: `Oznacz ${item.name} jako niezrobione`,
+              })
+            : t({ en: `Mark ${item.name} as complete`, pl: `Oznacz ${item.name} jako zrobione` })
+        }
         checked={item.checked}
         onChange={(event) => {
           const { checked } = event.currentTarget;
@@ -123,7 +135,7 @@ function CheckedNoteItem({
       />
       <SeamlessTextInput
         autoFocus={autoFocus}
-        aria-label='Checklist item'
+        aria-label={t({ en: 'Checklist item', pl: 'Pozycja listy' })}
         className={item.checked ? css.done : undefined}
         defaultValue={item.name}
         enterKeyHint='next'
@@ -153,7 +165,7 @@ function CheckedNoteItem({
         required
       />
       <Btn
-        aria-label={`Delete ${item.name}`}
+        aria-label={t({ en: `Delete ${item.name}`, pl: `Usuń: ${item.name}` })}
         className={css.deleteItem}
         icon={<Trash2Icon aria-hidden='true' />}
         iconOnly

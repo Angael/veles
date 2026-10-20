@@ -6,12 +6,15 @@ import { RecipeNutrition } from './RecipeNutrition';
 import { RecipeRating } from './RecipeRating';
 import type { RecipeViewItem } from '../recipes.api';
 import css from './RecipeViewPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type RecipeViewPageProps = {
   recipe: RecipeViewItem;
 };
 
 export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
+  const { t } = useI18n();
+
   return (
     <main className={css.page}>
       <article className={css.recipe}>
@@ -19,7 +22,7 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
           <div className={css.identity}>
             <h1>{recipe.name}</h1>
             {recipe.tags.length > 0 ? (
-              <div className={css.tags} aria-label='Recipe tags'>
+              <div className={css.tags} aria-label={t({ en: 'Recipe tags', pl: 'Tagi przepisu' })}>
                 {recipe.tags.map((tag) => (
                   <span className={css.tag} key={tag}>
                     #{tag}
@@ -30,7 +33,11 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
           </div>
 
           {recipe.canManage ? (
-            <div className={css.actions} aria-label='Recipe management actions' role='group'>
+            <div
+              className={css.actions}
+              aria-label={t({ en: 'Recipe management actions', pl: 'Zarządzanie przepisem' })}
+              role='group'
+            >
               <Btn
                 className={css.actionButton}
                 icon={<PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
@@ -40,18 +47,20 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
                 size='sm'
                 variant='outlineMain'
               >
-                Edit
+                {t({ en: 'Edit', pl: 'Edytuj' })}
               </Btn>
               <Btn
                 className={css.actionButton}
                 icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
-                onClick={() => window.confirm('Delete this recipe?')}
+                onClick={() =>
+                  window.confirm(t({ en: 'Delete this recipe?', pl: 'Usunąć ten przepis?' }))
+                }
                 radius='pill'
                 size='sm'
                 type='button'
                 variant='outlineDanger'
               >
-                Delete
+                {t({ en: 'Delete', pl: 'Usuń' })}
               </Btn>
             </div>
           ) : null}
@@ -67,7 +76,10 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
             <section className={css.utilityGroup}>
               <RecipeNutrition recipe={recipe} />
             </section>
-            <section className={css.utilityGroup} aria-label='Ingredients'>
+            <section
+              className={css.utilityGroup}
+              aria-label={t({ en: 'Ingredients', pl: 'Składniki' })}
+            >
               <ul className={css.ingredientList}>
                 {recipe.ingredients.map((ingredient, index) => (
                   <li key={`${index}-${ingredient}`}>{ingredient}</li>

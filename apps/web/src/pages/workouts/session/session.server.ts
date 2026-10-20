@@ -1,4 +1,3 @@
-import { format, parseISO } from 'date-fns';
 import { and, asc, desc, eq, gt, lt, sql } from 'drizzle-orm';
 import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
@@ -6,6 +5,7 @@ import { db } from '@/server/db.server';
 import {
   autoFinishIdleWorkouts,
   completeFilledSets,
+  defaultWorkoutName,
   nextPosition,
   previousSetCount,
   requireNoOpenWorkout,
@@ -37,7 +37,7 @@ export async function startWorkoutRecord(userId: string, data: typeof startWorko
     .insert(workoutSessions)
     .values({
       date: data.date,
-      name: `${format(parseISO(data.date), 'EEEE')} workout`,
+      name: defaultWorkoutName(data.date),
       startedAt: new Date(),
       userId,
     })

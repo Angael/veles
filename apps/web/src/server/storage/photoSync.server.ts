@@ -9,6 +9,8 @@ import { log } from '@/server/logger.server';
 import { getStorageConfig } from './config.server';
 import { optimizeImage } from './image.server';
 import { deleteFileByKey, uploadFileByKey } from './r2.server';
+import { translate } from '@/lib/i18n/getLocale';
+import { pluralPl } from '@/lib/i18n/locale';
 
 /** One submitted photo, in order: a stored photo link id, or a new file to upload. */
 type PhotoEntry = string | File;
@@ -91,21 +93,32 @@ function readPhotoEntries(formData: FormData, maxCount: number): PhotoEntry[] {
   const entries = photoEntriesType(formData.getAll(PHOTOS_FORM_FIELD));
 
   if (entries instanceof type.errors) {
-    throw new ClientSafeError('Photos are invalid.');
+    throw new ClientSafeError(
+      translate({ en: 'Photos are invalid.', pl: 'Zdjęcia są nieprawidłowe.' }),
+    );
   }
 
   const storedIds = entries.filter((entry) => typeof entry === 'string');
 
   if (new Set(storedIds).size !== storedIds.length) {
-    throw new ClientSafeError('Photos are invalid.');
+    throw new ClientSafeError(
+      translate({ en: 'Photos are invalid.', pl: 'Zdjęcia są nieprawidłowe.' }),
+    );
   }
 
   if (entries.length > maxCount) {
-    throw new ClientSafeError(`Up to ${maxCount} photos are allowed.`);
+    throw new ClientSafeError(
+      translate({
+        en: `Up to ${maxCount} photos are allowed.`,
+        pl: `Dozwolone maksimum to ${maxCount} ${pluralPl(maxCount, 'zdjęcie', 'zdjęcia', 'zdjęć')}.`,
+      }),
+    );
   }
 
   if (entries.some((entry) => entry instanceof File && entry.size > IMAGE_MAX_INPUT_BYTES)) {
-    throw new ClientSafeError('A photo is too large.');
+    throw new ClientSafeError(
+      translate({ en: 'A photo is too large.', pl: 'Zdjęcie jest za duże.' }),
+    );
   }
 
   return entries;
@@ -136,7 +149,12 @@ async function syncPhotoLinks(
   const fullEntries = mode === 'append' ? [...stored.map((link) => link.id), ...entries] : entries;
 
   if (fullEntries.length > maxCount) {
-    throw new ClientSafeError(`Up to ${maxCount} photos are allowed.`);
+    throw new ClientSafeError(
+      translate({
+        en: `Up to ${maxCount} photos are allowed.`,
+        pl: `Dozwolone maksimum to ${maxCount} ${pluralPl(maxCount, 'zdjęcie', 'zdjęcia', 'zdjęć')}.`,
+      }),
+    );
   }
 
   const plan = planPhotoSync(fullEntries, stored, uploaded);
@@ -249,7 +267,12 @@ function planPhotoSync(
     const link = storedById.get(entry);
 
     if (!link) {
-      throw new ClientSafeError('Photos changed since this page loaded. Reload and try again.');
+      throw new ClientSafeError(
+        translate({
+          en: 'Photos changed since this page loaded. Reload and try again.',
+          pl: 'Zdjęcia zmieniły się od załadowania strony. Odśwież i spróbuj ponownie.',
+        }),
+      );
     }
 
     return {
