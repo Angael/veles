@@ -15,6 +15,7 @@ import {
   connectionInvitationsBetween,
   sendConnectionInvitationEmail,
 } from './connections.server';
+import { translate } from '@/lib/i18n/getLocale';
 
 const invitationIdInputType = type({ id: 'string.uuid' });
 
@@ -61,7 +62,12 @@ export const sendConnectionInvitation = createServerFn({ method: 'POST' })
     const session = await requireSession();
 
     if (data.email === session.user.email.toLowerCase()) {
-      throw new ClientSafeError('You cannot invite your own email address.');
+      throw new ClientSafeError(
+        translate({
+          en: 'You cannot invite your own email address.',
+          pl: 'Nie możesz zaprosić własnego adresu e-mail.',
+        }),
+      );
     }
 
     const recipientRows = await db
@@ -86,7 +92,12 @@ export const sendConnectionInvitation = createServerFn({ method: 'POST' })
 
       // An invite created while connected would become stale consent after a later disconnect.
       if (existingConnections.length > 0) {
-        throw new ClientSafeError('You are already connected to this user.');
+        throw new ClientSafeError(
+          translate({
+            en: 'You are already connected to this user.',
+            pl: 'Masz już połączenie z tym użytkownikiem.',
+          }),
+        );
       }
     }
 
@@ -161,7 +172,12 @@ export const acceptConnectionInvitation = createServerFn({ method: 'POST' })
     const invitation = invitationRows[0];
 
     if (!invitation) {
-      throw new ClientSafeError('This invitation is no longer available.');
+      throw new ClientSafeError(
+        translate({
+          en: 'This invitation is no longer available.',
+          pl: 'To zaproszenie jest już niedostępne.',
+        }),
+      );
     }
 
     await db.transaction(async (tx) => {

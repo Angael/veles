@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { rulerStyle } from './ScrubCell';
 import { useScrub, type ScrubOptions } from './useScrub';
 import css from './Scrub.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type ScrubFieldProps = Omit<ScrubOptions, 'onTap'> & {
   label: string;
@@ -28,6 +29,7 @@ export function ScrubField({
   unit,
   ...options
 }: ScrubFieldProps) {
+  const { t } = useI18n();
   const [typing, setTyping] = useState(false);
   const { handlers, offset } = useScrub({ ...options, onTap: () => setTyping(true) });
   const current = options.value ?? options.fallback;
@@ -53,7 +55,10 @@ export function ScrubField({
         />
       ) : (
         <div
-          aria-label={`${label}, drag sideways or tap to type`}
+          aria-label={t({
+            en: `${label}, drag sideways or tap to type`,
+            pl: `${label}, przeciągnij w bok lub dotknij, aby wpisać`,
+          })}
           aria-valuenow={current}
           className={clsx(
             css.fieldValue,

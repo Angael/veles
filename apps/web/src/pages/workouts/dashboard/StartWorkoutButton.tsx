@@ -5,6 +5,7 @@ import { todayLocalDate } from '@/lib/dateOnly';
 import { ElapsedTime } from '../ElapsedTime';
 import type { WorkoutSummary } from '../workouts.api';
 import { useStartWorkoutMutation } from '../workouts.query';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /**
  * Floating button that starts an empty workout. While a workout is open it turns into a
@@ -12,6 +13,7 @@ import { useStartWorkoutMutation } from '../workouts.query';
  * Routines start from their own page.
  */
 export function StartWorkoutButton({ active }: { active: WorkoutSummary | undefined }) {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const startWorkout = useStartWorkoutMutation();
 
@@ -21,7 +23,8 @@ export function StartWorkoutButton({ active }: { active: WorkoutSummary | undefi
         icon={<PlayIcon aria-hidden='true' />}
         render={<Link params={{ id: active.id }} to='/workouts/$id' />}
       >
-        Continue · {active.startedAt ? <ElapsedTime startedAt={active.startedAt} /> : active.name}
+        {t({ en: 'Continue', pl: 'Kontynuuj' })} ·{' '}
+        {active.startedAt ? <ElapsedTime startedAt={active.startedAt} /> : active.name}
       </FloatingButton>
     );
   }
@@ -37,7 +40,7 @@ export function StartWorkoutButton({ active }: { active: WorkoutSummary | undefi
         )
       }
     >
-      Empty workout
+      {t({ en: 'Empty workout', pl: 'Pusty trening' })}
     </FloatingButton>
   );
 }

@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { RoutinePage } from '@/pages/workouts/routines/RoutinePage';
 import { routineQueryOptions } from '@/pages/workouts/routines/routines.query';
 import { workoutsQueryOptions } from '@/pages/workouts/workouts.query';
+import { translate } from '@/lib/i18n/getLocale';
 
 export const Route = createFileRoute('/_authenticated/workouts/routines/$id')({
   loader: async ({ context: { queryClient }, params }) => {
@@ -12,10 +13,12 @@ export const Route = createFileRoute('/_authenticated/workouts/routines/$id')({
     return routine;
   },
   component: RouteComponent,
-  head: ({ loaderData }) => ({ meta: [{ title: loaderData?.name ?? 'Routine' }] }),
+  head: ({ loaderData }) => ({
+    meta: [{ title: loaderData?.name ?? translate({ en: 'Routine', pl: 'Plan' }) }],
+  }),
   staticData: {
     layout: 'task',
-    navbar: { backFallback: { to: '/workouts' }, label: 'Routine' },
+    navbar: { backFallback: { to: '/workouts' }, label: { en: 'Routine', pl: 'Plan' } },
   },
 });
 

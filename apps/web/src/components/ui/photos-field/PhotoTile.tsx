@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { PHOTOS_FORM_FIELD } from '@/lib/storage/imageLimits';
 import css from './PhotosField.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /** A stored photo has a URL; a newly picked one has the file. */
 export type FieldPhoto = { id: string; url: string | null } | { file: File; id: string };
@@ -26,12 +27,16 @@ export function PhotoTile({ label, onRemove, photo }: PhotoTileProps) {
   });
   const file = 'file' in photo ? photo.file : null;
   const previewUrl = usePreviewUrl(photo);
+  const { formatNumber, t } = useI18n();
 
   return (
     <article
       {...attributes}
       {...listeners}
-      aria-label={`${label}. Drag to reorder.`}
+      aria-label={t({
+        en: `${label}. Drag to reorder.`,
+        pl: `${label}. Przeciągnij, aby zmienić kolejność.`,
+      })}
       className={clsx(css.tile, css.sortableTile, isDragging && css.dragging)}
       ref={setNodeRef}
       style={{ transform: CSS.Translate.toString(transform), transition }}
@@ -55,7 +60,7 @@ export function PhotoTile({ label, onRemove, photo }: PhotoTileProps) {
       ) : null}
 
       <Btn
-        aria-label={`Remove ${label}`}
+        aria-label={t({ en: `Remove ${label}`, pl: `Usuń: ${label}` })}
         className={css.removeButton}
         icon={<XIcon aria-hidden='true' size={14} strokeWidth={2} />}
         iconOnly
@@ -71,7 +76,7 @@ export function PhotoTile({ label, onRemove, photo }: PhotoTileProps) {
         variant='ghost'
       />
 
-      {file ? <span className={css.metaBadge}>{formatFileMeta(file)}</span> : null}
+      {file ? <span className={css.metaBadge}>{formatFileMeta(file, formatNumber)}</span> : null}
     </article>
   );
 }
@@ -106,8 +111,12 @@ function usePreviewUrl(photo: FieldPhoto) {
   return 'url' in photo ? photo.url : fileUrl;
 }
 
-function formatFileMeta(file: File) {
+function formatFileMeta(
+  file: File,
+  formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string,
+) {
   const extension = file.name.split('.').pop()?.toUpperCase() ?? 'IMG';
   const kb = file.size / 1024;
-  return `${extension} • ${kb < 1024 ? `${kb.toFixed(1)} KB` : `${(kb / 1024).toFixed(1)} MB`}`;
+  const oneDecimal = { maximumFractionDigits: 1, minimumFractionDigits: 1 };
+  return `${extension} • ${kb < 1024 ? `${formatNumber(kb, oneDecimal)} KB` : `${formatNumber(kb / 1024, oneDecimal)} MB`}`;
 }

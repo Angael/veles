@@ -19,6 +19,7 @@ import {
 } from './calorieGoalCalculator';
 import { MacroPercentageEditor } from './MacroPercentageEditor';
 import css from './CalorieGoalsPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export function CalorieGoalsPage({
   goal,
@@ -27,6 +28,7 @@ export function CalorieGoalsPage({
   goal: CalorieGoal | null;
   latestWeightKg: number | null;
 }) {
+  const { t } = useI18n();
   const initialValues: NutritionGoalValues = {
     kcal: goal?.kcal ?? null,
     protein: goal?.protein ?? null,
@@ -80,14 +82,15 @@ export function CalorieGoalsPage({
         <Card as='section' className={css.currentGoals} tone='primary'>
           <div className={css.currentGoalsHeading}>
             <h2>
-              <span aria-hidden='true'>3.</span> Review daily targets
+              <span aria-hidden='true'>3.</span>{' '}
+              {t({ en: 'Review daily targets', pl: 'Sprawdź dzienne cele' })}
             </h2>
           </div>
           <KcalMacrosForm kcalInput={{ min: 1 }} onValueChange={updateGoalValue} values={values} />
 
           <FormSubmitRow>
             <Btn loading={goalMutation.isPending} type='submit'>
-              Save
+              {t({ en: 'Save', pl: 'Zapisz' })}
             </Btn>
           </FormSubmitRow>
         </Card>

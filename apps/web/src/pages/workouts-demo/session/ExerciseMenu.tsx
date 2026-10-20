@@ -42,14 +42,14 @@ export function ExerciseMenu({ actions, onRename, slot }: ExerciseMenuProps) {
       <ContextMenuSubmenuRoot>
         <ContextMenuSubmenuTrigger
           icon={<RulerIcon aria-hidden='true' />}
-          label={`Track: ${MEASURE_LABELS[slot.measure]}`}
+          label={`Track: ${MEASURE_LABELS[slot.measure].en}`}
         />
         <ContextMenuPopup aria-label='What to track'>
           {(Object.keys(MEASURE_FIELDS) as Measure[]).map((measure) => (
             <ContextMenuItem
               icon={measure === slot.measure ? <CheckIcon aria-hidden='true' /> : <span />}
               key={measure}
-              label={MEASURE_LABELS[measure]}
+              label={MEASURE_LABELS[measure].en}
               onClick={() => actions.updateSlot(slot.id, { measure })}
             />
           ))}

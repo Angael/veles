@@ -4,6 +4,8 @@ import { todayLocalDate } from '@/lib/dateOnly';
 import type { WorkoutSummary } from '../workouts.api';
 import { workoutsQueryOptions } from '../workouts.query';
 import css from './WorkoutStats.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { pluralEn, pluralPl } from '@/lib/i18n/locale';
 
 const weekOf = (date: string) =>
   format(startOfWeek(parseISO(date), { weekStartsOn: 1 }), 'yyyy-MM-dd');
@@ -51,34 +53,57 @@ function computeStats(workouts: WorkoutSummary[], today: string) {
   };
 }
 
-const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? '' : 's'}`;
-
 /** 2×2 grid of headline numbers beside the calendar. */
 export function WorkoutStats() {
   const { data: workouts } = useSuspenseQuery(workoutsQueryOptions());
   const stats = computeStats(workouts, todayLocalDate());
+  const { formatNumber, t } = useI18n();
+  const workoutCount = (count: number) =>
+    t({
+      en: `${count} ${pluralEn(count, 'workout', 'workouts')}`,
+      pl: `${count} ${pluralPl(count, 'trening', 'treningi', 'treningów')}`,
+    });
 
   return (
-    <dl aria-label='Workout stats' className={css.grid} data-appear='2'>
+    <dl
+      aria-label={t({ en: 'Workout stats', pl: 'Statystyki treningów' })}
+      className={css.grid}
+      data-appear='2'
+    >
       <div>
-        <dt>This week</dt>
-        <dd>{plural(stats.weekCount, 'workout')}</dd>
-        <dd className={css.sub}>{plural(stats.weekSets, 'set')}</dd>
+        <dt>{t({ en: 'This week', pl: 'Ten tydzień' })}</dt>
+        <dd>{workoutCount(stats.weekCount)}</dd>
+        <dd className={css.sub}>
+          {t({
+            en: `${stats.weekSets} ${pluralEn(stats.weekSets, 'set', 'sets')}`,
+            pl: `${stats.weekSets} ${pluralPl(stats.weekSets, 'seria', 'serie', 'serii')}`,
+          })}
+        </dd>
       </div>
       <div>
-        <dt>This month</dt>
-        <dd>{plural(stats.monthCount, 'workout')}</dd>
+        <dt>{t({ en: 'This month', pl: 'Ten miesiąc' })}</dt>
+        <dd>{workoutCount(stats.monthCount)}</dd>
         {stats.monthVolumeKg > 0 ? (
-          <dd className={css.sub}>{stats.monthVolumeKg.toLocaleString()} kg lifted</dd>
+          <dd className={css.sub}>
+            {t({
+              en: `${formatNumber(stats.monthVolumeKg)} kg lifted`,
+              pl: `${formatNumber(stats.monthVolumeKg)} kg podniesione`,
+            })}
+          </dd>
         ) : null}
       </div>
       <div>
-        <dt>Streak</dt>
-        <dd>{plural(stats.streak, 'week')}</dd>
-        <dd className={css.sub}>with a workout</dd>
+        <dt>{t({ en: 'Streak', pl: 'Seria' })}</dt>
+        <dd>
+          {t({
+            en: `${stats.streak} ${pluralEn(stats.streak, 'week', 'weeks')}`,
+            pl: `${stats.streak} ${pluralPl(stats.streak, 'tydzień', 'tygodnie', 'tygodni')}`,
+          })}
+        </dd>
+        <dd className={css.sub}>{t({ en: 'with a workout', pl: 'z treningiem' })}</dd>
       </div>
       <div>
-        <dt>Average length</dt>
+        <dt>{t({ en: 'Average length', pl: 'Średni czas' })}</dt>
         <dd>{stats.averageSeconds === null ? '—' : formatLength(stats.averageSeconds)}</dd>
       </div>
     </dl>

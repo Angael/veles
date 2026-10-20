@@ -12,6 +12,7 @@ import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { storagePathToUrl } from '@/server/storage/config.server';
 import { getFoodImageAssets } from '../foodImages.server';
+import { translate } from '@/lib/i18n/getLocale';
 
 export type FoodShareRecipient = {
   id: string;
@@ -90,7 +91,12 @@ export const shareFoodLogs = createServerFn({ method: 'POST' })
     const connectedIds = new Set(connectedUsers.map((user) => user.id));
 
     if (!recipientUserIds.every((id) => connectedIds.has(id))) {
-      throw new ClientSafeError('You can only share products with your friends.');
+      throw new ClientSafeError(
+        translate({
+          en: 'You can only share products with your friends.',
+          pl: 'Produkty możesz udostępniać tylko znajomym.',
+        }),
+      );
     }
 
     const gramsByLogId = new Map(data.items.map((item) => [item.logId, item.grams]));
@@ -102,7 +108,13 @@ export const shareFoodLogs = createServerFn({ method: 'POST' })
       )
       .orderBy(desc(foodLogs.consumedAt));
 
-    if (logs.length === 0) throw new ClientSafeError('The selected products no longer exist.');
+    if (logs.length === 0)
+      throw new ClientSafeError(
+        translate({
+          en: 'The selected products no longer exist.',
+          pl: 'Wybrane produkty już nie istnieją.',
+        }),
+      );
 
     await db.transaction(async (tx) => {
       const shares = await tx
@@ -207,7 +219,12 @@ export const acceptFoodLogShare = createServerFn({ method: 'POST' })
         .returning({ id: foodLogShares.id });
 
       if (deleted.length === 0 || items.length === 0) {
-        throw new ClientSafeError('These shared products are no longer available.');
+        throw new ClientSafeError(
+          translate({
+            en: 'These shared products are no longer available.',
+            pl: 'Te udostępnione produkty są już niedostępne.',
+          }),
+        );
       }
 
       const consumedAt = new Date();

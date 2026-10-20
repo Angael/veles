@@ -1,10 +1,16 @@
 import { dateOnlyType } from '@/lib/dateOnly';
 import type { WeightEntry } from './weight.api';
 
-/** Parses the documented line format and keeps the last value for duplicate dates. */
-export function parseWeightEntries(value: string): { entries: WeightEntry[]; errors: string[] } {
+/**
+ * Parses the documented line format and keeps the last value for duplicate dates. Reports invalid
+ * lines by their 1-based number, so the page can word the error in the user's language.
+ */
+export function parseWeightEntries(value: string): {
+  entries: WeightEntry[];
+  invalidLines: number[];
+} {
   const entriesByDate = new Map<string, WeightEntry>();
-  const errors: string[] = [];
+  const invalidLines: number[] = [];
 
   for (const [index, rawLine] of value.split(/\r?\n/).entries()) {
     const line = rawLine.trim();
@@ -14,7 +20,7 @@ export function parseWeightEntries(value: string): { entries: WeightEntry[]; err
     const weightKg = match?.[2] ? Number(match[2].replace(',', '.')) : Number.NaN;
 
     if (!date || !dateOnlyType.allows(date) || weightKg < 30 || weightKg > 300) {
-      errors.push(`Line ${index + 1} is invalid.`);
+      invalidLines.push(index + 1);
       continue;
     }
     entriesByDate.set(date, { date, weightKg });
@@ -22,6 +28,6 @@ export function parseWeightEntries(value: string): { entries: WeightEntry[]; err
 
   return {
     entries: [...entriesByDate.values()].toSorted((a, b) => a.date.localeCompare(b.date)),
-    errors,
+    invalidLines,
   };
 }

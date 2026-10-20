@@ -9,6 +9,7 @@ import { ExerciseNote } from './ExerciseNote';
 import type { SessionActions } from './session.query';
 import { SetRow } from './SetRow';
 import css from './Session.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type ExerciseCardProps = {
   actions: SessionActions;
@@ -39,6 +40,7 @@ export function ExerciseCard({
   tip,
   workoutId,
 }: ExerciseCardProps) {
+  const { t } = useI18n();
   const [renaming, setRenaming] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const numbers = workingSetNumbers(slot.sets);
@@ -50,7 +52,7 @@ export function ExerciseCard({
           <span className={css.exerciseNumber}>{number}</span>
           {renaming ? (
             <input
-              aria-label='Exercise name'
+              aria-label={t({ en: 'Exercise name', pl: 'Nazwa ćwiczenia' })}
               autoFocus
               className={css.renameInput}
               defaultValue={slot.name}
@@ -65,7 +67,7 @@ export function ExerciseCard({
             <h3>{slot.name}</h3>
           )}
           <button
-            aria-label='Earlier sessions'
+            aria-label={t({ en: 'Earlier sessions', pl: 'Wcześniejsze treningi' })}
             className={css.historyButton}
             onClick={() => setHistoryOpen(true)}
             type='button'
@@ -104,10 +106,13 @@ export function ExerciseCard({
         <button
           className={css.addSet}
           onClick={() => actions.addSet(slot.id)}
-          title='Adds one set, copying the last one'
+          title={t({
+            en: 'Adds one set, copying the last one',
+            pl: 'Dodaje jedną serię, kopiując ostatnią',
+          })}
           type='button'
         >
-          <PlusIcon aria-hidden='true' /> Add set
+          <PlusIcon aria-hidden='true' /> {t({ en: 'Add set', pl: 'Dodaj serię' })}
         </button>
       </div>
 

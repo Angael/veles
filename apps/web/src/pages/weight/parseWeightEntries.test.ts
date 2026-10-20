@@ -8,14 +8,14 @@ describe('parseWeightEntries', () => {
         { date: '2026-08-01', weightKg: 78.4 },
         { date: '2026-08-02', weightKg: 77.9 },
       ],
-      errors: [],
+      invalidLines: [],
     });
   });
 
   it('reports invalid dates, formats, and weights by line', () => {
     expect(parseWeightEntries('2026-02-30 78kg\n2026-08-02 20kg\nnot a weight')).toEqual({
       entries: [],
-      errors: ['Line 1 is invalid.', 'Line 2 is invalid.', 'Line 3 is invalid.'],
+      invalidLines: [1, 2, 3],
     });
   });
 });

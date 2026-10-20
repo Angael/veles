@@ -10,6 +10,7 @@ import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import type { DiaryKeyRecord } from './diaryCrypto';
 import { useDiaryPassphraseMutation } from './diary.query';
 import css from './DiaryPassphraseForm.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type DiaryPassphraseFormProps = {
   keyRecord: DiaryKeyRecord | null;
@@ -17,26 +18,42 @@ type DiaryPassphraseFormProps = {
 };
 
 export function DiaryPassphraseForm({ keyRecord, onUnlocked }: DiaryPassphraseFormProps) {
+  const { t } = useI18n();
   const router = useRouter();
   const mutation = useDiaryPassphraseMutation(keyRecord);
   const [mismatch, setMismatch] = useState(false);
   const isSetup = keyRecord === null;
 
   let errorMsg: string | undefined;
-  if (mismatch) errorMsg = 'Passphrases do not match.';
+  if (mismatch) errorMsg = t({ en: 'Passphrases do not match.', pl: 'Hasła nie są takie same.' });
   else if (mutation.isError) {
-    errorMsg = isSetup ? 'The passphrase could not be saved. Try again.' : 'Wrong passphrase.';
+    errorMsg = isSetup
+      ? t({
+          en: 'The passphrase could not be saved. Try again.',
+          pl: 'Nie udało się zapisać hasła. Spróbuj ponownie.',
+        })
+      : t({ en: 'Wrong passphrase.', pl: 'Nieprawidłowe hasło.' });
   }
 
   return (
     <main className={css.page}>
       <Card as='section' className={css.card} data-appear>
         <LockKeyholeIcon aria-hidden='true' className={css.icon} />
-        <h1>{isSetup ? 'Protect your diary' : 'Diary locked'}</h1>
+        <h1>
+          {isSetup
+            ? t({ en: 'Protect your diary', pl: 'Chroń swój dziennik' })
+            : t({ en: 'Diary locked', pl: 'Dziennik zablokowany' })}
+        </h1>
         <p className={css.text}>
           {isSetup
-            ? 'Your entries are encrypted on this device with a passphrase. The server never sees it. If you forget it, nobody can recover your entries.'
-            : 'Enter your passphrase to read your entries.'}
+            ? t({
+                en: 'Your entries are encrypted on this device with a passphrase. The server never sees it. If you forget it, nobody can recover your entries.',
+                pl: 'Wpisy są szyfrowane na tym urządzeniu hasłem. Serwer nigdy go nie widzi. Jeśli je zapomnisz, nikt nie odzyska Twoich wpisów.',
+              })
+            : t({
+                en: 'Enter your passphrase to read your entries.',
+                pl: 'Wpisz hasło, aby przeczytać wpisy.',
+              })}
         </p>
         <TypedForm
           className={css.form}
@@ -58,7 +75,7 @@ export function DiaryPassphraseForm({ keyRecord, onUnlocked }: DiaryPassphraseFo
             );
           }}
         >
-          <Label text='Passphrase'>
+          <Label text={t({ en: 'Passphrase', pl: 'Hasło' })}>
             <TextInput
               autoComplete={isSetup ? 'new-password' : 'current-password'}
               autoFocus
@@ -69,16 +86,18 @@ export function DiaryPassphraseForm({ keyRecord, onUnlocked }: DiaryPassphraseFo
             />
           </Label>
           {isSetup ? (
-            <Label text='Repeat passphrase'>
+            <Label text={t({ en: 'Repeat passphrase', pl: 'Powtórz hasło' })}>
               <TextInput autoComplete='new-password' name='confirm' required type='password' />
             </Label>
           ) : null}
           <label className={css.remember}>
             <Checkbox name='remember' />
-            Remember on this device
+            {t({ en: 'Remember on this device', pl: 'Zapamiętaj na tym urządzeniu' })}
           </label>
           <Btn loading={mutation.isPending} type='submit' variant='main'>
-            {isSetup ? 'Set passphrase' : 'Unlock'}
+            {isSetup
+              ? t({ en: 'Set passphrase', pl: 'Ustaw hasło' })
+              : t({ en: 'Unlock', pl: 'Odblokuj' })}
           </Btn>
         </TypedForm>
       </Card>

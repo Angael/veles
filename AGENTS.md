@@ -67,6 +67,7 @@
 - This app uses css reset and theme.css
 - Shared responsive breakpoints live in `apps/web/src/styles/breakpoints.css`; use its custom media names instead of repeating raw width queries.
 - Respect the css reset first: margins for text blocks, base font inheritance, and default line-height are already normalized there, so only restyle them when a component intentionally needs to diverge.
+- All user-facing copy needs both English and Polish translations.
 - Avoid decorative eyebrow/kicker UI text that only repeats context without adding clarity.
 - Components should not have more than soft cap 200 lines of code, hard cap 300 lines. It's a code smell that file does too much.
 - `apps/web/src/routes/**/*.tsx` files should stay small. They can contain up to soft cap ~200, hard cap 300 lines. Beyond that export the feature implementation from `apps/web/src/pages`.

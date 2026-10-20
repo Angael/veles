@@ -1,5 +1,4 @@
 import { useRouter, type UseNavigateResult } from '@tanstack/react-router';
-import { format, parseISO } from 'date-fns';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
@@ -14,6 +13,7 @@ import type { WeightEntryPhoto } from '../weight.api';
 import { useUpdateWeightEntryMutation } from '../weight.query';
 import { WEIGHT_PHOTO_MAX_COUNT } from '../weightPhotos.api';
 import css from '../WeightEntryPages.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type EditWeightEntryPageProps = {
   entry: {
@@ -24,6 +24,7 @@ type EditWeightEntryPageProps = {
 };
 
 export function EditWeightEntryPage({ entry }: EditWeightEntryPageProps) {
+  const { formatDate, t } = useI18n();
   const router = useRouter();
   const [weightKg, setWeightKg] = useState<number | null>(entry.weightKg);
   const mutation = useUpdateWeightEntryMutation();
@@ -56,9 +57,14 @@ export function EditWeightEntryPage({ entry }: EditWeightEntryPageProps) {
       <Card as='section'>
         <TypedForm className={css.form} errorMsg={mutation.error?.message} onSubmit={handleSubmit}>
           <time className={css.date} dateTime={entry.date}>
-            {format(parseISO(entry.date), 'EEEE, MMM d, yyyy')}
+            {formatDate(entry.date, {
+              day: 'numeric',
+              month: 'long',
+              weekday: 'long',
+              year: 'numeric',
+            })}
           </time>
-          <Label text='Weight (kg)'>
+          <Label text={t({ en: 'Weight (kg)', pl: 'Waga (kg)' })}>
             <NumberInput
               enterKeyHint='done'
               max={300}
@@ -67,7 +73,7 @@ export function EditWeightEntryPage({ entry }: EditWeightEntryPageProps) {
                 markDirty();
                 setWeightKg(value);
               }}
-              placeholder='e.g. 78.4'
+              placeholder={t({ en: 'e.g. 78.4', pl: 'np. 78,4' })}
               required
               size='lg'
               stepperStep={0.1}
@@ -81,7 +87,7 @@ export function EditWeightEntryPage({ entry }: EditWeightEntryPageProps) {
           />
           <FormSubmitRow>
             <Btn disabled={weightKg === null} loading={mutation.isPending} type='submit'>
-              Save
+              {t({ en: 'Save', pl: 'Zapisz' })}
             </Btn>
           </FormSubmitRow>
         </TypedForm>

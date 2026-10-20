@@ -4,6 +4,7 @@ import { rulerStyle } from '../scrub/ScrubCell';
 import { Pointer } from './Pointer';
 import { phase, useCoarsePointer, useTimeline } from './useHints';
 import css from './Hints.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /** Value shown for a given drag distance: 0.5 steps while slow, then 2.5 and 5 when flicked. */
 function demoValue(slow: number, fast: number) {
@@ -18,6 +19,7 @@ function demoValue(slow: number, fast: number) {
  * increase, like pulling a ruler.
  */
 export function DragDemo() {
+  const { formatNumber } = useI18n();
   const progress = useTimeline(4200, 0.6);
   const coarse = useCoarsePointer();
 
@@ -32,7 +34,7 @@ export function DragDemo() {
     <div aria-hidden='true' className={css.stage}>
       <div className={clsx(css.fakeCell, pressed && css.fakeCellActive)} style={rulerStyle(travel)}>
         <ChevronLeftIcon />
-        <span>{value}</span>
+        <span>{formatNumber(value)}</span>
         <ChevronRightIcon />
       </div>
       <Pointer

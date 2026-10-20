@@ -1,7 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { format, parseISO } from 'date-fns';
 import { PlayIcon, Trash2Icon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
@@ -9,7 +8,7 @@ import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
 import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import { todayLocalDate } from '@/lib/dateOnly';
-import { MEASURE_LABELS, SET_BADGE, workingSetNumbers } from '../metrics';
+import { MEASURE_LABELS, SET_BADGE, SHORT_DAY, workingSetNumbers } from '../metrics';
 import { workoutsQueryOptions } from '../workouts.query';
 import {
   routineQueryOptions,
@@ -18,12 +17,14 @@ import {
   useUpdateRoutineMutation,
 } from './routines.query';
 import css from './RoutinePage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /**
  * One routine: rename it and edit its description in place, see its exercises with their set
  * types, delete it, or start it. Starting waits while another workout is open.
  */
 export function RoutinePage({ routineId }: { routineId: string }) {
+  const { formatDate, t } = useI18n();
   const { data: routine } = useSuspenseQuery(routineQueryOptions(routineId));
   const { data: workouts } = useSuspenseQuery(workoutsQueryOptions());
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export function RoutinePage({ routineId }: { routineId: string }) {
     <main className={css.page}>
       <Card className={css.header}>
         <SeamlessTextInput
-          aria-label='Routine name'
+          aria-label={t({ en: 'Routine name', pl: 'Nazwa planu' })}
           className={css.name}
           defaultValue={routine.name}
           key={routine.name}
@@ -47,7 +48,7 @@ export function RoutinePage({ routineId }: { routineId: string }) {
           onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.blur()}
         />
         <SeamlessTextarea
-          aria-label='Routine description'
+          aria-label={t({ en: 'Routine description', pl: 'Opis planu' })}
           defaultValue={routine.description}
           key={routine.description}
           onBlur={(event) => {
@@ -56,18 +57,23 @@ export function RoutinePage({ routineId }: { routineId: string }) {
               updateRoutine.mutate({ description, id: routine.id });
             }
           }}
-          placeholder='Add a description…'
+          placeholder={t({ en: 'Add a description…', pl: 'Dodaj opis…' })}
           rows={1}
         />
         <p className={css.meta}>
           {routine.lastUsed
-            ? `Last done ${format(parseISO(routine.lastUsed), 'EEE dd.MM')}`
-            : 'Not done yet'}
+            ? t({
+                en: `Last done ${formatDate(routine.lastUsed, SHORT_DAY)}`,
+                pl: `Ostatnio ${formatDate(routine.lastUsed, SHORT_DAY)}`,
+              })
+            : t({ en: 'Not done yet', pl: 'Jeszcze nie wykonany' })}
         </p>
       </Card>
 
       {routine.exercises.length === 0 ? (
-        <p className={css.hint}>This routine has no exercises.</p>
+        <p className={css.hint}>
+          {t({ en: 'This routine has no exercises.', pl: 'Ten plan nie ma ćwiczeń.' })}
+        </p>
       ) : (
         <ol className={css.exercises}>
           {routine.exercises.map((exercise, index) => {
@@ -77,9 +83,15 @@ export function RoutinePage({ routineId }: { routineId: string }) {
                 <span className={css.number}>{index + 1}</span>
                 <span className={css.exerciseText}>
                   <strong>{exercise.name}</strong>
-                  <small>{MEASURE_LABELS[exercise.measure]}</small>
+                  <small>{t(MEASURE_LABELS[exercise.measure])}</small>
                 </span>
-                <span aria-label={`${exercise.setTypes.length} sets`} className={css.sets}>
+                <span
+                  aria-label={t({
+                    en: `${exercise.setTypes.length} sets`,
+                    pl: `Serie: ${exercise.setTypes.length}`,
+                  })}
+                  className={css.sets}
+                >
                   {exercise.setTypes.map((type, setIndex) => (
                     <span
                       aria-hidden='true'
@@ -87,7 +99,7 @@ export function RoutinePage({ routineId }: { routineId: string }) {
                       // Sets have no id of their own here; the position is the identity.
                       key={setIndex}
                     >
-                      {type === 'normal' ? numbers[setIndex] : SET_BADGE[type]}
+                      {type === 'normal' ? numbers[setIndex] : t(SET_BADGE[type])}
                     </span>
                   ))}
                 </span>
@@ -98,15 +110,21 @@ export function RoutinePage({ routineId }: { routineId: string }) {
       )}
 
       <p className={css.hint}>
-        To change exercises, start this routine, edit the workout, then pick “Update routine” in its
-        ⋯ menu.
+        {t({
+          en: 'To change exercises, start this routine, edit the workout, then pick “Update routine” in its ⋯ menu.',
+          pl: 'Aby zmienić ćwiczenia, rozpocznij ten plan, edytuj trening, a potem wybierz „Zaktualizuj plan” w menu ⋯.',
+        })}
       </p>
 
       <Btn
         className={css.delete}
         icon={<Trash2Icon aria-hidden='true' />}
         onClick={() => {
-          if (!window.confirm(`Delete routine “${routine.name}”? Past workouts stay.`)) return;
+          const message = t({
+            en: `Delete routine “${routine.name}”? Past workouts stay.`,
+            pl: `Usunąć plan „${routine.name}”? Wcześniejsze treningi zostaną.`,
+          });
+          if (!window.confirm(message)) return;
           // Leave first, so the deleted routine is not refetched on this page.
           void navigate({ replace: true, to: '/workouts' });
           deleteRoutine.mutate({ id: routine.id });
@@ -115,7 +133,7 @@ export function RoutinePage({ routineId }: { routineId: string }) {
         size='sm'
         variant='ghostDanger'
       >
-        Delete routine
+        {t({ en: 'Delete routine', pl: 'Usuń plan' })}
       </Btn>
 
       {active ? (
@@ -123,7 +141,7 @@ export function RoutinePage({ routineId }: { routineId: string }) {
           icon={<PlayIcon aria-hidden='true' />}
           render={<Link params={{ id: active.id }} to='/workouts/$id' />}
         >
-          Continue open workout
+          {t({ en: 'Continue open workout', pl: 'Kontynuuj otwarty trening' })}
         </FloatingButton>
       ) : (
         <FloatingButton
@@ -139,7 +157,7 @@ export function RoutinePage({ routineId }: { routineId: string }) {
             )
           }
         >
-          Start routine
+          {t({ en: 'Start routine', pl: 'Rozpocznij plan' })}
         </FloatingButton>
       )}
     </main>

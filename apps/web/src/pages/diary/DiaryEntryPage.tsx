@@ -13,6 +13,7 @@ import type { DiaryKeyRecord } from './diaryCrypto';
 import { DiaryLockGate } from './DiaryLockGate';
 import { type DiaryEntrySummary, useDecryptedEntries } from './useDecryptedEntries';
 import css from './DiaryEntryPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type DiaryEntryPageProps = {
   entry: EncryptedDiaryEntry;
@@ -48,6 +49,7 @@ function DecryptedDiaryEntry({
   encryptedEntries,
   ...props
 }: Omit<DiaryEntryEditorProps, 'entry'> & { encryptedEntries: EncryptedDiaryEntry[] }) {
+  const { t } = useI18n();
   const decrypted = useDecryptedEntries(props.diaryKey, encryptedEntries);
   const entry = decrypted?.entries[0];
 
@@ -55,7 +57,10 @@ function DecryptedDiaryEntry({
   if (!entry) {
     return (
       <p className={css.decryptError} role='alert'>
-        This entry could not be decrypted.
+        {t({
+          en: 'This entry could not be decrypted.',
+          pl: 'Nie udało się odszyfrować tego wpisu.',
+        })}
       </p>
     );
   }
@@ -63,8 +68,10 @@ function DecryptedDiaryEntry({
 }
 
 function DiaryEntryEditor({ diaryKey, entry, focusTitle, onLock }: DiaryEntryEditorProps) {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const router = useRouter();
+  const untitled = t({ en: 'Untitled entry', pl: 'Wpis bez tytułu' });
 
   const saveMutation = useUpdateDiaryEntryMutation(diaryKey);
   const deleteMutation = useDeleteDiaryEntryMutation();
@@ -82,9 +89,11 @@ function DiaryEntryEditor({ diaryKey, entry, focusTitle, onLock }: DiaryEntryEdi
       deps: [entry.entryDate, entry.id, entry.markdown, entry.title],
     },
   );
-  let saveState = 'Saved';
-  if (saveMutation.isPending) saveState = 'Saving...';
-  if (saveMutation.isError) saveState = 'Changes could not be saved.';
+  let saveState = t({ en: 'Saved', pl: 'Zapisano' });
+  if (saveMutation.isPending) saveState = t({ en: 'Saving...', pl: 'Zapisywanie...' });
+  if (saveMutation.isError) {
+    saveState = t({ en: 'Changes could not be saved.', pl: 'Nie udało się zapisać zmian.' });
+  }
 
   return (
     <main className={css.page}>
@@ -92,7 +101,7 @@ function DiaryEntryEditor({ diaryKey, entry, focusTitle, onLock }: DiaryEntryEdi
         <header className={css.header}>
           <div className={css.headerActions}>
             <DateInput
-              aria-label='Diary entry date'
+              aria-label={t({ en: 'Diary entry date', pl: 'Data wpisu' })}
               className={css.dateInput}
               max='9999-12-31'
               onChange={(event) => {
@@ -112,7 +121,7 @@ function DiaryEntryEditor({ diaryKey, entry, focusTitle, onLock }: DiaryEntryEdi
             />
             <div className={css.headerButtons}>
               <Btn
-                aria-label='Lock diary'
+                aria-label={t({ en: 'Lock diary', pl: 'Zablokuj dziennik' })}
                 icon={<LockIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
                 iconOnly
                 onClick={onLock}
@@ -121,14 +130,17 @@ function DiaryEntryEditor({ diaryKey, entry, focusTitle, onLock }: DiaryEntryEdi
                 variant='ghost'
               />
               <Btn
-                aria-label='Delete diary entry'
+                aria-label={t({ en: 'Delete diary entry', pl: 'Usuń wpis' })}
                 icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
                 iconOnly
                 loading={deleteMutation.isPending}
                 onClick={() => {
                   if (
                     window.confirm(
-                      `Delete “${draft.title || 'Untitled entry'}”? This cannot be undone.`,
+                      t({
+                        en: `Delete “${draft.title || untitled}”? This cannot be undone.`,
+                        pl: `Usunąć „${draft.title || untitled}”? Tego nie można cofnąć.`,
+                      }),
                     )
                   ) {
                     deleteMutation.mutate(
@@ -151,21 +163,21 @@ function DiaryEntryEditor({ diaryKey, entry, focusTitle, onLock }: DiaryEntryEdi
           </div>
           <h1>
             <SeamlessTextInput
-              aria-label='Diary entry title'
+              aria-label={t({ en: 'Diary entry title', pl: 'Tytuł wpisu' })}
               autoFocus={focusTitle}
               className={css.titleInput}
               maxLength={160}
               onChange={(event) => {
                 setDraft((currentDraft) => ({ ...currentDraft, title: event.target.value }));
               }}
-              placeholder='Untitled entry'
+              placeholder={untitled}
               value={draft.title}
             />
           </h1>
         </header>
         <Card as='section' className={css.body}>
           <SeamlessTextarea
-            aria-label='Diary entry'
+            aria-label={t({ en: 'Diary entry', pl: 'Wpis w dzienniku' })}
             className={css.editor}
             maxLength={16000}
             onChange={(event) => {

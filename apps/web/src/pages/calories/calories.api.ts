@@ -38,6 +38,7 @@ import {
   toFoodProduct,
   updateFoodProductRecord,
 } from './foodProducts.server';
+import { translate } from '@/lib/i18n/getLocale';
 
 const FOOD_UPLOAD_MAX_REQUEST_BYTES = 12 * 1024 * 1024;
 
@@ -51,7 +52,9 @@ const limitFoodUploadRequestMiddleware = createMiddleware().server(async ({ next
     request.headers.get('content-length') ?? '',
   );
   if (contentLength instanceof type.errors || contentLength > FOOD_UPLOAD_MAX_REQUEST_BYTES) {
-    throw new ClientSafeError('Upload request is too large.');
+    throw new ClientSafeError(
+      translate({ en: 'Upload request is too large.', pl: 'Przesyłane dane są za duże.' }),
+    );
   }
   return next();
 });
@@ -247,7 +250,10 @@ export const getFoodProduct = createServerFn({ method: 'GET' })
       .from(foodProducts)
       .where(eq(foodProducts.id, data.id))
       .limit(1);
-    if (!food) throw new ClientSafeError('Food product not found.');
+    if (!food)
+      throw new ClientSafeError(
+        translate({ en: 'Food product not found.', pl: 'Nie znaleziono produktu.' }),
+      );
 
     const assetsById = await getFoodImageAssets([food.imageUploadObjectId]);
     return toFoodProduct(food, assetsById.get(food.imageUploadObjectId ?? ''));
@@ -297,7 +303,13 @@ export const recordFood = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(recordFoodMultipartType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    if (data.photo) throw new ClientSafeError('Product-backed entries use the product photo.');
+    if (data.photo)
+      throw new ClientSafeError(
+        translate({
+          en: 'Product-backed entries use the product photo.',
+          pl: 'Wpisy powiązane z produktem używają zdjęcia produktu.',
+        }),
+      );
     return recordFoodRecord(session.user.id, data.values);
   });
 
@@ -324,7 +336,10 @@ export const getFoodLog = createServerFn({ method: 'GET' })
       .from(foodLogs)
       .where(and(eq(foodLogs.id, data.id), eq(foodLogs.userId, session.user.id)))
       .limit(1);
-    if (!entry) throw new ClientSafeError('Food log not found.');
+    if (!entry)
+      throw new ClientSafeError(
+        translate({ en: 'Food log not found.', pl: 'Nie znaleziono wpisu.' }),
+      );
 
     const productImageIds = await getProductImageIds([entry.productId]);
     const productImageId = entry.productId ? productImageIds.get(entry.productId) : null;

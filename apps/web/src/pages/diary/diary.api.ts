@@ -3,7 +3,6 @@ import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { notFound } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { and, desc, eq } from 'drizzle-orm';
-import { format, parseISO } from 'date-fns';
 import { diaryEntries, diaryKeys } from '@veles/db/schema';
 import { db } from '@/server/db.server';
 import { dateOnlyType } from '@/lib/dateOnly';
@@ -34,11 +33,6 @@ const updateDiaryEntryInputType = type({
   entryDate: dateOnlyType,
   id: 'string.uuid',
 });
-
-/** Formats a server-validated diary date for display. */
-export function formatDiaryDate(value: string) {
-  return format(parseISO(value), 'MMMM d, yyyy');
-}
 
 async function getKeyRecord(userId: string): Promise<DiaryKeyRecord | null> {
   const rows = await db

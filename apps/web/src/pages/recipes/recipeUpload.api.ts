@@ -10,6 +10,7 @@ import { limitRequestSizeMiddleware } from '@/server/middleware/limitRequestSize
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { type PhotoLinkTable, persistWithPhotos } from '@/server/storage/photoSync.server';
 import { createRecipeRow, updateRecipeRow } from './recipes.server';
+import { translate } from '@/lib/i18n/getLocale';
 
 const RECIPE_IMAGE_KEY_PREFIX = 'recipe-images';
 
@@ -61,7 +62,9 @@ export const updateRecipe = createServerFn({ method: 'POST' })
     const recipeId = recipeIdType(data.get('id'));
 
     if (recipeId instanceof type.errors) {
-      throw new ClientSafeError('Recipe not found.');
+      throw new ClientSafeError(
+        translate({ en: 'Recipe not found.', pl: 'Nie znaleziono przepisu.' }),
+      );
     }
 
     return persistRecipeUpload(data, session.user.id, recipeId);

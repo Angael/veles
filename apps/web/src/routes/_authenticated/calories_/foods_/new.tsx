@@ -8,7 +8,10 @@ export const Route = createFileRoute('/_authenticated/calories_/foods_/new')({
   component: Component,
   staticData: {
     layout: 'task',
-    navbar: { backFallback: caloriesDayTarget, label: 'Create food product' },
+    navbar: {
+      backFallback: caloriesDayTarget,
+      label: { en: 'Create food product', pl: 'Utwórz produkt' },
+    },
   },
 });
 

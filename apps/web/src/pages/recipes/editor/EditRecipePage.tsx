@@ -12,12 +12,14 @@ import { useUpdateRecipeMutation } from '../recipes.query';
 import { RECIPE_PHOTO_MAX_COUNT } from '../recipeUpload.api';
 import css from './EditRecipePage.module.css';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type EditRecipePageProps = {
   recipe: RecipeLibraryItem;
 };
 
 export function EditRecipePage({ recipe }: EditRecipePageProps) {
+  const { t } = useI18n();
   const router = useRouter();
   const [draft, setDraft] = useState<RecipeFormDraft>(() => recipeToDraft(recipe));
   const saveMutation = useUpdateRecipeMutation();
@@ -64,7 +66,7 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
 
           <FormSubmitRow>
             <Btn loading={saveMutation.isPending} type='submit'>
-              Save
+              {t({ en: 'Save', pl: 'Zapisz' })}
             </Btn>
           </FormSubmitRow>
         </TypedForm>

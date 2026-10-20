@@ -9,6 +9,7 @@ import {
 import { ChevronLeftIcon } from 'lucide-react';
 import type { MouseEvent } from 'react';
 import { Btn, type BtnVariant } from '@/components/ui/btn/Btn';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 import type { NavbarTarget } from '@/lib/routing/staticRouteData';
 
 const leafMatchOptions = {
@@ -34,6 +35,7 @@ type Props = {
  * `backFallback` so SSR markup, new-tab clicks, and no-JS fallbacks stay meaningful.
  */
 export function RouteBackButton({ className, variant = 'outlineMain' }: Props) {
+  const { t } = useI18n();
   const router = useRouter();
   const canGoBack = useCanGoBack();
   const target = useRouteBackFallback();
@@ -50,7 +52,7 @@ export function RouteBackButton({ className, variant = 'outlineMain' }: Props) {
 
   return (
     <Btn
-      aria-label='Back'
+      aria-label={t({ en: 'Back', pl: 'Wstecz' })}
       className={className}
       icon={<ChevronLeftIcon aria-hidden='true' size={18} strokeWidth={2} />}
       iconOnly

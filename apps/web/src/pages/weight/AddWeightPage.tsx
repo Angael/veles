@@ -14,8 +14,10 @@ import { PhotosField } from '@/components/ui/photos-field/PhotosField';
 import css from './WeightEntryPages.module.css';
 import { useAddWeightEntryMutation } from './weight.query';
 import { WEIGHT_PHOTO_MAX_COUNT } from './weightPhotos.api';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export function AddWeightPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const today = format(new Date(), 'yyyy-MM-dd');
   const [date, setDate] = useState(today);
@@ -49,13 +51,13 @@ export function AddWeightPage() {
     <main>
       <Card as='section'>
         <TypedForm className={css.form} errorMsg={mutation.error?.message} onSubmit={handleSubmit}>
-          <Label text='Weight (kg)'>
+          <Label text={t({ en: 'Weight (kg)', pl: 'Waga (kg)' })}>
             <NumberInput
               enterKeyHint='done'
               max={300}
               min={30}
               onValueChange={setWeightKg}
-              placeholder='e.g. 78.4'
+              placeholder={t({ en: 'e.g. 78.4', pl: 'np. 78,4' })}
               required
               size='lg'
               stepperStep={0.1}
@@ -64,11 +66,11 @@ export function AddWeightPage() {
           </Label>
           <PhotosField maxCount={WEIGHT_PHOTO_MAX_COUNT} />
           <FormSubmitRow>
-            <Label text='Date'>
+            <Label text={t({ en: 'Date', pl: 'Data' })}>
               <DateInput max={today} name='date' onValueChange={setDate} required value={date} />
             </Label>
             <Btn disabled={!date || weightKg === null} loading={mutation.isPending} type='submit'>
-              Add weight
+              {t({ en: 'Add weight', pl: 'Dodaj wagę' })}
             </Btn>
           </FormSubmitRow>
         </TypedForm>

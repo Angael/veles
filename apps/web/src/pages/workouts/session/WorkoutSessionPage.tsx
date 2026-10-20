@@ -14,12 +14,14 @@ import { SessionHeader } from './SessionHeader';
 import { useSessionActions } from './session.query';
 import { SetSheet } from './SetSheet';
 import css from './Session.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /**
  * Live workout: the screen you stare at between sets. Every edit saves right away; ticking a set
  * starts the rest timer.
  */
 export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
+  const { t } = useI18n();
   const { data: session } = useSuspenseQuery(workoutSessionQueryOptions(workoutId));
   const actions = useSessionActions(workoutId);
   const timer = useRestTimer();
@@ -57,7 +59,12 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
       <SessionHeader onFinish={timer.skip} onShowHints={hints.reset} session={session} />
 
       {session.slots.length === 0 ? (
-        <p className={css.empty}>Add the first exercise to start logging sets.</p>
+        <p className={css.empty}>
+          {t({
+            en: 'Add the first exercise to start logging sets.',
+            pl: 'Dodaj pierwsze ćwiczenie, aby zapisywać serie.',
+          })}
+        </p>
       ) : (
         <div className={css.cards}>
           {session.slots.map((slot, index) => (
@@ -89,7 +96,7 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
         radius='pill'
         variant='outlineMain'
       >
-        Add exercise
+        {t({ en: 'Add exercise', pl: 'Dodaj ćwiczenie' })}
       </Btn>
       <ExercisePickerDialog
         onOpenChange={setPickerOpen}

@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/context-menu/ContextMenu';
 import { ListItem } from '@/components/ui/list/List';
 import css from './LoggedFood.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type LoggedFoodProps = {
   date: string;
@@ -28,6 +29,7 @@ type LoggedFoodProps = {
 
 /** Logged food row; right click or long press opens per-entry actions. */
 export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFoodProps) {
+  const { formatNumber, t } = useI18n();
   const deleteMutation = useDeleteFoodLogMutation();
   const [multiplyOpen, setMultiplyOpen] = useState(false);
   // Mode outlives `open` so the dialog keeps its title while animating closed.
@@ -49,7 +51,7 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
           <FoodSummary
             action={
               <Btn
-                aria-label={`Delete ${entry.name}`}
+                aria-label={t({ en: `Delete ${entry.name}`, pl: `Usuń: ${entry.name}` })}
                 icon={<Trash2Icon aria-hidden='true' />}
                 iconOnly
                 loading={deleteMutation.isPending}
@@ -66,14 +68,18 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
             mediaOverlay={
               <label className={css.selectTarget}>
                 <Checkbox
-                  aria-label={`Select ${entry.name}`}
+                  aria-label={t({ en: `Select ${entry.name}`, pl: `Zaznacz: ${entry.name}` })}
                   checked={selected}
                   className={css.checkbox}
                   onCheckedChange={(checked) => onSelectedChange(entry.id, checked)}
                 />
               </label>
             }
-            meta={entry.grams === null ? 'Custom entry' : `${Math.round(entry.grams)} g`}
+            meta={
+              entry.grams === null
+                ? t({ en: 'Custom entry', pl: 'Własny wpis' })
+                : `${formatNumber(Math.round(entry.grams))} g`
+            }
             name={
               <Link params={{ logId: entry.id }} to='/calories/logs/$logId'>
                 {entry.name}
@@ -82,38 +88,42 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
             protein={entry.protein ?? 0}
           />
         </ContextMenuTrigger>
-        <ContextMenuPopup aria-label={`${entry.name} actions`}>
+        <ContextMenuPopup
+          aria-label={t({ en: `${entry.name} actions`, pl: `Akcje: ${entry.name}` })}
+        >
           <ContextMenuLinkItem
             icon={<PencilIcon aria-hidden='true' />}
-            label='Edit'
+            label={t({ en: 'Edit', pl: 'Edytuj' })}
             render={<Link params={{ logId: entry.id }} to='/calories/logs/$logId' />}
           />
           <ContextMenuItem
             icon={<CopyPlusIcon aria-hidden='true' />}
-            label='Multiply…'
+            label={t({ en: 'Multiply…', pl: 'Pomnóż…' })}
             onClick={() => setMultiplyOpen(true)}
           />
           <ContextMenuItem
             icon={logsDateModeIcon('move')}
-            label='Move to…'
+            label={t({ en: 'Move to…', pl: 'Przenieś do…' })}
             onClick={() => setDateDialog({ mode: 'move', open: true })}
           />
           <ContextMenuItem
             icon={logsDateModeIcon('copy')}
-            label='Copy to…'
+            label={t({ en: 'Copy to…', pl: 'Kopiuj do…' })}
             onClick={() => setDateDialog({ mode: 'copy', open: true })}
           />
           <ContextMenuItem
             icon={
               selected ? <SquareCheckIcon aria-hidden='true' /> : <SquareIcon aria-hidden='true' />
             }
-            label={selected ? 'Deselect' : 'Select'}
+            label={
+              selected ? t({ en: 'Deselect', pl: 'Odznacz' }) : t({ en: 'Select', pl: 'Zaznacz' })
+            }
             onClick={() => onSelectedChange(entry.id, !selected)}
           />
           <ContextMenuSeparator />
           <ContextMenuItem
             icon={<Trash2Icon aria-hidden='true' />}
-            label='Delete'
+            label={t({ en: 'Delete', pl: 'Usuń' })}
             onClick={remove}
             variant='danger'
           />

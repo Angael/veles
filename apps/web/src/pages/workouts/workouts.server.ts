@@ -1,3 +1,4 @@
+import { format, parseISO } from 'date-fns';
 import { and, asc, desc, eq, inArray, isNotNull, isNull, lt, ne, or, sql } from 'drizzle-orm';
 import {
   type exerciseMeasures,
@@ -10,6 +11,7 @@ import {
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db, type DbTransaction } from '@/server/db.server';
 import type { Measure, SetMetrics, SetType } from './metrics';
+import { getLocale, translate } from '@/lib/i18n/getLocale';
 
 export type WorkoutSetData = SetMetrics & {
   id: string;
@@ -76,7 +78,10 @@ export async function requireOwnedWorkout(tx: Db, userId: string, workoutId: str
     .select({ date: workoutSessions.date, id: workoutSessions.id })
     .from(workoutSessions)
     .where(and(eq(workoutSessions.id, workoutId), eq(workoutSessions.userId, userId)));
-  if (!workout) throw new ClientSafeError('Workout not found.');
+  if (!workout)
+    throw new ClientSafeError(
+      translate({ en: 'Workout not found.', pl: 'Nie znaleziono treningu.' }),
+    );
   return workout;
 }
 
@@ -91,7 +96,13 @@ export async function requireOwnedSlot(tx: Db, userId: string, slotId: string) {
     .from(workoutSessionExercises)
     .innerJoin(workoutSessions, eq(workoutSessions.id, workoutSessionExercises.sessionId))
     .where(and(eq(workoutSessionExercises.id, slotId), eq(workoutSessions.userId, userId)));
-  if (!slot) throw new ClientSafeError('Exercise not found in this workout.');
+  if (!slot)
+    throw new ClientSafeError(
+      translate({
+        en: 'Exercise not found in this workout.',
+        pl: 'Nie znaleziono ćwiczenia w tym treningu.',
+      }),
+    );
   return slot;
 }
 
@@ -110,7 +121,8 @@ export async function requireOwnedSet(tx: Db, userId: string, setId: string) {
     )
     .innerJoin(workoutSessions, eq(workoutSessions.id, workoutSessionExercises.sessionId))
     .where(and(eq(workoutSets.id, setId), eq(workoutSessions.userId, userId)));
-  if (!set) throw new ClientSafeError('Set not found.');
+  if (!set)
+    throw new ClientSafeError(translate({ en: 'Set not found.', pl: 'Nie znaleziono serii.' }));
   return set;
 }
 
@@ -206,7 +218,10 @@ export async function requireNoOpenWorkout(tx: Db, userId: string, exceptId?: st
       ),
     )
     .limit(1);
-  if (open) throw new ClientSafeError('Finish your open workout first.');
+  if (open)
+    throw new ClientSafeError(
+      translate({ en: 'Finish your open workout first.', pl: 'Najpierw zakończ otwarty trening.' }),
+    );
 }
 
 export async function requireOwnedExercise(tx: Db, userId: string, exerciseId: string) {
@@ -214,7 +229,10 @@ export async function requireOwnedExercise(tx: Db, userId: string, exerciseId: s
     .select({ id: workoutExercises.id })
     .from(workoutExercises)
     .where(and(eq(workoutExercises.id, exerciseId), eq(workoutExercises.userId, userId)));
-  if (!exercise) throw new ClientSafeError('Exercise not found.');
+  if (!exercise)
+    throw new ClientSafeError(
+      translate({ en: 'Exercise not found.', pl: 'Nie znaleziono ćwiczenia.' }),
+    );
   return exercise;
 }
 
@@ -284,7 +302,10 @@ export async function loadWorkoutSession(
     .select()
     .from(workoutSessions)
     .where(and(eq(workoutSessions.id, workoutId), eq(workoutSessions.userId, userId)));
-  if (!workout) throw new ClientSafeError('Workout not found.');
+  if (!workout)
+    throw new ClientSafeError(
+      translate({ en: 'Workout not found.', pl: 'Nie znaleziono treningu.' }),
+    );
   const current = { date: workout.date, id: workout.id };
 
   const slots = await db
@@ -418,5 +439,25 @@ export type ExerciseRef = {
 export async function resolveExerciseId(tx: Db, userId: string, ref: ExerciseRef) {
   if (ref.exerciseId) return (await requireOwnedExercise(tx, userId, ref.exerciseId)).id;
   if (ref.newExercise) return findOrCreateExercise(tx, userId, ref.newExercise);
-  throw new ClientSafeError('Pick or name an exercise.');
+  throw new ClientSafeError(
+    translate({ en: 'Pick or name an exercise.', pl: 'Wybierz lub nazwij ćwiczenie.' }),
+  );
+}
+
+const POLISH_WEEKDAY_ADJECTIVES = [
+  'Niedzielny',
+  'Poniedziałkowy',
+  'Wtorkowy',
+  'Środowy',
+  'Czwartkowy',
+  'Piątkowy',
+  'Sobotni',
+];
+
+/** "Monday workout" / "Poniedziałkowy trening", in the language of the user who starts it. */
+export function defaultWorkoutName(date: string) {
+  const day = parseISO(date);
+  return getLocale() === 'pl'
+    ? `${POLISH_WEEKDAY_ADJECTIVES[day.getDay()]} trening`
+    : `${format(day, 'EEEE')} workout`;
 }

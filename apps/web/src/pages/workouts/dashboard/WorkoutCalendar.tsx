@@ -7,6 +7,9 @@ import { todayLocalDate } from '@/lib/dateOnly';
 import type { CalendarDay } from './dashboard.api';
 import { workoutCalendarQueryOptions } from './dashboard.query';
 import css from './WorkoutCalendar.module.css';
+import { type I18n, useI18n } from '@/lib/i18n/I18nProvider';
+import { pluralEn, pluralPl } from '@/lib/i18n/locale';
+import { SHORT_DAY } from '../metrics';
 
 const WEEKS = 26;
 /** Full brightness from this much training in a day; longer days are usually a forgotten Finish. */
@@ -26,10 +29,10 @@ const levelOf = (seconds: number) =>
  * Month name above the first week that holds the 1st of that month. Week 0 is labelled only if
  * no other label follows within two weeks, so "Apr May" never overlap.
  */
-function monthLabels(start: string) {
+function monthLabels(start: string, dateLocale: I18n['dateLocale']) {
   const labels = Array.from({ length: WEEKS }, (_, week) => {
     const sunday = addDays(parseISO(start), week * 7 + 6);
-    return week === 0 || sunday.getDate() <= 7 ? format(sunday, 'MMM') : '';
+    return week === 0 || sunday.getDate() <= 7 ? format(sunday, 'LLL', { locale: dateLocale }) : '';
   });
   if (labels[1] || labels[2]) labels[0] = '';
   return labels;
@@ -45,6 +48,7 @@ const formatMinutes = (seconds: number) =>
  * mean more training that day; tap a square to open that day's workout.
  */
 export function WorkoutCalendar() {
+  const { dateLocale, t } = useI18n();
   const today = todayLocalDate();
   const start = calendarStart(today);
   const { data } = useSuspenseQuery(workoutCalendarQueryOptions(start));
@@ -63,32 +67,35 @@ export function WorkoutCalendar() {
       data-appear='1'
     >
       <header className={css.header}>
-        <h2 id='workout-calendar-title'>Last 6 months</h2>
+        <h2 id='workout-calendar-title'>{t({ en: 'Last 6 months', pl: 'Ostatnie 6 miesięcy' })}</h2>
         <p className={css.summary}>
           {trainingDays === 0
-            ? 'No workouts yet'
-            : `${trainingDays} ${trainingDays === 1 ? 'day' : 'days'} · ${formatMinutes(totalSeconds)}`}
+            ? t({ en: 'No workouts yet', pl: 'Brak treningów' })
+            : t({
+                en: `${trainingDays} ${pluralEn(trainingDays, 'day', 'days')} · ${formatMinutes(totalSeconds)}`,
+                pl: `${trainingDays} ${pluralPl(trainingDays, 'dzień', 'dni', 'dni')} · ${formatMinutes(totalSeconds)}`,
+              })}
         </p>
       </header>
 
       <div className={css.months} aria-hidden='true'>
-        {monthLabels(start).map((label, week) => (
+        {monthLabels(start, dateLocale).map((label, week) => (
           <span key={week}>{label}</span>
         ))}
       </div>
 
-      <ol aria-label='Training days' className={css.grid}>
+      <ol aria-label={t({ en: 'Training days', pl: 'Dni treningowe' })} className={css.grid}>
         {days.map((date) => (
           <DaySquare date={date} day={byDate.get(date)} future={date > today} key={date} />
         ))}
       </ol>
 
       <div aria-hidden='true' className={css.legend}>
-        <span>Less</span>
+        <span>{t({ en: 'Less', pl: 'Mniej' })}</span>
         {[0, 1, 2, 3, 4].map((level) => (
           <span className={clsx(css.square, css[`level${level}`])} key={level} />
         ))}
-        <span>More</span>
+        <span>{t({ en: 'More', pl: 'Więcej' })}</span>
       </div>
     </Card>
   );
@@ -97,10 +104,19 @@ export function WorkoutCalendar() {
 type DaySquareProps = { date: string; day: CalendarDay | undefined; future: boolean };
 
 function DaySquare({ date, day, future }: DaySquareProps) {
-  const label = `${format(parseISO(date), 'EEE dd.MM')} · ${
+  const { formatDate, t } = useI18n();
+  const dayLabel = formatDate(date, SHORT_DAY);
+  const extraWorkouts =
+    day && day.workoutCount > 1
+      ? t({
+          en: `, ${day.workoutCount} workouts`,
+          pl: `, ${day.workoutCount} ${pluralPl(day.workoutCount, 'trening', 'treningi', 'treningów')}`,
+        })
+      : '';
+  const label = `${dayLabel} · ${
     day
-      ? `${formatMinutes(day.seconds)}${day.workoutCount > 1 ? `, ${day.workoutCount} workouts` : ''}`
-      : 'no workout'
+      ? `${formatMinutes(day.seconds)}${extraWorkouts}`
+      : t({ en: 'no workout', pl: 'brak treningu' })
   }`;
   const className = clsx(
     css.square,

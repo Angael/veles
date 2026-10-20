@@ -16,25 +16,33 @@ import {
 import { Label } from '@/components/ui/label/Label';
 import { SelectionBarAction } from '@/components/ui/selection-bar/SelectionBar';
 import css from './LogsDateAction.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { productCountText } from '../calorieHelpers';
 
 export type LogsDateMode = 'copy' | 'move';
 
 const modes = {
   copy: {
-    description: 'Copies keep the same amounts, kcal, and macros.',
+    description: {
+      en: 'Copies keep the same amounts, kcal, and macros.',
+      pl: 'Kopie zachowują te same ilości, kcal i makroskładniki.',
+    },
     icon: <CopyIcon aria-hidden='true' />,
-    label: 'Copy',
+    label: { en: 'Copy', pl: 'Kopiuj' },
+    title: { en: 'Copy', pl: 'Skopiuj' },
   },
   move: {
-    description: 'Products leave this day and are added to the chosen one.',
+    description: {
+      en: 'Products leave this day and are added to the chosen one.',
+      pl: 'Produkty znikną z tego dnia i zostaną dodane do wybranego.',
+    },
     icon: <CalendarArrowUpIcon aria-hidden='true' />,
-    label: 'Move',
+    label: { en: 'Move', pl: 'Przenieś' },
+    title: { en: 'Move', pl: 'Przenieś' },
   },
 } satisfies Record<LogsDateMode, object>;
 
 export const logsDateModeIcon = (mode: LogsDateMode) => modes[mode].icon;
-
-const productCount = (count: number) => `${count} ${count === 1 ? 'product' : 'products'}`;
 
 type ActionProps = {
   date: string;
@@ -45,13 +53,14 @@ type ActionProps = {
 
 /** Selection bar Move or Copy action opening the date dialog for every selected log. */
 export function LogsDateAction({ date, logs, mode, onDone }: ActionProps) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <SelectionBarAction
         icon={modes[mode].icon}
-        label={modes[mode].label}
+        label={t(modes[mode].label)}
         onClick={() => setOpen(true)}
       />
       <LogsDateDialog
@@ -74,13 +83,15 @@ type DialogProps = Omit<ActionProps, 'onDone'> & {
 
 /** Picks the day the logs are moved or copied to. */
 export function LogsDateDialog({ date, logs, mode, onDone, onOpenChange, open }: DialogProps) {
+  const { t } = useI18n();
+
   return (
     <DialogRoot onOpenChange={onOpenChange} open={open}>
       <DialogPopup>
         <DialogTitle>
-          {modes[mode].label} {productCount(logs.length)}
+          {t(modes[mode].title)} {t(productCountText(logs.length))}
         </DialogTitle>
-        <DialogDescription>{modes[mode].description}</DialogDescription>
+        <DialogDescription>{t(modes[mode].description)}</DialogDescription>
         <LogsDateForm
           date={date}
           logs={logs}
@@ -97,6 +108,7 @@ export function LogsDateDialog({ date, logs, mode, onDone, onOpenChange, open }:
 
 /** Mounts with the popup, so the target resets to today every time the dialog opens. */
 function LogsDateForm({ date, logs, mode, onDone }: ActionProps) {
+  const { t } = useI18n();
   const [target, setTarget] = useState(todayLocalDate);
   const moveMutation = useMoveFoodLogsMutation();
   const copyMutation = useCopyFoodLogsMutation();
@@ -116,13 +128,15 @@ function LogsDateForm({ date, logs, mode, onDone }: ActionProps) {
         confirm();
       }}
     >
-      <Label text='Date'>
+      <Label text={t({ en: 'Date', pl: 'Data' })}>
         <DateInput enterKeyHint='done' onValueChange={setTarget} required value={target} />
       </Label>
       <DialogActions>
-        <DialogClose render={<Btn type='button' variant='ghost' />}>Cancel</DialogClose>
+        <DialogClose render={<Btn type='button' variant='ghost' />}>
+          {t({ en: 'Cancel', pl: 'Anuluj' })}
+        </DialogClose>
         <Btn disabled={!valid} icon={modes[mode].icon} loading={mutation.isPending} type='submit'>
-          {modes[mode].label}
+          {t(modes[mode].label)}
         </Btn>
       </DialogActions>
     </form>

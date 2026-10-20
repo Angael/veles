@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import css from './NutritionInline.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type NutritionInlineProps = {
   kcal: number;
@@ -18,23 +19,25 @@ export function NutritionInline({
   energyDisplay = 'always',
   stacked = false,
 }: NutritionInlineProps) {
+  const { formatNumber } = useI18n();
+
   return (
     <div className={clsx(css.root, stacked && css.stacked)}>
       <div className={energyDisplay === 'phone' ? css.energyPhoneOnly : css.energy}>
-        <strong>{Math.round(kcal)}</strong>
+        <strong>{formatNumber(Math.round(kcal))}</strong>
         <span>kcal</span>
       </div>
       <div className={css.macros}>
         <div className={css.macro}>
-          {Math.round(protein)}
+          {formatNumber(Math.round(protein))}
           <span className={css.unit}>g</span>
         </div>
         <div className={css.macro}>
-          {Math.round(fat)}
+          {formatNumber(Math.round(fat))}
           <span className={css.unit}>g</span>
         </div>
         <div className={css.macro}>
-          {Math.round(carbs)}
+          {formatNumber(Math.round(carbs))}
           <span className={css.unit}>g</span>
         </div>
       </div>

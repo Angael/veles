@@ -3,9 +3,12 @@ import { CopyIcon, LayersIcon, Trash2Icon } from 'lucide-react';
 import { Pointer } from './Pointer';
 import { phase, useCoarsePointer, useTimeline } from './useHints';
 import css from './Hints.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { SET_BADGE, SET_TYPE_LABELS } from '../metrics';
 
 /** Press and hold a row: a ring fills around the press point, then the menu pops. */
 export function LongPressDemo() {
+  const { t } = useI18n();
   const progress = useTimeline(3600, 0.6);
   const coarse = useCoarsePointer();
   const approach = phase(progress, 0, 0.12);
@@ -39,13 +42,13 @@ export function LongPressDemo() {
       />
       <ul className={clsx(css.miniMenu, menu && css.miniMenuShown)}>
         <li>
-          <LayersIcon /> Type
+          <LayersIcon /> {t({ en: 'Type', pl: 'Typ' })}
         </li>
         <li>
-          <CopyIcon /> Duplicate
+          <CopyIcon /> {t({ en: 'Duplicate', pl: 'Powiel' })}
         </li>
         <li>
-          <Trash2Icon /> Delete
+          <Trash2Icon /> {t({ en: 'Delete', pl: 'Usuń' })}
         </li>
       </ul>
     </div>
@@ -53,14 +56,15 @@ export function LongPressDemo() {
 }
 
 const SET_TYPE_STEPS = [
-  { badge: '1', className: undefined, label: 'Normal' },
-  { badge: 'W', className: css.typeBadgeWarmup, label: 'Warm-up' },
-  { badge: 'D', className: css.typeBadgeDrop, label: 'Drop set' },
-  { badge: 'F', className: css.typeBadgeFailure, label: 'To failure' },
-];
+  { className: undefined, type: 'normal' },
+  { className: css.typeBadgeWarmup, type: 'warmup' },
+  { className: css.typeBadgeDrop, type: 'drop' },
+  { className: css.typeBadgeFailure, type: 'failure' },
+] as const;
 
 /** Taps the set number four times, cycling normal → warm-up → drop → failure → normal. */
 export function SetTypeDemo() {
+  const { t } = useI18n();
   const progress = useTimeline(5200, 0.45);
   const coarse = useCoarsePointer();
   const approach = phase(progress, 0, 0.1);
@@ -70,8 +74,10 @@ export function SetTypeDemo() {
 
   return (
     <div aria-hidden='true' className={css.stage}>
-      <span className={clsx(css.typeBadge, step?.className)}>{step?.badge}</span>
-      <span className={css.typeLabel}>{step?.label}</span>
+      <span className={clsx(css.typeBadge, step?.className)}>
+        {!step || step.type === 'normal' ? '1' : t(SET_BADGE[step.type])}
+      </span>
+      <span className={css.typeLabel}>{step ? t(SET_TYPE_LABELS[step.type]) : null}</span>
       <Pointer coarse={coarse} pressed={pressed} x={(1 - approach) * 30} y={(1 - approach) * 24} />
     </div>
   );

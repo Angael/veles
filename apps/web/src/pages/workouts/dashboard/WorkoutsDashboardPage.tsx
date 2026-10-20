@@ -8,6 +8,7 @@ import { StartWorkoutButton } from './StartWorkoutButton';
 import { WorkoutCalendar } from './WorkoutCalendar';
 import { WorkoutStats } from './WorkoutStats';
 import css from './WorkoutsDashboardPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 const RECENT = 10;
 
@@ -16,6 +17,7 @@ const RECENT = 10;
  * calendar, stats and routines on the side. Starting an empty workout lives in the floating button.
  */
 export function WorkoutsDashboardPage() {
+  const { t } = useI18n();
   const { data: workouts } = useSuspenseQuery(workoutsQueryOptions());
   const active = workouts.find((workout) => workout.endedAt === null);
   const shown = [
@@ -25,15 +27,21 @@ export function WorkoutsDashboardPage() {
 
   return (
     <main className={css.page}>
-      <section aria-label='Workouts' className={css.main} data-appear>
+      <section aria-label={t({ en: 'Workouts', pl: 'Treningi' })} className={css.main} data-appear>
         {shown.length > 0 ? (
           <WorkoutList workouts={shown} />
         ) : (
-          <p className={css.hint}>No workouts yet. Start one with the button below.</p>
+          <p className={css.hint}>
+            {t({
+              en: 'No workouts yet. Start one with the button below.',
+              pl: 'Brak treningów. Rozpocznij pierwszy przyciskiem poniżej.',
+            })}
+          </p>
         )}
         {workouts.length > shown.length ? (
           <Link className={css.more} to='/workouts/history'>
-            All workouts <ArrowRightIcon aria-hidden='true' />
+            {t({ en: 'All workouts', pl: 'Wszystkie treningi' })}{' '}
+            <ArrowRightIcon aria-hidden='true' />
           </Link>
         ) : null}
       </section>

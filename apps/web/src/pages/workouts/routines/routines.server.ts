@@ -22,13 +22,15 @@ import type {
   updateRoutineInputType,
   workoutIdType,
 } from '../workouts.validation';
+import { translate } from '@/lib/i18n/getLocale';
 
 export async function requireOwnedRoutine(tx: DbTransaction, userId: string, routineId: string) {
   const [routine] = await tx
     .select({ id: workoutRoutines.id, name: workoutRoutines.name })
     .from(workoutRoutines)
     .where(and(eq(workoutRoutines.id, routineId), eq(workoutRoutines.userId, userId)));
-  if (!routine) throw new ClientSafeError('Routine not found.');
+  if (!routine)
+    throw new ClientSafeError(translate({ en: 'Routine not found.', pl: 'Nie znaleziono planu.' }));
   return routine;
 }
 
@@ -139,7 +141,10 @@ export async function updateRoutineFromWorkoutRecord(
       .select({ routineId: workoutSessions.routineId })
       .from(workoutSessions)
       .where(eq(workoutSessions.id, workout.id));
-    if (!linked?.routineId) throw new ClientSafeError('This workout has no routine.');
+    if (!linked?.routineId)
+      throw new ClientSafeError(
+        translate({ en: 'This workout has no routine.', pl: 'Ten trening nie ma planu.' }),
+      );
     const routine = await requireOwnedRoutine(tx, userId, linked.routineId);
     await tx
       .delete(workoutRoutineExercises)

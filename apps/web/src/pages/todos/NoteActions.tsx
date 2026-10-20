@@ -5,15 +5,19 @@ import type { NoteSummary } from './notes.api';
 import { useDeleteNoteMutation, useSetNoteSharedMutation } from './notes.query';
 import { NoteTypeButton } from './NoteTypeButton';
 import css from './TodosPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export function NoteActions({ note }: { note: NoteSummary }) {
+  const { t } = useI18n();
   const deleteNote = useDeleteNoteMutation();
   const setShared = useSetNoteSharedMutation();
 
   if (!note.isOwned) {
     return (
       <div className={css.noteActions}>
-        <span className={css.sharedBy}>Shared by {note.ownerName}</span>
+        <span className={css.sharedBy}>
+          {t({ en: `Shared by ${note.ownerName}`, pl: `Udostępnia: ${note.ownerName}` })}
+        </span>
         <NoteTypeButton note={note} />
       </div>
     );
@@ -24,7 +28,17 @@ export function NoteActions({ note }: { note: NoteSummary }) {
       <NoteTypeButton note={note} />
       <MenuBtnRoot>
         <Btn
-          aria-label={`Sharing options, currently ${note.shared ? 'shared with friends' : 'private'}`}
+          aria-label={
+            note.shared
+              ? t({
+                  en: 'Sharing options, currently shared with friends',
+                  pl: 'Opcje udostępniania, obecnie udostępniona znajomym',
+                })
+              : t({
+                  en: 'Sharing options, currently private',
+                  pl: 'Opcje udostępniania, obecnie prywatna',
+                })
+          }
           icon={<Share2Icon aria-hidden='true' />}
           iconOnly
           loading={setShared.isPending}
@@ -34,22 +48,31 @@ export function NoteActions({ note }: { note: NoteSummary }) {
           variant={note.shared ? 'ghostSuccess' : 'ghost'}
         />
         <MenuBtnPopup
-          aria-label='Note sharing options'
-          description='Choose who can access this note.'
-          heading='Share note'
+          aria-label={t({ en: 'Note sharing options', pl: 'Opcje udostępniania notatki' })}
+          description={t({
+            en: 'Choose who can access this note.',
+            pl: 'Wybierz, kto ma dostęp do tej notatki.',
+          })}
+          heading={t({ en: 'Share note', pl: 'Udostępnij notatkę' })}
         >
           <MenuBtnItem
-            description='Let your friends view and edit this note'
+            description={t({
+              en: 'Let your friends view and edit this note',
+              pl: 'Pozwól znajomym oglądać i edytować tę notatkę',
+            })}
             icon={<UsersIcon aria-hidden='true' />}
-            label='Share with friends'
+            label={t({ en: 'Share with friends', pl: 'Udostępnij znajomym' })}
             onClick={() => {
               if (!note.shared) setShared.mutate({ id: note.id, shared: true });
             }}
           />
           <MenuBtnItem
-            description='Only you can access this note'
+            description={t({
+              en: 'Only you can access this note',
+              pl: 'Tylko Ty masz dostęp do tej notatki',
+            })}
             icon={<LockIcon aria-hidden='true' />}
-            label='Keep note private'
+            label={t({ en: 'Keep note private', pl: 'Zostaw jako prywatną' })}
             onClick={() => {
               if (note.shared) setShared.mutate({ id: note.id, shared: false });
             }}
@@ -57,12 +80,19 @@ export function NoteActions({ note }: { note: NoteSummary }) {
         </MenuBtnPopup>
       </MenuBtnRoot>
       <Btn
-        aria-label='Delete note'
+        aria-label={t({ en: 'Delete note', pl: 'Usuń notatkę' })}
         icon={<Trash2Icon aria-hidden='true' />}
         iconOnly
         loading={deleteNote.isPending}
         onClick={() => {
-          if (window.confirm(`Delete “${note.title}”? This cannot be undone.`)) {
+          if (
+            window.confirm(
+              t({
+                en: `Delete “${note.title}”? This cannot be undone.`,
+                pl: `Usunąć „${note.title}”? Tego nie można cofnąć.`,
+              }),
+            )
+          ) {
             deleteNote.mutate({ id: note.id });
           }
         }}
