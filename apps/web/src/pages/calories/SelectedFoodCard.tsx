@@ -7,9 +7,11 @@ import { FoodSummary, type FoodSummaryProps } from './FoodSummary';
 type SelectedFoodCardProps = Omit<FoodSummaryProps, 'action' | 'meta' | 'name'> & {
   name: string;
   productId: string;
+  /** Set when shown in Add food, so saving the product edit returns to Add food. */
+  addFoodDate?: string;
 };
 
-export function SelectedFoodCard({ productId, ...props }: SelectedFoodCardProps) {
+export function SelectedFoodCard({ addFoodDate, productId, ...props }: SelectedFoodCardProps) {
   return (
     <Card aria-label='Selected food' as='section' style={{ padding: 0 }}>
       <FoodSummary
@@ -20,7 +22,13 @@ export function SelectedFoodCard({ productId, ...props }: SelectedFoodCardProps)
             icon={<PencilIcon aria-hidden='true' />}
             iconOnly
             isLink
-            render={<Link params={{ foodId: productId }} to='/calories/foods/$foodId' />}
+            render={
+              <Link
+                params={{ foodId: productId }}
+                search={addFoodDate ? { date: addFoodDate, from: 'add' } : {}}
+                to='/calories/foods/$foodId'
+              />
+            }
             size='sm'
             variant='ghost'
           />
