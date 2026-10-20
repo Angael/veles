@@ -33,7 +33,8 @@ export function NumberInput({
   onValueChange,
   ...props
 }: NumberInputProps) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
+  const decimalSeparator = getDecimalSeparator(locale);
   // Typed arithmetic such as `10*2`; Base UI only accepts plain numbers, so it's held here until committed.
   const [expression, setExpression] = useState<string | null>(null);
 
@@ -43,7 +44,7 @@ export function NumberInput({
       return;
     }
 
-    const result = evaluateArithmeticExpression(expression);
+    const result = evaluateArithmeticExpression(normalizeDecimalSeparator(expression, '.'));
 
     // Flush so Base UI's own blur/submit handling already sees the result.
     flushSync(() => {
@@ -61,6 +62,7 @@ export function NumberInput({
     <NumberField.Root
       allowWheelScrub
       className={clsx(css.root, css[size], className)}
+      locale={locale}
       data-required={props.required ? '' : undefined}
       step={stepperStep ?? 'any'}
       onValueChange={(value, eventDetails) => {
@@ -84,7 +86,7 @@ export function NumberInput({
           onBlurCapture={(event) => commitExpression(event.currentTarget)}
           onChange={(event) => {
             const input = event.currentTarget;
-            input.value = normalizeDecimalSeparator(input.value);
+            input.value = normalizeDecimalSeparator(input.value, decimalSeparator);
 
             if (isArithmeticExpression(input.value)) {
               event.preventBaseUIHandler();
@@ -94,9 +96,9 @@ export function NumberInput({
             }
           }}
           onKeyDown={(event) => {
-            if (event.key === ',') {
+            if ((event.key === ',' || event.key === '.') && event.key !== decimalSeparator) {
               event.preventDefault();
-              insertText(event.currentTarget, '.');
+              insertText(event.currentTarget, decimalSeparator);
             } else if (isArithmeticOperator(event.key) && !event.ctrlKey && !event.metaKey) {
               // Base UI blocks operator keys, so insert them ourselves.
               event.preventDefault();
@@ -107,7 +109,7 @@ export function NumberInput({
           }}
           onPaste={(event) => {
             const pastedText = event.clipboardData.getData('text/plain');
-            const normalizedText = normalizeDecimalSeparator(pastedText);
+            const normalizedText = normalizeDecimalSeparator(pastedText, decimalSeparator);
 
             if (normalizedText !== pastedText || /[-+*/]/.test(normalizedText)) {
               event.preventDefault();
@@ -128,8 +130,16 @@ export function NumberInput({
   );
 }
 
-function normalizeDecimalSeparator(value: string) {
-  return value.replaceAll(',', '.');
+/** Base UI parses with the app locale, so typed `.` or `,` must match that locale's decimal separator. */
+function getDecimalSeparator(locale: string) {
+  return (
+    new Intl.NumberFormat(locale).formatToParts(0.1).find((part) => part.type === 'decimal')
+      ?.value ?? '.'
+  );
+}
+
+function normalizeDecimalSeparator(value: string, separator: string) {
+  return value.replaceAll(/[.,]/g, separator);
 }
 
 /** Inserts normalized text at the caret and emits the input event Base UI uses to parse it. */
