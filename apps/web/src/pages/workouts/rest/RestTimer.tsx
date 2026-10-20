@@ -6,6 +6,7 @@ import dock from '@/components/ui/mobile-dock/MobileDock.module.css';
 import { formatDuration } from '../metrics';
 import type { RestTimer } from './useRestTimer';
 import css from './RestTimer.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /** Feeds the drain animation; CSS scales the fill by `--rest-progress`. */
 const progressStyle = (timer: RestTimer): CSSProperties & { '--rest-progress': number } => ({
@@ -27,10 +28,11 @@ function Clock({ timer }: { timer: RestTimer }) {
  * desktop). The pill itself drains as a progress bar.
  */
 export function RestDock({ timer }: { timer: RestTimer }) {
+  const { t } = useI18n();
   if (!timer.running) return null;
   return (
     <div
-      aria-label='Rest timer'
+      aria-label={t({ en: 'Rest timer', pl: 'Czas przerwy' })}
       className={clsx(dock.dock, css.dock, 'floatingButton', 'selectionBar')}
       role='timer'
       style={progressStyle(timer)}
@@ -46,7 +48,7 @@ export function RestDock({ timer }: { timer: RestTimer }) {
         +15
       </Btn>
       <Btn
-        aria-label='Skip rest'
+        aria-label={t({ en: 'Skip rest', pl: 'Pomiń przerwę' })}
         icon={<XIcon aria-hidden='true' />}
         iconOnly
         onClick={timer.skip}

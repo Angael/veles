@@ -8,12 +8,14 @@ import {
   useUpdateRoutineFromWorkoutMutation,
 } from '../routines/routines.query';
 import type { WorkoutSessionData } from '../workouts.server';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /**
  * Rare session actions: save the exercises as a new routine, or overwrite the routine this
  * session came from. Routines keep exercises, set counts and set types, never the numbers.
  */
 export function SessionMenu({ session }: { session: WorkoutSessionData }) {
+  const { t } = useI18n();
   const [saving, setSaving] = useState(false);
   const saveRoutine = useSaveRoutineFromWorkoutMutation();
   const updateRoutine = useUpdateRoutineFromWorkoutMutation();
@@ -23,7 +25,7 @@ export function SessionMenu({ session }: { session: WorkoutSessionData }) {
     <>
       <MenuBtnRoot>
         <Btn
-          aria-label='More workout actions'
+          aria-label={t({ en: 'More workout actions', pl: 'Więcej akcji treningu' })}
           icon={<EllipsisIcon aria-hidden='true' />}
           iconOnly
           render={<MenuBtn />}
@@ -31,20 +33,32 @@ export function SessionMenu({ session }: { session: WorkoutSessionData }) {
           size='sm'
           variant='ghost'
         />
-        <MenuBtnPopup aria-label='Workout actions' heading='Workout'>
+        <MenuBtnPopup
+          aria-label={t({ en: 'Workout actions', pl: 'Akcje treningu' })}
+          heading={t({ en: 'Workout', pl: 'Trening' })}
+        >
           <MenuBtnItem
-            description='Start it again later with the same exercises'
+            description={t({
+              en: 'Start it again later with the same exercises',
+              pl: 'Rozpocznij go później z tymi samymi ćwiczeniami',
+            })}
             disabled={empty}
             icon={<BookmarkPlusIcon aria-hidden='true' />}
-            label='Save as new routine'
+            label={t({ en: 'Save as new routine', pl: 'Zapisz jako nowy plan' })}
             onClick={() => setSaving(true)}
           />
           {session.routine ? (
             <MenuBtnItem
-              description='Replace its exercises and sets with these'
+              description={t({
+                en: 'Replace its exercises and sets with these',
+                pl: 'Zastąp jego ćwiczenia i serie tymi',
+              })}
               disabled={empty || updateRoutine.isPending}
               icon={<RefreshCwIcon aria-hidden='true' />}
-              label={`Update routine “${session.routine.name}”`}
+              label={t({
+                en: `Update routine “${session.routine.name}”`,
+                pl: `Zaktualizuj plan „${session.routine.name}”`,
+              })}
               onClick={() => updateRoutine.mutate({ workoutId: session.id })}
             />
           ) : null}
@@ -56,8 +70,8 @@ export function SessionMenu({ session }: { session: WorkoutSessionData }) {
         onSubmit={(values) => saveRoutine.mutateAsync({ ...values, workoutId: session.id })}
         open={saving}
         pending={saveRoutine.isPending}
-        submitLabel='Save routine'
-        title='Save as routine'
+        submitLabel={t({ en: 'Save routine', pl: 'Zapisz plan' })}
+        title={t({ en: 'Save as routine', pl: 'Zapisz jako plan' })}
       />
     </>
   );

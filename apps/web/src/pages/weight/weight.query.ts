@@ -2,13 +2,19 @@ import { useMutation } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { saveWeight, saveWeights } from './weight.api';
 import { addWeightEntry, updateWeightEntry } from './weightPhotos.api';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export function useSaveWeightMutation() {
+  const { t } = useI18n();
+
   return useMutation({
     meta: {
       error: {
-        message: 'Your weight was not changed. Please try again.',
-        title: 'Could not save weight',
+        message: t({
+          en: 'Your weight was not changed. Please try again.',
+          pl: 'Waga nie została zmieniona. Spróbuj ponownie.',
+        }),
+        title: t({ en: 'Could not save weight', pl: 'Nie udało się zapisać wagi' }),
       },
     },
     mutationFn: saveWeight,
@@ -16,11 +22,16 @@ export function useSaveWeightMutation() {
 }
 
 export function useSaveWeightsMutation() {
+  const { t } = useI18n();
+
   return useMutation({
     meta: {
       error: {
-        message: 'Your entries were not imported. Please try again.',
-        title: 'Could not import weights',
+        message: t({
+          en: 'Your entries were not imported. Please try again.',
+          pl: 'Wpisy nie zostały zaimportowane. Spróbuj ponownie.',
+        }),
+        title: t({ en: 'Could not import weights', pl: 'Nie udało się zaimportować wag' }),
       },
     },
     mutationFn: saveWeights,

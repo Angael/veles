@@ -9,9 +9,11 @@ import { calorieFoodQueryOptions, useLookupFoodByBarcodeMutation } from '../calo
 import { BarcodeScanner } from './BarcodeScanner';
 import { LookupNotice, type LookupState } from './ScanNotice';
 import css from './ScanFoodPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /** Camera-first barcode lookup; a match opens the Add food confirm step as a new history entry. */
 export function ScanFoodPage({ initialDate: date }: { initialDate: string }) {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const lookingUp = useRef(false);
@@ -42,7 +44,7 @@ export function ScanFoodPage({ initialDate: date }: { initialDate: string }) {
     <main className={css.scanPage}>
       <header className={css.header}>
         <RouteBackButton variant='ghost' />
-        <h1>Scan barcode</h1>
+        <h1>{t({ en: 'Scan barcode', pl: 'Zeskanuj kod kreskowy' })}</h1>
       </header>
       <BarcodeScanner
         notice={
@@ -62,13 +64,13 @@ export function ScanFoodPage({ initialDate: date }: { initialDate: string }) {
         onSubmit={(data) => lookupBarcode(data.string('barcode'))}
       >
         <TextInput
-          aria-label='Enter barcode manually'
+          aria-label={t({ en: 'Enter barcode manually', pl: 'Wpisz kod kreskowy ręcznie' })}
           inputMode='numeric'
           name='barcode'
-          placeholder='Or type the barcode'
+          placeholder={t({ en: 'Or type the barcode', pl: 'Lub wpisz kod kreskowy' })}
         />
         <Btn type='submit' variant='outlineMain'>
-          Look up
+          {t({ en: 'Look up', pl: 'Szukaj' })}
         </Btn>
       </TypedForm>
     </main>

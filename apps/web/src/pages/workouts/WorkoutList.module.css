@@ -48,53 +48,75 @@
   }
 }
 
-/* The open workout: primary tint, a light sweep across it and a glow that breathes. */
+/* The open workout: primary tint, a light sweep across it and a glow that breathes.
+   Both animate only `transform`/`opacity` on pseudo-elements so they stay on the compositor
+   instead of repainting the card every frame. */
 .row.open {
+  position: relative;
+  overflow: hidden;
   border-color: var(--c-primary-border);
-  background:
-    linear-gradient(
-        105deg,
-        transparent 35%,
-        color-mix(in srgb, var(--c-accent) 12%, transparent) 50%,
-        transparent 65%
-      )
-      0 0 / 250% 100% no-repeat,
-    var(--c-primary-surface-strong);
+  background: var(--c-primary-surface-strong);
   box-shadow: var(--shadow-card-primary);
-  animation:
-    open-sweep 3.5s var(--ease-out) infinite,
-    open-glow 2.5s ease-in-out infinite alternate;
+  isolation: isolate;
+
+  &::after {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      color-mix(in srgb, var(--c-accent) 12%, transparent) 50%,
+      transparent 65%
+    );
+    content: '';
+    pointer-events: none;
+    animation: open-sweep 3.5s var(--ease-out) infinite;
+    will-change: transform;
+  }
 
   & h3 {
     font-size: var(--text-lg);
   }
+}
 
-  @media (prefers-reduced-motion: reduce) {
+/* The glow lives on the link because the card clips the sweep. */
+.link:has(.open) {
+  position: relative;
+
+  &::before {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-xs);
+    box-shadow: 0 0 1.5rem -0.25rem var(--c-primary-border-soft);
+    content: '';
+    opacity: 0;
+    pointer-events: none;
+    animation: open-glow 2.5s ease-in-out infinite alternate;
+    will-change: opacity;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row.open::after,
+  .link:has(.open)::before {
     animation: none;
   }
 }
 
 @keyframes open-sweep {
   from {
-    background-position:
-      150% 0,
-      0 0;
+    transform: translateX(-100%);
   }
 
   to {
-    background-position:
-      -50% 0,
-      0 0;
+    transform: translateX(100%);
   }
 }
 
 @keyframes open-glow {
-  from {
-    box-shadow: 0 0 0 0 transparent;
-  }
-
   to {
-    box-shadow: 0 0 1.5rem -0.25rem var(--c-primary-border-soft);
+    opacity: 1;
   }
 }
 
@@ -127,6 +149,7 @@
 
 /* Pulsing dot before the label, like a "recording" light. */
 .live {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -134,29 +157,44 @@
   font-size: var(--text-sm);
   font-weight: var(--font-weight-semibold);
 
+  /* Dot plus a ring that grows and fades; only transform/opacity animate. */
   &::before {
     width: 0.5rem;
     height: 0.5rem;
     border-radius: var(--radius-pill);
     background: currentcolor;
     content: '';
+  }
+
+  &::after {
+    position: absolute;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: var(--radius-pill);
+    background: currentcolor;
+    content: '';
+    pointer-events: none;
     animation: live-pulse 1.6s ease-out infinite;
+    will-change: transform, opacity;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    &::before {
+    &::after {
       animation: none;
+      opacity: 0;
     }
   }
 }
 
 @keyframes live-pulse {
   from {
-    box-shadow: 0 0 0 0 color-mix(in srgb, currentcolor 60%, transparent);
+    opacity: 0.6;
+    transform: scale(1);
   }
 
   to {
-    box-shadow: 0 0 0 0.45rem transparent;
+    opacity: 0;
+    transform: scale(2.8);
   }
 }
 

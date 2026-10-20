@@ -7,6 +7,7 @@ import {
   getReceivedFoodLogShares,
   shareFoodLogs,
 } from './foodLogShares.api';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 const foodShareRecipientsKey = ['food-share-recipients'] as const;
 const receivedFoodLogSharesKey = ['received-food-log-shares'] as const;
@@ -28,8 +29,14 @@ export function receivedFoodLogSharesQueryOptions() {
 }
 
 export function useShareFoodLogsMutation() {
+  const { t } = useI18n();
+
   return useMutation({
-    meta: { error: { title: 'Could not share products' } },
+    meta: {
+      error: {
+        title: t({ en: 'Could not share products', pl: 'Nie udało się udostępnić produktów' }),
+      },
+    },
     mutationFn: (data: {
       items: { grams: number | null; logId: string }[];
       recipientUserIds: string[];
@@ -38,8 +45,17 @@ export function useShareFoodLogsMutation() {
 }
 
 export function useAcceptFoodLogShareMutation() {
+  const { t } = useI18n();
+
   return useMutation({
-    meta: { error: { title: 'Could not add shared products' } },
+    meta: {
+      error: {
+        title: t({
+          en: 'Could not add shared products',
+          pl: 'Nie udało się dodać udostępnionych produktów',
+        }),
+      },
+    },
     mutationFn: (data: { date: string; id: string }) => acceptFoodLogShare({ data }),
     // Settled, not success: a share accepted elsewhere must disappear here too.
     onSettled: (_data, _error, _variables, _onMutateResult, context) =>
@@ -51,9 +67,16 @@ export function useAcceptFoodLogShareMutation() {
 }
 
 export function useDeclineFoodLogShareMutation() {
+  const { t } = useI18n();
+
   return useMutation({
     meta: {
-      error: { title: 'Could not decline shared products' },
+      error: {
+        title: t({
+          en: 'Could not decline shared products',
+          pl: 'Nie udało się odrzucić udostępnionych produktów',
+        }),
+      },
       invalidateQueryKey: receivedFoodLogSharesKey,
     },
     mutationFn: (id: string) => declineFoodLogShare({ data: { id } }),

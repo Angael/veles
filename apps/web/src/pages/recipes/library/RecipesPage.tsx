@@ -10,14 +10,15 @@ import { TextInput } from '@/components/ui/text-input/TextInput';
 import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
 import type { RecipeLibraryItem } from '../recipes.api';
 import css from './RecipesPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type RecipesPageProps = {
   recipes: RecipeLibraryItem[];
 };
 
 const recipeScopeItems = [
-  { label: 'All recipes', value: 'all' },
-  { label: 'Your recipes', value: 'owned' },
+  { label: { en: 'All recipes', pl: 'Wszystkie przepisy' }, value: 'all' },
+  { label: { en: 'Your recipes', pl: 'Twoje przepisy' }, value: 'owned' },
 ] as const;
 
 const recipeSearchFields = [
@@ -27,6 +28,7 @@ const recipeSearchFields = [
 ] satisfies RankedSearchFields<RecipeLibraryItem>;
 
 export function RecipesPage({ recipes }: RecipesPageProps) {
+  const { formatNumber, t } = useI18n();
   const [recipeScope, setRecipeScope] = useState<'all' | 'owned'>('all');
   const [searchInputValue, setSearchInputValue] = useState('');
   const [search] = useThrottledValue(searchInputValue, { wait: 200 });
@@ -36,24 +38,27 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
 
   return (
     <main className={css.page}>
-      <title>Recipes</title>
+      <title>{t({ en: 'Recipes', pl: 'Przepisy' })}</title>
       <section className={css.controls} data-appear>
         <div className={css.toolbar}>
           <label className={css.searchField}>
             <TextInput
-              aria-label='Search recipes'
+              aria-label={t({ en: 'Search recipes', pl: 'Szukaj przepisów' })}
               autoComplete='off'
               className={css.searchInput}
               name='search'
               onValueChange={setSearchInputValue}
-              placeholder='Search by name, tags, or description'
+              placeholder={t({
+                en: 'Search by name, tags, or description',
+                pl: 'Szukaj po nazwie, tagach lub opisie',
+              })}
               type='search'
               value={searchInputValue}
             />
           </label>
           <SelectInput
-            aria-label='Recipe ownership'
-            items={recipeScopeItems}
+            aria-label={t({ en: 'Recipe ownership', pl: 'Właściciel przepisu' })}
+            items={recipeScopeItems.map((item) => ({ ...item, label: t(item.label) }))}
             onValueChange={(value) => {
               if (value) {
                 setRecipeScope(value);
@@ -112,10 +117,10 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
 
                 <div className={css.recipeFooter}>
                   {recipe.rating !== null ? (
-                    <span className={css.footerItem}>{recipe.rating}/5</span>
+                    <span className={css.footerItem}>{formatNumber(recipe.rating)}/5</span>
                   ) : null}
                   {recipe.kcal !== null ? (
-                    <p className={css.footerItem}>{String(recipe.kcal)} KCAL</p>
+                    <p className={css.footerItem}>{formatNumber(recipe.kcal)} KCAL</p>
                   ) : null}
                 </div>
               </div>
@@ -128,7 +133,7 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
         icon={<PlusIcon aria-hidden='true' size={18} strokeWidth={1.8} />}
         to='/recipes/add'
       >
-        Add recipe
+        {t({ en: 'Add recipe', pl: 'Dodaj przepis' })}
       </FloatingButton>
     </main>
   );

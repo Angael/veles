@@ -3,6 +3,7 @@ import { LoaderCircleIcon, SearchXIcon, TriangleAlertIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import css from './ScanNotice.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export type LookupState =
   | { status: 'idle' }
@@ -17,44 +18,53 @@ type LookupNoticeProps = {
 
 /** Lookup progress and failures, with the next steps for each. */
 export function LookupNotice({ date, lookup, onDismiss, onRetry }: LookupNoticeProps) {
+  const { t } = useI18n();
   switch (lookup.status) {
     case 'lookingUp':
       return (
         <ScanNotice
           detail={lookup.barcode}
           icon={<LoaderCircleIcon aria-hidden='true' className={css.spinner} />}
-          title='Looking up product…'
+          title={t({ en: 'Looking up product…', pl: 'Wyszukiwanie produktu…' })}
         />
       );
     case 'notFound':
       return (
         <ScanNotice
-          detail={`No product matches ${lookup.barcode}.`}
+          detail={t({
+            en: `No product matches ${lookup.barcode}.`,
+            pl: `Brak produktu dla kodu ${lookup.barcode}.`,
+          })}
           icon={<SearchXIcon aria-hidden='true' />}
-          title='Product not found'
+          title={t({ en: 'Product not found', pl: 'Nie znaleziono produktu' })}
         >
           <Btn onClick={onDismiss} variant='ghost'>
-            Scan again
+            {t({ en: 'Scan again', pl: 'Skanuj ponownie' })}
           </Btn>
           <Btn
             isLink
             render={<Link search={{ barcode: lookup.barcode, date }} to='/calories/foods/new' />}
           >
-            Add product
+            {t({ en: 'Add product', pl: 'Dodaj produkt' })}
           </Btn>
         </ScanNotice>
       );
     case 'error':
       return (
         <ScanNotice
-          detail={`We could not check ${lookup.barcode}. Check your connection and try again.`}
-          title='Lookup failed'
+          detail={t({
+            en: `We could not check ${lookup.barcode}. Check your connection and try again.`,
+            pl: `Nie udało się sprawdzić kodu ${lookup.barcode}. Sprawdź połączenie i spróbuj ponownie.`,
+          })}
+          title={t({ en: 'Lookup failed', pl: 'Wyszukiwanie nie powiodło się' })}
           tone='danger'
         >
           <Btn onClick={onDismiss} variant='ghost'>
-            Scan again
+            {t({ en: 'Scan again', pl: 'Skanuj ponownie' })}
           </Btn>
-          <Btn onClick={() => onRetry(lookup.barcode)}>Try again</Btn>
+          <Btn onClick={() => onRetry(lookup.barcode)}>
+            {t({ en: 'Try again', pl: 'Spróbuj ponownie' })}
+          </Btn>
         </ScanNotice>
       );
   }

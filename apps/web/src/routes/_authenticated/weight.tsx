@@ -12,7 +12,7 @@ export const Route = createFileRoute('/_authenticated/weight')({
     return { entries, initialChartRange };
   },
   component: RouteComponent,
-  staticData: { navbar: { label: 'Weight' } },
+  staticData: { navbar: { label: { en: 'Weight', pl: 'Waga' } } },
 });
 
 function RouteComponent() {

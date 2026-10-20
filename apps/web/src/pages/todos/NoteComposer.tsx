@@ -14,19 +14,21 @@ import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessT
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { useCreateNoteMutation } from './notes.query';
 import css from './TodosPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /** Floating "Add note" button that asks for a title in a dialog; the form resets on each open. */
 export function NoteComposer() {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const createNote = useCreateNoteMutation();
 
   return (
     <DialogRoot onOpenChange={setOpen} open={open}>
       <FloatingButton icon={<PlusIcon aria-hidden='true' />} render={<DialogTrigger />}>
-        Add note
+        {t({ en: 'Add note', pl: 'Dodaj notatkę' })}
       </FloatingButton>
       <DialogPopup>
-        <DialogTitle>New note</DialogTitle>
+        <DialogTitle>{t({ en: 'New note', pl: 'Nowa notatka' })}</DialogTitle>
         <TypedForm
           className={css.composerForm}
           onSubmit={async (data) => {
@@ -39,17 +41,19 @@ export function NoteComposer() {
           }}
         >
           <SeamlessTextInput
-            aria-label='Title'
+            aria-label={t({ en: 'Title', pl: 'Tytuł' })}
             className={css.titleInput}
             maxLength={160}
             name='title'
-            placeholder='Note title'
+            placeholder={t({ en: 'Note title', pl: 'Tytuł notatki' })}
             required
           />
           <DialogActions>
-            <DialogClose render={<Btn variant='ghost' />}>Cancel</DialogClose>
+            <DialogClose render={<Btn variant='ghost' />}>
+              {t({ en: 'Cancel', pl: 'Anuluj' })}
+            </DialogClose>
             <Btn loading={createNote.isPending} type='submit'>
-              Create note
+              {t({ en: 'Create note', pl: 'Utwórz notatkę' })}
             </Btn>
           </DialogActions>
         </TypedForm>

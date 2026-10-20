@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { format, parseISO } from 'date-fns';
 import {
   DialogDescription,
   DialogPopup,
@@ -8,6 +7,8 @@ import {
 } from '@/components/ui/dialog/Dialog';
 import { exerciseHistoryQueryOptions } from '../exercises/exercises.query';
 import css from './ExerciseNotes.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { SHORT_DAY } from '../metrics';
 
 type ExerciseHistoryDialogProps = {
   exerciseId: string;
@@ -29,6 +30,7 @@ export function ExerciseHistoryDialog({
   open,
   workoutId,
 }: ExerciseHistoryDialogProps) {
+  const { formatDate, t } = useI18n();
   const history = useQuery({
     ...exerciseHistoryQueryOptions(exerciseId, workoutId),
     enabled: open,
@@ -39,27 +41,42 @@ export function ExerciseHistoryDialog({
     <DialogRoot onOpenChange={onOpenChange} open={open}>
       <DialogPopup>
         <DialogTitle>{exerciseName}</DialogTitle>
-        {history.isPending ? <DialogDescription>Loading…</DialogDescription> : null}
-        {history.isError ? <DialogDescription>Could not load history.</DialogDescription> : null}
+        {history.isPending ? (
+          <DialogDescription>{t({ en: 'Loading…', pl: 'Wczytywanie…' })}</DialogDescription>
+        ) : null}
+        {history.isError ? (
+          <DialogDescription>
+            {t({ en: 'Could not load history.', pl: 'Nie udało się wczytać historii.' })}
+          </DialogDescription>
+        ) : null}
         {history.isSuccess && entries.length === 0 ? (
-          <DialogDescription>No earlier sessions yet.</DialogDescription>
+          <DialogDescription>
+            {t({ en: 'No earlier sessions yet.', pl: 'Brak wcześniejszych treningów.' })}
+          </DialogDescription>
         ) : null}
         <ol className={css.history}>
           {entries.map((entry) => (
             <li className={css.historyEntry} key={entry.id}>
               <span
                 className={css.position}
-                title={`Exercise ${entry.position} of ${entry.exerciseCount} in that workout`}
+                title={t({
+                  en: `Exercise ${entry.position} of ${entry.exerciseCount} in that workout`,
+                  pl: `Ćwiczenie ${entry.position} z ${entry.exerciseCount} w tym treningu`,
+                })}
               >
                 #{entry.position}
-                <small>of {entry.exerciseCount}</small>
+                <small>
+                  {t({ en: `of ${entry.exerciseCount}`, pl: `z ${entry.exerciseCount}` })}
+                </small>
               </span>
               <div className={css.historyBody}>
                 <span className={css.historyMeta}>
-                  {format(parseISO(entry.date), 'EEE dd.MM')} · {entry.workoutName}
+                  {formatDate(entry.date, SHORT_DAY)} · {entry.workoutName}
                 </span>
                 <span className={css.historySets}>
-                  {entry.sets.length > 0 ? entry.sets.join('  ') : 'No sets done'}
+                  {entry.sets.length > 0
+                    ? entry.sets.join('  ')
+                    : t({ en: 'No sets done', pl: 'Brak wykonanych serii' })}
                 </span>
                 {entry.note ? <p className={css.historyNote}>{entry.note}</p> : null}
               </div>

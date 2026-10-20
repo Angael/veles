@@ -14,12 +14,14 @@ import { Btn } from '@/components/ui/btn/Btn';
 import { List } from '@/components/ui/list/List';
 import { SelectionBar } from '@/components/ui/selection-bar/SelectionBar';
 import css from './CaloriesPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type Props = { day: CalorieDashboardDay };
 
 /** Day overview; selecting logs via their images swaps the Log food button for bulk actions. */
 export function CalorieOverview({ day }: Props) {
   const { date, goal, logs, totals } = day;
+  const { t } = useI18n();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const selectedLogs = logs.filter((entry) => selectedIds.includes(entry.id));
   const selecting = selectedLogs.length > 0;
@@ -37,7 +39,7 @@ export function CalorieOverview({ day }: Props) {
     <div className={css.overviewStack}>
       {selecting ? (
         <SelectionBar
-          aria-label='Selected products'
+          aria-label={t({ en: 'Selected products', pl: 'Wybrane produkty' })}
           count={selectedLogs.length}
           onClear={clearSelection}
         >
@@ -55,14 +57,16 @@ export function CalorieOverview({ day }: Props) {
 
       <section className={css.logSection} data-appear='2'>
         <div className={css.logHeading}>
-          <h2>Logged products</h2>
+          <h2>{t({ en: 'Logged products', pl: 'Zapisane produkty' })}</h2>
           {selecting ? (
             <Btn
               onClick={() => setSelectedIds(allSelected ? [] : logs.map((entry) => entry.id))}
               size='sm'
               variant='text'
             >
-              {allSelected ? 'Deselect all' : 'Select all'}
+              {allSelected
+                ? t({ en: 'Deselect all', pl: 'Odznacz wszystko' })
+                : t({ en: 'Select all', pl: 'Zaznacz wszystko' })}
             </Btn>
           ) : null}
         </div>
@@ -80,7 +84,9 @@ export function CalorieOverview({ day }: Props) {
             ))}
           </List>
         ) : (
-          <p className={css.emptyLog}>Nothing logged for this day</p>
+          <p className={css.emptyLog}>
+            {t({ en: 'Nothing logged for this day', pl: 'Brak wpisów w tym dniu' })}
+          </p>
         )}
       </section>
     </div>

@@ -20,6 +20,8 @@ import { type DragEvent, useId, useRef, useState } from 'react';
 import { IMAGE_MAX_INPUT_BYTES } from '@/lib/storage/imageLimits';
 import css from './PhotosField.module.css';
 import { type FieldPhoto, PhotoTile } from './PhotoTile';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { pluralEn, pluralPl } from '@/lib/i18n/locale';
 
 type PhotosFieldProps = {
   /** Photos already stored on the server, in their saved order. */
@@ -38,11 +40,12 @@ type PhotosFieldProps = {
  */
 export function PhotosField({
   defaultPhotos = [],
-  label = 'Photos',
+  label,
   maxBytes = IMAGE_MAX_INPUT_BYTES,
   maxCount,
   onChange,
 }: PhotosFieldProps) {
+  const { t } = useI18n();
   const dndContextId = useId();
   const inputId = useId();
   const dragDepthRef = useRef(0);
@@ -74,7 +77,10 @@ export function PhotosField({
 
     if (rejectedCount > 0) {
       window.alert(
-        `${rejectedCount} item${rejectedCount === 1 ? '' : 's'} were not added because of the limit.`,
+        t({
+          en: `${rejectedCount} ${pluralEn(rejectedCount, 'item was', 'items were')} not added because of the limit.`,
+          pl: `Limit: ${pluralPl(rejectedCount, 'pominięto 1 element', `pominięto ${rejectedCount} elementy`, `pominięto ${rejectedCount} elementów`)}.`,
+        }),
       );
     }
 
@@ -94,7 +100,7 @@ export function PhotosField({
 
   return (
     <div className={css.root}>
-      <span>{label}</span>
+      <span>{label ?? t({ en: 'Photos', pl: 'Zdjęcia' })}</span>
       <div
         className={clsx(css.grid, isFileDragActive && css.dragActive)}
         onDragEnter={(event) => {
@@ -132,7 +138,7 @@ export function PhotosField({
             {photos.map((photo, index) => (
               <PhotoTile
                 key={photo.id}
-                label={`Photo ${index + 1}`}
+                label={t({ en: `Photo ${index + 1}`, pl: `Zdjęcie ${index + 1}` })}
                 onRemove={(id) => changePhotos(photos.filter((item) => item.id !== id))}
                 photo={photo}
               />
@@ -156,8 +162,15 @@ export function PhotosField({
             />
 
             <UploadIcon aria-hidden='true' size={20} strokeWidth={1.9} />
-            <strong>Add images</strong>
-            <span>{photos.length ? 'Drop here or browse' : `Up to ${maxCount} images`}</span>
+            <strong>{t({ en: 'Add images', pl: 'Dodaj zdjęcia' })}</strong>
+            <span>
+              {photos.length
+                ? t({ en: 'Drop here or browse', pl: 'Upuść tutaj lub wybierz' })
+                : t({
+                    en: `Up to ${maxCount} images`,
+                    pl: `Maksymalnie ${maxCount} ${pluralPl(maxCount, 'zdjęcie', 'zdjęcia', 'zdjęć')}`,
+                  })}
+            </span>
           </label>
         ) : null}
       </div>

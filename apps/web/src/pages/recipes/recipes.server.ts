@@ -9,6 +9,7 @@ import {
   type updateRecipeFieldsInputType,
   type updateRecipeRatingInputType,
 } from './recipes.validation';
+import { translate } from '@/lib/i18n/getLocale';
 
 type Db = typeof db | DbTransaction;
 type RecipeFields = typeof recipeFieldsType.infer;
@@ -44,7 +45,10 @@ export async function updateRecipeRow(
     .set({ ...roundNutrition(fields), updatedAt: new Date() })
     .where(and(eq(recipes.id, recipeId), eq(recipes.userId, userId)))
     .returning({ id: recipes.id });
-  if (!recipe) throw new ClientSafeError('Recipe not found.');
+  if (!recipe)
+    throw new ClientSafeError(
+      translate({ en: 'Recipe not found.', pl: 'Nie znaleziono przepisu.' }),
+    );
   return recipe;
 }
 

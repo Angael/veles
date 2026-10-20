@@ -32,7 +32,7 @@ export function SetMenu({ actions, set, slot, update }: SetMenuProps) {
       <ContextMenuSubmenuRoot>
         <ContextMenuSubmenuTrigger
           icon={<LayersIcon aria-hidden='true' />}
-          label={`Type: ${SET_TYPE_LABELS[set.type]}`}
+          label={`Type: ${SET_TYPE_LABELS[set.type].en}`}
         />
         <ContextMenuPopup aria-label='Set type'>
           {SET_TYPE_ORDER.map((type) => (
@@ -45,7 +45,7 @@ export function SetMenu({ actions, set, slot, update }: SetMenuProps) {
                 )
               }
               key={type}
-              label={SET_TYPE_LABELS[type]}
+              label={SET_TYPE_LABELS[type].en}
               onClick={() => update({ type })}
             />
           ))}

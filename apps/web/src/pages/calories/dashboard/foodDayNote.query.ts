@@ -2,6 +2,7 @@ import { type QueryClient, useMutation } from '@tanstack/react-query';
 import type { CalorieDashboardDay } from '../calories.api';
 import { calorieDashboardQueryOptions } from '../calories.query';
 import { setFoodDayNote } from './foodDayNote.api';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type SetFoodDayNoteVariables = { date: string; offPlan?: boolean; note?: string };
 
@@ -22,8 +23,14 @@ function patchDashboardDay(
 
 /** Saves a day's note or off-plan flag and patches the cached week instead of refetching it. */
 export function useSetFoodDayNoteMutation() {
+  const { t } = useI18n();
+
   return useMutation({
-    meta: { error: { title: 'Could not save the day note' } },
+    meta: {
+      error: {
+        title: t({ en: 'Could not save the day note', pl: 'Nie udało się zapisać notatki dnia' }),
+      },
+    },
     mutationFn: (data: SetFoodDayNoteVariables) => setFoodDayNote({ data }),
     onMutate: async ({ date, note, offPlan }, context) => {
       await context.client.cancelQueries({

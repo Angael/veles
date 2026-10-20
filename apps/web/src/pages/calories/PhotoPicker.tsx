@@ -2,6 +2,7 @@ import { ImageIcon, Trash2Icon, UploadIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import css from './PhotoPicker.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export type PhotoPickerValue = {
   imageAction: 'keep' | 'replace' | 'remove';
@@ -53,6 +54,7 @@ export function PhotoPicker({
   onChange,
   value,
 }: PhotoPickerProps) {
+  const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const visibleUrl = value.imageAction === 'remove' ? null : (previewUrl ?? existingUrl);
@@ -79,18 +81,26 @@ export function PhotoPicker({
 
   return (
     <fieldset className={css.root} disabled={disabled}>
-      <legend className={css.legend}>Photo</legend>
+      <legend className={css.legend}>{t({ en: 'Photo', pl: 'Zdjęcie' })}</legend>
       <div className={css.card} data-has-image={visibleUrl ? '' : undefined}>
         {visibleUrl ? (
-          <img alt='Food' className={css.preview} draggable={false} src={visibleUrl} />
+          <img
+            alt={t({ en: 'Food', pl: 'Jedzenie' })}
+            className={css.preview}
+            draggable={false}
+            src={visibleUrl}
+          />
         ) : (
           <div className={css.placeholder}>
             <ImageIcon aria-hidden='true' className={css.placeholderIcon} />
-            <span>No photo selected</span>
+            <span>{t({ en: 'No photo selected', pl: 'Nie wybrano zdjęcia' })}</span>
           </div>
         )}
         <div aria-live='polite' className={css.status}>
-          {value.photo?.name ?? (visibleUrl ? 'Photo added' : 'Ready for a photo')}
+          {value.photo?.name ??
+            (visibleUrl
+              ? t({ en: 'Photo added', pl: 'Dodano zdjęcie' })
+              : t({ en: 'Ready for a photo', pl: 'Gotowe na zdjęcie' }))}
         </div>
         <div className={css.actions}>
           {allowUpload ? (
@@ -102,12 +112,14 @@ export function PhotoPicker({
               type='button'
               variant='white'
             >
-              {visibleUrl ? 'Replace' : 'Upload'}
+              {visibleUrl
+                ? t({ en: 'Replace', pl: 'Zamień' })
+                : t({ en: 'Upload', pl: 'Prześlij' })}
             </Btn>
           ) : null}
           {visibleUrl ? (
             <Btn
-              aria-label='Remove photo'
+              aria-label={t({ en: 'Remove photo', pl: 'Usuń zdjęcie' })}
               className={css.action}
               icon={<Trash2Icon aria-hidden='true' />}
               iconOnly
@@ -126,7 +138,7 @@ export function PhotoPicker({
         ref={inputRef}
         accept='image/*'
         capture='environment'
-        aria-label='Upload photo'
+        aria-label={t({ en: 'Upload photo', pl: 'Prześlij zdjęcie' })}
         className={css.fileInput}
         onChange={(event) => {
           const [photo] = Array.from(event.target.files ?? []);

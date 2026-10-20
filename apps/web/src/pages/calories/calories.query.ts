@@ -1,5 +1,4 @@
 import { queryOptions, useMutation } from '@tanstack/react-query';
-import { format, parseISO } from 'date-fns';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import { todayLocalDate } from '@/lib/dateOnly';
 import {
@@ -19,7 +18,8 @@ import {
   updateFoodProduct,
 } from './calories.api';
 import { setDailyCalorieGoal } from './goals/goals.api';
-import { calorieWeekStart } from './calorieHelpers';
+import { calorieWeekStart, productCountText } from './calorieHelpers';
+import { type I18n, useI18n } from '@/lib/i18n/I18nProvider';
 
 export const calorieDashboardKey = ['calorie-dashboard'] as const;
 const calorieFoodKey = ['calorie-food'] as const;
@@ -130,9 +130,13 @@ export function useDeleteFoodLogMutation() {
 }
 
 export function useDeleteFoodLogsMutation() {
+  const { t } = useI18n();
+
   return useMutation({
     meta: {
-      error: { title: 'Could not delete products' },
+      error: {
+        title: t({ en: 'Could not delete products', pl: 'Nie udało się usunąć produktów' }),
+      },
       invalidateQueryKey: calorieDashboardKey,
     },
     mutationFn: (ids: string[]) => deleteFoodLogs({ data: { ids } }),
@@ -140,9 +144,13 @@ export function useDeleteFoodLogsMutation() {
 }
 
 export function useMultiplyFoodLogsMutation() {
+  const { t } = useI18n();
+
   return useMutation({
     meta: {
-      error: { title: 'Could not multiply products' },
+      error: {
+        title: t({ en: 'Could not multiply products', pl: 'Nie udało się pomnożyć produktów' }),
+      },
       invalidateQueryKey: calorieDashboardKey,
     },
     mutationFn: (data: { factor: number; ids: string[] }) => multiplyFoodLogs({ data }),
@@ -155,33 +163,51 @@ export type FoodLogsDateVariables = { date: string; ids: string[] };
  * Success toast for move/copy. Lives on the mutation, not the `mutate()` call: moved rows and the
  * selection bar unmount once the dashboard refetches, which skips per-call callbacks.
  */
-function toastFoodLogsDate(verb: string, { date, ids }: FoodLogsDateVariables) {
-  const products = `${ids.length} ${ids.length === 1 ? 'product' : 'products'}`;
+function toastFoodLogsDate(
+  { formatDate, t }: I18n,
+  action: 'copy' | 'move',
+  { date, ids }: FoodLogsDateVariables,
+) {
+  const products = t(productCountText(ids.length));
+  const day = formatDate(date, { day: 'numeric', month: 'short', weekday: 'short' });
+  const enVerb = action === 'move' ? 'Moved' : 'Copied';
+  const plVerb = action === 'move' ? 'Przeniesiono' : 'Skopiowano';
   toastManager.add({
-    title: `${verb} ${products} to ${format(parseISO(date), 'EEE, d MMM')}`,
+    title: t({
+      en: `${enVerb} ${products} to ${day}`,
+      pl: `${plVerb} ${products} na ${day}`,
+    }),
     type: 'success',
   });
 }
 
 export function useMoveFoodLogsMutation() {
+  const i18n = useI18n();
+
   return useMutation({
     meta: {
-      error: { title: 'Could not move products' },
+      error: {
+        title: i18n.t({ en: 'Could not move products', pl: 'Nie udało się przenieść produktów' }),
+      },
       invalidateQueryKey: calorieDashboardKey,
     },
     mutationFn: (data: FoodLogsDateVariables) => moveFoodLogs({ data }),
-    onSuccess: (_data, variables) => toastFoodLogsDate('Moved', variables),
+    onSuccess: (_data, variables) => toastFoodLogsDate(i18n, 'move', variables),
   });
 }
 
 export function useCopyFoodLogsMutation() {
+  const i18n = useI18n();
+
   return useMutation({
     meta: {
-      error: { title: 'Could not copy products' },
+      error: {
+        title: i18n.t({ en: 'Could not copy products', pl: 'Nie udało się skopiować produktów' }),
+      },
       invalidateQueryKey: calorieDashboardKey,
     },
     mutationFn: (data: FoodLogsDateVariables) => copyFoodLogs({ data }),
-    onSuccess: (_data, variables) => toastFoodLogsDate('Copied', variables),
+    onSuccess: (_data, variables) => toastFoodLogsDate(i18n, 'copy', variables),
   });
 }
 

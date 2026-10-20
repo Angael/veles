@@ -107,6 +107,107 @@
   }
 }
 
+.languageOptions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--space-xs);
+}
+
+.languageOption {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-md);
+  min-height: 4.25rem;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  background: var(--c-surface-inset);
+  cursor: pointer;
+  transition:
+    border-color 160ms var(--ease-out),
+    background-color 160ms var(--ease-out);
+
+  &:hover {
+    border-color: var(--c-border-strong);
+  }
+
+  &:has(:focus-visible) {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 2px;
+  }
+
+  &:has(:checked) {
+    border-color: var(--c-primary-border);
+    background: var(--c-primary-surface);
+
+    & .languageCode {
+      background: var(--c-primary);
+      color: var(--c-primary-contrast);
+    }
+
+    & .languageCheck {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  &:has(:disabled) {
+    cursor: progress;
+  }
+}
+
+.languageRadio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.languageCode {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c-surface-raised);
+  color: var(--c-muted-strong);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition:
+    background-color 160ms var(--ease-out),
+    color 160ms var(--ease-out);
+}
+
+.languageText {
+  display: grid;
+  min-width: 0;
+
+  & strong {
+    color: var(--c-text-strong);
+    font-size: var(--text-sm-dynamic);
+  }
+
+  & small {
+    color: var(--c-muted-strong);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.languageCheck {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--c-primary);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 160ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
 .sharingSection {
   display: grid;
   gap: var(--space-sm);

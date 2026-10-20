@@ -12,10 +12,12 @@ import { CALORIE_DATE_FORMAT, calorieWeekDates, calorieWeekStart } from '../calo
 import { todayLocalDate } from '@/lib/dateOnly';
 import { Btn } from '@/components/ui/btn/Btn';
 import css from './CaloriesPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type CaloriesPageProps = { dashboard: CalorieDashboard; date: string };
 
 export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
+  const { dateLocale, t } = useI18n();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const todayDate = todayLocalDate();
@@ -54,12 +56,12 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
           size='sm'
           variant='outlineMain'
         >
-          Today
+          {t({ en: 'Today', pl: 'Dzisiaj' })}
         </Btn>
 
         <div className={css.dayStrip}>
           <Btn
-            aria-label='Previous week'
+            aria-label={t({ en: 'Previous week', pl: 'Poprzedni tydzień' })}
             className={css.dayNav}
             icon={<ChevronLeftIcon aria-hidden='true' />}
             iconOnly
@@ -71,7 +73,7 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
             variant='ghost'
           />
           <ToggleGroup
-            aria-label='Diary week'
+            aria-label={t({ en: 'Diary week', pl: 'Tydzień dziennika' })}
             className={css.dayOptions}
             onValueChange={(values) => {
               const selected = values[0];
@@ -100,8 +102,12 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
                   key={day}
                   value={day}
                 >
-                  <span className={css.compactDay}>{format(parsedDay, 'EEEEE')}</span>
-                  <span className={css.expandedDay}>{format(parsedDay, 'EEEE')}</span>
+                  <span className={css.compactDay}>
+                    {format(parsedDay, 'EEEEE', { locale: dateLocale })}
+                  </span>
+                  <span className={css.expandedDay}>
+                    {format(parsedDay, 'EEEE', { locale: dateLocale })}
+                  </span>
                   <strong className={css.compactDay}>{format(parsedDay, 'd')}</strong>
                   <strong className={css.expandedDay}>{format(parsedDay, 'dd.MM')}</strong>
                   <DayProgress
@@ -115,7 +121,7 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
             })}
           </ToggleGroup>
           <Btn
-            aria-label='Next week'
+            aria-label={t({ en: 'Next week', pl: 'Następny tydzień' })}
             className={css.dayNav}
             icon={<ChevronRightIcon aria-hidden='true' />}
             iconOnly
@@ -146,6 +152,7 @@ function DayProgress({
   isPast: boolean;
   isToday: boolean;
 }) {
+  const { formatNumber, t } = useI18n();
   if (!dayStatus?.goal) return null;
 
   const goalKcal = dayStatus.goal.kcal;
@@ -157,7 +164,10 @@ function DayProgress({
 
   return (
     <span
-      aria-label={`${Math.round(consumedKcal)} of ${Math.round(goalKcal)} kcal`}
+      aria-label={t({
+        en: `${formatNumber(Math.round(consumedKcal))} of ${formatNumber(Math.round(goalKcal))} kcal`,
+        pl: `${formatNumber(Math.round(consumedKcal))} z ${formatNumber(Math.round(goalKcal))} kcal`,
+      })}
       aria-valuemax={goalKcal}
       aria-valuemin={0}
       aria-valuenow={Math.min(consumedKcal, goalKcal)}

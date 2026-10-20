@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { translate } from '@/lib/i18n/getLocale';
 import { eq, inArray } from 'drizzle-orm';
 import { uploadObjects } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
@@ -74,7 +75,13 @@ export async function prepareImageAction(
   userId: string,
 ): Promise<PreparedFoodImage | null> {
   if (action === 'keep' || action === 'remove') return null;
-  if (!photo) throw new ClientSafeError('Choose a photo before replacing the image.');
+  if (!photo)
+    throw new ClientSafeError(
+      translate({
+        en: 'Choose a photo before replacing the image.',
+        pl: 'Wybierz zdjęcie przed zamianą obrazu.',
+      }),
+    );
 
   return prepareFoodImage(photo, userId);
 }

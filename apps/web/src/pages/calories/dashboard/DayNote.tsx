@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import { Toggle } from '@/components/ui/toggle/Toggle';
 import { useSetFoodDayNoteMutation } from './foodDayNote.query';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 import css from './DayNote.module.css';
 
 const NOTE_SAVE_DELAY_MS = 600;
@@ -19,6 +20,7 @@ type DayNoteProps = {
  * and when the page hides or unmounts, so a quick note is not lost.
  */
 export function DayNote({ date, note, offPlan }: DayNoteProps) {
+  const { t } = useI18n();
   const setDayNote = useSetFoodDayNoteMutation();
   const savedNote = useRef(note ?? '');
 
@@ -41,19 +43,23 @@ export function DayNote({ date, note, offPlan }: DayNoteProps) {
   }, [noteSaver]);
 
   return (
-    <section aria-label='Day note' className={css.dayNote} data-appear='2'>
+    <section
+      aria-label={t({ en: 'Day note', pl: 'Notatka dnia' })}
+      className={css.dayNote}
+      data-appear='2'
+    >
       <SeamlessTextarea
-        aria-label='Note for this day'
+        aria-label={t({ en: 'Note for this day', pl: 'Notatka do tego dnia' })}
         className={css.note}
         defaultValue={note ?? ''}
         maxLength={NOTE_MAX_LENGTH}
         onBlur={() => noteSaver.flush()}
         onChange={(event) => noteSaver.maybeExecute(event.target.value)}
-        placeholder='Add a note for this day…'
+        placeholder={t({ en: 'Add a note for this day…', pl: 'Dodaj notatkę do tego dnia…' })}
         rows={1}
       />
       <label className={css.offPlan} data-checked={offPlan || undefined}>
-        <span>Off plan</span>
+        <span>{t({ en: 'Off plan', pl: 'Poza planem' })}</span>
         <Toggle
           checked={offPlan}
           onCheckedChange={(checked) => setDayNote.mutate({ date, offPlan: checked })}

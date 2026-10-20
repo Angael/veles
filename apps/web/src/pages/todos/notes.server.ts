@@ -14,6 +14,7 @@ import type {
   setListItemCheckedInputType,
   deleteListItemInputType,
 } from './notes.validation';
+import { translate } from '@/lib/i18n/getLocale';
 
 /** Matches notes the user owns or that a connected user shared; these are readable and editable. */
 export function accessibleNote(userId: string, includeShared = true) {
@@ -70,7 +71,8 @@ export async function updateNoteRecord(
     .where(and(eq(notes.id, data.id), accessibleNote(userId, includeShared)))
     .returning({ id: notes.id });
 
-  if (!updated) throw new ClientSafeError('Note not found.');
+  if (!updated)
+    throw new ClientSafeError(translate({ en: 'Note not found.', pl: 'Nie znaleziono notatki.' }));
 }
 
 /** Deletes an owned note and its cascading list items. */
@@ -80,7 +82,8 @@ export async function deleteNoteRecord(userId: string, data: typeof deleteNoteIn
     .where(and(eq(notes.id, data.id), eq(notes.ownerId, userId)))
     .returning({ id: notes.id });
 
-  if (!deleted) throw new ClientSafeError('Note not found.');
+  if (!deleted)
+    throw new ClientSafeError(translate({ en: 'Note not found.', pl: 'Nie znaleziono notatki.' }));
 }
 
 /** Changes sharing only for a note the caller owns. */
@@ -94,7 +97,8 @@ export async function setNoteSharedRecord(
     .where(and(eq(notes.id, data.id), eq(notes.ownerId, userId)))
     .returning({ id: notes.id });
 
-  if (!updated) throw new ClientSafeError('Note not found.');
+  if (!updated)
+    throw new ClientSafeError(translate({ en: 'Note not found.', pl: 'Nie znaleziono notatki.' }));
 }
 
 /** Turns note lines into list items or list items into note lines, inside the caller's transaction. */
@@ -146,7 +150,10 @@ export async function toggleNoteTypeRecord(
       .where(and(eq(notes.id, data.id), accessibleNote(userId, includeShared)))
       .for('update');
 
-    if (!note) throw new ClientSafeError('Note not found.');
+    if (!note)
+      throw new ClientSafeError(
+        translate({ en: 'Note not found.', pl: 'Nie znaleziono notatki.' }),
+      );
 
     await convertNoteType(tx, data.id, note);
   });
@@ -170,7 +177,10 @@ export async function createListItemRecord(
     )
     .limit(1);
 
-  if (!shoppingList) throw new ClientSafeError('Shopping list not found.');
+  if (!shoppingList)
+    throw new ClientSafeError(
+      translate({ en: 'Shopping list not found.', pl: 'Nie znaleziono listy zakupów.' }),
+    );
 
   const [created] = await db
     .insert(listItems)
@@ -197,7 +207,10 @@ export async function updateListItemRecord(
     .where(and(eq(listItems.id, data.id), accessibleNote(userId, includeShared)))
     .limit(1);
 
-  if (!item) throw new ClientSafeError('Product not found.');
+  if (!item)
+    throw new ClientSafeError(
+      translate({ en: 'Product not found.', pl: 'Nie znaleziono produktu.' }),
+    );
 
   await db.update(listItems).set({ name: data.name }).where(eq(listItems.id, item.id));
   await db.update(notes).set({ updatedAt: new Date() }).where(eq(notes.id, item.noteId));
@@ -216,7 +229,10 @@ export async function setListItemCheckedRecord(
     .where(and(eq(listItems.id, data.id), accessibleNote(userId, includeShared)))
     .limit(1);
 
-  if (!item) throw new ClientSafeError('Product not found.');
+  if (!item)
+    throw new ClientSafeError(
+      translate({ en: 'Product not found.', pl: 'Nie znaleziono produktu.' }),
+    );
 
   await db.update(listItems).set({ checked: data.checked }).where(eq(listItems.id, item.id));
 }
@@ -234,7 +250,8 @@ export async function deleteListItemRecord(
     .where(and(eq(listItems.id, data.id), accessibleNote(userId, includeShared)))
     .limit(1);
 
-  if (!item) throw new ClientSafeError('Item not found.');
+  if (!item)
+    throw new ClientSafeError(translate({ en: 'Item not found.', pl: 'Nie znaleziono pozycji.' }));
 
   await db.delete(listItems).where(eq(listItems.id, item.id));
   await db.update(notes).set({ updatedAt: new Date() }).where(eq(notes.id, item.noteId));

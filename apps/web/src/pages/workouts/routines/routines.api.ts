@@ -26,6 +26,7 @@ import {
   updateRoutineFromWorkoutRecord,
   updateRoutineRecord,
 } from './routines.server';
+import { translate } from '@/lib/i18n/getLocale';
 
 export type RoutineSummary = {
   id: string;
@@ -104,7 +105,10 @@ export const getRoutine = createServerFn({ method: 'GET' })
       })
       .from(workoutRoutines)
       .where(and(eq(workoutRoutines.id, data.id), eq(workoutRoutines.userId, userId)));
-    if (!routine) throw new ClientSafeError('Routine not found.');
+    if (!routine)
+      throw new ClientSafeError(
+        translate({ en: 'Routine not found.', pl: 'Nie znaleziono planu.' }),
+      );
 
     const [slots, [lastUsed]] = await Promise.all([
       db

@@ -1,6 +1,7 @@
 import { SwitchCameraIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 import css from './CameraSwitch.module.css';
 
 type CameraSwitchProps = {
@@ -17,6 +18,7 @@ const hintSeenStorageKey = 'camera.switchHintSeen';
  * one may focus better. Mount it over a live preview: browsers list cameras only after access.
  */
 export function CameraSwitch({ activeDeviceId, onSwitch }: CameraSwitchProps) {
+  const { t } = useI18n();
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [notice, setNotice] = useState<Notice>();
 
@@ -29,7 +31,11 @@ export function CameraSwitch({ activeDeviceId, onSwitch }: CameraSwitchProps) {
       );
       if (rearCameras.length > 1 && !localStorage.getItem(hintSeenStorageKey)) {
         localStorage.setItem(hintSeenStorageKey, '1');
-        setNotice({ id: 0, long: true, text: 'Blurry? Try another camera.' });
+        setNotice({
+          id: 0,
+          long: true,
+          text: t({ en: 'Blurry? Try another camera.', pl: 'Rozmazane? Spróbuj innej kamery.' }),
+        });
       }
     });
   }, []);
@@ -42,7 +48,13 @@ export function CameraSwitch({ activeDeviceId, onSwitch }: CameraSwitchProps) {
     const next = cameras[nextIndex];
     if (!next) return;
     onSwitch(next.deviceId);
-    setNotice({ id: (notice?.id ?? 0) + 1, text: `Camera ${nextIndex + 1}/${cameras.length}` });
+    setNotice({
+      id: (notice?.id ?? 0) + 1,
+      text: t({
+        en: `Camera ${nextIndex + 1}/${cameras.length}`,
+        pl: `Kamera ${nextIndex + 1}/${cameras.length}`,
+      }),
+    });
   }
 
   return (
@@ -54,7 +66,7 @@ export function CameraSwitch({ activeDeviceId, onSwitch }: CameraSwitchProps) {
         </output>
       ) : null}
       <Btn
-        aria-label='Switch camera'
+        aria-label={t({ en: 'Switch camera', pl: 'Przełącz kamerę' })}
         className={css.button}
         icon={<SwitchCameraIcon aria-hidden='true' />}
         iconOnly

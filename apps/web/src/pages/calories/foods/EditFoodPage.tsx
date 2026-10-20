@@ -4,6 +4,7 @@ import { useUpdateFoodProductMutation } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 import { todayLocalDate } from '@/lib/dateOnly';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type Props = {
   /** Set when opened from Add food: saving returns there with this product and date. */
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export function EditFoodPage({ addFoodDate, food }: Props) {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const updateMutation = useUpdateFoodProductMutation();
   const { markDirty, markSaved } = useUnsavedChangesGuard();
@@ -38,7 +40,7 @@ export function EditFoodPage({ addFoodDate, food }: Props) {
         onDirty={markDirty}
         onSubmit={save}
         pending={updateMutation.isPending}
-        submitLabel='Save'
+        submitLabel={t({ en: 'Save', pl: 'Zapisz' })}
       />
     </main>
   );

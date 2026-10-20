@@ -1,3 +1,5 @@
+import type { Localized } from '@/lib/i18n/locale';
+
 export type NavbarTarget =
   | { to: '/' }
   | { search?: { date?: string }; to: '/calories' }
@@ -14,7 +16,7 @@ export type NavbarTargetMatch = {
 };
 
 type NavbarData = {
-  label: string;
+  label: Localized;
   /**
    * Back target used when there is no in-app history entry to return to. Also the back link's
    * `href`, and its presence is what makes the route show a back button.

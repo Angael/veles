@@ -8,6 +8,7 @@ import { useImportDiaryEntriesMutation } from './diary.query';
 import { createDiaryBackup } from './diaryBackup';
 import type { DiaryEntrySummary } from './useDecryptedEntries';
 import css from './DiaryBackupActions.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type DiaryBackupActionsProps = {
   diaryKey: CryptoKey;
@@ -15,6 +16,7 @@ type DiaryBackupActionsProps = {
 };
 
 export function DiaryBackupActions({ diaryKey, entries }: DiaryBackupActionsProps) {
+  const { t } = useI18n();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importMutation = useImportDiaryEntriesMutation(diaryKey, entries);
@@ -47,7 +49,7 @@ export function DiaryBackupActions({ diaryKey, entries }: DiaryBackupActionsProp
           size='sm'
           variant='ghost'
         >
-          Export
+          {t({ en: 'Export', pl: 'Eksportuj' })}
         </Btn>
       ) : null}
       <Btn
@@ -57,7 +59,7 @@ export function DiaryBackupActions({ diaryKey, entries }: DiaryBackupActionsProp
         size='sm'
         variant='ghost'
       >
-        Import
+        {t({ en: 'Import', pl: 'Importuj' })}
       </Btn>
       <input
         accept='application/json,.json'

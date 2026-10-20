@@ -15,7 +15,10 @@ export const Route = createFileRoute('/_authenticated/calories_/add')({
     return context.queryClient.ensureQueryData(calorieFoodsQueryOptions());
   },
   component: Component,
-  staticData: { layout: 'task', navbar: { backFallback: caloriesDayTarget, label: 'Add food' } },
+  staticData: {
+    layout: 'task',
+    navbar: { backFallback: caloriesDayTarget, label: { en: 'Add food', pl: 'Dodaj jedzenie' } },
+  },
 });
 
 function Component() {
