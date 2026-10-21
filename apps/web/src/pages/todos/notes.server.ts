@@ -185,6 +185,7 @@ export async function createListItemRecord(
   const [created] = await db
     .insert(listItems)
     .values({
+      id: data.id,
       name: data.name,
       noteId: shoppingList.id,
     })

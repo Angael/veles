@@ -1,11 +1,13 @@
+import { useLiveQuery } from '@tanstack/react-db';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useThrottledValue } from '@tanstack/react-pacer';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Card } from '@/components/ui/card/Card';
 import { SelectInput } from '@/components/ui/select-input/SelectInput';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { filterAndRankBySearch, type RankedSearchFields } from '@/lib/search/filterAndRankBySearch';
 import { CheckedNoteCard } from './CheckedNoteCard';
+import { listItemsCollection } from './listItems.collection';
 import type { NoteSummary } from './notes.api';
 import { NoteComposer } from './NoteComposer';
 import { notesQueryOptions } from './notes.query';
@@ -18,11 +20,13 @@ const noteScopeItems = [
   { label: { en: 'Your notes', pl: 'Twoje notatki' }, value: 'owned' },
 ] as const;
 
+type SearchableNote = NoteSummary & { itemNames: string[] };
+
 const noteSearchFields = [
   (note) => note.title,
   (note) => note.content,
-  (note) => note.items.map((item) => item.name),
-] satisfies RankedSearchFields<NoteSummary>;
+  (note) => note.itemNames,
+] satisfies RankedSearchFields<SearchableNote>;
 
 export function TodosPage() {
   const { t } = useI18n();
@@ -30,7 +34,18 @@ export function TodosPage() {
   const [noteScope, setNoteScope] = useState<'all' | 'owned'>('all');
   const [searchInputValue, setSearchInputValue] = useState('');
   const [search] = useThrottledValue(searchInputValue, { wait: 200 });
-  const scopedNotes = noteScope === 'owned' ? notes.filter((note) => note.isOwned) : notes;
+  // Same collection the cards write to, so search sees renamed or added items immediately.
+  const { data: items } = useLiveQuery({ query: (q) => q.from({ item: listItemsCollection }) });
+  const searchableNotes = useMemo(
+    () =>
+      notes.map((note) => ({
+        ...note,
+        itemNames: items.filter((item) => item.noteId === note.id).map((item) => item.name),
+      })),
+    [items, notes],
+  );
+  const scopedNotes =
+    noteScope === 'owned' ? searchableNotes.filter((note) => note.isOwned) : searchableNotes;
   const visibleNotes = filterAndRankBySearch(scopedNotes, search, noteSearchFields);
 
   return (

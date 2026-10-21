@@ -22,6 +22,8 @@ export const toggleNoteTypeInputType = type({ '+': 'reject', id: 'string.uuid' }
 
 export const createListItemInputType = type({
   '+': 'reject',
+  // Client-generated UUIDv7 so optimistic rows keep their identity; the DB default fills it when omitted.
+  'id?': 'string.uuid',
   name: 'string.trim |> 0 < string <= 240',
   noteId: 'string.uuid',
 });

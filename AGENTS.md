@@ -44,6 +44,7 @@
   - `.query.ts`: For useMutation and queryOptions
   - `.server.ts`: Other server-only stuff
   - `.client.ts`: Client-only code
+  - `.collection.ts`: TanStack DB collection descriptors and their mutation handlers (see the `tanstack-db` skill)
 - No barrel files, DTO, re-export files
 
 ## Server Functions

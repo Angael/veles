@@ -7,6 +7,7 @@ import { sessionUserQueryOptions } from '@/lib/auth/session.query';
 import { getLocale, translate } from '@/lib/i18n/getLocale';
 import { I18nProvider } from '@/lib/i18n/I18nProvider';
 import globalCss from '@/styles/global.css?url';
+import type { DbClient } from '@tanstack/react-db';
 import type { QueryClient } from '@tanstack/react-query';
 import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
 import * as React from 'react';
@@ -43,37 +44,39 @@ const faviconLinks = [
   { rel: 'manifest', href: `/${faviconConfig.manifest}` },
 ];
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  beforeLoad: async ({ context }) => ({
-    // Before this was a simple `user: await getSessionUser()` but it fetched for any redirect even when very fresh
-    user: await context.queryClient.fetchQuery(sessionUserQueryOptions()),
-  }),
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
-      { name: 'theme-color', content: '#060816' },
-      { title: appName },
-      {
-        name: 'description',
-        content: translate({
-          en: 'Private place for workouts, body weight, food logging, and shared personal files.',
-          pl: 'Prywatne miejsce na treningi, wagę ciała, dziennik jedzenia i wspólne pliki.',
-        }),
-      },
-    ],
-    links: [{ rel: 'stylesheet', href: globalCss }, ...faviconLinks],
-  }),
-  errorComponent: (props) => (
-    <RootDocument>
-      <AppFrame>
-        <DefaultCatchBoundary {...props} />
-      </AppFrame>
-    </RootDocument>
-  ),
-  notFoundComponent: () => <NotFound />,
-  component: RootComponent,
-});
+export const Route = createRootRouteWithContext<{ dbClient: DbClient; queryClient: QueryClient }>()(
+  {
+    beforeLoad: async ({ context }) => ({
+      // Before this was a simple `user: await getSessionUser()` but it fetched for any redirect even when very fresh
+      user: await context.queryClient.fetchQuery(sessionUserQueryOptions()),
+    }),
+    head: () => ({
+      meta: [
+        { charSet: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
+        { name: 'theme-color', content: '#060816' },
+        { title: appName },
+        {
+          name: 'description',
+          content: translate({
+            en: 'Private place for workouts, body weight, food logging, and shared personal files.',
+            pl: 'Prywatne miejsce na treningi, wagę ciała, dziennik jedzenia i wspólne pliki.',
+          }),
+        },
+      ],
+      links: [{ rel: 'stylesheet', href: globalCss }, ...faviconLinks],
+    }),
+    errorComponent: (props) => (
+      <RootDocument>
+        <AppFrame>
+          <DefaultCatchBoundary {...props} />
+        </AppFrame>
+      </RootDocument>
+    ),
+    notFoundComponent: () => <NotFound />,
+    component: RootComponent,
+  },
+);
 
 function RootComponent() {
   const { user } = Route.useRouteContext();

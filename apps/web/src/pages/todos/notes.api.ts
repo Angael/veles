@@ -1,6 +1,6 @@
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { asc, eq, inArray } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { listItems, notes, users } from '@veles/db/schema';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
@@ -29,10 +29,13 @@ import {
   deleteListItemRecord,
 } from './notes.server';
 
+/** One shopping list row as synced into the client-side `listItems` collection. */
 export type NoteListItem = {
   checked: boolean;
+  createdAt: string;
   id: string;
   name: string;
+  noteId: string;
 };
 
 export type NoteSummary = {
@@ -41,7 +44,6 @@ export type NoteSummary = {
   isOwned: boolean;
   ownerName: string;
   shared: boolean;
-  items: NoteListItem[];
   title: string;
   type: 'note' | 'shopping_list';
 };
@@ -64,23 +66,6 @@ export const getNotes = createServerFn({ method: 'GET' })
       .innerJoin(users, eq(notes.ownerId, users.id))
       .where(accessibleNote(session.user.id))
       .orderBy(asc(notes.createdAt), asc(notes.id));
-    const shoppingListIds = ownedNotes
-      .filter((note) => note.type === 'shopping_list')
-      .map((note) => note.id);
-    const items =
-      shoppingListIds.length === 0
-        ? []
-        : await db
-            .select({
-              checked: listItems.checked,
-              id: listItems.id,
-              name: listItems.name,
-              noteId: listItems.noteId,
-            })
-            .from(listItems)
-            .where(inArray(listItems.noteId, shoppingListIds))
-            .orderBy(asc(listItems.createdAt), asc(listItems.id));
-
     return ownedNotes.flatMap((note): NoteSummary[] => {
       if (note.type !== 'note' && note.type !== 'shopping_list') return [];
 
@@ -89,7 +74,6 @@ export const getNotes = createServerFn({ method: 'GET' })
           content: note.content,
           id: note.id,
           isOwned: note.ownerId === session.user.id,
-          items: items.filter((item) => item.noteId === note.id),
           ownerName: note.ownerName,
           shared: note.shared,
           title: note.title,
@@ -97,6 +81,27 @@ export const getNotes = createServerFn({ method: 'GET' })
         },
       ];
     });
+  });
+
+/** Returns every list item the user can access as flat rows; the client collection groups them. */
+export const getListItems = createServerFn({ method: 'GET' })
+  .middleware([logMiddleware('getListItems')])
+  .handler(async (): Promise<NoteListItem[]> => {
+    const session = await requireSession();
+    const rows = await db
+      .select({
+        checked: listItems.checked,
+        createdAt: listItems.createdAt,
+        id: listItems.id,
+        name: listItems.name,
+        noteId: listItems.noteId,
+      })
+      .from(listItems)
+      .innerJoin(notes, eq(notes.id, listItems.noteId))
+      .where(and(accessibleNote(session.user.id), eq(notes.type, 'shopping_list')))
+      .orderBy(asc(listItems.createdAt), asc(listItems.id));
+
+    return rows.map((row) => ({ ...row, createdAt: row.createdAt.toISOString() }));
   });
 
 export const createNote = createServerFn({ method: 'POST' })
