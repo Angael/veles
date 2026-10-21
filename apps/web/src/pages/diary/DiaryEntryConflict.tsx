@@ -13,10 +13,7 @@ type DiaryEntryConflictProps = {
   onUseMine: (draft: DiaryEntryDraft) => void;
 };
 
-/**
- * Lets the user recover from a rejected stale save: keeps the draft, reloads the newer entry into
- * the editor, and then offers the kept draft back. Leaving the page asks first while text is kept.
- */
+/** Keeps a rejected draft, reloads the newer entry, and offers the draft back. */
 export function DiaryEntryConflict({
   conflicted,
   draft,

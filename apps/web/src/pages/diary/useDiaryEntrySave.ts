@@ -11,13 +11,10 @@ export type DiaryEntryDraft = DiaryEntryContent & {
 };
 
 /**
- * Autosaves diary drafts one at a time against the version the editor loaded. Each success
- * advances the version for the next save. A conflict stops saving, with no retry, until the page
- * loads the latest entry, so a stale draft never overwrites newer text. Load the latest entry only
- * while `isPending` is false, or a queued save could reuse the newer version.
+ * Autosaves diary drafts in order against the loaded version. A conflict stops saving until the
+ * latest entry is loaded, so a stale draft never overwrites newer text.
  */
 export function useDiaryEntrySave(key: CryptoKey, entry: DiaryEntrySummary) {
-  // The version the next save must match: the loaded one, then each saved one.
   const versionRef = useRef(entry.version);
   const [conflictAt, setConflictAt] = useState<number | null>(null);
 
@@ -43,7 +40,6 @@ export function useDiaryEntrySave(key: CryptoKey, entry: DiaryEntrySummary) {
     onError: (error) => {
       if (isVersionConflictError(error)) setConflictAt(entry.version);
     },
-    // Runs saves in order, so each one sends the version the previous save returned.
     scope: { id: `diary-entry-${entry.id}` },
   });
 

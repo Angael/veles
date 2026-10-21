@@ -15,10 +15,7 @@ type ConflictNoticeProps = {
   recoveredText: string | null;
 };
 
-/**
- * Explains a rejected stale save. First it offers to load the latest version; after that it shows
- * the user's unsaved text so they can copy parts of it, put it back, or drop it.
- */
+/** Explains a rejected stale save, then shows the unsaved text to reuse or discard. */
 export function ConflictNotice({
   className,
   loading = false,

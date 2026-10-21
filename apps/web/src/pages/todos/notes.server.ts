@@ -72,11 +72,7 @@ export async function createNoteRecord(userId: string, data: typeof createNoteIn
   return created;
 }
 
-/**
- * Edits note text within the caller's scope only when `data.version` is still current. The version
- * check and increment run in one UPDATE, so of two writers that loaded the same version exactly one
- * wins; the other gets a `VersionConflictError` and the stored note stays unchanged.
- */
+/** Edits note text in the caller's scope only if `data.version` is current; one UPDATE checks and increments it. */
 export async function updateNoteRecord(
   userId: string,
   data: typeof updateNoteInputType.infer,

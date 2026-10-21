@@ -6,11 +6,7 @@ import { translate } from '@/lib/i18n/getLocale';
 import { db } from '@/server/db.server';
 import type { updateDiaryEntryInputType } from './diary.validation';
 
-/**
- * Stores a re-encrypted entry only when `data.version` is still current. The check and increment
- * run in one UPDATE, so of two editors that loaded the same version exactly one wins; the other
- * gets a `VersionConflictError` and the stored entry stays unchanged.
- */
+/** Stores a re-encrypted entry only if `data.version` is current; one UPDATE checks and increments it. */
 export async function updateDiaryEntryRecord(
   userId: string,
   data: typeof updateDiaryEntryInputType.infer,

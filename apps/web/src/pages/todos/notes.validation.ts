@@ -13,7 +13,6 @@ const noteVersionType = 'number.integer >= 1';
 export const updateNoteInputType = type({
   '+': 'reject',
   id: 'string.uuid',
-  // Required: an update without the version the editor loaded must not skip the conflict check.
   version: noteVersionType,
   'title?': 'string.trim |> 0 < string <= 160',
   'content?': 'string <= 16000',

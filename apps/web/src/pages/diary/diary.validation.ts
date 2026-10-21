@@ -8,6 +8,5 @@ export const updateDiaryEntryInputType = type({
   ciphertext: ciphertextType,
   entryDate: dateOnlyType,
   id: 'string.uuid',
-  // Required: a save without the version the editor loaded must not skip the conflict check.
   version: 'number.integer >= 1',
 });

@@ -3,11 +3,11 @@ import { eq } from 'drizzle-orm';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { diaryEntries } from '@veles/db/schema';
 import { VersionConflictError } from '@/lib/errors/VersionConflictError';
-import { createTestDatabase } from '@/server/testDatabase.server';
+import { createTestDatabase, type TestDatabase } from '@/server/testDatabase.server';
 import { updateDiaryEntryRecord } from './diary.server';
 import { updateDiaryEntryInputType } from './diary.validation';
 
-const testDatabase = vi.hoisted(() => ({ current: undefined as unknown }));
+const testDatabase = vi.hoisted((): { current?: TestDatabase['db'] } => ({}));
 
 vi.mock('@/server/db.server', () => ({
   get db() {
@@ -16,8 +16,8 @@ vi.mock('@/server/db.server', () => ({
 }));
 vi.mock('@/lib/i18n/getLocale', () => ({ translate: (text: { en: string }) => text.en }));
 
-let testDb: Awaited<ReturnType<typeof createTestDatabase>>;
-let database: typeof testDb.db;
+let testDb: TestDatabase;
+let database: TestDatabase['db'];
 
 beforeAll(async () => {
   testDb = await createTestDatabase();

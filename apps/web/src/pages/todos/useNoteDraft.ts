@@ -9,14 +9,11 @@ type NoteText = { content: string; title: string };
 const textOf = ({ content, title }: NoteText): NoteText => ({ content, title });
 
 /**
- * Holds a note card's editable text and the version it was loaded from. Polled server changes
- * replace the text only while the card has no unsaved edits. A save against a stale version stops
- * further saves and keeps the draft; `loadLatest` then loads the newer note and keeps the rejected
- * draft in `recovered`, so the user can reconcile instead of losing either version.
+ * Holds a note card's editable text and its base version. Polled changes apply only without unsaved
+ * edits. After a conflict, `loadLatest` loads the newer note and keeps the draft in `recovered`.
  */
 export function useNoteDraft(note: NoteSummary) {
   const queryClient = useQueryClient();
-  // The text and version the editor was loaded from, moved forward by each successful save.
   const [base, setBase] = useState({ ...textOf(note), version: note.version });
   const [draft, setDraft] = useState(textOf(note));
   const [seenVersion, setSeenVersion] = useState(note.version);

@@ -58,11 +58,7 @@ export function useSetNoteSharedMutation() {
   });
 }
 
-/**
- * Saves note text against the version the editor holds. Saves of one note run in order, and the
- * next one starts after `onSuccess` stored the new version, so an editor's consecutive saves never
- * conflict with each other.
- */
+/** Saves note text against the editor's version; saves of one note run in order. */
 export function useUpdateNoteMutation(
   noteId: string,
   getVersion: () => number,
