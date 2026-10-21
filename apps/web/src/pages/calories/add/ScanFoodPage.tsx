@@ -11,7 +11,7 @@ import { LookupNotice, type LookupState } from './ScanNotice';
 import css from './ScanFoodPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-/** Camera-first barcode lookup; a match opens the Add food confirm step as a new history entry. */
+/** Camera-first barcode lookup; a match opens the diary's Add food dialog for that food. */
 export function ScanFoodPage({ initialDate: date }: { initialDate: string }) {
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -29,7 +29,11 @@ export function ScanFoodPage({ initialDate: date }: { initialDate: string }) {
       const result = await lookupMutation.mutateAsync({ data: { barcode } });
       if (result.status === 'found') {
         queryClient.setQueryData(calorieFoodQueryOptions(result.food.id).queryKey, result.food);
-        await navigate({ search: { date, foodId: result.food.id }, to: '/calories/add' });
+        await navigate({
+          replace: true,
+          search: { date, foodId: result.food.id },
+          to: '/calories',
+        });
       } else {
         setLookup({ barcode, status: 'notFound' });
       }

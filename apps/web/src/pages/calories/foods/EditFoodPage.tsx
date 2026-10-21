@@ -25,7 +25,7 @@ export function EditFoodPage({ addFoodDate, food }: Props) {
       await navigate({
         replace: true,
         search: { date: addFoodDate, foodId: food.id },
-        to: '/calories/add',
+        to: '/calories',
       });
       return;
     }
