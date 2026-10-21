@@ -20,7 +20,7 @@ export function MobileNavbar({ user }: { user: SessionUser | null }) {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
-  const prefs = useMobileNavPrefs();
+  const [prefs, savePrefs] = useMobileNavPrefs();
   const [customizing, setCustomizing] = useState(false);
   const longPress = useLongPress(() => setCustomizing(true));
 
@@ -65,7 +65,12 @@ export function MobileNavbar({ user }: { user: SessionUser | null }) {
           <MobileMoreSheet hiddenItems={rest} items={items} pathname={pathname} />
         </li>
       </ul>
-      <MobileNavCustomizer onOpenChange={setCustomizing} open={customizing} prefs={prefs} />
+      <MobileNavCustomizer
+        onOpenChange={setCustomizing}
+        onPrefsChange={savePrefs}
+        open={customizing}
+        prefs={prefs}
+      />
     </nav>
   );
 }

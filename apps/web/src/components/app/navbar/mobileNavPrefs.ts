@@ -1,4 +1,6 @@
-import { useSyncExternalStore } from 'react';
+import { createIsomorphicFn } from '@tanstack/react-start';
+import { getCookie } from '@tanstack/react-start/server';
+import { useState } from 'react';
 import { NAVBAR_ITEMS, type NavbarItem, type NavbarItemKey } from './navbarItems';
 
 /** Pinned links plus the always-present More tab fit six slots at 320px. */
@@ -11,96 +13,65 @@ export type MobileNavPrefs = {
   pinned: NavbarItemKey[];
 };
 
-const STORAGE_KEY = 'veles.mobileNav.v1';
+const COOKIE_NAME = 'veles-mobile-nav';
+const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
+const PINNED_MARK = '+';
 const ALL_KEYS = NAVBAR_ITEMS.map((item) => item.key);
 
-export const DEFAULT_MOBILE_NAV_PREFS: MobileNavPrefs = {
+const DEFAULT_PREFS: MobileNavPrefs = {
   order: ALL_KEYS,
   pinned: ['diary', 'todos', 'recipes', 'workouts', 'calories'],
 };
 
-function isKey(value: unknown): value is NavbarItemKey {
+function isKey(value: string): value is NavbarItemKey {
   return ALL_KEYS.some((key) => key === value);
 }
 
-/**
- * Reads stored prefs and repairs them against the current item list: unknown keys drop, new
- * items append to the order, and the pin count respects the max. Bad JSON falls back to defaults.
- */
-function parsePrefs(raw: string | null): MobileNavPrefs {
-  if (!raw) {
-    return DEFAULT_MOBILE_NAV_PREFS;
-  }
-  try {
-    const value: unknown = JSON.parse(raw);
-    if (typeof value !== 'object' || value === null) {
-      return DEFAULT_MOBILE_NAV_PREFS;
-    }
-    const order = 'order' in value && Array.isArray(value.order) ? value.order.filter(isKey) : [];
-    const pinned =
-      'pinned' in value && Array.isArray(value.pinned) ? value.pinned.filter(isKey) : [];
-    return {
-      order: [...new Set([...order, ...ALL_KEYS])],
-      pinned: [...new Set(pinned)].slice(0, MOBILE_NAV_MAX_PINNED),
-    };
-  } catch {
-    return DEFAULT_MOBILE_NAV_PREFS;
-  }
+/** Cookie value is the ordered key list, pinned keys prefixed: `+diary,+todos,weight`. */
+function serialize({ order, pinned }: MobileNavPrefs) {
+  return order.map((key) => (pinned.includes(key) ? PINNED_MARK + key : key)).join(',');
 }
 
-const listeners = new Set<() => void>();
-let cachedRaw: string | null | undefined;
-let cachedPrefs = DEFAULT_MOBILE_NAV_PREFS;
-
-function readRaw() {
-  try {
-    return localStorage.getItem(STORAGE_KEY);
-  } catch {
-    return null;
+/** Parses the cookie and drops unknown keys; items added since the save append unpinned. */
+function parse(value: string | undefined): MobileNavPrefs {
+  if (!value) {
+    return DEFAULT_PREFS;
   }
-}
+  const entries = value.split(',');
+  const keys = entries.map((entry) => entry.replace(PINNED_MARK, '')).filter(isKey);
+  const pinned = entries
+    .filter((entry) => entry.startsWith(PINNED_MARK))
+    .map((entry) => entry.slice(PINNED_MARK.length))
+    .filter(isKey);
 
-function getSnapshot() {
-  const raw = readRaw();
-  if (raw !== cachedRaw) {
-    cachedRaw = raw;
-    cachedPrefs = parsePrefs(raw);
-  }
-  return cachedPrefs;
-}
-
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  const onStorage = (event: StorageEvent) => {
-    if (event.key === STORAGE_KEY) {
-      listener();
-    }
-  };
-  window.addEventListener('storage', onStorage);
-  return () => {
-    listeners.delete(listener);
-    window.removeEventListener('storage', onStorage);
+  return {
+    order: [...new Set([...keys, ...ALL_KEYS])],
+    pinned: [...new Set(pinned)].slice(0, MOBILE_NAV_MAX_PINNED),
   };
 }
 
-export function saveMobileNavPrefs(prefs: MobileNavPrefs | null) {
-  try {
-    if (prefs) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
-    } else {
-      localStorage.removeItem(STORAGE_KEY);
-    }
-  } catch {
-    // Private mode or full storage: keep the current layout.
-  }
-  for (const listener of listeners) {
-    listener();
-  }
-}
+const readCookie = createIsomorphicFn()
+  .server(() => getCookie(COOKIE_NAME))
+  .client(() =>
+    document.cookie
+      .split('; ')
+      .find((part) => part.startsWith(`${COOKIE_NAME}=`))
+      ?.slice(COOKIE_NAME.length + 1),
+  );
 
-/** Device-local dock layout. The server render uses the defaults, then the stored value applies. */
+/** Dock layout stored in a cookie, so the server renders the user's layout on first paint. */
 export function useMobileNavPrefs() {
-  return useSyncExternalStore(subscribe, getSnapshot, () => DEFAULT_MOBILE_NAV_PREFS);
+  const [prefs, setPrefs] = useState(() => parse(readCookie()));
+
+  const savePrefs = (next: MobileNavPrefs | null) => {
+    setPrefs(next ?? DEFAULT_PREFS);
+    const secure = location.protocol === 'https:' ? '; Secure' : '';
+    const value = next ? serialize(next) : '';
+    const maxAge = next ? COOKIE_MAX_AGE_SECONDS : 0;
+    document.cookie = `${COOKIE_NAME}=${value}; Max-Age=${maxAge}; Path=/; SameSite=Lax${secure}`;
+  };
+
+  return [prefs, savePrefs] as const;
 }
 
 export function orderedNavbarItems(prefs: MobileNavPrefs): NavbarItem[] {

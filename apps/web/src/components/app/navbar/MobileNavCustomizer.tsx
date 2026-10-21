@@ -25,25 +25,26 @@ import {
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import css from './MobileNavCustomizer.module.css';
 import { MobileNavCustomizerRow } from './MobileNavCustomizerRow';
-import {
-  MOBILE_NAV_MAX_PINNED,
-  type MobileNavPrefs,
-  orderedNavbarItems,
-  saveMobileNavPrefs,
-} from './mobileNavPrefs';
+import { MOBILE_NAV_MAX_PINNED, type MobileNavPrefs, orderedNavbarItems } from './mobileNavPrefs';
 import type { NavbarItemKey } from './navbarItems';
 
 type MobileNavCustomizerProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   prefs: MobileNavPrefs;
+  onPrefsChange: (prefs: MobileNavPrefs | null) => void;
 };
 
 /**
  * Bottom sheet that edits the phone dock: drag rows to reorder and switch sections into the bar
- * (up to the max). Changes save at once on this device; More always stays so nothing is lost.
+ * (up to the max). Changes save at once to a cookie; More always stays so nothing is lost.
  */
-export function MobileNavCustomizer({ open, onOpenChange, prefs }: MobileNavCustomizerProps) {
+export function MobileNavCustomizer({
+  open,
+  onOpenChange,
+  prefs,
+  onPrefsChange,
+}: MobileNavCustomizerProps) {
   const { t } = useI18n();
   const items = orderedNavbarItems(prefs);
   const full = prefs.pinned.length >= MOBILE_NAV_MAX_PINNED;
@@ -57,12 +58,12 @@ export function MobileNavCustomizer({ open, onOpenChange, prefs }: MobileNavCust
     const from = prefs.order.findIndex((key) => key === active.id);
     const to = prefs.order.findIndex((key) => key === over?.id);
     if (from !== -1 && to !== -1 && from !== to) {
-      saveMobileNavPrefs({ ...prefs, order: arrayMove(prefs.order, from, to) });
+      onPrefsChange({ ...prefs, order: arrayMove(prefs.order, from, to) });
     }
   };
 
   const setPinned = (key: NavbarItemKey, pinned: boolean) => {
-    saveMobileNavPrefs({
+    onPrefsChange({
       ...prefs,
       pinned: pinned ? [...prefs.pinned, key] : prefs.pinned.filter((k) => k !== key),
     });
@@ -88,7 +89,7 @@ export function MobileNavCustomizer({ open, onOpenChange, prefs }: MobileNavCust
           </SortableContext>
         </DndContext>
         <DialogActions>
-          <Btn onClick={() => saveMobileNavPrefs(null)} variant='ghost'>
+          <Btn onClick={() => onPrefsChange(null)} variant='ghost'>
             {t({ en: 'Reset', pl: 'Przywróć domyślne' })}
           </Btn>
           <DialogClose render={<Btn>{t({ en: 'Done', pl: 'Gotowe' })}</Btn>} />
