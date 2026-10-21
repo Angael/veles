@@ -10,7 +10,8 @@
 @media (--phone) {
   .button {
     right: var(--space-lg);
-    bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+    /* MobileNavbar lifts this above its taller dock while it is visible. */
+    bottom: calc(var(--mobile-nav-fab-offset) + env(safe-area-inset-bottom, 0px));
   }
 
   /* stylelint-disable-next-line selector-pseudo-class-no-unknown */

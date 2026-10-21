@@ -1,39 +1,184 @@
-.group {
+/*
+ * Two-level dock. Sections come first in the DOM (pick a group, then a page) but render below the
+ * destination links so the section switch stays closest to the thumb.
+ */
+@media (--phone) {
+  nav.wrapper {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.25rem;
+    /* Concentric with the 44px pill links inside the 0.3rem dock padding. */
+    border-radius: calc(var(--button-min-height) / 2 + 0.3rem);
+  }
+}
+
+.sections {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.25rem;
 }
 
-.item {
-  display: inline-flex;
+.section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: var(--dock-item-height);
+  min-height: var(--button-min-height);
+  gap: 0.125rem;
+  /* Bottom room keeps the current-section bar clear of the label. */
+  padding: 0 0.25rem 0.25rem;
   border: 0;
   border-radius: var(--radius-pill);
   color: var(--c-muted);
   background: transparent;
+  font-size: var(--text-xs);
+  line-height: 1.1;
   transition:
     color 160ms ease,
     background-color 160ms ease;
+
+  /* Shown section: shares the link tray's surface, with a notch pointing at the row it controls. */
+  &[data-pressed] {
+    color: var(--c-text-strong);
+    background: var(--c-surface-tray);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -0.25rem;
+      left: 50%;
+      width: 0.75rem;
+      height: 0.25rem;
+      background: var(--c-surface-tray);
+      clip-path: polygon(0 100%, 50% 0, 100% 100%);
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Section that holds the current page: bar under the label plus weight, never color alone. */
+  &[data-current] {
+    font-weight: var(--font-weight-semibold);
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0.1875rem;
+      left: 50%;
+      width: 1rem;
+      height: 0.1875rem;
+      border-radius: var(--radius-pill);
+      background: var(--c-accent);
+      transform: translateX(-50%);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: -2px;
+  }
 }
 
-.item[data-pressed] {
-  color: var(--c-text-strong);
-  background: linear-gradient(180deg, rgba(59, 130, 246, 0.32), rgba(59, 130, 246, 0.18));
-  box-shadow: inset 0 0 0 1px rgba(147, 197, 253, 0.18);
+.sectionLabel {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--radius-pill);
+  background: var(--c-surface-tray);
+  list-style: none;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--button-min-height);
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+  border-radius: var(--radius-pill);
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  line-height: 1.1;
+  text-decoration: none;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease;
+
+  & > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Current page: filled pill, inset border, weight and a trailing dot. */
+  &[aria-current='page'] {
+    color: var(--c-text-strong);
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.32), rgba(59, 130, 246, 0.18));
+    box-shadow: inset 0 0 0 1px var(--c-primary-border-soft);
+    font-weight: var(--font-weight-semibold);
+
+    &::after {
+      content: '';
+      flex: none;
+      width: 0.375rem;
+      height: 0.375rem;
+      border-radius: 50%;
+      background: currentcolor;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: -2px;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .item:hover {
+  .section:not([data-pressed]):hover,
+  .link:not([aria-current='page']):hover {
     color: var(--c-text-strong);
     background: rgba(148, 163, 184, 0.09);
   }
 }
 
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 @media not (--phone) {
   .wrapper {
     display: none;
+  }
+}
+
+@media (--phone) {
+  /*
+   * Dock top sits ~6.7rem above the safe area. The reserve keeps page scroll room even while the
+   * selection bar owns the dock, so the page height doesn't jump; the floating button only lifts
+   * while this navbar is actually visible.
+   */
+  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+  :global(body):has(.wrapper) {
+    --mobile-nav-reserve: 7.5rem;
+  }
+
+  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+  :global(body):has(.wrapper):not(:has(:global(.selectionBar))) {
+    --mobile-nav-fab-offset: 7.5rem;
   }
 }
 
@@ -44,9 +189,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .item {
+  .section,
+  .link {
     transition:
-      color 120ms ease,
-      background-color 120ms ease;
+      color 80ms ease,
+      background-color 80ms ease;
   }
 }

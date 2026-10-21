@@ -7,7 +7,7 @@ import type { SessionUser } from '@/lib/auth/session.api';
 import { getInitials } from '@/lib/getInitials';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import css from './Navbar.module.css';
-import { NAVBAR_ITEMS } from './navbarItems';
+import { isNavbarItemActive, NAVBAR_ITEMS } from './navbarItems';
 
 export function Navbar({ user }: { user: SessionUser | null }) {
   const { t } = useI18n();
@@ -27,7 +27,7 @@ export function Navbar({ user }: { user: SessionUser | null }) {
       {user ? (
         <ul className={css.trackerList}>
           {NAVBAR_ITEMS.map((item) => {
-            const active = item.matchPrefixes.some((prefix) => pathname.startsWith(prefix));
+            const active = isNavbarItemActive(item, pathname);
             const Icon = item.icon;
 
             return (

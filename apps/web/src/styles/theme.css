@@ -93,6 +93,8 @@
   --c-surface-input: rgba(2, 6, 23, 0.55);
   --c-surface-inset: rgba(2, 6, 23, 0.5);
   --c-surface-header: #0a0f1f;
+  /* Quiet grouping surface, e.g. the phone dock's destination row and its section control. */
+  --c-surface-tray: rgba(148, 163, 184, 0.1);
 
   --c-border: rgba(148, 163, 184, 0.2);
   /* Reserved theme token for upcoming hover treatments. */
@@ -124,6 +126,9 @@
   --button-min-height: 44px;
   /* Control height inside the phone bottom dock (mobile navbar, selection bar). */
   --dock-item-height: 2.2rem;
+  /* Phone bottom clearance for page scroll room and FloatingButton; MobileNavbar raises both. */
+  --mobile-nav-reserve: 4rem;
+  --mobile-nav-fab-offset: 4rem;
 
   --radius-xs: 14px;
   --radius-sm: 16px;
