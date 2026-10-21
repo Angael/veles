@@ -35,10 +35,7 @@ export function AppFrame({
     <div className={css.page}>
       <div className={clsx(css.shell, layout && 'focusShell', layout === 'task' && css.taskShell)}>
         {layout === 'task' ? (
-          <TaskHeader
-            actions={navbar?.Actions ? <navbar.Actions /> : null}
-            title={navbar?.Title ? <navbar.Title /> : label}
-          />
+          <TaskHeader actions={navbar?.Actions ? <navbar.Actions /> : null} title={label} />
         ) : null}
         {layout ? null : (
           <header className={css.header}>

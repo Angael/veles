@@ -394,22 +394,3 @@
   display: grid;
   gap: var(--space-md);
 }
-
-/* Page title that opens the rename dialog: looks like a heading until hovered or focused. */
-.titleButton {
-  padding: 0;
-  border: 0;
-  color: inherit;
-  font: inherit;
-  text-align: start;
-  text-decoration: underline dotted transparent;
-  text-underline-offset: 0.2em;
-  background: none;
-  cursor: pointer;
-  transition: text-decoration-color 160ms var(--ease-out);
-
-  &:hover,
-  &:focus-visible {
-    text-decoration-color: var(--c-muted);
-  }
-}
