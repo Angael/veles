@@ -20,7 +20,7 @@ const ALL_KEYS = NAVBAR_ITEMS.map((item) => item.key);
 
 const DEFAULT_PREFS: MobileNavPrefs = {
   order: ALL_KEYS,
-  pinned: ['diary', 'todos', 'recipes', 'workouts', 'calories'],
+  pinned: ALL_KEYS.filter((key) => key !== 'diary'),
 };
 
 function isKey(value: string): value is NavbarItemKey {
