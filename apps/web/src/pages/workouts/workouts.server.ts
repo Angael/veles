@@ -75,7 +75,7 @@ export function toSetColumns(patch: Partial<SetMetrics>) {
 
 export async function requireOwnedWorkout(tx: Db, userId: string, workoutId: string) {
   const [workout] = await tx
-    .select({ date: workoutSessions.date, id: workoutSessions.id })
+    .select({ date: workoutSessions.date, id: workoutSessions.id, name: workoutSessions.name })
     .from(workoutSessions)
     .where(and(eq(workoutSessions.id, workoutId), eq(workoutSessions.userId, userId)));
   if (!workout)

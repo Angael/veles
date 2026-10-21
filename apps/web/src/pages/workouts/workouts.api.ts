@@ -93,7 +93,7 @@ export const startWorkout = createServerFn({ method: 'POST' })
     return startWorkoutRecord(session.user.id, data);
   });
 
-/** Renames a session, or finishes / reopens it. Reopening is refused while another is open. */
+/** Renames a session, moves it to another day, or finishes / reopens it. */
 export const updateWorkout = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateWorkout')])
   .validator(arkTypeValidator(updateWorkoutInputType))
