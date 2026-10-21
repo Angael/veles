@@ -78,7 +78,6 @@ export function DiaryPassphraseForm({ keyRecord, onUnlocked }: DiaryPassphraseFo
           <Label text={t({ en: 'Passphrase', pl: 'Hasło' })}>
             <TextInput
               autoComplete={isSetup ? 'new-password' : 'current-password'}
-              autoFocus
               minLength={isSetup ? 8 : undefined}
               name='passphrase'
               required
