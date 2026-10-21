@@ -55,3 +55,10 @@
     transition: none;
   }
 }
+
+.actions {
+  display: flex;
+  flex: none;
+  gap: var(--space-xs);
+  margin-left: auto;
+}

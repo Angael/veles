@@ -1,25 +1,25 @@
 import { useNavigate } from '@tanstack/react-router';
-import { CircleHelpIcon, FlagIcon, RotateCcwIcon } from 'lucide-react';
+import { FlagIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
-import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
 import { floorDuration, formatDuration } from '../metrics';
 import { useUpdateWorkoutMutation } from '../workouts.query';
 import type { WorkoutSessionData } from '../workouts.server';
-import { SessionMenu } from './SessionMenu';
 import css from './Session.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-type SessionHeaderProps = {
+type SessionSummaryProps = {
   onFinish: () => void;
-  onShowHints: () => void;
   session: WorkoutSessionData;
 };
 
-/** Workout name, elapsed time, a "?" to replay the tips, and Finish (Reopen once finished). */
-export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderProps) {
-  const { t } = useI18n();
+/**
+ * Day and elapsed time of the session, with Finish while it runs. Name and rare actions (rename,
+ * reopen, move) live in the task header above.
+ */
+export function SessionSummary({ onFinish, session }: SessionSummaryProps) {
+  const { formatDate, t } = useI18n();
   const navigate = useNavigate();
   const updateWorkout = useUpdateWorkoutMutation();
   const setSeconds = session.slots
@@ -29,44 +29,23 @@ export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderP
   const finished = session.endedAt !== null;
 
   return (
-    <Card className={css.sessionHeader}>
-      <SeamlessTextInput
-        aria-label={t({ en: 'Workout name', pl: 'Nazwa treningu' })}
-        defaultValue={session.name}
-        key={session.name}
-        onBlur={(event) => {
-          const name = event.target.value.trim();
-          if (name && name !== session.name) updateWorkout.mutate({ id: session.id, name });
-        }}
-        onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.blur()}
-      />
+    <Card className={css.summary}>
       <dl className={css.stats}>
         <div>
+          <dt>{t({ en: 'Day', pl: 'Dzień' })}</dt>
+          <dd>
+            <time dateTime={session.date}>
+              {formatDate(session.date, { day: 'numeric', month: 'short', weekday: 'short' })}
+            </time>
+          </dd>
+        </div>
+        <div>
           <dt>{t({ en: 'Time', pl: 'Czas' })}</dt>
-          <dd>{elapsed === null ? '—' : formatDuration(elapsed)}</dd>
+          <dd className={css.timeValue}>{elapsed === null ? '—' : formatDuration(elapsed)}</dd>
         </div>
       </dl>
-      <Btn
-        aria-label={t({ en: 'Show tips again', pl: 'Pokaż wskazówki ponownie' })}
-        icon={<CircleHelpIcon aria-hidden='true' />}
-        iconOnly
-        onClick={onShowHints}
-        radius='pill'
-        size='sm'
-        variant='ghost'
-      />
-      <SessionMenu session={session} />
       {finished ? (
-        <Btn
-          disabled={updateWorkout.isPending}
-          icon={<RotateCcwIcon aria-hidden='true' />}
-          onClick={() => updateWorkout.mutate({ finished: false, id: session.id })}
-          radius='pill'
-          size='sm'
-          variant='outlineMain'
-        >
-          {t({ en: 'Reopen', pl: 'Otwórz ponownie' })}
-        </Btn>
+        <span className={css.finishedBadge}>{t({ en: 'Finished', pl: 'Zakończony' })}</span>
       ) : (
         <Btn
           disabled={updateWorkout.isPending}
@@ -83,7 +62,6 @@ export function SessionHeader({ onFinish, onShowHints, session }: SessionHeaderP
             )
           }
           radius='pill'
-          size='sm'
         >
           {t({ en: 'Finish', pl: 'Zakończ' })}
         </Btn>
