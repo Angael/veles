@@ -55,6 +55,7 @@ export function FriendsCard() {
       as='section'
       className={css.friendsCard}
       data-appear='1'
+      id='friends'
     >
       <header className={css.sectionHeader}>
         <div>
