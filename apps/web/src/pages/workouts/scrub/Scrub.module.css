@@ -102,6 +102,12 @@
   font-size: 0.7em;
 }
 
+/* Keeps room for the decimal part, so whole numbers don't shift when it appears. */
+.fraction {
+  display: inline-block;
+  text-align: start;
+}
+
 /* Typing in place: a plain text field, so the browser handles caret, selection and scroll. */
 .typing {
   border-color: var(--c-primary-border);

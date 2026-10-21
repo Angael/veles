@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useState } from 'react';
 import { rulerStyle } from './ScrubCell';
+import { fractionDigits, ScrubNumber } from './ScrubNumber';
 import { useScrub, type ScrubOptions } from './useScrub';
 import css from './Scrub.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
@@ -71,7 +72,9 @@ export function ScrubField({
           {...handlers}
         >
           <ChevronLeftIcon aria-hidden='true' className={css.hintChevron} />
-          <span className={css.fieldNumber}>{format(current)}</span>
+          <span className={css.fieldNumber}>
+            <ScrubNumber digits={fractionDigits(options.tiers)} text={format(current)} />
+          </span>
           <ChevronRightIcon aria-hidden='true' className={css.hintChevron} />
         </div>
       )}
