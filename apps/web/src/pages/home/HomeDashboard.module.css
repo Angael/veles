@@ -14,20 +14,27 @@
   padding: var(--space-lg);
 }
 
-.foodTile,
-.weightTile {
+.grid > article {
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+}
+
+.food,
+.weight,
+.friends,
+.agent {
   grid-column: span 6;
 }
 
-.recipeTile {
-  display: grid;
+.grid > .recipes {
   grid-column: 1 / -1;
   gap: var(--space-sm);
 }
 
-.todosTile,
-.diaryTile,
-.familyTile {
+.workouts,
+.notes,
+.diary {
   grid-column: span 4;
 }
 
@@ -74,17 +81,7 @@
   }
 }
 
-.foodTile,
-.weightTile,
-.todosTile,
-.diaryTile,
-.familyTile {
-  display: grid;
-  align-content: start;
-  gap: var(--space-md);
-}
-
-.foodTile {
+.food {
   background: var(--c-surface-strong);
 }
 
@@ -282,8 +279,7 @@
 
 .emptyWeight p,
 .emptyRecipes p,
-.todosTile p,
-.familyTile p {
+.description {
   color: var(--c-muted);
   text-wrap: pretty;
 }
@@ -343,11 +339,23 @@
   gap: var(--space-sm);
 }
 
-.diaryReadout {
-  color: var(--c-text-strong);
-  font-size: var(--text-lg);
-  font-weight: var(--font-weight-semibold);
-  text-wrap: balance;
+.readout {
+  display: grid;
+  gap: 0.125rem;
+
+  strong {
+    overflow: hidden;
+    color: var(--c-text-strong);
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-semibold);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  span {
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+  }
 }
 
 @media (--phone) {
@@ -364,21 +372,20 @@
     padding: var(--space-md);
   }
 
-  .foodTile,
-  .weightTile,
-  .recipeTile,
-  .familyTile {
+  .food,
+  .weight,
+  .workouts,
+  .friends,
+  .agent {
     grid-column: 1 / -1;
   }
 
-  .todosTile,
-  .diaryTile {
+  .notes,
+  .diary {
     grid-column: span 1;
-    gap: var(--space-sm);
   }
 
-  .foodTile,
-  .weightTile {
+  .grid > article {
     gap: var(--space-sm);
   }
 
@@ -398,12 +405,12 @@
     font-size: 0.6875rem;
   }
 
-  .weightTile {
+  .grid > .weight {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: center;
   }
 
-  .weightTile .tileHeading,
+  .weight .tileHeading,
   .weightMeta,
   .emptyWeight {
     grid-column: 1 / -1;
