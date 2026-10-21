@@ -12,3 +12,8 @@ function useRouteSession() {
 export function WorkoutActions() {
   return <SessionMenu session={useRouteSession()} />;
 }
+
+/** Session name as the task header title. */
+export function useWorkoutLabel(): string {
+  return useRouteSession().name;
+}

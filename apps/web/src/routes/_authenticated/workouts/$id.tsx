@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { WorkoutSessionPage } from '@/pages/workouts/session/WorkoutSessionPage';
-import { WorkoutActions } from '@/pages/workouts/session/WorkoutActions';
+import { useWorkoutLabel, WorkoutActions } from '@/pages/workouts/session/WorkoutTaskHeader';
 import { workoutSessionQueryOptions } from '@/pages/workouts/workouts.query';
 import { translate } from '@/lib/i18n/getLocale';
 
@@ -16,7 +16,7 @@ export const Route = createFileRoute('/_authenticated/workouts/$id')({
     navbar: {
       Actions: WorkoutActions,
       backFallback: { to: '/workouts' },
-      label: { en: 'Workout', pl: 'Trening' },
+      label: useWorkoutLabel,
     },
   },
 });
