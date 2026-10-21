@@ -1,52 +1,44 @@
-import { Toggle } from '@base-ui/react/toggle';
-import { ToggleGroup } from '@base-ui/react/toggle-group';
 import { Link, useRouterState } from '@tanstack/react-router';
 import clsx from 'clsx';
 import dock from '@/components/ui/mobile-dock/MobileDock.module.css';
 import type { SessionUser } from '@/lib/auth/session.api';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import css from './MobileNavbar.module.css';
-import { NAVBAR_ITEMS } from './navbarItems';
+import { MobileMoreSheet } from './MobileMoreSheet';
+import { MOBILE_DOCK_ITEMS } from './navbarItems';
 
+/** Phone dock: labeled direct tabs for daily destinations plus a More sheet listing every section. */
 export function MobileNavbar({ user }: { user: SessionUser | null }) {
   const { t } = useI18n();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
-  const items = user ? NAVBAR_ITEMS : [];
-  const activeValue = items.find((item) =>
-    item.matchPrefixes.some((prefix) => pathname.startsWith(prefix)),
-  )?.key;
 
-  if (items.length === 0) {
+  if (!user) {
     return null;
   }
 
-  const navLabel = t({ en: 'Primary mobile navigation', pl: 'Główna nawigacja mobilna' });
-
   return (
-    <nav aria-label={navLabel} className={clsx(dock.dock, css.wrapper)}>
-      <ToggleGroup
-        aria-label={navLabel}
-        className={css.group}
-        value={activeValue ? [activeValue] : []}
-      >
-        {items.map((item) => {
+    <nav
+      aria-label={t({ en: 'Primary mobile navigation', pl: 'Główna nawigacja mobilna' })}
+      className={clsx(dock.dock, css.wrapper)}
+    >
+      <ul className={css.group}>
+        {MOBILE_DOCK_ITEMS.map((item) => {
           const Icon = item.icon;
           return (
-            <Toggle
-              key={item.key}
-              aria-label={t(item.label)}
-              className={css.item}
-              nativeButton={false}
-              render={<Link to={item.link} />}
-              value={item.key}
-            >
-              <Icon aria-hidden='true' size={20} strokeWidth={1.9} />
-            </Toggle>
+            <li key={item.key}>
+              <Link className={css.item} to={item.link}>
+                <Icon aria-hidden='true' className={css.icon} size={20} strokeWidth={1.9} />
+                <span className={css.label}>{t(item.label)}</span>
+              </Link>
+            </li>
           );
         })}
-      </ToggleGroup>
+        <li>
+          <MobileMoreSheet pathname={pathname} />
+        </li>
+      </ul>
     </nav>
   );
 }

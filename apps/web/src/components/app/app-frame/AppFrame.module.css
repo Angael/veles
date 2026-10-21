@@ -24,13 +24,15 @@
 
   @media (--phone) {
     width: min(1100px, calc(100% - 1rem));
-    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--dock-clearance) + 0.75rem + env(safe-area-inset-bottom, 0px));
     --btn-floating-clearance: calc(var(--button-min-height) + var(--space-lg));
 
     /* A fixed action needs scroll room so the final page control can clear it. */
     /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
     &:has(:global(.floatingButton)) {
-      padding-bottom: calc(4rem + var(--btn-floating-clearance) + env(safe-area-inset-bottom, 0px));
+      padding-bottom: calc(
+        var(--dock-clearance) + var(--btn-floating-clearance) + env(safe-area-inset-bottom, 0px)
+      );
     }
   }
 }

@@ -1,12 +1,12 @@
 import { Link } from '@tanstack/react-router';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
 import {
-  BookOpenIcon,
-  CheckIcon,
+  BookHeartIcon,
+  ChefHatIcon,
   FlameIcon,
   ScaleIcon,
+  StickyNoteIcon,
   UsersRoundIcon,
-  UtensilsIcon,
 } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
@@ -146,7 +146,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
         <Card as='section' className={css.recipeTile} data-appear='2' shadow={false}>
           <div className={css.tileHeading}>
             <h2>{t({ en: 'Recipes for today', pl: 'Przepisy na dziś' })}</h2>
-            <UtensilsIcon aria-hidden='true' />
+            <ChefHatIcon aria-hidden='true' />
           </div>
           <div className={css.recipeStack}>
             {recommendedRecipes.length ? (
@@ -191,7 +191,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
         <Card as='article' className={css.todosTile} data-appear='3' shadow={false}>
           <div className={css.tileHeading}>
             <h2>{t({ en: 'Notes', pl: 'Notatki' })}</h2>
-            <CheckIcon aria-hidden='true' />
+            <StickyNoteIcon aria-hidden='true' />
           </div>
           <p>{t({ en: 'View your list', pl: 'Zobacz swoją listę' })}</p>
           <Link
@@ -204,7 +204,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
         <Card as='article' className={css.diaryTile} data-appear='4' shadow={false}>
           <div className={css.tileHeading}>
             <h2>{t({ en: 'Diary', pl: 'Dziennik' })}</h2>
-            <BookOpenIcon aria-hidden='true' />
+            <BookHeartIcon aria-hidden='true' />
           </div>
           <div className={css.diaryReadout}>
             {formatDiaryDistance(data.lastDiaryEntryDate, i18n)}

@@ -123,7 +123,9 @@
 
   --button-min-height: 44px;
   /* Control height inside the phone bottom dock (mobile navbar, selection bar). */
-  --dock-item-height: 2.2rem;
+  --dock-item-height: 2.75rem;
+  /* Distance from the viewport bottom (before the safe-area inset) that clears the phone dock. */
+  --dock-clearance: calc(var(--dock-item-height) + 1.8rem);
 
   --radius-xs: 14px;
   --radius-sm: 16px;

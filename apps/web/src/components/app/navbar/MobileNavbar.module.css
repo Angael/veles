@@ -1,31 +1,72 @@
 .group {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
+/* Shared by the dock links and the More trigger button. */
 .item {
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
   min-height: var(--dock-item-height);
+  gap: 0.125rem;
+  padding: 0.2rem 0.25rem;
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: calc(var(--radius-pill) - 2px);
   color: var(--c-muted);
   background: transparent;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition:
     color 160ms ease,
     background-color 160ms ease;
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 1px;
+  }
+
+  &:active {
+    background: rgba(148, 163, 184, 0.14);
+  }
+
+  /* Router sets `data-status` on the current link; More sets `data-current` for its sections. */
+  &[data-status='active'],
+  &[data-current] {
+    color: var(--c-text-strong);
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.32), rgba(59, 130, 246, 0.18));
+    box-shadow: inset 0 0 0 1px rgba(147, 197, 253, 0.18);
+
+    .label {
+      font-weight: var(--font-weight-semibold);
+    }
+  }
 }
 
-.item[data-pressed] {
-  color: var(--c-text-strong);
-  background: linear-gradient(180deg, rgba(59, 130, 246, 0.32), rgba(59, 130, 246, 0.18));
-  box-shadow: inset 0 0 0 1px rgba(147, 197, 253, 0.18);
+.icon {
+  flex: none;
+}
+
+.label {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .item:hover {
+  .item:not([data-status='active'], [data-current]):hover {
     color: var(--c-text-strong);
     background: rgba(148, 163, 184, 0.09);
   }
