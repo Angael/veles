@@ -52,6 +52,20 @@ export function useUpdateWorkoutMutation() {
   });
 }
 
+/** Moves a session to another local day; the list, calendar and session refresh. */
+export function useMoveWorkoutMutation() {
+  const { t } = useI18n();
+
+  return useMutation({
+    meta: {
+      error: { title: t({ en: 'Workout was not moved', pl: 'Nie udało się przenieść treningu' }) },
+      invalidateQueryKey: workoutKeys.all,
+      success: { title: t({ en: 'Workout moved', pl: 'Przeniesiono trening' }) },
+    },
+    mutationFn: (variables: { id: string; date: string }) => updateWorkout({ data: variables }),
+  });
+}
+
 export function useDeleteWorkoutMutation() {
   const { t } = useI18n();
 

@@ -9,6 +9,8 @@ import {
 } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { sessionsBefore, toMetrics } from '@/pages/workouts/workouts.server';
+import { workoutName } from '@/pages/workouts/workoutName';
+import { getLocale } from '@/lib/i18n/getLocale';
 import { db } from '@/server/db.server';
 import { byIdDesc, inDateRange, parseKey, type ReadQuery, toPage } from './mcp-read-helpers.server';
 
@@ -109,6 +111,7 @@ export async function readWorkoutSessions(userId: string, query: ReadQuery) {
     nextCursor: page.nextCursor,
     items: page.items.map(({ routineId, routineName, durationSeconds, ...session }) => ({
       ...session,
+      name: workoutName(session, getLocale()),
       inProgress: session.endedAt === null,
       durationSeconds:
         durationSeconds ??

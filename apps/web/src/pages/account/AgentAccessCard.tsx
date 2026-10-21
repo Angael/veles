@@ -22,6 +22,7 @@ export function AgentAccessCard({ userName }: AgentAccessCardProps) {
       as='section'
       className={css.card}
       data-appear='1'
+      id='agent-access'
       tone='primary'
     >
       <header className={css.header}>

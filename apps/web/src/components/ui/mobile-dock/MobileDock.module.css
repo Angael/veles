@@ -1,6 +1,7 @@
 /*
  * Phone bottom dock shared by MobileNavbar and SelectionBar, which takes over the slot while
- * items are selected. Children size themselves with `--dock-item-height` so both match.
+ * items are selected. Takeover bars size controls with `--dock-item-height`; the labeled navbar
+ * uses `--dock-nav-item-height` and overrides `--dock-width` and `--dock-padding` on its own dock.
  */
 @media (--phone) {
   .dock {
@@ -8,8 +9,8 @@
     bottom: calc(env(safe-area-inset-bottom, 0px) + 0.35rem);
     left: 50%;
     z-index: 20;
-    width: min(22rem, calc(100vw - 1.5rem));
-    padding: 0.3rem;
+    width: var(--dock-width);
+    padding: var(--dock-padding);
     border: 1px solid rgba(148, 163, 184, 0.26);
     border-radius: calc(var(--radius-pill) - 2px);
     background: rgba(15, 23, 42, 0.82);

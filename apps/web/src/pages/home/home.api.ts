@@ -2,7 +2,14 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { and, desc, eq, lte } from 'drizzle-orm';
-import { calorieGoals, diaryEntries, foodLogs, recipes, weightEntries } from '@veles/db/schema';
+import {
+  calorieGoals,
+  diaryEntries,
+  foodLogs,
+  recipes,
+  weightEntries,
+  workoutSessions,
+} from '@veles/db/schema';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { fromHundredths, HUNDREDTHS, toCalorieGoal } from '@/lib/nutrition';
 import { requireSession } from '@/server/getSession.server';
@@ -34,6 +41,7 @@ export type HomeDashboardData = {
     };
   };
   lastDiaryEntryDate: string | null;
+  lastWorkout: { name: string; date: string } | null;
   weightEntries: Array<{
     date: string;
     weightKg: number;
@@ -48,48 +56,58 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
   .validator(arkTypeValidator(homeDashboardInputType))
   .handler(async ({ data }): Promise<HomeDashboardData> => {
     const session = await requireSession();
-    const [recipeRows, weightRows, diaryRows, foodLogRows, goalRows] = await Promise.all([
-      db
-        .select({
-          kcal: recipes.kcal,
-          protein: recipes.protein,
-          fat: recipes.fats,
-          carbs: recipes.carbs,
-          id: recipes.id,
-          name: recipes.name,
-        })
-        .from(recipes)
-        .where(eq(recipes.userId, session.user.id)),
-      db
-        .select({ date: weightEntries.date, weightGrams: weightEntries.weightGrams })
-        .from(weightEntries)
-        .where(eq(weightEntries.userId, session.user.id))
-        .orderBy(desc(weightEntries.date))
-        .limit(8),
-      db
-        .select({ entryDate: diaryEntries.entryDate })
-        .from(diaryEntries)
-        .where(eq(diaryEntries.userId, session.user.id))
-        .orderBy(desc(diaryEntries.entryDate), desc(diaryEntries.createdAt))
-        .limit(1),
-      db
-        .select({
-          kcal: foodLogs.kcalHundredths,
-          protein: foodLogs.proteinHundredths,
-          fat: foodLogs.fatHundredths,
-          carbs: foodLogs.carbsHundredths,
-        })
-        .from(foodLogs)
-        .where(and(eq(foodLogs.userId, session.user.id), eq(foodLogs.logDate, data.date))),
-      db
-        .select()
-        .from(calorieGoals)
-        .where(
-          and(eq(calorieGoals.userId, session.user.id), lte(calorieGoals.effectiveDate, data.date)),
-        )
-        .orderBy(desc(calorieGoals.effectiveDate))
-        .limit(1),
-    ]);
+    const [recipeRows, weightRows, diaryRows, foodLogRows, goalRows, workoutRows] =
+      await Promise.all([
+        db
+          .select({
+            kcal: recipes.kcal,
+            protein: recipes.protein,
+            fat: recipes.fats,
+            carbs: recipes.carbs,
+            id: recipes.id,
+            name: recipes.name,
+          })
+          .from(recipes)
+          .where(eq(recipes.userId, session.user.id)),
+        db
+          .select({ date: weightEntries.date, weightGrams: weightEntries.weightGrams })
+          .from(weightEntries)
+          .where(eq(weightEntries.userId, session.user.id))
+          .orderBy(desc(weightEntries.date))
+          .limit(8),
+        db
+          .select({ entryDate: diaryEntries.entryDate })
+          .from(diaryEntries)
+          .where(eq(diaryEntries.userId, session.user.id))
+          .orderBy(desc(diaryEntries.entryDate), desc(diaryEntries.createdAt))
+          .limit(1),
+        db
+          .select({
+            kcal: foodLogs.kcalHundredths,
+            protein: foodLogs.proteinHundredths,
+            fat: foodLogs.fatHundredths,
+            carbs: foodLogs.carbsHundredths,
+          })
+          .from(foodLogs)
+          .where(and(eq(foodLogs.userId, session.user.id), eq(foodLogs.logDate, data.date))),
+        db
+          .select()
+          .from(calorieGoals)
+          .where(
+            and(
+              eq(calorieGoals.userId, session.user.id),
+              lte(calorieGoals.effectiveDate, data.date),
+            ),
+          )
+          .orderBy(desc(calorieGoals.effectiveDate))
+          .limit(1),
+        db
+          .select({ name: workoutSessions.name, date: workoutSessions.date })
+          .from(workoutSessions)
+          .where(eq(workoutSessions.userId, session.user.id))
+          .orderBy(desc(workoutSessions.date), desc(workoutSessions.createdAt))
+          .limit(1),
+      ]);
     const totals = foodLogRows.reduce<{
       kcal: number;
       protein: number;
@@ -126,6 +144,7 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
         },
       },
       lastDiaryEntryDate: diaryRows[0]?.entryDate ?? null,
+      lastWorkout: workoutRows[0] ?? null,
       weightEntries: weightRows
         .map((entry) => ({ date: entry.date, weightKg: entry.weightGrams / 1_000 }))
         .toReversed(),
