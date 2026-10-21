@@ -27,15 +27,67 @@
     border-color 160ms ease,
     color 160ms ease;
 
+  &[data-dragging] {
+    position: relative;
+    z-index: 1;
+    box-shadow: var(--shadow-popup);
+  }
+
   &[data-pinned] {
     border-color: var(--c-primary-border-soft);
     background: var(--c-primary-surface);
     color: var(--c-text-strong);
 
+    .handle {
+      display: inline-flex;
+      flex: none;
+      width: 2rem;
+      height: 2.75rem;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: var(--radius-xs);
+      background: transparent;
+      color: var(--c-muted);
+      cursor: grab;
+      touch-action: none;
+
+      &:focus-visible {
+        outline: 2px solid var(--c-primary-focus);
+      }
+
+      [data-dragging] & {
+        cursor: grabbing;
+      }
+    }
+
     .icon {
       border-color: var(--c-primary-border);
       background: var(--c-primary-surface-strong);
     }
+  }
+}
+
+.handle {
+  display: inline-flex;
+  flex: none;
+  width: 2rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--c-muted);
+  cursor: grab;
+  touch-action: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+  }
+
+  [data-dragging] & {
+    cursor: grabbing;
   }
 }
 

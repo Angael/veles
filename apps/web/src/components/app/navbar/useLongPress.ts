@@ -27,6 +27,10 @@ export function useLongPress(onLongPress: () => void) {
   const fire = () => {
     cancel();
     fired.current = true;
+    // The opened dialog's backdrop takes the pointer, so the native menu fires outside the dock.
+    const block = (event: Event) => event.preventDefault();
+    window.addEventListener('contextmenu', block, { capture: true });
+    setTimeout(() => window.removeEventListener('contextmenu', block, { capture: true }), 1000);
     if ('vibrate' in navigator) {
       navigator.vibrate(10);
     }

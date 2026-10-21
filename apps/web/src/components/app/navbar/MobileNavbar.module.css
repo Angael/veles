@@ -9,13 +9,15 @@
     calc(100vw - 1rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
   );
 
-  /* Hold feedback: the dock eases down while a press is held, then the customizer opens. */
+  /* Hold feedback: the dock eases down while a press is held, then the editor opens. */
   -webkit-touch-callout: none;
   user-select: none;
-  transition: transform 500ms ease;
+  transition: transform 160ms ease;
 
+  /* Taps stay still: the shrink waits 200ms, then fills the rest of the 500ms hold. */
   &[data-pressing] {
     transform: translateX(-50%) scale(0.96);
+    transition: transform 300ms ease 200ms;
   }
 
   @media not (--phone) {

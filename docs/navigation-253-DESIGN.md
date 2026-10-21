@@ -134,7 +134,7 @@ changed, because they have no dock.
 ## Update: combined with More and customization (#251)
 
 - The labeled dock now shows the user's pinned sections (max 5) and a More tab. Defaults: Diary, Notes, Recipes, Workouts, Calories.
-- More opens a sheet with every section and a "Customize bottom bar" button.
-- Press and hold the dock (or right-click) to open the customizer: switch sections into the bar and move them up or down.
+- More opens a sheet with every section and a "Edit bottom bar" button.
+- Press and hold the dock (or right-click) to open the editor: switch sections into the bar and drag them to reorder.
 - Prefs are stored per device in `localStorage` (`veles.mobileNav.v1`). No database change.
 - The preview image above shows the earlier six-link version.

@@ -1,14 +1,7 @@
 import { Link } from '@tanstack/react-router';
-import { LayoutGridIcon, SlidersHorizontalIcon, XIcon } from 'lucide-react';
+import { LayoutGridIcon, PencilIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Btn } from '@/components/ui/btn/Btn';
-import {
-  DialogClose,
-  DialogPopup,
-  DialogRoot,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog/Dialog';
+import { DialogPopup, DialogRoot, DialogTrigger } from '@/components/ui/dialog/Dialog';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import css from './MobileMoreSheet.module.css';
 import dockCss from './MobileNavbar.module.css';
@@ -63,23 +56,10 @@ export function MobileMoreSheet({
         </span>
         <span className={dockCss.label}>{moreLabel}</span>
       </DialogTrigger>
-      <DialogPopup className={css.sheet}>
-        <div className={css.header}>
-          <DialogTitle className={css.title}>
-            {t({ en: 'All sections', pl: 'Wszystkie sekcje' })}
-          </DialogTitle>
-          <DialogClose
-            render={
-              <Btn
-                aria-label={t({ en: 'Close', pl: 'Zamknij' })}
-                icon={<XIcon aria-hidden='true' size={18} strokeWidth={1.9} />}
-                iconOnly
-                radius='pill'
-                variant='ghost'
-              />
-            }
-          />
-        </div>
+      <DialogPopup
+        aria-label={t({ en: 'All sections', pl: 'Wszystkie sekcje' })}
+        className={css.sheet}
+      >
         <ul className={css.list}>
           {items.map((item) => {
             const Icon = item.icon;
@@ -104,16 +84,17 @@ export function MobileMoreSheet({
             );
           })}
         </ul>
-        <Btn
-          icon={<SlidersHorizontalIcon aria-hidden='true' size={18} strokeWidth={1.9} />}
+        <button
+          className={css.edit}
           onClick={() => {
             setOpen(false);
             onCustomize();
           }}
-          variant='ghost'
+          type='button'
         >
-          {t({ en: 'Customize bottom bar', pl: 'Dostosuj dolny pasek' })}
-        </Btn>
+          <PencilIcon aria-hidden='true' size={14} strokeWidth={2} />
+          {t({ en: 'Edit bottom bar', pl: 'Edytuj dolny pasek' })}
+        </button>
       </DialogPopup>
     </DialogRoot>
   );
