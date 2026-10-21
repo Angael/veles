@@ -17,7 +17,7 @@ import { TaskHeader } from './TaskHeader';
 import { VelesLogo } from './VelesLogo';
 
 const routeMatchOptions = {
-  select: (state: RouterState<RegisteredRouter['routeTree']>) => state.matches.at(-1)?.staticData,
+  select: (state: RouterState<RegisteredRouter['routeTree']>) => state.matches.at(-1),
 };
 
 export function AppFrame({
@@ -28,13 +28,22 @@ export function AppFrame({
   user?: SessionUser | null;
 }) {
   const { t } = useI18n();
-  const { layout, navbar } = useRouterState(routeMatchOptions) ?? {};
-  const label = navbar ? t(navbar.label) : undefined;
+  const match = useRouterState(routeMatchOptions);
+  const { layout, navbar } = match?.staticData ?? {};
+  // Keyed by route, so a hook label never runs in place of another route's hook.
+  const label =
+    typeof navbar?.label === 'function' ? (
+      <HookLabel key={match?.routeId} useLabel={navbar.label} />
+    ) : (
+      navbar && t(navbar.label)
+    );
 
   return (
     <div className={css.page}>
       <div className={clsx(css.shell, layout && 'focusShell', layout === 'task' && css.taskShell)}>
-        {layout === 'task' ? <TaskHeader label={label} /> : null}
+        {layout === 'task' ? (
+          <TaskHeader actions={navbar?.Actions ? <navbar.Actions /> : null} title={label} />
+        ) : null}
         {layout ? null : (
           <header className={css.header}>
             {navbar ? (
@@ -59,4 +68,8 @@ export function AppFrame({
       </div>
     </div>
   );
+}
+
+function HookLabel({ useLabel }: { useLabel: () => string }) {
+  return useLabel();
 }

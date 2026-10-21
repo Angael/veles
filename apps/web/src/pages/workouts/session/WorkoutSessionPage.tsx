@@ -10,7 +10,7 @@ import { useRestTimer } from '../rest/useRestTimer';
 import { workoutSessionQueryOptions } from '../workouts.query';
 import type { WorkoutSetData, WorkoutSlotData } from '../workouts.server';
 import { ExerciseCard } from './ExerciseCard';
-import { SessionHeader } from './SessionHeader';
+import { SessionSummary } from './SessionSummary';
 import { useSessionActions } from './session.query';
 import { SetSheet } from './SetSheet';
 import css from './Session.module.css';
@@ -56,7 +56,7 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
 
   return (
     <div className={css.session}>
-      <SessionHeader onFinish={timer.skip} onShowHints={hints.reset} session={session} />
+      <SessionSummary onFinish={timer.skip} session={session} />
 
       {session.slots.length === 0 ? (
         <p className={css.empty}>

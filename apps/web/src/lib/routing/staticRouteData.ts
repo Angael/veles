@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react';
 import type { Localized } from '@/lib/i18n/locale';
 
 export type NavbarTarget =
@@ -16,12 +17,18 @@ export type NavbarTargetMatch = {
 };
 
 type NavbarData = {
-  label: Localized;
+  /**
+   * Route title. A hook (name it `use…`) builds it from the page's data, e.g. a session name; it
+   * returns plain text, so every route title looks the same.
+   */
+  label: Localized | (() => string);
   /**
    * Back target used when there is no in-app history entry to return to. Also the back link's
    * `href`, and its presence is what makes the route show a back button.
    */
   backFallback?: NavbarTarget | ((match: NavbarTargetMatch) => NavbarTarget);
+  /** Task header buttons after the title, e.g. a menu of rare page actions. */
+  Actions?: ComponentType;
 };
 
 declare module '@tanstack/react-router' {
