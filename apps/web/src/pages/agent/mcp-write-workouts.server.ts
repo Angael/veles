@@ -25,7 +25,7 @@ export function registerWorkoutTools(server: McpServer, userId: string) {
   server.registerTool(
     'save_workout',
     {
-      description: `Create (no id; date required) or update (id) a workout session. Omitted fields stay; exercises, when given, replace all exercises and sets in order. ${exerciseRef} A new session is finished unless finished is false (only one open session at a time); with routineId and no exercises it copies the routine. Returns { id }.`,
+      description: `Create (no id; date required) or update (id) a workout session. Omitted fields stay; exercises, when given, replace all exercises and sets in order. To move a session to another day, send id and date only. ${exerciseRef} A new session is finished unless finished is false (only one open session at a time); with routineId and no exercises it copies the routine. Returns { id }.`,
       inputSchema: agentInput(saveWorkoutInputType),
       annotations: destructive,
     },
