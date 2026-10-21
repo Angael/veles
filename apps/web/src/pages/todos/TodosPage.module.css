@@ -25,11 +25,10 @@
 
 .composerForm {
   display: grid;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .titleInput {
-  grid-column: 1 / -1;
   font-size: var(--text-xl-dynamic);
   font-weight: var(--font-weight-semibold);
 }

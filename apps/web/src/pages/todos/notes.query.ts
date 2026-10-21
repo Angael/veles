@@ -8,6 +8,7 @@ import {
   toggleNoteType,
   updateNote,
 } from './notes.api';
+import type { createNoteInputType } from './notes.validation';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export const notesQueryKey = ['notes'] as const;
@@ -23,11 +24,20 @@ export function notesQueryOptions() {
   });
 }
 
+/** A new checklist may arrive with items, so the list items collection refetches too. */
 export function useCreateNoteMutation() {
+  const { t } = useI18n();
+  const listItems = useListItemsCollection();
   return useMutation({
-    meta: { invalidateQueryKey: notesQueryKey },
-    mutationFn: (variables: { content: string; title: string; type: 'note' | 'shopping_list' }) =>
-      createNote({ data: variables }),
+    meta: {
+      error: {
+        title: t({ en: 'Note could not be created', pl: 'Nie udało się utworzyć notatki' }),
+      },
+      invalidateQueryKey: notesQueryKey,
+    },
+    mutationFn: (variables: typeof createNoteInputType.inferIn) => createNote({ data: variables }),
+    onSuccess: (_data, variables) =>
+      variables.items?.length ? listItems.utils.refetch() : undefined,
   });
 }
 

@@ -1,8 +1,12 @@
 import { type } from 'arktype';
 
+const itemNameType = 'string.trim |> 0 < string <= 240';
+
 export const createNoteInputType = type({
   '+': 'reject',
   content: 'string <= 16000',
+  // Initial checklist rows, so a list is created with its items in one transaction.
+  'items?': type(itemNameType).array().atMostLength(200),
   title: 'string.trim |> 0 < string <= 160',
   type: "'note' | 'shopping_list'",
 });
@@ -41,8 +45,6 @@ export const setListItemCheckedInputType = type({
 });
 
 export const deleteListItemInputType = type({ '+': 'reject', id: 'string.uuid' });
-
-const itemNameType = 'string.trim |> 0 < string <= 240';
 
 /** A note with its list changes at once; on update only given fields change. */
 export const saveNoteInputType = type({

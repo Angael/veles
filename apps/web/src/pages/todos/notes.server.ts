@@ -4,7 +4,6 @@ import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { invariant } from '@/lib/invariant';
 import { db, type DbTransaction } from '@/server/db.server';
 import type {
-  createNoteInputType,
   updateNoteInputType,
   deleteNoteInputType,
   setNoteSharedInputType,
@@ -41,22 +40,6 @@ export function accessibleNote(userId: string, includeShared = true) {
       ),
     ),
   );
-}
-
-/** Creates a note for the authenticated owner. */
-export async function createNoteRecord(userId: string, data: typeof createNoteInputType.infer) {
-  const [created] = await db
-    .insert(notes)
-    .values({
-      content: data.content,
-      ownerId: userId,
-      title: data.title,
-      type: data.type,
-    })
-    .returning({ id: notes.id });
-
-  invariant(created, 'Note could not be created.');
-  return created;
 }
 
 /** Edits note content within the caller's scope. */
