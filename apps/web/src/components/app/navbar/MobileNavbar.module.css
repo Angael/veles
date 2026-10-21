@@ -9,8 +9,21 @@
     calc(100vw - 1rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
   );
 
+  /* Hold feedback: the dock eases down while a press is held, then the customizer opens. */
+  -webkit-touch-callout: none;
+  user-select: none;
+  transition: transform 500ms ease;
+
+  &[data-pressing] {
+    transform: translateX(-50%) scale(0.96);
+  }
+
   @media not (--phone) {
     display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
   }
 }
 
@@ -41,10 +54,16 @@
   align-items: center;
   justify-content: center;
   gap: 0.125rem;
+  width: 100%;
   padding-inline: 0.125rem;
+  border: 0;
   border-radius: var(--radius-pill);
+  background: transparent;
   color: var(--c-muted);
+  font: inherit;
   text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition: color 160ms ease;
 
   &:focus-visible {
