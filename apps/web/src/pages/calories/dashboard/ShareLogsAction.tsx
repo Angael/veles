@@ -21,6 +21,8 @@ import { toastManager } from '@/components/ui/toast/toastManager';
 import { getInitials } from '@/lib/getInitials';
 import { ShareLogsItems } from './ShareLogsItems';
 import css from './ShareLogsAction.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { productCountText } from '../calorieHelpers';
 
 type Props = {
   logs: CalorieLog[];
@@ -37,6 +39,7 @@ const gramsByLogId = (logs: CalorieLog[]) =>
  * sender can adjust each log's grams first, e.g. to share only the friend's half of a meal.
  */
 export function ShareLogsAction({ logs, onShared }: Props) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   // null until the user picks: a lone friend is preselected without waiting for an effect.
   const [pickedIds, setPickedIds] = useState<string[] | null>(null);
@@ -46,7 +49,7 @@ export function ShareLogsAction({ logs, onShared }: Props) {
   const friends = friendsQuery.data ?? [];
   const recipientIds =
     pickedIds ?? (friends.length === 1 ? friends.map((friend) => friend.id) : []);
-  const products = `${logs.length} ${logs.length === 1 ? 'product' : 'products'}`;
+  const products = t(productCountText(logs.length));
   const gramsValid = logs.every((entry) => entry.grams === null || (gramsById[entry.id] ?? 0) > 0);
 
   function share() {
@@ -61,7 +64,10 @@ export function ShareLogsAction({ logs, onShared }: Props) {
       {
         onSuccess: () => {
           toastManager.add({
-            title: `Shared ${products} with ${names.join(', ')}`,
+            title: t({
+              en: `Shared ${products} with ${names.join(', ')}`,
+              pl: `Udostępniono ${products}: ${names.join(', ')}`,
+            }),
             type: 'success',
           });
           setOpen(false);
@@ -72,11 +78,22 @@ export function ShareLogsAction({ logs, onShared }: Props) {
   }
 
   function friendsStatus() {
-    if (friendsQuery.isPending) return <p role='status'>Loading friends…</p>;
-    if (friendsQuery.isError) return <p role='alert'>Could not load your friends.</p>;
+    if (friendsQuery.isPending)
+      return <p role='status'>{t({ en: 'Loading friends…', pl: 'Wczytywanie znajomych…' })}</p>;
+    if (friendsQuery.isError)
+      return (
+        <p role='alert'>
+          {t({ en: 'Could not load your friends.', pl: 'Nie udało się wczytać znajomych.' })}
+        </p>
+      );
     return (
       <p>
-        No friends yet. <Link to='/account'>Invite friends</Link> to share products with them.
+        {t({ en: 'No friends yet.', pl: 'Nie masz jeszcze znajomych.' })}{' '}
+        <Link to='/account'>{t({ en: 'Invite friends', pl: 'Zaproś znajomych' })}</Link>
+        {t({
+          en: ' to share products with them.',
+          pl: ', aby udostępniać im produkty.',
+        })}
       </p>
     );
   }
@@ -93,14 +110,17 @@ export function ShareLogsAction({ logs, onShared }: Props) {
     >
       <SelectionBarAction
         icon={<SendIcon aria-hidden='true' />}
-        label='Share'
+        label={t({ en: 'Share', pl: 'Udostępnij' })}
         primary
         render={<DialogTrigger />}
       />
       <DialogPopup>
-        <DialogTitle>Share {products}</DialogTitle>
+        <DialogTitle>{t({ en: `Share ${products}`, pl: `Udostępnij ${products}` })}</DialogTitle>
         <DialogDescription>
-          They get a copy of these {products} to add to their own diary.
+          {t({
+            en: `They get a copy of these ${products} to add to their own diary.`,
+            pl: `Otrzymają kopię (${products}), którą dodadzą do własnego dziennika.`,
+          })}
         </DialogDescription>
         <ShareLogsItems
           gramsById={gramsById}
@@ -137,14 +157,16 @@ export function ShareLogsAction({ logs, onShared }: Props) {
           </ul>
         )}
         <DialogActions>
-          <DialogClose render={<Btn variant='ghost' />}>Cancel</DialogClose>
+          <DialogClose render={<Btn variant='ghost' />}>
+            {t({ en: 'Cancel', pl: 'Anuluj' })}
+          </DialogClose>
           <Btn
             disabled={recipientIds.length === 0 || !gramsValid}
             icon={<SendIcon aria-hidden='true' />}
             loading={shareMutation.isPending}
             onClick={share}
           >
-            Share
+            {t({ en: 'Share', pl: 'Udostępnij' })}
           </Btn>
         </DialogActions>
       </DialogPopup>

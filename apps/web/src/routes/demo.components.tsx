@@ -6,7 +6,7 @@ export const Route = createFileRoute('/demo/components')({
   head: () => ({ meta: [{ title: 'Components Demo' }] }),
   staticData: {
     navbar: {
-      label: 'Components',
+      label: { en: 'Components', pl: 'Komponenty' },
       backFallback: { to: '/' },
     },
   },

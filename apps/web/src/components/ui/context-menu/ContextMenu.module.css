@@ -72,6 +72,14 @@
   }
 }
 
+.submenuChevron {
+  margin-inline-start: auto;
+}
+
+.item[data-popup-open] {
+  background: var(--c-primary-surface);
+}
+
 .danger {
   &,
   & > svg {

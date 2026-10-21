@@ -1,6 +1,7 @@
 import { type } from 'arktype';
 import { createMiddleware } from '@tanstack/react-start';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
+import { translate } from '@/lib/i18n/getLocale';
 
 const contentLengthType = type('string.numeric.parse |> number.integer >= 0');
 
@@ -16,7 +17,9 @@ export const limitRequestSizeMiddleware = (maxBytes = PHOTO_FORM_MAX_REQUEST_BYT
     const contentLength = contentLengthType(request.headers.get('content-length') ?? '');
 
     if (contentLength instanceof type.errors || contentLength > maxBytes) {
-      throw new ClientSafeError('Upload request is too large.');
+      throw new ClientSafeError(
+        translate({ en: 'Upload request is too large.', pl: 'Przesyłane dane są za duże.' }),
+      );
     }
 
     return next();

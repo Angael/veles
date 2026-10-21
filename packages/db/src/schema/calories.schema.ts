@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
+  boolean,
   date,
   index,
   integer,
@@ -20,6 +21,8 @@ export const foodProducts = pgTable(
       .primaryKey()
       .default(sql`uuidv7()`),
     barcode: text('barcode'),
+    /** Stable key of a catalog seed; the deploy sync owns rows that have one. */
+    seedKey: text('seed_key'),
     name: text('name').notNull(),
     /** Optional Polish search alias populated by seeds; product create/edit flows must not write it. */
     namePl: text('name_pl'),
@@ -36,6 +39,7 @@ export const foodProducts = pgTable(
   },
   (table) => [
     uniqueIndex('food_product_barcode_idx').on(table.barcode),
+    uniqueIndex('food_product_seed_key_idx').on(table.seedKey),
     index('food_product_name_idx').on(table.name),
     index('food_product_image_upload_object_id_idx').on(table.imageUploadObjectId),
   ],
@@ -135,4 +139,24 @@ export const calorieGoals = pgTable(
   (table) => [
     uniqueIndex('calorie_goal_user_id_effective_date_idx').on(table.userId, table.effectiveDate),
   ],
+);
+
+/** Per-day food diary context: an off-plan flag and a free note. A row exists only while one is set. */
+export const calorieDayNotes = pgTable(
+  'calorie_day_note',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`uuidv7()`),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    date: date('date', { mode: 'string' }).notNull(),
+    /** The user went off the plan; logged entries are only what was eaten before that. */
+    offPlan: boolean('off_plan').notNull().default(false),
+    note: text('note'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex('calorie_day_note_user_id_date_idx').on(table.userId, table.date)],
 );

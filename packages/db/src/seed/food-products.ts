@@ -1,4 +1,4 @@
-import { foodProducts } from '../schema/calories.schema.ts';
+import type { foodProducts } from '../schema/calories.schema.ts';
 
 /**
  * Searchable starter foods with practical single-item or typical-serving sizes.
@@ -22,68 +22,22 @@ export type FoodProductSeed = Pick<
   | 'fatPer100gHundredths'
   | 'carbsPer100gHundredths'
 > & {
+  /** Stable identity used by the deploy sync; never change or reuse it. */
+  seedKey: string;
   name_en: string;
   name_pl: string;
 };
 
-/** Legacy seed names removed from the Poland-focused catalog during a production sync. */
-export const retiredFoodProductNames = [
-  'All-purpose flour, bleached',
-  'Apple, honeycrisp',
-  'Apple, red delicious',
-  'Applesauce, unsweetened',
-  'Barley, pearled, cooked',
-  'Beet greens',
-  'Bell pepper, orange',
-  'Bread flour',
-  'Bulgur, cooked',
-  'Corn grits, cooked',
-  'Corn grits, dry',
-  'Corn masa harina',
-  'Corn oil',
-  'Couscous, cooked',
-  'Crab, blue, cooked',
-  'Great northern beans, cooked',
-  'Ground turkey, cooked, 93% lean',
-  'Ground turkey, raw, 93% lean',
-  'Lettuce, green leaf',
-  'Lettuce, red leaf',
-  'Lima beans, cooked',
-  'Macaroni, cooked',
-  'Macaroni, dry',
-  'Milk, 1%',
-  'Millet, cooked',
-  'Navy beans, cooked',
-  'Oats, steel-cut, dry',
-  'Pasta, cooked',
-  'Pastry flour',
-  'Peanut oil',
-  'Pear, anjou',
-  'Pear, bartlett',
-  'Pinto beans, cooked',
-  'Pinto beans, dry',
-  'Quinoa, cooked',
-  'Plantain',
-  'Potato, gold',
-  'Potato, red',
-  'Potato, russet',
-  'Refrigerated biscuit dough',
-  'Rice flour, brown',
-  'Rye flour, dark',
-  'Rye flour, light',
-  'Salmon, sockeye, raw',
-  'Soybean oil',
-  'Squash, acorn',
-  'Squash, yellow',
-  'Swiss cheese',
-  'Whole wheat pasta, cooked',
-  'Wild rice, cooked',
-  'Yellow mustard',
-] as const;
+/**
+ * Seed keys the deploy sync deletes from the shared catalog.
+ * Move a seed's key here when you remove it from `foodProductSeeds`.
+ */
+export const retiredFoodProductSeedKeys: string[] = [];
 
-export const foodProductSeeds = [
+export const foodProductSeeds: FoodProductSeed[] = [
   // Vegetables
   {
+    seedKey: 'asparagus',
     barcode: null,
     name_en: 'Asparagus',
     name_pl: 'Szparagi',
@@ -94,6 +48,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 388,
   },
   {
+    seedKey: 'avocado',
     barcode: null,
     name_en: 'Avocado',
     name_pl: 'Awokado',
@@ -104,6 +59,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 853,
   },
   {
+    seedKey: 'beetroot',
     barcode: null,
     name_en: 'Beetroot',
     name_pl: 'Burak',
@@ -114,6 +70,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 956,
   },
   {
+    seedKey: 'bell-pepper-green',
     barcode: null,
     name_en: 'Bell pepper, green',
     name_pl: 'Papryka zielona',
@@ -124,6 +81,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 464,
   },
   {
+    seedKey: 'bell-pepper-red',
     barcode: null,
     name_en: 'Bell pepper, red',
     name_pl: 'Papryka czerwona',
@@ -134,6 +92,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 603,
   },
   {
+    seedKey: 'bell-pepper-yellow',
     barcode: null,
     name_en: 'Bell pepper, yellow',
     name_pl: 'Papryka żółta',
@@ -144,6 +103,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 632,
   },
   {
+    seedKey: 'bok-choy',
     barcode: null,
     name_en: 'Bok choy',
     name_pl: 'Kapusta pak choi',
@@ -154,6 +114,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 351,
   },
   {
+    seedKey: 'broccoli',
     barcode: null,
     name_en: 'Broccoli',
     name_pl: 'Brokuł',
@@ -164,6 +125,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 664,
   },
   {
+    seedKey: 'brussels-sprouts',
     barcode: null,
     name_en: 'Brussels sprouts',
     name_pl: 'Brukselka',
@@ -174,6 +136,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 895,
   },
   {
+    seedKey: 'cabbage-green',
     barcode: null,
     name_en: 'Cabbage, green',
     name_pl: 'Kapusta biała',
@@ -184,6 +147,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 580,
   },
   {
+    seedKey: 'cabbage-red',
     barcode: null,
     name_en: 'Cabbage, red',
     name_pl: 'Kapusta czerwona',
@@ -194,6 +158,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 737,
   },
   {
+    seedKey: 'carrot',
     barcode: null,
     name_en: 'Carrot',
     name_pl: 'Marchew',
@@ -204,6 +169,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 824,
   },
   {
+    seedKey: 'cauliflower',
     barcode: null,
     name_en: 'Cauliflower',
     name_pl: 'Kalafior',
@@ -214,6 +180,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 497,
   },
   {
+    seedKey: 'celery',
     barcode: null,
     name_en: 'Celery',
     name_pl: 'Seler naciowy',
@@ -224,6 +191,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 297,
   },
   {
+    seedKey: 'celeriac-raw',
     barcode: null,
     name_en: 'Celeriac, raw',
     name_pl: 'Seler korzeniowy surowy',
@@ -234,6 +202,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 920,
   },
   {
+    seedKey: 'cucumber',
     barcode: null,
     name_en: 'Cucumber',
     name_pl: 'Ogórek',
@@ -244,6 +213,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 363,
   },
   {
+    seedKey: 'eggplant',
     barcode: null,
     name_en: 'Eggplant',
     name_pl: 'Bakłażan',
@@ -254,6 +224,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 588,
   },
   {
+    seedKey: 'fennel',
     barcode: null,
     name_en: 'Fennel',
     name_pl: 'Fenkuł',
@@ -264,6 +235,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 730,
   },
   {
+    seedKey: 'garlic',
     barcode: null,
     name_en: 'Garlic',
     name_pl: 'Czosnek',
@@ -274,6 +246,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 3_310,
   },
   {
+    seedKey: 'green-beans',
     barcode: null,
     name_en: 'Green beans',
     name_pl: 'Fasolka szparagowa zielona',
@@ -284,6 +257,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 697,
   },
   {
+    seedKey: 'kale',
     barcode: null,
     name_en: 'Kale',
     name_pl: 'Jarmuż',
@@ -294,6 +268,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 442,
   },
   {
+    seedKey: 'leek',
     barcode: null,
     name_en: 'Leek',
     name_pl: 'Por',
@@ -304,6 +279,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_420,
   },
   {
+    seedKey: 'lettuce-iceberg',
     barcode: null,
     name_en: 'Lettuce, iceberg',
     name_pl: 'Sałata lodowa',
@@ -314,6 +290,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 297,
   },
   {
+    seedKey: 'lettuce-romaine',
     barcode: null,
     name_en: 'Lettuce, romaine',
     name_pl: 'Sałata rzymska',
@@ -324,6 +301,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 329,
   },
   {
+    seedKey: 'mushrooms-button',
     barcode: null,
     name_en: 'Mushrooms, button',
     name_pl: 'Pieczarki białe',
@@ -334,6 +312,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 326,
   },
   {
+    seedKey: 'mushrooms-cremini',
     barcode: null,
     name_en: 'Mushrooms, cremini',
     name_pl: 'Pieczarki brązowe',
@@ -344,6 +323,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 430,
   },
   {
+    seedKey: 'mushrooms-portobello',
     barcode: null,
     name_en: 'Mushrooms, portobello',
     name_pl: 'Pieczarki portobello',
@@ -354,6 +334,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 387,
   },
   {
+    seedKey: 'mushrooms-shiitake',
     barcode: null,
     name_en: 'Mushrooms, shiitake',
     name_pl: 'Grzyby shiitake',
@@ -364,6 +345,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 679,
   },
   {
+    seedKey: 'onion-red',
     barcode: null,
     name_en: 'Onion, red',
     name_pl: 'Cebula czerwona',
@@ -374,6 +356,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 993,
   },
   {
+    seedKey: 'onion-yellow',
     barcode: null,
     name_en: 'Onion, yellow',
     name_pl: 'Cebula żółta',
@@ -384,6 +367,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 861,
   },
   {
+    seedKey: 'onion-white',
     barcode: null,
     name_en: 'Onion, white',
     name_pl: 'Cebula biała',
@@ -394,6 +378,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 768,
   },
   {
+    seedKey: 'parsnip',
     barcode: null,
     name_en: 'Parsnip',
     name_pl: 'Pasternak',
@@ -404,6 +389,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_800,
   },
   {
+    seedKey: 'parsley-root-raw',
     barcode: null,
     name_en: 'Parsley root, raw',
     name_pl: 'Pietruszka korzeń surowy',
@@ -414,6 +400,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_230,
   },
   {
+    seedKey: 'peas-green',
     barcode: null,
     name_en: 'Peas, green',
     name_pl: 'Groszek zielony',
@@ -424,6 +411,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_440,
   },
   {
+    seedKey: 'potatoes-raw',
     barcode: null,
     name_en: 'Potatoes, raw',
     name_pl: 'Ziemniaki surowe',
@@ -434,6 +422,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_749,
   },
   {
+    seedKey: 'potatoes-boiled',
     barcode: null,
     name_en: 'Potatoes, boiled',
     name_pl: 'Ziemniaki gotowane',
@@ -444,6 +433,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_013,
   },
   {
+    seedKey: 'potatoes-baked',
     barcode: null,
     name_en: 'Potatoes, baked',
     name_pl: 'Ziemniaki pieczone',
@@ -454,6 +444,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_115,
   },
   {
+    seedKey: 'pumpkin',
     barcode: null,
     name_en: 'Pumpkin',
     name_pl: 'Dynia',
@@ -464,6 +455,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 650,
   },
   {
+    seedKey: 'radish',
     barcode: null,
     name_en: 'Radish',
     name_pl: 'Rzodkiewka',
@@ -474,6 +466,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 340,
   },
   {
+    seedKey: 'rutabaga',
     barcode: null,
     name_en: 'Rutabaga',
     name_pl: 'Brukiew',
@@ -484,6 +477,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 862,
   },
   {
+    seedKey: 'spinach',
     barcode: null,
     name_en: 'Spinach',
     name_pl: 'Szpinak',
@@ -494,6 +488,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 363,
   },
   {
+    seedKey: 'zucchini',
     barcode: null,
     name_en: 'Zucchini',
     name_pl: 'Cukinia',
@@ -504,6 +499,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 311,
   },
   {
+    seedKey: 'squash-butternut',
     barcode: null,
     name_en: 'Squash, butternut',
     name_pl: 'Dynia piżmowa',
@@ -514,6 +510,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_170,
   },
   {
+    seedKey: 'squash-spaghetti',
     barcode: null,
     name_en: 'Squash, spaghetti',
     name_pl: 'Dynia makaronowa',
@@ -524,6 +521,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 691,
   },
   {
+    seedKey: 'sweet-potato',
     barcode: null,
     name_en: 'Sweet potato',
     name_pl: 'Batat',
@@ -534,6 +532,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_730,
   },
   {
+    seedKey: 'tomato-roma',
     barcode: null,
     name_en: 'Tomato, roma',
     name_pl: 'Pomidor Roma',
@@ -544,6 +543,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 384,
   },
   {
+    seedKey: 'tomato-canned',
     barcode: null,
     name_en: 'Tomato, canned',
     name_pl: 'Pomidory z puszki',
@@ -554,6 +554,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 347,
   },
   {
+    seedKey: 'tomato-fresh',
     barcode: null,
     name_en: 'Tomato, fresh',
     name_pl: 'Pomidor świeży',
@@ -564,6 +565,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 389,
   },
   {
+    seedKey: 'turnip',
     barcode: null,
     name_en: 'Turnip',
     name_pl: 'Rzepa',
@@ -574,6 +576,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 643,
   },
   {
+    seedKey: 'corn-on-the-cob',
     barcode: null,
     name_en: 'Corn on the cob',
     name_pl: 'Kukurydza w kolbie',
@@ -586,6 +589,7 @@ export const foodProductSeeds = [
 
   // Fruits
   {
+    seedKey: 'apple',
     barcode: null,
     name_en: 'Apple',
     name_pl: 'Jabłko',
@@ -596,6 +600,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_381,
   },
   {
+    seedKey: 'apple-fuji',
     barcode: null,
     name_en: 'Apple, fuji',
     name_pl: 'Jabłko Fuji',
@@ -606,6 +611,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_520,
   },
   {
+    seedKey: 'apple-gala',
     barcode: null,
     name_en: 'Apple, gala',
     name_pl: 'Jabłko Gala',
@@ -616,6 +622,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_370,
   },
   {
+    seedKey: 'apple-granny-smith',
     barcode: null,
     name_en: 'Apple, granny smith',
     name_pl: 'Jabłko Granny Smith',
@@ -626,6 +633,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_360,
   },
   {
+    seedKey: 'apricot',
     barcode: null,
     name_en: 'Apricot',
     name_pl: 'Morela',
@@ -636,6 +644,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_020,
   },
   {
+    seedKey: 'banana',
     barcode: null,
     name_en: 'Banana',
     name_pl: 'Banan',
@@ -646,6 +655,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_280,
   },
   {
+    seedKey: 'blackcurrants',
     barcode: null,
     name_en: 'Blackcurrants',
     name_pl: 'Czarne porzeczki',
@@ -656,6 +666,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_538,
   },
   {
+    seedKey: 'blackberries',
     barcode: null,
     name_en: 'Blackberries',
     name_pl: 'Jeżyny',
@@ -666,6 +677,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 961,
   },
   {
+    seedKey: 'blueberries',
     barcode: null,
     name_en: 'Blueberries',
     name_pl: 'Borówki amerykańskie',
@@ -676,6 +688,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_450,
   },
   {
+    seedKey: 'cherries',
     barcode: null,
     name_en: 'Cherries',
     name_pl: 'Czereśnie',
@@ -686,6 +699,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_600,
   },
   {
+    seedKey: 'cantaloupe',
     barcode: null,
     name_en: 'Cantaloupe',
     name_pl: 'Melon kantalupa',
@@ -696,6 +710,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 816,
   },
   {
+    seedKey: 'coconut-meat',
     barcode: null,
     name_en: 'Coconut meat',
     name_pl: 'Miąższ kokosa',
@@ -706,6 +721,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_520,
   },
   {
+    seedKey: 'figs-dried',
     barcode: null,
     name_en: 'Figs, dried',
     name_pl: 'Figi suszone',
@@ -716,6 +732,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 6_390,
   },
   {
+    seedKey: 'gooseberries',
     barcode: null,
     name_en: 'Gooseberries',
     name_pl: 'Agrest',
@@ -726,6 +743,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_018,
   },
   {
+    seedKey: 'grapefruit',
     barcode: null,
     name_en: 'Grapefruit',
     name_pl: 'Grejpfrut',
@@ -736,6 +754,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 808,
   },
   {
+    seedKey: 'grapes-red',
     barcode: null,
     name_en: 'Grapes, red',
     name_pl: 'Winogrona czerwone',
@@ -746,6 +765,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_810,
   },
   {
+    seedKey: 'grapes-green',
     barcode: null,
     name_en: 'Grapes, green',
     name_pl: 'Winogrona zielone',
@@ -756,6 +776,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_810,
   },
   {
+    seedKey: 'kiwi',
     barcode: null,
     name_en: 'Kiwi',
     name_pl: 'Kiwi',
@@ -766,6 +787,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_470,
   },
   {
+    seedKey: 'lemon',
     barcode: null,
     name_en: 'Lemon',
     name_pl: 'Cytryna',
@@ -776,6 +798,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 932,
   },
   {
+    seedKey: 'mango',
     barcode: null,
     name_en: 'Mango',
     name_pl: 'Mango',
@@ -786,6 +809,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_530,
   },
   {
+    seedKey: 'mandarin',
     barcode: null,
     name_en: 'Mandarin',
     name_pl: 'Mandarynka',
@@ -796,6 +820,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_330,
   },
   {
+    seedKey: 'nectarine',
     barcode: null,
     name_en: 'Nectarine',
     name_pl: 'Nektarynka',
@@ -806,6 +831,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_060,
   },
   {
+    seedKey: 'orange',
     barcode: null,
     name_en: 'Orange',
     name_pl: 'Pomarańcza',
@@ -816,6 +842,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_180,
   },
   {
+    seedKey: 'papaya',
     barcode: null,
     name_en: 'Papaya',
     name_pl: 'Papaja',
@@ -826,6 +853,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_080,
   },
   {
+    seedKey: 'pear',
     barcode: null,
     name_en: 'Pear',
     name_pl: 'Gruszka',
@@ -836,6 +864,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_523,
   },
   {
+    seedKey: 'peach',
     barcode: null,
     name_en: 'Peach',
     name_pl: 'Brzoskwinia',
@@ -846,6 +875,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 954,
   },
   {
+    seedKey: 'pineapple',
     barcode: null,
     name_en: 'Pineapple',
     name_pl: 'Ananas',
@@ -856,6 +886,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_180,
   },
   {
+    seedKey: 'plum',
     barcode: null,
     name_en: 'Plum',
     name_pl: 'Śliwka',
@@ -866,6 +897,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_140,
   },
   {
+    seedKey: 'pomegranate',
     barcode: null,
     name_en: 'Pomegranate',
     name_pl: 'Granat',
@@ -876,6 +908,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_870,
   },
   {
+    seedKey: 'raspberries',
     barcode: null,
     name_en: 'Raspberries',
     name_pl: 'Maliny',
@@ -886,6 +919,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_190,
   },
   {
+    seedKey: 'strawberries',
     barcode: null,
     name_en: 'Strawberries',
     name_pl: 'Truskawki',
@@ -896,6 +930,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 768,
   },
   {
+    seedKey: 'watermelon',
     barcode: null,
     name_en: 'Watermelon',
     name_pl: 'Arbuz',
@@ -908,6 +943,7 @@ export const foodProductSeeds = [
 
   // Grains and staples
   {
+    seedKey: 'wheat-flour',
     barcode: null,
     name_en: 'Wheat flour',
     name_pl: 'Mąka pszenna',
@@ -918,6 +954,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_630,
   },
   {
+    seedKey: 'whole-wheat-flour',
     barcode: null,
     name_en: 'Whole wheat flour',
     name_pl: 'Mąka pszenna pełnoziarnista',
@@ -928,6 +965,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_200,
   },
   {
+    seedKey: 'rye-flour',
     barcode: null,
     name_en: 'Rye flour',
     name_pl: 'Mąka żytnia',
@@ -938,6 +976,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_540,
   },
   {
+    seedKey: 'rice-flour-white',
     barcode: null,
     name_en: 'Rice flour, white',
     name_pl: 'Mąka z białego ryżu',
@@ -948,6 +987,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 8_010,
   },
   {
+    seedKey: 'cornmeal-yellow',
     barcode: null,
     name_en: 'Cornmeal, yellow',
     name_pl: 'Kaszka kukurydziana żółta',
@@ -958,6 +998,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_030,
   },
   {
+    seedKey: 'oat-flour',
     barcode: null,
     name_en: 'Oat flour',
     name_pl: 'Mąka owsiana',
@@ -968,6 +1009,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 6_990,
   },
   {
+    seedKey: 'almond-flour',
     barcode: null,
     name_en: 'Almond flour',
     name_pl: 'Mąka migdałowa',
@@ -978,6 +1020,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_620,
   },
   {
+    seedKey: 'potato-flour',
     barcode: null,
     name_en: 'Potato flour',
     name_pl: 'Mąka ziemniaczana',
@@ -988,6 +1031,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 8_310,
   },
   {
+    seedKey: 'semolina-flour',
     barcode: null,
     name_en: 'Semolina flour',
     name_pl: 'Semolina',
@@ -998,6 +1042,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_380,
   },
   {
+    seedKey: 'pasta-dry',
     barcode: null,
     name_en: 'Pasta, dry',
     name_pl: 'Makaron suchy',
@@ -1008,6 +1053,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_470,
   },
   {
+    seedKey: 'whole-wheat-pasta-dry',
     barcode: null,
     name_en: 'Whole wheat pasta, dry',
     name_pl: 'Makaron pełnoziarnisty suchy',
@@ -1018,6 +1064,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_340,
   },
   {
+    seedKey: 'gluten-free-corn-pasta-dry',
     barcode: null,
     name_en: 'Gluten-free corn pasta, dry',
     name_pl: 'Makaron kukurydziany bezglutenowy suchy',
@@ -1028,6 +1075,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_930,
   },
   {
+    seedKey: 'rice-white-dry',
     barcode: null,
     name_en: 'Rice, white, dry',
     name_pl: 'Ryż biały suchy',
@@ -1038,6 +1086,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 8_000,
   },
   {
+    seedKey: 'rice-white-cooked',
     barcode: null,
     name_en: 'Rice, white, cooked',
     name_pl: 'Ryż biały gotowany',
@@ -1048,6 +1097,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_820,
   },
   {
+    seedKey: 'rice-brown-dry',
     barcode: null,
     name_en: 'Rice, brown, dry',
     name_pl: 'Ryż brązowy suchy',
@@ -1058,6 +1108,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_620,
   },
   {
+    seedKey: 'rice-brown-cooked',
     barcode: null,
     name_en: 'Rice, brown, cooked',
     name_pl: 'Ryż brązowy gotowany',
@@ -1068,6 +1119,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_560,
   },
   {
+    seedKey: 'wild-rice-dry',
     barcode: null,
     name_en: 'Wild rice, dry',
     name_pl: 'Ryż dziki suchy',
@@ -1078,6 +1130,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_570,
   },
   {
+    seedKey: 'bulgur-dry',
     barcode: null,
     name_en: 'Bulgur, dry',
     name_pl: 'Kasza bulgur sucha',
@@ -1088,6 +1141,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_590,
   },
   {
+    seedKey: 'quinoa-dry',
     barcode: null,
     name_en: 'Quinoa, dry',
     name_pl: 'Komosa ryżowa sucha',
@@ -1098,6 +1152,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 6_420,
   },
   {
+    seedKey: 'couscous-dry',
     barcode: null,
     name_en: 'Couscous, dry',
     name_pl: 'Kuskus suchy',
@@ -1108,6 +1163,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_740,
   },
   {
+    seedKey: 'barley-pearled-dry',
     barcode: null,
     name_en: 'Barley, pearled, dry',
     name_pl: 'Kasza jęczmienna perłowa sucha',
@@ -1118,6 +1174,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_770,
   },
   {
+    seedKey: 'buckwheat-groats-dry',
     barcode: null,
     name_en: 'Buckwheat groats, dry',
     name_pl: 'Kasza gryczana sucha',
@@ -1128,6 +1185,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_500,
   },
   {
+    seedKey: 'millet-dry',
     barcode: null,
     name_en: 'Millet, dry',
     name_pl: 'Kasza jaglana sucha',
@@ -1138,6 +1196,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_280,
   },
   {
+    seedKey: 'oats-rolled-dry',
     barcode: null,
     name_en: 'Oats, rolled, dry',
     name_pl: 'Płatki owsiane suche',
@@ -1148,6 +1207,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 6_870,
   },
   {
+    seedKey: 'white-bread',
     barcode: null,
     name_en: 'White bread',
     name_pl: 'Chleb biały',
@@ -1158,6 +1218,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 4_390,
   },
   {
+    seedKey: 'whole-wheat-bread',
     barcode: null,
     name_en: 'Whole wheat bread',
     name_pl: 'Chleb pszenny pełnoziarnisty',
@@ -1168,6 +1229,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 4_270,
   },
   {
+    seedKey: 'rye-bread',
     barcode: null,
     name_en: 'Rye bread',
     name_pl: 'Chleb żytni',
@@ -1178,6 +1240,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 4_830,
   },
   {
+    seedKey: 'sourdough-bread',
     barcode: null,
     name_en: 'Sourdough bread',
     name_pl: 'Chleb na zakwasie',
@@ -1188,6 +1251,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 5_190,
   },
   {
+    seedKey: 'wheat-rye-bread',
     barcode: null,
     name_en: 'Wheat-rye bread',
     name_pl: 'Chleb pszenno-żytni',
@@ -1198,6 +1262,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 4_900,
   },
   {
+    seedKey: 'spelt-bread',
     barcode: null,
     name_en: 'Spelt bread',
     name_pl: 'Chleb orkiszowy',
@@ -1208,6 +1273,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 5_000,
   },
   {
+    seedKey: 'wheat-rye-bread-with-seeds',
     barcode: null,
     name_en: 'Wheat-rye bread with seeds',
     name_pl: 'Chleb pszenno-żytni z ziarnami',
@@ -1218,6 +1284,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 4_600,
   },
   {
+    seedKey: 'poznan-wheat-roll',
     barcode: null,
     name_en: 'Poznań wheat roll',
     name_pl: 'Bułka poznańska',
@@ -1228,6 +1295,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 5_400,
   },
   {
+    seedKey: 'morning-wheat-roll',
     barcode: null,
     name_en: 'Morning wheat roll',
     name_pl: 'Bułka poranna',
@@ -1238,6 +1306,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 5_600,
   },
   {
+    seedKey: 'graham-wheat-roll',
     barcode: null,
     name_en: 'Graham wheat roll',
     name_pl: 'Bułka grahamka',
@@ -1248,6 +1317,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 4_100,
   },
   {
+    seedKey: 'breakfast-roll-with-seeds',
     barcode: null,
     name_en: 'Breakfast roll with seeds',
     name_pl: 'Bułka śniadaniowa z ziarnami',
@@ -1258,6 +1328,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 5_100,
   },
   {
+    seedKey: 'kaiser-roll',
     barcode: null,
     name_en: 'Kaiser roll',
     name_pl: 'Bułka kajzerka',
@@ -1268,6 +1339,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 5_500,
   },
   {
+    seedKey: 'spelt-roll-with-seeds',
     barcode: null,
     name_en: 'Spelt roll with seeds',
     name_pl: 'Bułka orkiszowa z ziarnami',
@@ -1278,6 +1350,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 4_700,
   },
   {
+    seedKey: 'flaxseed-and-sesame-roll',
     barcode: null,
     name_en: 'Flaxseed and sesame roll',
     name_pl: 'Bułka z siemieniem lnianym i sezamem',
@@ -1288,6 +1361,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 4_900,
   },
   {
+    seedKey: 'pita-bread',
     barcode: null,
     name_en: 'Pita bread',
     name_pl: 'Chleb pita',
@@ -1298,6 +1372,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 5_570,
   },
   {
+    seedKey: 'bagel',
     barcode: null,
     name_en: 'Bagel',
     name_pl: 'Bajgiel',
@@ -1308,6 +1383,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 4_890,
   },
   {
+    seedKey: 'flour-tortilla',
     barcode: null,
     name_en: 'Flour tortilla',
     name_pl: 'Tortilla pszenna',
@@ -1318,6 +1394,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 4_930,
   },
   {
+    seedKey: 'corn-tortilla',
     barcode: null,
     name_en: 'Corn tortilla',
     name_pl: 'Tortilla kukurydziana',
@@ -1328,6 +1405,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 4_460,
   },
   {
+    seedKey: 'breadcrumbs',
     barcode: null,
     name_en: 'Breadcrumbs',
     name_pl: 'Bułka tarta',
@@ -1340,6 +1418,7 @@ export const foodProductSeeds = [
 
   // Legumes and plant proteins
   {
+    seedKey: 'lentils-dry',
     barcode: null,
     name_en: 'Lentils, dry',
     name_pl: 'Soczewica sucha',
@@ -1350,6 +1429,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 6_220,
   },
   {
+    seedKey: 'lentils-cooked',
     barcode: null,
     name_en: 'Lentils, cooked',
     name_pl: 'Soczewica gotowana',
@@ -1360,6 +1440,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_010,
   },
   {
+    seedKey: 'chickpeas-dry',
     barcode: null,
     name_en: 'Chickpeas, dry',
     name_pl: 'Ciecierzyca sucha',
@@ -1370,6 +1451,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 6_040,
   },
   {
+    seedKey: 'chickpeas-cooked',
     barcode: null,
     name_en: 'Chickpeas, cooked',
     name_pl: 'Ciecierzyca gotowana',
@@ -1380,6 +1462,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_740,
   },
   {
+    seedKey: 'chickpeas-canned',
     barcode: null,
     name_en: 'Chickpeas, canned',
     name_pl: 'Ciecierzyca z puszki',
@@ -1390,6 +1473,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_250,
   },
   {
+    seedKey: 'black-beans-dry',
     barcode: null,
     name_en: 'Black beans, dry',
     name_pl: 'Fasola czarna sucha',
@@ -1400,6 +1484,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 6_240,
   },
   {
+    seedKey: 'black-beans-cooked',
     barcode: null,
     name_en: 'Black beans, cooked',
     name_pl: 'Fasola czarna gotowana',
@@ -1410,6 +1495,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_370,
   },
   {
+    seedKey: 'black-beans-canned',
     barcode: null,
     name_en: 'Black beans, canned',
     name_pl: 'Fasola czarna z puszki',
@@ -1420,6 +1506,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_660,
   },
   {
+    seedKey: 'kidney-beans-dry',
     barcode: null,
     name_en: 'Kidney beans, dry',
     name_pl: 'Fasola czerwona kidney sucha',
@@ -1430,6 +1517,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 6_130,
   },
   {
+    seedKey: 'kidney-beans-cooked',
     barcode: null,
     name_en: 'Kidney beans, cooked',
     name_pl: 'Fasola czerwona kidney gotowana',
@@ -1440,6 +1528,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_280,
   },
   {
+    seedKey: 'kidney-beans-canned',
     barcode: null,
     name_en: 'Kidney beans, canned',
     name_pl: 'Fasola czerwona kidney z puszki',
@@ -1450,6 +1539,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_150,
   },
   {
+    seedKey: 'cannellini-beans-cooked',
     barcode: null,
     name_en: 'Cannellini beans, cooked',
     name_pl: 'Fasola biała cannellini gotowana',
@@ -1460,6 +1550,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_510,
   },
   {
+    seedKey: 'green-peas-cooked',
     barcode: null,
     name_en: 'Green peas, cooked',
     name_pl: 'Groszek zielony gotowany',
@@ -1470,6 +1561,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_430,
   },
   {
+    seedKey: 'edamame-cooked',
     barcode: null,
     name_en: 'Edamame, cooked',
     name_pl: 'Edamame gotowane',
@@ -1480,6 +1572,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 891,
   },
   {
+    seedKey: 'tofu-firm',
     barcode: null,
     name_en: 'Tofu, firm',
     name_pl: 'Tofu twarde',
@@ -1490,6 +1583,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 285,
   },
   {
+    seedKey: 'hummus',
     barcode: null,
     name_en: 'Hummus',
     name_pl: 'Hummus',
@@ -1502,6 +1596,7 @@ export const foodProductSeeds = [
 
   // Meat and poultry
   {
+    seedKey: 'chicken-breast-raw',
     barcode: null,
     name_en: 'Chicken breast, raw',
     name_pl: 'Pierś z kurczaka surowa',
@@ -1512,6 +1607,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'chicken-breast-cooked',
     barcode: null,
     name_en: 'Chicken breast, cooked',
     name_pl: 'Pierś z kurczaka po obróbce termicznej',
@@ -1522,6 +1618,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'chicken-thigh-raw',
     barcode: null,
     name_en: 'Chicken thigh, raw',
     name_pl: 'Udo z kurczaka surowe',
@@ -1532,6 +1629,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'chicken-thigh-cooked',
     barcode: null,
     name_en: 'Chicken thigh, cooked',
     name_pl: 'Udo z kurczaka po obróbce termicznej',
@@ -1542,6 +1640,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'chicken-drumstick-raw',
     barcode: null,
     name_en: 'Chicken drumstick, raw',
     name_pl: 'Podudzie z kurczaka surowe',
@@ -1552,6 +1651,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'chicken-drumstick-cooked',
     barcode: null,
     name_en: 'Chicken drumstick, cooked',
     name_pl: 'Podudzie z kurczaka po obróbce termicznej',
@@ -1562,6 +1662,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'chicken-wing-raw',
     barcode: null,
     name_en: 'Chicken wing, raw',
     name_pl: 'Skrzydełko z kurczaka surowe',
@@ -1572,6 +1673,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'chicken-wing-cooked',
     barcode: null,
     name_en: 'Chicken wing, cooked',
     name_pl: 'Skrzydełko z kurczaka po obróbce termicznej',
@@ -1582,6 +1684,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'roast-chicken-meat-and-skin',
     barcode: null,
     name_en: 'Roast chicken, meat and skin',
     name_pl: 'Kurczak pieczony, mięso ze skórą',
@@ -1592,6 +1695,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'ground-chicken-raw',
     barcode: null,
     name_en: 'Ground chicken, raw',
     name_pl: 'Mięso mielone z kurczaka surowe',
@@ -1602,6 +1706,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 4,
   },
   {
+    seedKey: 'turkey-breast-raw',
     barcode: null,
     name_en: 'Turkey breast, raw',
     name_pl: 'Pierś z indyka surowa',
@@ -1612,6 +1717,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'turkey-breast-roasted',
     barcode: null,
     name_en: 'Turkey breast, roasted',
     name_pl: 'Pierś z indyka pieczona',
@@ -1622,6 +1728,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'duck-breast-raw',
     barcode: null,
     name_en: 'Duck breast, raw',
     name_pl: 'Pierś z kaczki surowa',
@@ -1632,6 +1739,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'beef-mince-raw-90-pct-lean',
     barcode: null,
     name_en: 'Beef mince, raw, 90% lean',
     name_pl: 'Wołowina mielona surowa, 10% tłuszczu',
@@ -1642,6 +1750,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'beef-mince-raw-80-pct-lean',
     barcode: null,
     name_en: 'Beef mince, raw, 80% lean',
     name_pl: 'Wołowina mielona surowa, 20% tłuszczu',
@@ -1652,6 +1761,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'beef-tenderloin-raw',
     barcode: null,
     name_en: 'Beef tenderloin, raw',
     name_pl: 'Polędwica wołowa surowa',
@@ -1662,6 +1772,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 18,
   },
   {
+    seedKey: 'beef-tenderloin-cooked',
     barcode: null,
     name_en: 'Beef tenderloin, cooked',
     name_pl: 'Polędwica wołowa po obróbce termicznej',
@@ -1672,6 +1783,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'beef-ribeye-steak-antrykot-raw',
     barcode: null,
     name_en: 'Beef ribeye steak (antrykot), raw',
     name_pl: 'Stek wołowy z antrykotu surowy',
@@ -1682,6 +1794,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'beef-ribeye-steak-antrykot-cooked',
     barcode: null,
     name_en: 'Beef ribeye steak (antrykot), cooked',
     name_pl: 'Stek wołowy z antrykotu po obróbce termicznej',
@@ -1692,6 +1805,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'beef-strip-steak-raw',
     barcode: null,
     name_en: 'Beef strip steak, raw',
     name_pl: 'Stek wołowy z rostbefu surowy',
@@ -1702,6 +1816,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 22,
   },
   {
+    seedKey: 'beef-sirloin-steak-raw',
     barcode: null,
     name_en: 'Beef sirloin steak, raw',
     name_pl: 'Stek wołowy z krzyżowej surowy',
@@ -1712,6 +1827,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 22,
   },
   {
+    seedKey: 'beef-top-round-raw',
     barcode: null,
     name_en: 'Beef top round, raw',
     name_pl: 'Wołowina zrazowa wewnętrzna surowa',
@@ -1722,6 +1838,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'beef-flank-steak-raw',
     barcode: null,
     name_en: 'Beef flank steak, raw',
     name_pl: 'Stek wołowy z łaty surowy',
@@ -1732,6 +1849,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'beef-chuck-roast-raw',
     barcode: null,
     name_en: 'Beef chuck roast, raw',
     name_pl: 'Łopatka wołowa na pieczeń surowa',
@@ -1742,6 +1860,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'beef-brisket-raw',
     barcode: null,
     name_en: 'Beef brisket, raw',
     name_pl: 'Mostek wołowy surowy',
@@ -1752,6 +1871,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 60,
   },
   {
+    seedKey: 'pork-loin-raw',
     barcode: null,
     name_en: 'Pork loin, raw',
     name_pl: 'Schab wieprzowy surowy',
@@ -1762,6 +1882,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'pork-loin-cooked',
     barcode: null,
     name_en: 'Pork loin, cooked',
     name_pl: 'Schab wieprzowy po obróbce termicznej',
@@ -1772,6 +1893,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'pork-tenderloin-raw',
     barcode: null,
     name_en: 'Pork tenderloin, raw',
     name_pl: 'Polędwiczka wieprzowa surowa',
@@ -1782,6 +1904,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'pork-tenderloin-cooked',
     barcode: null,
     name_en: 'Pork tenderloin, cooked',
     name_pl: 'Polędwiczka wieprzowa po obróbce termicznej',
@@ -1792,6 +1915,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'pork-chop-raw',
     barcode: null,
     name_en: 'Pork chop, raw',
     name_pl: 'Kotlet wieprzowy surowy',
@@ -1802,6 +1926,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'pork-shoulder-raw',
     barcode: null,
     name_en: 'Pork shoulder, raw',
     name_pl: 'Łopatka wieprzowa surowa',
@@ -1812,6 +1937,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'pork-belly-raw',
     barcode: null,
     name_en: 'Pork belly, raw',
     name_pl: 'Boczek surowy',
@@ -1822,6 +1948,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'bacon-cooked',
     barcode: null,
     name_en: 'Bacon, cooked',
     name_pl: 'Bekon po obróbce termicznej',
@@ -1832,6 +1959,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 143,
   },
   {
+    seedKey: 'ham-sliced',
     barcode: null,
     name_en: 'Ham, sliced',
     name_pl: 'Szynka w plastrach',
@@ -1842,6 +1970,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 363,
   },
   {
+    seedKey: 'pork-sausage-cooked',
     barcode: null,
     name_en: 'Pork sausage, cooked',
     name_pl: 'Kiełbasa wieprzowa po obróbce termicznej',
@@ -1852,6 +1981,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 270,
   },
   {
+    seedKey: 'italian-sausage-cooked',
     barcode: null,
     name_en: 'Italian sausage, cooked',
     name_pl: 'Kiełbasa włoska po obróbce termicznej',
@@ -1862,6 +1992,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 186,
   },
   {
+    seedKey: 'chorizo-cooked',
     barcode: null,
     name_en: 'Chorizo, cooked',
     name_pl: 'Chorizo po obróbce termicznej',
@@ -1872,6 +2003,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 263,
   },
   {
+    seedKey: 'lamb-leg-raw',
     barcode: null,
     name_en: 'Lamb leg, raw',
     name_pl: 'Udziec jagnięcy surowy',
@@ -1882,6 +2014,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'ground-lamb-raw',
     barcode: null,
     name_en: 'Ground lamb, raw',
     name_pl: 'Jagnięcina mielona surowa',
@@ -1892,6 +2025,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'veal-cutlet-raw',
     barcode: null,
     name_en: 'Veal cutlet, raw',
     name_pl: 'Kotlet cielęcy surowy',
@@ -1904,6 +2038,7 @@ export const foodProductSeeds = [
 
   // Fish and seafood
   {
+    seedKey: 'salmon-atlantic-raw',
     barcode: null,
     name_en: 'Salmon, Atlantic, raw',
     name_pl: 'Łosoś atlantycki surowy',
@@ -1914,6 +2049,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'salmon-atlantic-cooked',
     barcode: null,
     name_en: 'Salmon, Atlantic, cooked',
     name_pl: 'Łosoś atlantycki po obróbce termicznej',
@@ -1924,6 +2060,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'tuna-canned-in-water',
     barcode: null,
     name_en: 'Tuna, canned in water',
     name_pl: 'Tuńczyk w wodzie z puszki',
@@ -1934,6 +2071,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'tuna-yellowfin-raw',
     barcode: null,
     name_en: 'Tuna, yellowfin, raw',
     name_pl: 'Tuńczyk żółtopłetwy surowy',
@@ -1944,6 +2082,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'cod-atlantic-raw',
     barcode: null,
     name_en: 'Cod, Atlantic, raw',
     name_pl: 'Dorsz atlantycki surowy',
@@ -1954,6 +2093,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'cod-atlantic-cooked',
     barcode: null,
     name_en: 'Cod, Atlantic, cooked',
     name_pl: 'Dorsz atlantycki po obróbce termicznej',
@@ -1964,6 +2104,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'haddock-raw',
     barcode: null,
     name_en: 'Haddock, raw',
     name_pl: 'Plamiak surowy',
@@ -1974,6 +2115,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'pollock-raw',
     barcode: null,
     name_en: 'Pollock, raw',
     name_pl: 'Mintaj surowy',
@@ -1984,6 +2126,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'tilapia-raw',
     barcode: null,
     name_en: 'Tilapia, raw',
     name_pl: 'Tilapia surowa',
@@ -1994,6 +2137,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'trout-rainbow-raw',
     barcode: null,
     name_en: 'Trout, rainbow, raw',
     name_pl: 'Pstrąg tęczowy surowy',
@@ -2004,6 +2148,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'sardines-canned-in-oil',
     barcode: null,
     name_en: 'Sardines, canned in oil',
     name_pl: 'Sardynki w oleju z puszki',
@@ -2014,6 +2159,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'mackerel-atlantic-raw',
     barcode: null,
     name_en: 'Mackerel, Atlantic, raw',
     name_pl: 'Makrela atlantycka surowa',
@@ -2024,6 +2170,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'herring-atlantic-raw',
     barcode: null,
     name_en: 'Herring, Atlantic, raw',
     name_pl: 'Śledź atlantycki surowy',
@@ -2034,6 +2181,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'anchovies-canned-in-oil',
     barcode: null,
     name_en: 'Anchovies, canned in oil',
     name_pl: 'Anchois w oleju z puszki',
@@ -2044,6 +2192,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 241,
   },
   {
+    seedKey: 'shrimp-raw',
     barcode: null,
     name_en: 'Shrimp, raw',
     name_pl: 'Krewetki surowe',
@@ -2054,6 +2203,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 49,
   },
   {
+    seedKey: 'shrimp-cooked',
     barcode: null,
     name_en: 'Shrimp, cooked',
     name_pl: 'Krewetki gotowane',
@@ -2064,6 +2214,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 152,
   },
   {
+    seedKey: 'lobster-cooked',
     barcode: null,
     name_en: 'Lobster, cooked',
     name_pl: 'Homar gotowany',
@@ -2074,6 +2225,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 312,
   },
   {
+    seedKey: 'scallops-cooked',
     barcode: null,
     name_en: 'Scallops, cooked',
     name_pl: 'Przegrzebki po obróbce termicznej',
@@ -2084,6 +2236,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 541,
   },
   {
+    seedKey: 'mussels-cooked',
     barcode: null,
     name_en: 'Mussels, cooked',
     name_pl: 'Małże gotowane',
@@ -2094,6 +2247,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 739,
   },
   {
+    seedKey: 'squid-raw',
     barcode: null,
     name_en: 'Squid, raw',
     name_pl: 'Kalmar surowy',
@@ -2104,6 +2258,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 308,
   },
   {
+    seedKey: 'halibut-raw',
     barcode: null,
     name_en: 'Halibut, raw',
     name_pl: 'Halibut surowy',
@@ -2114,6 +2269,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 181,
   },
   {
+    seedKey: 'swordfish-raw',
     barcode: null,
     name_en: 'Swordfish, raw',
     name_pl: 'Miecznik surowy',
@@ -2126,6 +2282,7 @@ export const foodProductSeeds = [
 
   // Dairy and eggs
   {
+    seedKey: 'egg-whole-raw',
     barcode: null,
     name_en: 'Egg, whole, raw',
     name_pl: 'Jajko całe surowe',
@@ -2136,6 +2293,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 72,
   },
   {
+    seedKey: 'egg-whole-hard-boiled',
     barcode: null,
     name_en: 'Egg, whole, hard-boiled',
     name_pl: 'Jajko całe na twardo',
@@ -2146,6 +2304,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 112,
   },
   {
+    seedKey: 'egg-white-raw',
     barcode: null,
     name_en: 'Egg white, raw',
     name_pl: 'Białko jaja surowe',
@@ -2156,6 +2315,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 73,
   },
   {
+    seedKey: 'egg-yolk-raw',
     barcode: null,
     name_en: 'Egg yolk, raw',
     name_pl: 'Żółtko jaja surowe',
@@ -2166,6 +2326,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 359,
   },
   {
+    seedKey: 'milk-whole',
     barcode: null,
     name_en: 'Milk, whole',
     name_pl: 'Mleko pełnotłuste',
@@ -2176,6 +2337,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 463,
   },
   {
+    seedKey: 'milk-2-pct',
     barcode: null,
     name_en: 'Milk, 2%',
     name_pl: 'Mleko 2%',
@@ -2186,6 +2348,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 490,
   },
   {
+    seedKey: 'milk-skim',
     barcode: null,
     name_en: 'Milk, skim',
     name_pl: 'Mleko odtłuszczone',
@@ -2196,6 +2359,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 492,
   },
   {
+    seedKey: 'buttermilk-low-fat',
     barcode: null,
     name_en: 'Buttermilk, low-fat',
     name_pl: 'Maślanka o obniżonej zawartości tłuszczu',
@@ -2206,6 +2370,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 481,
   },
   {
+    seedKey: 'greek-yogurt-plain-nonfat',
     barcode: null,
     name_en: 'Greek yogurt, plain, nonfat',
     name_pl: 'Jogurt grecki naturalny 0%',
@@ -2216,6 +2381,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 364,
   },
   {
+    seedKey: 'greek-yogurt-plain-whole-milk',
     barcode: null,
     name_en: 'Greek yogurt, plain, whole milk',
     name_pl: 'Jogurt grecki naturalny pełnotłusty',
@@ -2226,6 +2392,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 475,
   },
   {
+    seedKey: 'yogurt-plain-nonfat',
     barcode: null,
     name_en: 'Yogurt, plain, nonfat',
     name_pl: 'Jogurt naturalny 0%',
@@ -2236,6 +2403,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 768,
   },
   {
+    seedKey: 'yogurt-plain-whole-milk',
     barcode: null,
     name_en: 'Yogurt, plain, whole milk',
     name_pl: 'Jogurt naturalny pełnotłusty',
@@ -2246,6 +2414,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 466,
   },
   {
+    seedKey: 'yogurt-strawberry',
     barcode: null,
     name_en: 'Yogurt, strawberry',
     name_pl: 'Jogurt truskawkowy',
@@ -2256,6 +2425,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_220,
   },
   {
+    seedKey: 'cottage-cheese-low-fat',
     barcode: null,
     name_en: 'Cottage cheese, low-fat',
     name_pl: 'Serek wiejski lekki',
@@ -2266,6 +2436,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 431,
   },
   {
+    seedKey: 'cottage-cheese-full-fat',
     barcode: null,
     name_en: 'Cottage cheese, full-fat',
     name_pl: 'Serek wiejski pełnotłusty',
@@ -2276,6 +2447,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 460,
   },
   {
+    seedKey: 'cheddar-cheese',
     barcode: null,
     name_en: 'Cheddar cheese',
     name_pl: 'Ser cheddar',
@@ -2286,6 +2458,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 244,
   },
   {
+    seedKey: 'mozzarella-cheese',
     barcode: null,
     name_en: 'Mozzarella cheese',
     name_pl: 'Ser mozzarella',
@@ -2296,6 +2469,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 444,
   },
   {
+    seedKey: 'parmesan-cheese',
     barcode: null,
     name_en: 'Parmesan cheese',
     name_pl: 'Parmezan',
@@ -2306,6 +2480,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_240,
   },
   {
+    seedKey: 'feta-cheese',
     barcode: null,
     name_en: 'Feta cheese',
     name_pl: 'Ser feta',
@@ -2316,6 +2491,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 558,
   },
   {
+    seedKey: 'halloumi-cheese',
     barcode: null,
     name_en: 'Halloumi cheese',
     name_pl: 'Ser halloumi',
@@ -2326,6 +2502,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 120,
   },
   {
+    seedKey: 'ricotta-cheese-whole-milk',
     barcode: null,
     name_en: 'Ricotta cheese, whole milk',
     name_pl: 'Ricotta pełnotłusta',
@@ -2336,6 +2513,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 686,
   },
   {
+    seedKey: 'cream-cheese',
     barcode: null,
     name_en: 'Cream cheese',
     name_pl: 'Serek śmietankowy do smarowania',
@@ -2346,6 +2524,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 456,
   },
   {
+    seedKey: 'sour-cream',
     barcode: null,
     name_en: 'Sour cream',
     name_pl: 'Kwaśna śmietana',
@@ -2356,6 +2535,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 556,
   },
   {
+    seedKey: 'heavy-cream',
     barcode: null,
     name_en: 'Heavy cream',
     name_pl: 'Śmietanka kremówka',
@@ -2366,6 +2546,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 284,
   },
   {
+    seedKey: 'butter-salted',
     barcode: null,
     name_en: 'Butter, salted',
     name_pl: 'Masło solone',
@@ -2376,6 +2557,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 6,
   },
   {
+    seedKey: 'butter-unsalted',
     barcode: null,
     name_en: 'Butter, unsalted',
     name_pl: 'Masło niesolone',
@@ -2388,6 +2570,7 @@ export const foodProductSeeds = [
 
   // Nuts, seeds and oils
   {
+    seedKey: 'almonds-raw',
     barcode: null,
     name_en: 'Almonds, raw',
     name_pl: 'Migdały surowe',
@@ -2398,6 +2581,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_000,
   },
   {
+    seedKey: 'almonds-roasted',
     barcode: null,
     name_en: 'Almonds, roasted',
     name_pl: 'Migdały prażone',
@@ -2408,6 +2592,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_620,
   },
   {
+    seedKey: 'walnuts',
     barcode: null,
     name_en: 'Walnuts',
     name_pl: 'Orzechy włoskie',
@@ -2418,6 +2603,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_090,
   },
   {
+    seedKey: 'pecans',
     barcode: null,
     name_en: 'Pecans',
     name_pl: 'Orzechy pekan',
@@ -2428,6 +2614,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_270,
   },
   {
+    seedKey: 'cashews',
     barcode: null,
     name_en: 'Cashews',
     name_pl: 'Orzechy nerkowca',
@@ -2438,6 +2625,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 3_020,
   },
   {
+    seedKey: 'pistachios',
     barcode: null,
     name_en: 'Pistachios',
     name_pl: 'Pistacje',
@@ -2448,6 +2636,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_720,
   },
   {
+    seedKey: 'hazelnuts',
     barcode: null,
     name_en: 'Hazelnuts',
     name_pl: 'Orzechy laskowe',
@@ -2458,6 +2647,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_650,
   },
   {
+    seedKey: 'macadamia-nuts',
     barcode: null,
     name_en: 'Macadamia nuts',
     name_pl: 'Orzechy makadamia',
@@ -2468,6 +2658,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_410,
   },
   {
+    seedKey: 'brazil-nuts',
     barcode: null,
     name_en: 'Brazil nuts',
     name_pl: 'Orzechy brazylijskie',
@@ -2478,6 +2669,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_160,
   },
   {
+    seedKey: 'peanuts',
     barcode: null,
     name_en: 'Peanuts',
     name_pl: 'Orzechy ziemne',
@@ -2488,6 +2680,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_650,
   },
   {
+    seedKey: 'peanut-butter',
     barcode: null,
     name_en: 'Peanut butter',
     name_pl: 'Masło orzechowe',
@@ -2498,6 +2691,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_270,
   },
   {
+    seedKey: 'almond-butter',
     barcode: null,
     name_en: 'Almond butter',
     name_pl: 'Masło migdałowe',
@@ -2508,6 +2702,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_120,
   },
   {
+    seedKey: 'tahini',
     barcode: null,
     name_en: 'Tahini',
     name_pl: 'Tahini',
@@ -2518,6 +2713,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_150,
   },
   {
+    seedKey: 'sunflower-seeds',
     barcode: null,
     name_en: 'Sunflower seeds',
     name_pl: 'Pestki słonecznika',
@@ -2528,6 +2724,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_450,
   },
   {
+    seedKey: 'pumpkin-seeds',
     barcode: null,
     name_en: 'Pumpkin seeds',
     name_pl: 'Pestki dyni',
@@ -2538,6 +2735,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_870,
   },
   {
+    seedKey: 'chia-seeds',
     barcode: null,
     name_en: 'Chia seeds',
     name_pl: 'Nasiona chia',
@@ -2548,6 +2746,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 3_830,
   },
   {
+    seedKey: 'flaxseed-ground',
     barcode: null,
     name_en: 'Flaxseed, ground',
     name_pl: 'Siemię lniane mielone',
@@ -2558,6 +2757,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 3_440,
   },
   {
+    seedKey: 'sesame-seeds',
     barcode: null,
     name_en: 'Sesame seeds',
     name_pl: 'Sezam',
@@ -2568,6 +2768,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_340,
   },
   {
+    seedKey: 'olive-oil',
     barcode: null,
     name_en: 'Olive oil',
     name_pl: 'Oliwa z oliwek',
@@ -2578,6 +2779,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'canola-oil',
     barcode: null,
     name_en: 'Canola oil',
     name_pl: 'Olej rzepakowy',
@@ -2588,6 +2790,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'sunflower-oil',
     barcode: null,
     name_en: 'Sunflower oil',
     name_pl: 'Olej słonecznikowy',
@@ -2598,6 +2801,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 0,
   },
   {
+    seedKey: 'coconut-oil',
     barcode: null,
     name_en: 'Coconut oil',
     name_pl: 'Olej kokosowy',
@@ -2610,6 +2814,7 @@ export const foodProductSeeds = [
 
   // Sauces, condiments and treats
   {
+    seedKey: 'tomato-sauce',
     barcode: null,
     name_en: 'Tomato sauce',
     name_pl: 'Sos pomidorowy',
@@ -2620,6 +2825,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 633,
   },
   {
+    seedKey: 'tomato-paste',
     barcode: null,
     name_en: 'Tomato paste',
     name_pl: 'Koncentrat pomidorowy',
@@ -2630,6 +2836,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_890,
   },
   {
+    seedKey: 'salsa',
     barcode: null,
     name_en: 'Salsa',
     name_pl: 'Sos salsa',
@@ -2640,6 +2847,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 674,
   },
   {
+    seedKey: 'ketchup',
     barcode: null,
     name_en: 'Ketchup',
     name_pl: 'Ketchup',
@@ -2650,6 +2858,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 2_740,
   },
   {
+    seedKey: 'mayonnaise',
     barcode: null,
     name_en: 'Mayonnaise',
     name_pl: 'Majonez',
@@ -2660,6 +2869,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 57,
   },
   {
+    seedKey: 'soy-sauce',
     barcode: null,
     name_en: 'Soy sauce',
     name_pl: 'Sos sojowy',
@@ -2670,6 +2880,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 559,
   },
   {
+    seedKey: 'apple-cider-vinegar',
     barcode: null,
     name_en: 'Apple cider vinegar',
     name_pl: 'Ocet jabłkowy',
@@ -2680,6 +2891,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 93,
   },
   {
+    seedKey: 'honey',
     barcode: null,
     name_en: 'Honey',
     name_pl: 'Miód',
@@ -2690,6 +2902,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 8_240,
   },
   {
+    seedKey: 'granulated-sugar',
     barcode: null,
     name_en: 'Granulated sugar',
     name_pl: 'Cukier kryształ',
@@ -2700,6 +2913,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 10_000,
   },
   {
+    seedKey: 'maple-syrup',
     barcode: null,
     name_en: 'Maple syrup',
     name_pl: 'Syrop klonowy',
@@ -2710,6 +2924,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 6_740,
   },
   {
+    seedKey: 'strawberry-jam',
     barcode: null,
     name_en: 'Strawberry jam',
     name_pl: 'Dżem truskawkowy',
@@ -2720,6 +2935,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 6_890,
   },
   {
+    seedKey: 'nutella-hazelnut-cocoa-spread',
     barcode: null,
     name_en: 'Nutella hazelnut cocoa spread',
     name_pl: 'Krem Nutella',
@@ -2730,6 +2946,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 5_750,
   },
   {
+    seedKey: 'dark-chocolate',
     barcode: null,
     name_en: 'Dark chocolate',
     name_pl: 'Czekolada gorzka',
@@ -2740,6 +2957,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 4_590,
   },
   {
+    seedKey: 'milk-chocolate',
     barcode: null,
     name_en: 'Milk chocolate',
     name_pl: 'Czekolada mleczna',
@@ -2750,6 +2968,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 5_940,
   },
   {
+    seedKey: 'popcorn-air-popped',
     barcode: null,
     name_en: 'Popcorn, air-popped',
     name_pl: 'Popcorn bez tłuszczu',
@@ -2760,6 +2979,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 7_780,
   },
   {
+    seedKey: 'potato-chips',
     barcode: null,
     name_en: 'Potato chips',
     name_pl: 'Chipsy ziemniaczane',
@@ -2770,6 +2990,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 6_480,
   },
   {
+    seedKey: 'tortilla-chips',
     barcode: null,
     name_en: 'Tortilla chips',
     name_pl: 'Chipsy tortilla',
@@ -2780,6 +3001,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 6_780,
   },
   {
+    seedKey: 'pretzels',
     barcode: null,
     name_en: 'Pretzels',
     name_pl: 'Precelki',
@@ -2790,6 +3012,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 8_040,
   },
   {
+    seedKey: 'granola',
     barcode: null,
     name_en: 'Granola',
     name_pl: 'Granola',
@@ -2802,6 +3025,7 @@ export const foodProductSeeds = [
   // Gym staples available in Poland. Powders are dry (not mixed with milk/water).
   // Unbranded entries are representative quick-log estimates; labels vary by flavor.
   {
+    seedKey: 'wpc-75-whey-protein-powder',
     barcode: null,
     name_en: 'WPC 75 whey protein powder',
     name_pl: 'Odżywka białkowa WPC 75',
@@ -2812,6 +3036,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 800,
   },
   {
+    seedKey: 'wpc-80-whey-protein-powder-plain',
     barcode: null,
     name_en: 'WPC 80 whey protein powder, plain',
     name_pl: 'Odżywka białkowa WPC 80 naturalna',
@@ -2822,6 +3047,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 690,
   },
   {
+    seedKey: 'whey-protein-powder-flavored',
     barcode: null,
     name_en: 'Whey protein powder, flavored',
     name_pl: 'Odżywka białkowa whey smakowa',
@@ -2832,6 +3058,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 1_600,
   },
   {
+    seedKey: 'wpi-whey-isolate-protein-powder',
     barcode: null,
     name_en: 'WPI whey isolate protein powder',
     name_pl: 'Odżywka białkowa WPI izolat serwatki',
@@ -2842,6 +3069,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 260,
   },
   {
+    seedKey: 'micellar-casein-protein-powder',
     barcode: null,
     name_en: 'Micellar casein protein powder',
     name_pl: 'Odżywka białkowa kazeina micelarna',
@@ -2852,6 +3080,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 430,
   },
   {
+    seedKey: 'skyr-plain',
     barcode: null,
     name_en: 'Skyr, plain',
     name_pl: 'Skyr naturalny',
@@ -2862,6 +3091,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 410,
   },
   {
+    seedKey: 'quark-low-fat',
     barcode: null,
     name_en: 'Quark, low-fat',
     name_pl: 'Twaróg chudy',
@@ -2872,6 +3102,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 350,
   },
   {
+    seedKey: 'quark-semi-fat',
     barcode: null,
     name_en: 'Quark, semi-fat',
     name_pl: 'Twaróg półtłusty',
@@ -2882,6 +3113,7 @@ export const foodProductSeeds = [
     carbsPer100gHundredths: 380,
   },
   {
+    seedKey: 'high-protein-cottage-cheese',
     barcode: null,
     name_en: 'High-protein cottage cheese',
     name_pl: 'Serek wiejski wysokobiałkowy',
@@ -2890,5 +3122,1067 @@ export const foodProductSeeds = [
     proteinPer100gHundredths: 1_400,
     fatPer100gHundredths: 300,
     carbsPer100gHundredths: 240,
+  },
+
+  // Popular prepared foods, snacks and drinks. See food-products.sources.md.
+  // USDA SR Legacy, FDC 170698.
+  {
+    seedKey: 'fries-deep-fried',
+    barcode: null,
+    name_en: 'Fries, deep-fried',
+    name_pl: 'Frytki smażone',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 31_200,
+    proteinPer100gHundredths: 343,
+    fatPer100gHundredths: 1_473,
+    carbsPer100gHundredths: 4_144,
+  },
+  // USDA SR Legacy, FDC 169264.
+  {
+    seedKey: 'fries-oven-baked',
+    barcode: null,
+    name_en: 'Fries, oven-baked',
+    name_pl: 'Frytki pieczone w piekarniku',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 15_800,
+    proteinPer100gHundredths: 275,
+    fatPer100gHundredths: 548,
+    carbsPer100gHundredths: 2_555,
+  },
+  // USDA SR Legacy, FDC 173292.
+  {
+    seedKey: 'pizza-cheese-regular-crust',
+    barcode: null,
+    name_en: 'Pizza, cheese, regular crust',
+    name_pl: 'Pizza serowa na tradycyjnym cieście',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 26_600,
+    proteinPer100gHundredths: 1_139,
+    fatPer100gHundredths: 969,
+    carbsPer100gHundredths: 3_333,
+  },
+  // USDA SR Legacy, FDC 173295.
+  {
+    seedKey: 'pizza-pepperoni-regular-crust',
+    barcode: null,
+    name_en: 'Pizza, pepperoni, regular crust',
+    name_pl: 'Pizza pepperoni na tradycyjnym cieście',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 28_200,
+    proteinPer100gHundredths: 1_174,
+    fatPer100gHundredths: 1_191,
+    carbsPer100gHundredths: 3_198,
+  },
+  // USDA SR Legacy, FDC 170694.
+  {
+    seedKey: 'hamburger-with-condiments',
+    barcode: null,
+    name_en: 'Hamburger, with condiments',
+    name_pl: 'Hamburger z sosami',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 26_300,
+    proteinPer100gHundredths: 1_330,
+    fatPer100gHundredths: 1_018,
+    carbsPer100gHundredths: 2_957,
+  },
+  // USDA SR Legacy, FDC 170691.
+  {
+    seedKey: 'cheeseburger-with-condiments',
+    barcode: null,
+    name_en: 'Cheeseburger, with condiments',
+    name_pl: 'Cheeseburger z sosami',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 27_000,
+    proteinPer100gHundredths: 1_349,
+    fatPer100gHundredths: 1_290,
+    carbsPer100gHundredths: 2_546,
+  },
+  // USDA SR Legacy, FDC 170718.
+  {
+    seedKey: 'chicken-nuggets-fried',
+    barcode: null,
+    name_en: 'Chicken nuggets, fried',
+    name_pl: 'Nuggetsy z kurczaka smażone',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 30_700,
+    proteinPer100gHundredths: 1_592,
+    fatPer100gHundredths: 2_036,
+    carbsPer100gHundredths: 1_493,
+  },
+  // USDA SR Legacy, FDC 171633.
+  {
+    seedKey: 'frankfurter-sausage-boiled',
+    barcode: null,
+    name_en: 'Frankfurter sausage, boiled',
+    name_pl: 'Parówka gotowana',
+    productSizeGramsHundredths: 5_000,
+    kcalPer100gHundredths: 29_800,
+    proteinPer100gHundredths: 1_031,
+    fatPer100gHundredths: 2_628,
+    carbsPer100gHundredths: 496,
+  },
+  // USDA SR Legacy, FDC 172455.
+  {
+    seedKey: 'falafel',
+    barcode: null,
+    name_en: 'Falafel',
+    name_pl: 'Falafel',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 33_300,
+    proteinPer100gHundredths: 1_331,
+    fatPer100gHundredths: 1_780,
+    carbsPer100gHundredths: 3_184,
+  },
+  // USDA SR Legacy, FDC 170092.
+  {
+    seedKey: 'potato-pancakes',
+    barcode: null,
+    name_en: 'Potato pancakes',
+    name_pl: 'Placki ziemniaczane',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 26_800,
+    proteinPer100gHundredths: 608,
+    fatPer100gHundredths: 1_476,
+    carbsPer100gHundredths: 2_781,
+  },
+  // USDA SR Legacy, FDC 168555.
+  {
+    seedKey: 'mashed-potatoes-with-milk-and-butter',
+    barcode: null,
+    name_en: 'Mashed potatoes, with milk and butter',
+    name_pl: 'Puree ziemniaczane z mlekiem i masłem',
+    productSizeGramsHundredths: 20_000,
+    kcalPer100gHundredths: 11_300,
+    proteinPer100gHundredths: 186,
+    fatPer100gHundredths: 422,
+    carbsPer100gHundredths: 1_681,
+  },
+  // USDA SR Legacy, FDC 168914.
+  {
+    seedKey: 'rice-noodles-cooked',
+    barcode: null,
+    name_en: 'Rice noodles, cooked',
+    name_pl: 'Makaron ryżowy gotowany',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 10_800,
+    proteinPer100gHundredths: 179,
+    fatPer100gHundredths: 20,
+    carbsPer100gHundredths: 2_401,
+  },
+  // USDA SR Legacy, FDC 174987.
+  {
+    seedKey: 'butter-croissant',
+    barcode: null,
+    name_en: 'Butter croissant',
+    name_pl: 'Croissant maślany',
+    productSizeGramsHundredths: 6_000,
+    kcalPer100gHundredths: 40_600,
+    proteinPer100gHundredths: 820,
+    fatPer100gHundredths: 2_100,
+    carbsPer100gHundredths: 4_580,
+  },
+  // USDA SR Legacy, FDC 172759.
+  {
+    seedKey: 'doughnut-jam-filled',
+    barcode: null,
+    name_en: 'Doughnut, jam-filled',
+    name_pl: 'Pączek z dżemem',
+    productSizeGramsHundredths: 7_000,
+    kcalPer100gHundredths: 34_000,
+    proteinPer100gHundredths: 590,
+    fatPer100gHundredths: 1_870,
+    carbsPer100gHundredths: 3_900,
+  },
+  // USDA SR Legacy, FDC 175009.
+  {
+    seedKey: 'pancakes-plain',
+    barcode: null,
+    name_en: 'Pancakes, plain',
+    name_pl: 'Pancakes, placuszki bez dodatków',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 22_700,
+    proteinPer100gHundredths: 640,
+    fatPer100gHundredths: 970,
+    carbsPer100gHundredths: 2_830,
+  },
+  // USDA SR Legacy, FDC 175039.
+  {
+    seedKey: 'waffles-plain',
+    barcode: null,
+    name_en: 'Waffles, plain',
+    name_pl: 'Gofry bez dodatków',
+    productSizeGramsHundredths: 8_000,
+    kcalPer100gHundredths: 29_100,
+    proteinPer100gHundredths: 790,
+    fatPer100gHundredths: 1_410,
+    carbsPer100gHundredths: 3_290,
+  },
+  // USDA SR Legacy, FDC 167575.
+  {
+    seedKey: 'ice-cream-vanilla',
+    barcode: null,
+    name_en: 'Ice cream, vanilla',
+    name_pl: 'Lody waniliowe',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 20_700,
+    proteinPer100gHundredths: 350,
+    fatPer100gHundredths: 1_100,
+    carbsPer100gHundredths: 2_360,
+  },
+  // USDA SR Legacy, FDC 168809.
+  {
+    seedKey: 'ice-cream-chocolate',
+    barcode: null,
+    name_en: 'Ice cream, chocolate',
+    name_pl: 'Lody czekoladowe',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 21_600,
+    proteinPer100gHundredths: 380,
+    fatPer100gHundredths: 1_100,
+    carbsPer100gHundredths: 2_820,
+  },
+  // USDA SR Legacy, FDC 172711.
+  {
+    seedKey: 'cheesecake',
+    barcode: null,
+    name_en: 'Cheesecake',
+    name_pl: 'Sernik',
+    productSizeGramsHundredths: 12_000,
+    kcalPer100gHundredths: 32_100,
+    proteinPer100gHundredths: 550,
+    fatPer100gHundredths: 2_250,
+    carbsPer100gHundredths: 2_550,
+  },
+  // USDA SR Legacy, FDC 174949.
+  {
+    seedKey: 'brownie',
+    barcode: null,
+    name_en: 'Brownie',
+    name_pl: 'Brownie',
+    productSizeGramsHundredths: 6_000,
+    kcalPer100gHundredths: 46_600,
+    proteinPer100gHundredths: 620,
+    fatPer100gHundredths: 2_910,
+    carbsPer100gHundredths: 5_020,
+  },
+  // USDA SR Legacy, FDC 172234.
+  {
+    seedKey: 'mustard-yellow',
+    barcode: null,
+    name_en: 'Mustard, yellow',
+    name_pl: 'Musztarda żółta',
+    productSizeGramsHundredths: 1_500,
+    kcalPer100gHundredths: 6_000,
+    proteinPer100gHundredths: 374,
+    fatPer100gHundredths: 334,
+    carbsPer100gHundredths: 583,
+  },
+  // USDA SR Legacy, FDC 168558.
+  {
+    seedKey: 'dill-pickles',
+    barcode: null,
+    name_en: 'Dill pickles',
+    name_pl: 'Ogórki konserwowe z koperkiem',
+    productSizeGramsHundredths: 8_000,
+    kcalPer100gHundredths: 1_200,
+    proteinPer100gHundredths: 50,
+    fatPer100gHundredths: 30,
+    carbsPer100gHundredths: 241,
+  },
+  // USDA SR Legacy, FDC 169279.
+  {
+    seedKey: 'sauerkraut',
+    barcode: null,
+    name_en: 'Sauerkraut',
+    name_pl: 'Kapusta kiszona',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 1_900,
+    proteinPer100gHundredths: 91,
+    fatPer100gHundredths: 14,
+    carbsPer100gHundredths: 428,
+  },
+  // USDA SR Legacy, FDC 169096.
+  {
+    seedKey: 'green-olives',
+    barcode: null,
+    name_en: 'Green olives',
+    name_pl: 'Oliwki zielone',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 14_500,
+    proteinPer100gHundredths: 103,
+    fatPer100gHundredths: 1_532,
+    carbsPer100gHundredths: 384,
+  },
+  // USDA SR Legacy, FDC 174648.
+  {
+    seedKey: 'corn-flakes',
+    barcode: null,
+    name_en: 'Corn flakes',
+    name_pl: 'Płatki kukurydziane',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 38_400,
+    proteinPer100gHundredths: 590,
+    fatPer100gHundredths: 91,
+    carbsPer100gHundredths: 8_801,
+  },
+  // USDA SR Legacy, FDC 174852.
+  {
+    seedKey: 'cola-regular',
+    barcode: null,
+    name_en: 'Cola, regular',
+    name_pl: 'Cola z cukrem',
+    productSizeGramsHundredths: 33_000,
+    kcalPer100gHundredths: 4_200,
+    proteinPer100gHundredths: 0,
+    fatPer100gHundredths: 25,
+    carbsPer100gHundredths: 1_036,
+  },
+  // USDA SR Legacy, FDC 169098.
+  {
+    seedKey: 'orange-juice',
+    barcode: null,
+    name_en: 'Orange juice',
+    name_pl: 'Sok pomarańczowy',
+    productSizeGramsHundredths: 25_000,
+    kcalPer100gHundredths: 4_500,
+    proteinPer100gHundredths: 70,
+    fatPer100gHundredths: 20,
+    carbsPer100gHundredths: 1_040,
+  },
+  // USDA SR Legacy, FDC 173933.
+  {
+    seedKey: 'apple-juice-unsweetened',
+    barcode: null,
+    name_en: 'Apple juice, unsweetened',
+    name_pl: 'Sok jabłkowy bez dodatku cukru',
+    productSizeGramsHundredths: 25_000,
+    kcalPer100gHundredths: 4_600,
+    proteinPer100gHundredths: 10,
+    fatPer100gHundredths: 13,
+    carbsPer100gHundredths: 1_130,
+  },
+  // USDA SR Legacy, FDC 168746.
+  {
+    seedKey: 'beer-regular',
+    barcode: null,
+    name_en: 'Beer, regular',
+    name_pl: 'Piwo jasne',
+    productSizeGramsHundredths: 50_000,
+    kcalPer100gHundredths: 4_300,
+    proteinPer100gHundredths: 46,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 355,
+  },
+  // USDA SR Legacy, FDC 171890.
+  {
+    seedKey: 'coffee-black-brewed',
+    barcode: null,
+    name_en: 'Coffee, black, brewed',
+    name_pl: 'Kawa czarna parzona',
+    productSizeGramsHundredths: 20_000,
+    kcalPer100gHundredths: 100,
+    proteinPer100gHundredths: 12,
+    fatPer100gHundredths: 2,
+    carbsPer100gHundredths: 0,
+  },
+  // USDA SR Legacy, FDC 173227.
+  {
+    seedKey: 'tea-black-brewed',
+    barcode: null,
+    name_en: 'Tea, black, brewed',
+    name_pl: 'Herbata czarna parzona',
+    productSizeGramsHundredths: 25_000,
+    kcalPer100gHundredths: 100,
+    proteinPer100gHundredths: 0,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 30,
+  },
+  // USDA SR Legacy, FDC 171176.
+  {
+    seedKey: 'tomato-soup-ready-to-eat',
+    barcode: null,
+    name_en: 'Tomato soup, ready to eat',
+    name_pl: 'Zupa pomidorowa gotowa do spożycia',
+    productSizeGramsHundredths: 30_000,
+    kcalPer100gHundredths: 3_200,
+    proteinPer100gHundredths: 71,
+    fatPer100gHundredths: 21,
+    carbsPer100gHundredths: 745,
+  },
+  // USDA SR Legacy, FDC 172909.
+  {
+    seedKey: 'chicken-noodle-soup-ready-to-eat',
+    barcode: null,
+    name_en: 'Chicken noodle soup, ready to eat',
+    name_pl: 'Zupa z kurczakiem i makaronem gotowa do spożycia',
+    productSizeGramsHundredths: 30_000,
+    kcalPer100gHundredths: 2_400,
+    proteinPer100gHundredths: 116,
+    fatPer100gHundredths: 76,
+    carbsPer100gHundredths: 297,
+  },
+  // Estimate: equal edible weights of boiled frankfurter (FDC 171633) and bun (FDC 172796).
+  {
+    seedKey: 'hot-dog-plain-no-sauces',
+    barcode: null,
+    name_en: 'Hot dog, plain, no sauces',
+    name_pl: 'Hot dog bez sosów',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 28_850,
+    proteinPer100gHundredths: 1_004,
+    fatPer100gHundredths: 1_510,
+    carbsPer100gHundredths: 2_754,
+  },
+
+  // More everyday meals, breakfast foods, pantry staples and drinks.
+  // USDA SR Legacy, FDC 169850.
+  {
+    seedKey: 'lasagna-with-meat',
+    barcode: null,
+    name_en: 'Lasagna, with meat',
+    name_pl: 'Lasagne z mięsem',
+    productSizeGramsHundredths: 30_000,
+    kcalPer100gHundredths: 18_500,
+    proteinPer100gHundredths: 1_083,
+    fatPer100gHundredths: 1_069,
+    carbsPer100gHundredths: 1_136,
+  },
+  // USDA SR Legacy, FDC 167680.
+  {
+    seedKey: 'spaghetti-with-meat-sauce',
+    barcode: null,
+    name_en: 'Spaghetti, with meat sauce',
+    name_pl: 'Spaghetti z sosem mięsnym',
+    productSizeGramsHundredths: 30_000,
+    kcalPer100gHundredths: 12_100,
+    proteinPer100gHundredths: 579,
+    fatPer100gHundredths: 359,
+    carbsPer100gHundredths: 1_640,
+  },
+  // USDA SR Legacy, FDC 169770.
+  {
+    seedKey: 'macaroni-and-cheese-prepared',
+    barcode: null,
+    name_en: 'Macaroni and cheese, prepared',
+    name_pl: 'Makaron z sosem serowym',
+    productSizeGramsHundredths: 25_000,
+    kcalPer100gHundredths: 16_400,
+    proteinPer100gHundredths: 668,
+    fatPer100gHundredths: 499,
+    carbsPer100gHundredths: 2_310,
+  },
+  // USDA SR Legacy, FDC 173330.
+  {
+    seedKey: 'beef-stew-canned',
+    barcode: null,
+    name_en: 'Beef stew, canned',
+    name_pl: 'Gulasz wołowy z puszki',
+    productSizeGramsHundredths: 30_000,
+    kcalPer100gHundredths: 9_900,
+    proteinPer100gHundredths: 441,
+    fatPer100gHundredths: 553,
+    carbsPer100gHundredths: 785,
+  },
+  // USDA SR Legacy, FDC 172039.
+  {
+    seedKey: 'burrito-beans-and-cheese',
+    barcode: null,
+    name_en: 'Burrito, beans and cheese',
+    name_pl: 'Burrito z fasolą i serem',
+    productSizeGramsHundredths: 20_000,
+    kcalPer100gHundredths: 20_500,
+    proteinPer100gHundredths: 735,
+    fatPer100gHundredths: 605,
+    carbsPer100gHundredths: 3_123,
+  },
+  // USDA SR Legacy, FDC 174195.
+  {
+    seedKey: 'fish-fingers-cooked',
+    barcode: null,
+    name_en: 'Fish fingers, cooked',
+    name_pl: 'Paluszki rybne po obróbce termicznej',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 27_700,
+    proteinPer100gHundredths: 1_101,
+    fatPer100gHundredths: 1_623,
+    carbsPer100gHundredths: 2_166,
+  },
+  // USDA SR Legacy, FDC 169846.
+  {
+    seedKey: 'fish-fillet-breaded-and-fried',
+    barcode: null,
+    name_en: 'Fish fillet, breaded and fried',
+    name_pl: 'Filet rybny panierowany smażony',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 21_900,
+    proteinPer100gHundredths: 1_349,
+    fatPer100gHundredths: 1_079,
+    carbsPer100gHundredths: 1_689,
+  },
+  // USDA SR Legacy, FDC 170697.
+  {
+    seedKey: 'onion-rings-fried',
+    barcode: null,
+    name_en: 'Onion rings, fried',
+    name_pl: 'Krążki cebulowe smażone',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 41_100,
+    proteinPer100gHundredths: 386,
+    fatPer100gHundredths: 2_523,
+    carbsPer100gHundredths: 4_358,
+  },
+  // USDA SR Legacy, FDC 173628.
+  {
+    seedKey: 'chicken-wings-battered-and-fried',
+    barcode: null,
+    name_en: 'Chicken wings, battered and fried',
+    name_pl: 'Skrzydełka z kurczaka w cieście smażone',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 32_400,
+    proteinPer100gHundredths: 1_987,
+    fatPer100gHundredths: 2_181,
+    carbsPer100gHundredths: 1_094,
+  },
+  // USDA SR Legacy, FDC 172187.
+  {
+    seedKey: 'scrambled-eggs',
+    barcode: null,
+    name_en: 'Scrambled eggs',
+    name_pl: 'Jajecznica',
+    productSizeGramsHundredths: 12_000,
+    kcalPer100gHundredths: 14_900,
+    proteinPer100gHundredths: 999,
+    fatPer100gHundredths: 1_098,
+    carbsPer100gHundredths: 161,
+  },
+  // USDA SR Legacy, FDC 173423.
+  {
+    seedKey: 'egg-fried',
+    barcode: null,
+    name_en: 'Egg, fried',
+    name_pl: 'Jajko sadzone',
+    productSizeGramsHundredths: 5_000,
+    kcalPer100gHundredths: 19_600,
+    proteinPer100gHundredths: 1_361,
+    fatPer100gHundredths: 1_484,
+    carbsPer100gHundredths: 83,
+  },
+  // USDA SR Legacy, FDC 172185.
+  {
+    seedKey: 'omelette-plain',
+    barcode: null,
+    name_en: 'Omelette, plain',
+    name_pl: 'Omlet bez dodatków',
+    productSizeGramsHundredths: 12_000,
+    kcalPer100gHundredths: 15_400,
+    proteinPer100gHundredths: 1_057,
+    fatPer100gHundredths: 1_166,
+    carbsPer100gHundredths: 64,
+  },
+  // USDA SR Legacy, FDC 172186.
+  {
+    seedKey: 'egg-poached',
+    barcode: null,
+    name_en: 'Egg, poached',
+    name_pl: 'Jajko w koszulce',
+    productSizeGramsHundredths: 5_000,
+    kcalPer100gHundredths: 14_300,
+    proteinPer100gHundredths: 1_251,
+    fatPer100gHundredths: 947,
+    carbsPer100gHundredths: 71,
+  },
+  // USDA SR Legacy, FDC 169026.
+  {
+    seedKey: 'coleslaw',
+    barcode: null,
+    name_en: 'Coleslaw',
+    name_pl: 'Surówka coleslaw',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 15_900,
+    proteinPer100gHundredths: 88,
+    fatPer100gHundredths: 1_178,
+    carbsPer100gHundredths: 1_235,
+  },
+  // USDA SR Legacy, FDC 169269.
+  {
+    seedKey: 'potato-salad',
+    barcode: null,
+    name_en: 'Potato salad',
+    name_pl: 'Sałatka ziemniaczana',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 14_300,
+    proteinPer100gHundredths: 268,
+    fatPer100gHundredths: 820,
+    carbsPer100gHundredths: 1_117,
+  },
+  // USDA SR Legacy, FDC 175182.
+  {
+    seedKey: 'baked-beans-canned-vegetarian',
+    barcode: null,
+    name_en: 'Baked beans, canned, vegetarian',
+    name_pl: 'Fasola w sosie z puszki bez mięsa',
+    productSizeGramsHundredths: 20_000,
+    kcalPer100gHundredths: 9_400,
+    proteinPer100gHundredths: 475,
+    fatPer100gHundredths: 37,
+    carbsPer100gHundredths: 2_114,
+  },
+  // USDA SR Legacy, FDC 171241.
+  {
+    seedKey: 'gouda-cheese',
+    barcode: null,
+    name_en: 'Gouda cheese',
+    name_pl: 'Ser gouda',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 35_600,
+    proteinPer100gHundredths: 2_494,
+    fatPer100gHundredths: 2_744,
+    carbsPer100gHundredths: 222,
+  },
+  // USDA SR Legacy, FDC 172177.
+  {
+    seedKey: 'brie-cheese',
+    barcode: null,
+    name_en: 'Brie cheese',
+    name_pl: 'Ser brie',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 33_400,
+    proteinPer100gHundredths: 2_075,
+    fatPer100gHundredths: 2_768,
+    carbsPer100gHundredths: 45,
+  },
+  // USDA SR Legacy, FDC 172178.
+  {
+    seedKey: 'camembert-cheese',
+    barcode: null,
+    name_en: 'Camembert cheese',
+    name_pl: 'Ser camembert',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 30_000,
+    proteinPer100gHundredths: 1_980,
+    fatPer100gHundredths: 2_426,
+    carbsPer100gHundredths: 46,
+  },
+  // USDA SR Legacy, FDC 172938.
+  {
+    seedKey: 'salami-dry-pork',
+    barcode: null,
+    name_en: 'Salami, dry, pork',
+    name_pl: 'Salami wieprzowe suszone',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 40_700,
+    proteinPer100gHundredths: 2_258,
+    fatPer100gHundredths: 3_372,
+    carbsPer100gHundredths: 160,
+  },
+  // USDA SR Legacy, FDC 173687.
+  {
+    seedKey: 'salmon-smoked',
+    barcode: null,
+    name_en: 'Salmon, smoked',
+    name_pl: 'Łosoś wędzony',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 11_700,
+    proteinPer100gHundredths: 1_828,
+    fatPer100gHundredths: 432,
+    carbsPer100gHundredths: 0,
+  },
+  // USDA SR Legacy, FDC 173708.
+  {
+    seedKey: 'tuna-canned-in-oil-drained',
+    barcode: null,
+    name_en: 'Tuna, canned in oil, drained',
+    name_pl: 'Tuńczyk w oleju z puszki odsączony',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 19_800,
+    proteinPer100gHundredths: 2_913,
+    fatPer100gHundredths: 821,
+    carbsPer100gHundredths: 0,
+  },
+  // USDA SR Legacy, FDC 174832.
+  {
+    seedKey: 'almond-drink-unsweetened',
+    barcode: null,
+    name_en: 'Almond drink, unsweetened',
+    name_pl: 'Napój migdałowy bez cukru',
+    productSizeGramsHundredths: 25_000,
+    kcalPer100gHundredths: 1_500,
+    proteinPer100gHundredths: 40,
+    fatPer100gHundredths: 96,
+    carbsPer100gHundredths: 131,
+  },
+  // USDA SR Legacy, FDC 172456.
+  {
+    seedKey: 'soy-drink-original-or-vanilla-fortified',
+    barcode: null,
+    name_en: 'Soy drink, original or vanilla, fortified',
+    name_pl: 'Napój sojowy klasyczny lub waniliowy wzbogacany',
+    productSizeGramsHundredths: 25_000,
+    kcalPer100gHundredths: 4_300,
+    proteinPer100gHundredths: 260,
+    fatPer100gHundredths: 147,
+    carbsPer100gHundredths: 492,
+  },
+  // USDA SR Legacy, FDC 170879.
+  {
+    seedKey: 'chocolate-milk-whole',
+    barcode: null,
+    name_en: 'Chocolate milk, whole',
+    name_pl: 'Mleko czekoladowe pełnotłuste',
+    productSizeGramsHundredths: 25_000,
+    kcalPer100gHundredths: 8_300,
+    proteinPer100gHundredths: 317,
+    fatPer100gHundredths: 339,
+    carbsPer100gHundredths: 1_034,
+  },
+  // USDA SR Legacy, FDC 171277.
+  {
+    seedKey: 'hot-chocolate-with-milk',
+    barcode: null,
+    name_en: 'Hot chocolate, with milk',
+    name_pl: 'Gorąca czekolada na mleku',
+    productSizeGramsHundredths: 25_000,
+    kcalPer100gHundredths: 7_700,
+    proteinPer100gHundredths: 352,
+    fatPer100gHundredths: 234,
+    carbsPer100gHundredths: 1_074,
+  },
+  // USDA SR Legacy, FDC 173190.
+  {
+    seedKey: 'red-wine',
+    barcode: null,
+    name_en: 'Red wine',
+    name_pl: 'Wino czerwone',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 8_500,
+    proteinPer100gHundredths: 7,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 261,
+  },
+  // USDA SR Legacy, FDC 174837.
+  {
+    seedKey: 'white-wine',
+    barcode: null,
+    name_en: 'White wine',
+    name_pl: 'Wino białe',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 8_200,
+    proteinPer100gHundredths: 7,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 260,
+  },
+  // USDA SR Legacy, FDC 168165.
+  {
+    seedKey: 'raisins-seedless',
+    barcode: null,
+    name_en: 'Raisins, seedless',
+    name_pl: 'Rodzynki bez pestek',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 29_900,
+    proteinPer100gHundredths: 330,
+    fatPer100gHundredths: 25,
+    carbsPer100gHundredths: 7_932,
+  },
+  // USDA SR Legacy, FDC 173941.
+  {
+    seedKey: 'apricots-dried',
+    barcode: null,
+    name_en: 'Apricots, dried',
+    name_pl: 'Morele suszone',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 24_100,
+    proteinPer100gHundredths: 339,
+    fatPer100gHundredths: 51,
+    carbsPer100gHundredths: 6_264,
+  },
+  // USDA SR Legacy, FDC 171726.
+  {
+    seedKey: 'dates-dried-deglet-noor',
+    barcode: null,
+    name_en: 'Dates, dried, Deglet Noor',
+    name_pl: 'Daktyle suszone Deglet Noor',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 28_200,
+    proteinPer100gHundredths: 245,
+    fatPer100gHundredths: 39,
+    carbsPer100gHundredths: 7_503,
+  },
+  // USDA SR Legacy, FDC 168162.
+  {
+    seedKey: 'prunes-dried',
+    barcode: null,
+    name_en: 'Prunes, dried',
+    name_pl: 'Śliwki suszone',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 24_000,
+    proteinPer100gHundredths: 218,
+    fatPer100gHundredths: 38,
+    carbsPer100gHundredths: 6_388,
+  },
+  // USDA SR Legacy, FDC 172808.
+  {
+    seedKey: 'chocolate-chip-cookies',
+    barcode: null,
+    name_en: 'Chocolate chip cookies',
+    name_pl: 'Ciastka z kawałkami czekolady',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 48_800,
+    proteinPer100gHundredths: 570,
+    fatPer100gHundredths: 2_840,
+    carbsPer100gHundredths: 5_820,
+  },
+  // USDA SR Legacy, FDC 172697.
+  {
+    seedKey: 'chocolate-cake-without-frosting',
+    barcode: null,
+    name_en: 'Chocolate cake, without frosting',
+    name_pl: 'Ciasto czekoladowe bez polewy',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 37_100,
+    proteinPer100gHundredths: 530,
+    fatPer100gHundredths: 1_510,
+    carbsPer100gHundredths: 5_340,
+  },
+  // USDA SR Legacy, FDC 172765.
+  {
+    seedKey: 'blueberry-muffin',
+    barcode: null,
+    name_en: 'Blueberry muffin',
+    name_pl: 'Muffin z borówkami',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 37_500,
+    proteinPer100gHundredths: 449,
+    fatPer100gHundredths: 1_607,
+    carbsPer100gHundredths: 5_300,
+  },
+  // USDA SR Legacy, FDC 173806.
+  {
+    seedKey: 'peanuts-dry-roasted-unsalted',
+    barcode: null,
+    name_en: 'Peanuts, dry-roasted, unsalted',
+    name_pl: 'Orzechy ziemne prażone bez soli',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 58_700,
+    proteinPer100gHundredths: 2_435,
+    fatPer100gHundredths: 4_966,
+    carbsPer100gHundredths: 2_126,
+  },
+  // USDA SR Legacy, FDC 167966.
+  {
+    seedKey: 'brown-rice-crackers-plain',
+    barcode: null,
+    name_en: 'Brown rice crackers, plain',
+    name_pl: 'Krakersy z brązowego ryżu bez dodatków',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 38_700,
+    proteinPer100gHundredths: 820,
+    fatPer100gHundredths: 280,
+    carbsPer100gHundredths: 8_150,
+  },
+  // USDA SR Legacy, FDC 169593.
+  {
+    seedKey: 'cocoa-powder-unsweetened',
+    barcode: null,
+    name_en: 'Cocoa powder, unsweetened',
+    name_pl: 'Kakao w proszku bez cukru',
+    productSizeGramsHundredths: 1_000,
+    kcalPer100gHundredths: 22_800,
+    proteinPer100gHundredths: 1_960,
+    fatPer100gHundredths: 1_370,
+    carbsPer100gHundredths: 5_790,
+  },
+  // USDA SR Legacy, FDC 167767.
+  {
+    seedKey: 'pineapple-canned-in-juice-drained',
+    barcode: null,
+    name_en: 'Pineapple, canned in juice, drained',
+    name_pl: 'Ananas z puszki w soku odsączony',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 6_000,
+    proteinPer100gHundredths: 51,
+    fatPer100gHundredths: 11,
+    carbsPer100gHundredths: 1_556,
+  },
+  // USDA SR Legacy, FDC 169214.
+  {
+    seedKey: 'sweetcorn-canned-drained',
+    barcode: null,
+    name_en: 'Sweetcorn, canned, drained',
+    name_pl: 'Kukurydza z puszki odsączona',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 6_700,
+    proteinPer100gHundredths: 229,
+    fatPer100gHundredths: 122,
+    carbsPer100gHundredths: 1_434,
+  },
+  // USDA SR Legacy, FDC 169094.
+  {
+    seedKey: 'black-olives-canned',
+    barcode: null,
+    name_en: 'Black olives, canned',
+    name_pl: 'Oliwki czarne z puszki',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 11_600,
+    proteinPer100gHundredths: 84,
+    fatPer100gHundredths: 1_090,
+    carbsPer100gHundredths: 604,
+  },
+  // USDA SR Legacy, FDC 170173.
+  {
+    seedKey: 'coconut-milk-canned',
+    barcode: null,
+    name_en: 'Coconut milk, canned',
+    name_pl: 'Mleczko kokosowe z puszki',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 19_700,
+    proteinPer100gHundredths: 202,
+    fatPer100gHundredths: 2_133,
+    carbsPer100gHundredths: 281,
+  },
+  // USDA SR Legacy, FDC 174523.
+  {
+    seedKey: 'barbecue-sauce',
+    barcode: null,
+    name_en: 'Barbecue sauce',
+    name_pl: 'Sos barbecue',
+    productSizeGramsHundredths: 3_000,
+    kcalPer100gHundredths: 17_200,
+    proteinPer100gHundredths: 82,
+    fatPer100gHundredths: 63,
+    carbsPer100gHundredths: 4_077,
+  },
+
+  // Alcoholic drinks: strengths refer to alcohol by volume; portions remain in grams.
+  // USDA SR Legacy, FDC 168749.
+  {
+    seedKey: 'beer-light',
+    barcode: null,
+    name_en: 'Beer, light',
+    name_pl: 'Piwo o obniżonej kaloryczności',
+    productSizeGramsHundredths: 50_000,
+    kcalPer100gHundredths: 2_900,
+    proteinPer100gHundredths: 24,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 164,
+  },
+  // USDA SR Legacy, FDC 171908.
+  {
+    seedKey: 'rose-wine',
+    barcode: null,
+    name_en: 'Rosé wine',
+    name_pl: 'Wino różowe',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 8_300,
+    proteinPer100gHundredths: 36,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 380,
+  },
+  // USDA SR Legacy, FDC 173176.
+  {
+    seedKey: 'dessert-wine-sweet',
+    barcode: null,
+    name_en: 'Dessert wine, sweet',
+    name_pl: 'Wino deserowe słodkie',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 16_000,
+    proteinPer100gHundredths: 20,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 1_369,
+  },
+  // USDA SR Legacy, FDC 174818.
+  {
+    seedKey: 'vodka-40-pct-alcohol',
+    barcode: null,
+    name_en: 'Vodka, 40% alcohol',
+    name_pl: 'Wódka 40%',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 23_100,
+    proteinPer100gHundredths: 0,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 0,
+  },
+  // USDA SR Legacy, FDC 174817.
+  {
+    seedKey: 'rum-40-pct-alcohol',
+    barcode: null,
+    name_en: 'Rum, 40% alcohol',
+    name_pl: 'Rum 40%',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 23_100,
+    proteinPer100gHundredths: 0,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 0,
+  },
+  // USDA SR Legacy, FDC 174815.
+  {
+    seedKey: 'gin-40-pct-alcohol',
+    barcode: null,
+    name_en: 'Gin, 40% alcohol',
+    name_pl: 'Gin 40%',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 23_100,
+    proteinPer100gHundredths: 0,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 0,
+  },
+  // USDA SR Legacy, FDC 174819.
+  {
+    seedKey: 'whiskey-43-pct-alcohol',
+    barcode: null,
+    name_en: 'Whiskey, 43% alcohol',
+    name_pl: 'Whisky 43%',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 25_000,
+    proteinPer100gHundredths: 0,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 10,
+  },
+  // USDA SR Legacy, FDC 175098.
+  {
+    seedKey: 'coffee-cream-liqueur-17-pct-alcohol',
+    barcode: null,
+    name_en: 'Coffee cream liqueur, 17% alcohol',
+    name_pl: 'Likier kawowy ze śmietanką 17%',
+    productSizeGramsHundredths: 4_000,
+    kcalPer100gHundredths: 32_700,
+    proteinPer100gHundredths: 280,
+    fatPer100gHundredths: 1_570,
+    carbsPer100gHundredths: 2_090,
+  },
+  // USDA SR Legacy, FDC 168752.
+  {
+    seedKey: 'pina-colada-prepared',
+    barcode: null,
+    name_en: 'Piña colada, prepared',
+    name_pl: 'Piña colada gotowa',
+    productSizeGramsHundredths: 20_000,
+    kcalPer100gHundredths: 17_400,
+    proteinPer100gHundredths: 42,
+    fatPer100gHundredths: 188,
+    carbsPer100gHundredths: 2_266,
+  },
+  // USDA SR Legacy, FDC 173662.
+  {
+    seedKey: 'whiskey-sour-prepared',
+    barcode: null,
+    name_en: 'Whiskey sour, prepared',
+    name_pl: 'Whiskey sour gotowy',
+    productSizeGramsHundredths: 15_000,
+    kcalPer100gHundredths: 14_900,
+    proteinPer100gHundredths: 0,
+    fatPer100gHundredths: 3,
+    carbsPer100gHundredths: 1_317,
+  },
+  // USDA SR Legacy, FDC 167723.
+  {
+    seedKey: 'sake',
+    barcode: null,
+    name_en: 'Sake',
+    name_pl: 'Sake',
+    productSizeGramsHundredths: 10_000,
+    kcalPer100gHundredths: 13_400,
+    proteinPer100gHundredths: 50,
+    fatPer100gHundredths: 0,
+    carbsPer100gHundredths: 500,
   },
 ];

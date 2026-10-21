@@ -1,0 +1,8 @@
+.page {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.empty h1 {
+  font-size: var(--text-lg);
+}

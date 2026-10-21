@@ -4,6 +4,7 @@ import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import type { CalorieGoal, CalorieTotals } from '../calories.api';
 import css from './DailySummary.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type DailySummaryProps = {
   goal: CalorieGoal | null;
@@ -11,9 +12,14 @@ type DailySummaryProps = {
 };
 
 export function DailySummary({ goal, totals }: DailySummaryProps) {
+  const { formatNumber, t } = useI18n();
+
   return (
     <Card
-      aria-label='Daily nutrition summary'
+      aria-label={t({
+        en: 'Daily nutrition summary',
+        pl: 'Dzienne podsumowanie wartości odżywczych',
+      })}
       as='section'
       className={css.summary}
       data-appear='1'
@@ -22,11 +28,15 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
       <div className={css.energy}>
         <div className={css.energyTop}>
           <p className={css.energyAmount}>
-            <strong>{Math.round(totals.kcal)}</strong>
-            <span>{goal ? `/ ${Math.round(goal.kcal)} kcal` : 'kcal eaten'}</span>
+            <strong>{formatNumber(Math.round(totals.kcal))}</strong>
+            <span>
+              {goal
+                ? `/ ${formatNumber(Math.round(goal.kcal))} kcal`
+                : t({ en: 'kcal eaten', pl: 'kcal zjedzone' })}
+            </span>
           </p>
           <Btn
-            aria-label={goal ? 'Edit goals' : undefined}
+            aria-label={goal ? t({ en: 'Edit goals', pl: 'Edytuj cele' }) : undefined}
             className={css.goalAction}
             icon={<GoalIcon aria-hidden='true' />}
             iconOnly={Boolean(goal)}
@@ -36,7 +46,7 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
             size='sm'
             variant='ghost'
           >
-            {goal ? null : 'Set goals'}
+            {goal ? null : t({ en: 'Set goals', pl: 'Ustaw cele' })}
           </Btn>
         </div>
         {goal ? (
@@ -45,29 +55,52 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
             <EnergyStatus consumed={totals.kcal} goal={goal.kcal} />
           </>
         ) : (
-          <p className={css.energyHint}>Set a daily goal to see how much is left.</p>
+          <p className={css.energyHint}>
+            {t({
+              en: 'Set a daily goal to see how much is left.',
+              pl: 'Ustaw dzienny cel, aby zobaczyć, ile zostało.',
+            })}
+          </p>
         )}
       </div>
 
       <dl className={css.macros}>
-        <Macro goal={goal?.protein} label='Protein' tone='protein' value={totals.protein ?? 0} />
-        <Macro goal={goal?.fat} label='Fat' tone='fat' value={totals.fat ?? 0} />
-        <Macro goal={goal?.carbs} label='Carbs' tone='carbs' value={totals.carbs ?? 0} />
+        <Macro
+          goal={goal?.protein}
+          label={t({ en: 'Protein', pl: 'Białko' })}
+          tone='protein'
+          value={totals.protein ?? 0}
+        />
+        <Macro
+          goal={goal?.fat}
+          label={t({ en: 'Fat', pl: 'Tłuszcz' })}
+          tone='fat'
+          value={totals.fat ?? 0}
+        />
+        <Macro
+          goal={goal?.carbs}
+          label={t({ en: 'Carbs', pl: 'Węglowodany' })}
+          tone='carbs'
+          value={totals.carbs ?? 0}
+        />
       </dl>
     </Card>
   );
 }
 
 function EnergyStatus({ consumed, goal }: { consumed: number; goal: number }) {
+  const { formatNumber, t } = useI18n();
   const isOver = consumed > goal;
 
   return (
     <p className={css.energyStatus} data-over={isOver || undefined}>
       <span>
-        <strong>{Math.round(Math.abs(goal - consumed))}</strong> kcal{' '}
-        {isOver ? 'over goal' : 'left'}
+        <strong>{formatNumber(Math.round(Math.abs(goal - consumed)))}</strong> kcal{' '}
+        {isOver ? t({ en: 'over goal', pl: 'ponad cel' }) : t({ en: 'left', pl: 'zostało' })}
       </span>
-      {goal > 0 ? <span>{Math.round((consumed / goal) * 100)}%</span> : null}
+      {goal > 0 ? (
+        <span>{formatNumber(consumed / goal, { maximumFractionDigits: 0, style: 'percent' })}</span>
+      ) : null}
     </p>
   );
 }
@@ -83,14 +116,15 @@ function Macro({
   tone: 'protein' | 'fat' | 'carbs';
   value: number;
 }) {
+  const { formatNumber } = useI18n();
   const hasGoal = goal !== null && goal !== undefined;
 
   return (
     <div className={css.macro} data-over={(hasGoal && value > goal) || undefined} data-tone={tone}>
       <dt>{label}</dt>
       <dd className={css.macroValue}>
-        <strong>{Math.round(value)}</strong>
-        {hasGoal ? ` / ${Math.round(goal)}` : null} g
+        <strong>{formatNumber(Math.round(value))}</strong>
+        {hasGoal ? ` / ${formatNumber(Math.round(goal))}` : null} g
       </dd>
       {hasGoal ? (
         <dd className={css.macroMeter}>

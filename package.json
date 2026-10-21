@@ -13,6 +13,7 @@
     "lint:css:fix": "pnpm --filter @veles/web lint:css:fix",
     "lint": "oxlint --config .oxlintrc.json .",
     "typecheck": "pnpm --recursive typecheck",
+    "mcp:tools": "pnpm --filter @veles/web mcp:tools && oxfmt --write docs/agent-tools.md",
     "fmt": "oxfmt --write .",
     "fmt:check": "oxfmt --check .",
     "check": "pnpm fmt:check && pnpm lint && pnpm lint:css && pnpm typecheck && pnpm test",
@@ -23,11 +24,7 @@
     "db:push": "pnpm --filter @veles/db db:push",
     "db:reset": "pnpm --filter @veles/db db:reset",
     "db:studio": "pnpm --filter @veles/db db:studio",
-    "db:studio:prod": "pnpm --filter @veles/db db:studio:prod",
-    "db:seed": "pnpm --filter @veles/db db:seed",
-    "db:seed:prod": "pnpm --filter @veles/db db:seed:prod",
-    "db:seed-remove": "pnpm --filter @veles/db db:seed-remove",
-    "db:seed-remove:prod": "pnpm --filter @veles/db db:seed-remove:prod"
+    "db:studio:prod": "pnpm --filter @veles/db db:studio:prod"
   },
   "dependencies": {
     "arktype": "2.2.3",
@@ -40,6 +37,7 @@
     "oxfmt": "0.63.0",
     "oxlint": "1.80.0",
     "oxlint-tsgolint": "7.0.2001",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929",
     "typescript": "7.0.2"
   },
   "engines": {

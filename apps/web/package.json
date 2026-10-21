@@ -4,29 +4,35 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --port 3000",
-    "build": "vite build && tsc --noEmit",
+    "build": "vite build && tsrs --noEmit",
     "start": "node .output/server/index.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "lint:css": "stylelint \"src/**/*.css\"",
     "lint:css:fix": "stylelint \"src/**/*.css\" --fix",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsrs --noEmit",
+    "mcp:tools": "node scripts/mcp-tools-doc.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.1110.0",
     "@base-ui/react": "1.7.0",
+    "@better-auth/api-key": "1.6.28",
     "@better-auth/drizzle-adapter": "1.6.28",
     "@dnd-kit/core": "6.3.1",
     "@dnd-kit/sortable": "10.0.0",
     "@dnd-kit/utilities": "3.2.2",
+    "@modelcontextprotocol/server": "2.3.0",
     "@tanstack/arktype-adapter": "1.167.0",
+    "@tanstack/query-db-collection": "1.4.7",
+    "@tanstack/react-db": "0.5.11",
     "@tanstack/react-pacer": "0.23.0",
     "@tanstack/react-query": "5.103.1",
     "@tanstack/react-query-devtools": "5.103.1",
-    "@tanstack/react-router": "1.170.38",
+    "@tanstack/react-router": "1.170.41",
     "@tanstack/react-router-devtools": "1.167.2",
     "@tanstack/react-router-ssr-query": "1.167.3",
-    "@tanstack/react-start": "1.168.56",
+    "@tanstack/react-router-with-db": "0.1.0",
+    "@tanstack/react-start": "1.168.60",
     "@veles/db": "workspace:*",
     "barcode-detector": "2.3.1",
     "better-auth": "1.6.28",
@@ -40,7 +46,8 @@
     "react-email": "6.9.5",
     "recharts": "3.10.1",
     "resend": "6.28.1",
-    "sharp": "0.35.5"
+    "sharp": "0.35.5",
+    "uuid": "14.0.3"
   },
   "devDependencies": {
     "@csstools/postcss-global-data": "4.0.0",
@@ -52,7 +59,7 @@
     "postcss-custom-media": "12.0.1",
     "stylelint": "17.14.1",
     "stylelint-config-recommended": "18.0.0",
-    "vite": "8.2.1",
+    "vite": "8.2.4",
     "vitest": "4.1.11"
   }
 }

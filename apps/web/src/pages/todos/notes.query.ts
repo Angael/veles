@@ -1,16 +1,14 @@
 import { queryOptions, useMutation } from '@tanstack/react-query';
+import { useListItemsCollection } from './listItems.collection';
 import {
-  createListItem,
   createNote,
-  deleteListItem,
   deleteNote,
   getNotes,
-  setListItemChecked,
   setNoteShared,
-  updateListItem,
   toggleNoteType,
   updateNote,
 } from './notes.api';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export const notesQueryKey = ['notes'] as const;
 
@@ -33,40 +31,23 @@ export function useCreateNoteMutation() {
   });
 }
 
-export function useCreateListItemMutation() {
-  return useMutation({
-    meta: { invalidateQueryKey: notesQueryKey },
-    mutationFn: (variables: { name: string; noteId: string }) =>
-      createListItem({ data: variables }),
-  });
-}
-
-export function useDeleteListItemMutation() {
-  return useMutation({
-    meta: { error: { title: 'Item could not be deleted' }, invalidateQueryKey: notesQueryKey },
-    mutationFn: (variables: { id: string }) => deleteListItem({ data: variables }),
-  });
-}
-
-export function useSetListItemCheckedMutation() {
-  return useMutation({
-    meta: { invalidateQueryKey: notesQueryKey },
-    mutationFn: (variables: { checked: boolean; id: string }) =>
-      setListItemChecked({ data: variables }),
-  });
-}
-
+/** Converting a note creates or removes list items on the server, so the collection refetches. */
 export function useToggleNoteTypeMutation() {
+  const listItems = useListItemsCollection();
   return useMutation({
     meta: { invalidateQueryKey: notesQueryKey },
     mutationFn: (variables: { id: string }) => toggleNoteType({ data: variables }),
+    onSuccess: () => listItems.utils.refetch(),
   });
 }
 
+/** Deleting a note cascades to its list items on the server, so the collection refetches. */
 export function useDeleteNoteMutation() {
+  const listItems = useListItemsCollection();
   return useMutation({
     meta: { invalidateQueryKey: notesQueryKey },
     mutationFn: (variables: { id: string }) => deleteNote({ data: variables }),
+    onSuccess: () => listItems.utils.refetch(),
   });
 }
 
@@ -78,16 +59,14 @@ export function useSetNoteSharedMutation() {
 }
 
 export function useUpdateNoteMutation() {
+  const { t } = useI18n();
+
   return useMutation({
-    meta: { error: { title: 'Note could not be saved' }, invalidateQueryKey: notesQueryKey },
+    meta: {
+      error: { title: t({ en: 'Note could not be saved', pl: 'Nie udało się zapisać notatki' }) },
+      invalidateQueryKey: notesQueryKey,
+    },
     mutationFn: (variables: { id: string; title?: string; content?: string }) =>
       updateNote({ data: variables }),
-  });
-}
-
-export function useUpdateListItemMutation() {
-  return useMutation({
-    meta: { error: { title: 'Product could not be saved' }, invalidateQueryKey: notesQueryKey },
-    mutationFn: (variables: { id: string; name: string }) => updateListItem({ data: variables }),
   });
 }

@@ -2,6 +2,7 @@ import type { ComponentProps } from 'react';
 import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import css from './KcalMacrosForm.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type NutritionField = 'kcal' | 'protein' | 'fat' | 'carbs';
 type NutritionValues = Partial<Record<NutritionField, number | null>>;
@@ -29,6 +30,7 @@ export function KcalMacrosForm({
   readOnly,
   values,
 }: KcalMacrosFormProps) {
+  const { t } = useI18n();
   const inputProps = (field: NutritionField) => ({
     ...(values ? { value: values[field] } : { defaultValue: defaultValues?.[field] ?? undefined }),
     min: field === 'kcal' ? (kcalInput?.min ?? 0) : 0,
@@ -46,13 +48,31 @@ export function KcalMacrosForm({
       <Label text={isPer100 ? 'kcal / 100 g' : 'kcal'}>
         <NumberInput {...inputProps('kcal')} />
       </Label>
-      <Label text={isPer100 ? 'Protein / 100 g' : 'Protein (g)'}>
+      <Label
+        text={t(
+          isPer100
+            ? { en: 'Protein / 100 g', pl: 'Białko / 100 g' }
+            : { en: 'Protein (g)', pl: 'Białko (g)' },
+        )}
+      >
         <NumberInput {...inputProps('protein')} />
       </Label>
-      <Label text={isPer100 ? 'Fat / 100 g' : 'Fat (g)'}>
+      <Label
+        text={t(
+          isPer100
+            ? { en: 'Fat / 100 g', pl: 'Tłuszcz / 100 g' }
+            : { en: 'Fat (g)', pl: 'Tłuszcz (g)' },
+        )}
+      >
         <NumberInput {...inputProps('fat')} />
       </Label>
-      <Label text={isPer100 ? 'Carbs / 100 g' : 'Carbs (g)'}>
+      <Label
+        text={t(
+          isPer100
+            ? { en: 'Carbs / 100 g', pl: 'Węglowodany / 100 g' }
+            : { en: 'Carbs (g)', pl: 'Węglowodany (g)' },
+        )}
+      >
         <NumberInput {...inputProps('carbs')} />
       </Label>
     </div>

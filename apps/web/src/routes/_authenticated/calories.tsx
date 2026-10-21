@@ -5,6 +5,7 @@ import { CaloriesPage } from '@/pages/calories/dashboard/CaloriesPage';
 import { calorieDashboardQueryOptions } from '@/pages/calories/calories.query';
 import { receivedFoodLogSharesQueryOptions } from '@/pages/calories/dashboard/foodLogShares.query';
 import { calorieWeekStart, normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
+import { translate } from '@/lib/i18n/getLocale';
 
 export const Route = createFileRoute('/_authenticated/calories')({
   validateSearch: type({ 'date?': 'string', 'foodId?': 'string' }),
@@ -21,8 +22,8 @@ export const Route = createFileRoute('/_authenticated/calories')({
       context.queryClient.prefetchQuery(receivedFoodLogSharesQueryOptions()),
     ]),
   component: RouteComponent,
-  head: () => ({ meta: [{ title: 'Food diary' }] }),
-  staticData: { navbar: { label: 'Calories' } },
+  head: () => ({ meta: [{ title: translate({ en: 'Food diary', pl: 'Dziennik jedzenia' }) }] }),
+  staticData: { navbar: { label: { en: 'Calories', pl: 'Kalorie' } } },
 });
 function RouteComponent() {
   const search = Route.useSearch();

@@ -1,5 +1,6 @@
 import { ContextMenu } from '@base-ui/react/context-menu';
 import clsx from 'clsx';
+import { ChevronRightIcon } from 'lucide-react';
 import type { ComponentProps, ReactNode } from 'react';
 import css from './ContextMenu.module.css';
 
@@ -78,4 +79,26 @@ export const ContextMenuSeparator = ({
   ...props
 }: ComponentProps<typeof ContextMenu.Separator>) => (
   <ContextMenu.Separator className={clsx(css.separator, className)} {...props} />
+);
+
+export const ContextMenuSubmenuRoot = ContextMenu.SubmenuRoot;
+
+type ContextMenuSubmenuTriggerProps = Omit<
+  ComponentProps<typeof ContextMenu.SubmenuTrigger>,
+  'children'
+> &
+  Omit<ItemContentProps, 'variant'>;
+
+/** Item that opens a nested `ContextMenuPopup`; keeps long option lists out of the main menu. */
+export const ContextMenuSubmenuTrigger = ({
+  className,
+  icon,
+  label,
+  ...props
+}: ContextMenuSubmenuTriggerProps) => (
+  <ContextMenu.SubmenuTrigger className={clsx(css.item, className)} {...props}>
+    {icon}
+    <span>{label}</span>
+    <ChevronRightIcon aria-hidden='true' className={css.submenuChevron} />
+  </ContextMenu.SubmenuTrigger>
 );

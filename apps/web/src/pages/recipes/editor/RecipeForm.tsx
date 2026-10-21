@@ -4,6 +4,7 @@ import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { TextareaInput } from '@/components/ui/textarea-input/TextareaInput';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import css from './RecipeForm.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export type RecipeFormDraft = {
   carbs: number | null;
@@ -24,29 +25,34 @@ type RecipeFormProps = {
 };
 
 export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
+  const { t } = useI18n();
+
   return (
     <div className={css.fieldList}>
-      <Label text='Name'>
+      <Label text={t({ en: 'Name', pl: 'Nazwa' })}>
         <TextInput
           name='name'
           onValueChange={(value) => onDraftChange({ ...draft, name: value })}
-          placeholder='Smoky chicken burrito bowl'
+          placeholder={t({
+            en: 'Smoky chicken burrito bowl',
+            pl: 'Miska burrito z wędzonym kurczakiem',
+          })}
           required
           value={draft.name}
         />
       </Label>
 
-      <Label text='Description'>
+      <Label text={t({ en: 'Description', pl: 'Opis' })}>
         <TextareaInput
           name='description'
           onChange={(event) => onDraftChange({ ...draft, description: event.currentTarget.value })}
-          placeholder='Short recipe description'
+          placeholder={t({ en: 'Short recipe description', pl: 'Krótki opis przepisu' })}
           rows={4}
           value={draft.description}
         />
       </Label>
 
-      <Label text='Ingredients'>
+      <Label text={t({ en: 'Ingredients', pl: 'Składniki' })}>
         <TextareaInput
           name='ingredients'
           onChange={(event) =>
@@ -55,23 +61,26 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
               ingredients: event.currentTarget.value.split('\n'),
             })
           }
-          placeholder='One ingredient per line'
+          placeholder={t({ en: 'One ingredient per line', pl: 'Jeden składnik w linii' })}
           rows={6}
           value={draft.ingredients.join('\n')}
         />
       </Label>
 
-      <Label text='Tags'>
+      <Label text={t({ en: 'Tags', pl: 'Tagi' })}>
         <TextInput
           name='tags'
           onValueChange={(value) => onDraftChange({ ...draft, tags: value.split(',') })}
-          placeholder='dinner, chicken, high protein'
+          placeholder={t({
+            en: 'dinner, chicken, high protein',
+            pl: 'obiad, kurczak, dużo białka',
+          })}
           value={draft.tags.join(', ')}
         />
       </Label>
 
       <div className={css.fieldGrid}>
-        <Label text='Rating'>
+        <Label text={t({ en: 'Rating', pl: 'Ocena' })}>
           <NumberInput
             max={5}
             min={1}
@@ -82,7 +91,7 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
           />
         </Label>
 
-        <Label text='Portions'>
+        <Label text={t({ en: 'Portions', pl: 'Porcje' })}>
           <NumberInput
             min={1}
             name='portions'

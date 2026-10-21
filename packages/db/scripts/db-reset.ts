@@ -1,5 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { Client } from 'pg';
+import { createDatabaseConnection } from '../src/index.ts';
+import { syncFoodProductSeeds } from '../src/seed/sync-food-products.ts';
 
 const expectedDatabaseName = 'veles_dev';
 const databaseUrl = process.env.DATABASE_URL;
@@ -129,8 +131,19 @@ async function resetDatabase(connectionString: string) {
   runPnpmScript('db:migrate');
   runPnpmScript('db:push');
   await seedDatabase(connectionString);
+  await syncFoodProductCatalog(connectionString);
 
   console.info(`Reset and seeded ${expectedDatabaseName}.`);
+}
+
+/** Adds the shared food catalog the same way the worker does on deploy. */
+async function syncFoodProductCatalog(connectionString: string) {
+  const connection = createDatabaseConnection({ connectionString, maxConnections: 1 });
+  try {
+    console.info('Synced food product seeds.', await syncFoodProductSeeds(connection.db));
+  } finally {
+    await connection.close();
+  }
 }
 
 async function resetSchemas(connectionString: string) {
@@ -177,7 +190,6 @@ async function seedDatabase(connectionString: string) {
     await seedFoodProducts(client);
     await seedFoodLogs(client, devUser.id);
     await seedRecipes(client, devUser.id);
-    await seedDiaryEntries(client, devUser.id);
     await client.query('COMMIT');
   } catch (error) {
     await client.query('ROLLBACK');
@@ -435,37 +447,6 @@ async function seedRecipes(client: Client, userId: string) {
         recipe.fat,
         recipe.carbs,
       ],
-    );
-  }
-}
-
-async function seedDiaryEntries(client: Client, userId: string) {
-  const entries = [
-    {
-      id: '01900000-0000-7000-8000-000000000101',
-      title: 'First seeded entry',
-      markdown: 'A stable fixture for checking the diary list and detail views.',
-      entryDate: '2026-01-12',
-    },
-    {
-      id: '01900000-0000-7000-8000-000000000102',
-      title: 'Markdown playground',
-      markdown: '## Things to verify\n\n- headings\n- lists\n- **formatting**',
-      entryDate: '2026-02-08',
-    },
-  ];
-
-  for (const entry of entries) {
-    await client.query(
-      `INSERT INTO diary_entry (id, user_id, title, markdown, entry_date)
-       VALUES ($1, $2, $3, $4, $5)
-       ON CONFLICT (id) DO UPDATE SET
-         user_id = EXCLUDED.user_id,
-         title = EXCLUDED.title,
-         markdown = EXCLUDED.markdown,
-         entry_date = EXCLUDED.entry_date,
-         updated_at = now()`,
-      [entry.id, userId, entry.title, entry.markdown, entry.entryDate],
     );
   }
 }

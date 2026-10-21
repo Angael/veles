@@ -6,6 +6,7 @@ import { invariant } from '@/lib/invariant';
 import { db } from '@/server/db.server';
 import { getServerEnv } from '@/server/env.server';
 import { ConnectionInvitationEmail } from '@/server/email/ConnectionInvitationEmail';
+import { getLocale } from '@/lib/i18n/getLocale';
 
 interface SendConnectionInvitationOptions {
   recipientEmail: string;
@@ -105,13 +106,17 @@ export async function sendConnectionInvitationEmail({
   invariant(env.resendApiKey, 'Connection invitation email is not configured.');
   invariant(env.invitationEmailFrom, 'Connection invitation email is not configured.');
 
+  const locale = getLocale();
   const invitationUrl = new URL(`/invite/${token}`, env.appUrl).toString();
   const resend = new Resend(env.resendApiKey);
   const { error } = await resend.emails.send({
     from: env.invitationEmailFrom,
     to: [recipientEmail],
-    subject: `${inviterName} invited you to connect on Veles`,
-    react: ConnectionInvitationEmail({ invitationUrl, inviterName, recipientEmail }),
+    subject: {
+      en: `${inviterName} invited you to connect on Veles`,
+      pl: `${inviterName} zaprasza Cię do połączenia w Veles`,
+    }[locale],
+    react: ConnectionInvitationEmail({ invitationUrl, inviterName, locale, recipientEmail }),
   });
   invariant(
     !error,

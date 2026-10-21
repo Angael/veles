@@ -1,6 +1,7 @@
 import type { CalorieLog } from '../calories.api';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import css from './ShareLogsAction.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type Props = {
   gramsById: Record<string, number | null>;
@@ -10,6 +11,8 @@ type Props = {
 
 /** Lists the logs being shared with a grams input each, so the sender can share a different portion. */
 export function ShareLogsItems({ gramsById, logs, onGramsChange }: Props) {
+  const { formatNumber, t } = useI18n();
+
   return (
     <ul className={css.items}>
       {logs.map((entry) => {
@@ -20,14 +23,14 @@ export function ShareLogsItems({ gramsById, logs, onGramsChange }: Props) {
           <li className={css.item} key={entry.id}>
             <div className={css.itemText}>
               <strong>{entry.name}</strong>
-              <span>{Math.round(kcal)} kcal</span>
+              <span>{formatNumber(Math.round(kcal))} kcal</span>
             </div>
             {entry.grams === null ? (
-              <span className={css.custom}>Custom entry</span>
+              <span className={css.custom}>{t({ en: 'Custom entry', pl: 'Własny wpis' })}</span>
             ) : (
               <div className={css.gramsField}>
                 <NumberInput
-                  aria-label={`Grams of ${entry.name}`}
+                  aria-label={t({ en: `Grams of ${entry.name}`, pl: `Gramy: ${entry.name}` })}
                   min={0.01}
                   onValueChange={(value) => onGramsChange(entry.id, value)}
                   size='sm'

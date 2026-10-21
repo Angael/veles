@@ -1,7 +1,7 @@
-import { format, parseISO } from 'date-fns';
 import { ImageOffIcon } from 'lucide-react';
 import type { WeightEntryPhoto } from '../weight.api';
 import css from './WeightEntryPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type WeightPhotoGalleryProps = {
   date: string;
@@ -9,12 +9,16 @@ type WeightPhotoGalleryProps = {
 };
 
 export function WeightPhotoGallery({ date, photos }: WeightPhotoGalleryProps) {
-  const dateLabel = format(parseISO(date), 'MMM d, yyyy');
+  const { formatDate, t } = useI18n();
+  const dateLabel = formatDate(date, { day: 'numeric', month: 'short', year: 'numeric' });
 
   return (
     <ul className={css.gallery}>
       {photos.map((photo, index) => {
-        const alt = `Progress photo ${index + 1} from ${dateLabel}`;
+        const alt = t({
+          en: `Progress photo ${index + 1} from ${dateLabel}`,
+          pl: `Zdjęcie postępów ${index + 1} z ${dateLabel}`,
+        });
 
         return (
           <li className={css.photo} key={photo.id}>

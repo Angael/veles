@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import type { CalorieGoal, CalorieLog, CalorieTotals } from '../calories.api';
+import type { CalorieDashboardDay } from '../calories.api';
 import { DailySummary } from './DailySummary';
+import { DayNote } from './DayNote';
 import { DeleteLogsAction } from './DeleteLogsAction';
 import { FoodSearch } from './FoodSearch';
 import { LogFoodMenu } from './LogFoodMenu';
@@ -14,18 +15,18 @@ import { Btn } from '@/components/ui/btn/Btn';
 import { List } from '@/components/ui/list/List';
 import { SelectionBar } from '@/components/ui/selection-bar/SelectionBar';
 import css from './CaloriesPage.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type Props = {
-  date: string;
-  goal: CalorieGoal | null;
+  day: CalorieDashboardDay;
   /** Food to open in the add dialog, e.g. after scanning or creating it. */
   linkedFoodId?: string;
-  logs: CalorieLog[];
-  totals: CalorieTotals;
 };
 
 /** Day overview; selecting logs via their images swaps the Log food button for bulk actions. */
-export function CalorieOverview({ date, goal, linkedFoodId, logs, totals }: Props) {
+export function CalorieOverview({ day, linkedFoodId }: Props) {
+  const { date, goal, logs, totals } = day;
+  const { t } = useI18n();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const selectedLogs = logs.filter((entry) => selectedIds.includes(entry.id));
   const selecting = selectedLogs.length > 0;
@@ -43,7 +44,7 @@ export function CalorieOverview({ date, goal, linkedFoodId, logs, totals }: Prop
     <div className={css.overviewStack}>
       {selecting ? (
         <SelectionBar
-          aria-label='Selected products'
+          aria-label={t({ en: 'Selected products', pl: 'Wybrane produkty' })}
           count={selectedLogs.length}
           onClear={clearSelection}
         >
@@ -57,17 +58,20 @@ export function CalorieOverview({ date, goal, linkedFoodId, logs, totals }: Prop
         <LogFoodMenu date={date} />
       )}
       <DailySummary goal={goal} totals={totals} />
+      <DayNote date={date} note={day.note} offPlan={day.offPlan} />
 
       <section className={css.logSection} data-appear='2'>
         <div className={css.logHeading}>
-          <h2>Logged products</h2>
+          <h2>{t({ en: 'Logged products', pl: 'Zapisane produkty' })}</h2>
           {selecting ? (
             <Btn
               onClick={() => setSelectedIds(allSelected ? [] : logs.map((entry) => entry.id))}
               size='sm'
               variant='text'
             >
-              {allSelected ? 'Deselect all' : 'Select all'}
+              {allSelected
+                ? t({ en: 'Deselect all', pl: 'Odznacz wszystko' })
+                : t({ en: 'Select all', pl: 'Zaznacz wszystko' })}
             </Btn>
           ) : null}
         </div>
@@ -86,7 +90,9 @@ export function CalorieOverview({ date, goal, linkedFoodId, logs, totals }: Prop
             ))}
           </List>
         ) : (
-          <p className={css.emptyLog}>Nothing logged for this day</p>
+          <p className={css.emptyLog}>
+            {t({ en: 'Nothing logged for this day', pl: 'Brak wpisów w tym dniu' })}
+          </p>
         )}
       </section>
     </div>

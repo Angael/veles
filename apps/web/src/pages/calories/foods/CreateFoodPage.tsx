@@ -2,9 +2,11 @@ import { useNavigate } from '@tanstack/react-router';
 import { useCreateFoodProductMutation } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type Props = { barcode?: string; date: string; name?: string };
 export function CreateFoodPage({ barcode, date, name }: Props) {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const createMutation = useCreateFoodProductMutation();
   const { markDirty, markSaved } = useUnsavedChangesGuard();
@@ -24,7 +26,7 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
         onDirty={markDirty}
         onSubmit={save}
         pending={createMutation.isPending}
-        submitLabel='Create food'
+        submitLabel={t({ en: 'Create food', pl: 'Utwórz produkt' })}
       />
     </main>
   );

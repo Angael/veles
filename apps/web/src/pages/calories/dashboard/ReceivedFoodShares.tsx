@@ -12,15 +12,16 @@ import { Card } from '@/components/ui/card/Card';
 import { List, ListItem } from '@/components/ui/list/List';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import css from './ReceivedFoodShares.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { productCountText } from '../calorieHelpers';
 
 type Props = {
   date: string;
 };
 
-const productCount = (count: number) => `${count} ${count === 1 ? 'product' : 'products'}`;
-
 /** Incoming logs shown like the user's own, wrapped in a card that accepts or declines them all at once. */
 export function ReceivedFoodShares({ date }: Props) {
+  const { formatNumber, t } = useI18n();
   const sharesQuery = useQuery(receivedFoodLogSharesQueryOptions());
   const acceptMutation = useAcceptFoodLogShareMutation();
   const declineMutation = useDeclineFoodLogShareMutation();
@@ -31,7 +32,10 @@ export function ReceivedFoodShares({ date }: Props) {
       {
         onSuccess: () =>
           toastManager.add({
-            title: `Added ${productCount(share.items.length)} from ${share.senderName}`,
+            title: t({
+              en: `Added ${t(productCountText(share.items.length))} from ${share.senderName}`,
+              pl: `Dodano ${t(productCountText(share.items.length))} od: ${share.senderName}`,
+            }),
             type: 'success',
           }),
       },
@@ -42,7 +46,10 @@ export function ReceivedFoodShares({ date }: Props) {
     declineMutation.mutate(share.id, {
       onSuccess: () =>
         toastManager.add({
-          title: `Declined ${productCount(share.items.length)} from ${share.senderName}`,
+          title: t({
+            en: `Declined ${t(productCountText(share.items.length))} from ${share.senderName}`,
+            pl: `Odrzucono ${t(productCountText(share.items.length))} od: ${share.senderName}`,
+          }),
         }),
     });
   }
@@ -62,7 +69,10 @@ export function ReceivedFoodShares({ date }: Props) {
         tone='primary'
       >
         <h3 className={css.heading} id={headingId}>
-          {share.senderName} shared {count === 1 ? 'a product' : `${count} products`} with you
+          {t({
+            en: `${share.senderName} shared ${count === 1 ? 'a product' : `${count} products`} with you`,
+            pl: `${share.senderName} udostępnia Ci ${t(productCountText(count))}`,
+          })}
         </h3>
         <List as='ol'>
           {share.items.map((item) => (
@@ -73,7 +83,11 @@ export function ReceivedFoodShares({ date }: Props) {
                 fat={item.fat ?? 0}
                 imageUrl={item.imageUrl}
                 kcal={item.kcal}
-                meta={item.grams === null ? 'Custom entry' : `${Math.round(item.grams)} g`}
+                meta={
+                  item.grams === null
+                    ? t({ en: 'Custom entry', pl: 'Własny wpis' })
+                    : `${formatNumber(Math.round(item.grams))} g`
+                }
                 name={item.name}
                 protein={item.protein ?? 0}
               />
@@ -88,7 +102,7 @@ export function ReceivedFoodShares({ date }: Props) {
             onClick={() => decline(share)}
             variant='ghost'
           >
-            Decline
+            {t({ en: 'Decline', pl: 'Odrzuć' })}
           </Btn>
           <Btn
             disabled={declining}
@@ -96,7 +110,9 @@ export function ReceivedFoodShares({ date }: Props) {
             loading={accepting}
             onClick={() => accept(share)}
           >
-            {count === 1 ? 'Add to diary' : 'Add all to diary'}
+            {count === 1
+              ? t({ en: 'Add to diary', pl: 'Dodaj do dziennika' })
+              : t({ en: 'Add all to diary', pl: 'Dodaj wszystkie do dziennika' })}
           </Btn>
         </div>
       </Card>

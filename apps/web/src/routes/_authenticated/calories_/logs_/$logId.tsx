@@ -7,7 +7,10 @@ export const Route = createFileRoute('/_authenticated/calories_/logs_/$logId')({
   component: Component,
   staticData: {
     layout: 'task',
-    navbar: { backFallback: { to: '/calories' }, label: 'Edit food log' },
+    navbar: {
+      backFallback: { to: '/calories' },
+      label: { en: 'Edit food log', pl: 'Edytuj wpis' },
+    },
   },
 });
 

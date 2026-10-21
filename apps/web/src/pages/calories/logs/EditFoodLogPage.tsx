@@ -16,8 +16,10 @@ import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import css from '../CalorieFlows.module.css';
 import { useProportionalNutrition } from './useProportionalNutrition';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export function EditFoodLogPage({ log }: { log: CalorieLog }) {
+  const { t } = useI18n();
   const router = useRouter();
   const updateMutation = useUpdateFoodLogMutation();
   const isProduct = log.productId !== null;
@@ -65,12 +67,12 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
       <Card as='section'>
         <TypedForm className={css.form} errorMsg={updateMutation.error?.message} onSubmit={submit}>
           {!isProduct ? (
-            <Label text='Name'>
+            <Label text={t({ en: 'Name', pl: 'Nazwa' })}>
               <TextInput defaultValue={log.name} name='name' required />
             </Label>
           ) : null}
 
-          <Label text='Amount eaten (g)'>
+          <Label text={t({ en: 'Amount eaten (g)', pl: 'Zjedzona ilość (g)' })}>
             <NumberInput min={0} name='grams' onValueChange={changeGrams} size='lg' value={grams} />
           </Label>
 
@@ -88,11 +90,11 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
           ) : null}
 
           <FormSubmitRow>
-            <Label text='Date'>
+            <Label text={t({ en: 'Date', pl: 'Data' })}>
               <DateInput defaultValue={log.date} name='date' required />
             </Label>
             <Btn loading={isPending} type='submit'>
-              Save
+              {t({ en: 'Save', pl: 'Zapisz' })}
             </Btn>
           </FormSubmitRow>
         </TypedForm>

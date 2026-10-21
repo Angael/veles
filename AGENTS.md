@@ -24,9 +24,8 @@
 - When writing PRs, follow ASD-STE100 (Simplified Technical English) and keep it short.
 
 ## Database Scripts
-- `pnpm db:seed` inserts only the shared food products into the development database at `DATABASE_URL`.
-- `pnpm db:seed:prod` inserts only the shared food products into the production database at `PROD_DATABASE_URL`.
-- `pnpm db:reset` rebuilds the development database and seeds the development user/account, calorie goal, food products, food logs and weights, recipes, and diary entries.
+- The worker syncs the shared food products (`packages/db/src/seed/food-products.ts`) on every start, so deploys apply them. To remove a seed, move its `seedKey` to `retiredFoodProductSeedKeys`.
+- `pnpm db:reset` rebuilds the development database and seeds the development user/account, calorie goal, food logs and weights, and recipes, then runs the worker's food product sync. Diary entries are end-to-end encrypted, so they are not seeded.
 
 ## Structure
 - There is no root `src/`. Code lives in `apps/web/src`, `apps/worker/src`, `apps/preview/src`, and `packages/db/src`; paths in this section are repository-root-relative.
@@ -45,6 +44,7 @@
   - `.query.ts`: For useMutation and queryOptions
   - `.server.ts`: Other server-only stuff
   - `.client.ts`: Client-only code
+  - `.collection.ts`: TanStack DB collection descriptors and their mutation handlers (see the `tanstack-db` skill)
 - No barrel files, DTO, re-export files
 
 ## Server Functions
@@ -63,16 +63,29 @@
 - Forms that take effort to fill in use `useUnsavedChangesGuard`; call `markSaved()` right before the post-save navigation.
 
 ## UI
+- Keep the logged-in dashboard and logged-out home page up to date with cards showcasing all user-facing app features and pages.
 - Prefer css modules, prefer syntax `import css from ...`
 - In css modules, prefer nested selectors when it keeps related styles together.
 - This app uses css reset and theme.css
 - Shared responsive breakpoints live in `apps/web/src/styles/breakpoints.css`; use its custom media names instead of repeating raw width queries.
 - Respect the css reset first: margins for text blocks, base font inheritance, and default line-height are already normalized there, so only restyle them when a component intentionally needs to diverge.
+- All user-facing copy needs both English and Polish translations.
 - Avoid decorative eyebrow/kicker UI text that only repeats context without adding clarity.
 - Components should not have more than soft cap 200 lines of code, hard cap 300 lines. It's a code smell that file does too much.
 - `apps/web/src/routes/**/*.tsx` files should stay small. They can contain up to soft cap ~200, hard cap 300 lines. Beyond that export the feature implementation from `apps/web/src/pages`.
 - Keep demo route code outside reusable `apps/web/src/components`.
 - For icons use `lucide-react`, always renaming imports with an `Icon` suffix to avoid naming conflicts.
+
+## Agent MCP
+- The MCP server (`apps/web/src/pages/agent`) should cover user-facing features with read and write
+- Agents load every listed tool schema into context, also in sessions that never use Veles. Keep the tool count low: one tool per entity with an object or array payload, not one tool per field or per step. Do not add a batch twin of a tool (e.g. `save_weights` next to `save_weight`); a bulk import stays in the app.
+- Perform joins and calculations on the server; return readable, nested results so agents do not have to reconstruct relationships from raw table rows. Never make agents list parents, then fetch children and match them by parent id
+- When you add, rename, or change a feature or its data, update the MCP in the same change:
+  - `apps/web/src/lib/agentAccess.ts`: add the feature and its label.
+  - `mcp-read-*.server.ts`: add or update its reader; register it with its field description (units, scaling) in `mcp-resources.server.ts`.
+  - `mcp-write-*.server.ts`: add write tools that call the feature's shared `.server.ts` operations and `.validation.ts` types, wrap inputs in `agentInput()` and handlers in `agentWriter(userId, feature)`, and register them in `mcp-server.server.ts` behind the feature's write permission.
+  - Run `pnpm mcp:tools` to regenerate `docs/agent-tools.md`.
+- Every MCP query must filter by the key owner's `userId`.
 
 ## TS
 - Avoid `as any`, `as unknown`, and `as never`; if one is necessary, ask the user for approval.

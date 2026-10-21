@@ -17,7 +17,7 @@ export const Route = createFileRoute('/_authenticated/calories_/goals')({
   component: Component,
   staticData: {
     layout: 'task',
-    navbar: { backFallback: { to: '/calories' }, label: 'Daily goals' },
+    navbar: { backFallback: { to: '/calories' }, label: { en: 'Daily goals', pl: 'Cele dzienne' } },
   },
 });
 
