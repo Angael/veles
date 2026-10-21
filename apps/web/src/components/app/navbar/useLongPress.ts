@@ -69,7 +69,7 @@ export function useLongPress(onLongPress: () => void) {
         }
       },
       onClickCapture: (event: MouseEvent) => {
-        if (fired.current) {
+        if (fired.current && isOwnTarget(event)) {
           fired.current = false;
           event.preventDefault();
           event.stopPropagation();
