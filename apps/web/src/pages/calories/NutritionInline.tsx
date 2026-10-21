@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import type { ReactNode } from 'react';
 import css from './NutritionInline.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
@@ -8,6 +9,8 @@ type NutritionInlineProps = {
   fat: number;
   carbs: number;
   energyDisplay?: 'always' | 'phone';
+  /** Shown beside kcal, e.g. the portion weight. */
+  energyMeta?: ReactNode;
   stacked?: boolean;
 };
 
@@ -17,6 +20,7 @@ export function NutritionInline({
   fat,
   carbs,
   energyDisplay = 'always',
+  energyMeta,
   stacked = false,
 }: NutritionInlineProps) {
   const { formatNumber } = useI18n();
@@ -26,6 +30,7 @@ export function NutritionInline({
       <div className={energyDisplay === 'phone' ? css.energyPhoneOnly : css.energy}>
         <strong>{formatNumber(Math.round(kcal))}</strong>
         <span>kcal</span>
+        {energyMeta ? <span className={css.energyMeta}>{energyMeta}</span> : null}
       </div>
       <div className={css.macros}>
         <div className={css.macro}>

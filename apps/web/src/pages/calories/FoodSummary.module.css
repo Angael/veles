@@ -73,13 +73,6 @@
     overflow-wrap: anywhere;
   }
 
-  & span {
-    flex: none;
-    color: var(--c-muted);
-    font-size: var(--text-sm);
-    font-variant-numeric: tabular-nums;
-  }
-
   & a {
     color: inherit;
     text-decoration: none;
@@ -130,10 +123,6 @@
 
     & strong {
       font-size: var(--text-md-dynamic);
-    }
-
-    & span {
-      font-size: var(--text-xs);
     }
   }
 }
