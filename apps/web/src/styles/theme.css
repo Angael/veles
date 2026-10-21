@@ -122,8 +122,14 @@
   --space-xl: 2rem;
 
   --button-min-height: 44px;
-  /* Control height inside the phone bottom dock (mobile navbar, selection bar). */
+  /* Control height inside the phone bottom dock (selection bar, rest timer). */
   --dock-item-height: 2.2rem;
+  /* Phone dock box; the labeled mobile navbar overrides both on its own dock. */
+  --dock-width: min(22rem, calc(100vw - 1.5rem));
+  --dock-padding: 0.3rem;
+  /* Labeled mobile navbar item height, and the bottom space its dock and a gap occupy. */
+  --dock-nav-item-height: 3rem;
+  --dock-nav-clearance: 4.75rem;
 
   --radius-xs: 14px;
   --radius-sm: 16px;

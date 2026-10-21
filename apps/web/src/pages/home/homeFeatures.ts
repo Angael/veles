@@ -1,13 +1,13 @@
 import {
-  BookOpenIcon,
+  NotebookPenIcon,
   BotIcon,
-  CheckIcon,
+  StickyNoteIcon,
   DumbbellIcon,
   FlameIcon,
   type LucideIcon,
   ScaleIcon,
   UsersRoundIcon,
-  UtensilsIcon,
+  CookingPotIcon,
 } from 'lucide-react';
 import type { Localized } from '@/lib/i18n/locale';
 
@@ -58,7 +58,7 @@ export const homeFeatures: HomeFeature[] = [
   },
   {
     id: 'recipes',
-    icon: UtensilsIcon,
+    icon: CookingPotIcon,
     title: { en: 'Recipes', pl: 'Przepisy' },
     description: {
       en: 'Save recipes with ingredients and nutrition, and share them with friends.',
@@ -78,7 +78,7 @@ export const homeFeatures: HomeFeature[] = [
   },
   {
     id: 'notes',
-    icon: CheckIcon,
+    icon: StickyNoteIcon,
     title: { en: 'Notes', pl: 'Notatki' },
     description: {
       en: 'Keep quick notes and checklists, such as shopping lists.',
@@ -88,7 +88,7 @@ export const homeFeatures: HomeFeature[] = [
   },
   {
     id: 'diary',
-    icon: BookOpenIcon,
+    icon: NotebookPenIcon,
     title: { en: 'Diary', pl: 'Dziennik' },
     description: {
       en: 'Write daily entries that are encrypted on your device before they are saved.',
