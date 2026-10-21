@@ -19,18 +19,16 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type DiaryEntryPageProps = {
   entry: EncryptedDiaryEntry;
-  focusTitle?: boolean;
   keyRecord: DiaryKeyRecord | null;
 };
 
 type DiaryEntryEditorProps = {
   diaryKey: CryptoKey;
   entry: DiaryEntrySummary;
-  focusTitle: boolean;
   onLock: () => void;
 };
 
-export function DiaryEntryPage({ entry, focusTitle = false, keyRecord }: DiaryEntryPageProps) {
+export function DiaryEntryPage({ entry, keyRecord }: DiaryEntryPageProps) {
   const encryptedEntries = useMemo(() => [entry], [entry]);
 
   return (
@@ -39,7 +37,6 @@ export function DiaryEntryPage({ entry, focusTitle = false, keyRecord }: DiaryEn
         <DecryptedDiaryEntry
           diaryKey={diaryKey}
           encryptedEntries={encryptedEntries}
-          focusTitle={focusTitle}
           onLock={lock}
         />
       )}
@@ -69,7 +66,7 @@ function DecryptedDiaryEntry({
   return <DiaryEntryEditor {...props} entry={entry} />;
 }
 
-function DiaryEntryEditor({ diaryKey, entry, focusTitle, onLock }: DiaryEntryEditorProps) {
+function DiaryEntryEditor({ diaryKey, entry, onLock }: DiaryEntryEditorProps) {
   const { t } = useI18n();
   const navigate = useNavigate();
   const router = useRouter();
@@ -167,7 +164,6 @@ function DiaryEntryEditor({ diaryKey, entry, focusTitle, onLock }: DiaryEntryEdi
           <h1>
             <SeamlessTextInput
               aria-label={t({ en: 'Diary entry title', pl: 'Tytuł wpisu' })}
-              autoFocus={focusTitle}
               className={css.titleInput}
               maxLength={160}
               onChange={(event) => {
