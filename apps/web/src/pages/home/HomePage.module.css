@@ -149,30 +149,6 @@
     var(--c-surface-strong);
 }
 
-.loginLink {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
-  gap: var(--space-xs);
-  min-height: var(--button-min-height);
-  margin-top: auto;
-  color: var(--c-accent);
-  font-weight: var(--font-weight-semibold);
-  text-decoration: none;
-
-  &:focus-visible {
-    border-radius: var(--radius-xs);
-    outline: 2px solid var(--c-primary-focus);
-    outline-offset: 2px;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-}
-
 .tileHeading {
   display: flex;
   align-items: center;

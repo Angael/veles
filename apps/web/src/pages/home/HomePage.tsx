@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { ArrowUpRightIcon, LogInIcon } from 'lucide-react';
+import { ArrowUpRightIcon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { HomeFeaturePreview } from './HomeFeaturePreview';
@@ -47,7 +47,6 @@ export function HomePage() {
       {homeFeatures.map((feature, index) => {
         const Icon = feature.icon;
         const title = t(feature.title);
-        const path = feature.hash ? `${feature.to}#${feature.hash}` : feature.to;
 
         return (
           <Card
@@ -63,18 +62,6 @@ export function HomePage() {
             </div>
             <p>{t(feature.description)}</p>
             <HomeFeaturePreview feature={feature.id} />
-            <Link
-              aria-label={t({
-                en: `Log in to open ${title}`,
-                pl: `Zaloguj się, aby otworzyć: ${title}`,
-              })}
-              className={css.loginLink}
-              search={{ redirect: path }}
-              to='/login'
-            >
-              {t({ en: 'Log in to open', pl: 'Zaloguj się, aby otworzyć' })}
-              <LogInIcon aria-hidden='true' size={16} />
-            </Link>
           </Card>
         );
       })}
