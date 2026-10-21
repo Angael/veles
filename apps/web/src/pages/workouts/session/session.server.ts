@@ -26,6 +26,7 @@ import type {
   updateWorkoutSetInputType,
   workoutIdType,
 } from '../workouts.validation';
+import { workoutMovePatch } from './moveWorkout';
 
 type IdInput = typeof workoutIdType.infer;
 
@@ -46,12 +47,16 @@ export async function startWorkoutRecord(userId: string, data: typeof startWorko
   return { id: workout.id };
 }
 
-/** Renames a session, or finishes / reopens it. Reopening is refused while another is open. */
+/**
+ * Renames a session, moves it to another day, or finishes / reopens it. Reopening is refused while
+ * another is open. Moving updates only the session row, so its exercises and sets stay.
+ */
 export async function updateWorkoutRecord(
   userId: string,
   data: typeof updateWorkoutInputType.infer,
 ) {
-  await requireOwnedWorkout(db, userId, data.id);
+  const workout = await requireOwnedWorkout(db, userId, data.id);
+  const move = data.date ? workoutMovePatch(workout, data.date, defaultWorkoutName) : null;
   if (data.finished === false) {
     await autoFinishIdleWorkouts(db, userId);
     await requireNoOpenWorkout(db, userId, data.id);
@@ -59,6 +64,7 @@ export async function updateWorkoutRecord(
   await db
     .update(workoutSessions)
     .set({
+      ...move,
       ...(data.name?.trim() ? { name: data.name.trim() } : {}),
       ...(data.finished === undefined ? {} : { endedAt: data.finished ? new Date() : null }),
       updatedAt: new Date(),

@@ -134,7 +134,7 @@ Save the weight in kg for one date. Replaces the weight already saved for that d
 
 _write, destructive_
 
-Create (no id; date required) or update (id) a workout session. Omitted fields stay; exercises, when given, replace all exercises and sets in order. Each exercise is exerciseId from workout_exercises (read it first to reuse existing ones), or newExercise { name, measure }, which reuses an exercise with that exact name or creates it. A new session is finished unless finished is false (only one open session at a time); with routineId and no exercises it copies the routine. Returns { id }.
+Create (no id; date required) or update (id) a workout session. Omitted fields stay; exercises, when given, replace all exercises and sets in order. To move a session to another day, send id and date only. Each exercise is exerciseId from workout_exercises (read it first to reuse existing ones), or newExercise { name, measure }, which reuses an exercise with that exact name or creates it. A new session is finished unless finished is false (only one open session at a time); with routineId and no exercises it copies the routine. Returns { id }.
 
 | Input       | Type                                       | Required | Notes         |
 | ----------- | ------------------------------------------ | -------- | ------------- |
