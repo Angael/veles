@@ -1,11 +1,16 @@
 import {
-  BookOpenIcon,
+  CookingPotIcon,
   DumbbellIcon,
   FlameIcon,
-  ListTodoIcon,
   NotebookPenIcon,
   ScaleIcon,
+  StickyNoteIcon,
 } from 'lucide-react';
+
+/**
+ * Primary destinations shared by the desktop header and the phone dock. Diary, Notes, and Recipes
+ * need clearly different silhouettes (notebook, square note, pot): the phone labels are small.
+ */
 
 export const NAVBAR_ITEMS = [
   {
@@ -20,14 +25,14 @@ export const NAVBAR_ITEMS = [
     label: { en: 'Notes', pl: 'Notatki' },
     link: '/todos',
     matchPrefixes: ['/todos'],
-    icon: ListTodoIcon,
+    icon: StickyNoteIcon,
   },
   {
     key: 'recipes',
     label: { en: 'Recipes', pl: 'Przepisy' },
     link: '/recipes',
     matchPrefixes: ['/recipes'],
-    icon: BookOpenIcon,
+    icon: CookingPotIcon,
   },
   {
     key: 'weight',
