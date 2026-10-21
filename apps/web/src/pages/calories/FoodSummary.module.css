@@ -60,22 +60,20 @@
   gap: 0.35rem;
 }
 
+/* Inline flow lets long names use the full width and the meta trail the last line. */
 .identity {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-xs);
   min-width: 0;
 
   & strong {
-    min-width: 0;
     color: var(--c-text-strong);
     font-size: var(--text-lg);
     overflow-wrap: anywhere;
   }
 
   & span {
-    flex: none;
+    margin-inline-start: var(--space-xs);
     color: var(--c-muted);
+    white-space: nowrap;
     font-size: var(--text-sm);
     font-variant-numeric: tabular-nums;
   }
@@ -126,8 +124,6 @@
   }
 
   .identity {
-    gap: var(--space-xs);
-
     & strong {
       font-size: var(--text-md-dynamic);
     }
