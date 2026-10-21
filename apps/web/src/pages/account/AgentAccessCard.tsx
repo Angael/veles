@@ -1,6 +1,7 @@
 import { BotIcon, ChevronDownIcon, ShieldCheckIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card/Card';
 import { agentFeatureNames } from '@/lib/agentAccess';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 import { useAgentPermissionsQuery, useApiKeysQuery } from './account.query';
 import { AgentKeyList } from './AgentKeyList';
 import { AgentPermissions } from './AgentPermissions';
@@ -12,6 +13,7 @@ interface AgentAccessCardProps {
 }
 
 export function AgentAccessCard({ userName }: AgentAccessCardProps) {
+  const { t } = useI18n();
   const keysQuery = useApiKeysQuery();
 
   return (
@@ -27,18 +29,26 @@ export function AgentAccessCard({ userName }: AgentAccessCardProps) {
           <BotIcon />
         </span>
         <div>
-          <h2>AI Agent access</h2>
-          <p>Let an AI assistant like Vel read or update your Veles data.</p>
+          <h2>{t({ en: 'AI Agent access', pl: 'Dostęp dla agentów AI' })}</h2>
+          <p>
+            {t({
+              en: 'Let an AI assistant like Vel read or update your Veles data.',
+              pl: 'Pozwól asystentowi AI, takiemu jak Vel, odczytywać lub zmieniać Twoje dane w Veles.',
+            })}
+          </p>
         </div>
       </header>
 
       <section aria-labelledby='agent-keys-title' className={css.block}>
         <div className={css.blockHead}>
-          <div>
-            <h3 id='agent-keys-title'>Keys</h3>
-            <p>Give each agent its own key. Keys do not expire; revoke one to cut off access.</p>
-          </div>
+          <h3 id='agent-keys-title'>{t({ en: 'Keys', pl: 'Klucze' })}</h3>
           <CreateAgentKeyDialog userName={userName} />
+          <p>
+            {t({
+              en: 'Give each agent its own key. Keys do not expire; revoke one to cut off access.',
+              pl: 'Daj każdemu agentowi osobny klucz. Klucze nie wygasają; unieważnij klucz, aby odciąć dostęp.',
+            })}
+          </p>
         </div>
 
         <AgentKeyList />
@@ -47,8 +57,10 @@ export function AgentAccessCard({ userName }: AgentAccessCardProps) {
       <details className={css.disclosure}>
         <summary>
           <ShieldCheckIcon aria-hidden='true' />
-          <span>What AI can access</span>
-          <PermissionSummary />
+          <span className={css.summaryText}>
+            <span>{t({ en: 'What AI can access', pl: 'Do czego AI ma dostęp' })}</span>
+            <PermissionSummary />
+          </span>
           <ChevronDownIcon aria-hidden='true' className={css.chevron} />
         </summary>
         <AgentPermissions />
@@ -59,14 +71,20 @@ export function AgentAccessCard({ userName }: AgentAccessCardProps) {
 
 /** Shows how many features are open so the collapsed permissions row still says something useful. */
 function PermissionSummary() {
+  const { t } = useI18n();
   const permissions = useAgentPermissionsQuery().data;
   if (!permissions) return <small />;
   const reads = agentFeatureNames.filter((feature) => permissions[feature].read).length;
   const writes = agentFeatureNames.filter((feature) => permissions[feature].write).length;
-  if (!reads && !writes) return <small>Nothing shared</small>;
+  if (!reads && !writes)
+    return <small>{t({ en: 'Nothing shared', pl: 'Nic nie udostępniono' })}</small>;
+  const total = agentFeatureNames.length;
   return (
     <small>
-      {reads}/{agentFeatureNames.length} read · {writes} write
+      {t({
+        en: `${reads}/${total} read · ${writes} write`,
+        pl: `odczyt ${reads}/${total} · zapis ${writes}`,
+      })}
     </small>
   );
 }

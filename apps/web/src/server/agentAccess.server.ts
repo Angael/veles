@@ -40,7 +40,7 @@ export async function requireAgentAccess(
   const allowed = access === 'read' ? row?.readEnabled : row?.readEnabled && row.writeEnabled;
   if (!allowed) {
     throw new ClientSafeError(
-      `${agentFeatures[feature].label} ${access} access is disabled in Account.`,
+      `${agentFeatures[feature].label.en} ${access} access is disabled in Account.`,
     );
   }
 }

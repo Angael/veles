@@ -1,12 +1,14 @@
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { KeyRoundIcon, TrashIcon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Skeleton } from '@/components/ui/skeleton/Skeleton';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 import { useApiKeysQuery, useDeleteApiKeyMutation } from './account.query';
 import css from './AgentAccessCard.module.css';
 
 /** Lists the account's agent keys with last use, so stale keys are easy to spot and revoke. */
 export function AgentKeyList() {
+  const { dateLocale, formatDate, t } = useI18n();
   const keysQuery = useApiKeysQuery();
   const deleteMutation = useDeleteApiKeyMutation();
 
@@ -25,14 +27,14 @@ export function AgentKeyList() {
     return (
       <div className={css.empty} role='alert'>
         <KeyRoundIcon aria-hidden='true' />
-        Could not load your keys.
+        {t({ en: 'Could not load your keys.', pl: 'Nie udało się wczytać kluczy.' })}
         <Btn
           loading={keysQuery.isFetching}
           onClick={() => void keysQuery.refetch()}
           size='sm'
           variant='outlineMain'
         >
-          Try again
+          {t({ en: 'Try again', pl: 'Spróbuj ponownie' })}
         </Btn>
       </div>
     );
@@ -42,7 +44,10 @@ export function AgentKeyList() {
     return (
       <p className={css.empty}>
         <KeyRoundIcon aria-hidden='true' />
-        No keys yet. Create one to connect your first agent.
+        {t({
+          en: 'No keys yet. Create one to connect your first agent.',
+          pl: 'Nie masz jeszcze kluczy. Utwórz klucz, aby połączyć pierwszego agenta.',
+        })}
       </p>
     );
   }
@@ -50,7 +55,15 @@ export function AgentKeyList() {
   return (
     <ul className={css.keyList}>
       {keysQuery.data.map((key) => {
-        const name = key.name ?? 'Unnamed key';
+        const name = key.name ?? t({ en: 'Unnamed key', pl: 'Klucz bez nazwy' });
+        const created = formatDate(key.createdAt, {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        });
+        const lastUsed = key.lastRequest
+          ? formatDistanceToNow(key.lastRequest, { addSuffix: true, locale: dateLocale })
+          : null;
         return (
           <li className={css.keyRow} key={key.id}>
             <span aria-hidden='true' className={css.keyIcon}>
@@ -61,15 +74,15 @@ export function AgentKeyList() {
               <span>
                 <code>{key.start ?? 'vls_'}…</code>
                 <span>
-                  {key.lastRequest
-                    ? `Used ${formatDistanceToNow(key.lastRequest, { addSuffix: true })}`
-                    : 'Never used'}
+                  {lastUsed
+                    ? t({ en: `Used ${lastUsed}`, pl: `Użyty ${lastUsed}` })
+                    : t({ en: 'Never used', pl: 'Jeszcze nieużyty' })}
                 </span>
-                <span>Created {format(key.createdAt, 'd MMM yyyy')}</span>
+                <span>{t({ en: `Created ${created}`, pl: `Utworzony ${created}` })}</span>
               </span>
             </div>
             <Btn
-              aria-label={`Revoke ${name}`}
+              aria-label={t({ en: `Revoke ${name}`, pl: `Unieważnij ${name}` })}
               icon={<TrashIcon aria-hidden='true' />}
               iconOnly
               loading={deleteMutation.isPending && deleteMutation.variables === key.id}
