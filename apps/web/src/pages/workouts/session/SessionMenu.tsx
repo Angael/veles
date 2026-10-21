@@ -1,4 +1,11 @@
-import { BookmarkPlusIcon, CalendarArrowUpIcon, EllipsisIcon, RefreshCwIcon } from 'lucide-react';
+import {
+  BookmarkPlusIcon,
+  CalendarArrowUpIcon,
+  EllipsisIcon,
+  PencilIcon,
+  RefreshCwIcon,
+  RotateCcwIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { MenuBtn, MenuBtnItem, MenuBtnPopup, MenuBtnRoot } from '@/components/ui/menu-btn/MenuBtn';
@@ -7,19 +14,23 @@ import {
   useSaveRoutineFromWorkoutMutation,
   useUpdateRoutineFromWorkoutMutation,
 } from '../routines/routines.query';
+import { useUpdateWorkoutMutation } from '../workouts.query';
 import type { WorkoutSessionData } from '../workouts.server';
 import { MoveWorkoutDialog } from './MoveWorkoutDialog';
+import { RenameWorkoutDialog } from './RenameWorkoutDialog';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /**
- * Rare session actions: move the session to another day, save the exercises as a new routine, or
- * overwrite the routine this session came from. Routines keep exercises, set counts and set types,
+ * Rare session actions: reopen a finished session, rename it, move it to another day, save the
+ * exercises as a new routine, or overwrite the routine this session came from. Routines keep exercises, set counts and set types,
  * never the numbers.
  */
 export function SessionMenu({ session }: { session: WorkoutSessionData }) {
   const { formatDate, t } = useI18n();
   const [saving, setSaving] = useState(false);
   const [moving, setMoving] = useState(false);
+  const [renaming, setRenaming] = useState(false);
+  const updateWorkout = useUpdateWorkoutMutation();
   const saveRoutine = useSaveRoutineFromWorkoutMutation();
   const updateRoutine = useUpdateRoutineFromWorkoutMutation();
   const empty = session.slots.length === 0;
@@ -40,6 +51,23 @@ export function SessionMenu({ session }: { session: WorkoutSessionData }) {
           aria-label={t({ en: 'Workout actions', pl: 'Akcje treningu' })}
           heading={t({ en: 'Workout', pl: 'Trening' })}
         >
+          {session.endedAt === null ? null : (
+            <MenuBtnItem
+              description={t({
+                en: 'Keep logging sets in this workout',
+                pl: 'Zapisuj dalej serie w tym treningu',
+              })}
+              disabled={updateWorkout.isPending}
+              icon={<RotateCcwIcon aria-hidden='true' />}
+              label={t({ en: 'Reopen', pl: 'Otwórz ponownie' })}
+              onClick={() => updateWorkout.mutate({ finished: false, id: session.id })}
+            />
+          )}
+          <MenuBtnItem
+            icon={<PencilIcon aria-hidden='true' />}
+            label={t({ en: 'Rename', pl: 'Zmień nazwę' })}
+            onClick={() => setRenaming(true)}
+          />
           <MenuBtnItem
             description={formatDate(session.date, {
               day: 'numeric',
@@ -77,6 +105,7 @@ export function SessionMenu({ session }: { session: WorkoutSessionData }) {
           ) : null}
         </MenuBtnPopup>
       </MenuBtnRoot>
+      <RenameWorkoutDialog onOpenChange={setRenaming} open={renaming} session={session} />
       <MoveWorkoutDialog onOpenChange={setMoving} open={moving} session={session} />
       <RoutineDialog
         defaults={{ description: '', name: session.name }}

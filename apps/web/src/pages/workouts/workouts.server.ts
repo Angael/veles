@@ -1,4 +1,3 @@
-import { format, parseISO } from 'date-fns';
 import { and, asc, desc, eq, inArray, isNotNull, isNull, lt, ne, or, sql } from 'drizzle-orm';
 import {
   type exerciseMeasures,
@@ -11,6 +10,7 @@ import {
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db, type DbTransaction } from '@/server/db.server';
 import type { Measure, SetMetrics, SetType } from './metrics';
+import { defaultWorkoutName as localizedDefaultWorkoutName, workoutName } from './workoutName';
 import { getLocale, translate } from '@/lib/i18n/getLocale';
 
 export type WorkoutSetData = SetMetrics & {
@@ -343,7 +343,7 @@ export async function loadWorkoutSession(
     date: workout.date,
     endedAt: workout.endedAt?.toISOString() ?? null,
     id: workout.id,
-    name: workout.name,
+    name: workoutName(workout, getLocale()),
     routine: routine ?? null,
     slots: slots.map((slot) => {
       const previousSlotId = previousSlotByExercise.get(slot.exerciseId);
@@ -444,20 +444,7 @@ export async function resolveExerciseId(tx: Db, userId: string, ref: ExerciseRef
   );
 }
 
-const POLISH_WEEKDAY_ADJECTIVES = [
-  'Niedzielny',
-  'Poniedziałkowy',
-  'Wtorkowy',
-  'Środowy',
-  'Czwartkowy',
-  'Piątkowy',
-  'Sobotni',
-];
-
-/** "Monday workout" / "Poniedziałkowy trening", in the language of the user who starts it. */
+/** Default session name in the language of the user who starts or moves it. */
 export function defaultWorkoutName(date: string) {
-  const day = parseISO(date);
-  return getLocale() === 'pl'
-    ? `${POLISH_WEEKDAY_ADJECTIVES[day.getDay()]} trening`
-    : `${format(day, 'EEEE')} workout`;
+  return localizedDefaultWorkoutName(date, getLocale());
 }

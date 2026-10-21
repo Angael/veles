@@ -33,7 +33,7 @@ export function MoveWorkoutDialog({ onOpenChange, open, session }: MoveWorkoutDi
       <DialogPopup>
         <DialogTitle>{t({ en: 'Move to another day', pl: 'Przenieś na inny dzień' })}</DialogTitle>
         <TypedForm
-          className={css.moveForm}
+          className={css.dialogForm}
           onSubmit={(data) => {
             const date = data.string('date');
             if (date === session.date) return onOpenChange(false);

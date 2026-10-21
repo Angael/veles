@@ -5,7 +5,9 @@ import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
+import { getLocale } from '@/lib/i18n/getLocale';
 import { floorDuration } from './metrics';
+import { workoutName } from './workoutName';
 import { autoFinishIdleWorkouts, setSecondsSql, loadWorkoutSession } from './workouts.server';
 import {
   deleteWorkoutRecord,
@@ -69,7 +71,7 @@ export const getWorkouts = createServerFn({ method: 'GET' })
       endedAt: row.endedAt?.toISOString() ?? null,
       exerciseCount: row.exerciseCount,
       id: row.id,
-      name: row.name,
+      name: workoutName(row, getLocale()),
       startedAt: row.startedAt?.toISOString() ?? null,
       volumeKg: Math.round(row.volumeGrams / 1_000),
     }));

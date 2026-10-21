@@ -12,22 +12,18 @@
   }
 }
 
-.sessionHeader {
+/* Day and time on the left, Finish (or the finished mark) on the right. */
+.summary {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-sm) var(--space-lg);
-
-  & > input {
-    flex: 1 1 12rem;
-    font-size: var(--text-lg);
-    font-weight: var(--font-weight-semibold);
-  }
 }
 
 .stats {
   display: flex;
-  gap: var(--space-lg);
+  gap: var(--space-xl);
   margin: 0;
 
   & div {
@@ -41,9 +37,20 @@
 
   & dd {
     margin: 0;
-    font-family: var(--font-mono);
-    font-variant-numeric: tabular-nums;
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-semibold);
   }
+}
+
+.timeValue {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.finishedBadge {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* Empty session: nudges toward the Add exercise button below. */
@@ -383,7 +390,26 @@
   }
 }
 
-.moveForm {
+.dialogForm {
   display: grid;
   gap: var(--space-md);
+}
+
+/* Page title that opens the rename dialog: looks like a heading until hovered or focused. */
+.titleButton {
+  padding: 0;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  text-decoration: underline dotted transparent;
+  text-underline-offset: 0.2em;
+  background: none;
+  cursor: pointer;
+  transition: text-decoration-color 160ms var(--ease-out);
+
+  &:hover,
+  &:focus-visible {
+    text-decoration-color: var(--c-muted);
+  }
 }
