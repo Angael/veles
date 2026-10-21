@@ -27,7 +27,7 @@ export const resources = {
     feature: 'notes',
     dated: false,
     description:
-      'Notes and shopping lists. Notes have content; shopping lists (type "shopping_list") have items (id, name, checked) in list order instead.',
+      'Notes and shopping lists. Notes have content; shopping lists (type "shopping_list") have items (id, name, checked) in list order instead. version is the concurrency token that save_note needs to change title, content, or type.',
     read: readNotes,
   },
   weights: {

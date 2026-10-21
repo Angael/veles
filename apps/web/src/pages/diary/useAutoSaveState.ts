@@ -48,6 +48,8 @@ export function useAutoSaveState<State>(
   }, [saveDebouncer]);
 
   useEffect(() => {
+    // New source data replaces the local value, so a pending save of the old value must not run.
+    saveDebouncer.cancel();
     latestStateRef.current = initialState;
     setState(initialState);
     // The caller controls synchronization with the values used to identify source data.

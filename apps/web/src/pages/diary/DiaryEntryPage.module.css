@@ -36,6 +36,10 @@
   letter-spacing: inherit;
 }
 
+.conflict {
+  margin-bottom: var(--space-md);
+}
+
 .body {
   padding: var(--space-xl);
 

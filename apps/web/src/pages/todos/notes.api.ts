@@ -46,6 +46,7 @@ export type NoteSummary = {
   shared: boolean;
   title: string;
   type: 'note' | 'shopping_list';
+  version: number;
 };
 
 export const getNotes = createServerFn({ method: 'GET' })
@@ -61,6 +62,7 @@ export const getNotes = createServerFn({ method: 'GET' })
         shared: notes.shared,
         title: notes.title,
         type: notes.type,
+        version: notes.version,
       })
       .from(notes)
       .innerJoin(users, eq(notes.ownerId, users.id))
@@ -78,6 +80,7 @@ export const getNotes = createServerFn({ method: 'GET' })
           shared: note.shared,
           title: note.title,
           type: note.type,
+          version: note.version,
         },
       ];
     });

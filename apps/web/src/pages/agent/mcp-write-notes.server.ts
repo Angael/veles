@@ -12,7 +12,7 @@ export function registerNoteTools(server: McpServer, userId: string) {
     'save_note',
     {
       description:
-        'Create (no id; title required) or update (id) an owned note or shopping list. Omitted fields stay. New notes are private; shared shows the note to connected friends. Changing type converts content lines to list items or back. items adds, edits (name, checked), and removes shopping list items. Returns { id }.',
+        'Create (no id; title required) or update (id) an owned note or shopping list. Omitted fields stay. Updates that change title, content, or type need the version from the last read; a stale version fails with a conflict and changes nothing, so read the note again and merge. New notes are private; shared shows the note to connected friends. Changing type converts content lines to list items or back. items adds, edits (name, checked), and removes shopping list items. Returns { id, version }.',
       inputSchema: agentInput(saveNoteInputType),
       annotations: writeAnnotations({ destructive: true, idempotent: false, openWorld: true }),
     },

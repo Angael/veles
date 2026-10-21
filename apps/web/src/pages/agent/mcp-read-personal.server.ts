@@ -27,6 +27,7 @@ export async function readNotes(userId: string, query: ReadQuery) {
       title: notes.title,
       content: notes.content,
       shared: notes.shared,
+      version: notes.version,
       createdAt: notes.createdAt,
       updatedAt: notes.updatedAt,
     })

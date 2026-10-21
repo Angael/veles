@@ -10,6 +10,8 @@ import { requireSession } from '@/server/getSession.server';
 import { invariant } from '@/lib/invariant';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import type { DiaryKeyRecord } from './diaryCrypto';
+import { updateDiaryEntryRecord } from './diary.server';
+import { updateDiaryEntryInputType } from './diary.validation';
 
 export type EncryptedDiaryEntry = {
   ciphertext: string | null;
@@ -17,10 +19,9 @@ export type EncryptedDiaryEntry = {
   entryDate: string;
   id: string;
   updatedAt: Date;
+  version: number;
 };
 
-// Sealed JSON of a 160-char title and 16000-char body, with room for escapes, UTF-8, and base64.
-const ciphertextType = type('string <= 200000');
 const keyRecordType = type({
   iterations: 'number.integer >= 100000',
   salt: 'string <= 64',
@@ -28,11 +29,6 @@ const keyRecordType = type({
 });
 const idType = type({ id: 'string.uuid' });
 const createDiaryEntryInputType = type({ entryDate: dateOnlyType });
-const updateDiaryEntryInputType = type({
-  ciphertext: ciphertextType,
-  entryDate: dateOnlyType,
-  id: 'string.uuid',
-});
 
 async function getKeyRecord(userId: string): Promise<DiaryKeyRecord | null> {
   const rows = await db
@@ -53,6 +49,7 @@ const encryptedEntryColumns = {
   entryDate: diaryEntries.entryDate,
   id: diaryEntries.id,
   updatedAt: diaryEntries.updatedAt,
+  version: diaryEntries.version,
 };
 
 export const getDiaryEntries = createServerFn({ method: 'GET' })
@@ -133,15 +130,7 @@ export const updateDiaryEntry = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(updateDiaryEntryInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-
-    await db
-      .update(diaryEntries)
-      .set({
-        ciphertext: data.ciphertext,
-        entryDate: data.entryDate,
-        updatedAt: new Date(),
-      })
-      .where(and(eq(diaryEntries.id, data.id), eq(diaryEntries.userId, session.user.id)));
+    return updateDiaryEntryRecord(session.user.id, data);
   });
 
 export const deleteDiaryEntry = createServerFn({ method: 'POST' })

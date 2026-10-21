@@ -7,9 +7,14 @@ export const createNoteInputType = type({
   type: "'note' | 'shopping_list'",
 });
 
+/** A note's concurrency token, as read with the note. */
+const noteVersionType = 'number.integer >= 1';
+
 export const updateNoteInputType = type({
   '+': 'reject',
   id: 'string.uuid',
+  // Required: an update without the version the editor loaded must not skip the conflict check.
+  version: noteVersionType,
   'title?': 'string.trim |> 0 < string <= 160',
   'content?': 'string <= 16000',
 });
@@ -48,6 +53,8 @@ const itemNameType = 'string.trim |> 0 < string <= 240';
 export const saveNoteInputType = type({
   '+': 'reject',
   'id?': 'string.uuid',
+  // Required on updates that change title, content, or type; checked whenever given.
+  'version?': noteVersionType,
   'title?': 'string.trim |> 0 < string <= 160',
   'content?': 'string <= 16000',
   'type?': "'note' | 'shopping_list'",

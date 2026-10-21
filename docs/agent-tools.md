@@ -47,7 +47,7 @@ List permitted Veles records, 50 per page by default. Records come nested with t
 
 Resources:
 
-- notes: Notes and shopping lists. Notes have content; shopping lists (type "shopping_list") have items (id, name, checked) in list order instead.
+- notes: Notes and shopping lists. Notes have content; shopping lists (type "shopping_list") have items (id, name, checked) in list order instead. version is the concurrency token that save_note needs to change title, content, or type.
 - weights: Weight history in kg, newest date first, with photoUrls (progress photos). Cursor and from/to are dates.
 - recipes: Recipes with ingredients, tags, and imageUrls. total is for all portions, perPortion for one; kcal is energy; macros are protein, fat, carbs in grams.
 - food_days: Food diary, one item per day with entries or a day note, newest first; id and date are the same YYYY-MM-DD. Each day has entries (with imageUrl or null, and productId when logged from food_products), total, goal (the nutrition goal in effect; null without a goal or without Nutrition goals consent), note (the user's free text or null), and offPlan; kcal is energy; macros are protein, fat, carbs in grams. offPlan true means the user went off the diet and probably overate: total is only what was logged, not the real intake, so use the note to judge how much more was eaten, and leave the day out of averages and trends.
@@ -93,7 +93,7 @@ Daily review in one call: for each day from..to (max 31), food (offPlan, note, t
 
 _write, destructive, shared_
 
-Create (no id; title required) or update (id) an owned note or shopping list. Omitted fields stay. New notes are private; shared shows the note to connected friends. Changing type converts content lines to list items or back. items adds, edits (name, checked), and removes shopping list items. Returns { id }.
+Create (no id; title required) or update (id) an owned note or shopping list. Omitted fields stay. Updates that change title, content, or type need the version from the last read; a stale version fails with a conflict and changes nothing, so read the note again and merge. New notes are private; shared shows the note to connected friends. Changing type converts content lines to list items or back. items adds, edits (name, checked), and removes shopping list items. Returns { id, version }.
 
 | Input     | Type                      | Required | Notes           |
 | --------- | ------------------------- | -------- | --------------- |
@@ -103,6 +103,7 @@ Create (no id; title required) or update (id) an owned note or shopping list. Om
 | `shared`  | boolean                   |          |                 |
 | `title`   | string                    |          |                 |
 | `type`    | "note" \| "shopping_list" |          |                 |
+| `version` | integer                   |          |                 |
 
 ### `delete_note`
 

@@ -1,6 +1,8 @@
 import { isNotFound, isRedirect } from '@tanstack/react-router';
 import { createMiddleware } from '@tanstack/react-start';
+import { setResponseStatus } from '@tanstack/react-start/server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
+import { VersionConflictError } from '@/lib/errors/VersionConflictError';
 import { translate } from '@/lib/i18n/getLocale';
 
 export const sanitizeServerFnErrorMiddleware = createMiddleware({ type: 'function' }).server(
@@ -8,6 +10,7 @@ export const sanitizeServerFnErrorMiddleware = createMiddleware({ type: 'functio
     try {
       return await next();
     } catch (error) {
+      if (error instanceof VersionConflictError) setResponseStatus(error.status);
       if (error instanceof ClientSafeError || isNotFound(error) || isRedirect(error)) {
         throw error;
       }

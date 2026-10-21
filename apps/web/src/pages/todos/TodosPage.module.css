@@ -138,3 +138,7 @@
     grid-template-columns: 1fr;
   }
 }
+
+.conflict {
+  padding: var(--space-sm);
+}

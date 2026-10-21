@@ -53,6 +53,7 @@ import { toastManager } from '@/components/ui/toast/toastManager';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { Toggle } from '@/components/ui/toggle/Toggle';
 import css from './ComponentsDemoPage.module.css';
+import { ConflictNoticeDemo } from './ConflictNoticeDemo';
 import { PhotosFieldDemo } from './PhotosFieldDemo';
 import { CameraDemo } from './CameraDemo';
 
@@ -316,6 +317,7 @@ export function ComponentsDemoPage() {
         />
       </section>
 
+      <ConflictNoticeDemo />
       <PhotosFieldDemo />
       <CameraDemo />
 

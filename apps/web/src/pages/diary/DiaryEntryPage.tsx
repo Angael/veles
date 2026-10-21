@@ -8,10 +8,12 @@ import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessT
 import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import { useAutoSaveState } from './useAutoSaveState';
 import type { EncryptedDiaryEntry } from './diary.api';
-import { useDeleteDiaryEntryMutation, useUpdateDiaryEntryMutation } from './diary.query';
+import { useDeleteDiaryEntryMutation } from './diary.query';
 import type { DiaryKeyRecord } from './diaryCrypto';
 import { DiaryLockGate } from './DiaryLockGate';
 import { type DiaryEntrySummary, useDecryptedEntries } from './useDecryptedEntries';
+import { useDiaryEntrySave } from './useDiaryEntrySave';
+import { DiaryEntryConflict } from './DiaryEntryConflict';
 import css from './DiaryEntryPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
@@ -73,7 +75,7 @@ function DiaryEntryEditor({ diaryKey, entry, focusTitle, onLock }: DiaryEntryEdi
   const router = useRouter();
   const untitled = t({ en: 'Untitled entry', pl: 'Wpis bez tytułu' });
 
-  const saveMutation = useUpdateDiaryEntryMutation(diaryKey);
+  const entrySave = useDiaryEntrySave(diaryKey, entry);
   const deleteMutation = useDeleteDiaryEntryMutation();
 
   const [draft, setDraft] = useAutoSaveState(
@@ -83,17 +85,18 @@ function DiaryEntryEditor({ diaryKey, entry, focusTitle, onLock }: DiaryEntryEdi
       markdown: entry.markdown,
       title: entry.title,
     },
-    (nextDraft) => saveMutation.mutate(nextDraft),
+    entrySave.save,
     {
       debounceMs: 400,
-      deps: [entry.entryDate, entry.id, entry.markdown, entry.title],
+      deps: [entry.entryDate, entry.id, entry.markdown, entry.title, entry.version],
     },
   );
   let saveState = t({ en: 'Saved', pl: 'Zapisano' });
-  if (saveMutation.isPending) saveState = t({ en: 'Saving...', pl: 'Zapisywanie...' });
-  if (saveMutation.isError) {
+  if (entrySave.isPending) saveState = t({ en: 'Saving...', pl: 'Zapisywanie...' });
+  if (entrySave.isError) {
     saveState = t({ en: 'Changes could not be saved.', pl: 'Nie udało się zapisać zmian.' });
   }
+  if (entrySave.conflicted) saveState = t({ en: 'Not saved', pl: 'Nie zapisano' });
 
   return (
     <main className={css.page}>
@@ -175,6 +178,12 @@ function DiaryEntryEditor({ diaryKey, entry, focusTitle, onLock }: DiaryEntryEdi
             />
           </h1>
         </header>
+        <DiaryEntryConflict
+          conflicted={entrySave.conflicted}
+          draft={draft}
+          onUseMine={setDraft}
+          saving={entrySave.isPending}
+        />
         <Card as='section' className={css.body}>
           <SeamlessTextarea
             aria-label={t({ en: 'Diary entry', pl: 'Wpis w dzienniku' })}

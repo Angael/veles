@@ -14,6 +14,8 @@ export const diaryEntries = pgTable(
     /** AES-GCM sealed `{ title, markdown }`, encrypted in the browser. Null means empty entry. */
     ciphertext: text('ciphertext'),
     entryDate: date('entry_date', { mode: 'string' }).notNull(),
+    /** Optimistic concurrency token. Each update increments it. */
+    version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
   },

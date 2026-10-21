@@ -1,5 +1,14 @@
 import { sql } from 'drizzle-orm';
-import { boolean, check, index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  check,
+  index,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 import { users } from './auth.schema.ts';
 
 export const notes = pgTable(
@@ -12,6 +21,8 @@ export const notes = pgTable(
     title: text('title').notNull(),
     content: text('content').notNull().default(''),
     shared: boolean('shared').notNull().default(false),
+    /** Optimistic concurrency token. Each title, content, or type change increments it. */
+    version: integer('version').notNull().default(1),
     ownerId: text('owner_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),

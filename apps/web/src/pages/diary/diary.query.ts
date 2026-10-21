@@ -1,12 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import { saveDiaryKey } from '@/lib/diaryKeyVault';
-import { createDiaryEntry, deleteDiaryEntry, setupDiaryKey, updateDiaryEntry } from './diary.api';
+import { createDiaryEntry, deleteDiaryEntry, setupDiaryKey } from './diary.api';
 import { parseDiaryBackup, selectNewBackupEntries } from './diaryBackup';
 import { importDiaryEntries } from './diaryBackup.api';
 import {
   createDiaryKey,
-  type DiaryEntryContent,
   type DiaryKeyRecord,
   encryptDiaryEntry,
   unlockDiaryKey,
@@ -14,11 +13,6 @@ import {
 import type { DiaryEntrySummary } from './useDecryptedEntries';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { pluralEn, pluralPl } from '@/lib/i18n/locale';
-
-type DiaryEntryDraft = DiaryEntryContent & {
-  entryDate: string;
-  id: string;
-};
 
 type PassphraseInput = {
   passphrase: string;
@@ -31,16 +25,6 @@ export function useCreateDiaryEntryMutation() {
 
 export function useDeleteDiaryEntryMutation() {
   return useMutation({ mutationFn: deleteDiaryEntry });
-}
-
-/** Encrypts the draft in the browser before it is sent to the server. */
-export function useUpdateDiaryEntryMutation(key: CryptoKey) {
-  return useMutation({
-    mutationFn: async ({ entryDate, id, markdown, title }: DiaryEntryDraft) =>
-      updateDiaryEntry({
-        data: { ciphertext: await encryptDiaryEntry(key, id, { markdown, title }), entryDate, id },
-      }),
-  });
 }
 
 /** Unlocks the diary with an existing key record, or creates and stores a new one. */

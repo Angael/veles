@@ -58,7 +58,19 @@ export function useSetNoteSharedMutation() {
   });
 }
 
-export function useUpdateNoteMutation() {
+/**
+ * Saves note text against the version the editor holds. Saves of one note run in order, and the
+ * next one starts after `onSuccess` stored the new version, so an editor's consecutive saves never
+ * conflict with each other.
+ */
+export function useUpdateNoteMutation(
+  noteId: string,
+  getVersion: () => number,
+  callbacks: {
+    onError: (error: Error) => void;
+    onSuccess: (saved: { content?: string; title?: string; version: number }) => void;
+  },
+) {
   const { t } = useI18n();
 
   return useMutation({
@@ -66,7 +78,12 @@ export function useUpdateNoteMutation() {
       error: { title: t({ en: 'Note could not be saved', pl: 'Nie udało się zapisać notatki' }) },
       invalidateQueryKey: notesQueryKey,
     },
-    mutationFn: (variables: { id: string; title?: string; content?: string }) =>
-      updateNote({ data: variables }),
+    mutationFn: async (variables: { content?: string; title?: string }) => {
+      const saved = await updateNote({ data: { ...variables, id: noteId, version: getVersion() } });
+      return { ...variables, version: saved.version };
+    },
+    // Hook-level callbacks run for every save; `mutate` callbacks would skip all but the last.
+    ...callbacks,
+    scope: { id: `note-${noteId}` },
   });
 }

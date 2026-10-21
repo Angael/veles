@@ -1,6 +1,7 @@
-import { and, asc, eq, inArray, or } from 'drizzle-orm';
+import { and, asc, eq, inArray, or, sql } from 'drizzle-orm';
 import { listItems, notes, userConnections } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
+import { VersionConflictError } from '@/lib/errors/VersionConflictError';
 import { invariant } from '@/lib/invariant';
 import { db, type DbTransaction } from '@/server/db.server';
 import type {
@@ -43,6 +44,18 @@ export function accessibleNote(userId: string, includeShared = true) {
   );
 }
 
+/** Increments a note's concurrency token in the same statement that changes its text or type. */
+export const nextNoteVersion = sql<number>`${notes.version} + 1`;
+
+export function noteVersionConflict() {
+  return new VersionConflictError(
+    translate({
+      en: 'This note changed somewhere else. Load the latest version before you save again.',
+      pl: 'Ta notatka zmieniła się w innym miejscu. Wczytaj najnowszą wersję przed kolejnym zapisem.',
+    }),
+  );
+}
+
 /** Creates a note for the authenticated owner. */
 export async function createNoteRecord(userId: string, data: typeof createNoteInputType.infer) {
   const [created] = await db
@@ -53,26 +66,39 @@ export async function createNoteRecord(userId: string, data: typeof createNoteIn
       title: data.title,
       type: data.type,
     })
-    .returning({ id: notes.id });
+    .returning({ id: notes.id, version: notes.version });
 
   invariant(created, 'Note could not be created.');
   return created;
 }
 
-/** Edits note content within the caller's scope. */
+/**
+ * Edits note text within the caller's scope only when `data.version` is still current. The version
+ * check and increment run in one UPDATE, so of two writers that loaded the same version exactly one
+ * wins; the other gets a `VersionConflictError` and the stored note stays unchanged.
+ */
 export async function updateNoteRecord(
   userId: string,
   data: typeof updateNoteInputType.infer,
   includeShared = false,
 ) {
+  const scope = and(eq(notes.id, data.id), accessibleNote(userId, includeShared));
   const [updated] = await db
     .update(notes)
-    .set({ title: data.title, content: data.content, updatedAt: new Date() })
-    .where(and(eq(notes.id, data.id), accessibleNote(userId, includeShared)))
-    .returning({ id: notes.id });
+    .set({
+      title: data.title,
+      content: data.content,
+      updatedAt: new Date(),
+      version: nextNoteVersion,
+    })
+    .where(and(scope, eq(notes.version, data.version)))
+    .returning({ version: notes.version });
 
-  if (!updated)
-    throw new ClientSafeError(translate({ en: 'Note not found.', pl: 'Nie znaleziono notatki.' }));
+  if (updated) return updated;
+
+  const [existing] = await db.select({ id: notes.id }).from(notes).where(scope).limit(1);
+  if (existing) throw noteVersionConflict();
+  throw new ClientSafeError(translate({ en: 'Note not found.', pl: 'Nie znaleziono notatki.' }));
 }
 
 /** Deletes an owned note and its cascading list items. */
@@ -119,6 +145,7 @@ export async function convertNoteType(
         content: items.map((item) => item.name).join('\n'),
         type: 'note',
         updatedAt: new Date(),
+        version: nextNoteVersion,
       })
       .where(eq(notes.id, noteId));
     await tx.delete(listItems).where(eq(listItems.noteId, noteId));
@@ -129,7 +156,12 @@ export async function convertNoteType(
       .filter(Boolean);
     await tx
       .update(notes)
-      .set({ content: '', type: 'shopping_list', updatedAt: new Date() })
+      .set({
+        content: '',
+        type: 'shopping_list',
+        updatedAt: new Date(),
+        version: nextNoteVersion,
+      })
       .where(eq(notes.id, noteId));
     if (names.length) {
       await tx.insert(listItems).values(names.map((name) => ({ name, noteId })));

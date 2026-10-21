@@ -7,8 +7,9 @@ import { Card } from '@/components/ui/card/Card';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
 import { listItemsCollection, useListItemsCollection } from './listItems.collection';
 import { NoteActions } from './NoteActions';
+import { NoteConflictNotice } from './NoteConflictNotice';
 import type { NoteListItem, NoteSummary } from './notes.api';
-import { useUpdateNoteMutation } from './notes.query';
+import { useNoteDraft } from './useNoteDraft';
 import css from './TodosPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
@@ -16,7 +17,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
   const { t } = useI18n();
   const [newItemId, setNewItemId] = useState<string | null>(null);
   const listItems = useListItemsCollection();
-  const updateNote = useUpdateNoteMutation();
+  const noteDraft = useNoteDraft(note);
   // Live query: re-runs incrementally whenever a row in the collection changes, including
   // optimistic writes from this card, another card, or a background refetch.
   // No dependency array: TanStack DB derives the query identity, including `note.id`, from the query.
@@ -52,13 +53,12 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
           <SeamlessTextInput
             aria-label={t({ en: 'Checklist title', pl: 'Tytuł listy' })}
             className={css.titleInput}
-            defaultValue={note.title}
             enterKeyHint='next'
             maxLength={160}
-            onBlur={(event) => {
-              const title = event.currentTarget.value.trim();
-              if (!title) event.currentTarget.value = note.title;
-              else if (title !== note.title) updateNote.mutate({ id: note.id, title });
+            onBlur={noteDraft.saveTitle}
+            onChange={(event) => {
+              const title = event.currentTarget.value;
+              noteDraft.setDraft((current) => ({ ...current, title }));
             }}
             onKeyDown={(event) => {
               if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
@@ -67,10 +67,12 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
               }
             }}
             required
+            value={noteDraft.draft.title}
           />
         </h2>
         <NoteActions note={note} />
       </div>
+      <NoteConflictNotice noteDraft={noteDraft} />
       {items.length === 0 ? (
         <p className={css.emptyList}>{t({ en: 'No items yet.', pl: 'Brak pozycji.' })}</p>
       ) : null}

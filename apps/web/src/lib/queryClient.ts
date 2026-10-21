@@ -1,5 +1,6 @@
 import { MutationCache, QueryClient, type QueryKey } from '@tanstack/react-query';
 import { toastManager } from '@/components/ui/toast/toastManager';
+import { isVersionConflictError } from '@/lib/errors/VersionConflictError';
 
 type MutationNotification = {
   id?: string;
@@ -28,8 +29,9 @@ export function createQueryClient() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
     mutationCache: new MutationCache({
-      onError: (_error, _variables, _onMutateResult, mutation) => {
-        if (mutation.meta?.error) {
+      onError: (error, _variables, _onMutateResult, mutation) => {
+        // The editor that sent a stale version explains the conflict itself.
+        if (mutation.meta?.error && !isVersionConflictError(error)) {
           addMutationToast('error', mutation.meta.error);
         }
       },
