@@ -3,6 +3,8 @@ import { sessionUserQueryKey } from '@/lib/auth/session.query';
 import { apiKey, signOut } from '@/lib/auth/client';
 import type { AgentFeature } from '@/lib/agentAccess';
 import { clearDiaryKey } from '@/lib/diaryKeyVault';
+import { translate } from '@/lib/i18n/getLocale';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 import {
   getAgentPermissions,
   setAllAgentPermissions,
@@ -93,7 +95,11 @@ export function useDisconnectUserMutation() {
 
 /** Better Auth's client returns `{ data, error }`; React Query needs a throw. */
 function unwrap<T>({ data, error }: { data: T | null; error: { message?: string } | null }) {
-  if (error || data === null) throw new Error(error?.message ?? 'Request failed');
+  if (error || data === null) {
+    throw new Error(
+      error?.message ?? translate({ en: 'Request failed', pl: 'Żądanie nie powiodło się' }),
+    );
+  }
   return data;
 }
 
@@ -115,9 +121,17 @@ export function useCreateApiKeyMutation() {
 }
 
 export function useDeleteApiKeyMutation() {
+  const { t } = useI18n();
+
   return useMutation({
     meta: {
-      error: { title: 'Could not revoke the key', message: 'The key still works. Try again.' },
+      error: {
+        title: t({ en: 'Could not revoke the key', pl: 'Nie udało się unieważnić klucza' }),
+        message: t({
+          en: 'The key still works. Try again.',
+          pl: 'Klucz nadal działa. Spróbuj ponownie.',
+        }),
+      },
       invalidateQueryKey: apiKeysQueryKey,
     },
     mutationFn: async (keyId: string) => unwrap(await apiKey.delete({ keyId })),

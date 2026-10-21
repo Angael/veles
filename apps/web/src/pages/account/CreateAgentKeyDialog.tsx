@@ -13,6 +13,7 @@ import {
 import { Label } from '@/components/ui/label/Label';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 import { useCreateApiKeyMutation } from './account.query';
 import { AgentSetupGuide } from './AgentSetupGuide';
 import css from './AgentAccessCard.module.css';
@@ -23,6 +24,7 @@ interface CreateAgentKeyDialogProps {
 
 /** Names a new key, then shows its one-time setup prompt; closing the dialog forgets the key. */
 export function CreateAgentKeyDialog({ userName }: CreateAgentKeyDialogProps) {
+  const { t } = useI18n();
   const [newKey, setNewKey] = useState<string | null>(null);
   const createMutation = useCreateApiKeyMutation();
 
@@ -35,28 +37,35 @@ export function CreateAgentKeyDialog({ userName }: CreateAgentKeyDialogProps) {
       }}
     >
       <DialogTrigger render={<Btn icon={<PlusIcon aria-hidden='true' />} size='sm' />}>
-        New key
+        {t({ en: 'New key', pl: 'Nowy klucz' })}
       </DialogTrigger>
       <DialogPopup>
         {newKey ? (
           <>
             <div className={css.dialogHead}>
-              <DialogTitle>Key created</DialogTitle>
+              <DialogTitle>{t({ en: 'Key created', pl: 'Klucz utworzony' })}</DialogTitle>
               <DialogDescription>
-                It is shown only once. Send this prompt to your AI agent, or to the person who runs
-                it.
+                {t({
+                  en: 'It is shown only once. Send this prompt to your AI agent, or to the person who runs it.',
+                  pl: 'Zobaczysz go tylko raz. Wyślij ten prompt do swojego agenta AI albo do osoby, która go obsługuje.',
+                })}
               </DialogDescription>
             </div>
             <AgentSetupGuide apiKey={newKey} userName={userName} />
             <DialogActions>
-              <DialogClose render={<Btn />}>Done</DialogClose>
+              <DialogClose render={<Btn />}>{t({ en: 'Done', pl: 'Gotowe' })}</DialogClose>
             </DialogActions>
           </>
         ) : (
           <>
             <div className={css.dialogHead}>
-              <DialogTitle>New agent key</DialogTitle>
-              <DialogDescription>Name the key after the agent that will use it.</DialogDescription>
+              <DialogTitle>{t({ en: 'New agent key', pl: 'Nowy klucz agenta' })}</DialogTitle>
+              <DialogDescription>
+                {t({
+                  en: 'Name the key after the agent that will use it.',
+                  pl: 'Nazwij klucz tak jak agenta, który będzie go używać.',
+                })}
+              </DialogDescription>
             </div>
             <TypedForm
               className={css.dialogForm}
@@ -65,7 +74,7 @@ export function CreateAgentKeyDialog({ userName }: CreateAgentKeyDialogProps) {
                 setNewKey(created.key);
               }}
             >
-              <Label text='Key name'>
+              <Label text={t({ en: 'Key name', pl: 'Nazwa klucza' })}>
                 <TextInput defaultValue='Vel' maxLength={32} name='name' required />
               </Label>
               {createMutation.error ? (
@@ -74,9 +83,11 @@ export function CreateAgentKeyDialog({ userName }: CreateAgentKeyDialogProps) {
                 </p>
               ) : null}
               <DialogActions>
-                <DialogClose render={<Btn variant='ghost' />}>Cancel</DialogClose>
+                <DialogClose render={<Btn variant='ghost' />}>
+                  {t({ en: 'Cancel', pl: 'Anuluj' })}
+                </DialogClose>
                 <Btn loading={createMutation.isPending} type='submit'>
-                  Create key
+                  {t({ en: 'Create key', pl: 'Utwórz klucz' })}
                 </Btn>
               </DialogActions>
             </TypedForm>

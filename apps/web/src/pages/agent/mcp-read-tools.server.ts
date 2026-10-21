@@ -39,7 +39,7 @@ export function registerReadTools(
         account: ownerName,
         features: agentFeatureNames.map((feature) => ({
           feature,
-          label: agentFeatures[feature].label,
+          label: agentFeatures[feature].label.en,
           ...current[feature],
         })),
       });
