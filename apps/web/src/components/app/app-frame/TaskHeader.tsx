@@ -1,12 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { RouteBackButton } from './RouteBackButton';
 import css from './TaskHeader.module.css';
 
 /**
- * Sticky back + title bar for task routes. An IntersectionObserver flips `data-collapsed` once the
+ * Sticky back + title bar for task routes, with optional actions on the right. An IntersectionObserver flips `data-collapsed` once the
  * page scrolls past the sentinel; CSS then scales the title and fades in the bar.
  */
-export function TaskHeader({ label }: { label?: string }) {
+export function TaskHeader({ actions, title }: { actions?: ReactNode; title?: ReactNode }) {
   const sentinelRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
 
@@ -27,7 +27,8 @@ export function TaskHeader({ label }: { label?: string }) {
       <div aria-hidden='true' className={css.sentinel} ref={sentinelRef} />
       <header className={css.header} ref={headerRef}>
         <RouteBackButton variant='ghost' />
-        {label ? <h1 className={css.title}>{label}</h1> : null}
+        {title ? <h1 className={css.title}>{title}</h1> : null}
+        {actions ? <div className={css.actions}>{actions}</div> : null}
       </header>
     </>
   );
