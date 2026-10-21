@@ -39,7 +39,8 @@
   }
 
   & .energyMeta {
-    margin-left: var(--space-xs);
+    margin-inline-start: var(--space-xs);
+    white-space: nowrap;
   }
 }
 
