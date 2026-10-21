@@ -13,7 +13,7 @@ import { useLongPress } from './useLongPress';
 
 /**
  * Phone bottom dock: the user's pinned destinations with icons and labels, then More with every
- * section. Press and hold the dock (or use More) to choose and reorder the pinned links (#251).
+ * section. Press and hold the dock to choose and reorder the pinned links (#251).
  */
 export function MobileNavbar({ user }: { user: SessionUser | null }) {
   const { t } = useI18n();
@@ -62,12 +62,7 @@ export function MobileNavbar({ user }: { user: SessionUser | null }) {
           );
         })}
         <li>
-          <MobileMoreSheet
-            hiddenItems={rest}
-            items={items}
-            onCustomize={() => setCustomizing(true)}
-            pathname={pathname}
-          />
+          <MobileMoreSheet hiddenItems={rest} items={items} pathname={pathname} />
         </li>
       </ul>
       <MobileNavCustomizer onOpenChange={setCustomizing} open={customizing} prefs={prefs} />

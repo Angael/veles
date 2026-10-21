@@ -9,15 +9,24 @@
     calc(100vw - 1rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
   );
 
-  /* Hold feedback: the dock eases down while a press is held, then the editor opens. */
+  /*
+   * Hold feedback without transform: scaling the dock re-rasterizes it and makes icons jump.
+   * Taps stay still; the glow waits 200ms, then fills the rest of the 500ms hold.
+   */
   -webkit-touch-callout: none;
   user-select: none;
-  transition: transform 160ms ease;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 
-  /* Taps stay still: the shrink waits 200ms, then fills the rest of the 500ms hold. */
   &[data-pressing] {
-    transform: translateX(-50%) scale(0.96);
-    transition: transform 300ms ease 200ms;
+    border-color: var(--c-primary-border);
+    box-shadow:
+      0 18px 48px rgba(2, 6, 23, 0.42),
+      0 0 0 4px var(--c-primary-surface-strong);
+    transition:
+      border-color 300ms ease 200ms,
+      box-shadow 300ms ease 200ms;
   }
 
   @media not (--phone) {

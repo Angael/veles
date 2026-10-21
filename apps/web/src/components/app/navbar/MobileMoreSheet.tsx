@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { LayoutGridIcon, PencilIcon } from 'lucide-react';
+import { LayoutGridIcon } from 'lucide-react';
 import { useState } from 'react';
 import { DialogPopup, DialogRoot, DialogTrigger } from '@/components/ui/dialog/Dialog';
 import { useI18n } from '@/lib/i18n/I18nProvider';
@@ -12,20 +12,14 @@ type MobileMoreSheetProps = {
   items: NavbarItem[];
   /** Sections not pinned to the dock; More looks current while one of them is open. */
   hiddenItems: NavbarItem[];
-  onCustomize: () => void;
   pathname: string;
 };
 
 /**
- * More dock tab and its bottom sheet listing every section, plus the button that opens dock
- * customization. The sheet closes on any route change so browser back never leaves it open.
+ * More dock tab and its bottom sheet listing every section. The sheet closes on any route change
+ * so browser back never leaves it open.
  */
-export function MobileMoreSheet({
-  items,
-  hiddenItems,
-  onCustomize,
-  pathname,
-}: MobileMoreSheetProps) {
+export function MobileMoreSheet({ items, hiddenItems, pathname }: MobileMoreSheetProps) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [openedAt, setOpenedAt] = useState(pathname);
@@ -84,17 +78,6 @@ export function MobileMoreSheet({
             );
           })}
         </ul>
-        <button
-          className={css.edit}
-          onClick={() => {
-            setOpen(false);
-            onCustomize();
-          }}
-          type='button'
-        >
-          <PencilIcon aria-hidden='true' size={14} strokeWidth={2} />
-          {t({ en: 'Edit bottom bar', pl: 'Edytuj dolny pasek' })}
-        </button>
       </DialogPopup>
     </DialogRoot>
   );
