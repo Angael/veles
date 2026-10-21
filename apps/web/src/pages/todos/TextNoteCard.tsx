@@ -1,50 +1,57 @@
 import { Card } from '@/components/ui/card/Card';
+import { ConflictNotice } from '@/components/ui/conflict-notice/ConflictNotice';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
 import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import { NoteActions } from './NoteActions';
-import { NoteConflictNotice } from './NoteConflictNotice';
 import type { NoteSummary } from './notes.api';
-import { useNoteDraft } from './useNoteDraft';
+import { useNoteSave } from './useNoteSave';
 import css from './TodosPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export function TextNoteCard({ note }: { note: NoteSummary }) {
   const { t } = useI18n();
-  const noteDraft = useNoteDraft(note);
-  const { draft, setDraft } = noteDraft;
+  const noteSave = useNoteSave(note);
 
   return (
-    <Card as='article' className={css.noteCard}>
+    <Card as='article' className={css.noteCard} ref={noteSave.cardRef}>
       <div className={css.cardHeader}>
         <h2>
           <SeamlessTextInput
             aria-label={t({ en: 'Note title', pl: 'Tytuł notatki' })}
             className={css.titleInput}
+            defaultValue={note.title}
+            key={noteSave.inputsKey}
             maxLength={160}
-            onBlur={noteDraft.saveTitle}
-            onChange={(event) => {
-              const title = event.currentTarget.value;
-              setDraft((current) => ({ ...current, title }));
+            onBlur={(event) => {
+              const title = event.currentTarget.value.trim();
+              if (!title) event.currentTarget.value = note.title;
+              else if (title !== note.title) noteSave.save({ title });
             }}
             required
-            value={draft.title}
           />
         </h2>
         <NoteActions note={note} />
       </div>
-      <NoteConflictNotice noteDraft={noteDraft} />
+      {noteSave.conflicted ? (
+        <ConflictNotice
+          className={css.conflict}
+          loading={noteSave.loading}
+          onKeepMine={noteSave.keepMine}
+          onLoadLatest={noteSave.loadLatest}
+        />
+      ) : null}
       <SeamlessTextarea
         aria-label={t({ en: 'Note content', pl: 'Treść notatki' })}
         className={css.contentInput}
+        defaultValue={note.content}
+        key={noteSave.inputsKey}
         maxLength={16000}
-        onBlur={noteDraft.saveContent}
-        onChange={(event) => {
+        onBlur={(event) => {
           const content = event.currentTarget.value;
-          setDraft((current) => ({ ...current, content }));
+          if (content !== note.content) noteSave.save({ content });
         }}
         placeholder={t({ en: 'Write your note…', pl: 'Napisz notatkę…' })}
         rows={3}
-        value={draft.content}
       />
     </Card>
   );

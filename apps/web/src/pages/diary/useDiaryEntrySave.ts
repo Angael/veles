@@ -1,7 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
+import { useRouter } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 import { isVersionConflictError } from '@/lib/errors/VersionConflictError';
-import { updateDiaryEntry } from './diary.api';
+import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
+import { getDiaryEntryById, updateDiaryEntry } from './diary.api';
 import { type DiaryEntryContent, encryptDiaryEntry } from './diaryCrypto';
 import type { DiaryEntrySummary } from './useDecryptedEntries';
 
@@ -11,16 +13,26 @@ export type DiaryEntryDraft = DiaryEntryContent & {
 };
 
 /**
- * Autosaves diary drafts in order against the loaded version. A conflict stops saving until the
- * latest entry is loaded, so a stale draft never overwrites newer text.
+ * Autosaves diary drafts one at a time against the version the editor loaded. A conflict stops
+ * saving, with no retry, and keeps the draft in the editor until the user loads the latest entry
+ * or keeps the draft and saves it against the latest version.
  */
 export function useDiaryEntrySave(key: CryptoKey, entry: DiaryEntrySummary) {
+  const router = useRouter();
+  const { markDirty, markSaved } = useUnsavedChangesGuard();
+  // The version the next save must match: the loaded one, then each saved one.
   const versionRef = useRef(entry.version);
-  const [conflictAt, setConflictAt] = useState<number | null>(null);
+  const [conflicted, setConflicted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     versionRef.current = entry.version;
   }, [entry.version]);
+
+  useEffect(() => {
+    if (conflicted) markDirty();
+    else markSaved();
+  }, [conflicted, markDirty, markSaved]);
 
   const mutation = useMutation({
     mutationFn: async (draft: DiaryEntryDraft) => {
@@ -38,20 +50,37 @@ export function useDiaryEntrySave(key: CryptoKey, entry: DiaryEntrySummary) {
       versionRef.current = version;
     },
     onError: (error) => {
-      if (isVersionConflictError(error)) setConflictAt(entry.version);
+      if (isVersionConflictError(error)) setConflicted(true);
     },
+    // Runs saves in order, so each one sends the version the previous save returned.
     scope: { id: `diary-entry-${entry.id}` },
   });
 
-  // Loading the latest entry changes `entry.version`, which clears the conflict.
-  const conflicted = conflictAt === entry.version;
+  /** Runs a conflict resolution; when it fails, the conflict stays. */
+  const resolve = (action: () => Promise<void>) => {
+    setLoading(true);
+    void action()
+      .then(() => setConflicted(false))
+      .catch(() => undefined)
+      .finally(() => setLoading(false));
+  };
 
   return {
     conflicted,
     isError: mutation.isError && !isVersionConflictError(mutation.error),
     isPending: mutation.isPending,
+    loading: loading || mutation.isPending,
     save: (draft: DiaryEntryDraft) => {
       if (!conflicted) mutation.mutate(draft);
     },
+    /** Reloads the route; the new `entry.version` resets the editor to the latest entry. */
+    loadLatest: () => resolve(() => router.invalidate()),
+    /** Saves the kept draft over the latest version, at the user's request. */
+    keepMine: (draft: DiaryEntryDraft) =>
+      resolve(async () => {
+        const latest = await getDiaryEntryById({ data: { id: entry.id } });
+        versionRef.current = latest.entry.version;
+        await mutation.mutateAsync(draft);
+      }),
   };
 }

@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { v7 as uuidv7 } from 'uuid';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
+import { ConflictNotice } from '@/components/ui/conflict-notice/ConflictNotice';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
 import { listItemsCollection, useListItemsCollection } from './listItems.collection';
 import { NoteActions } from './NoteActions';
-import { NoteConflictNotice } from './NoteConflictNotice';
 import type { NoteListItem, NoteSummary } from './notes.api';
-import { useNoteDraft } from './useNoteDraft';
+import { useNoteSave } from './useNoteSave';
 import css from './TodosPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
@@ -17,7 +17,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
   const { t } = useI18n();
   const [newItemId, setNewItemId] = useState<string | null>(null);
   const listItems = useListItemsCollection();
-  const noteDraft = useNoteDraft(note);
+  const noteSave = useNoteSave(note);
   // Live query: re-runs incrementally whenever a row in the collection changes, including
   // optimistic writes from this card, another card, or a background refetch.
   // No dependency array: TanStack DB derives the query identity, including `note.id`, from the query.
@@ -47,18 +47,20 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
   };
 
   return (
-    <Card as='article' className={css.listCard}>
+    <Card as='article' className={css.listCard} ref={noteSave.cardRef}>
       <div className={css.cardHeader}>
         <h2>
           <SeamlessTextInput
             aria-label={t({ en: 'Checklist title', pl: 'Tytuł listy' })}
             className={css.titleInput}
+            defaultValue={note.title}
             enterKeyHint='next'
+            key={noteSave.inputsKey}
             maxLength={160}
-            onBlur={noteDraft.saveTitle}
-            onChange={(event) => {
-              const title = event.currentTarget.value;
-              noteDraft.setDraft((current) => ({ ...current, title }));
+            onBlur={(event) => {
+              const title = event.currentTarget.value.trim();
+              if (!title) event.currentTarget.value = note.title;
+              else if (title !== note.title) noteSave.save({ title });
             }}
             onKeyDown={(event) => {
               if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
@@ -67,12 +69,18 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
               }
             }}
             required
-            value={noteDraft.draft.title}
           />
         </h2>
         <NoteActions note={note} />
       </div>
-      <NoteConflictNotice noteDraft={noteDraft} />
+      {noteSave.conflicted ? (
+        <ConflictNotice
+          className={css.conflict}
+          loading={noteSave.loading}
+          onKeepMine={noteSave.keepMine}
+          onLoadLatest={noteSave.loadLatest}
+        />
+      ) : null}
       {items.length === 0 ? (
         <p className={css.emptyList}>{t({ en: 'No items yet.', pl: 'Brak pozycji.' })}</p>
       ) : null}

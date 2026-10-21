@@ -2,6 +2,7 @@ import { useNavigate, useRouter } from '@tanstack/react-router';
 import { LockIcon, Trash2Icon } from 'lucide-react';
 import { useMemo } from 'react';
 import { Card } from '@/components/ui/card/Card';
+import { ConflictNotice } from '@/components/ui/conflict-notice/ConflictNotice';
 import { Btn } from '@/components/ui/btn/Btn';
 import { DateInput } from '@/components/ui/date-input/DateInput';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
@@ -13,7 +14,6 @@ import type { DiaryKeyRecord } from './diaryCrypto';
 import { DiaryLockGate } from './DiaryLockGate';
 import { type DiaryEntrySummary, useDecryptedEntries } from './useDecryptedEntries';
 import { useDiaryEntrySave } from './useDiaryEntrySave';
-import { DiaryEntryConflict } from './DiaryEntryConflict';
 import css from './DiaryEntryPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
@@ -174,12 +174,14 @@ function DiaryEntryEditor({ diaryKey, entry, onLock }: DiaryEntryEditorProps) {
             />
           </h1>
         </header>
-        <DiaryEntryConflict
-          conflicted={entrySave.conflicted}
-          draft={draft}
-          onUseMine={setDraft}
-          saving={entrySave.isPending}
-        />
+        {entrySave.conflicted ? (
+          <ConflictNotice
+            className={css.conflict}
+            loading={entrySave.loading}
+            onKeepMine={() => entrySave.keepMine(draft)}
+            onLoadLatest={entrySave.loadLatest}
+          />
+        ) : null}
         <Card as='section' className={css.body}>
           <SeamlessTextarea
             aria-label={t({ en: 'Diary entry', pl: 'Wpis w dzienniku' })}

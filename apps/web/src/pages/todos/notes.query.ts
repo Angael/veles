@@ -10,6 +10,8 @@ import {
 } from './notes.api';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
+type NoteTextChanges = { content?: string; title?: string };
+
 export const notesQueryKey = ['notes'] as const;
 
 /** Notes are shared between users, so keep them fresh: refetch on focus and poll while visible. */
@@ -63,8 +65,8 @@ export function useUpdateNoteMutation(
   noteId: string,
   getVersion: () => number,
   callbacks: {
-    onError: (error: Error) => void;
-    onSuccess: (saved: { content?: string; title?: string; version: number }) => void;
+    onError: (error: Error, changes: NoteTextChanges) => void;
+    onSuccess: (saved: { version: number }) => void;
   },
 ) {
   const { t } = useI18n();
@@ -74,10 +76,8 @@ export function useUpdateNoteMutation(
       error: { title: t({ en: 'Note could not be saved', pl: 'Nie udało się zapisać notatki' }) },
       invalidateQueryKey: notesQueryKey,
     },
-    mutationFn: async (variables: { content?: string; title?: string }) => {
-      const saved = await updateNote({ data: { ...variables, id: noteId, version: getVersion() } });
-      return { ...variables, version: saved.version };
-    },
+    mutationFn: (changes: NoteTextChanges) =>
+      updateNote({ data: { ...changes, id: noteId, version: getVersion() } }),
     // Hook-level callbacks run for every save; `mutate` callbacks would skip all but the last.
     ...callbacks,
     scope: { id: `note-${noteId}` },
