@@ -156,7 +156,6 @@ function DiaryList({ diaryKey, encryptedEntries, onLock }: DiaryListProps) {
               onSuccess: (entry) => {
                 void navigate({
                   params: { id: entry.id },
-                  search: { created: '1' },
                   to: '/diary/$id',
                 })
                   .then(() => router.invalidate())

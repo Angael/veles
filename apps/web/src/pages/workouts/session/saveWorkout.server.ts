@@ -13,6 +13,7 @@ import {
   toSetColumns,
 } from '../workouts.server';
 import type { saveWorkoutInputType } from '../workouts.validation';
+import { workoutMovePatch } from './moveWorkout';
 
 type SaveWorkoutInput = typeof saveWorkoutInputType.infer;
 
@@ -61,12 +62,13 @@ export async function saveWorkoutRecord(userId: string, data: SaveWorkoutInput) 
     let finished = !opening;
 
     if (data.id) {
-      workoutId = (await requireOwnedWorkout(tx, userId, data.id)).id;
+      const workout = await requireOwnedWorkout(tx, userId, data.id);
+      workoutId = workout.id;
       if (opening) await requireNoOpenWorkout(tx, userId, workoutId);
       const [updated] = await tx
         .update(workoutSessions)
         .set({
-          ...(data.date ? { date: data.date } : {}),
+          ...(data.date ? workoutMovePatch(workout, data.date, defaultWorkoutName) : null),
           ...(data.name?.trim() ? { name: data.name.trim() } : {}),
           ...(data.routineId === undefined ? {} : { routineId: routine?.id ?? null }),
           ...(data.finished === undefined ? {} : { endedAt: data.finished ? now : null }),
