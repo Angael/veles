@@ -8,6 +8,7 @@ import { CalendarDaysIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-reac
 import type { CalorieDashboard, CalorieDashboardDay } from '../calories.api';
 import { calorieDashboardQueryOptions } from '../calories.query';
 import { CalorieOverview } from './CalorieOverview';
+import { useCaloriesReturnScrollOrigin } from '../caloriesReturnScroll';
 import { CALORIE_DATE_FORMAT, calorieWeekDates, calorieWeekStart } from '../calorieHelpers';
 import { todayLocalDate } from '@/lib/dateOnly';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -20,6 +21,7 @@ export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
   const { dateLocale, t } = useI18n();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  useCaloriesReturnScrollOrigin();
   const todayDate = todayLocalDate();
   const today = parseISO(todayDate);
   const selectedDay = dashboard.days.find((day) => day.date === date);

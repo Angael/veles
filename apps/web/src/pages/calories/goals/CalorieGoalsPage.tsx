@@ -1,6 +1,7 @@
 import type { UseNavigateResult } from '@tanstack/react-router';
 import { useState } from 'react';
 import type { CalorieGoal } from '../calories.api';
+import { caloriesReturnState } from '../caloriesReturnScroll';
 import { useSetDailyCalorieGoalMutation } from '../calories.query';
 import { todayLocalDate } from '@/lib/dateOnly';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -49,7 +50,12 @@ export function CalorieGoalsPage({
       fat: formData.optionalNumber('fat'),
       carbs: formData.optionalNumber('carbs'),
     });
-    await navigate({ replace: true, search: { date }, to: '/calories' });
+    await navigate({
+      replace: true,
+      search: { date },
+      state: caloriesReturnState(date),
+      to: '/calories',
+    });
   }
 
   function applyPercentages(nextPercentages: MacroPercentages) {

@@ -5,6 +5,7 @@ import { routerWithDbClient } from '@tanstack/react-router-with-db';
 import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
 import { NotFound } from '@/components/app/not-found/NotFound';
 import { createQueryClient } from '@/lib/queryClient';
+import { scrollRestorationKey } from '@/lib/routing/scrollRestorationKey';
 import { routeTree } from './routeTree.gen';
 
 export function getRouter() {
@@ -20,6 +21,7 @@ export function getRouter() {
     defaultErrorComponent: DefaultCatchBoundary,
     defaultNotFoundComponent: () => <NotFound />,
     scrollRestoration: true,
+    getScrollRestorationKey: scrollRestorationKey,
   });
 
   setupRouterSsrQueryIntegration({
