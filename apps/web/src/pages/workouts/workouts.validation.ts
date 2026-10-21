@@ -23,6 +23,7 @@ export const startWorkoutInputType = type({ date: dateOnlyType });
 
 export const updateWorkoutInputType = type({
   id: 'string.uuid',
+  'date?': dateOnlyType,
   'name?': name,
   'finished?': 'boolean',
 });
