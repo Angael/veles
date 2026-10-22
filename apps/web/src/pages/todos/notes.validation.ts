@@ -1,12 +1,16 @@
 import { type } from 'arktype';
 
-const itemNameType = 'string.trim |> 0 < string <= 240';
+// Item names may be empty, so a new row can stay blank until the user types its name.
+// They are single-line: list to note conversion joins names with newlines, so line breaks become spaces.
+const itemNameType = type('string')
+  .pipe((name) => name.replace(/\s*[\r\n]+\s*/g, ' ').trim())
+  .to('string <= 240');
 
 export const createNoteInputType = type({
   '+': 'reject',
   content: 'string <= 16000',
   // Initial checklist rows, so a list is created with its items in one transaction.
-  'items?': type(itemNameType).array().atMostLength(200),
+  'items?': itemNameType.array().atMostLength(200),
   title: 'string.trim |> 0 < string <= 160',
   type: "'note' | 'shopping_list'",
 });
@@ -28,14 +32,14 @@ export const createListItemInputType = type({
   '+': 'reject',
   // Client-generated UUIDv7 so optimistic rows keep their identity; the DB default fills it when omitted.
   'id?': 'string.uuid',
-  name: 'string.trim |> 0 < string <= 240',
+  name: itemNameType,
   noteId: 'string.uuid',
 });
 
 export const updateListItemInputType = type({
   '+': 'reject',
   id: 'string.uuid',
-  name: 'string.trim |> 0 < string <= 240',
+  name: itemNameType,
 });
 
 export const setListItemCheckedInputType = type({
@@ -56,7 +60,7 @@ export const saveNoteInputType = type({
   'shared?': 'boolean',
   'items?': {
     '+': 'reject',
-    'add?': type(itemNameType).array().atMostLength(200),
+    'add?': itemNameType.array().atMostLength(200),
     'update?': type({
       '+': 'reject',
       id: 'string.uuid',
