@@ -30,7 +30,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
   });
 
   /**
-   * Appends a placeholder item and focuses it at once. The client picks the id, so the row
+   * Appends an empty item and focuses it at once. The client picks the id, so the row
    * exists before the server answers; no pending state and no waiting for the created id.
    */
   const addItem = () => {
@@ -39,7 +39,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
       checked: false,
       createdAt: new Date().toISOString(),
       id,
-      name: t({ en: 'New item', pl: 'Nowa pozycja' }),
+      name: '',
       noteId: note.id,
     });
     setNewItemId(id);
@@ -118,11 +118,19 @@ function CheckedNoteItem({
       <input
         aria-label={
           item.checked
-            ? t({
-                en: `Mark ${item.name} as incomplete`,
-                pl: `Oznacz ${item.name} jako niezrobione`,
-              })
-            : t({ en: `Mark ${item.name} as complete`, pl: `Oznacz ${item.name} jako zrobione` })
+            ? t(
+                item.name
+                  ? {
+                      en: `Mark ${item.name} as incomplete`,
+                      pl: `Oznacz ${item.name} jako niezrobione`,
+                    }
+                  : { en: 'Mark item as incomplete', pl: 'Oznacz pozycję jako niezrobioną' },
+              )
+            : t(
+                item.name
+                  ? { en: `Mark ${item.name} as complete`, pl: `Oznacz ${item.name} jako zrobione` }
+                  : { en: 'Mark item as complete', pl: 'Oznacz pozycję jako zrobioną' },
+              )
         }
         checked={item.checked}
         onChange={(event) => {
@@ -140,7 +148,6 @@ function CheckedNoteItem({
         defaultValue={item.name}
         enterKeyHint='next'
         maxLength={240}
-        onFocus={autoFocus ? (event) => event.currentTarget.select() : undefined}
         onKeyDown={(event) => {
           if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
             event.preventDefault();
@@ -155,17 +162,20 @@ function CheckedNoteItem({
         }}
         onBlur={(event) => {
           const name = event.currentTarget.value.trim();
-          if (!name) event.currentTarget.value = item.name;
-          else if (name !== item.name) {
+          if (name !== item.name) {
             listItems.update(item.id, (draft) => {
               draft.name = name;
             });
           }
         }}
-        required
+        placeholder={t({ en: 'List item', pl: 'Pozycja listy' })}
       />
       <Btn
-        aria-label={t({ en: `Delete ${item.name}`, pl: `Usuń: ${item.name}` })}
+        aria-label={t(
+          item.name
+            ? { en: `Delete ${item.name}`, pl: `Usuń: ${item.name}` }
+            : { en: 'Delete item', pl: 'Usuń pozycję' },
+        )}
         className={css.deleteItem}
         icon={<Trash2Icon aria-hidden='true' />}
         iconOnly
