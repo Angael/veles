@@ -276,6 +276,33 @@
   font-variant-numeric: tabular-nums;
 }
 
+.layout > .mealPlan {
+  grid-column: 1 / -1;
+}
+
+.planPreview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: grid;
+    gap: 0.125rem;
+    padding: var(--space-sm);
+    border: var(--border-width) solid var(--c-border);
+    border-radius: var(--radius-xs);
+    color: var(--c-text-strong);
+  }
+
+  span {
+    color: var(--c-accent);
+    font-size: var(--text-sm);
+  }
+}
+
 @media (--laptop) {
   .layout {
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -303,7 +330,8 @@
   .hero,
   .feature,
   .weight,
-  .food {
+  .food,
+  .layout > .mealPlan {
     grid-column: span 1;
     grid-row: auto;
   }
