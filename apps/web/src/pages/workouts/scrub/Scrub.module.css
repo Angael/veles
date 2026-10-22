@@ -103,19 +103,8 @@
 }
 
 /* Pins the decimal point near the centre, so whole numbers don't shift when a fraction appears. */
-.anchored {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  align-items: baseline;
-}
-
-.whole {
-  text-align: end;
-}
-
-.fraction {
-  text-align: start;
-  white-space: nowrap;
+.padDigits {
+  opacity: 0.45;
 }
 
 /* Typing in place: a plain text field, so the browser handles caret, selection and scroll. */

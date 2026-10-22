@@ -1,40 +1,34 @@
-import type { ReactNode } from 'react';
 import type { ScrubTier } from './useScrub';
 import css from './Scrub.module.css';
 
-/** True when the smallest step makes decimals, e.g. 0.5 kg; reps and time stay whole. */
-export const hasFraction = (tiers: ScrubTier[]) =>
-  tiers.some((tier) => !Number.isInteger(tier.step));
+/** Most decimal digits any step makes, e.g. 1 for 0.5 kg; 0 for reps and time. */
+export const stepDecimals = (tiers: ScrubTier[]) =>
+  Math.max(0, ...tiers.map((tier) => String(tier.step).split('.')[1]?.length ?? 0));
 
 /**
- * Formatted number pinned at its decimal point: the whole part ends at a fixed spot and the
- * fraction and unit follow it. So 20 → 20.5 → 21 keeps "20" still, and "20 kg" stays tight.
+ * Formatted number padded with greyed zeros to the decimals the steps can make, so
+ * 20 → 20.5 → 21 shows as 20.0 → 20.5 → 21.0 and its width does not jump.
  */
 export function ScrubNumber({
-  fraction,
-  suffix,
-  text,
+  decimals,
+  format,
+  value,
 }: {
-  fraction: boolean;
-  suffix?: ReactNode;
-  text: string;
+  decimals: number;
+  format: (value: number) => string;
+  value: number;
 }) {
-  const match = fraction ? /^(.*?)([.,]\d*)?$/.exec(text) : null;
-  if (!match) {
-    return (
-      <>
-        {text}
-        {suffix}
-      </>
-    );
-  }
+  const text = format(value);
+  if (decimals === 0) return text;
+  // Read the locale's decimal separator from the formatter itself ("0.5" or "0,5").
+  const separator = format(0.5).replace(/\d/g, '') || '.';
+  const shown = text.split(separator)[1]?.length ?? 0;
+  if (shown >= decimals) return text;
+  const pad = '0'.repeat(decimals - shown);
   return (
-    <span className={css.anchored}>
-      <span className={css.whole}>{match[1]}</span>
-      <span className={css.fraction}>
-        {match[2]}
-        {suffix}
-      </span>
-    </span>
+    <>
+      {text}
+      <span className={css.padDigits}>{shown === 0 ? separator + pad : pad}</span>
+    </>
   );
 }

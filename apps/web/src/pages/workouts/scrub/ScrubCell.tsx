@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { hasFraction, ScrubNumber } from './ScrubNumber';
+import { ScrubNumber, stepDecimals } from './ScrubNumber';
 import { useScrub, type ScrubOptions } from './useScrub';
 import css from './Scrub.module.css';
 
@@ -103,11 +103,10 @@ export function ScrubCell({
         {shown === null ? (
           unitLabel
         ) : (
-          <ScrubNumber
-            fraction={hasFraction(options.tiers)}
-            suffix={unitLabel}
-            text={format(shown)}
-          />
+          <>
+            <ScrubNumber decimals={stepDecimals(options.tiers)} format={format} value={shown} />
+            {unitLabel}
+          </>
         )}
       </span>
       <ChevronRightIcon aria-hidden='true' className={css.hintChevron} />
