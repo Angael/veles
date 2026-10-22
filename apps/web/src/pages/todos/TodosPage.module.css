@@ -105,6 +105,11 @@
 .itemName {
   padding-block: calc((2.5rem - 1lh) / 2);
   overflow-wrap: anywhere;
+
+  /* Pulls the focus ring in past the row padding so it hugs the text. */
+  &:focus-visible {
+    outline-offset: calc((1lh - 2.5rem) / 2 + 0.125rem);
+  }
 }
 
 .item input[type='checkbox']:focus-visible {
