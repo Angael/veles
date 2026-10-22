@@ -808,6 +808,18 @@ export const foodProductSeeds: FoodProductSeed[] = [
     fatPer100gHundredths: 57,
     carbsPer100gHundredths: 1_530,
   },
+  // USDA SR Legacy, FDC 169941.
+  {
+    seedKey: 'persimmon',
+    barcode: null,
+    name_en: 'Persimmon (kaki)',
+    name_pl: 'Owoc kaki (persymona)',
+    productSizeGramsHundredths: 16_800,
+    kcalPer100gHundredths: 7_000,
+    proteinPer100gHundredths: 58,
+    fatPer100gHundredths: 19,
+    carbsPer100gHundredths: 1_859,
+  },
   {
     seedKey: 'mandarin',
     barcode: null,
