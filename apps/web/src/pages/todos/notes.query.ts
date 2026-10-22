@@ -43,13 +43,22 @@ export function useCreateNoteMutation() {
   });
 }
 
-/** Converting a note creates or removes list items on the server, so the collection refetches. */
-export function useToggleNoteTypeMutation() {
+/**
+ * Converts a note against the card's version, queued after its pending text saves. Converting
+ * creates or removes list items on the server, so the collection refetches.
+ */
+export function useToggleNoteTypeMutation(
+  noteId: string,
+  getVersion: () => number,
+  onError: (error: Error) => void,
+) {
   const listItems = useListItemsCollection();
   return useMutation({
     meta: { invalidateQueryKey: notesQueryKey },
-    mutationFn: (variables: { id: string }) => toggleNoteType({ data: variables }),
+    mutationFn: () => toggleNoteType({ data: { id: noteId, version: getVersion() } }),
+    onError,
     onSuccess: () => listItems.utils.refetch(),
+    scope: { id: `note-${noteId}` },
   });
 }
 
@@ -70,13 +79,13 @@ export function useSetNoteSharedMutation() {
   });
 }
 
-/** Saves note text against the editor's version; saves of one note run in order. */
+/** Saves note text against the editor's version; saves and type changes of one note run in order. */
 export function useUpdateNoteMutation(
   noteId: string,
   getVersion: () => number,
   callbacks: {
     onError: (error: Error, changes: NoteTextChanges) => void;
-    onSuccess: (saved: { version: number }) => void;
+    onSuccess: (saved: { version: number }, changes: NoteTextChanges) => void;
   },
 ) {
   const { t } = useI18n();

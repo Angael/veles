@@ -102,7 +102,7 @@ describe('updateNoteRecord', () => {
 
   it('advances the version when a type change rewrites the content', async () => {
     const note = await createNote();
-    await toggleNoteTypeRecord('owner', { id: note.id });
+    await toggleNoteTypeRecord('owner', { id: note.id, version: note.version });
 
     await expect(
       updateNoteRecord('owner', { id: note.id, title: 'Stale', version: note.version }),

@@ -26,7 +26,11 @@ export const deleteNoteInputType = type({ '+': 'reject', id: 'string.uuid' });
 
 export const setNoteSharedInputType = type({ '+': 'reject', id: 'string.uuid', shared: 'boolean' });
 
-export const toggleNoteTypeInputType = type({ '+': 'reject', id: 'string.uuid' });
+export const toggleNoteTypeInputType = type({
+  '+': 'reject',
+  id: 'string.uuid',
+  version: noteVersionType,
+});
 
 export const createListItemInputType = type({
   '+': 'reject',

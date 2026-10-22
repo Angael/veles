@@ -148,7 +148,7 @@ export async function convertNoteType(
   }
 }
 
-/** Converts a note and its items atomically within the caller's scope. */
+/** Converts a note and its items atomically within the caller's scope, only if `data.version` is current. */
 export async function toggleNoteTypeRecord(
   userId: string,
   data: typeof toggleNoteTypeInputType.infer,
@@ -156,7 +156,7 @@ export async function toggleNoteTypeRecord(
 ) {
   await db.transaction(async (tx) => {
     const [note] = await tx
-      .select({ content: notes.content, type: notes.type })
+      .select({ content: notes.content, type: notes.type, version: notes.version })
       .from(notes)
       .where(and(eq(notes.id, data.id), accessibleNote(userId, includeShared)))
       .for('update');
@@ -165,6 +165,7 @@ export async function toggleNoteTypeRecord(
       throw new ClientSafeError(
         translate({ en: 'Note not found.', pl: 'Nie znaleziono notatki.' }),
       );
+    if (note.version !== data.version) throw noteVersionConflict();
 
     await convertNoteType(tx, data.id, note);
   });

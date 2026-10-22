@@ -4,11 +4,10 @@ import { useState } from 'react';
 import { v7 as uuidv7 } from 'uuid';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
-import { ConflictNotice } from '@/components/ui/conflict-notice/ConflictNotice';
-import { UnsavedCopy } from '@/components/ui/conflict-notice/UnsavedCopy';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
 import { listItemsCollection, useListItemsCollection } from './listItems.collection';
 import { NoteActions } from './NoteActions';
+import { NoteConflict } from './NoteConflict';
 import type { NoteListItem, NoteSummary } from './notes.api';
 import { useNoteSave } from './useNoteSave';
 import css from './TodosPage.module.css';
@@ -48,7 +47,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
   };
 
   return (
-    <Card as='article' className={css.listCard} ref={noteSave.cardRef}>
+    <Card as='article' className={css.listCard}>
       <div className={css.cardHeader}>
         <h2>
           <SeamlessTextInput
@@ -56,13 +55,10 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
             className={css.titleInput}
             defaultValue={note.title}
             enterKeyHint='next'
-            key={noteSave.inputsKey}
             maxLength={160}
-            onBlur={(event) => {
-              const title = event.currentTarget.value.trim();
-              if (!title) event.currentTarget.value = note.title;
-              else if (title !== note.title) noteSave.save({ title });
-            }}
+            readOnly={noteSave.stale}
+            ref={noteSave.titleRef}
+            onBlur={(event) => noteSave.saveTitle(event.currentTarget)}
             onKeyDown={(event) => {
               if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
                 event.preventDefault();
@@ -72,23 +68,9 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
             required
           />
         </h2>
-        <NoteActions note={note} />
+        <NoteActions noteSave={noteSave} note={note} />
       </div>
-      {noteSave.conflicted ? (
-        <ConflictNotice
-          className={css.conflict}
-          loading={noteSave.loading}
-          onKeepMine={noteSave.keepMine}
-          onLoadLatest={noteSave.loadLatest}
-        />
-      ) : null}
-      {noteSave.unsavedText === null ? null : (
-        <UnsavedCopy
-          className={css.conflict}
-          onDismiss={noteSave.dismissUnsavedText}
-          text={noteSave.unsavedText}
-        />
-      )}
+      <NoteConflict noteSave={noteSave} />
       {items.length === 0 ? (
         <p className={css.emptyList}>{t({ en: 'No items yet.', pl: 'Brak pozycji.' })}</p>
       ) : null}

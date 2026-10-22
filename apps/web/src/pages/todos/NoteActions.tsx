@@ -4,10 +4,17 @@ import { MenuBtn, MenuBtnItem, MenuBtnPopup, MenuBtnRoot } from '@/components/ui
 import type { NoteSummary } from './notes.api';
 import { useDeleteNoteMutation, useSetNoteSharedMutation } from './notes.query';
 import { NoteTypeButton } from './NoteTypeButton';
+import type { useNoteSave } from './useNoteSave';
 import css from './TodosPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-export function NoteActions({ note }: { note: NoteSummary }) {
+export function NoteActions({
+  note,
+  noteSave,
+}: {
+  note: NoteSummary;
+  noteSave: ReturnType<typeof useNoteSave>;
+}) {
   const { t } = useI18n();
   const deleteNote = useDeleteNoteMutation();
   const setShared = useSetNoteSharedMutation();
@@ -18,14 +25,14 @@ export function NoteActions({ note }: { note: NoteSummary }) {
         <span className={css.sharedBy}>
           {t({ en: `Shared by ${note.ownerName}`, pl: `Udostępnia: ${note.ownerName}` })}
         </span>
-        <NoteTypeButton note={note} />
+        <NoteTypeButton note={note} noteSave={noteSave} />
       </div>
     );
   }
 
   return (
     <div className={css.noteActions}>
-      <NoteTypeButton note={note} />
+      <NoteTypeButton note={note} noteSave={noteSave} />
       <MenuBtnRoot>
         <Btn
           aria-label={
