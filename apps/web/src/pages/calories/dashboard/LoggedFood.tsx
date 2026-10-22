@@ -63,6 +63,7 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
             carbs={entry.carbs ?? 0}
             density='compact'
             fat={entry.fat ?? 0}
+            category={entry.category}
             imageUrl={entry.imageUrl}
             kcal={entry.kcal}
             mediaOverlay={

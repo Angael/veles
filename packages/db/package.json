@@ -5,6 +5,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./schema": "./src/schema/index.ts",
+    "./seed/food-products": "./src/seed/food-products.ts",
     "./seed/sync-food-products": "./src/seed/sync-food-products.ts"
   },
   "scripts": {

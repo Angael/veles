@@ -1,5 +1,6 @@
 import { and, eq, inArray, isNotNull, sql } from 'drizzle-orm';
 import { foodLogs, foodProducts, uploadObjects } from '@veles/db/schema';
+import { foodProductCategory } from '@veles/db/seed/food-products';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { fromHundredths, HUNDREDTHS, optionalHundredths, toHundredths } from '@/lib/nutrition';
 import { db } from '@/server/db.server';
@@ -45,6 +46,7 @@ export function toFoodProduct(
     namePl: product.namePl,
     barcode: product.barcode,
     imageUrl: asset ? storagePathToUrl(asset.key) : null,
+    category: foodProductCategory(product.seedKey),
     productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
     kcalPer100g: product.kcalPer100gHundredths / HUNDREDTHS,
     proteinPer100g: fromHundredths(product.proteinPer100gHundredths),

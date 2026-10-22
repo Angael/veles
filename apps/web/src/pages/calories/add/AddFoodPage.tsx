@@ -86,6 +86,7 @@ export function AddFoodPage({ date, foodId }: Props) {
                 carbs={nutritionAtGrams(food.carbsPer100g, productGrams)}
                 density='compact'
                 fat={nutritionAtGrams(food.fatPer100g, productGrams)}
+                category={food.category}
                 imageUrl={food.imageUrl}
                 kcal={kcal}
                 meta={`${formatNumber(Math.round(productGrams))} g`}

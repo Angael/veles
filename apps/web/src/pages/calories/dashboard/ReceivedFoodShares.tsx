@@ -81,6 +81,7 @@ export function ReceivedFoodShares({ date }: Props) {
                 carbs={item.carbs ?? 0}
                 density='compact'
                 fat={item.fat ?? 0}
+                category={item.category}
                 imageUrl={item.imageUrl}
                 kcal={item.kcal}
                 meta={

@@ -1,6 +1,7 @@
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { foodLogs, foodProducts, uploadObjects } from '@veles/db/schema';
+import { foodProductCategory, type FoodProductCategory } from '@veles/db/seed/food-products';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { fromHundredths, HUNDREDTHS, optionalHundredths, toHundredths } from '@/lib/nutrition';
 import { db } from '@/server/db.server';
@@ -22,6 +23,7 @@ export function toCalorieLog(
   logEntry: typeof foodLogs.$inferSelect,
   logAsset: typeof uploadObjects.$inferSelect | undefined,
   productAsset?: typeof uploadObjects.$inferSelect,
+  category: FoodProductCategory | null = null,
 ): CalorieLog {
   const asset = logAsset ?? productAsset;
 
@@ -37,12 +39,16 @@ export function toCalorieLog(
     fat: fromHundredths(logEntry.fatHundredths),
     carbs: fromHundredths(logEntry.carbsHundredths),
     imageUrl: asset ? storagePathToUrl(asset.key) : null,
+    category,
   };
 }
 
-async function withImage(entry: typeof foodLogs.$inferSelect) {
+async function withImage(
+  entry: typeof foodLogs.$inferSelect,
+  category: FoodProductCategory | null = null,
+) {
   const assetsById = await getFoodImageAssets([entry.imageUploadObjectId]);
-  return toCalorieLog(entry, assetsById.get(entry.imageUploadObjectId ?? ''));
+  return toCalorieLog(entry, assetsById.get(entry.imageUploadObjectId ?? ''), undefined, category);
 }
 
 /** Logs grams of a catalog product, snapshotting its nutrition scaled to the eaten amount. */
@@ -86,7 +92,7 @@ export async function recordFoodRecord(userId: string, values: typeof recordFood
     .returning();
 
   if (!inserted) throw new Error('Food log could not be created.');
-  return withImage(inserted);
+  return withImage(inserted, foodProductCategory(product.seedKey));
 }
 
 /** Logs a food that is not in the catalog, with the nutrition the user entered. */

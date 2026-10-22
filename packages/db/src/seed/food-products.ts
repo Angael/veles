@@ -1,5 +1,31 @@
 import type { foodProducts } from '../schema/calories.schema.ts';
 
+export const foodProductCategories = [
+  'vegetable',
+  'fruit',
+  'grain',
+  'bread',
+  'legume',
+  'meat',
+  'poultry',
+  'fish',
+  'seafood',
+  'dairy',
+  'egg',
+  'nut',
+  'oil',
+  'condiment',
+  'sweet',
+  'snack',
+  'supplement',
+  'meal',
+  'drink',
+  'hotDrink',
+  'alcohol',
+] as const;
+
+export type FoodProductCategory = (typeof foodProductCategories)[number];
+
 /**
  * Searchable starter foods with practical single-item or typical-serving sizes.
  *
@@ -24,6 +50,8 @@ export type FoodProductSeed = Pick<
 > & {
   /** Stable identity used by the deploy sync; never change or reuse it. */
   seedKey: string;
+  /** Picks the placeholder icon shown while the product has no photo. */
+  category: FoodProductCategory;
   name_en: string;
   name_pl: string;
 };
@@ -38,6 +66,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // Vegetables
   {
     seedKey: 'asparagus',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Asparagus',
     name_pl: 'Szparagi',
@@ -49,6 +78,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'avocado',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Avocado',
     name_pl: 'Awokado',
@@ -60,6 +90,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'beetroot',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Beetroot',
     name_pl: 'Burak',
@@ -71,6 +102,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'bell-pepper-green',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Bell pepper, green',
     name_pl: 'Papryka zielona',
@@ -82,6 +114,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'bell-pepper-red',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Bell pepper, red',
     name_pl: 'Papryka czerwona',
@@ -93,6 +126,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'bell-pepper-yellow',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Bell pepper, yellow',
     name_pl: 'Papryka żółta',
@@ -104,6 +138,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'bok-choy',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Bok choy',
     name_pl: 'Kapusta pak choi',
@@ -115,6 +150,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'broccoli',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Broccoli',
     name_pl: 'Brokuł',
@@ -126,6 +162,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'brussels-sprouts',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Brussels sprouts',
     name_pl: 'Brukselka',
@@ -137,6 +174,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cabbage-green',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Cabbage, green',
     name_pl: 'Kapusta biała',
@@ -148,6 +186,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cabbage-red',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Cabbage, red',
     name_pl: 'Kapusta czerwona',
@@ -159,6 +198,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'carrot',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Carrot',
     name_pl: 'Marchew',
@@ -170,6 +210,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cauliflower',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Cauliflower',
     name_pl: 'Kalafior',
@@ -181,6 +222,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'celery',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Celery',
     name_pl: 'Seler naciowy',
@@ -192,6 +234,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'celeriac-raw',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Celeriac, raw',
     name_pl: 'Seler korzeniowy surowy',
@@ -203,6 +246,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cucumber',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Cucumber',
     name_pl: 'Ogórek',
@@ -214,6 +258,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'eggplant',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Eggplant',
     name_pl: 'Bakłażan',
@@ -225,6 +270,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'fennel',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Fennel',
     name_pl: 'Fenkuł',
@@ -236,6 +282,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'garlic',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Garlic',
     name_pl: 'Czosnek',
@@ -247,6 +294,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'green-beans',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Green beans',
     name_pl: 'Fasolka szparagowa zielona',
@@ -258,6 +306,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'kale',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Kale',
     name_pl: 'Jarmuż',
@@ -269,6 +318,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'leek',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Leek',
     name_pl: 'Por',
@@ -280,6 +330,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'lettuce-iceberg',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Lettuce, iceberg',
     name_pl: 'Sałata lodowa',
@@ -291,6 +342,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'lettuce-romaine',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Lettuce, romaine',
     name_pl: 'Sałata rzymska',
@@ -302,6 +354,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'mushrooms-button',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Mushrooms, button',
     name_pl: 'Pieczarki białe',
@@ -313,6 +366,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'mushrooms-cremini',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Mushrooms, cremini',
     name_pl: 'Pieczarki brązowe',
@@ -324,6 +378,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'mushrooms-portobello',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Mushrooms, portobello',
     name_pl: 'Pieczarki portobello',
@@ -335,6 +390,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'mushrooms-shiitake',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Mushrooms, shiitake',
     name_pl: 'Grzyby shiitake',
@@ -346,6 +402,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'onion-red',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Onion, red',
     name_pl: 'Cebula czerwona',
@@ -357,6 +414,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'onion-yellow',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Onion, yellow',
     name_pl: 'Cebula żółta',
@@ -368,6 +426,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'onion-white',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Onion, white',
     name_pl: 'Cebula biała',
@@ -379,6 +438,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'parsnip',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Parsnip',
     name_pl: 'Pasternak',
@@ -390,6 +450,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'parsley-root-raw',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Parsley root, raw',
     name_pl: 'Pietruszka korzeń surowy',
@@ -401,6 +462,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'peas-green',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Peas, green',
     name_pl: 'Groszek zielony',
@@ -412,6 +474,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'potatoes-raw',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Potatoes, raw',
     name_pl: 'Ziemniaki surowe',
@@ -423,6 +486,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'potatoes-boiled',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Potatoes, boiled',
     name_pl: 'Ziemniaki gotowane',
@@ -434,6 +498,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'potatoes-baked',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Potatoes, baked',
     name_pl: 'Ziemniaki pieczone',
@@ -445,6 +510,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pumpkin',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Pumpkin',
     name_pl: 'Dynia',
@@ -456,6 +522,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'radish',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Radish',
     name_pl: 'Rzodkiewka',
@@ -467,6 +534,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'rutabaga',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Rutabaga',
     name_pl: 'Brukiew',
@@ -478,6 +546,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'spinach',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Spinach',
     name_pl: 'Szpinak',
@@ -489,6 +558,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'zucchini',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Zucchini',
     name_pl: 'Cukinia',
@@ -500,6 +570,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'squash-butternut',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Squash, butternut',
     name_pl: 'Dynia piżmowa',
@@ -511,6 +582,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'squash-spaghetti',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Squash, spaghetti',
     name_pl: 'Dynia makaronowa',
@@ -522,6 +594,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'sweet-potato',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Sweet potato',
     name_pl: 'Batat',
@@ -533,6 +606,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'tomato-roma',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Tomato, roma',
     name_pl: 'Pomidor Roma',
@@ -544,6 +618,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'tomato-canned',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Tomato, canned',
     name_pl: 'Pomidory z puszki',
@@ -555,6 +630,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'tomato-fresh',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Tomato, fresh',
     name_pl: 'Pomidor świeży',
@@ -566,6 +642,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'turnip',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Turnip',
     name_pl: 'Rzepa',
@@ -577,6 +654,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'corn-on-the-cob',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Corn on the cob',
     name_pl: 'Kukurydza w kolbie',
@@ -590,6 +668,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // Fruits
   {
     seedKey: 'apple',
+    category: 'fruit',
     barcode: null,
     name_en: 'Apple',
     name_pl: 'Jabłko',
@@ -601,6 +680,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'apple-fuji',
+    category: 'fruit',
     barcode: null,
     name_en: 'Apple, fuji',
     name_pl: 'Jabłko Fuji',
@@ -612,6 +692,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'apple-gala',
+    category: 'fruit',
     barcode: null,
     name_en: 'Apple, gala',
     name_pl: 'Jabłko Gala',
@@ -623,6 +704,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'apple-granny-smith',
+    category: 'fruit',
     barcode: null,
     name_en: 'Apple, granny smith',
     name_pl: 'Jabłko Granny Smith',
@@ -634,6 +716,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'apricot',
+    category: 'fruit',
     barcode: null,
     name_en: 'Apricot',
     name_pl: 'Morela',
@@ -645,6 +728,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'banana',
+    category: 'fruit',
     barcode: null,
     name_en: 'Banana',
     name_pl: 'Banan',
@@ -656,6 +740,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'blackcurrants',
+    category: 'fruit',
     barcode: null,
     name_en: 'Blackcurrants',
     name_pl: 'Czarne porzeczki',
@@ -667,6 +752,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'blackberries',
+    category: 'fruit',
     barcode: null,
     name_en: 'Blackberries',
     name_pl: 'Jeżyny',
@@ -678,6 +764,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'blueberries',
+    category: 'fruit',
     barcode: null,
     name_en: 'Blueberries',
     name_pl: 'Borówki amerykańskie',
@@ -689,6 +776,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cherries',
+    category: 'fruit',
     barcode: null,
     name_en: 'Cherries',
     name_pl: 'Czereśnie',
@@ -700,6 +788,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cantaloupe',
+    category: 'fruit',
     barcode: null,
     name_en: 'Cantaloupe',
     name_pl: 'Melon kantalupa',
@@ -711,6 +800,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'coconut-meat',
+    category: 'fruit',
     barcode: null,
     name_en: 'Coconut meat',
     name_pl: 'Miąższ kokosa',
@@ -722,6 +812,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'figs-dried',
+    category: 'fruit',
     barcode: null,
     name_en: 'Figs, dried',
     name_pl: 'Figi suszone',
@@ -733,6 +824,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'gooseberries',
+    category: 'fruit',
     barcode: null,
     name_en: 'Gooseberries',
     name_pl: 'Agrest',
@@ -744,6 +836,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'grapefruit',
+    category: 'fruit',
     barcode: null,
     name_en: 'Grapefruit',
     name_pl: 'Grejpfrut',
@@ -755,6 +848,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'grapes-red',
+    category: 'fruit',
     barcode: null,
     name_en: 'Grapes, red',
     name_pl: 'Winogrona czerwone',
@@ -766,6 +860,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'grapes-green',
+    category: 'fruit',
     barcode: null,
     name_en: 'Grapes, green',
     name_pl: 'Winogrona zielone',
@@ -777,6 +872,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'kiwi',
+    category: 'fruit',
     barcode: null,
     name_en: 'Kiwi',
     name_pl: 'Kiwi',
@@ -788,6 +884,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'lemon',
+    category: 'fruit',
     barcode: null,
     name_en: 'Lemon',
     name_pl: 'Cytryna',
@@ -799,6 +896,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'mango',
+    category: 'fruit',
     barcode: null,
     name_en: 'Mango',
     name_pl: 'Mango',
@@ -811,6 +909,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 169941.
   {
     seedKey: 'persimmon',
+    category: 'fruit',
     barcode: null,
     name_en: 'Persimmon (kaki)',
     name_pl: 'Owoc kaki (persymona)',
@@ -822,6 +921,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'mandarin',
+    category: 'fruit',
     barcode: null,
     name_en: 'Mandarin',
     name_pl: 'Mandarynka',
@@ -833,6 +933,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'nectarine',
+    category: 'fruit',
     barcode: null,
     name_en: 'Nectarine',
     name_pl: 'Nektarynka',
@@ -844,6 +945,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'orange',
+    category: 'fruit',
     barcode: null,
     name_en: 'Orange',
     name_pl: 'Pomarańcza',
@@ -855,6 +957,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'papaya',
+    category: 'fruit',
     barcode: null,
     name_en: 'Papaya',
     name_pl: 'Papaja',
@@ -866,6 +969,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pear',
+    category: 'fruit',
     barcode: null,
     name_en: 'Pear',
     name_pl: 'Gruszka',
@@ -877,6 +981,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'peach',
+    category: 'fruit',
     barcode: null,
     name_en: 'Peach',
     name_pl: 'Brzoskwinia',
@@ -888,6 +993,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pineapple',
+    category: 'fruit',
     barcode: null,
     name_en: 'Pineapple',
     name_pl: 'Ananas',
@@ -899,6 +1005,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'plum',
+    category: 'fruit',
     barcode: null,
     name_en: 'Plum',
     name_pl: 'Śliwka',
@@ -910,6 +1017,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pomegranate',
+    category: 'fruit',
     barcode: null,
     name_en: 'Pomegranate',
     name_pl: 'Granat',
@@ -921,6 +1029,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'raspberries',
+    category: 'fruit',
     barcode: null,
     name_en: 'Raspberries',
     name_pl: 'Maliny',
@@ -932,6 +1041,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'strawberries',
+    category: 'fruit',
     barcode: null,
     name_en: 'Strawberries',
     name_pl: 'Truskawki',
@@ -943,6 +1053,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'watermelon',
+    category: 'fruit',
     barcode: null,
     name_en: 'Watermelon',
     name_pl: 'Arbuz',
@@ -956,6 +1067,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // Grains and staples
   {
     seedKey: 'wheat-flour',
+    category: 'grain',
     barcode: null,
     name_en: 'Wheat flour',
     name_pl: 'Mąka pszenna',
@@ -967,6 +1079,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'whole-wheat-flour',
+    category: 'grain',
     barcode: null,
     name_en: 'Whole wheat flour',
     name_pl: 'Mąka pszenna pełnoziarnista',
@@ -978,6 +1091,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'rye-flour',
+    category: 'grain',
     barcode: null,
     name_en: 'Rye flour',
     name_pl: 'Mąka żytnia',
@@ -989,6 +1103,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'rice-flour-white',
+    category: 'grain',
     barcode: null,
     name_en: 'Rice flour, white',
     name_pl: 'Mąka z białego ryżu',
@@ -1000,6 +1115,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cornmeal-yellow',
+    category: 'grain',
     barcode: null,
     name_en: 'Cornmeal, yellow',
     name_pl: 'Kaszka kukurydziana żółta',
@@ -1011,6 +1127,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'oat-flour',
+    category: 'grain',
     barcode: null,
     name_en: 'Oat flour',
     name_pl: 'Mąka owsiana',
@@ -1022,6 +1139,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'almond-flour',
+    category: 'grain',
     barcode: null,
     name_en: 'Almond flour',
     name_pl: 'Mąka migdałowa',
@@ -1033,6 +1151,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'potato-flour',
+    category: 'grain',
     barcode: null,
     name_en: 'Potato flour',
     name_pl: 'Mąka ziemniaczana',
@@ -1044,6 +1163,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'semolina-flour',
+    category: 'grain',
     barcode: null,
     name_en: 'Semolina flour',
     name_pl: 'Semolina',
@@ -1055,6 +1175,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pasta-dry',
+    category: 'grain',
     barcode: null,
     name_en: 'Pasta, dry',
     name_pl: 'Makaron suchy',
@@ -1066,6 +1187,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'whole-wheat-pasta-dry',
+    category: 'grain',
     barcode: null,
     name_en: 'Whole wheat pasta, dry',
     name_pl: 'Makaron pełnoziarnisty suchy',
@@ -1077,6 +1199,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'gluten-free-corn-pasta-dry',
+    category: 'grain',
     barcode: null,
     name_en: 'Gluten-free corn pasta, dry',
     name_pl: 'Makaron kukurydziany bezglutenowy suchy',
@@ -1088,6 +1211,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'rice-white-dry',
+    category: 'grain',
     barcode: null,
     name_en: 'Rice, white, dry',
     name_pl: 'Ryż biały suchy',
@@ -1099,6 +1223,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'rice-white-cooked',
+    category: 'grain',
     barcode: null,
     name_en: 'Rice, white, cooked',
     name_pl: 'Ryż biały gotowany',
@@ -1110,6 +1235,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'rice-brown-dry',
+    category: 'grain',
     barcode: null,
     name_en: 'Rice, brown, dry',
     name_pl: 'Ryż brązowy suchy',
@@ -1121,6 +1247,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'rice-brown-cooked',
+    category: 'grain',
     barcode: null,
     name_en: 'Rice, brown, cooked',
     name_pl: 'Ryż brązowy gotowany',
@@ -1132,6 +1259,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'wild-rice-dry',
+    category: 'grain',
     barcode: null,
     name_en: 'Wild rice, dry',
     name_pl: 'Ryż dziki suchy',
@@ -1143,6 +1271,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'bulgur-dry',
+    category: 'grain',
     barcode: null,
     name_en: 'Bulgur, dry',
     name_pl: 'Kasza bulgur sucha',
@@ -1154,6 +1283,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'quinoa-dry',
+    category: 'grain',
     barcode: null,
     name_en: 'Quinoa, dry',
     name_pl: 'Komosa ryżowa sucha',
@@ -1165,6 +1295,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'couscous-dry',
+    category: 'grain',
     barcode: null,
     name_en: 'Couscous, dry',
     name_pl: 'Kuskus suchy',
@@ -1176,6 +1307,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'barley-pearled-dry',
+    category: 'grain',
     barcode: null,
     name_en: 'Barley, pearled, dry',
     name_pl: 'Kasza jęczmienna perłowa sucha',
@@ -1187,6 +1319,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'buckwheat-groats-dry',
+    category: 'grain',
     barcode: null,
     name_en: 'Buckwheat groats, dry',
     name_pl: 'Kasza gryczana sucha',
@@ -1198,6 +1331,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'millet-dry',
+    category: 'grain',
     barcode: null,
     name_en: 'Millet, dry',
     name_pl: 'Kasza jaglana sucha',
@@ -1209,6 +1343,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'oats-rolled-dry',
+    category: 'grain',
     barcode: null,
     name_en: 'Oats, rolled, dry',
     name_pl: 'Płatki owsiane suche',
@@ -1220,6 +1355,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'white-bread',
+    category: 'bread',
     barcode: null,
     name_en: 'White bread',
     name_pl: 'Chleb biały',
@@ -1231,6 +1367,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'whole-wheat-bread',
+    category: 'bread',
     barcode: null,
     name_en: 'Whole wheat bread',
     name_pl: 'Chleb pszenny pełnoziarnisty',
@@ -1242,6 +1379,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'rye-bread',
+    category: 'bread',
     barcode: null,
     name_en: 'Rye bread',
     name_pl: 'Chleb żytni',
@@ -1253,6 +1391,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'sourdough-bread',
+    category: 'bread',
     barcode: null,
     name_en: 'Sourdough bread',
     name_pl: 'Chleb na zakwasie',
@@ -1264,6 +1403,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'wheat-rye-bread',
+    category: 'bread',
     barcode: null,
     name_en: 'Wheat-rye bread',
     name_pl: 'Chleb pszenno-żytni',
@@ -1275,6 +1415,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'spelt-bread',
+    category: 'bread',
     barcode: null,
     name_en: 'Spelt bread',
     name_pl: 'Chleb orkiszowy',
@@ -1286,6 +1427,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'wheat-rye-bread-with-seeds',
+    category: 'bread',
     barcode: null,
     name_en: 'Wheat-rye bread with seeds',
     name_pl: 'Chleb pszenno-żytni z ziarnami',
@@ -1297,6 +1439,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'poznan-wheat-roll',
+    category: 'bread',
     barcode: null,
     name_en: 'Poznań wheat roll',
     name_pl: 'Bułka poznańska',
@@ -1308,6 +1451,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'morning-wheat-roll',
+    category: 'bread',
     barcode: null,
     name_en: 'Morning wheat roll',
     name_pl: 'Bułka poranna',
@@ -1319,6 +1463,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'graham-wheat-roll',
+    category: 'bread',
     barcode: null,
     name_en: 'Graham wheat roll',
     name_pl: 'Bułka grahamka',
@@ -1330,6 +1475,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'breakfast-roll-with-seeds',
+    category: 'bread',
     barcode: null,
     name_en: 'Breakfast roll with seeds',
     name_pl: 'Bułka śniadaniowa z ziarnami',
@@ -1341,6 +1487,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'kaiser-roll',
+    category: 'bread',
     barcode: null,
     name_en: 'Kaiser roll',
     name_pl: 'Bułka kajzerka',
@@ -1352,6 +1499,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'spelt-roll-with-seeds',
+    category: 'bread',
     barcode: null,
     name_en: 'Spelt roll with seeds',
     name_pl: 'Bułka orkiszowa z ziarnami',
@@ -1363,6 +1511,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'flaxseed-and-sesame-roll',
+    category: 'bread',
     barcode: null,
     name_en: 'Flaxseed and sesame roll',
     name_pl: 'Bułka z siemieniem lnianym i sezamem',
@@ -1374,6 +1523,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pita-bread',
+    category: 'bread',
     barcode: null,
     name_en: 'Pita bread',
     name_pl: 'Chleb pita',
@@ -1385,6 +1535,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'bagel',
+    category: 'bread',
     barcode: null,
     name_en: 'Bagel',
     name_pl: 'Bajgiel',
@@ -1396,6 +1547,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'flour-tortilla',
+    category: 'bread',
     barcode: null,
     name_en: 'Flour tortilla',
     name_pl: 'Tortilla pszenna',
@@ -1407,6 +1559,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'corn-tortilla',
+    category: 'bread',
     barcode: null,
     name_en: 'Corn tortilla',
     name_pl: 'Tortilla kukurydziana',
@@ -1418,6 +1571,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'breadcrumbs',
+    category: 'grain',
     barcode: null,
     name_en: 'Breadcrumbs',
     name_pl: 'Bułka tarta',
@@ -1431,6 +1585,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // Legumes and plant proteins
   {
     seedKey: 'lentils-dry',
+    category: 'legume',
     barcode: null,
     name_en: 'Lentils, dry',
     name_pl: 'Soczewica sucha',
@@ -1442,6 +1597,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'lentils-cooked',
+    category: 'legume',
     barcode: null,
     name_en: 'Lentils, cooked',
     name_pl: 'Soczewica gotowana',
@@ -1453,6 +1609,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'chickpeas-dry',
+    category: 'legume',
     barcode: null,
     name_en: 'Chickpeas, dry',
     name_pl: 'Ciecierzyca sucha',
@@ -1464,6 +1621,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'chickpeas-cooked',
+    category: 'legume',
     barcode: null,
     name_en: 'Chickpeas, cooked',
     name_pl: 'Ciecierzyca gotowana',
@@ -1475,6 +1633,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'chickpeas-canned',
+    category: 'legume',
     barcode: null,
     name_en: 'Chickpeas, canned',
     name_pl: 'Ciecierzyca z puszki',
@@ -1486,6 +1645,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'black-beans-dry',
+    category: 'legume',
     barcode: null,
     name_en: 'Black beans, dry',
     name_pl: 'Fasola czarna sucha',
@@ -1497,6 +1657,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'black-beans-cooked',
+    category: 'legume',
     barcode: null,
     name_en: 'Black beans, cooked',
     name_pl: 'Fasola czarna gotowana',
@@ -1508,6 +1669,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'black-beans-canned',
+    category: 'legume',
     barcode: null,
     name_en: 'Black beans, canned',
     name_pl: 'Fasola czarna z puszki',
@@ -1519,6 +1681,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'kidney-beans-dry',
+    category: 'legume',
     barcode: null,
     name_en: 'Kidney beans, dry',
     name_pl: 'Fasola czerwona kidney sucha',
@@ -1530,6 +1693,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'kidney-beans-cooked',
+    category: 'legume',
     barcode: null,
     name_en: 'Kidney beans, cooked',
     name_pl: 'Fasola czerwona kidney gotowana',
@@ -1541,6 +1705,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'kidney-beans-canned',
+    category: 'legume',
     barcode: null,
     name_en: 'Kidney beans, canned',
     name_pl: 'Fasola czerwona kidney z puszki',
@@ -1552,6 +1717,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cannellini-beans-cooked',
+    category: 'legume',
     barcode: null,
     name_en: 'Cannellini beans, cooked',
     name_pl: 'Fasola biała cannellini gotowana',
@@ -1563,6 +1729,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'green-peas-cooked',
+    category: 'legume',
     barcode: null,
     name_en: 'Green peas, cooked',
     name_pl: 'Groszek zielony gotowany',
@@ -1574,6 +1741,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'edamame-cooked',
+    category: 'legume',
     barcode: null,
     name_en: 'Edamame, cooked',
     name_pl: 'Edamame gotowane',
@@ -1585,6 +1753,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'tofu-firm',
+    category: 'legume',
     barcode: null,
     name_en: 'Tofu, firm',
     name_pl: 'Tofu twarde',
@@ -1596,6 +1765,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'hummus',
+    category: 'legume',
     barcode: null,
     name_en: 'Hummus',
     name_pl: 'Hummus',
@@ -1609,6 +1779,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // Meat and poultry
   {
     seedKey: 'chicken-breast-raw',
+    category: 'poultry',
     barcode: null,
     name_en: 'Chicken breast, raw',
     name_pl: 'Pierś z kurczaka surowa',
@@ -1620,6 +1791,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'chicken-breast-cooked',
+    category: 'poultry',
     barcode: null,
     name_en: 'Chicken breast, cooked',
     name_pl: 'Pierś z kurczaka po obróbce termicznej',
@@ -1631,6 +1803,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'chicken-thigh-raw',
+    category: 'poultry',
     barcode: null,
     name_en: 'Chicken thigh, raw',
     name_pl: 'Udo z kurczaka surowe',
@@ -1642,6 +1815,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'chicken-thigh-cooked',
+    category: 'poultry',
     barcode: null,
     name_en: 'Chicken thigh, cooked',
     name_pl: 'Udo z kurczaka po obróbce termicznej',
@@ -1653,6 +1827,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'chicken-drumstick-raw',
+    category: 'poultry',
     barcode: null,
     name_en: 'Chicken drumstick, raw',
     name_pl: 'Podudzie z kurczaka surowe',
@@ -1664,6 +1839,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'chicken-drumstick-cooked',
+    category: 'poultry',
     barcode: null,
     name_en: 'Chicken drumstick, cooked',
     name_pl: 'Podudzie z kurczaka po obróbce termicznej',
@@ -1675,6 +1851,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'chicken-wing-raw',
+    category: 'poultry',
     barcode: null,
     name_en: 'Chicken wing, raw',
     name_pl: 'Skrzydełko z kurczaka surowe',
@@ -1686,6 +1863,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'chicken-wing-cooked',
+    category: 'poultry',
     barcode: null,
     name_en: 'Chicken wing, cooked',
     name_pl: 'Skrzydełko z kurczaka po obróbce termicznej',
@@ -1697,6 +1875,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'roast-chicken-meat-and-skin',
+    category: 'poultry',
     barcode: null,
     name_en: 'Roast chicken, meat and skin',
     name_pl: 'Kurczak pieczony, mięso ze skórą',
@@ -1708,6 +1887,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'ground-chicken-raw',
+    category: 'poultry',
     barcode: null,
     name_en: 'Ground chicken, raw',
     name_pl: 'Mięso mielone z kurczaka surowe',
@@ -1719,6 +1899,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'turkey-breast-raw',
+    category: 'poultry',
     barcode: null,
     name_en: 'Turkey breast, raw',
     name_pl: 'Pierś z indyka surowa',
@@ -1730,6 +1911,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'turkey-breast-roasted',
+    category: 'poultry',
     barcode: null,
     name_en: 'Turkey breast, roasted',
     name_pl: 'Pierś z indyka pieczona',
@@ -1741,6 +1923,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'duck-breast-raw',
+    category: 'poultry',
     barcode: null,
     name_en: 'Duck breast, raw',
     name_pl: 'Pierś z kaczki surowa',
@@ -1752,6 +1935,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'beef-mince-raw-90-pct-lean',
+    category: 'meat',
     barcode: null,
     name_en: 'Beef mince, raw, 90% lean',
     name_pl: 'Wołowina mielona surowa, 10% tłuszczu',
@@ -1763,6 +1947,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'beef-mince-raw-80-pct-lean',
+    category: 'meat',
     barcode: null,
     name_en: 'Beef mince, raw, 80% lean',
     name_pl: 'Wołowina mielona surowa, 20% tłuszczu',
@@ -1774,6 +1959,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'beef-tenderloin-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Beef tenderloin, raw',
     name_pl: 'Polędwica wołowa surowa',
@@ -1785,6 +1971,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'beef-tenderloin-cooked',
+    category: 'meat',
     barcode: null,
     name_en: 'Beef tenderloin, cooked',
     name_pl: 'Polędwica wołowa po obróbce termicznej',
@@ -1796,6 +1983,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'beef-ribeye-steak-antrykot-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Beef ribeye steak (antrykot), raw',
     name_pl: 'Stek wołowy z antrykotu surowy',
@@ -1807,6 +1995,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'beef-ribeye-steak-antrykot-cooked',
+    category: 'meat',
     barcode: null,
     name_en: 'Beef ribeye steak (antrykot), cooked',
     name_pl: 'Stek wołowy z antrykotu po obróbce termicznej',
@@ -1818,6 +2007,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'beef-strip-steak-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Beef strip steak, raw',
     name_pl: 'Stek wołowy z rostbefu surowy',
@@ -1829,6 +2019,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'beef-sirloin-steak-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Beef sirloin steak, raw',
     name_pl: 'Stek wołowy z krzyżowej surowy',
@@ -1840,6 +2031,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'beef-top-round-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Beef top round, raw',
     name_pl: 'Wołowina zrazowa wewnętrzna surowa',
@@ -1851,6 +2043,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'beef-flank-steak-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Beef flank steak, raw',
     name_pl: 'Stek wołowy z łaty surowy',
@@ -1862,6 +2055,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'beef-chuck-roast-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Beef chuck roast, raw',
     name_pl: 'Łopatka wołowa na pieczeń surowa',
@@ -1873,6 +2067,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'beef-brisket-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Beef brisket, raw',
     name_pl: 'Mostek wołowy surowy',
@@ -1884,6 +2079,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pork-loin-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Pork loin, raw',
     name_pl: 'Schab wieprzowy surowy',
@@ -1895,6 +2091,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pork-loin-cooked',
+    category: 'meat',
     barcode: null,
     name_en: 'Pork loin, cooked',
     name_pl: 'Schab wieprzowy po obróbce termicznej',
@@ -1906,6 +2103,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pork-tenderloin-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Pork tenderloin, raw',
     name_pl: 'Polędwiczka wieprzowa surowa',
@@ -1917,6 +2115,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pork-tenderloin-cooked',
+    category: 'meat',
     barcode: null,
     name_en: 'Pork tenderloin, cooked',
     name_pl: 'Polędwiczka wieprzowa po obróbce termicznej',
@@ -1928,6 +2127,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pork-chop-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Pork chop, raw',
     name_pl: 'Kotlet wieprzowy surowy',
@@ -1939,6 +2139,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pork-shoulder-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Pork shoulder, raw',
     name_pl: 'Łopatka wieprzowa surowa',
@@ -1950,6 +2151,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pork-belly-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Pork belly, raw',
     name_pl: 'Boczek surowy',
@@ -1961,6 +2163,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'bacon-cooked',
+    category: 'meat',
     barcode: null,
     name_en: 'Bacon, cooked',
     name_pl: 'Bekon po obróbce termicznej',
@@ -1972,6 +2175,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'ham-sliced',
+    category: 'meat',
     barcode: null,
     name_en: 'Ham, sliced',
     name_pl: 'Szynka w plastrach',
@@ -1983,6 +2187,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pork-sausage-cooked',
+    category: 'meat',
     barcode: null,
     name_en: 'Pork sausage, cooked',
     name_pl: 'Kiełbasa wieprzowa po obróbce termicznej',
@@ -1994,6 +2199,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'italian-sausage-cooked',
+    category: 'meat',
     barcode: null,
     name_en: 'Italian sausage, cooked',
     name_pl: 'Kiełbasa włoska po obróbce termicznej',
@@ -2005,6 +2211,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'chorizo-cooked',
+    category: 'meat',
     barcode: null,
     name_en: 'Chorizo, cooked',
     name_pl: 'Chorizo po obróbce termicznej',
@@ -2016,6 +2223,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'lamb-leg-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Lamb leg, raw',
     name_pl: 'Udziec jagnięcy surowy',
@@ -2027,6 +2235,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'ground-lamb-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Ground lamb, raw',
     name_pl: 'Jagnięcina mielona surowa',
@@ -2038,6 +2247,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'veal-cutlet-raw',
+    category: 'meat',
     barcode: null,
     name_en: 'Veal cutlet, raw',
     name_pl: 'Kotlet cielęcy surowy',
@@ -2051,6 +2261,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // Fish and seafood
   {
     seedKey: 'salmon-atlantic-raw',
+    category: 'fish',
     barcode: null,
     name_en: 'Salmon, Atlantic, raw',
     name_pl: 'Łosoś atlantycki surowy',
@@ -2062,6 +2273,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'salmon-atlantic-cooked',
+    category: 'fish',
     barcode: null,
     name_en: 'Salmon, Atlantic, cooked',
     name_pl: 'Łosoś atlantycki po obróbce termicznej',
@@ -2073,6 +2285,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'tuna-canned-in-water',
+    category: 'fish',
     barcode: null,
     name_en: 'Tuna, canned in water',
     name_pl: 'Tuńczyk w wodzie z puszki',
@@ -2084,6 +2297,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'tuna-yellowfin-raw',
+    category: 'fish',
     barcode: null,
     name_en: 'Tuna, yellowfin, raw',
     name_pl: 'Tuńczyk żółtopłetwy surowy',
@@ -2095,6 +2309,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cod-atlantic-raw',
+    category: 'fish',
     barcode: null,
     name_en: 'Cod, Atlantic, raw',
     name_pl: 'Dorsz atlantycki surowy',
@@ -2106,6 +2321,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cod-atlantic-cooked',
+    category: 'fish',
     barcode: null,
     name_en: 'Cod, Atlantic, cooked',
     name_pl: 'Dorsz atlantycki po obróbce termicznej',
@@ -2117,6 +2333,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'haddock-raw',
+    category: 'fish',
     barcode: null,
     name_en: 'Haddock, raw',
     name_pl: 'Plamiak surowy',
@@ -2128,6 +2345,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pollock-raw',
+    category: 'fish',
     barcode: null,
     name_en: 'Pollock, raw',
     name_pl: 'Mintaj surowy',
@@ -2139,6 +2357,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'tilapia-raw',
+    category: 'fish',
     barcode: null,
     name_en: 'Tilapia, raw',
     name_pl: 'Tilapia surowa',
@@ -2150,6 +2369,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'trout-rainbow-raw',
+    category: 'fish',
     barcode: null,
     name_en: 'Trout, rainbow, raw',
     name_pl: 'Pstrąg tęczowy surowy',
@@ -2161,6 +2381,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'sardines-canned-in-oil',
+    category: 'fish',
     barcode: null,
     name_en: 'Sardines, canned in oil',
     name_pl: 'Sardynki w oleju z puszki',
@@ -2172,6 +2393,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'mackerel-atlantic-raw',
+    category: 'fish',
     barcode: null,
     name_en: 'Mackerel, Atlantic, raw',
     name_pl: 'Makrela atlantycka surowa',
@@ -2183,6 +2405,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'herring-atlantic-raw',
+    category: 'fish',
     barcode: null,
     name_en: 'Herring, Atlantic, raw',
     name_pl: 'Śledź atlantycki surowy',
@@ -2194,6 +2417,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'anchovies-canned-in-oil',
+    category: 'fish',
     barcode: null,
     name_en: 'Anchovies, canned in oil',
     name_pl: 'Anchois w oleju z puszki',
@@ -2205,6 +2429,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'shrimp-raw',
+    category: 'seafood',
     barcode: null,
     name_en: 'Shrimp, raw',
     name_pl: 'Krewetki surowe',
@@ -2216,6 +2441,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'shrimp-cooked',
+    category: 'seafood',
     barcode: null,
     name_en: 'Shrimp, cooked',
     name_pl: 'Krewetki gotowane',
@@ -2227,6 +2453,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'lobster-cooked',
+    category: 'seafood',
     barcode: null,
     name_en: 'Lobster, cooked',
     name_pl: 'Homar gotowany',
@@ -2238,6 +2465,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'scallops-cooked',
+    category: 'seafood',
     barcode: null,
     name_en: 'Scallops, cooked',
     name_pl: 'Przegrzebki po obróbce termicznej',
@@ -2249,6 +2477,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'mussels-cooked',
+    category: 'seafood',
     barcode: null,
     name_en: 'Mussels, cooked',
     name_pl: 'Małże gotowane',
@@ -2260,6 +2489,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'squid-raw',
+    category: 'seafood',
     barcode: null,
     name_en: 'Squid, raw',
     name_pl: 'Kalmar surowy',
@@ -2271,6 +2501,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'halibut-raw',
+    category: 'fish',
     barcode: null,
     name_en: 'Halibut, raw',
     name_pl: 'Halibut surowy',
@@ -2282,6 +2513,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'swordfish-raw',
+    category: 'fish',
     barcode: null,
     name_en: 'Swordfish, raw',
     name_pl: 'Miecznik surowy',
@@ -2295,6 +2527,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // Dairy and eggs
   {
     seedKey: 'egg-whole-raw',
+    category: 'egg',
     barcode: null,
     name_en: 'Egg, whole, raw',
     name_pl: 'Jajko całe surowe',
@@ -2306,6 +2539,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'egg-whole-hard-boiled',
+    category: 'egg',
     barcode: null,
     name_en: 'Egg, whole, hard-boiled',
     name_pl: 'Jajko całe na twardo',
@@ -2317,6 +2551,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'egg-white-raw',
+    category: 'egg',
     barcode: null,
     name_en: 'Egg white, raw',
     name_pl: 'Białko jaja surowe',
@@ -2328,6 +2563,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'egg-yolk-raw',
+    category: 'egg',
     barcode: null,
     name_en: 'Egg yolk, raw',
     name_pl: 'Żółtko jaja surowe',
@@ -2339,6 +2575,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'milk-whole',
+    category: 'dairy',
     barcode: null,
     name_en: 'Milk, whole',
     name_pl: 'Mleko pełnotłuste',
@@ -2350,6 +2587,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'milk-2-pct',
+    category: 'dairy',
     barcode: null,
     name_en: 'Milk, 2%',
     name_pl: 'Mleko 2%',
@@ -2361,6 +2599,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'milk-skim',
+    category: 'dairy',
     barcode: null,
     name_en: 'Milk, skim',
     name_pl: 'Mleko odtłuszczone',
@@ -2372,6 +2611,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'buttermilk-low-fat',
+    category: 'dairy',
     barcode: null,
     name_en: 'Buttermilk, low-fat',
     name_pl: 'Maślanka o obniżonej zawartości tłuszczu',
@@ -2383,6 +2623,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'greek-yogurt-plain-nonfat',
+    category: 'dairy',
     barcode: null,
     name_en: 'Greek yogurt, plain, nonfat',
     name_pl: 'Jogurt grecki naturalny 0%',
@@ -2394,6 +2635,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'greek-yogurt-plain-whole-milk',
+    category: 'dairy',
     barcode: null,
     name_en: 'Greek yogurt, plain, whole milk',
     name_pl: 'Jogurt grecki naturalny pełnotłusty',
@@ -2405,6 +2647,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'yogurt-plain-nonfat',
+    category: 'dairy',
     barcode: null,
     name_en: 'Yogurt, plain, nonfat',
     name_pl: 'Jogurt naturalny 0%',
@@ -2416,6 +2659,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'yogurt-plain-whole-milk',
+    category: 'dairy',
     barcode: null,
     name_en: 'Yogurt, plain, whole milk',
     name_pl: 'Jogurt naturalny pełnotłusty',
@@ -2427,6 +2671,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'yogurt-strawberry',
+    category: 'dairy',
     barcode: null,
     name_en: 'Yogurt, strawberry',
     name_pl: 'Jogurt truskawkowy',
@@ -2438,6 +2683,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cottage-cheese-low-fat',
+    category: 'dairy',
     barcode: null,
     name_en: 'Cottage cheese, low-fat',
     name_pl: 'Serek wiejski lekki',
@@ -2449,6 +2695,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cottage-cheese-full-fat',
+    category: 'dairy',
     barcode: null,
     name_en: 'Cottage cheese, full-fat',
     name_pl: 'Serek wiejski pełnotłusty',
@@ -2460,6 +2707,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cheddar-cheese',
+    category: 'dairy',
     barcode: null,
     name_en: 'Cheddar cheese',
     name_pl: 'Ser cheddar',
@@ -2471,6 +2719,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'mozzarella-cheese',
+    category: 'dairy',
     barcode: null,
     name_en: 'Mozzarella cheese',
     name_pl: 'Ser mozzarella',
@@ -2482,6 +2731,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'parmesan-cheese',
+    category: 'dairy',
     barcode: null,
     name_en: 'Parmesan cheese',
     name_pl: 'Parmezan',
@@ -2493,6 +2743,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'feta-cheese',
+    category: 'dairy',
     barcode: null,
     name_en: 'Feta cheese',
     name_pl: 'Ser feta',
@@ -2504,6 +2755,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'halloumi-cheese',
+    category: 'dairy',
     barcode: null,
     name_en: 'Halloumi cheese',
     name_pl: 'Ser halloumi',
@@ -2515,6 +2767,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'ricotta-cheese-whole-milk',
+    category: 'dairy',
     barcode: null,
     name_en: 'Ricotta cheese, whole milk',
     name_pl: 'Ricotta pełnotłusta',
@@ -2526,6 +2779,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cream-cheese',
+    category: 'dairy',
     barcode: null,
     name_en: 'Cream cheese',
     name_pl: 'Serek śmietankowy do smarowania',
@@ -2537,6 +2791,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'sour-cream',
+    category: 'dairy',
     barcode: null,
     name_en: 'Sour cream',
     name_pl: 'Kwaśna śmietana',
@@ -2548,6 +2803,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'heavy-cream',
+    category: 'dairy',
     barcode: null,
     name_en: 'Heavy cream',
     name_pl: 'Śmietanka kremówka',
@@ -2559,6 +2815,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'butter-salted',
+    category: 'dairy',
     barcode: null,
     name_en: 'Butter, salted',
     name_pl: 'Masło solone',
@@ -2570,6 +2827,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'butter-unsalted',
+    category: 'dairy',
     barcode: null,
     name_en: 'Butter, unsalted',
     name_pl: 'Masło niesolone',
@@ -2583,6 +2841,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // Nuts, seeds and oils
   {
     seedKey: 'almonds-raw',
+    category: 'nut',
     barcode: null,
     name_en: 'Almonds, raw',
     name_pl: 'Migdały surowe',
@@ -2594,6 +2853,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'almonds-roasted',
+    category: 'nut',
     barcode: null,
     name_en: 'Almonds, roasted',
     name_pl: 'Migdały prażone',
@@ -2605,6 +2865,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'walnuts',
+    category: 'nut',
     barcode: null,
     name_en: 'Walnuts',
     name_pl: 'Orzechy włoskie',
@@ -2616,6 +2877,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pecans',
+    category: 'nut',
     barcode: null,
     name_en: 'Pecans',
     name_pl: 'Orzechy pekan',
@@ -2627,6 +2889,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'cashews',
+    category: 'nut',
     barcode: null,
     name_en: 'Cashews',
     name_pl: 'Orzechy nerkowca',
@@ -2638,6 +2901,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pistachios',
+    category: 'nut',
     barcode: null,
     name_en: 'Pistachios',
     name_pl: 'Pistacje',
@@ -2649,6 +2913,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'hazelnuts',
+    category: 'nut',
     barcode: null,
     name_en: 'Hazelnuts',
     name_pl: 'Orzechy laskowe',
@@ -2660,6 +2925,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'macadamia-nuts',
+    category: 'nut',
     barcode: null,
     name_en: 'Macadamia nuts',
     name_pl: 'Orzechy makadamia',
@@ -2671,6 +2937,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'brazil-nuts',
+    category: 'nut',
     barcode: null,
     name_en: 'Brazil nuts',
     name_pl: 'Orzechy brazylijskie',
@@ -2682,6 +2949,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'peanuts',
+    category: 'nut',
     barcode: null,
     name_en: 'Peanuts',
     name_pl: 'Orzechy ziemne',
@@ -2693,6 +2961,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'peanut-butter',
+    category: 'nut',
     barcode: null,
     name_en: 'Peanut butter',
     name_pl: 'Masło orzechowe',
@@ -2704,6 +2973,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'almond-butter',
+    category: 'nut',
     barcode: null,
     name_en: 'Almond butter',
     name_pl: 'Masło migdałowe',
@@ -2715,6 +2985,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'tahini',
+    category: 'nut',
     barcode: null,
     name_en: 'Tahini',
     name_pl: 'Tahini',
@@ -2726,6 +2997,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'sunflower-seeds',
+    category: 'nut',
     barcode: null,
     name_en: 'Sunflower seeds',
     name_pl: 'Pestki słonecznika',
@@ -2737,6 +3009,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pumpkin-seeds',
+    category: 'nut',
     barcode: null,
     name_en: 'Pumpkin seeds',
     name_pl: 'Pestki dyni',
@@ -2748,6 +3021,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'chia-seeds',
+    category: 'nut',
     barcode: null,
     name_en: 'Chia seeds',
     name_pl: 'Nasiona chia',
@@ -2759,6 +3033,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'flaxseed-ground',
+    category: 'nut',
     barcode: null,
     name_en: 'Flaxseed, ground',
     name_pl: 'Siemię lniane mielone',
@@ -2770,6 +3045,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'sesame-seeds',
+    category: 'nut',
     barcode: null,
     name_en: 'Sesame seeds',
     name_pl: 'Sezam',
@@ -2781,6 +3057,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'olive-oil',
+    category: 'oil',
     barcode: null,
     name_en: 'Olive oil',
     name_pl: 'Oliwa z oliwek',
@@ -2792,6 +3069,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'canola-oil',
+    category: 'oil',
     barcode: null,
     name_en: 'Canola oil',
     name_pl: 'Olej rzepakowy',
@@ -2803,6 +3081,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'sunflower-oil',
+    category: 'oil',
     barcode: null,
     name_en: 'Sunflower oil',
     name_pl: 'Olej słonecznikowy',
@@ -2814,6 +3093,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'coconut-oil',
+    category: 'oil',
     barcode: null,
     name_en: 'Coconut oil',
     name_pl: 'Olej kokosowy',
@@ -2827,6 +3107,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // Sauces, condiments and treats
   {
     seedKey: 'tomato-sauce',
+    category: 'condiment',
     barcode: null,
     name_en: 'Tomato sauce',
     name_pl: 'Sos pomidorowy',
@@ -2838,6 +3119,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'tomato-paste',
+    category: 'condiment',
     barcode: null,
     name_en: 'Tomato paste',
     name_pl: 'Koncentrat pomidorowy',
@@ -2849,6 +3131,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'salsa',
+    category: 'condiment',
     barcode: null,
     name_en: 'Salsa',
     name_pl: 'Sos salsa',
@@ -2860,6 +3143,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'ketchup',
+    category: 'condiment',
     barcode: null,
     name_en: 'Ketchup',
     name_pl: 'Ketchup',
@@ -2871,6 +3155,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'mayonnaise',
+    category: 'condiment',
     barcode: null,
     name_en: 'Mayonnaise',
     name_pl: 'Majonez',
@@ -2882,6 +3167,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'soy-sauce',
+    category: 'condiment',
     barcode: null,
     name_en: 'Soy sauce',
     name_pl: 'Sos sojowy',
@@ -2893,6 +3179,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'apple-cider-vinegar',
+    category: 'condiment',
     barcode: null,
     name_en: 'Apple cider vinegar',
     name_pl: 'Ocet jabłkowy',
@@ -2904,6 +3191,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'honey',
+    category: 'sweet',
     barcode: null,
     name_en: 'Honey',
     name_pl: 'Miód',
@@ -2915,6 +3203,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'granulated-sugar',
+    category: 'sweet',
     barcode: null,
     name_en: 'Granulated sugar',
     name_pl: 'Cukier kryształ',
@@ -2926,6 +3215,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'maple-syrup',
+    category: 'sweet',
     barcode: null,
     name_en: 'Maple syrup',
     name_pl: 'Syrop klonowy',
@@ -2937,6 +3227,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'strawberry-jam',
+    category: 'sweet',
     barcode: null,
     name_en: 'Strawberry jam',
     name_pl: 'Dżem truskawkowy',
@@ -2948,6 +3239,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'nutella-hazelnut-cocoa-spread',
+    category: 'sweet',
     barcode: null,
     name_en: 'Nutella hazelnut cocoa spread',
     name_pl: 'Krem Nutella',
@@ -2959,6 +3251,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'dark-chocolate',
+    category: 'sweet',
     barcode: null,
     name_en: 'Dark chocolate',
     name_pl: 'Czekolada gorzka',
@@ -2970,6 +3263,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'milk-chocolate',
+    category: 'sweet',
     barcode: null,
     name_en: 'Milk chocolate',
     name_pl: 'Czekolada mleczna',
@@ -2981,6 +3275,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'popcorn-air-popped',
+    category: 'snack',
     barcode: null,
     name_en: 'Popcorn, air-popped',
     name_pl: 'Popcorn bez tłuszczu',
@@ -2992,6 +3287,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'potato-chips',
+    category: 'snack',
     barcode: null,
     name_en: 'Potato chips',
     name_pl: 'Chipsy ziemniaczane',
@@ -3003,6 +3299,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'tortilla-chips',
+    category: 'snack',
     barcode: null,
     name_en: 'Tortilla chips',
     name_pl: 'Chipsy tortilla',
@@ -3014,6 +3311,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'pretzels',
+    category: 'snack',
     barcode: null,
     name_en: 'Pretzels',
     name_pl: 'Precelki',
@@ -3025,6 +3323,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'granola',
+    category: 'grain',
     barcode: null,
     name_en: 'Granola',
     name_pl: 'Granola',
@@ -3038,6 +3337,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // Unbranded entries are representative quick-log estimates; labels vary by flavor.
   {
     seedKey: 'wpc-75-whey-protein-powder',
+    category: 'supplement',
     barcode: null,
     name_en: 'WPC 75 whey protein powder',
     name_pl: 'Odżywka białkowa WPC 75',
@@ -3049,6 +3349,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'wpc-80-whey-protein-powder-plain',
+    category: 'supplement',
     barcode: null,
     name_en: 'WPC 80 whey protein powder, plain',
     name_pl: 'Odżywka białkowa WPC 80 naturalna',
@@ -3060,6 +3361,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'whey-protein-powder-flavored',
+    category: 'supplement',
     barcode: null,
     name_en: 'Whey protein powder, flavored',
     name_pl: 'Odżywka białkowa whey smakowa',
@@ -3071,6 +3373,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'wpi-whey-isolate-protein-powder',
+    category: 'supplement',
     barcode: null,
     name_en: 'WPI whey isolate protein powder',
     name_pl: 'Odżywka białkowa WPI izolat serwatki',
@@ -3082,6 +3385,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'micellar-casein-protein-powder',
+    category: 'supplement',
     barcode: null,
     name_en: 'Micellar casein protein powder',
     name_pl: 'Odżywka białkowa kazeina micelarna',
@@ -3093,6 +3397,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'skyr-plain',
+    category: 'dairy',
     barcode: null,
     name_en: 'Skyr, plain',
     name_pl: 'Skyr naturalny',
@@ -3104,6 +3409,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'quark-low-fat',
+    category: 'dairy',
     barcode: null,
     name_en: 'Quark, low-fat',
     name_pl: 'Twaróg chudy',
@@ -3115,6 +3421,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'quark-semi-fat',
+    category: 'dairy',
     barcode: null,
     name_en: 'Quark, semi-fat',
     name_pl: 'Twaróg półtłusty',
@@ -3126,6 +3433,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   },
   {
     seedKey: 'high-protein-cottage-cheese',
+    category: 'dairy',
     barcode: null,
     name_en: 'High-protein cottage cheese',
     name_pl: 'Serek wiejski wysokobiałkowy',
@@ -3140,6 +3448,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 170698.
   {
     seedKey: 'fries-deep-fried',
+    category: 'meal',
     barcode: null,
     name_en: 'Fries, deep-fried',
     name_pl: 'Frytki smażone',
@@ -3152,6 +3461,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 169264.
   {
     seedKey: 'fries-oven-baked',
+    category: 'meal',
     barcode: null,
     name_en: 'Fries, oven-baked',
     name_pl: 'Frytki pieczone w piekarniku',
@@ -3164,6 +3474,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173292.
   {
     seedKey: 'pizza-cheese-regular-crust',
+    category: 'meal',
     barcode: null,
     name_en: 'Pizza, cheese, regular crust',
     name_pl: 'Pizza serowa na tradycyjnym cieście',
@@ -3176,6 +3487,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173295.
   {
     seedKey: 'pizza-pepperoni-regular-crust',
+    category: 'meal',
     barcode: null,
     name_en: 'Pizza, pepperoni, regular crust',
     name_pl: 'Pizza pepperoni na tradycyjnym cieście',
@@ -3188,6 +3500,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 170694.
   {
     seedKey: 'hamburger-with-condiments',
+    category: 'meal',
     barcode: null,
     name_en: 'Hamburger, with condiments',
     name_pl: 'Hamburger z sosami',
@@ -3200,6 +3513,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 170691.
   {
     seedKey: 'cheeseburger-with-condiments',
+    category: 'meal',
     barcode: null,
     name_en: 'Cheeseburger, with condiments',
     name_pl: 'Cheeseburger z sosami',
@@ -3212,6 +3526,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 170718.
   {
     seedKey: 'chicken-nuggets-fried',
+    category: 'meal',
     barcode: null,
     name_en: 'Chicken nuggets, fried',
     name_pl: 'Nuggetsy z kurczaka smażone',
@@ -3224,6 +3539,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 171633.
   {
     seedKey: 'frankfurter-sausage-boiled',
+    category: 'meat',
     barcode: null,
     name_en: 'Frankfurter sausage, boiled',
     name_pl: 'Parówka gotowana',
@@ -3236,6 +3552,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172455.
   {
     seedKey: 'falafel',
+    category: 'meal',
     barcode: null,
     name_en: 'Falafel',
     name_pl: 'Falafel',
@@ -3248,6 +3565,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 170092.
   {
     seedKey: 'potato-pancakes',
+    category: 'meal',
     barcode: null,
     name_en: 'Potato pancakes',
     name_pl: 'Placki ziemniaczane',
@@ -3260,6 +3578,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 168555.
   {
     seedKey: 'mashed-potatoes-with-milk-and-butter',
+    category: 'meal',
     barcode: null,
     name_en: 'Mashed potatoes, with milk and butter',
     name_pl: 'Puree ziemniaczane z mlekiem i masłem',
@@ -3272,6 +3591,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 168914.
   {
     seedKey: 'rice-noodles-cooked',
+    category: 'grain',
     barcode: null,
     name_en: 'Rice noodles, cooked',
     name_pl: 'Makaron ryżowy gotowany',
@@ -3284,6 +3604,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 174987.
   {
     seedKey: 'butter-croissant',
+    category: 'sweet',
     barcode: null,
     name_en: 'Butter croissant',
     name_pl: 'Croissant maślany',
@@ -3296,6 +3617,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172759.
   {
     seedKey: 'doughnut-jam-filled',
+    category: 'sweet',
     barcode: null,
     name_en: 'Doughnut, jam-filled',
     name_pl: 'Pączek z dżemem',
@@ -3308,6 +3630,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 175009.
   {
     seedKey: 'pancakes-plain',
+    category: 'sweet',
     barcode: null,
     name_en: 'Pancakes, plain',
     name_pl: 'Pancakes, placuszki bez dodatków',
@@ -3320,6 +3643,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 175039.
   {
     seedKey: 'waffles-plain',
+    category: 'sweet',
     barcode: null,
     name_en: 'Waffles, plain',
     name_pl: 'Gofry bez dodatków',
@@ -3332,6 +3656,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 167575.
   {
     seedKey: 'ice-cream-vanilla',
+    category: 'sweet',
     barcode: null,
     name_en: 'Ice cream, vanilla',
     name_pl: 'Lody waniliowe',
@@ -3344,6 +3669,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 168809.
   {
     seedKey: 'ice-cream-chocolate',
+    category: 'sweet',
     barcode: null,
     name_en: 'Ice cream, chocolate',
     name_pl: 'Lody czekoladowe',
@@ -3356,6 +3682,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172711.
   {
     seedKey: 'cheesecake',
+    category: 'sweet',
     barcode: null,
     name_en: 'Cheesecake',
     name_pl: 'Sernik',
@@ -3368,6 +3695,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 174949.
   {
     seedKey: 'brownie',
+    category: 'sweet',
     barcode: null,
     name_en: 'Brownie',
     name_pl: 'Brownie',
@@ -3380,6 +3708,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172234.
   {
     seedKey: 'mustard-yellow',
+    category: 'condiment',
     barcode: null,
     name_en: 'Mustard, yellow',
     name_pl: 'Musztarda żółta',
@@ -3392,6 +3721,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 168558.
   {
     seedKey: 'dill-pickles',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Dill pickles',
     name_pl: 'Ogórki konserwowe z koperkiem',
@@ -3404,6 +3734,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 169279.
   {
     seedKey: 'sauerkraut',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Sauerkraut',
     name_pl: 'Kapusta kiszona',
@@ -3416,6 +3747,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 169096.
   {
     seedKey: 'green-olives',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Green olives',
     name_pl: 'Oliwki zielone',
@@ -3428,6 +3760,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 174648.
   {
     seedKey: 'corn-flakes',
+    category: 'grain',
     barcode: null,
     name_en: 'Corn flakes',
     name_pl: 'Płatki kukurydziane',
@@ -3440,6 +3773,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 174852.
   {
     seedKey: 'cola-regular',
+    category: 'drink',
     barcode: null,
     name_en: 'Cola, regular',
     name_pl: 'Cola z cukrem',
@@ -3452,6 +3786,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 169098.
   {
     seedKey: 'orange-juice',
+    category: 'drink',
     barcode: null,
     name_en: 'Orange juice',
     name_pl: 'Sok pomarańczowy',
@@ -3464,6 +3799,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173933.
   {
     seedKey: 'apple-juice-unsweetened',
+    category: 'drink',
     barcode: null,
     name_en: 'Apple juice, unsweetened',
     name_pl: 'Sok jabłkowy bez dodatku cukru',
@@ -3476,6 +3812,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 168746.
   {
     seedKey: 'beer-regular',
+    category: 'alcohol',
     barcode: null,
     name_en: 'Beer, regular',
     name_pl: 'Piwo jasne',
@@ -3488,6 +3825,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 171890.
   {
     seedKey: 'coffee-black-brewed',
+    category: 'hotDrink',
     barcode: null,
     name_en: 'Coffee, black, brewed',
     name_pl: 'Kawa czarna parzona',
@@ -3500,6 +3838,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173227.
   {
     seedKey: 'tea-black-brewed',
+    category: 'hotDrink',
     barcode: null,
     name_en: 'Tea, black, brewed',
     name_pl: 'Herbata czarna parzona',
@@ -3512,6 +3851,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 171176.
   {
     seedKey: 'tomato-soup-ready-to-eat',
+    category: 'meal',
     barcode: null,
     name_en: 'Tomato soup, ready to eat',
     name_pl: 'Zupa pomidorowa gotowa do spożycia',
@@ -3524,6 +3864,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172909.
   {
     seedKey: 'chicken-noodle-soup-ready-to-eat',
+    category: 'meal',
     barcode: null,
     name_en: 'Chicken noodle soup, ready to eat',
     name_pl: 'Zupa z kurczakiem i makaronem gotowa do spożycia',
@@ -3536,6 +3877,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // Estimate: equal edible weights of boiled frankfurter (FDC 171633) and bun (FDC 172796).
   {
     seedKey: 'hot-dog-plain-no-sauces',
+    category: 'meal',
     barcode: null,
     name_en: 'Hot dog, plain, no sauces',
     name_pl: 'Hot dog bez sosów',
@@ -3550,6 +3892,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 169850.
   {
     seedKey: 'lasagna-with-meat',
+    category: 'meal',
     barcode: null,
     name_en: 'Lasagna, with meat',
     name_pl: 'Lasagne z mięsem',
@@ -3562,6 +3905,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 167680.
   {
     seedKey: 'spaghetti-with-meat-sauce',
+    category: 'meal',
     barcode: null,
     name_en: 'Spaghetti, with meat sauce',
     name_pl: 'Spaghetti z sosem mięsnym',
@@ -3574,6 +3918,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 169770.
   {
     seedKey: 'macaroni-and-cheese-prepared',
+    category: 'meal',
     barcode: null,
     name_en: 'Macaroni and cheese, prepared',
     name_pl: 'Makaron z sosem serowym',
@@ -3586,6 +3931,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173330.
   {
     seedKey: 'beef-stew-canned',
+    category: 'meal',
     barcode: null,
     name_en: 'Beef stew, canned',
     name_pl: 'Gulasz wołowy z puszki',
@@ -3598,6 +3944,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172039.
   {
     seedKey: 'burrito-beans-and-cheese',
+    category: 'meal',
     barcode: null,
     name_en: 'Burrito, beans and cheese',
     name_pl: 'Burrito z fasolą i serem',
@@ -3610,6 +3957,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 174195.
   {
     seedKey: 'fish-fingers-cooked',
+    category: 'fish',
     barcode: null,
     name_en: 'Fish fingers, cooked',
     name_pl: 'Paluszki rybne po obróbce termicznej',
@@ -3622,6 +3970,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 169846.
   {
     seedKey: 'fish-fillet-breaded-and-fried',
+    category: 'fish',
     barcode: null,
     name_en: 'Fish fillet, breaded and fried',
     name_pl: 'Filet rybny panierowany smażony',
@@ -3634,6 +3983,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 170697.
   {
     seedKey: 'onion-rings-fried',
+    category: 'meal',
     barcode: null,
     name_en: 'Onion rings, fried',
     name_pl: 'Krążki cebulowe smażone',
@@ -3646,6 +3996,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173628.
   {
     seedKey: 'chicken-wings-battered-and-fried',
+    category: 'meal',
     barcode: null,
     name_en: 'Chicken wings, battered and fried',
     name_pl: 'Skrzydełka z kurczaka w cieście smażone',
@@ -3658,6 +4009,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172187.
   {
     seedKey: 'scrambled-eggs',
+    category: 'egg',
     barcode: null,
     name_en: 'Scrambled eggs',
     name_pl: 'Jajecznica',
@@ -3670,6 +4022,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173423.
   {
     seedKey: 'egg-fried',
+    category: 'egg',
     barcode: null,
     name_en: 'Egg, fried',
     name_pl: 'Jajko sadzone',
@@ -3682,6 +4035,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172185.
   {
     seedKey: 'omelette-plain',
+    category: 'egg',
     barcode: null,
     name_en: 'Omelette, plain',
     name_pl: 'Omlet bez dodatków',
@@ -3694,6 +4048,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172186.
   {
     seedKey: 'egg-poached',
+    category: 'egg',
     barcode: null,
     name_en: 'Egg, poached',
     name_pl: 'Jajko w koszulce',
@@ -3706,6 +4061,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 169026.
   {
     seedKey: 'coleslaw',
+    category: 'meal',
     barcode: null,
     name_en: 'Coleslaw',
     name_pl: 'Surówka coleslaw',
@@ -3718,6 +4074,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 169269.
   {
     seedKey: 'potato-salad',
+    category: 'meal',
     barcode: null,
     name_en: 'Potato salad',
     name_pl: 'Sałatka ziemniaczana',
@@ -3730,6 +4087,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 175182.
   {
     seedKey: 'baked-beans-canned-vegetarian',
+    category: 'legume',
     barcode: null,
     name_en: 'Baked beans, canned, vegetarian',
     name_pl: 'Fasola w sosie z puszki bez mięsa',
@@ -3742,6 +4100,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 171241.
   {
     seedKey: 'gouda-cheese',
+    category: 'dairy',
     barcode: null,
     name_en: 'Gouda cheese',
     name_pl: 'Ser gouda',
@@ -3754,6 +4113,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172177.
   {
     seedKey: 'brie-cheese',
+    category: 'dairy',
     barcode: null,
     name_en: 'Brie cheese',
     name_pl: 'Ser brie',
@@ -3766,6 +4126,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172178.
   {
     seedKey: 'camembert-cheese',
+    category: 'dairy',
     barcode: null,
     name_en: 'Camembert cheese',
     name_pl: 'Ser camembert',
@@ -3778,6 +4139,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172938.
   {
     seedKey: 'salami-dry-pork',
+    category: 'meat',
     barcode: null,
     name_en: 'Salami, dry, pork',
     name_pl: 'Salami wieprzowe suszone',
@@ -3790,6 +4152,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173687.
   {
     seedKey: 'salmon-smoked',
+    category: 'fish',
     barcode: null,
     name_en: 'Salmon, smoked',
     name_pl: 'Łosoś wędzony',
@@ -3802,6 +4165,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173708.
   {
     seedKey: 'tuna-canned-in-oil-drained',
+    category: 'fish',
     barcode: null,
     name_en: 'Tuna, canned in oil, drained',
     name_pl: 'Tuńczyk w oleju z puszki odsączony',
@@ -3814,6 +4178,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 174832.
   {
     seedKey: 'almond-drink-unsweetened',
+    category: 'drink',
     barcode: null,
     name_en: 'Almond drink, unsweetened',
     name_pl: 'Napój migdałowy bez cukru',
@@ -3826,6 +4191,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172456.
   {
     seedKey: 'soy-drink-original-or-vanilla-fortified',
+    category: 'drink',
     barcode: null,
     name_en: 'Soy drink, original or vanilla, fortified',
     name_pl: 'Napój sojowy klasyczny lub waniliowy wzbogacany',
@@ -3838,6 +4204,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 170879.
   {
     seedKey: 'chocolate-milk-whole',
+    category: 'dairy',
     barcode: null,
     name_en: 'Chocolate milk, whole',
     name_pl: 'Mleko czekoladowe pełnotłuste',
@@ -3850,6 +4217,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 171277.
   {
     seedKey: 'hot-chocolate-with-milk',
+    category: 'hotDrink',
     barcode: null,
     name_en: 'Hot chocolate, with milk',
     name_pl: 'Gorąca czekolada na mleku',
@@ -3862,6 +4230,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173190.
   {
     seedKey: 'red-wine',
+    category: 'alcohol',
     barcode: null,
     name_en: 'Red wine',
     name_pl: 'Wino czerwone',
@@ -3874,6 +4243,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 174837.
   {
     seedKey: 'white-wine',
+    category: 'alcohol',
     barcode: null,
     name_en: 'White wine',
     name_pl: 'Wino białe',
@@ -3886,6 +4256,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 168165.
   {
     seedKey: 'raisins-seedless',
+    category: 'fruit',
     barcode: null,
     name_en: 'Raisins, seedless',
     name_pl: 'Rodzynki bez pestek',
@@ -3898,6 +4269,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173941.
   {
     seedKey: 'apricots-dried',
+    category: 'fruit',
     barcode: null,
     name_en: 'Apricots, dried',
     name_pl: 'Morele suszone',
@@ -3910,6 +4282,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 171726.
   {
     seedKey: 'dates-dried-deglet-noor',
+    category: 'fruit',
     barcode: null,
     name_en: 'Dates, dried, Deglet Noor',
     name_pl: 'Daktyle suszone Deglet Noor',
@@ -3922,6 +4295,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 168162.
   {
     seedKey: 'prunes-dried',
+    category: 'fruit',
     barcode: null,
     name_en: 'Prunes, dried',
     name_pl: 'Śliwki suszone',
@@ -3934,6 +4308,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172808.
   {
     seedKey: 'chocolate-chip-cookies',
+    category: 'sweet',
     barcode: null,
     name_en: 'Chocolate chip cookies',
     name_pl: 'Ciastka z kawałkami czekolady',
@@ -3946,6 +4321,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172697.
   {
     seedKey: 'chocolate-cake-without-frosting',
+    category: 'sweet',
     barcode: null,
     name_en: 'Chocolate cake, without frosting',
     name_pl: 'Ciasto czekoladowe bez polewy',
@@ -3958,6 +4334,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 172765.
   {
     seedKey: 'blueberry-muffin',
+    category: 'sweet',
     barcode: null,
     name_en: 'Blueberry muffin',
     name_pl: 'Muffin z borówkami',
@@ -3970,6 +4347,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173806.
   {
     seedKey: 'peanuts-dry-roasted-unsalted',
+    category: 'nut',
     barcode: null,
     name_en: 'Peanuts, dry-roasted, unsalted',
     name_pl: 'Orzechy ziemne prażone bez soli',
@@ -3982,6 +4360,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 167966.
   {
     seedKey: 'brown-rice-crackers-plain',
+    category: 'snack',
     barcode: null,
     name_en: 'Brown rice crackers, plain',
     name_pl: 'Krakersy z brązowego ryżu bez dodatków',
@@ -3994,6 +4373,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 169593.
   {
     seedKey: 'cocoa-powder-unsweetened',
+    category: 'sweet',
     barcode: null,
     name_en: 'Cocoa powder, unsweetened',
     name_pl: 'Kakao w proszku bez cukru',
@@ -4006,6 +4386,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 167767.
   {
     seedKey: 'pineapple-canned-in-juice-drained',
+    category: 'fruit',
     barcode: null,
     name_en: 'Pineapple, canned in juice, drained',
     name_pl: 'Ananas z puszki w soku odsączony',
@@ -4018,6 +4399,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 169214.
   {
     seedKey: 'sweetcorn-canned-drained',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Sweetcorn, canned, drained',
     name_pl: 'Kukurydza z puszki odsączona',
@@ -4030,6 +4412,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 169094.
   {
     seedKey: 'black-olives-canned',
+    category: 'vegetable',
     barcode: null,
     name_en: 'Black olives, canned',
     name_pl: 'Oliwki czarne z puszki',
@@ -4042,6 +4425,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 170173.
   {
     seedKey: 'coconut-milk-canned',
+    category: 'condiment',
     barcode: null,
     name_en: 'Coconut milk, canned',
     name_pl: 'Mleczko kokosowe z puszki',
@@ -4054,6 +4438,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 174523.
   {
     seedKey: 'barbecue-sauce',
+    category: 'condiment',
     barcode: null,
     name_en: 'Barbecue sauce',
     name_pl: 'Sos barbecue',
@@ -4068,6 +4453,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 168749.
   {
     seedKey: 'beer-light',
+    category: 'alcohol',
     barcode: null,
     name_en: 'Beer, light',
     name_pl: 'Piwo o obniżonej kaloryczności',
@@ -4080,6 +4466,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 171908.
   {
     seedKey: 'rose-wine',
+    category: 'alcohol',
     barcode: null,
     name_en: 'Rosé wine',
     name_pl: 'Wino różowe',
@@ -4092,6 +4479,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173176.
   {
     seedKey: 'dessert-wine-sweet',
+    category: 'alcohol',
     barcode: null,
     name_en: 'Dessert wine, sweet',
     name_pl: 'Wino deserowe słodkie',
@@ -4104,6 +4492,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 174818.
   {
     seedKey: 'vodka-40-pct-alcohol',
+    category: 'alcohol',
     barcode: null,
     name_en: 'Vodka, 40% alcohol',
     name_pl: 'Wódka 40%',
@@ -4116,6 +4505,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 174817.
   {
     seedKey: 'rum-40-pct-alcohol',
+    category: 'alcohol',
     barcode: null,
     name_en: 'Rum, 40% alcohol',
     name_pl: 'Rum 40%',
@@ -4128,6 +4518,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 174815.
   {
     seedKey: 'gin-40-pct-alcohol',
+    category: 'alcohol',
     barcode: null,
     name_en: 'Gin, 40% alcohol',
     name_pl: 'Gin 40%',
@@ -4140,6 +4531,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 174819.
   {
     seedKey: 'whiskey-43-pct-alcohol',
+    category: 'alcohol',
     barcode: null,
     name_en: 'Whiskey, 43% alcohol',
     name_pl: 'Whisky 43%',
@@ -4152,6 +4544,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 175098.
   {
     seedKey: 'coffee-cream-liqueur-17-pct-alcohol',
+    category: 'alcohol',
     barcode: null,
     name_en: 'Coffee cream liqueur, 17% alcohol',
     name_pl: 'Likier kawowy ze śmietanką 17%',
@@ -4164,6 +4557,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 168752.
   {
     seedKey: 'pina-colada-prepared',
+    category: 'alcohol',
     barcode: null,
     name_en: 'Piña colada, prepared',
     name_pl: 'Piña colada gotowa',
@@ -4176,6 +4570,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 173662.
   {
     seedKey: 'whiskey-sour-prepared',
+    category: 'alcohol',
     barcode: null,
     name_en: 'Whiskey sour, prepared',
     name_pl: 'Whiskey sour gotowy',
@@ -4188,6 +4583,7 @@ export const foodProductSeeds: FoodProductSeed[] = [
   // USDA SR Legacy, FDC 167723.
   {
     seedKey: 'sake',
+    category: 'alcohol',
     barcode: null,
     name_en: 'Sake',
     name_pl: 'Sake',
@@ -4198,3 +4594,10 @@ export const foodProductSeeds: FoodProductSeed[] = [
     carbsPer100gHundredths: 500,
   },
 ];
+
+const categoryBySeedKey = new Map(foodProductSeeds.map((seed) => [seed.seedKey, seed.category]));
+
+/** Category of a seeded catalog product; null for user-created products. */
+export function foodProductCategory(seedKey: string | null): FoodProductCategory | null {
+  return seedKey ? (categoryBySeedKey.get(seedKey) ?? null) : null;
+}
