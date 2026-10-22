@@ -16,6 +16,7 @@ import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import css from '../CalorieFlows.module.css';
 import { useProportionalNutrition } from './useProportionalNutrition';
+import { caloriesReturnState } from '../caloriesReturnScroll';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export function EditFoodLogPage({ log }: { log: CalorieLog }) {
@@ -47,7 +48,12 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
       ...(isProduct ? {} : { imageAction: photo.imageAction, photo: photo.photo }),
     });
     await router.invalidate();
-    await _navigate({ replace: true, search: { date: nextDate }, to: '/calories' });
+    await _navigate({
+      replace: true,
+      search: { date: nextDate },
+      state: caloriesReturnState(nextDate),
+      to: '/calories',
+    });
   }
 
   return (

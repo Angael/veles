@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
+import { caloriesReturnState } from '../caloriesReturnScroll';
 import { useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { calorieDashboardQueryOptions, useRecordFoodMutation } from '../calories.query';
@@ -49,7 +50,12 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
       grams: selectedGrams,
       productId: food.id,
     });
-    await navigate({ replace: true, search: { date }, to: '/calories' });
+    await navigate({
+      replace: true,
+      search: { date },
+      state: caloriesReturnState(date),
+      to: '/calories',
+    });
   }
 
   return (
