@@ -5,7 +5,6 @@ import { VersionConflictError } from '@/lib/errors/VersionConflictError';
 import { invariant } from '@/lib/invariant';
 import { db, type DbTransaction } from '@/server/db.server';
 import type {
-  createNoteInputType,
   updateNoteInputType,
   deleteNoteInputType,
   setNoteSharedInputType,
@@ -54,22 +53,6 @@ export function noteVersionConflict() {
       pl: 'Ta notatka zmieniła się w innym miejscu. Wczytaj najnowszą wersję przed kolejnym zapisem.',
     }),
   );
-}
-
-/** Creates a note for the authenticated owner. */
-export async function createNoteRecord(userId: string, data: typeof createNoteInputType.infer) {
-  const [created] = await db
-    .insert(notes)
-    .values({
-      content: data.content,
-      ownerId: userId,
-      title: data.title,
-      type: data.type,
-    })
-    .returning({ id: notes.id, version: notes.version });
-
-  invariant(created, 'Note could not be created.');
-  return created;
 }
 
 /** Edits note text in the caller's scope only if `data.version` is current; one UPDATE checks and increments it. */

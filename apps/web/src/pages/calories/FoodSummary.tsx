@@ -44,9 +44,15 @@ export function FoodSummary({
       <div className={css.body}>
         <div className={css.identity}>
           <strong>{name}</strong>
-          {meta ? <span>{meta}</span> : null}
         </div>
-        <NutritionInline carbs={carbs} fat={fat} kcal={kcal} protein={protein} stacked />
+        <NutritionInline
+          carbs={carbs}
+          energyMeta={meta}
+          fat={fat}
+          kcal={kcal}
+          protein={protein}
+          stacked
+        />
       </div>
       {action ? <div className={css.action}>{action}</div> : null}
     </div>

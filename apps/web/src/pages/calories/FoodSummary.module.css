@@ -60,24 +60,14 @@
   gap: 0.35rem;
 }
 
+/* Block flow lets long names use the full row width. */
 .identity {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-xs);
   min-width: 0;
 
   & strong {
-    min-width: 0;
     color: var(--c-text-strong);
     font-size: var(--text-lg);
     overflow-wrap: anywhere;
-  }
-
-  & span {
-    flex: none;
-    color: var(--c-muted);
-    font-size: var(--text-sm);
-    font-variant-numeric: tabular-nums;
   }
 
   & a {
@@ -126,14 +116,8 @@
   }
 
   .identity {
-    gap: var(--space-xs);
-
     & strong {
       font-size: var(--text-md-dynamic);
-    }
-
-    & span {
-      font-size: var(--text-xs);
     }
   }
 }

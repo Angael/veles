@@ -17,8 +17,9 @@
 .head,
 .allRow,
 .row {
+  /* Fixed toggle columns keep every row aligned; only the label track shrinks and wraps. */
   display: grid;
-  grid-template-columns: 1fr 3.5rem 3.5rem;
+  grid-template-columns: minmax(0, 1fr) repeat(2, 3.5rem);
   align-items: center;
   justify-items: center;
   gap: var(--space-xs);
@@ -27,6 +28,8 @@
   & > :first-child {
     justify-self: start;
     min-width: 0;
+    overflow-wrap: anywhere;
+    hyphens: auto;
   }
 }
 
@@ -34,6 +37,7 @@
   min-height: auto;
   color: var(--c-muted-strong);
   font-size: var(--text-xs);
+  text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -49,6 +53,10 @@
     color: var(--c-text-strong);
     font-weight: var(--font-weight-semibold);
   }
+}
+
+.row {
+  padding-block: 0.25rem;
 }
 
 .row + .row {

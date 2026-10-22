@@ -190,6 +190,10 @@ async function seedDatabase(connectionString: string) {
     await seedFoodProducts(client);
     await seedFoodLogs(client, devUser.id);
     await seedRecipes(client, devUser.id);
+    await seedCalorieDayNotes(client, devUser.id);
+    await seedWeights(client, devUser.id);
+    await seedNotes(client, devUser.id);
+    await seedWorkouts(client, devUser.id);
     await client.query('COMMIT');
   } catch (error) {
     await client.query('ROLLBACK');
@@ -448,6 +452,294 @@ async function seedRecipes(client: Client, userId: string) {
         recipe.carbs,
       ],
     );
+  }
+}
+
+/** Returns the UTC calendar date `days` before today, so fixtures stay on the rolling dashboard. */
+function daysAgo(days: number) {
+  const date = new Date();
+  date.setUTCHours(0, 0, 0, 0);
+  date.setUTCDate(date.getUTCDate() - days);
+  return date;
+}
+
+function dateKey(date: Date) {
+  return date.toISOString().slice(0, 10);
+}
+
+/** Seeds one off-plan day and a plain note on the food diary history. */
+async function seedCalorieDayNotes(client: Client, userId: string) {
+  const dayNotes = [
+    { daysAgo: 12, offPlan: true, note: 'Birthday party, stopped logging after lunch.' },
+    { daysAgo: 4, offPlan: false, note: 'Felt hungry all day, more protein tomorrow.' },
+  ];
+
+  for (const dayNote of dayNotes) {
+    await client.query(
+      `INSERT INTO calorie_day_note (user_id, date, off_plan, note) VALUES ($1, $2, $3, $4)`,
+      [userId, dateKey(daysAgo(dayNote.daysAgo)), dayNote.offPlan, dayNote.note],
+    );
+  }
+}
+
+/** Seeds a slow cutting trend over five weeks, with a few skipped weigh-ins. */
+async function seedWeights(client: Client, userId: string) {
+  for (let day = 34; day >= 0; day--) {
+    if (day % 6 === 3) continue;
+
+    const trendGrams = 82_000 - (34 - day) * 60;
+    const noiseGrams = ((day * 37) % 7) * 100 - 300;
+    await client.query(
+      `INSERT INTO weight_entry (user_id, weight_grams, date) VALUES ($1, $2, $3)`,
+      [userId, trendGrams + noiseGrams, dateKey(daysAgo(day))],
+    );
+  }
+}
+
+/** Seeds a plain note and a partly checked shopping list. */
+async function seedNotes(client: Client, userId: string) {
+  const noteResult = await client.query<{ id: string }>(
+    `INSERT INTO note (type, title, content, owner_id) VALUES ('note', $1, $2, $3) RETURNING id`,
+    [
+      'Meal prep ideas',
+      'Chicken rice bowls for Monday to Wednesday.\nTry the salmon with potatoes on Friday.',
+      userId,
+    ],
+  );
+
+  if (!noteResult.rows[0]) {
+    throw new Error('Failed to seed note.');
+  }
+
+  const listResult = await client.query<{ id: string }>(
+    `INSERT INTO note (type, title, owner_id) VALUES ('shopping_list', $1, $2) RETURNING id`,
+    ['Groceries', userId],
+  );
+  const listId = listResult.rows[0]?.id;
+
+  if (!listId) {
+    throw new Error('Failed to seed shopping list.');
+  }
+
+  const items = [
+    { name: 'Chicken breast', checked: true },
+    { name: 'Rice', checked: true },
+    { name: 'Greek yogurt', checked: false },
+    { name: 'Bananas', checked: false },
+    { name: 'Oats', checked: false },
+  ];
+
+  for (const item of items) {
+    await client.query(`INSERT INTO list_item (note_id, name, checked) VALUES ($1, $2, $3)`, [
+      listId,
+      item.name,
+      item.checked,
+    ]);
+  }
+}
+
+type SeedSlot = { key: string; notes: string; sets: SeedSet[] };
+
+type SeedSet = {
+  type?: 'normal' | 'warmup' | 'drop' | 'failure';
+  kg?: number;
+  reps?: number;
+  seconds?: number;
+  meters?: number;
+};
+
+/**
+ * Seeds exercises, two routines, and finished sessions over the last two weeks.
+ * Working weights rise slightly between sessions, so progress views have a trend.
+ */
+async function seedWorkouts(client: Client, userId: string) {
+  const exercises = [
+    { key: 'bench', name: 'Bench press', measure: 'weight_reps', restSeconds: 150 },
+    { key: 'ohp', name: 'Overhead press', measure: 'weight_reps', restSeconds: 120 },
+    { key: 'pullup', name: 'Pull-up', measure: 'reps', restSeconds: 120 },
+    { key: 'squat', name: 'Back squat', measure: 'weight_reps', restSeconds: 180 },
+    { key: 'deadlift', name: 'Romanian deadlift', measure: 'weight_reps', restSeconds: 150 },
+    { key: 'plank', name: 'Plank', measure: 'duration', restSeconds: 60 },
+    { key: 'run', name: 'Running', measure: 'distance_duration', restSeconds: null },
+  ] as const;
+  const exerciseIds = new Map<string, string>();
+
+  for (const exercise of exercises) {
+    const result = await client.query<{ id: string }>(
+      `INSERT INTO workout_exercise (user_id, name, measure, rest_seconds)
+       VALUES ($1, $2, $3, $4) RETURNING id`,
+      [userId, exercise.name, exercise.measure, exercise.restSeconds],
+    );
+    const id = result.rows[0]?.id;
+    if (!id) throw new Error(`Failed to seed exercise ${exercise.name}.`);
+    exerciseIds.set(exercise.key, id);
+  }
+
+  const exerciseId = (key: string) => {
+    const id = exerciseIds.get(key);
+    if (!id) throw new Error(`Unknown seed exercise ${key}.`);
+    return id;
+  };
+  const routines = [
+    {
+      key: 'upper',
+      name: 'Upper body',
+      description: 'Push and pull, twice a week.',
+      exercises: [
+        { key: 'bench', setTypes: ['warmup', 'normal', 'normal', 'normal'] },
+        { key: 'ohp', setTypes: ['normal', 'normal', 'normal'] },
+        { key: 'pullup', setTypes: ['normal', 'normal', 'failure'] },
+      ],
+    },
+    {
+      key: 'lower',
+      name: 'Lower body',
+      description: '',
+      exercises: [
+        { key: 'squat', setTypes: ['warmup', 'normal', 'normal', 'normal'] },
+        { key: 'deadlift', setTypes: ['normal', 'normal', 'normal'] },
+        { key: 'plank', setTypes: ['normal', 'normal'] },
+      ],
+    },
+  ] as const;
+  const routineIds = new Map<string, string>();
+
+  for (const routine of routines) {
+    const result = await client.query<{ id: string }>(
+      `INSERT INTO workout_routine (user_id, name, description) VALUES ($1, $2, $3) RETURNING id`,
+      [userId, routine.name, routine.description],
+    );
+    const routineId = result.rows[0]?.id;
+    if (!routineId) throw new Error(`Failed to seed routine ${routine.name}.`);
+    routineIds.set(routine.key, routineId);
+
+    for (const [position, slot] of routine.exercises.entries()) {
+      await client.query(
+        `INSERT INTO workout_routine_exercise (routine_id, exercise_id, position, set_types)
+         VALUES ($1, $2, $3, $4)`,
+        [routineId, exerciseId(slot.key), position, slot.setTypes],
+      );
+    }
+  }
+
+  const upper = (step: number): SeedSlot[] => [
+    {
+      key: 'bench',
+      notes: step === 0 ? 'Pause on chest.' : '',
+      sets: [
+        { type: 'warmup', kg: 40, reps: 10 },
+        { kg: 70 + step * 2.5, reps: 8 },
+        { kg: 70 + step * 2.5, reps: 8 },
+        { kg: 70 + step * 2.5, reps: 7 },
+      ],
+    },
+    {
+      key: 'ohp',
+      notes: '',
+      sets: [
+        { kg: 40 + step * 1.25, reps: 8 },
+        { kg: 40 + step * 1.25, reps: 8 },
+        { kg: 40 + step * 1.25, reps: 6 },
+      ],
+    },
+    {
+      key: 'pullup',
+      notes: '',
+      sets: [{ reps: 8 + step }, { reps: 7 + step }, { type: 'failure', reps: 6 + step }],
+    },
+  ];
+  const lower = (step: number): SeedSlot[] => [
+    {
+      key: 'squat',
+      notes: step === 0 ? 'Knees out, belt on top sets.' : '',
+      sets: [
+        { type: 'warmup', kg: 60, reps: 8 },
+        { kg: 100 + step * 5, reps: 5 },
+        { kg: 100 + step * 5, reps: 5 },
+        { kg: 100 + step * 5, reps: 5 },
+      ],
+    },
+    {
+      key: 'deadlift',
+      notes: '',
+      sets: [
+        { kg: 90 + step * 5, reps: 8 },
+        { kg: 90 + step * 5, reps: 8 },
+        { kg: 90 + step * 5, reps: 8 },
+      ],
+    },
+    { key: 'plank', notes: '', sets: [{ seconds: 60 + step * 15 }, { seconds: 60 + step * 15 }] },
+  ];
+  const sessions: {
+    daysAgo: number;
+    name: string;
+    routineKey?: string;
+    durationSeconds?: number;
+    exercises: SeedSlot[];
+  }[] = [
+    { daysAgo: 13, name: 'Upper body', routineKey: 'upper', exercises: upper(0) },
+    { daysAgo: 11, name: 'Lower body', routineKey: 'lower', exercises: lower(0) },
+    {
+      daysAgo: 9,
+      name: 'Morning run',
+      exercises: [{ key: 'run', notes: '', sets: [{ meters: 5_000, seconds: 1_620 }] }],
+    },
+    { daysAgo: 8, name: 'Upper body', routineKey: 'upper', exercises: upper(1) },
+    { daysAgo: 6, name: 'Lower body', routineKey: 'lower', exercises: lower(1) },
+    { daysAgo: 5, name: 'Football', durationSeconds: 90 * 60, exercises: [] },
+    { daysAgo: 3, name: 'Upper body', routineKey: 'upper', exercises: upper(2) },
+    { daysAgo: 1, name: 'Lower body', routineKey: 'lower', exercises: lower(2) },
+  ];
+
+  for (const session of sessions) {
+    const startedAt = daysAgo(session.daysAgo);
+    startedAt.setUTCHours(17, 30);
+    let setTime = startedAt.getTime();
+    const endedAt = new Date(startedAt.getTime() + (session.durationSeconds ?? 60 * 60) * 1000);
+    const result = await client.query<{ id: string }>(
+      `INSERT INTO workout_session (user_id, name, routine_id, date, started_at, ended_at, duration_seconds)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+      [
+        userId,
+        session.name,
+        session.routineKey ? routineIds.get(session.routineKey) : null,
+        dateKey(daysAgo(session.daysAgo)),
+        startedAt,
+        endedAt,
+        session.durationSeconds ?? null,
+      ],
+    );
+    const sessionId = result.rows[0]?.id;
+    if (!sessionId) throw new Error(`Failed to seed session ${session.name}.`);
+
+    for (const [position, slot] of session.exercises.entries()) {
+      const slotResult = await client.query<{ id: string }>(
+        `INSERT INTO workout_session_exercise (session_id, exercise_id, position, notes)
+         VALUES ($1, $2, $3, $4) RETURNING id`,
+        [sessionId, exerciseId(slot.key), position, slot.notes],
+      );
+      const sessionExerciseId = slotResult.rows[0]?.id;
+      if (!sessionExerciseId) throw new Error(`Failed to seed session exercise ${slot.key}.`);
+
+      for (const [setPosition, set] of slot.sets.entries()) {
+        setTime += 3 * 60 * 1000;
+        await client.query(
+          `INSERT INTO workout_set
+            (session_exercise_id, position, type, weight_grams, reps, duration_seconds, distance_meters, completed_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [
+            sessionExerciseId,
+            setPosition,
+            set.type ?? 'normal',
+            set.kg === undefined ? null : Math.round(set.kg * 1000),
+            set.reps ?? null,
+            set.seconds ?? null,
+            set.meters ?? null,
+            new Date(Math.min(setTime, endedAt.getTime())),
+          ],
+        );
+      }
+    }
   }
 }
 

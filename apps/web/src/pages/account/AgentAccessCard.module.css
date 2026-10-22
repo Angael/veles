@@ -54,11 +54,12 @@
   gap: var(--space-sm);
 }
 
+/* Title and button share the first row; the hint spans the full width below, so the button never shrinks. */
 .blockHead {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-md);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.25rem var(--space-md);
 
   & h3 {
     color: var(--c-text-strong);
@@ -66,6 +67,7 @@
   }
 
   & p {
+    grid-column: 1 / -1;
     color: var(--c-muted);
     font-size: var(--text-sm);
     text-wrap: pretty;
@@ -79,7 +81,7 @@
 
 .keyRow {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm);
@@ -131,12 +133,22 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 0.25rem 0.6rem;
+    min-width: 0;
     color: var(--c-muted-strong);
     font-size: var(--text-xs);
+
+    & > * {
+      min-width: 0;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
   }
 
   & code {
+    overflow: hidden;
     padding: 0.05rem 0.4rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     border-radius: 6px;
     background: var(--c-surface-raised);
     color: var(--c-muted);
@@ -189,7 +201,7 @@
 
   & > summary {
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
     gap: var(--space-xs);
     padding: var(--space-sm) var(--space-md);
@@ -209,6 +221,7 @@
     }
 
     & small {
+      white-space: nowrap;
       color: var(--c-muted-strong);
       font-size: var(--text-xs);
       font-weight: var(--font-weight-regular);
@@ -222,6 +235,16 @@
   &[open] .chevron {
     transform: rotate(180deg);
   }
+}
+
+/* Title and count wrap onto two lines when the row is narrow, instead of squeezing the title. */
+.summaryText {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.1rem var(--space-xs);
+  min-width: 0;
 }
 
 .chevron {
