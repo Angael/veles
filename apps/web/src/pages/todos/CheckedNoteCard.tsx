@@ -1,13 +1,15 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
-import { PlusIcon, Trash2Icon } from 'lucide-react';
-import { useState } from 'react';
+import { PlusIcon } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { v7 as uuidv7 } from 'uuid';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
+import { CheckedNoteItem } from './CheckedNoteItem';
+import { focusField } from './ChecklistItemInput';
 import { listItemsCollection, useListItemsCollection } from './listItems.collection';
 import { NoteActions } from './NoteActions';
-import type { NoteListItem, NoteSummary } from './notes.api';
+import type { NoteSummary } from './notes.api';
 import { useUpdateNoteMutation } from './notes.query';
 import css from './TodosPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
@@ -15,6 +17,8 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 export function CheckedNoteCard({ note }: { note: NoteSummary }) {
   const { t } = useI18n();
   const [newItemId, setNewItemId] = useState<string | null>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const listItems = useListItemsCollection();
   const updateNote = useUpdateNoteMutation();
   // Live query: re-runs incrementally whenever a row in the collection changes, including
@@ -28,6 +32,9 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
         .orderBy(({ item }) => item.createdAt)
         .orderBy(({ item }) => item.id),
   });
+
+  const itemField = (id: string | undefined) =>
+    id ? listRef.current?.querySelector<HTMLTextAreaElement>(`[data-item-id="${id}"]`) : null;
 
   /**
    * Appends an empty item and focuses it at once. The client picks the id, so the row
@@ -43,6 +50,51 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
       noteId: note.id,
     });
     setNewItemId(id);
+  };
+
+  /** Enter goes to the next item; on the last item it adds a new one, as items sort by creation. */
+  const goToNextItem = (index: number) => {
+    const next = items[index + 1];
+    if (next) focusField(itemField(next.id), 'end');
+    else addItem();
+  };
+
+  /**
+   * Deletes an item. When its field has focus, focus first moves to a neighbor (or the title), so
+   * focus never drops to the page and the mobile keyboard stays open.
+   */
+  const removeItem = (index: number, direction: 'previous' | 'next' = 'previous') => {
+    const item = items[index];
+    if (!item) return;
+    const field = itemField(item.id);
+    // Moving focus away blurs the field; the flag stops its blur save from racing the delete.
+    field?.setAttribute('data-removed', '');
+    if (field === document.activeElement) {
+      const previous = items[index - 1];
+      const next = items[index + 1];
+      if (direction === 'previous' && previous) focusField(itemField(previous.id), 'end');
+      else if (next) focusField(itemField(next.id), 0);
+      else if (previous) focusField(itemField(previous.id), 'end');
+      else focusField(titleRef.current, 'end');
+    }
+    listItems.delete(item.id);
+  };
+
+  /** Backspace at the start of an item joins its text onto the previous item, like a text editor. */
+  const mergeIntoPrevious = (index: number, text: string) => {
+    const item = items[index];
+    const previous = items[index - 1];
+    const field = itemField(previous?.id);
+    if (!item || !previous || !field || field.value.length + text.length > 240) return;
+    itemField(item.id)?.setAttribute('data-removed', '');
+    const caret = field.value.length;
+    const name = field.value + text;
+    field.value = name;
+    focusField(field, caret);
+    listItems.update(previous.id, (draft) => {
+      draft.name = name.trim();
+    });
+    listItems.delete(item.id);
   };
 
   return (
@@ -66,6 +118,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
                 addItem();
               }
             }}
+            ref={titleRef}
             required
           />
         </h2>
@@ -74,13 +127,15 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
       {items.length === 0 ? (
         <p className={css.emptyList}>{t({ en: 'No items yet.', pl: 'Brak pozycji.' })}</p>
       ) : null}
-      <ul className={css.items}>
-        {items.map((item) => (
+      <ul className={css.items} ref={listRef}>
+        {items.map((item, index) => (
           <CheckedNoteItem
             autoFocus={item.id === newItemId}
             item={item}
             key={item.id}
-            onEnter={addItem}
+            onEnter={() => goToNextItem(index)}
+            onMergeIntoPrevious={index > 0 ? (text) => mergeIntoPrevious(index, text) : undefined}
+            onRemove={(direction) => removeItem(index, direction)}
           />
         ))}
       </ul>
@@ -89,6 +144,8 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
         className={css.addItem}
         icon={<PlusIcon aria-hidden='true' />}
         onClick={addItem}
+        // Keeps focus in the edited item, so the mobile keyboard does not close and reopen.
+        onMouseDown={(event) => event.preventDefault()}
         size='sm'
         type='button'
         variant='outlineMain'
@@ -96,94 +153,5 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
         {t({ en: 'Add item', pl: 'Dodaj pozycję' })}
       </Btn>
     </Card>
-  );
-}
-
-function CheckedNoteItem({
-  autoFocus,
-  item,
-  onEnter,
-}: {
-  autoFocus: boolean;
-  item: NoteListItem;
-  onEnter: () => void;
-}) {
-  const { t } = useI18n();
-  // No local state, effects, pending flags, or manual rollback: `item` is already optimistic.
-  const listItems = useListItemsCollection();
-  const deleteItem = () => listItems.delete(item.id);
-
-  return (
-    <li className={css.item}>
-      <input
-        aria-label={
-          item.checked
-            ? t(
-                item.name
-                  ? {
-                      en: `Mark ${item.name} as incomplete`,
-                      pl: `Oznacz ${item.name} jako niezrobione`,
-                    }
-                  : { en: 'Mark item as incomplete', pl: 'Oznacz pozycję jako niezrobioną' },
-              )
-            : t(
-                item.name
-                  ? { en: `Mark ${item.name} as complete`, pl: `Oznacz ${item.name} jako zrobione` }
-                  : { en: 'Mark item as complete', pl: 'Oznacz pozycję jako zrobioną' },
-              )
-        }
-        checked={item.checked}
-        onChange={(event) => {
-          const { checked } = event.currentTarget;
-          listItems.update(item.id, (draft) => {
-            draft.checked = checked;
-          });
-        }}
-        type='checkbox'
-      />
-      <SeamlessTextInput
-        autoFocus={autoFocus}
-        aria-label={t({ en: 'Checklist item', pl: 'Pozycja listy' })}
-        className={item.checked ? css.done : undefined}
-        defaultValue={item.name}
-        enterKeyHint='next'
-        maxLength={240}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
-            event.preventDefault();
-            onEnter();
-          } else if (
-            (event.key === 'Backspace' || event.key === 'Delete') &&
-            !event.currentTarget.value.trim()
-          ) {
-            event.preventDefault();
-            deleteItem();
-          }
-        }}
-        onBlur={(event) => {
-          const name = event.currentTarget.value.trim();
-          if (name !== item.name) {
-            listItems.update(item.id, (draft) => {
-              draft.name = name;
-            });
-          }
-        }}
-        placeholder={t({ en: 'New item', pl: 'Nowa pozycja' })}
-      />
-      <Btn
-        aria-label={t(
-          item.name
-            ? { en: `Delete ${item.name}`, pl: `Usuń: ${item.name}` }
-            : { en: 'Delete item', pl: 'Usuń pozycję' },
-        )}
-        className={css.deleteItem}
-        icon={<Trash2Icon aria-hidden='true' />}
-        iconOnly
-        onClick={deleteItem}
-        size='sm'
-        type='button'
-        variant='ghostDanger'
-      />
-    </li>
   );
 }
