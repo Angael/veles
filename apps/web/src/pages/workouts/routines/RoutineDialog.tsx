@@ -12,6 +12,7 @@ import { TextareaInput } from '@/components/ui/textarea-input/TextareaInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import css from './Routines.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
+import { selectOnMount } from '@/lib/selectOnMount';
 
 type RoutineDialogProps = {
   defaults: { name: string; description: string };
@@ -47,7 +48,13 @@ export function RoutineDialog({
           }}
         >
           <Label text={t({ en: 'Name', pl: 'Nazwa' })}>
-            <TextInput defaultValue={defaults.name} maxLength={200} name='name' required />
+            <TextInput
+              defaultValue={defaults.name}
+              maxLength={200}
+              name='name'
+              ref={selectOnMount}
+              required
+            />
           </Label>
           <Label text={t({ en: 'Description (optional)', pl: 'Opis (opcjonalnie)' })}>
             <TextareaInput

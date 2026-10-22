@@ -10,6 +10,7 @@ import type { SessionActions } from './session.query';
 import { SetRow } from './SetRow';
 import css from './Session.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
+import { selectOnMount } from '@/lib/selectOnMount';
 
 type ExerciseCardProps = {
   actions: SessionActions;
@@ -53,7 +54,6 @@ export function ExerciseCard({
           {renaming ? (
             <input
               aria-label={t({ en: 'Exercise name', pl: 'Nazwa ćwiczenia' })}
-              autoFocus
               className={css.renameInput}
               defaultValue={slot.name}
               onBlur={(event) => {
@@ -62,6 +62,7 @@ export function ExerciseCard({
                 setRenaming(false);
               }}
               onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.blur()}
+              ref={selectOnMount}
             />
           ) : (
             <h3>{slot.name}</h3>
