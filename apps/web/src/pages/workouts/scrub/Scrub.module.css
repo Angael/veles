@@ -103,6 +103,18 @@
 }
 
 /* Pins the decimal point near the centre, so whole numbers don't shift when a fraction appears. */
+.fractionDigits {
+  transition: opacity 0.1s ease-out;
+
+  &[data-padded] {
+    opacity: 0.45;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
 .padDigits {
   opacity: 0.45;
 }

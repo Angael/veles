@@ -22,13 +22,17 @@ export function ScrubNumber({
   if (decimals === 0) return text;
   // Read the locale's decimal separator from the formatter itself ("0.5" or "0,5").
   const separator = format(0.5).replace(/\d/g, '') || '.';
-  const shown = text.split(separator)[1]?.length ?? 0;
-  if (shown >= decimals) return text;
-  const pad = '0'.repeat(decimals - shown);
+  const [whole = text, digits = ''] = text.split(separator);
+  const pad = '0'.repeat(Math.max(0, decimals - digits.length));
+  // The fraction span stays mounted so its opacity can transition between real and padded digits.
   return (
     <>
-      {text}
-      <span className={css.padDigits}>{shown === 0 ? separator + pad : pad}</span>
+      {whole}
+      <span className={css.fractionDigits} data-padded={digits === '' || undefined}>
+        {separator}
+        {digits}
+        {digits !== '' && pad !== '' ? <span className={css.padDigits}>{pad}</span> : pad}
+      </span>
     </>
   );
 }
