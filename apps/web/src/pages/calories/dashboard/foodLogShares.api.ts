@@ -2,6 +2,7 @@ import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
 import { and, asc, desc, eq, inArray } from 'drizzle-orm';
+import { foodProductCategory, type FoodProductCategory } from '@veles/db/seed/food-products';
 import { foodLogShareItems, foodLogShares, foodLogs, foodProducts, users } from '@veles/db/schema';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
@@ -35,6 +36,7 @@ export type ReceivedFoodLogShareItem = {
   fat: number | null;
   carbs: number | null;
   imageUrl: string | null;
+  category: FoodProductCategory | null;
 };
 
 /** Lists the friends the signed-in user can send food logs to. */
@@ -153,6 +155,7 @@ export const getReceivedFoodLogShares = createServerFn({ method: 'GET' })
         item: foodLogShareItems,
         logEntry: foodLogs,
         productImageUploadObjectId: foodProducts.imageUploadObjectId,
+        productSeedKey: foodProducts.seedKey,
         senderName: users.name,
         shareId: foodLogShares.id,
       })
@@ -169,7 +172,8 @@ export const getReceivedFoodLogShares = createServerFn({ method: 'GET' })
     );
     const sharesById = new Map<string, ReceivedFoodLogShare>();
 
-    for (const { item, logEntry, productImageUploadObjectId, senderName, shareId } of rows) {
+    for (const row of rows) {
+      const { item, logEntry, productImageUploadObjectId, senderName, shareId } = row;
       const shared = scaleSharedLog(logEntry, item.gramsHundredths);
       const asset = assetsById.get(shared.imageUploadObjectId ?? productImageUploadObjectId ?? '');
       const share = sharesById.get(shareId) ?? { id: shareId, items: [], senderName };
@@ -183,6 +187,7 @@ export const getReceivedFoodLogShares = createServerFn({ method: 'GET' })
         fat: fromHundredths(shared.fatHundredths),
         carbs: fromHundredths(shared.carbsHundredths),
         imageUrl: asset ? storagePathToUrl(asset.key) : null,
+        category: foodProductCategory(row.productSeedKey),
       });
     }
 

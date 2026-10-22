@@ -4,6 +4,7 @@ import { createMiddleware, createServerFn } from '@tanstack/react-start';
 import { and, desc, eq, gte, inArray, lte } from 'drizzle-orm';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { calorieDayNotes, calorieGoals, foodLogs, foodProducts } from '@veles/db/schema';
+import { foodProductCategory, type FoodProductCategory } from '@veles/db/seed/food-products';
 import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
@@ -59,15 +60,22 @@ const limitFoodUploadRequestMiddleware = createMiddleware().server(async ({ next
   return next();
 });
 
-async function getProductImageIds(productIds: Array<string | null>) {
+type LogProduct = { imageUploadObjectId: string | null; seedKey: string | null };
+
+/** Loads the image and seed key of the products behind logs, so logs can fall back to them. */
+async function getLogProducts(productIds: Array<string | null>) {
   const ids = [...new Set(productIds.filter((id): id is string => Boolean(id)))];
-  if (ids.length === 0) return new Map<string, string | null>();
+  if (ids.length === 0) return new Map<string, LogProduct>();
 
   const products = await db
-    .select({ id: foodProducts.id, imageUploadObjectId: foodProducts.imageUploadObjectId })
+    .select({
+      id: foodProducts.id,
+      imageUploadObjectId: foodProducts.imageUploadObjectId,
+      seedKey: foodProducts.seedKey,
+    })
     .from(foodProducts)
     .where(inArray(foodProducts.id, ids));
-  return new Map(products.map((product) => [product.id, product.imageUploadObjectId]));
+  return new Map(products.map(({ id, ...product }) => [id, product]));
 }
 
 function calorieTotalsForLogs(logs: (typeof foodLogs.$inferSelect)[]): CalorieTotals {
@@ -135,10 +143,10 @@ export const getCalorieDashboard = createServerFn({ method: 'GET' })
           ),
         ),
     ]);
-    const productImageIds = await getProductImageIds(logs.map((entry) => entry.productId));
+    const logProducts = await getLogProducts(logs.map((entry) => entry.productId));
     const assetsById = await getFoodImageAssets([
       ...logs.map((entry) => entry.imageUploadObjectId),
-      ...productImageIds.values(),
+      ...[...logProducts.values()].map((product) => product.imageUploadObjectId),
     ]);
 
     const logsByDate = new Map<string, (typeof foodLogs.$inferSelect)[]>();
@@ -161,11 +169,12 @@ export const getCalorieDashboard = createServerFn({ method: 'GET' })
         date,
         goal: goal ? toCalorieGoal(goal) : null,
         logs: dayLogs.map((entry) => {
-          const productImageId = entry.productId ? productImageIds.get(entry.productId) : null;
+          const product = entry.productId ? logProducts.get(entry.productId) : undefined;
           return toCalorieLog(
             entry,
             assetsById.get(entry.imageUploadObjectId ?? ''),
-            assetsById.get(productImageId ?? ''),
+            assetsById.get(product?.imageUploadObjectId ?? ''),
+            foodProductCategory(product?.seedKey ?? null),
           );
         }),
         totals: calorieTotalsForLogs(dayLogs),
@@ -207,6 +216,7 @@ export type CalorieFood = {
   namePl: string | null;
   barcode: string | null;
   imageUrl: string | null;
+  category: FoodProductCategory | null;
   productSizeGrams: number | null;
   kcalPer100g: number;
   proteinPer100g: number | null;
@@ -235,6 +245,7 @@ export type CalorieLog = {
   fat: number | null;
   carbs: number | null;
   imageUrl: string | null;
+  category: FoodProductCategory | null;
 };
 
 export type CalorieTotals = {
@@ -356,13 +367,17 @@ export const getFoodLog = createServerFn({ method: 'GET' })
         translate({ en: 'Food log not found.', pl: 'Nie znaleziono wpisu.' }),
       );
 
-    const productImageIds = await getProductImageIds([entry.productId]);
-    const productImageId = entry.productId ? productImageIds.get(entry.productId) : null;
-    const assetsById = await getFoodImageAssets([entry.imageUploadObjectId, productImageId]);
+    const logProducts = await getLogProducts([entry.productId]);
+    const product = entry.productId ? logProducts.get(entry.productId) : undefined;
+    const assetsById = await getFoodImageAssets([
+      entry.imageUploadObjectId,
+      product?.imageUploadObjectId,
+    ]);
     return toCalorieLog(
       entry,
       assetsById.get(entry.imageUploadObjectId ?? ''),
-      assetsById.get(productImageId ?? ''),
+      assetsById.get(product?.imageUploadObjectId ?? ''),
+      foodProductCategory(product?.seedKey ?? null),
     );
   });
 

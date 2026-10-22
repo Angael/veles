@@ -62,6 +62,7 @@ export function EditFoodLogPage({ log }: { log: CalorieLog }) {
         <SelectedFoodCard
           carbs={nutrition.carbs ?? 0}
           fat={nutrition.fat ?? 0}
+          category={log.category}
           imageUrl={log.imageUrl}
           kcal={nutrition.kcal ?? 0}
           name={log.name}

@@ -64,6 +64,7 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
         addFoodDate={date}
         carbs={carbs}
         fat={fat}
+        category={food.category}
         imageUrl={food.imageUrl}
         kcal={kcal}
         name={t(foodProductNames(food))}

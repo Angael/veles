@@ -1,12 +1,15 @@
 import clsx from 'clsx';
-import { UtensilsIcon } from 'lucide-react';
+import type { FoodProductCategory } from '@veles/db/seed/food-products';
 import type { ReactNode } from 'react';
+import { FoodCategoryIcon } from './FoodCategoryIcon';
 import { NutritionInline } from './NutritionInline';
 import css from './FoodSummary.module.css';
 
 export type FoodSummaryProps = {
   action?: ReactNode;
   carbs: number;
+  /** Picks the placeholder icon when there is no image. */
+  category?: FoodProductCategory | null;
   fat: number;
   imageUrl: string | null;
   kcal: number;
@@ -22,6 +25,7 @@ export type FoodSummaryProps = {
 export function FoodSummary({
   action,
   carbs,
+  category = null,
   density = 'default',
   fat,
   imageUrl,
@@ -37,7 +41,7 @@ export function FoodSummary({
         {imageUrl ? (
           <img alt='' aria-hidden='true' className={css.image} loading='lazy' src={imageUrl} />
         ) : (
-          <UtensilsIcon aria-hidden='true' />
+          <FoodCategoryIcon category={category} />
         )}
         {mediaOverlay}
       </div>
