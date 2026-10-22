@@ -109,18 +109,25 @@ export async function readWorkoutSessions(userId: string, query: ReadQuery) {
 
   return {
     nextCursor: page.nextCursor,
-    items: page.items.map(({ routineId, routineName, durationSeconds, ...session }) => ({
-      ...session,
-      name: workoutName(session, getLocale()),
-      inProgress: session.endedAt === null,
-      durationSeconds:
-        durationSeconds ??
-        (session.startedAt && session.endedAt
-          ? Math.round((session.endedAt.getTime() - session.startedAt.getTime()) / 1000)
-          : null),
-      routine: routineId && routineName ? { id: routineId, name: routineName } : null,
-      exercises: (exercisesBySession.get(session.id) ?? []).map((entry) => entry.exercise),
-    })),
+    items: page.items.map(({ routineId, routineName, durationSeconds, ...session }) => {
+      const exercises = (exercisesBySession.get(session.id) ?? []).map((entry) => entry.exercise);
+      return {
+        ...session,
+        name: workoutName(
+          session,
+          exercises.map((exercise) => exercise.name),
+          getLocale(),
+        ),
+        inProgress: session.endedAt === null,
+        durationSeconds:
+          durationSeconds ??
+          (session.startedAt && session.endedAt
+            ? Math.round((session.endedAt.getTime() - session.startedAt.getTime()) / 1000)
+            : null),
+        routine: routineId && routineName ? { id: routineId, name: routineName } : null,
+        exercises,
+      };
+    }),
   };
 }
 

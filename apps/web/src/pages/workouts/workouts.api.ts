@@ -8,7 +8,12 @@ import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { getLocale } from '@/lib/i18n/getLocale';
 import { floorDuration } from './metrics';
 import { workoutName } from './workoutName';
-import { autoFinishIdleWorkouts, setSecondsSql, loadWorkoutSession } from './workouts.server';
+import {
+  autoFinishIdleWorkouts,
+  exerciseNamesBySession,
+  setSecondsSql,
+  loadWorkoutSession,
+} from './workouts.server';
 import {
   deleteWorkoutRecord,
   startWorkoutRecord,
@@ -58,7 +63,9 @@ export const getWorkouts = createServerFn({ method: 'GET' })
       .groupBy(workoutSessions.id)
       .orderBy(desc(workoutSessions.date), desc(workoutSessions.id))
       .limit(200);
+    const exerciseNames = await exerciseNamesBySession(rows.map((row) => row.id));
 
+    const locale = getLocale();
     return rows.map((row) => ({
       date: row.date,
       doneSets: row.doneSets,
@@ -71,7 +78,7 @@ export const getWorkouts = createServerFn({ method: 'GET' })
       endedAt: row.endedAt?.toISOString() ?? null,
       exerciseCount: row.exerciseCount,
       id: row.id,
-      name: workoutName(row, getLocale()),
+      name: workoutName(row, exerciseNames.get(row.id) ?? [], locale),
       startedAt: row.startedAt?.toISOString() ?? null,
       volumeKg: Math.round(row.volumeGrams / 1_000),
     }));

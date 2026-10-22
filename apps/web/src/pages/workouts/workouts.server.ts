@@ -343,7 +343,11 @@ export async function loadWorkoutSession(
     date: workout.date,
     endedAt: workout.endedAt?.toISOString() ?? null,
     id: workout.id,
-    name: workoutName(workout, getLocale()),
+    name: workoutName(
+      workout,
+      slots.map((slot) => slot.name),
+      getLocale(),
+    ),
     routine: routine ?? null,
     slots: slots.map((slot) => {
       const previousSlotId = previousSlotByExercise.get(slot.exerciseId);
@@ -442,6 +446,21 @@ export async function resolveExerciseId(tx: Db, userId: string, ref: ExerciseRef
   throw new ClientSafeError(
     translate({ en: 'Pick or name an exercise.', pl: 'Wybierz lub nazwij ćwiczenie.' }),
   );
+}
+
+/** Exercise names of each session in workout order, for names derived from the exercises. */
+export async function exerciseNamesBySession(sessionIds: string[]) {
+  const rows = sessionIds.length
+    ? await db
+        .select({ name: workoutExercises.name, sessionId: workoutSessionExercises.sessionId })
+        .from(workoutSessionExercises)
+        .innerJoin(workoutExercises, eq(workoutExercises.id, workoutSessionExercises.exerciseId))
+        .where(inArray(workoutSessionExercises.sessionId, sessionIds))
+        .orderBy(asc(workoutSessionExercises.position))
+    : [];
+  const map = new Map<string, string[]>();
+  for (const row of rows) map.set(row.sessionId, [...(map.get(row.sessionId) ?? []), row.name]);
+  return map;
 }
 
 /** Default session name in the language of the user who starts or moves it. */
