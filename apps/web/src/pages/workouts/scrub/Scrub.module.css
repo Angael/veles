@@ -102,10 +102,20 @@
   font-size: 0.7em;
 }
 
-/* Keeps room for the decimal part, so whole numbers don't shift when it appears. */
+/* Pins the decimal point near the centre, so whole numbers don't shift when a fraction appears. */
+.anchored {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  align-items: baseline;
+}
+
+.whole {
+  text-align: end;
+}
+
 .fraction {
-  display: inline-block;
   text-align: start;
+  white-space: nowrap;
 }
 
 /* Typing in place: a plain text field, so the browser handles caret, selection and scroll. */

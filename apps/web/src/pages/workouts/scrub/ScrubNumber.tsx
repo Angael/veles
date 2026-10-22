@@ -1,23 +1,40 @@
+import type { ReactNode } from 'react';
 import type { ScrubTier } from './useScrub';
 import css from './Scrub.module.css';
 
-/** Decimal places the smallest step can produce, e.g. 0.5 → 1, 0.25 → 2, 5 → 0. */
-export const fractionDigits = (tiers: ScrubTier[]) =>
-  Math.max(0, ...tiers.map((tier) => String(tier.step).split('.')[1]?.length ?? 0));
+/** True when the smallest step makes decimals, e.g. 0.5 kg; reps and time stay whole. */
+export const hasFraction = (tiers: ScrubTier[]) =>
+  tiers.some((tier) => !Number.isInteger(tier.step));
 
 /**
- * Formatted number with a fixed-width slot for its decimal part, so 20 → 20.5 → 21 keeps the
- * whole part still instead of shifting the centred text sideways.
+ * Formatted number pinned at its decimal point: the whole part ends at a fixed spot and the
+ * fraction and unit follow it. So 20 → 20.5 → 21 keeps "20" still, and "20 kg" stays tight.
  */
-export function ScrubNumber({ digits, text }: { digits: number; text: string }) {
-  if (digits === 0) return text;
-  const match = /^(.*?)([.,]\d*)?$/.exec(text);
+export function ScrubNumber({
+  fraction,
+  suffix,
+  text,
+}: {
+  fraction: boolean;
+  suffix?: ReactNode;
+  text: string;
+}) {
+  const match = fraction ? /^(.*?)([.,]\d*)?$/.exec(text) : null;
+  if (!match) {
+    return (
+      <>
+        {text}
+        {suffix}
+      </>
+    );
+  }
   return (
-    <>
-      {match?.[1] ?? text}
-      <span className={css.fraction} style={{ minWidth: `${digits + 1}ch` }}>
-        {match?.[2]}
+    <span className={css.anchored}>
+      <span className={css.whole}>{match[1]}</span>
+      <span className={css.fraction}>
+        {match[2]}
+        {suffix}
       </span>
-    </>
+    </span>
   );
 }
