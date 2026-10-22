@@ -26,10 +26,15 @@ const EMPTY_DRAFT: RecipeFormDraft = {
   tags: [],
 };
 
-export function AddRecipePage() {
+type Props = {
+  /** Prefill, e.g. ingredients and totals taken from selected food logs. */
+  initialDraft?: RecipeFormDraft;
+};
+
+export function AddRecipePage({ initialDraft = EMPTY_DRAFT }: Props) {
   const { t } = useI18n();
   const createMutation = useCreateRecipeMutation();
-  const [draft, setDraft] = useState<RecipeFormDraft>(EMPTY_DRAFT);
+  const [draft, setDraft] = useState<RecipeFormDraft>(initialDraft);
   const [error, setError] = useState<string | null>(null);
   const { markDirty, markSaved } = useUnsavedChangesGuard();
 
