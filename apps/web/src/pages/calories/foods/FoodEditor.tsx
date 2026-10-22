@@ -5,6 +5,9 @@ import { Card } from '@/components/ui/card/Card';
 import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { KcalMacrosForm } from '@/components/ui/kcal-macros-form/KcalMacrosForm';
 import { Label } from '@/components/ui/label/Label';
+import { SelectInput } from '@/components/ui/select-input/SelectInput';
+import type { FoodProductUnit } from '@veles/db/seed/food-products';
+import { foodUnitOptions, foodUnitSizeLabel } from '../foodUnits';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { PhotoPicker, type PhotoPickerValue } from '../PhotoPicker';
 import { TextInput } from '@/components/ui/text-input/TextInput';
@@ -18,6 +21,7 @@ export type FoodEditorValue = {
   barcode?: string;
   name: string;
   productSizeGrams?: number;
+  unit: FoodProductUnit;
   kcalPer100g: number;
   proteinPer100g?: number;
   fatPer100g?: number;
@@ -48,12 +52,14 @@ export function FoodEditor({
 }: Props) {
   const { t } = useI18n();
   const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
+  const [unit, setUnit] = useState<FoodProductUnit>(food?.unit ?? 'package');
 
   async function handleSubmit(formData: TypedFormData) {
     await onSubmit({
       barcode: formData.string('barcode') || undefined,
       name: formData.string('name'),
       productSizeGrams: formData.optionalNumber('size'),
+      unit,
       kcalPer100g: formData.number('kcal'),
       proteinPer100g: formData.optionalNumber('protein'),
       fatPer100g: formData.optionalNumber('fat'),
@@ -74,17 +80,28 @@ export function FoodEditor({
           <TextInput defaultValue={food?.name ?? initialName} name='name' required />
         </Label>
         <div className={css.grid}>
-          <Label text={t({ en: 'Barcode', pl: 'Kod kreskowy' })}>
-            <TextInput
-              defaultValue={food?.barcode ?? initialBarcode}
-              inputMode='numeric'
-              name='barcode'
+          <Label text={t({ en: 'Unit', pl: 'Jednostka' })}>
+            <SelectInput
+              items={foodUnitOptions.map((option) => ({ ...option, label: t(option.label) }))}
+              onValueChange={(value) => {
+                if (!value) return;
+                setUnit(value);
+                onDirty();
+              }}
+              value={unit}
             />
           </Label>
-          <Label text={t({ en: 'Product size (g)', pl: 'Wielkość opakowania (g)' })}>
+          <Label text={t(foodUnitSizeLabel(unit))}>
             <NumberInput defaultValue={food?.productSizeGrams ?? undefined} min={1} name='size' />
           </Label>
         </div>
+        <Label text={t({ en: 'Barcode', pl: 'Kod kreskowy' })}>
+          <TextInput
+            defaultValue={food?.barcode ?? initialBarcode}
+            inputMode='numeric'
+            name='barcode'
+          />
+        </Label>
         <KcalMacrosForm
           defaultValues={{
             kcal: food?.kcalPer100g,

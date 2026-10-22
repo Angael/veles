@@ -13,17 +13,17 @@
   }
 }
 
-.packageShortcuts {
+.unitShortcuts {
   display: grid;
   gap: var(--space-xs);
 }
 
-.packageLabel {
+.unitLabel {
   color: var(--c-muted);
   font-size: var(--text-sm);
 }
 
-.packageButtons {
+.unitButtons {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   border: var(--border-width) solid var(--c-border);

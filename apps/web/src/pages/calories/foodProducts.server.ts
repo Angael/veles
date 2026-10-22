@@ -1,6 +1,6 @@
 import { and, eq, inArray, isNotNull, sql } from 'drizzle-orm';
 import { foodLogs, foodProducts, uploadObjects } from '@veles/db/schema';
-import { foodProductCategory } from '@veles/db/seed/food-products';
+import { foodProductCategory, foodProductUnit } from '@veles/db/seed/food-products';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { fromHundredths, HUNDREDTHS, optionalHundredths, toHundredths } from '@/lib/nutrition';
 import { db } from '@/server/db.server';
@@ -29,6 +29,7 @@ function productValues(data: typeof createFoodProductValuesType.infer) {
     name: data.name.trim(),
     barcode: data.barcode?.trim() ?? null,
     productSizeGramsHundredths: optionalHundredths(data.productSizeGrams ?? undefined),
+    unit: data.unit ?? null,
     kcalPer100gHundredths: toHundredths(data.kcalPer100g),
     proteinPer100gHundredths: optionalHundredths(data.proteinPer100g ?? undefined),
     fatPer100gHundredths: optionalHundredths(data.fatPer100g ?? undefined),
@@ -48,6 +49,7 @@ export function toFoodProduct(
     imageUrl: asset ? storagePathToUrl(asset.key) : null,
     category: foodProductCategory(product.seedKey),
     productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
+    unit: foodProductUnit(product.unit, product.seedKey),
     kcalPer100g: product.kcalPer100gHundredths / HUNDREDTHS,
     proteinPer100g: fromHundredths(product.proteinPer100gHundredths),
     fatPer100g: fromHundredths(product.fatPer100gHundredths),

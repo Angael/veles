@@ -6,6 +6,7 @@ import type { CalorieFood } from '../calories.api';
 import { calorieDashboardQueryOptions, useRecordFoodMutation } from '../calories.query';
 import { SelectedFoodCard } from '../SelectedFoodCard';
 import { foodProductNames } from '../calorieHelpers';
+import { foodUnitAmountText, type FoodUnitShortcut } from '../foodUnits';
 import { GoalPreview } from './GoalPreview';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
@@ -22,6 +23,8 @@ type Props = {
   initialDate: string;
 };
 
+const UNIT_SHORTCUTS: FoodUnitShortcut[] = [0.5, 1, 2];
+
 function nutritionAtGrams(valuePer100g: number | null, grams: number) {
   return Math.round(((valuePer100g ?? 0) * grams) / 100);
 }
@@ -33,7 +36,7 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
   const recordFoodMutation = useRecordFoodMutation();
   const [date, setDate] = useState(initialDate);
   const [grams, setGrams] = useState<number | null>(food.productSizeGrams ?? 100);
-  const packageSizeGrams = food.productSizeGrams;
+  const unitGrams = food.productSizeGrams;
   const dashboardQuery = useQuery(calorieDashboardQueryOptions(date));
   const day = dashboardQuery.data?.days.find((candidate) => candidate.date === date);
   const selectedGrams = grams ?? 0;
@@ -77,43 +80,27 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
           errorMsg={recordFoodMutation.error?.message}
           onSubmit={save}
         >
-          {packageSizeGrams !== null && packageSizeGrams > 0 ? (
+          {unitGrams !== null && unitGrams > 0 ? (
             <div
-              aria-label={t({ en: 'Package amount shortcuts', pl: 'Skróty ilości opakowania' })}
-              className={css.packageShortcuts}
+              aria-label={t({ en: 'Amount shortcuts', pl: 'Skróty ilości' })}
+              className={css.unitShortcuts}
               role='group'
             >
-              <span className={css.packageLabel}>
-                {t({
-                  en: `1 package (${formatNumber(Math.round(packageSizeGrams))} g)`,
-                  pl: `1 opakowanie (${formatNumber(Math.round(packageSizeGrams))} g)`,
-                })}
+              <span className={css.unitLabel}>
+                {`${t(foodUnitAmountText(food.unit, 1))} (${formatNumber(Math.round(unitGrams))} g)`}
               </span>
-              <div className={css.packageButtons}>
-                <Btn
-                  onClick={() => setGrams(packageSizeGrams / 2)}
-                  size='sm'
-                  type='button'
-                  variant='ghost'
-                >
-                  {t({ en: '½ package', pl: '½ opakowania' })}
-                </Btn>
-                <Btn
-                  onClick={() => setGrams(packageSizeGrams)}
-                  size='sm'
-                  type='button'
-                  variant='ghost'
-                >
-                  {t({ en: '1 package', pl: '1 opakowanie' })}
-                </Btn>
-                <Btn
-                  onClick={() => setGrams(packageSizeGrams * 2)}
-                  size='sm'
-                  type='button'
-                  variant='ghost'
-                >
-                  {t({ en: '2 packages', pl: '2 opakowania' })}
-                </Btn>
+              <div className={css.unitButtons}>
+                {UNIT_SHORTCUTS.map((amount) => (
+                  <Btn
+                    key={amount}
+                    onClick={() => setGrams(unitGrams * amount)}
+                    size='sm'
+                    type='button'
+                    variant='ghost'
+                  >
+                    {t(foodUnitAmountText(food.unit, amount))}
+                  </Btn>
+                ))}
               </div>
             </div>
           ) : null}

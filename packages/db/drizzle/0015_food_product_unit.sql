@@ -1,0 +1,1 @@
+ALTER TABLE "food_product" ADD COLUMN "unit" text;

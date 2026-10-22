@@ -30,6 +30,8 @@ export const foodProducts = pgTable(
       onDelete: 'restrict',
     }),
     productSizeGramsHundredths: integer('product_size_grams_hundredths'),
+    /** What one product size is (`FoodProductUnit`); null uses the seed default or "package". */
+    unit: text('unit'),
     kcalPer100gHundredths: integer('kcal_per_100g_hundredths').notNull(),
     proteinPer100gHundredths: integer('protein_per_100g_hundredths'),
     fatPer100gHundredths: integer('fat_per_100g_hundredths'),
