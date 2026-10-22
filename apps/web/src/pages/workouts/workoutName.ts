@@ -6,6 +6,9 @@ const WEEKDAY_NAMES: Localized<string[]> = {
   pl: ['Niedzielny', 'Poniedziałkowy', 'Wtorkowy', 'Środowy', 'Czwartkowy', 'Piątkowy', 'Sobotni'],
 };
 
+/** Exercises named in a derived name; the rest show as "+N" so the name stays one short line. */
+const MAX_NAMED_EXERCISES = 3;
+
 function weekdayName(locale: Locale, weekday: number) {
   const day = WEEKDAY_NAMES[locale][weekday];
   return locale === 'pl' ? `${day} trening` : `${day} workout`;
@@ -17,16 +20,34 @@ const DEFAULT_NAMES = new Set(
   ),
 );
 
-/** "Monday workout" / "Poniedziałkowy trening" for the session's local day. */
+/**
+ * "Monday workout" / "Poniedziałkowy trening" for the session's local day. Stored on new sessions
+ * as the marker of an untouched name.
+ */
 export function defaultWorkoutName(date: string, locale: Locale) {
   return weekdayName(locale, parseISO(date).getDay());
 }
 
+/** "Bench press · Squat · Row +2" from the session's exercises in order, repeats shown once. */
+function exercisesName(exerciseNames: string[]) {
+  const unique = [...new Set(exerciseNames)];
+  const named = unique.slice(0, MAX_NAMED_EXERCISES).join(' · ');
+  const rest = unique.length - MAX_NAMED_EXERCISES;
+  return rest > 0 ? `${named} +${rest}` : named;
+}
+
 /**
- * Name to show for a session. Untouched default names are stored in the language and on the day
- * of creation, so they are rebuilt from the current day and locale; a renamed session keeps its
- * name.
+ * Name to show for a session. An untouched default name is rebuilt at display time from the
+ * session's current exercises, or from its day and the current locale while it has none; a
+ * renamed session keeps its name.
  */
-export function workoutName(workout: { date: string; name: string }, locale: Locale) {
-  return DEFAULT_NAMES.has(workout.name) ? defaultWorkoutName(workout.date, locale) : workout.name;
+export function workoutName(
+  workout: { date: string; name: string },
+  exerciseNames: string[],
+  locale: Locale,
+) {
+  if (!DEFAULT_NAMES.has(workout.name)) return workout.name;
+  return exerciseNames.length
+    ? exercisesName(exerciseNames)
+    : defaultWorkoutName(workout.date, locale);
 }
