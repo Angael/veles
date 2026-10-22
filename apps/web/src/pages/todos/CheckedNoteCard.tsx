@@ -5,6 +5,7 @@ import { v7 as uuidv7 } from 'uuid';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { ConflictNotice } from '@/components/ui/conflict-notice/ConflictNotice';
+import { UnsavedCopy } from '@/components/ui/conflict-notice/UnsavedCopy';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
 import { listItemsCollection, useListItemsCollection } from './listItems.collection';
 import { NoteActions } from './NoteActions';
@@ -81,6 +82,13 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
           onLoadLatest={noteSave.loadLatest}
         />
       ) : null}
+      {noteSave.unsavedText === null ? null : (
+        <UnsavedCopy
+          className={css.conflict}
+          onDismiss={noteSave.dismissUnsavedText}
+          text={noteSave.unsavedText}
+        />
+      )}
       {items.length === 0 ? (
         <p className={css.emptyList}>{t({ en: 'No items yet.', pl: 'Brak pozycji.' })}</p>
       ) : null}

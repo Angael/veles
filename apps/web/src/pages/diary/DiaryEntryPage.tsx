@@ -3,6 +3,7 @@ import { LockIcon, Trash2Icon } from 'lucide-react';
 import { useMemo } from 'react';
 import { Card } from '@/components/ui/card/Card';
 import { ConflictNotice } from '@/components/ui/conflict-notice/ConflictNotice';
+import { UnsavedCopy } from '@/components/ui/conflict-notice/UnsavedCopy';
 import { Btn } from '@/components/ui/btn/Btn';
 import { DateInput } from '@/components/ui/date-input/DateInput';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
@@ -179,9 +180,16 @@ function DiaryEntryEditor({ diaryKey, entry, onLock }: DiaryEntryEditorProps) {
             className={css.conflict}
             loading={entrySave.loading}
             onKeepMine={() => entrySave.keepMine(draft)}
-            onLoadLatest={entrySave.loadLatest}
+            onLoadLatest={() => entrySave.loadLatest(draft)}
           />
         ) : null}
+        {entrySave.unsavedText === null ? null : (
+          <UnsavedCopy
+            className={css.conflict}
+            onDismiss={entrySave.dismissUnsavedText}
+            text={entrySave.unsavedText}
+          />
+        )}
         <Card as='section' className={css.body}>
           <SeamlessTextarea
             aria-label={t({ en: 'Diary entry', pl: 'Wpis w dzienniku' })}

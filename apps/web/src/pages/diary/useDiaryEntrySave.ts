@@ -15,7 +15,7 @@ export type DiaryEntryDraft = DiaryEntryContent & {
 /**
  * Autosaves diary drafts one at a time against the version the editor loaded. A conflict stops
  * saving, with no retry, and keeps the draft in the editor until the user loads the latest entry
- * or keeps the draft and saves it against the latest version.
+ * (the draft stays readable in `unsavedText`) or keeps the draft and saves it over the latest.
  */
 export function useDiaryEntrySave(key: CryptoKey, entry: DiaryEntrySummary) {
   const router = useRouter();
@@ -24,6 +24,7 @@ export function useDiaryEntrySave(key: CryptoKey, entry: DiaryEntrySummary) {
   const versionRef = useRef(entry.version);
   const [conflicted, setConflicted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [unsavedText, setUnsavedText] = useState<string | null>(null);
 
   useEffect(() => {
     versionRef.current = entry.version;
@@ -67,14 +68,20 @@ export function useDiaryEntrySave(key: CryptoKey, entry: DiaryEntrySummary) {
 
   return {
     conflicted,
+    dismissUnsavedText: () => setUnsavedText(null),
     isError: mutation.isError && !isVersionConflictError(mutation.error),
     isPending: mutation.isPending,
     loading: loading || mutation.isPending,
+    unsavedText,
     save: (draft: DiaryEntryDraft) => {
       if (!conflicted) mutation.mutate(draft);
     },
     /** Reloads the route; the new `entry.version` resets the editor to the latest entry. */
-    loadLatest: () => resolve(() => router.invalidate()),
+    loadLatest: (draft: DiaryEntryDraft) =>
+      resolve(async () => {
+        await router.invalidate();
+        setUnsavedText([draft.title, draft.markdown].filter(Boolean).join('\n\n'));
+      }),
     /** Saves the kept draft over the latest version, at the user's request. */
     keepMine: (draft: DiaryEntryDraft) =>
       resolve(async () => {

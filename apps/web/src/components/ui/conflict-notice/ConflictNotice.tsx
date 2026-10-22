@@ -30,8 +30,8 @@ export function ConflictNotice({
           </p>
           <p>
             {t({
-              en: 'A newer version was saved in another tab or device. Your changes are not saved. Copy what you need, then load the latest version, or keep yours and replace it.',
-              pl: 'Nowsza wersja została zapisana w innej karcie lub na innym urządzeniu. Twoje zmiany nie są zapisane. Skopiuj, czego potrzebujesz, i wczytaj najnowszą wersję albo zachowaj swoją i zastąp nią tamtą.',
+              en: 'A newer version was saved in another tab or device. Your changes are not saved. Load the latest version and copy from your text, or keep yours and replace it.',
+              pl: 'Nowsza wersja została zapisana w innej karcie lub na innym urządzeniu. Twoje zmiany nie są zapisane. Wczytaj najnowszą wersję i skopiuj ze swojego tekstu albo zachowaj swoją i zastąp nią tamtą.',
             })}
           </p>
           <div className={css.actions}>

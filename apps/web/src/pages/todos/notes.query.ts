@@ -20,7 +20,7 @@ export function notesQueryOptions() {
   return queryOptions({
     queryFn: () => getNotes(),
     queryKey: notesQueryKey,
-    refetchInterval: 30_000,
+    refetchInterval: 5_000,
     refetchOnWindowFocus: 'always',
     staleTime: 5_000,
   });

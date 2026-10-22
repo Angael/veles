@@ -1,5 +1,6 @@
 import { Card } from '@/components/ui/card/Card';
 import { ConflictNotice } from '@/components/ui/conflict-notice/ConflictNotice';
+import { UnsavedCopy } from '@/components/ui/conflict-notice/UnsavedCopy';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
 import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import { NoteActions } from './NoteActions';
@@ -40,6 +41,13 @@ export function TextNoteCard({ note }: { note: NoteSummary }) {
           onLoadLatest={noteSave.loadLatest}
         />
       ) : null}
+      {noteSave.unsavedText === null ? null : (
+        <UnsavedCopy
+          className={css.conflict}
+          onDismiss={noteSave.dismissUnsavedText}
+          text={noteSave.unsavedText}
+        />
+      )}
       <SeamlessTextarea
         aria-label={t({ en: 'Note content', pl: 'Treść notatki' })}
         className={css.contentInput}

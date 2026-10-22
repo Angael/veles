@@ -32,7 +32,7 @@ export const listItemsCollection = collectionOptions('list-items', (client) =>
     queryFn: () => getListItems(),
     queryKey: ['list-items'],
     // Lists are shared between users, so keep the same freshness as the notes query.
-    refetchInterval: 30_000,
+    refetchInterval: 5_000,
     refetchOnWindowFocus: 'always',
     staleTime: 5_000,
     onInsert: ({ collection, transaction }) =>
