@@ -60,7 +60,14 @@ export type FoodProductSeed = Pick<
  * Seed keys the deploy sync deletes from the shared catalog.
  * Move a seed's key here when you remove it from `foodProductSeeds`.
  */
-export const retiredFoodProductSeedKeys: string[] = [];
+export const retiredFoodProductSeedKeys: string[] = [
+  // Whole-egg preparations within ~8% of `egg-whole-raw`, or differing only by frying fat.
+  'egg-whole-hard-boiled',
+  'egg-poached',
+  'scrambled-eggs',
+  'omelette-plain',
+  'egg-fried',
+];
 
 export const foodProductSeeds: FoodProductSeed[] = [
   // Vegetables
@@ -2538,18 +2545,6 @@ export const foodProductSeeds: FoodProductSeed[] = [
     carbsPer100gHundredths: 72,
   },
   {
-    seedKey: 'egg-whole-hard-boiled',
-    category: 'egg',
-    barcode: null,
-    name_en: 'Egg, whole, hard-boiled',
-    name_pl: 'Jajko całe na twardo',
-    productSizeGramsHundredths: 5_000,
-    kcalPer100gHundredths: 15_500,
-    proteinPer100gHundredths: 1_260,
-    fatPer100gHundredths: 1_060,
-    carbsPer100gHundredths: 112,
-  },
-  {
     seedKey: 'egg-white-raw',
     category: 'egg',
     barcode: null,
@@ -4005,58 +4000,6 @@ export const foodProductSeeds: FoodProductSeed[] = [
     proteinPer100gHundredths: 1_987,
     fatPer100gHundredths: 2_181,
     carbsPer100gHundredths: 1_094,
-  },
-  // USDA SR Legacy, FDC 172187.
-  {
-    seedKey: 'scrambled-eggs',
-    category: 'egg',
-    barcode: null,
-    name_en: 'Scrambled eggs',
-    name_pl: 'Jajecznica',
-    productSizeGramsHundredths: 12_000,
-    kcalPer100gHundredths: 14_900,
-    proteinPer100gHundredths: 999,
-    fatPer100gHundredths: 1_098,
-    carbsPer100gHundredths: 161,
-  },
-  // USDA SR Legacy, FDC 173423.
-  {
-    seedKey: 'egg-fried',
-    category: 'egg',
-    barcode: null,
-    name_en: 'Egg, fried',
-    name_pl: 'Jajko sadzone',
-    productSizeGramsHundredths: 5_000,
-    kcalPer100gHundredths: 19_600,
-    proteinPer100gHundredths: 1_361,
-    fatPer100gHundredths: 1_484,
-    carbsPer100gHundredths: 83,
-  },
-  // USDA SR Legacy, FDC 172185.
-  {
-    seedKey: 'omelette-plain',
-    category: 'egg',
-    barcode: null,
-    name_en: 'Omelette, plain',
-    name_pl: 'Omlet bez dodatków',
-    productSizeGramsHundredths: 12_000,
-    kcalPer100gHundredths: 15_400,
-    proteinPer100gHundredths: 1_057,
-    fatPer100gHundredths: 1_166,
-    carbsPer100gHundredths: 64,
-  },
-  // USDA SR Legacy, FDC 172186.
-  {
-    seedKey: 'egg-poached',
-    category: 'egg',
-    barcode: null,
-    name_en: 'Egg, poached',
-    name_pl: 'Jajko w koszulce',
-    productSizeGramsHundredths: 5_000,
-    kcalPer100gHundredths: 14_300,
-    proteinPer100gHundredths: 1_251,
-    fatPer100gHundredths: 947,
-    carbsPer100gHundredths: 71,
   },
   // USDA SR Legacy, FDC 169026.
   {
