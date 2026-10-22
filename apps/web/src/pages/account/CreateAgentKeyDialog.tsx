@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label/Label';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { useI18n } from '@/lib/i18n/I18nProvider';
+import { selectOnMount } from '@/lib/selectOnMount';
 import { useCreateApiKeyMutation } from './account.query';
 import { AgentSetupGuide } from './AgentSetupGuide';
 import css from './AgentAccessCard.module.css';
@@ -75,7 +76,13 @@ export function CreateAgentKeyDialog({ userName }: CreateAgentKeyDialogProps) {
               }}
             >
               <Label text={t({ en: 'Key name', pl: 'Nazwa klucza' })}>
-                <TextInput defaultValue='Vel' maxLength={32} name='name' required />
+                <TextInput
+                  defaultValue='Vel'
+                  maxLength={32}
+                  name='name'
+                  ref={selectOnMount}
+                  required
+                />
               </Label>
               {createMutation.error ? (
                 <p className={css.error} role='alert'>
