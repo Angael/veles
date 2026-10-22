@@ -168,7 +168,7 @@ function CheckedNoteItem({
             });
           }
         }}
-        placeholder={t({ en: 'List item', pl: 'Pozycja listy' })}
+        placeholder={t({ en: 'New item', pl: 'Nowa pozycja' })}
       />
       <Btn
         aria-label={t(
