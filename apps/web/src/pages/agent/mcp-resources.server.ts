@@ -78,7 +78,7 @@ export const resources = {
     feature: 'workouts',
     dated: false,
     description:
-      'Exercise list with measure, restSeconds, notes, archived, lastDoneOn, and sessionCount.',
+      'Exercise list with measure, restSeconds, notes, archived, lastDoneOn, sessionCount, and nextSets (sets prescribed for the next time it is added, or null; see set_next_sets).',
     read: readWorkoutExercises,
   },
 } satisfies Record<string, AgentResource>;

@@ -72,6 +72,22 @@ export const updateExerciseInputType = type({
   'restSeconds?': '(number.integer >= 0) | null',
 });
 
+/** Most sets a prescription can hold; matches how many empty rows a new slot can get. */
+export const MAX_NEXT_SETS = 20;
+
+/**
+ * Sets prefilled the next time the exercise is added to a workout, in order. `sets` is required so
+ * clearing is an explicit `null`, never a forgotten field.
+ */
+export const setNextSetsInputType = type({
+  exerciseId: 'string.uuid',
+  sets: type({ 'type?': setType, ...setValues })
+    .array()
+    .atLeastLength(1)
+    .atMostLength(MAX_NEXT_SETS)
+    .or('null'),
+});
+
 /** A whole session at once; given exercises replace the session's exercises and sets. */
 export const saveWorkoutInputType = type({
   'id?': 'string.uuid',
