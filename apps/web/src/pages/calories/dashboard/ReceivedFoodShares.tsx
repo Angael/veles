@@ -101,7 +101,7 @@ export function ReceivedFoodShares({ date }: Props) {
             icon={<XIcon aria-hidden='true' />}
             loading={declining}
             onClick={() => decline(share)}
-            variant='ghost'
+            variant='danger'
           >
             {t({ en: 'Decline', pl: 'Odrzuć' })}
           </Btn>
@@ -111,9 +111,7 @@ export function ReceivedFoodShares({ date }: Props) {
             loading={accepting}
             onClick={() => accept(share)}
           >
-            {count === 1
-              ? t({ en: 'Add to diary', pl: 'Dodaj do dziennika' })
-              : t({ en: 'Add all to diary', pl: 'Dodaj wszystkie do dziennika' })}
+            {t({ en: 'Add', pl: 'Dodaj' })}
           </Btn>
         </div>
       </Card>
