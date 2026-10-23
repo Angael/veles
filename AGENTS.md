@@ -3,6 +3,7 @@
 - Run `pnpm check:fix` before finishing
 - Always use exact pinned package versions
 - skip "computer use"/"browser smoke tests" checks and launching dev server.
+- Show and accept kcal, macros, and food grams as whole numbers; decimals are insignificant there.
 - Display kcal as a distinct energy metric, never grouped on the same row with macros; group macros together in this order: protein, fat, carbs.
 - Generated files are exempt and must not be hand-edited.
 - Skip adding tests unless user tells you to write them

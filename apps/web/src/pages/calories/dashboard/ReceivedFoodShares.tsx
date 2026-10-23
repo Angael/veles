@@ -21,7 +21,7 @@ type Props = {
 
 /** Incoming logs shown like the user's own, wrapped in a card that accepts or declines them all at once. */
 export function ReceivedFoodShares({ date }: Props) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
   const sharesQuery = useQuery(receivedFoodLogSharesQueryOptions());
   const acceptMutation = useAcceptFoodLogShareMutation();
   const declineMutation = useDeclineFoodLogShareMutation();
@@ -78,19 +78,19 @@ export function ReceivedFoodShares({ date }: Props) {
           {share.items.map((item) => (
             <ListItem key={item.id} style={{ padding: 0 }}>
               <FoodSummary
-                carbs={item.carbs ?? 0}
+                carbs={item.carbs}
                 density='compact'
-                fat={item.fat ?? 0}
+                fat={item.fat}
                 category={item.category}
                 imageUrl={item.imageUrl}
                 kcal={item.kcal}
                 meta={
                   item.grams === null
                     ? t({ en: 'Custom entry', pl: 'Własny wpis' })
-                    : `${formatNumber(Math.round(item.grams))} g`
+                    : `${formatWhole(item.grams)} g`
                 }
                 name={item.name}
-                protein={item.protein ?? 0}
+                protein={item.protein}
               />
             </ListItem>
           ))}

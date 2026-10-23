@@ -389,69 +389,68 @@ async function seedFoodLogs(client: Client, userId: string) {
     }
   }
 }
+/** Seeds one recipe of custom ingredients only and one that links catalog products. */
 async function seedRecipes(client: Client, userId: string) {
   const recipes = [
     {
       id: '01900000-0000-7000-8000-000000000001',
       name: 'Weeknight tomato pasta',
       description: 'A quick pantry pasta for testing recipe views.',
-      ingredients: ['200 g pasta', '400 g tomatoes', '2 garlic cloves', 'olive oil'],
-      tags: ['quick', 'vegetarian'],
+      ingredients: [
+        { name: 'Pasta', grams: 200, productId: null },
+        { name: 'Tomatoes', grams: 400, productId: null },
+        { name: '2 garlic cloves', grams: null, productId: null },
+        { name: 'Olive oil', grams: null, productId: null },
+      ],
       portions: 2,
       rating: 4,
-      kcal: 620,
-      protein: 20,
-      fat: 16,
-      carbs: 98,
     },
     {
       id: '01900000-0000-7000-8000-000000000002',
-      name: 'Oatmeal with berries',
-      description: 'A deterministic breakfast fixture without uploaded images.',
-      ingredients: ['80 g oats', '250 ml milk', '100 g berries'],
-      tags: ['breakfast', 'quick'],
-      portions: 1,
+      name: 'Fruity toast breakfast',
+      description: 'A deterministic breakfast fixture with linked products and no images.',
+      ingredients: [
+        {
+          name: 'Whole-grain bread',
+          grams: 120,
+          productId: '01900000-0000-7000-8000-000000000205',
+        },
+        { name: 'Banana', grams: 120, productId: '01900000-0000-7000-8000-000000000201' },
+        { name: 'Apple', grams: 150, productId: '01900000-0000-7000-8000-000000000202' },
+        { name: 'Cinnamon', grams: null, productId: null },
+      ],
+      portions: 2,
       rating: 5,
-      kcal: 480,
-      protein: 18,
-      fat: 12,
-      carbs: 72,
     },
   ];
 
   for (const recipe of recipes) {
     await client.query(
-      `INSERT INTO recipe
-        (id, user_id, name, description, ingredients, tags, portions, rating, kcal, protein, fats, carbs)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      `INSERT INTO recipe (id, user_id, name, description, portions, rating)
+       VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (id) DO UPDATE SET
          user_id = EXCLUDED.user_id,
          name = EXCLUDED.name,
          description = EXCLUDED.description,
-         ingredients = EXCLUDED.ingredients,
-         tags = EXCLUDED.tags,
          portions = EXCLUDED.portions,
          rating = EXCLUDED.rating,
-         kcal = EXCLUDED.kcal,
-         protein = EXCLUDED.protein,
-         fats = EXCLUDED.fats,
-         carbs = EXCLUDED.carbs,
          updated_at = now()`,
-      [
-        recipe.id,
-        userId,
-        recipe.name,
-        recipe.description,
-        recipe.ingredients,
-        recipe.tags,
-        recipe.portions,
-        recipe.rating,
-        recipe.kcal,
-        recipe.protein,
-        recipe.fat,
-        recipe.carbs,
-      ],
+      [recipe.id, userId, recipe.name, recipe.description, recipe.portions, recipe.rating],
     );
+    await client.query('DELETE FROM recipe_ingredient WHERE recipe_id = $1', [recipe.id]);
+    for (const [position, ingredient] of recipe.ingredients.entries()) {
+      await client.query(
+        `INSERT INTO recipe_ingredient (recipe_id, position, product_id, name, grams_hundredths)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [
+          recipe.id,
+          position,
+          ingredient.productId,
+          ingredient.name,
+          ingredient.grams === null ? null : ingredient.grams * 100,
+        ],
+      );
+    }
   }
 }
 

@@ -10,8 +10,8 @@ type GoalPreviewProps = {
 
 /** Previews how the selected food changes the day's calorie goal. */
 export function GoalPreview({ consumedKcal, foodKcal, goalKcal, pending }: GoalPreviewProps) {
-  const { formatNumber, t } = useI18n();
-  const kcal = (value: number) => `${formatNumber(Math.round(value))} kcal`;
+  const { formatWhole, t } = useI18n();
+  const kcal = (value: number) => `${formatWhole(value)} kcal`;
 
   if (pending) {
     return (
@@ -55,8 +55,8 @@ export function GoalPreview({ consumedKcal, foodKcal, goalKcal, pending }: GoalP
       </div>
       <div
         aria-label={t({
-          en: `${formatNumber(Math.round(projectedKcal))} of ${kcal(goalKcal)} after adding this food${wouldExceedGoal ? ', over goal' : ''}`,
-          pl: `${formatNumber(Math.round(projectedKcal))} z ${kcal(goalKcal)} po dodaniu tego produktu${wouldExceedGoal ? ', ponad cel' : ''}`,
+          en: `${formatWhole(projectedKcal)} of ${kcal(goalKcal)} after adding this food${wouldExceedGoal ? ', over goal' : ''}`,
+          pl: `${formatWhole(projectedKcal)} z ${kcal(goalKcal)} po dodaniu tego produktu${wouldExceedGoal ? ', ponad cel' : ''}`,
         })}
         aria-valuemax={goalKcal}
         aria-valuemin={0}

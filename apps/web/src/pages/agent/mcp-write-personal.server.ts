@@ -5,9 +5,6 @@ import { saveWeightRecord } from '@/pages/weight/weight.server';
 import { saveWeightInputType } from '@/pages/weight/weight.validation';
 import { agentInput, agentWriter, writeAnnotations } from './mcp-tools.server';
 
-const recipeNutrition =
-  'kcal, protein, fats, carbs are whole numbers for the whole recipe (all portions), in kcal and grams';
-
 /** Weight writes; photos are added in the app and stay linked when the weight changes. */
 export function registerWeightTools(server: McpServer, userId: string) {
   const write = agentWriter(userId, 'weight');
@@ -31,7 +28,8 @@ export function registerRecipeTools(server: McpServer, userId: string) {
   server.registerTool(
     'save_recipe',
     {
-      description: `Create (no id; name required) or update (id) an owned recipe. Omitted fields stay; images stay. ${recipeNutrition}. ingredients (one string per line) and tags replace the whole list. rating is 1–5. Returns { id }.`,
+      description:
+        'Create (no id; name required) or update (id) an owned recipe. Omitted fields stay; images stay. portions is how many portions the recipe makes. ingredients replace the whole list. Each ingredient is { productId, grams } for a food_products product (name is optional and defaults to the product name; nutrition comes from the product), or { name, grams? } for a custom line with no nutrition. grams are for the whole recipe. rating is 1–5. Returns { id }.',
       inputSchema: agentInput(saveRecipeInputType),
       annotations: writeAnnotations({ destructive: false, idempotent: false }),
     },

@@ -240,3 +240,29 @@ export async function deleteListItemRecord(
   await db.delete(listItems).where(eq(listItems.id, item.id));
   await db.update(notes).set({ updatedAt: new Date() }).where(eq(notes.id, item.noteId));
 }
+
+/**
+ * Adds lines to a note the user owns or that a connection shares: list items for a shopping list,
+ * lines after the existing text for a plain note. Used by flows such as a recipe's shopping list.
+ */
+export async function appendNoteLinesRecord(userId: string, noteId: string, lines: string[]) {
+  await db.transaction(async (tx) => {
+    const [note] = await tx
+      .select({ content: notes.content, type: notes.type })
+      .from(notes)
+      .where(and(eq(notes.id, noteId), accessibleNote(userId)))
+      .for('update');
+    if (!note)
+      throw new ClientSafeError(
+        translate({ en: 'Note not found.', pl: 'Nie znaleziono notatki.' }),
+      );
+
+    if (note.type === 'shopping_list') {
+      await tx.insert(listItems).values(lines.map((name) => ({ name, noteId })));
+      await tx.update(notes).set({ updatedAt: new Date() }).where(eq(notes.id, noteId));
+    } else {
+      const content = [note.content.trimEnd(), ...lines].filter(Boolean).join('\n');
+      await tx.update(notes).set({ content, updatedAt: new Date() }).where(eq(notes.id, noteId));
+    }
+  });
+}
