@@ -18,14 +18,6 @@
   font-size: var(--text-sm);
 }
 
-.rows {
-  display: grid;
-  gap: var(--space-sm);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
 .add {
   justify-self: start;
 }

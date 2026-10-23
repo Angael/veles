@@ -1,0 +1,21 @@
+.fields {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.grams {
+  width: 8rem;
+}
+
+.suggestion {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+
+  & small {
+    flex: none;
+    color: var(--c-muted);
+    font-size: var(--text-xs);
+  }
+}

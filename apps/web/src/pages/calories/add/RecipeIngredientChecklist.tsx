@@ -4,10 +4,8 @@ import {
   isLoggableIngredient,
   type RecipeIngredient,
 } from '@/pages/recipes/recipeNutrition';
-import { FoodCategoryIcon } from '../FoodCategoryIcon';
 import { FoodSelectTarget } from '../FoodSelectTarget';
 import { FoodSummary } from '../FoodSummary';
-import css from './RecipeLogForm.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type Props = {
@@ -37,21 +35,17 @@ export function RecipeIngredientChecklist({
 
         if (!isLoggableIngredient(ingredient) || !nutrition) {
           return (
-            <ListItem key={ingredient.id}>
-              <div className={css.notLogged}>
-                <span className={css.notLoggedIcon}>
-                  <FoodCategoryIcon category={ingredient.category} />
-                </span>
-                <span className={css.ingredientName}>
-                  <strong>{ingredient.name}</strong>
-                  <small>
-                    {t({
-                      en: 'Not logged: no product or amount',
-                      pl: 'Nie zapisywany: brak produktu lub ilości',
-                    })}
-                  </small>
-                </span>
-              </div>
+            <ListItem key={ingredient.id} style={{ padding: 0 }}>
+              <FoodSummary
+                category={ingredient.category}
+                density='compact'
+                imageUrl={ingredient.imageUrl}
+                meta={t({
+                  en: 'Not logged: no product or amount',
+                  pl: 'Nie zapisywany: brak produktu lub ilości',
+                })}
+                name={ingredient.name}
+              />
             </ListItem>
           );
         }

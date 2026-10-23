@@ -1,7 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { PlusIcon } from 'lucide-react';
+import { useState } from 'react';
 import { calorieFoodsQueryOptions } from '@/pages/calories/calories.query';
 import { Btn } from '@/components/ui/btn/Btn';
+import { List } from '@/components/ui/list/List';
+import { IngredientDialog } from './IngredientDialog';
 import { IngredientRow } from './IngredientRow';
 import { ingredientDraft, ingredientsToInput, type IngredientDraft } from './recipeDraft';
 import css from './IngredientsField.module.css';
@@ -17,6 +20,8 @@ export function IngredientsField({ ingredients, onChange }: Props) {
   const { t } = useI18n();
   const foodsQuery = useQuery(calorieFoodsQueryOptions());
   const foods = foodsQuery.data ?? [];
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const editing = ingredients.find((ingredient) => ingredient.key === editingKey) ?? null;
 
   /** Replaces the row with `key`, or removes it when `next` is null. */
   function update(key: string, next: IngredientDraft | null) {
@@ -26,6 +31,18 @@ export function IngredientsField({ ingredients, onChange }: Props) {
         return next ? [next] : [];
       }),
     );
+  }
+
+  /** Closes the dialog and drops the row when nothing was picked or typed into it. */
+  function closeDialog() {
+    if (editing && !editing.name.trim() && !editing.productId) update(editing.key, null);
+    setEditingKey(null);
+  }
+
+  function addIngredient() {
+    const draft = ingredientDraft();
+    onChange([...ingredients, draft]);
+    setEditingKey(draft.key);
   }
 
   return (
@@ -42,27 +59,35 @@ export function IngredientsField({ ingredients, onChange }: Props) {
         type='hidden'
         value={JSON.stringify(ingredientsToInput(ingredients))}
       />
-      <ol className={css.rows}>
-        {ingredients.map((ingredient) => (
-          <IngredientRow
-            foods={foods}
-            ingredient={ingredient}
-            key={ingredient.key}
-            onChange={(next) => update(ingredient.key, next)}
-            onRemove={() => update(ingredient.key, null)}
-          />
-        ))}
-      </ol>
+      {ingredients.length ? (
+        <List as='ol'>
+          {ingredients.map((ingredient) => (
+            <IngredientRow
+              ingredient={ingredient}
+              key={ingredient.key}
+              onEdit={() => setEditingKey(ingredient.key)}
+              onRemove={() => update(ingredient.key, null)}
+              product={foods.find((food) => food.id === ingredient.productId)}
+            />
+          ))}
+        </List>
+      ) : null}
       <Btn
         className={css.add}
         icon={<PlusIcon aria-hidden='true' />}
-        onClick={() => onChange([...ingredients, ingredientDraft()])}
+        onClick={addIngredient}
         size='sm'
         type='button'
         variant='outlineMain'
       >
         {t({ en: 'Add ingredient', pl: 'Dodaj składnik' })}
       </Btn>
+      <IngredientDialog
+        foods={foods}
+        ingredient={editing}
+        onChange={(next) => update(next.key, next)}
+        onClose={closeDialog}
+      />
     </fieldset>
   );
 }

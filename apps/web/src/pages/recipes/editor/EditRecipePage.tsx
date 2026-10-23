@@ -7,7 +7,7 @@ import { PhotosField } from '@/components/ui/photos-field/PhotosField';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import type { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import { RecipeForm } from './RecipeForm';
-import { ingredientDraft, ingredientsFromRecipe, type RecipeFormDraft } from './recipeDraft';
+import { ingredientsFromRecipe, type RecipeFormDraft } from './recipeDraft';
 import type { RecipeLibraryItem } from '../recipes.api';
 import { useUpdateRecipeMutation } from '../recipes.query';
 import { RECIPE_PHOTO_MAX_COUNT } from '../recipeUpload.api';
@@ -77,10 +77,9 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
 }
 
 function recipeToDraft(recipe: RecipeLibraryItem): RecipeFormDraft {
-  const ingredients = ingredientsFromRecipe(recipe.ingredients);
   return {
     description: recipe.description,
-    ingredients: ingredients.length ? ingredients : [ingredientDraft()],
+    ingredients: ingredientsFromRecipe(recipe.ingredients),
     name: recipe.name,
     portions: recipe.portions,
     rating: recipe.rating,

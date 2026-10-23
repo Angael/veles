@@ -27,7 +27,7 @@ export function ingredientDraft(
 export function emptyRecipeDraft(): RecipeFormDraft {
   return {
     description: '',
-    ingredients: [ingredientDraft()],
+    ingredients: [],
     name: '',
     portions: 1,
     rating: null,
