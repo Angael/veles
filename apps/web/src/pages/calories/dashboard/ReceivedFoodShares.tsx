@@ -6,11 +6,9 @@ import {
   useAcceptFoodLogShareMutation,
   useDeclineFoodLogShareMutation,
 } from './foodLogShares.query';
-import type { ReceivedFoodLogShare } from './foodLogShares.api';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { List, ListItem } from '@/components/ui/list/List';
-import { toastManager } from '@/components/ui/toast/toastManager';
 import css from './ReceivedFoodShares.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { productCountText } from '../calorieHelpers';
@@ -19,40 +17,15 @@ type Props = {
   date: string;
 };
 
-/** Incoming logs shown like the user's own, wrapped in a card that accepts or declines them all at once. */
+/**
+ * Incoming logs shown like the user's own, wrapped in a card that accepts or declines them all at once.
+ * No success toast: accepted products appear in the log and the card disappears either way.
+ */
 export function ReceivedFoodShares({ date }: Props) {
   const { formatNumber, t } = useI18n();
   const sharesQuery = useQuery(receivedFoodLogSharesQueryOptions());
   const acceptMutation = useAcceptFoodLogShareMutation();
   const declineMutation = useDeclineFoodLogShareMutation();
-
-  function accept(share: ReceivedFoodLogShare) {
-    acceptMutation.mutate(
-      { date, id: share.id },
-      {
-        onSuccess: () =>
-          toastManager.add({
-            title: t({
-              en: `Added ${t(productCountText(share.items.length))} from ${share.senderName}`,
-              pl: `Dodano ${t(productCountText(share.items.length))} od: ${share.senderName}`,
-            }),
-            type: 'success',
-          }),
-      },
-    );
-  }
-
-  function decline(share: ReceivedFoodLogShare) {
-    declineMutation.mutate(share.id, {
-      onSuccess: () =>
-        toastManager.add({
-          title: t({
-            en: `Declined ${t(productCountText(share.items.length))} from ${share.senderName}`,
-            pl: `Odrzucono ${t(productCountText(share.items.length))} od: ${share.senderName}`,
-          }),
-        }),
-    });
-  }
 
   return (sharesQuery.data ?? []).map((share) => {
     const count = share.items.length;
@@ -100,7 +73,7 @@ export function ReceivedFoodShares({ date }: Props) {
             disabled={accepting}
             icon={<XIcon aria-hidden='true' />}
             loading={declining}
-            onClick={() => decline(share)}
+            onClick={() => declineMutation.mutate(share.id)}
             variant='ghost'
           >
             {t({ en: 'Decline', pl: 'Odrzuć' })}
@@ -109,7 +82,7 @@ export function ReceivedFoodShares({ date }: Props) {
             disabled={declining}
             icon={<CheckIcon aria-hidden='true' />}
             loading={accepting}
-            onClick={() => accept(share)}
+            onClick={() => acceptMutation.mutate({ date, id: share.id })}
           >
             {count === 1
               ? t({ en: 'Add to diary', pl: 'Dodaj do dziennika' })
