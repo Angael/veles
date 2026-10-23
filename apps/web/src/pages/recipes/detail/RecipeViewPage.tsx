@@ -14,7 +14,7 @@ type RecipeViewPageProps = {
 };
 
 export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
   const [portions, setPortions] = useState(recipe.portions);
   const scale = portions / recipe.portions;
 
@@ -97,7 +97,7 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
                     ) : null}
                     {ingredient.grams === null ? null : (
                       <span className={css.ingredientGrams}>
-                        {formatNumber(ingredient.grams * scale, { maximumFractionDigits: 0 })} g
+                        {formatWhole(ingredient.grams * scale)} g
                       </span>
                     )}
                   </li>

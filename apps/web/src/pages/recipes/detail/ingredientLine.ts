@@ -1,12 +1,12 @@
+import type { I18n } from '@/lib/i18n/I18nProvider';
 import type { RecipeIngredient } from '../recipeNutrition';
 
 /** Ingredient text with its amount scaled to the picked portions, e.g. `Rice – 150 g`. */
 export function ingredientLine(
   ingredient: RecipeIngredient,
   scale: number,
-  formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string,
+  formatWhole: I18n['formatWhole'],
 ) {
   if (ingredient.grams === null) return ingredient.name;
-  const grams = formatNumber(ingredient.grams * scale, { maximumFractionDigits: 0 });
-  return `${ingredient.name} – ${grams} g`;
+  return `${ingredient.name} – ${formatWhole(ingredient.grams * scale)} g`;
 }

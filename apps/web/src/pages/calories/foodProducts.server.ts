@@ -28,11 +28,11 @@ function productValues(data: typeof createFoodProductValuesType.infer) {
   return {
     name: data.name.trim(),
     barcode: data.barcode?.trim() ?? null,
-    productSizeGramsHundredths: optionalHundredths(data.productSizeGrams ?? undefined),
+    productSizeGramsHundredths: optionalHundredths(data.productSizeGrams),
     kcalPer100gHundredths: toHundredths(data.kcalPer100g),
-    proteinPer100gHundredths: optionalHundredths(data.proteinPer100g ?? undefined),
-    fatPer100gHundredths: optionalHundredths(data.fatPer100g ?? undefined),
-    carbsPer100gHundredths: optionalHundredths(data.carbsPer100g ?? undefined),
+    proteinPer100gHundredths: optionalHundredths(data.proteinPer100g),
+    fatPer100gHundredths: optionalHundredths(data.fatPer100g),
+    carbsPer100gHundredths: optionalHundredths(data.carbsPer100g),
   };
 }
 

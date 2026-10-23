@@ -21,3 +21,21 @@
 .add {
   justify-self: start;
 }
+
+.warning {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: flex-start;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--c-danger-border);
+  border-radius: var(--radius-md);
+  background: var(--c-danger-surface);
+  color: var(--c-danger-text);
+  font-size: var(--text-sm);
+
+  & svg {
+    flex: none;
+    width: 1em;
+    height: 1lh;
+  }
+}

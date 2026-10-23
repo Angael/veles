@@ -18,7 +18,7 @@ export function RecipeIngredientChecklist({
   onCheckedChange,
   scale,
 }: Props) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
 
   return (
     <List aria-label={t({ en: 'Ingredients to log', pl: 'Składniki do zapisania' })} data-selecting>
@@ -46,7 +46,7 @@ export function RecipeIngredientChecklist({
               }
               meta={
                 nutrition
-                  ? `${formatNumber(Math.round((ingredient.grams ?? 0) * scale))} g`
+                  ? `${formatWhole((ingredient.grams ?? 0) * scale)} g`
                   : t({
                       en: 'Not logged: no product or amount',
                       pl: 'Nie zapisywany: brak produktu lub ilości',

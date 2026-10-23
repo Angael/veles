@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { PlusIcon } from 'lucide-react';
+import { PlusIcon, TriangleAlertIcon } from 'lucide-react';
 import { useState } from 'react';
 import { calorieFoodsQueryOptions } from '@/pages/calories/calories.query';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -22,6 +22,9 @@ export function IngredientsField({ ingredients, onChange }: Props) {
   const foods = foodsQuery.data ?? [];
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const editing = ingredients.find((ingredient) => ingredient.key === editingKey) ?? null;
+  const unlinkedFromLogs = ingredients.filter(
+    (ingredient) => ingredient.fromLogWithoutProduct && !ingredient.productId,
+  ).length;
 
   /** Replaces the row with `key`, or removes it when `next` is null. */
   function update(key: string, next: IngredientDraft | null) {
@@ -54,6 +57,15 @@ export function IngredientsField({ ingredients, onChange }: Props) {
           pl: 'Ilości dotyczą całego przepisu.',
         })}
       </p>
+      {unlinkedFromLogs ? (
+        <p className={css.warning}>
+          <TriangleAlertIcon aria-hidden='true' />
+          {t({
+            en: `Logged foods without a product: ${unlinkedFromLogs}. They add no kcal to the recipe. Open one to search or scan its product.`,
+            pl: `Zapisane pozycje bez produktu: ${unlinkedFromLogs}. Nie dodają kcal do przepisu. Otwórz pozycję, aby wyszukać lub zeskanować produkt.`,
+          })}
+        </p>
+      ) : null}
       <input
         name='ingredients'
         type='hidden'

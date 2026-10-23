@@ -2,8 +2,12 @@ import { v7 as uuidv7 } from 'uuid';
 import type { RecipeIngredient } from '../recipeNutrition';
 import type { RecipeIngredientInput } from '../recipes.validation';
 
-/** One editor row; `key` only keeps React rows stable while rows are added and removed. */
+/**
+ * One editor row; `key` only keeps React rows stable while rows are added and removed.
+ * `fromLogWithoutProduct` marks a row prefilled from a food log that had no product.
+ */
 export type IngredientDraft = {
+  fromLogWithoutProduct?: boolean;
   grams: number | null;
   key: string;
   name: string;

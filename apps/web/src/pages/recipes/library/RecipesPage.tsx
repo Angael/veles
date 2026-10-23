@@ -27,7 +27,7 @@ const recipeSearchFields = [
 ] satisfies RankedSearchFields<RecipeLibraryItem>;
 
 export function RecipesPage({ recipes }: RecipesPageProps) {
-  const { formatNumber, t } = useI18n();
+  const { formatNumber, formatWhole, t } = useI18n();
   const [recipeScope, setRecipeScope] = useState<'all' | 'owned'>('all');
   const [searchInputValue, setSearchInputValue] = useState('');
   const [search] = useThrottledValue(searchInputValue, { wait: 200 });
@@ -109,9 +109,7 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
                     <span className={css.footerItem}>{formatNumber(recipe.rating)}/5</span>
                   ) : null}
                   {recipe.nutrition ? (
-                    <p className={css.footerItem}>
-                      {formatNumber(Math.round(recipe.nutrition.kcal))} KCAL
-                    </p>
+                    <p className={css.footerItem}>{formatWhole(recipe.nutrition.kcal)} KCAL</p>
                   ) : null}
                 </div>
               </div>

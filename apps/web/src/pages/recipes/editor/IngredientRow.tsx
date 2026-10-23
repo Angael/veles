@@ -17,7 +17,7 @@ type Props = {
 
 /** One ingredient shown like a food row; its name opens the ingredient dialog. */
 export function IngredientRow({ ingredient, onEdit, onRemove, product }: Props) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
   const nutrition = ingredientNutrition({
     grams: ingredient.grams,
     productId: ingredient.productId,
@@ -32,7 +32,7 @@ export function IngredientRow({ ingredient, onEdit, onRemove, product }: Props) 
   });
 
   function meta() {
-    if (nutrition) return `${formatNumber(Math.round(ingredient.grams ?? 0))} g`;
+    if (nutrition) return `${formatWhole(ingredient.grams ?? 0)} g`;
     if (ingredient.productId)
       return t({
         en: 'Product · add grams to count it',

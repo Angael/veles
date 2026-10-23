@@ -42,7 +42,7 @@ type Props = {
 
 /** Edits one ingredient live: search or scan a product to link it, or keep typed text as custom. */
 export function IngredientDialog({ foods, ingredient, onChange, onClose }: Props) {
-  const { formatNumber, locale, t } = useI18n();
+  const { formatWhole, locale, t } = useI18n();
   const [scanning, setScanning] = useState(false);
   const productName = (food: CalorieFood) => t(foodProductNames(food));
 
@@ -77,7 +77,7 @@ export function IngredientDialog({ foods, ingredient, onChange, onClose }: Props
               renderItem={(food) => (
                 <span className={css.suggestion}>
                   <span>{productName(food)}</span>
-                  <small>{formatNumber(Math.round(food.kcalPer100g))} kcal / 100 g</small>
+                  <small>{formatWhole(food.kcalPer100g)} kcal / 100 g</small>
                 </span>
               )}
               trailing={
@@ -96,7 +96,7 @@ export function IngredientDialog({ foods, ingredient, onChange, onClose }: Props
             <div className={css.grams}>
               <ScrubCell
                 aria-label={t({ en: 'Grams', pl: 'Gramy' })}
-                format={(grams) => formatNumber(Math.round(grams), { useGrouping: false })}
+                format={(grams) => formatWhole(grams, { useGrouping: false })}
                 max={20000}
                 onChange={(grams) => onChange({ ...ingredient, grams: grams || null })}
                 parse={parseGrams}

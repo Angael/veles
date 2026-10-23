@@ -29,7 +29,7 @@ type LoggedFoodProps = {
 
 /** Logged food row; right click or long press opens per-entry actions. */
 export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFoodProps) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
   const deleteMutation = useDeleteFoodLogMutation();
   const [multiplyOpen, setMultiplyOpen] = useState(false);
   // Mode outlives `open` so the dialog keeps its title while animating closed.
@@ -76,7 +76,7 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
             meta={
               entry.grams === null
                 ? t({ en: 'Custom entry', pl: 'Własny wpis' })
-                : `${formatNumber(Math.round(entry.grams))} g`
+                : `${formatWhole(entry.grams)} g`
             }
             name={
               <Link params={{ logId: entry.id }} to='/calories/logs/$logId'>

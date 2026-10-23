@@ -10,11 +10,8 @@ import {
 } from '@veles/db/schema';
 import { db } from '@/server/db.server';
 import { getRecipeIngredients } from '@/pages/recipes/recipeIngredients.server';
-import {
-  ingredientNutrition,
-  type Nutrition,
-  sumIngredientNutrition,
-} from '@/pages/recipes/recipeNutrition';
+import { type Nutrition, wholeOrNull } from '@/lib/nutrition';
+import { ingredientNutrition, sumIngredientNutrition } from '@/pages/recipes/recipeNutrition';
 import {
   byIdDesc,
   groupImageUrls,
@@ -112,17 +109,15 @@ export async function readWeights(userId: string, query: ReadQuery) {
   };
 }
 
-const round2 = (value: number | null) => (value === null ? null : Math.round(value * 100) / 100);
-
-/** Nutrition rounded for agents, with macros nested apart from kcal. */
+/** Whole-number nutrition for agents, with macros nested apart from kcal. */
 function agentNutrition(nutrition: Nutrition | null) {
   if (!nutrition) return null;
   return {
-    kcal: round2(nutrition.kcal),
+    kcal: Math.round(nutrition.kcal),
     macros: {
-      protein: round2(nutrition.protein),
-      fat: round2(nutrition.fat),
-      carbs: round2(nutrition.carbs),
+      protein: wholeOrNull(nutrition.protein),
+      fat: wholeOrNull(nutrition.fat),
+      carbs: wholeOrNull(nutrition.carbs),
     },
   };
 }

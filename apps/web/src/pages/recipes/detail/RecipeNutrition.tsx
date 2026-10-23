@@ -91,13 +91,13 @@ function NutritionItem({
   unit?: string;
   value: number | null;
 }) {
-  const { formatNumber } = useI18n();
+  const { formatWhole } = useI18n();
 
   if (value === null) {
     return null;
   }
 
-  const formattedValue = formatNumber(Math.round(value));
+  const formattedValue = formatWhole(value);
 
   return (
     <div className={clsx(css.nutritionItem, className)}>

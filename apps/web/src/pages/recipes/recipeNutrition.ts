@@ -1,10 +1,5 @@
 import type { FoodProductCategory } from '@veles/db/seed/food-products';
-export type Nutrition = {
-  kcal: number;
-  protein: number | null;
-  fat: number | null;
-  carbs: number | null;
-};
+import { type Nutrition, nutritionForGrams } from '@/lib/nutrition';
 
 /** A recipe ingredient for the whole recipe; `per100g` is set only while it links a product. */
 export type RecipeIngredient = {
@@ -29,15 +24,7 @@ export function isLoggableIngredient<T extends NutritionSource>(
 /** Nutrition of one ingredient at `scale` × its recipe amount, or null when it is not loggable. */
 export function ingredientNutrition(ingredient: NutritionSource, scale = 1): Nutrition | null {
   if (!isLoggableIngredient(ingredient)) return null;
-  const factor = (ingredient.grams * scale) / 100;
-  const at = (value: number | null) => (value === null ? null : value * factor);
-  const { per100g } = ingredient;
-  return {
-    kcal: per100g.kcal * factor,
-    protein: at(per100g.protein),
-    fat: at(per100g.fat),
-    carbs: at(per100g.carbs),
-  };
+  return nutritionForGrams(ingredient.per100g, ingredient.grams * scale);
 }
 
 export function sumNullable(left: number | null, right: number | null) {

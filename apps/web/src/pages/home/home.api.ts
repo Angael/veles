@@ -11,7 +11,7 @@ import {
   workoutSessions,
 } from '@veles/db/schema';
 import { dateOnlyType } from '@/lib/dateOnly';
-import { fromHundredths, HUNDREDTHS, toCalorieGoal } from '@/lib/nutrition';
+import { fromHundredths, HUNDREDTHS, toCalorieGoal, wholeOrNull } from '@/lib/nutrition';
 import { requireSession } from '@/server/getSession.server';
 import { db } from '@/server/db.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
@@ -49,9 +49,6 @@ export type HomeDashboardData = {
     weightKg: number;
   }>;
 };
-
-const roundOrNull = (value: number | null | undefined) =>
-  value === null || value === undefined ? null : Math.round(value);
 
 const homeDashboardInputType = type({ date: dateOnlyType });
 
@@ -129,10 +126,10 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
         const nutrition = sumIngredientNutrition(ingredients.get(recipe.id) ?? []);
         return {
           ...recipe,
-          kcal: roundOrNull(nutrition?.kcal),
-          protein: roundOrNull(nutrition?.protein),
-          fat: roundOrNull(nutrition?.fat),
-          carbs: roundOrNull(nutrition?.carbs),
+          kcal: wholeOrNull(nutrition?.kcal),
+          protein: wholeOrNull(nutrition?.protein),
+          fat: wholeOrNull(nutrition?.fat),
+          carbs: wholeOrNull(nutrition?.carbs),
         };
       }),
       nutrition: {

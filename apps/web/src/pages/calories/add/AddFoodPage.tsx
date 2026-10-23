@@ -29,7 +29,7 @@ function nutritionAtGrams(valuePer100g: number | null, grams: number) {
 
 /** Food search; picking a food pushes `?foodId` so back returns from the confirm step to the list. */
 export function AddFoodPage({ date, foodId }: Props) {
-  const { formatNumber, locale, t } = useI18n();
+  const { formatWhole, locale, t } = useI18n();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
@@ -92,7 +92,7 @@ export function AddFoodPage({ date, foodId }: Props) {
                 category={food.category}
                 imageUrl={food.imageUrl}
                 kcal={kcal}
-                meta={`${formatNumber(Math.round(productGrams))} g`}
+                meta={`${formatWhole(productGrams)} g`}
                 name={
                   <button
                     className={css.selectButton}

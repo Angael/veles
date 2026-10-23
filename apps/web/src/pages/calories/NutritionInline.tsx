@@ -27,27 +27,27 @@ export function NutritionInline({
   hideMacros = false,
   stacked = false,
 }: NutritionInlineProps) {
-  const { formatNumber } = useI18n();
+  const { formatWhole } = useI18n();
 
   return (
     <div className={clsx(css.root, stacked && css.stacked)}>
       <div className={energyDisplay === 'phone' ? css.energyPhoneOnly : css.energy}>
-        <strong>{formatNumber(Math.round(kcal))}</strong>
+        <strong>{formatWhole(kcal)}</strong>
         <span>kcal</span>
         {energyMeta ? <span className={css.energyMeta}>{energyMeta}</span> : null}
       </div>
       {hideMacros ? null : (
         <div className={css.macros}>
           <div className={css.macro}>
-            {formatNumber(Math.round(protein ?? 0))}
+            {formatWhole(protein ?? 0)}
             <span className={css.unit}>g</span>
           </div>
           <div className={css.macro}>
-            {formatNumber(Math.round(fat ?? 0))}
+            {formatWhole(fat ?? 0)}
             <span className={css.unit}>g</span>
           </div>
           <div className={css.macro}>
-            {formatNumber(Math.round(carbs ?? 0))}
+            {formatWhole(carbs ?? 0)}
             <span className={css.unit}>g</span>
           </div>
         </div>

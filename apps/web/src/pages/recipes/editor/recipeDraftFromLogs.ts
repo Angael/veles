@@ -23,6 +23,7 @@ export function recipeDraftFromLogs(logs: RecipeSourceLog[]): RecipeFormDraft {
       continue;
     }
     const ingredient = ingredientDraft({
+      fromLogWithoutProduct: !log.productId,
       grams: log.grams,
       name: log.name,
       productId: log.productId,

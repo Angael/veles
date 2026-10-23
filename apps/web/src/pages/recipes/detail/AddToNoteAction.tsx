@@ -26,14 +26,14 @@ type Props = { portions: number; recipe: RecipeLibraryItem; scale: number };
  * note a connection shares, or a new shopping list.
  */
 export function AddToNoteAction({ portions, recipe, scale }: Props) {
-  const { formatNumber, t } = useI18n();
+  const { formatNumber, formatWhole, t } = useI18n();
   const [open, setOpen] = useState(false);
   // Fetched with the page so the picker opens with the notes already listed.
   const notesQuery = useQuery(notesQueryOptions());
   const navigate = useNavigate();
   const addMutation = useAddRecipeToNoteMutation();
   const items = recipe.ingredients.map((ingredient) =>
-    ingredientLine(ingredient, scale, formatNumber),
+    ingredientLine(ingredient, scale, formatWhole),
   );
 
   function add(noteId: string | null) {

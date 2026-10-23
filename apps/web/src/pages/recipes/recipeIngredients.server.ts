@@ -3,7 +3,7 @@ import { foodProducts, recipeIngredients, uploadObjects } from '@veles/db/schema
 import { foodProductCategory } from '@veles/db/seed/food-products';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { translate } from '@/lib/i18n/getLocale';
-import { fromHundredths, HUNDREDTHS, toHundredths } from '@/lib/nutrition';
+import { fromHundredths, productPer100g, toHundredths } from '@/lib/nutrition';
 import { db, type DbTransaction } from '@/server/db.server';
 import { storagePathToUrl } from '@/server/storage/config.server';
 import { foodProductNames } from '@/pages/calories/calorieHelpers';
@@ -38,14 +38,7 @@ export async function getRecipeIngredients(recipeIds: string[], tx: Db = db) {
       grams: fromHundredths(ingredient.gramsHundredths),
       imageUrl: asset ? storagePathToUrl(asset.key) : null,
       category: product ? foodProductCategory(product.seedKey) : null,
-      per100g: product
-        ? {
-            kcal: product.kcalPer100gHundredths / HUNDREDTHS,
-            protein: fromHundredths(product.proteinPer100gHundredths),
-            fat: fromHundredths(product.fatPer100gHundredths),
-            carbs: fromHundredths(product.carbsPer100gHundredths),
-          }
-        : null,
+      per100g: product ? productPer100g(product) : null,
     });
     byRecipeId.set(ingredient.recipeId, list);
   }

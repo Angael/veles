@@ -3,7 +3,14 @@ import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { foodLogs, foodProducts, uploadObjects } from '@veles/db/schema';
 import { foodProductCategory, type FoodProductCategory } from '@veles/db/seed/food-products';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
-import { fromHundredths, HUNDREDTHS, optionalHundredths, toHundredths } from '@/lib/nutrition';
+import {
+  fromHundredths,
+  HUNDREDTHS,
+  optionalHundredths,
+  nutritionForGrams,
+  productPer100g,
+  toHundredths,
+} from '@/lib/nutrition';
 import { db } from '@/server/db.server';
 import { storagePathToUrl } from '@/server/storage/config.server';
 import type { CalorieLog } from './calories.api';
@@ -53,18 +60,16 @@ async function withImage(
 
 /** Food log fields snapshotting a product's name and nutrition scaled to the eaten grams. */
 export function productLogValues(product: typeof foodProducts.$inferSelect, grams: number) {
-  const gramsHundredths = toHundredths(grams);
-  const scale = (value: number | null) =>
-    value === null ? null : Math.round((value * gramsHundredths) / (100 * HUNDREDTHS));
+  const nutrition = nutritionForGrams(productPer100g(product), grams);
 
   return {
     name: translate(foodProductNames(product)),
     productId: product.id,
-    gramsHundredths,
-    kcalHundredths: scale(product.kcalPer100gHundredths) ?? 0,
-    proteinHundredths: scale(product.proteinPer100gHundredths),
-    fatHundredths: scale(product.fatPer100gHundredths),
-    carbsHundredths: scale(product.carbsPer100gHundredths),
+    gramsHundredths: toHundredths(grams),
+    kcalHundredths: toHundredths(nutrition.kcal),
+    proteinHundredths: optionalHundredths(nutrition.protein),
+    fatHundredths: optionalHundredths(nutrition.fat),
+    carbsHundredths: optionalHundredths(nutrition.carbs),
   };
 }
 
@@ -119,11 +124,11 @@ export async function recordCustomCaloriesRecord(
           name: values.name.trim(),
           productId: null,
           imageUploadObjectId: action === 'replace' ? (image?.asset.id ?? null) : null,
-          gramsHundredths: optionalHundredths(values.grams ?? undefined),
+          gramsHundredths: optionalHundredths(values.grams),
           kcalHundredths: toHundredths(values.kcal),
-          proteinHundredths: optionalHundredths(values.protein ?? undefined),
-          fatHundredths: optionalHundredths(values.fat ?? undefined),
-          carbsHundredths: optionalHundredths(values.carbs ?? undefined),
+          proteinHundredths: optionalHundredths(values.protein),
+          fatHundredths: optionalHundredths(values.fat),
+          carbsHundredths: optionalHundredths(values.carbs),
           logDate: values.date,
           consumedAt: new Date(),
           userId,
@@ -145,7 +150,7 @@ function updateOptionalNutrient(
   ratio: number | null,
   isProduct: boolean,
 ) {
-  if (!isProduct) return optionalHundredths(inputValue ?? undefined);
+  if (!isProduct) return optionalHundredths(inputValue);
   return existingHundredths === null || ratio === null
     ? existingHundredths
     : Math.round(existingHundredths * ratio);
@@ -185,7 +190,7 @@ export async function updateFoodLogRecord(
   if (action === 'remove') imageUploadObjectId = null;
 
   try {
-    const nextGrams = optionalHundredths(values.grams ?? undefined);
+    const nextGrams = optionalHundredths(values.grams);
     const isProduct = existing.productId !== null;
     const ratio =
       isProduct && existing.gramsHundredths && nextGrams !== null

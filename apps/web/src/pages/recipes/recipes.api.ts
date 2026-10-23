@@ -8,7 +8,8 @@ import { getSessionUserId, requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { storagePathToUrl } from '@/server/storage/config.server';
 import { getRecipeIngredients } from './recipeIngredients.server';
-import { type Nutrition, type RecipeIngredient, sumIngredientNutrition } from './recipeNutrition';
+import type { Nutrition } from '@/lib/nutrition';
+import { type RecipeIngredient, sumIngredientNutrition } from './recipeNutrition';
 import { accessibleRecipe, updateRecipeRatingRecord } from './recipes.server';
 import { updateRecipeRatingInputType } from './recipes.validation';
 

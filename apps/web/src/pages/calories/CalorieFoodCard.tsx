@@ -26,7 +26,7 @@ export function CalorieFoodCard({
   fat,
   carbs,
 }: CalorieFoodCardProps) {
-  const { formatNumber } = useI18n();
+  const { formatWhole } = useI18n();
 
   return (
     <li className={css.item}>
@@ -35,7 +35,7 @@ export function CalorieFoodCard({
           <img alt='' aria-hidden='true' className={css.photoWash} loading='lazy' src={imageUrl} />
         ) : null}
         <div aria-hidden='true' className={css.energyTile}>
-          <strong>{formatNumber(Math.round(kcal))}</strong>
+          <strong>{formatWhole(kcal)}</strong>
           <span>kcal</span>
         </div>
 
