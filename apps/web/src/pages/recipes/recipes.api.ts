@@ -27,8 +27,6 @@ export type RecipeLibraryItem = Omit<RecipeSelect, 'createdAt' | 'updatedAt' | '
 
 export type RecipeImage = { id: string; url: string };
 
-export type RecipeViewItem = RecipeLibraryItem & { canManage: boolean };
-
 export const getRecipeLibrary = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRecipeLibrary')])
   .handler(async () => {
@@ -70,21 +68,19 @@ export const getRecipeById = createServerFn({ method: 'GET' })
 
     const related = await getRecipeRelations([recipe.id]);
 
-    return {
-      ...toRecipeLibraryItem(recipe, related, recipe.userId === userId),
-      canManage: recipe.userId === userId,
-    } satisfies RecipeViewItem;
+    return toRecipeLibraryItem(recipe, related, recipe.userId === userId);
   });
 
-export const getOwnedRecipeById = createServerFn({ method: 'GET' })
-  .middleware([logMiddleware('getOwnedRecipeById')])
+/** Loads an own or shared recipe for the editor; friends edit shared recipes too. */
+export const getEditableRecipeById = createServerFn({ method: 'GET' })
+  .middleware([logMiddleware('getEditableRecipeById')])
   .validator(arkTypeValidator(recipeByIdInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
     const recipeRows = await db
       .select()
       .from(recipes)
-      .where(and(eq(recipes.id, data.id), eq(recipes.userId, session.user.id)))
+      .where(and(eq(recipes.id, data.id), accessibleRecipe(session.user.id)))
       .limit(1);
     const recipe = recipeRows[0];
 
@@ -94,7 +90,7 @@ export const getOwnedRecipeById = createServerFn({ method: 'GET' })
 
     const related = await getRecipeRelations([recipe.id]);
 
-    return toRecipeLibraryItem(recipe, related, true);
+    return toRecipeLibraryItem(recipe, related, recipe.userId === session.user.id);
   });
 
 export const updateRecipeRating = createServerFn({ method: 'POST' })

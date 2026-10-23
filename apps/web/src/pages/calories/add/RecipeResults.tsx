@@ -10,7 +10,7 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 
 const MAX_RECIPES = 3;
 
-/** The user's own loggable recipes whose name has every typed word, shown above the products. */
+/** The user's own and shared loggable recipes whose name has every typed word, shown above the products. */
 export function RecipeResults({ date, query }: { date: string; query: string }) {
   const { formatNumber, t } = useI18n();
   const recipesQuery = useQuery(recipeLibraryQueryOptions());
@@ -19,7 +19,6 @@ export function RecipeResults({ date, query }: { date: string; query: string }) 
     ? (recipesQuery.data ?? [])
         .filter(
           (recipe) =>
-            recipe.isOwned &&
             recipe.ingredients.some(isLoggableIngredient) &&
             terms.every((term) => recipe.name.toLocaleLowerCase().includes(term)),
         )
