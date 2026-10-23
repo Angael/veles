@@ -138,7 +138,6 @@ export async function readRecipes(userId: string, query: ReadQuery) {
       id: recipes.id,
       name: recipes.name,
       description: recipes.description,
-      tags: recipes.tags,
       portions: recipes.portions,
       rating: recipes.rating,
       createdAt: recipes.createdAt,

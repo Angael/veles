@@ -16,7 +16,6 @@ export type RecipeFormDraft = {
   name: string;
   portions: number;
   rating: number | null;
-  tags: string[];
 };
 
 export function ingredientDraft(
@@ -32,7 +31,6 @@ export function emptyRecipeDraft(): RecipeFormDraft {
     name: '',
     portions: 1,
     rating: null,
-    tags: [],
   };
 }
 

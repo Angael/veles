@@ -17,12 +17,15 @@ type AutocompleteInputProps<Item> = {
   placeholder?: string;
   renderItem: (item: Item) => ReactNode;
   size?: InputSize;
+  /** Content inside the input's right edge, e.g. an icon button. */
+  trailing?: ReactNode;
   value: string;
 };
 
 /**
  * Free-text input with suggestions. Base UI owns the combobox semantics: arrow keys move the
  * active option, Enter picks it, Escape closes the popup. The text may stay a custom value.
+ * Enter never submits the surrounding form.
  */
 export function AutocompleteInput<Item>({
   empty,
@@ -34,6 +37,7 @@ export function AutocompleteInput<Item>({
   placeholder,
   renderItem,
   size = 'md',
+  trailing,
   value,
   ...props
 }: AutocompleteInputProps<Item>) {
@@ -49,8 +53,11 @@ export function AutocompleteInput<Item>({
     >
       <Autocomplete.Input
         aria-label={props['aria-label']}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') event.preventDefault();
+        }}
         placeholder={placeholder}
-        render={<TextInput size={size} />}
+        render={<TextInput size={size} trailing={trailing} />}
       />
       <Autocomplete.Portal>
         <Autocomplete.Positioner className={css.positioner} sideOffset={6}>

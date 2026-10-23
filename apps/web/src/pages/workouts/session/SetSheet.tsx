@@ -11,7 +11,7 @@ import {
   scrubTuning,
   type MetricKey,
 } from '../metrics';
-import { ScrubField } from '../scrub/ScrubField';
+import { ScrubField } from '@/components/ui/scrub/ScrubField';
 import type { WorkoutSetData, WorkoutSlotData } from '../workouts.server';
 import css from './SetSheet.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';

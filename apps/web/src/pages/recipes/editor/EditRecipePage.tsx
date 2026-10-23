@@ -84,6 +84,5 @@ function recipeToDraft(recipe: RecipeLibraryItem): RecipeFormDraft {
     name: recipe.name,
     portions: recipe.portions,
     rating: recipe.rating,
-    tags: recipe.tags,
   };
 }

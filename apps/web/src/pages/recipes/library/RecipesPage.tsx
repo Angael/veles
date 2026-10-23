@@ -23,7 +23,6 @@ const recipeScopeItems = [
 
 const recipeSearchFields = [
   (recipe) => recipe.name,
-  (recipe) => recipe.tags,
   (recipe) => recipe.description,
 ] satisfies RankedSearchFields<RecipeLibraryItem>;
 
@@ -49,7 +48,7 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
               name='search'
               onValueChange={setSearchInputValue}
               placeholder={t({
-                en: 'Search by name, tags, or description',
+                en: 'Search by name or description',
                 pl: 'Szukaj po nazwie, tagach lub opisie',
               })}
               type='search'
@@ -98,16 +97,6 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
                 <div className={css.cardHeader}>
                   <div className={css.titleBlock}>
                     <h2>{recipe.name}</h2>
-
-                    {recipe.tags.length > 0 ? (
-                      <div className={css.tags}>
-                        {recipe.tags.map((tag) => (
-                          <span className={css.tag} key={tag}>
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
                   </div>
                 </div>
 

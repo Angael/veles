@@ -25,15 +25,6 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
         <header className={css.heading}>
           <div className={css.identity}>
             <h1>{recipe.name}</h1>
-            {recipe.tags.length > 0 ? (
-              <div className={css.tags} aria-label={t({ en: 'Recipe tags', pl: 'Tagi przepisu' })}>
-                {recipe.tags.map((tag) => (
-                  <span className={css.tag} key={tag}>
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            ) : null}
           </div>
 
           {recipe.canManage ? (

@@ -49,7 +49,7 @@ Resources:
 
 - notes: Notes and shopping lists. Notes have content; shopping lists (type "shopping_list") have items (id, name, checked) in list order instead.
 - weights: Weight history in kg, newest date first, with photoUrls (progress photos). Cursor and from/to are dates.
-- recipes: Recipes with tags, imageUrls, and ingredients in order. Ingredient grams are for the whole recipe (portions = how many portions it makes). A linked ingredient has productId (from food_products) and nutrition at its grams; a custom one has productId null, nutrition null, and logged false, as it is never written to the food log. total (all portions) and perPortion sum the linked ingredients and are null when none has nutrition; kcal is energy; macros are protein, fat, carbs in grams.
+- recipes: Recipes with imageUrls, and ingredients in order. Ingredient grams are for the whole recipe (portions = how many portions it makes). A linked ingredient has productId (from food_products) and nutrition at its grams; a custom one has productId null, nutrition null, and logged false, as it is never written to the food log. total (all portions) and perPortion sum the linked ingredients and are null when none has nutrition; kcal is energy; macros are protein, fat, carbs in grams.
 - food_days: Food diary, one item per day with entries or a day note, newest first; id and date are the same YYYY-MM-DD. Each day has entries (with imageUrl or null, and productId when logged from food_products), total, goal (the nutrition goal in effect; null without a goal or without Nutrition goals consent), note (the user's free text or null), and offPlan; kcal is energy; macros are protein, fat, carbs in grams. offPlan true means the user went off the diet and probably overate: total is only what was logged, not the real intake, so use the note to judge how much more was eaten, and leave the day out of averages and trends.
 - calorie_goals: Nutrition goal history by effectiveDate, newest first; each goal applies until the next one. kcal is energy; macros are protein, fat, carbs in grams (limits).
 - food_products: Shared food catalog with imageUrl or null. per100g nutrition: kcal is energy; macros are protein, fat, carbs in grams. productSizeGrams is one package.
@@ -196,7 +196,7 @@ Delete a routine. Sessions started from it stay and lose the link.
 
 _write_
 
-Create (no id; name required) or update (id) an owned recipe. Omitted fields stay; images stay. portions is how many portions the recipe makes. ingredients and tags replace the whole list. Each ingredient is { productId, grams } for a food_products product (name is optional and defaults to the product name; nutrition comes from the product), or { name, grams? } for a custom line with no nutrition that is never logged. grams are for the whole recipe. rating is 1–5. Returns { id }.
+Create (no id; name required) or update (id) an owned recipe. Omitted fields stay; images stay. portions is how many portions the recipe makes. ingredients replace the whole list. Each ingredient is { productId, grams } for a food_products product (name is optional and defaults to the product name; nutrition comes from the product), or { name, grams? } for a custom line with no nutrition that is never logged. grams are for the whole recipe. rating is 1–5. Returns { id }.
 
 | Input         | Type                         | Required | Notes         |
 | ------------- | ---------------------------- | -------- | ------------- |
@@ -206,7 +206,6 @@ Create (no id; name required) or update (id) an owned recipe. Omitted fields sta
 | `name`        | string                       |          |               |
 | `portions`    | integer                      |          |               |
 | `rating`      | integer \| null              |          |               |
-| `tags`        | string[]                     |          |               |
 
 ## Write: Food diary
 

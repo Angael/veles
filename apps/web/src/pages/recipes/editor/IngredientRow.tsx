@@ -5,13 +5,25 @@ import { foodProductNames } from '@/pages/calories/calorieHelpers';
 import { filterFoods } from '@/pages/calories/add/filterFoods';
 import { AutocompleteInput } from '@/components/ui/autocomplete-input/AutocompleteInput';
 import { Btn } from '@/components/ui/btn/Btn';
-import { NumberInput } from '@/components/ui/number-input/NumberInput';
+import { ScrubCell } from '@/components/ui/scrub/ScrubCell';
 import { IngredientScanDialog } from './IngredientScanDialog';
 import type { IngredientDraft } from './recipeDraft';
 import css from './IngredientRow.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 const MAX_SUGGESTIONS = 8;
+/** Slow drags move by 1 g, faster ones by 5, 10 and 50 g. */
+const GRAM_TIERS = [
+  { from: 0, step: 1 },
+  { from: 0.3, step: 5 },
+  { from: 0.65, step: 10 },
+  { from: 1.1, step: 50 },
+];
+
+const parseGrams = (text: string) => {
+  const value = Number(text.trim().replace(',', '.'));
+  return text.trim() && Number.isFinite(value) && value >= 0 ? Math.round(value) : null;
+};
 
 type Props = {
   foods: CalorieFood[];
@@ -73,27 +85,33 @@ export function IngredientRow({ foods, ingredient, onChange, onRemove }: Props) 
               </span>
             )}
             size='sm'
+            trailing={
+              <Btn
+                aria-label={t({ en: 'Scan barcode', pl: 'Skanuj kod kreskowy' })}
+                icon={<BarcodeIcon aria-hidden='true' />}
+                iconOnly
+                onClick={() => setScanning(true)}
+                size='sm'
+                type='button'
+                variant='ghost'
+              />
+            }
             value={ingredient.name}
           />
         </div>
-        <NumberInput
-          aria-label={t({ en: 'Grams', pl: 'Gramy' })}
-          className={css.grams}
-          min={0}
-          onValueChange={(grams) => onChange({ ...ingredient, grams: grams || null })}
-          placeholder='g'
-          size='sm'
-          value={ingredient.grams}
-        />
-        <Btn
-          aria-label={t({ en: 'Scan barcode', pl: 'Skanuj kod kreskowy' })}
-          icon={<BarcodeIcon aria-hidden='true' />}
-          iconOnly
-          onClick={() => setScanning(true)}
-          size='sm'
-          type='button'
-          variant='ghost'
-        />
+        <div className={css.grams}>
+          <ScrubCell
+            aria-label={t({ en: 'Grams', pl: 'Gramy' })}
+            format={(grams) => formatNumber(Math.round(grams), { useGrouping: false })}
+            max={20000}
+            onChange={(grams) => onChange({ ...ingredient, grams: grams || null })}
+            parse={parseGrams}
+            placeholder={null}
+            tiers={GRAM_TIERS}
+            unit='g'
+            value={ingredient.grams}
+          />
+        </div>
         <Btn
           aria-label={t({ en: 'Remove ingredient', pl: 'Usuń składnik' })}
           icon={<Trash2Icon aria-hidden='true' />}

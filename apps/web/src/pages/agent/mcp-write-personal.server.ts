@@ -29,7 +29,7 @@ export function registerRecipeTools(server: McpServer, userId: string) {
     'save_recipe',
     {
       description:
-        'Create (no id; name required) or update (id) an owned recipe. Omitted fields stay; images stay. portions is how many portions the recipe makes. ingredients and tags replace the whole list. Each ingredient is { productId, grams } for a food_products product (name is optional and defaults to the product name; nutrition comes from the product), or { name, grams? } for a custom line with no nutrition that is never logged. grams are for the whole recipe. rating is 1–5. Returns { id }.',
+        'Create (no id; name required) or update (id) an owned recipe. Omitted fields stay; images stay. portions is how many portions the recipe makes. ingredients replace the whole list. Each ingredient is { productId, grams } for a food_products product (name is optional and defaults to the product name; nutrition comes from the product), or { name, grams? } for a custom line with no nutrition that is never logged. grams are for the whole recipe. rating is 1–5. Returns { id }.',
       inputSchema: agentInput(saveRecipeInputType),
       annotations: writeAnnotations({ destructive: false, idempotent: false }),
     },

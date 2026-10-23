@@ -25,7 +25,6 @@ export const recipes = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     name: text('name').notNull(),
     description: text('description').notNull(),
-    tags: text('tags').array().notNull(),
     portions: integer('portions').notNull().default(1),
     rating: integer('rating'),
     createdAt: timestamp('created_at').notNull().defaultNow(),

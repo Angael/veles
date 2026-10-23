@@ -40,7 +40,7 @@ export const resources = {
   recipes: {
     feature: 'recipes',
     dated: false,
-    description: `Recipes with tags, imageUrls, and ingredients in order. Ingredient grams are for the whole recipe (portions = how many portions it makes). A linked ingredient has productId (from food_products) and nutrition at its grams; a custom one has productId null, nutrition null, and logged false, as it is never written to the food log. total (all portions) and perPortion sum the linked ingredients and are null when none has nutrition; ${kcalAndMacros}.`,
+    description: `Recipes with imageUrls, and ingredients in order. Ingredient grams are for the whole recipe (portions = how many portions it makes). A linked ingredient has productId (from food_products) and nutrition at its grams; a custom one has productId null, nutrition null, and logged false, as it is never written to the food log. total (all portions) and perPortion sum the linked ingredients and are null when none has nutrition; ${kcalAndMacros}.`,
     read: readRecipes,
   },
   food_days: {

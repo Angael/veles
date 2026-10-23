@@ -28,18 +28,6 @@
   }
 }
 
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-}
-
-.tag {
-  color: var(--c-muted-strong);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-}
-
 .actions {
   display: flex;
   width: min(100%, 17rem);

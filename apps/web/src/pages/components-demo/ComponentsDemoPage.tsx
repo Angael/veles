@@ -55,6 +55,7 @@ import { Toggle } from '@/components/ui/toggle/Toggle';
 import css from './ComponentsDemoPage.module.css';
 import { PhotosFieldDemo } from './PhotosFieldDemo';
 import { AutocompleteDemo } from './AutocompleteDemo';
+import { ScrubDemo } from './ScrubDemo';
 import { CameraDemo } from './CameraDemo';
 
 const SELECT_OPTIONS = [
@@ -390,6 +391,7 @@ export function ComponentsDemoPage() {
       </section>
 
       <AutocompleteDemo />
+      <ScrubDemo />
 
       <section>
         <h2>Navbar</h2>

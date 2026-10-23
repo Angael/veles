@@ -45,18 +45,6 @@ export function RecipeForm({ draft, onDraftChange }: RecipeFormProps) {
         onChange={(ingredients) => onDraftChange({ ...draft, ingredients })}
       />
 
-      <Label text={t({ en: 'Tags', pl: 'Tagi' })}>
-        <TextInput
-          name='tags'
-          onValueChange={(value) => onDraftChange({ ...draft, tags: value.split(',') })}
-          placeholder={t({
-            en: 'dinner, chicken, high protein',
-            pl: 'obiad, kurczak, dużo białka',
-          })}
-          value={draft.tags.join(', ')}
-        />
-      </Label>
-
       <div className={css.fieldGrid}>
         <Label text={t({ en: 'Rating', pl: 'Ocena' })}>
           <NumberInput

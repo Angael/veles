@@ -1,8 +1,6 @@
 import { type } from 'arktype';
 import { dateOnlyType } from '@/lib/dateOnly';
 
-const recipeTextListType = type('string.trim[]').pipe((values) => values.filter(Boolean));
-
 /** One ingredient for the whole recipe: a linked product, or a custom line with no nutrition. */
 export const recipeIngredientInputType = type({
   '+': 'reject',
@@ -26,7 +24,6 @@ export const recipeFieldsType = type({
   name: 'string.trim |> string >= 1',
   description: type('string.trim').default(''),
   ingredients: recipeIngredientsType.default(() => []),
-  tags: recipeTextListType.default(() => []),
   portions: type('number.integer >= 1').default(1),
   rating: type('(1 <= number.integer <= 5) | null').default(null),
 });
@@ -36,7 +33,6 @@ export const updateRecipeFieldsInputType = type({
   'name?': 'string.trim |> string >= 1',
   'description?': 'string.trim',
   'ingredients?': recipeIngredientsType,
-  'tags?': recipeTextListType,
   'portions?': 'number.integer >= 1',
   'rating?': '(1 <= number.integer <= 5) | null',
 });

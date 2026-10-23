@@ -118,7 +118,7 @@ function NutritionItem({
     return null;
   }
 
-  const formattedValue = formatNumber(value, { maximumFractionDigits: 1 });
+  const formattedValue = formatNumber(Math.round(value));
 
   return (
     <div className={clsx(css.nutritionItem, className)}>

@@ -402,7 +402,6 @@ async function seedRecipes(client: Client, userId: string) {
         { name: '2 garlic cloves', grams: null, productId: null },
         { name: 'Olive oil', grams: null, productId: null },
       ],
-      tags: ['quick', 'vegetarian'],
       portions: 2,
       rating: 4,
     },
@@ -420,7 +419,6 @@ async function seedRecipes(client: Client, userId: string) {
         { name: 'Apple', grams: 150, productId: '01900000-0000-7000-8000-000000000202' },
         { name: 'Cinnamon', grams: null, productId: null },
       ],
-      tags: ['breakfast', 'quick'],
       portions: 2,
       rating: 5,
     },
@@ -428,25 +426,16 @@ async function seedRecipes(client: Client, userId: string) {
 
   for (const recipe of recipes) {
     await client.query(
-      `INSERT INTO recipe (id, user_id, name, description, tags, portions, rating)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO recipe (id, user_id, name, description, portions, rating)
+       VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (id) DO UPDATE SET
          user_id = EXCLUDED.user_id,
          name = EXCLUDED.name,
          description = EXCLUDED.description,
-         tags = EXCLUDED.tags,
          portions = EXCLUDED.portions,
          rating = EXCLUDED.rating,
          updated_at = now()`,
-      [
-        recipe.id,
-        userId,
-        recipe.name,
-        recipe.description,
-        recipe.tags,
-        recipe.portions,
-        recipe.rating,
-      ],
+      [recipe.id, userId, recipe.name, recipe.description, recipe.portions, recipe.rating],
     );
     await client.query('DELETE FROM recipe_ingredient WHERE recipe_id = $1', [recipe.id]);
     for (const [position, ingredient] of recipe.ingredients.entries()) {

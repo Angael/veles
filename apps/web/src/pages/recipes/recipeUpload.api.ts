@@ -35,7 +35,6 @@ const uploadRecipeInputType = type({
   name: 'string.trim |> string >= 1',
   portions: portionsFormValueType,
   rating: optionalRatingFormValueType,
-  tags: recipeFieldsType.get('tags'),
 });
 
 export const createRecipe = createServerFn({ method: 'POST' })
@@ -100,14 +99,12 @@ function recipeImageLinks(tx: DbTransaction, recipeId: string): PhotoLinkTable {
 
 /** Turns recipe form fields into the recipe persistence shape. */
 function validateRecipeFields(formData: FormData) {
-  const tagsValue = formData.get('tags');
   const validation = uploadRecipeInputType({
     description: formData.get('description'),
     ingredients: formData.get('ingredients') ?? '[]',
     name: formData.get('name'),
     portions: formData.get('portions'),
     rating: formData.get('rating'),
-    tags: typeof tagsValue === 'string' ? tagsValue.split(',') : [],
   });
 
   if (validation instanceof type.errors) {
