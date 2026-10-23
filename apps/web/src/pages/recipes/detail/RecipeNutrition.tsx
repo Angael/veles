@@ -1,23 +1,31 @@
 import { Link } from '@tanstack/react-router';
-import { useState } from 'react';
-import { Btn } from '@/components/ui/btn/Btn';
 import clsx from 'clsx';
+import { PlusIcon } from 'lucide-react';
+import { Btn } from '@/components/ui/btn/Btn';
 import { SliderInput } from '@/components/ui/slider-input/SliderInput';
 import type { RecipeLibraryItem } from '../recipes.api';
+import { isLoggableIngredient, sumIngredientNutrition } from '../recipeNutrition';
+import { AddToNoteAction } from './AddToNoteAction';
 import css from './RecipeNutrition.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-export function RecipeNutrition({ recipe }: { recipe: RecipeLibraryItem }) {
+type Props = {
+  onPortionsChange: (portions: number) => void;
+  portions: number;
+  recipe: RecipeLibraryItem;
+};
+
+/** Portion picker with the matching nutrition, and actions that use the picked amount. */
+export function RecipeNutrition({ onPortionsChange, portions, recipe }: Props) {
   const { t } = useI18n();
   const basePortions = Math.max(1, recipe.portions);
-  const [portions, setPortions] = useState(basePortions);
   const scale = portions / basePortions;
-  const nutrition = {
-    carbs: scaled(recipe.carbs, scale),
-    fat: scaled(recipe.fats, scale),
-    kcal: scaled(recipe.kcal, scale),
-    protein: scaled(recipe.protein, scale),
-  };
+  const nutrition = sumIngredientNutrition(recipe.ingredients, scale);
+  const canLog = portions > 0 && recipe.ingredients.some(isLoggableIngredient);
+  const shortcuts = [
+    { label: t({ en: '½ recipe', pl: '½ przepisu' }), portions: basePortions / 2 },
+    { label: t({ en: 'Whole recipe', pl: 'Cały przepis' }), portions: basePortions },
+  ];
 
   return (
     <section
@@ -28,66 +36,69 @@ export function RecipeNutrition({ recipe }: { recipe: RecipeLibraryItem }) {
         className={css.portionSlider}
         label={t({ en: 'Portions', pl: 'Porcje' })}
         max={Math.max(8, basePortions)}
-        min={0}
-        onValueChange={setPortions}
+        min={0.5}
+        onValueChange={onPortionsChange}
         step={0.5}
         value={portions}
       />
-
-      <div className={css.nutritionValues}>
-        <dl>
-          <NutritionItem className={css.kcal} label='Kcal' value={nutrition.kcal} />
-        </dl>
-        <dl className={css.macros}>
-          <NutritionItem
-            className={css.protein}
-            label={t({ en: 'Protein', pl: 'Białko' })}
-            unit='g'
-            value={nutrition.protein}
-          />
-          <NutritionItem
-            className={css.fat}
-            label={t({ en: 'Fat', pl: 'Tłuszcz' })}
-            unit='g'
-            value={nutrition.fat}
-          />
-          <NutritionItem
-            className={css.carb}
-            label={t({ en: 'Carb', pl: 'Węglowodany' })}
-            unit='g'
-            value={nutrition.carbs}
-          />
-        </dl>
+      <div className={css.shortcuts} role='group'>
+        {shortcuts.map((shortcut) => (
+          <Btn
+            aria-pressed={portions === shortcut.portions}
+            key={shortcut.label}
+            onClick={() => onPortionsChange(shortcut.portions)}
+            radius='pill'
+            size='sm'
+            type='button'
+            variant={portions === shortcut.portions ? 'main' : 'ghost'}
+          >
+            {shortcut.label}
+          </Btn>
+        ))}
       </div>
-      {nutrition.kcal !== null ? (
-        <Btn
-          isLink
-          render={
-            <Link
-              search={{
-                carbs: nutrition.carbs ?? undefined,
-                fat: nutrition.fat ?? undefined,
-                kcal: nutrition.kcal,
-                name: t({
-                  en: `${recipe.name} (quick add)`,
-                  pl: `${recipe.name} (szybkie dodanie)`,
-                }),
-                protein: nutrition.protein ?? undefined,
-              }}
-              to='/calories/quick-add'
+
+      {nutrition ? (
+        <div className={css.nutritionValues}>
+          <dl>
+            <NutritionItem className={css.kcal} label='Kcal' value={nutrition.kcal} />
+          </dl>
+          <dl className={css.macros}>
+            <NutritionItem
+              className={css.protein}
+              label={t({ en: 'Protein', pl: 'Białko' })}
+              unit='g'
+              value={nutrition.protein}
             />
-          }
-          variant='outlineMain'
-        >
-          {t({ en: 'Quick add kcal', pl: 'Szybko dodaj kcal' })}
-        </Btn>
+            <NutritionItem
+              className={css.fat}
+              label={t({ en: 'Fat', pl: 'Tłuszcz' })}
+              unit='g'
+              value={nutrition.fat}
+            />
+            <NutritionItem
+              className={css.carb}
+              label={t({ en: 'Carb', pl: 'Węglowodany' })}
+              unit='g'
+              value={nutrition.carbs}
+            />
+          </dl>
+        </div>
       ) : null}
+
+      <div className={css.actions}>
+        {canLog ? (
+          <Btn
+            icon={<PlusIcon aria-hidden='true' />}
+            isLink
+            render={<Link search={{ portions, recipeId: recipe.id }} to='/calories/add' />}
+          >
+            {t({ en: 'Add', pl: 'Dodaj' })}
+          </Btn>
+        ) : null}
+        <AddToNoteAction portions={portions} recipe={recipe} />
+      </div>
     </section>
   );
-}
-
-function scaled(value: number | null, scale: number) {
-  return value === null ? null : value * scale;
 }
 
 function NutritionItem({

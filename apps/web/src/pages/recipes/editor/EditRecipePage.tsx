@@ -6,7 +6,8 @@ import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { PhotosField } from '@/components/ui/photos-field/PhotosField';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import type { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
-import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
+import { RecipeForm } from './RecipeForm';
+import { ingredientDraft, ingredientsFromRecipe, type RecipeFormDraft } from './recipeDraft';
 import type { RecipeLibraryItem } from '../recipes.api';
 import { useUpdateRecipeMutation } from '../recipes.query';
 import { RECIPE_PHOTO_MAX_COUNT } from '../recipeUpload.api';
@@ -76,15 +77,12 @@ export function EditRecipePage({ recipe }: EditRecipePageProps) {
 }
 
 function recipeToDraft(recipe: RecipeLibraryItem): RecipeFormDraft {
+  const ingredients = ingredientsFromRecipe(recipe.ingredients);
   return {
-    carbs: recipe.carbs,
     description: recipe.description,
-    fats: recipe.fats,
-    ingredients: recipe.ingredients,
-    kcal: recipe.kcal,
+    ingredients: ingredients.length ? ingredients : [ingredientDraft()],
     name: recipe.name,
     portions: recipe.portions,
-    protein: recipe.protein,
     rating: recipe.rating,
     tags: recipe.tags,
   };

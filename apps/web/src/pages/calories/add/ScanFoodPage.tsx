@@ -6,8 +6,8 @@ import { Btn } from '@/components/ui/btn/Btn';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { calorieFoodQueryOptions, useLookupFoodByBarcodeMutation } from '../calories.query';
-import { BarcodeScanner } from './BarcodeScanner';
-import { LookupNotice, type LookupState } from './ScanNotice';
+import { BarcodeScanner } from '@/components/ui/barcode-scanner/BarcodeScanner';
+import { LookupNotice, type LookupState } from './LookupNotice';
 import css from './ScanFoodPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 

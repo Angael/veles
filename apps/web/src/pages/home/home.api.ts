@@ -15,6 +15,8 @@ import { fromHundredths, HUNDREDTHS, toCalorieGoal } from '@/lib/nutrition';
 import { requireSession } from '@/server/getSession.server';
 import { db } from '@/server/db.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
+import { getRecipeIngredients } from '@/pages/recipes/recipeIngredients.server';
+import { sumIngredientNutrition } from '@/pages/recipes/recipeNutrition';
 
 export type HomeDashboardData = {
   date: string;
@@ -48,6 +50,9 @@ export type HomeDashboardData = {
   }>;
 };
 
+const roundOrNull = (value: number | null | undefined) =>
+  value === null || value === undefined ? null : Math.round(value);
+
 const homeDashboardInputType = type({ date: dateOnlyType });
 
 /** Loads the records needed to render today's authenticated home dashboard. */
@@ -59,14 +64,7 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
     const [recipeRows, weightRows, diaryRows, foodLogRows, goalRows, workoutRows] =
       await Promise.all([
         db
-          .select({
-            kcal: recipes.kcal,
-            protein: recipes.protein,
-            fat: recipes.fats,
-            carbs: recipes.carbs,
-            id: recipes.id,
-            name: recipes.name,
-          })
+          .select({ id: recipes.id, name: recipes.name })
           .from(recipes)
           .where(eq(recipes.userId, session.user.id)),
         db
@@ -123,10 +121,20 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
       { kcal: 0, protein: 0, fat: 0, carbs: 0 },
     );
     const goal = goalRows[0] ? toCalorieGoal(goalRows[0]) : null;
+    const ingredients = await getRecipeIngredients(recipeRows.map((recipe) => recipe.id));
 
     return {
       date: data.date,
-      recipes: recipeRows,
+      recipes: recipeRows.map((recipe) => {
+        const nutrition = sumIngredientNutrition(ingredients.get(recipe.id) ?? []);
+        return {
+          ...recipe,
+          kcal: roundOrNull(nutrition?.kcal),
+          protein: roundOrNull(nutrition?.protein),
+          fat: roundOrNull(nutrition?.fat),
+          carbs: roundOrNull(nutrition?.carbs),
+        };
+      }),
       nutrition: {
         goal: goal
           ? {

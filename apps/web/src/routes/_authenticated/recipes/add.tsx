@@ -7,7 +7,6 @@ import {
   recipeSourceLogIdsType,
 } from '@/pages/recipes/editor/recipeFromLogs.api';
 import { translate } from '@/lib/i18n/getLocale';
-import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export const Route = createFileRoute('/_authenticated/recipes/add')({
   validateSearch: type({ 'fromLogs?': recipeSourceLogIdsType }),
@@ -26,10 +25,7 @@ export const Route = createFileRoute('/_authenticated/recipes/add')({
 
 function RouteComponent() {
   const sourceLogs = Route.useLoaderData();
-  const { formatNumber } = useI18n();
-  const initialDraft = sourceLogs.length
-    ? recipeDraftFromLogs(sourceLogs, (grams) => formatNumber(grams, { maximumFractionDigits: 1 }))
-    : undefined;
+  const initialDraft = sourceLogs.length ? recipeDraftFromLogs(sourceLogs) : undefined;
 
   return <AddRecipePage initialDraft={initialDraft} />;
 }

@@ -1,0 +1,31 @@
+.field {
+  display: grid;
+  gap: var(--space-xs);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  & legend {
+    padding: 0;
+    color: var(--c-accent-strong);
+    font-size: var(--text-xs);
+  }
+}
+
+.hint {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+}
+
+.rows {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.add {
+  justify-self: start;
+}

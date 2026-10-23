@@ -13,7 +13,7 @@ import type {
   saveFoodProductInputType,
   updateFoodProductValuesType,
 } from './calories.validation';
-import { foodBarcodeAliases } from './foodBarcode';
+import { foodBarcodeAliases } from '@/lib/foodBarcode';
 import {
   getFoodImageAssets,
   prepareFoodImage,

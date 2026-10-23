@@ -54,6 +54,7 @@ import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { Toggle } from '@/components/ui/toggle/Toggle';
 import css from './ComponentsDemoPage.module.css';
 import { PhotosFieldDemo } from './PhotosFieldDemo';
+import { AutocompleteDemo } from './AutocompleteDemo';
 import { CameraDemo } from './CameraDemo';
 
 const SELECT_OPTIONS = [
@@ -387,6 +388,8 @@ export function ComponentsDemoPage() {
           value={selectValue}
         />
       </section>
+
+      <AutocompleteDemo />
 
       <section>
         <h2>Navbar</h2>

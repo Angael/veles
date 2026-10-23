@@ -60,3 +60,19 @@
 .carb dd {
   color: var(--c-macro-carb);
 }
+
+.shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+
+  & > * {
+    flex: 1 1 auto;
+  }
+}

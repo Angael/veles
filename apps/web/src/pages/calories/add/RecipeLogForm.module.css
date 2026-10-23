@@ -1,0 +1,58 @@
+@import '../../../styles/breakpoints.css';
+
+.page,
+.form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+/* Room for the goal preview that is fixed to the bottom on phones. */
+.page {
+  @media (--phone) {
+    padding-bottom: 7rem;
+  }
+}
+
+.title {
+  color: var(--c-text-strong);
+  font-size: var(--text-xl-dynamic);
+  text-wrap: balance;
+}
+
+.portions {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.ingredient {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+
+  &[data-disabled] {
+    color: var(--c-muted);
+    cursor: default;
+  }
+}
+
+.ingredientName {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+
+  & strong {
+    overflow-wrap: anywhere;
+  }
+
+  & small {
+    color: var(--c-muted);
+    font-size: var(--text-xs);
+  }
+}

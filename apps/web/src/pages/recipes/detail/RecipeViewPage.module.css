@@ -177,6 +177,14 @@
   }
 }
 
+.linkedIcon {
+  flex: none;
+  align-self: center;
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--c-accent-strong);
+}
+
 .description {
   max-width: 62ch;
   overflow-wrap: anywhere;

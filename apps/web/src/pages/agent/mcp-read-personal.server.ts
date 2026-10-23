@@ -9,6 +9,13 @@ import {
   weightEntryPhotos,
 } from '@veles/db/schema';
 import { db } from '@/server/db.server';
+import { getRecipeIngredients } from '@/pages/recipes/recipeIngredients.server';
+import {
+  ingredientNutrition,
+  isLoggableIngredient,
+  type Nutrition,
+  sumIngredientNutrition,
+} from '@/pages/recipes/recipeNutrition';
 import {
   byIdDesc,
   groupImageUrls,
@@ -106,24 +113,34 @@ export async function readWeights(userId: string, query: ReadQuery) {
   };
 }
 
-const perPortion = (value: number | null, portions: number) =>
-  value === null ? null : Math.round((value / portions) * 100) / 100;
+const round2 = (value: number | null) => (value === null ? null : Math.round(value * 100) / 100);
 
-/** Owned recipes, newest first, with whole-recipe and per-portion nutrition and image URLs. */
+/** Nutrition rounded for agents, with macros nested apart from kcal. */
+function agentNutrition(nutrition: Nutrition | null) {
+  if (!nutrition) return null;
+  return {
+    kcal: round2(nutrition.kcal),
+    macros: {
+      protein: round2(nutrition.protein),
+      fat: round2(nutrition.fat),
+      carbs: round2(nutrition.carbs),
+    },
+  };
+}
+
+/**
+ * Owned recipes, newest first, with nested ingredients and image URLs. Nutrition comes from the
+ * linked products at the recipe amounts; custom ingredients have none and are never logged.
+ */
 export async function readRecipes(userId: string, query: ReadQuery) {
   const rows = await db
     .select({
       id: recipes.id,
       name: recipes.name,
       description: recipes.description,
-      ingredients: recipes.ingredients,
       tags: recipes.tags,
       portions: recipes.portions,
       rating: recipes.rating,
-      kcal: recipes.kcal,
-      protein: recipes.protein,
-      fat: recipes.fats,
-      carbs: recipes.carbs,
       createdAt: recipes.createdAt,
       updatedAt: recipes.updatedAt,
     })
@@ -133,30 +150,36 @@ export async function readRecipes(userId: string, query: ReadQuery) {
     .limit(query.limit + 1);
   const page = toPage(rows, query.limit, (recipe) => recipe.id);
   const recipeIds = page.items.map((recipe) => recipe.id);
-  const imageUrls = groupImageUrls(
+  const [imageRows, ingredientsByRecipe] = await Promise.all([
     recipeIds.length
-      ? await db
+      ? db
           .select({ parentId: recipeImages.recipeId, key: uploadObjects.key })
           .from(recipeImages)
           .innerJoin(uploadObjects, eq(uploadObjects.id, recipeImages.uploadObjectId))
           .where(inArray(recipeImages.recipeId, recipeIds))
           .orderBy(asc(recipeImages.position))
       : [],
-  );
+    getRecipeIngredients(recipeIds),
+  ]);
+  const imageUrls = groupImageUrls(imageRows);
   return {
     nextCursor: page.nextCursor,
-    items: page.items.map(({ kcal, protein, fat, carbs, ...recipe }) => ({
-      ...recipe,
-      imageUrls: imageUrls.get(recipe.id) ?? [],
-      total: { kcal, macros: { protein, fat, carbs } },
-      perPortion: {
-        kcal: perPortion(kcal, recipe.portions),
-        macros: {
-          protein: perPortion(protein, recipe.portions),
-          fat: perPortion(fat, recipe.portions),
-          carbs: perPortion(carbs, recipe.portions),
-        },
-      },
-    })),
+    items: page.items.map((recipe) => {
+      const ingredients = ingredientsByRecipe.get(recipe.id) ?? [];
+      return {
+        ...recipe,
+        imageUrls: imageUrls.get(recipe.id) ?? [],
+        ingredients: ingredients.map((ingredient) => ({
+          id: ingredient.id,
+          name: ingredient.name,
+          productId: ingredient.productId,
+          grams: ingredient.grams,
+          logged: isLoggableIngredient(ingredient),
+          nutrition: agentNutrition(ingredientNutrition(ingredient)),
+        })),
+        total: agentNutrition(sumIngredientNutrition(ingredients)),
+        perPortion: agentNutrition(sumIngredientNutrition(ingredients, 1 / recipe.portions)),
+      };
+    }),
   };
 }

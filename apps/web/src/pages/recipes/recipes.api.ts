@@ -8,6 +8,8 @@ import { getSessionUserId, requireSession } from '@/server/getSession.server';
 import { getSharingFriendsIds } from '@/server/getSharingFriendsIds.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { storagePathToUrl } from '@/server/storage/config.server';
+import { getRecipeIngredients } from './recipeIngredients.server';
+import { type Nutrition, type RecipeIngredient, sumIngredientNutrition } from './recipeNutrition';
 import { updateRecipeRatingRecord } from './recipes.server';
 import { updateRecipeRatingInputType } from './recipes.validation';
 
@@ -16,7 +18,10 @@ type RecipeSelect = typeof recipes.$inferSelect;
 export type RecipeLibraryItem = Omit<RecipeSelect, 'createdAt' | 'updatedAt' | 'userId'> & {
   createdAt: string;
   images: RecipeImage[];
+  ingredients: RecipeIngredient[];
   isOwned: boolean;
+  /** Whole-recipe nutrition of the linked ingredients; null when none has nutrition. */
+  nutrition: Nutrition | null;
   updatedAt: string;
 };
 
@@ -36,44 +41,13 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
     const sharingFriendIds = getSharingFriendsIds(userId, userSharingSettings.shareRecipes);
 
     const recipeRows = await db
-      .select({
-        carbs: recipes.carbs,
-        createdAt: recipes.createdAt,
-        description: recipes.description,
-        fats: recipes.fats,
-        id: recipes.id,
-        ingredients: recipes.ingredients,
-        ownerUserId: recipes.userId,
-        kcal: recipes.kcal,
-        name: recipes.name,
-        protein: recipes.protein,
-        portions: recipes.portions,
-        rating: recipes.rating,
-        tags: recipes.tags,
-        updatedAt: recipes.updatedAt,
-      })
+      .select()
       .from(recipes)
       .where(or(eq(recipes.userId, userId), inArray(recipes.userId, sharingFriendIds)));
 
-    const imagesByRecipeId = await getImagesByRecipeId(recipeRows.map((recipe) => recipe.id));
+    const related = await getRecipeRelations(recipeRows.map((recipe) => recipe.id));
     return recipeRows
-      .map((recipe): RecipeLibraryItem => ({
-        carbs: recipe.carbs,
-        createdAt: recipe.createdAt.toISOString(),
-        description: recipe.description,
-        fats: recipe.fats,
-        id: recipe.id,
-        images: imagesByRecipeId.get(recipe.id) ?? [],
-        isOwned: recipe.ownerUserId === userId,
-        ingredients: recipe.ingredients,
-        kcal: recipe.kcal,
-        name: recipe.name,
-        portions: recipe.portions,
-        protein: recipe.protein,
-        rating: recipe.rating,
-        tags: recipe.tags,
-        updatedAt: recipe.updatedAt.toISOString(),
-      }))
+      .map((recipe) => toRecipeLibraryItem(recipe, related, recipe.userId === userId))
       .toSorted((left, right) => right.updatedAt.localeCompare(left.updatedAt));
   });
 
@@ -106,10 +80,10 @@ export const getRecipeById = createServerFn({ method: 'GET' })
       return null;
     }
 
-    const imagesByRecipeId = await getImagesByRecipeId([recipe.id]);
+    const related = await getRecipeRelations([recipe.id]);
 
     return {
-      ...toRecipeLibraryItem(recipe, imagesByRecipeId, recipe.userId === userId),
+      ...toRecipeLibraryItem(recipe, related, recipe.userId === userId),
       canManage: recipe.userId === userId,
     } satisfies RecipeViewItem;
   });
@@ -130,9 +104,9 @@ export const getOwnedRecipeById = createServerFn({ method: 'GET' })
       return null;
     }
 
-    const imagesByRecipeId = await getImagesByRecipeId([recipe.id]);
+    const related = await getRecipeRelations([recipe.id]);
 
-    return toRecipeLibraryItem(recipe, imagesByRecipeId, true);
+    return toRecipeLibraryItem(recipe, related, true);
   });
 
 export const updateRecipeRating = createServerFn({ method: 'POST' })
@@ -180,26 +154,28 @@ async function getImagesByRecipeId(recipeIds: string[]) {
   return imagesByRecipeId;
 }
 
+/** Loads images and ingredients of the given recipes together. */
+async function getRecipeRelations(recipeIds: string[]) {
+  const [images, ingredients] = await Promise.all([
+    getImagesByRecipeId(recipeIds),
+    getRecipeIngredients(recipeIds),
+  ]);
+  return { images, ingredients };
+}
+
 function toRecipeLibraryItem(
-  recipe: RecipeSelect,
-  imagesByRecipeId: Map<string, RecipeImage[]>,
+  { userId: _userId, ...recipe }: RecipeSelect,
+  related: Awaited<ReturnType<typeof getRecipeRelations>>,
   isOwned: boolean,
 ): RecipeLibraryItem {
+  const ingredients = related.ingredients.get(recipe.id) ?? [];
   return {
-    carbs: recipe.carbs,
+    ...recipe,
     createdAt: recipe.createdAt.toISOString(),
-    description: recipe.description,
-    fats: recipe.fats,
-    id: recipe.id,
-    images: imagesByRecipeId.get(recipe.id) ?? [],
+    images: related.images.get(recipe.id) ?? [],
+    ingredients,
     isOwned,
-    ingredients: recipe.ingredients,
-    kcal: recipe.kcal,
-    name: recipe.name,
-    portions: recipe.portions,
-    protein: recipe.protein,
-    rating: recipe.rating,
-    tags: recipe.tags,
+    nutrition: sumIngredientNutrition(ingredients),
     updatedAt: recipe.updatedAt.toISOString(),
   };
 }

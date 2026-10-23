@@ -1,6 +1,8 @@
 import { Link } from '@tanstack/react-router';
-import { PencilIcon, Trash2Icon } from 'lucide-react';
+import { LinkIcon, PencilIcon, Trash2Icon } from 'lucide-react';
+import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
+import { ingredientLine } from './ingredientLine';
 import { RecipeImgSlider } from './RecipeImgSlider';
 import { RecipeNutrition } from './RecipeNutrition';
 import { RecipeRating } from './RecipeRating';
@@ -13,7 +15,9 @@ type RecipeViewPageProps = {
 };
 
 export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
-  const { t } = useI18n();
+  const { formatNumber, t } = useI18n();
+  const [portions, setPortions] = useState(Math.max(1, recipe.portions));
+  const scale = portions / Math.max(1, recipe.portions);
 
   return (
     <main className={css.page}>
@@ -74,15 +78,24 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
 
           <aside className={css.rail}>
             <section className={css.utilityGroup}>
-              <RecipeNutrition recipe={recipe} />
+              <RecipeNutrition onPortionsChange={setPortions} portions={portions} recipe={recipe} />
             </section>
             <section
               className={css.utilityGroup}
               aria-label={t({ en: 'Ingredients', pl: 'Składniki' })}
             >
               <ul className={css.ingredientList}>
-                {recipe.ingredients.map((ingredient, index) => (
-                  <li key={`${index}-${ingredient}`}>{ingredient}</li>
+                {recipe.ingredients.map((ingredient) => (
+                  <li key={ingredient.id}>
+                    {ingredientLine(ingredient, scale, formatNumber)}
+                    {ingredient.productId ? (
+                      <LinkIcon
+                        aria-label={t({ en: 'Linked product', pl: 'Powiązany produkt' })}
+                        className={css.linkedIcon}
+                        role='img'
+                      />
+                    ) : null}
+                  </li>
                 ))}
               </ul>
             </section>

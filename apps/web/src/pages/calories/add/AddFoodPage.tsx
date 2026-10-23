@@ -8,6 +8,7 @@ import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '../calories.q
 import { foodProductNames } from '../calorieHelpers';
 import { SelectedFoodForm } from './SelectedFoodForm';
 import { filterFoods } from './filterFoods';
+import { RecipeResults } from './RecipeResults';
 import { Btn } from '@/components/ui/btn/Btn';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
 import { List, ListItem } from '@/components/ui/list/List';
@@ -74,6 +75,8 @@ export function AddFoodPage({ date, foodId }: Props) {
           value={query}
         />
       </Label>
+
+      <RecipeResults date={date} query={filterQuery} />
 
       <List aria-busy={foodsQuery.isFetching || isFiltering}>
         {foods.map((food) => {

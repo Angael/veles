@@ -119,8 +119,10 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
                   {recipe.rating !== null ? (
                     <span className={css.footerItem}>{formatNumber(recipe.rating)}/5</span>
                   ) : null}
-                  {recipe.kcal !== null ? (
-                    <p className={css.footerItem}>{formatNumber(recipe.kcal)} KCAL</p>
+                  {recipe.nutrition ? (
+                    <p className={css.footerItem}>
+                      {formatNumber(Math.round(recipe.nutrition.kcal))} KCAL
+                    </p>
                   ) : null}
                 </div>
               </div>

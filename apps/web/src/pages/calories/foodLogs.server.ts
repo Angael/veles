@@ -51,6 +51,23 @@ async function withImage(
   return toCalorieLog(entry, assetsById.get(entry.imageUploadObjectId ?? ''), undefined, category);
 }
 
+/** Food log fields snapshotting a product's name and nutrition scaled to the eaten grams. */
+export function productLogValues(product: typeof foodProducts.$inferSelect, grams: number) {
+  const gramsHundredths = toHundredths(grams);
+  const scale = (value: number | null) =>
+    value === null ? null : Math.round((value * gramsHundredths) / (100 * HUNDREDTHS));
+
+  return {
+    name: translate(foodProductNames(product)),
+    productId: product.id,
+    gramsHundredths,
+    kcalHundredths: scale(product.kcalPer100gHundredths) ?? 0,
+    proteinHundredths: scale(product.proteinPer100gHundredths),
+    fatHundredths: scale(product.fatPer100gHundredths),
+    carbsHundredths: scale(product.carbsPer100gHundredths),
+  };
+}
+
 /** Logs grams of a catalog product, snapshotting its nutrition scaled to the eaten amount. */
 export async function recordFoodRecord(userId: string, values: typeof recordFoodValuesType.infer) {
   const [product] = await db
@@ -68,23 +85,12 @@ export async function recordFoodRecord(userId: string, values: typeof recordFood
 
   const productAssets = await getFoodImageAssets([product.imageUploadObjectId]);
   const productAsset = productAssets.get(product.imageUploadObjectId ?? '');
-  const imageUploadObjectId = productAsset?.id ?? null;
-
-  const gramsHundredths = toHundredths(values.grams);
-  const scale = (value: number | null) =>
-    value === null ? null : Math.round((value * gramsHundredths) / (100 * HUNDREDTHS));
 
   const [inserted] = await db
     .insert(foodLogs)
     .values({
-      name: translate(foodProductNames(product)),
-      productId: product.id,
-      imageUploadObjectId,
-      gramsHundredths,
-      kcalHundredths: scale(product.kcalPer100gHundredths) ?? 0,
-      proteinHundredths: scale(product.proteinPer100gHundredths),
-      fatHundredths: scale(product.fatPer100gHundredths),
-      carbsHundredths: scale(product.carbsPer100gHundredths),
+      ...productLogValues(product, values.grams),
+      imageUploadObjectId: productAsset?.id ?? null,
       logDate: values.date,
       consumedAt: new Date(),
       userId,
