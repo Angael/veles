@@ -31,7 +31,7 @@ function nutritionAtGrams(valuePer100g: number | null, grams: number) {
 
 /** Confirms a food log while keeping its nutrition preview and daily allowance in sync. */
 export function SelectedFoodForm({ food, initialDate }: Props) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
   const navigate = useNavigate();
   const recordFoodMutation = useRecordFoodMutation();
   const [date, setDate] = useState(initialDate);
@@ -87,7 +87,7 @@ export function SelectedFoodForm({ food, initialDate }: Props) {
               role='group'
             >
               <span className={css.unitLabel}>
-                {`${t(foodUnitAmountText(food.unit, 1))} (${formatNumber(Math.round(unitGrams))} g)`}
+                {`${t(foodUnitAmountText(food.unit, 1))} (${formatWhole(unitGrams)} g)`}
               </span>
               <div className={css.unitButtons}>
                 {UNIT_SHORTCUTS.map((amount) => (

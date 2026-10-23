@@ -4,20 +4,20 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 import { MACRO_LABELS } from '@/lib/nutritionLabels';
 
 export function DashboardFood({ nutrition }: { nutrition: HomeDashboardData['nutrition'] }) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
   const kcal = nutrition.totals.kcal;
 
   return (
     <div className={css.nutrition}>
       <div className={css.kcal}>
         <div className={css.kcalValue}>
-          <strong>{formatNumber(Math.round(kcal))}</strong>
+          <strong>{formatWhole(kcal)}</strong>
           <span>kcal</span>
           <small>
             {nutrition.goal
               ? t({
-                  en: `of ${formatNumber(Math.round(nutrition.goal.kcal))}`,
-                  pl: `z ${formatNumber(Math.round(nutrition.goal.kcal))}`,
+                  en: `of ${formatWhole(nutrition.goal.kcal)}`,
+                  pl: `z ${formatWhole(nutrition.goal.kcal)}`,
                 })
               : t({ en: 'No goal', pl: 'Brak celu' })}
           </small>
@@ -54,19 +54,19 @@ function MacroProgress({
   total: number;
   goal: number | null;
 }) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
 
   return (
     <div className={css.macroProgress}>
       <div className={css.macroHeading}>
         <span>{t(MACRO_LABELS[label])}</span>
-        <strong>{formatNumber(Math.round(total))}g</strong>
+        <strong>{formatWhole(total)}g</strong>
         <small>
           {goal === null
             ? t({ en: 'No goal', pl: 'Brak celu' })
             : t({
-                en: `of ${formatNumber(Math.round(goal))}g`,
-                pl: `z ${formatNumber(Math.round(goal))}g`,
+                en: `of ${formatWhole(goal)}g`,
+                pl: `z ${formatWhole(goal)}g`,
               })}
         </small>
       </div>
@@ -85,7 +85,7 @@ function NutritionProgress({
   total: number;
   goal: number | null;
 }) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
   const maximum = goal === null ? Math.max(total, 1) : Math.max(goal, 1);
   const name = label === 'kcal' ? 'kcal' : t(MACRO_LABELS[label]);
   const unit = label === 'kcal' ? ' kcal' : 'g';
@@ -97,8 +97,8 @@ function NutritionProgress({
         aria-valuetext={
           goal !== null && total > goal
             ? t({
-                en: `${formatNumber(Math.round(total))} of ${formatNumber(Math.round(goal))}${unit}`,
-                pl: `${formatNumber(Math.round(total))} z ${formatNumber(Math.round(goal))}${unit}`,
+                en: `${formatWhole(total)} of ${formatWhole(goal)}${unit}`,
+                pl: `${formatWhole(total)} z ${formatWhole(goal)}${unit}`,
               })
             : undefined
         }

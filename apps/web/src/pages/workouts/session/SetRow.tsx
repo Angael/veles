@@ -14,7 +14,7 @@ import {
   SET_TYPE_NOTES,
   SET_TYPES,
 } from '../metrics';
-import { ScrubCell } from '../scrub/ScrubCell';
+import { ScrubCell } from '@/components/ui/scrub/ScrubCell';
 import type { WorkoutSetData, WorkoutSlotData } from '../workouts.server';
 import type { SessionActions, SetPatch } from './session.query';
 import { SetMenu } from './SetMenu';

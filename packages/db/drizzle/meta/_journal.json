@@ -110,8 +110,29 @@
     {
       "idx": 15,
       "version": "7",
-      "when": 1792709359657,
-      "tag": "0015_food_product_unit",
+      "when": 1792795794470,
+      "tag": "0015_recipe_ingredients",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1792795801015,
+      "tag": "0016_backfill_recipe_ingredients",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792795801467,
+      "tag": "0017_drop_recipe_text_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792796136548,
+      "tag": "0018_food_product_unit",
       "breakpoints": true
     }
   ]

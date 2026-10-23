@@ -1,0 +1,40 @@
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: 0.2rem 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  & svg {
+    flex: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--c-accent);
+  }
+
+  & span {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  & small {
+    flex: none;
+    color: var(--c-muted);
+    font-size: var(--text-xs);
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:disabled {
+    cursor: progress;
+  }
+}

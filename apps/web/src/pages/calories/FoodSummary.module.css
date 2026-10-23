@@ -11,12 +11,12 @@
   padding: var(--space-sm) var(--space-md) var(--space-sm) var(--space-sm);
 }
 
-.summary:has(.identity a) {
+.summary:has(.identity :is(a, button)) {
   transition: background-color var(--duration-fast) var(--ease-out);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .summary:has(.identity a:hover) {
+  .summary:has(.identity :is(a, button):hover) {
     background-color: var(--c-surface-raised);
   }
 }
@@ -75,17 +75,32 @@
     text-decoration: none;
   }
 
-  & a::after {
+  & button {
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  & :is(a, button)::after {
     content: '';
     position: absolute;
     inset: 0;
   }
 
-  & a:focus-visible {
+  & :is(a, button):focus-visible {
     border-radius: 0.2rem;
     outline: 2px solid var(--c-primary-focus);
     outline-offset: 2px;
   }
+}
+
+.note {
+  color: var(--c-muted);
+  font-size: var(--text-xs);
 }
 
 .action {
@@ -119,5 +134,15 @@
     & strong {
       font-size: var(--text-md-dynamic);
     }
+  }
+}
+
+.summary.tight {
+  grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+  min-height: 0;
+
+  & .media {
+    width: 3.5rem;
+    height: 3.5rem;
   }
 }

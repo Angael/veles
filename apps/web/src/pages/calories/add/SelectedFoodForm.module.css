@@ -137,6 +137,7 @@
     border: var(--border-width) solid var(--c-border);
     border-radius: var(--radius-sm);
     background: var(--c-surface);
+    backdrop-filter: var(--blur-surface);
     box-shadow: var(--shadow-popup);
     transform: translateX(-50%);
   }

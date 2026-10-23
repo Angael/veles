@@ -10,6 +10,7 @@ import { limitRequestSizeMiddleware } from '@/server/middleware/limitRequestSize
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { type PhotoLinkTable, persistWithPhotos } from '@/server/storage/photoSync.server';
 import { createRecipeRow, updateRecipeRow } from './recipes.server';
+import { recipeFieldsType } from './recipes.validation';
 import { translate } from '@/lib/i18n/getLocale';
 
 const RECIPE_IMAGE_KEY_PREFIX = 'recipe-images';
@@ -19,10 +20,6 @@ export const RECIPE_PHOTO_MAX_COUNT = 8;
 const formDataType = type('FormData');
 const recipeIdType = type('string.uuid');
 
-const optionalNumericFormValueType = type('string.trim').pipe((value): number | null | ArkErrors =>
-  value === '' ? null : type('string.numeric.parse')(value),
-);
-
 const optionalRatingFormValueType = type('string.trim').pipe((value): number | null | ArkErrors =>
   value === '' ? null : type('string.numeric.parse |> 1 <= number <= 5')(value),
 );
@@ -31,19 +28,13 @@ const portionsFormValueType = type('string.trim').pipe((value): number | ArkErro
   type('string.numeric.parse |> number.integer >= 1')(value),
 );
 
-const recipeTextListType = type('string.trim[]').pipe((values) => values.filter(Boolean));
-
+/** Text fields come from the form; `ingredients` is the editor's JSON list. */
 const uploadRecipeInputType = type({
-  carbs: optionalNumericFormValueType,
   description: 'string.trim',
-  fats: optionalNumericFormValueType,
-  ingredients: recipeTextListType,
-  kcal: optionalNumericFormValueType,
+  ingredients: type('string.json.parse').to(recipeFieldsType.get('ingredients')),
   name: 'string.trim |> string >= 1',
   portions: portionsFormValueType,
-  protein: optionalNumericFormValueType,
   rating: optionalRatingFormValueType,
-  tags: recipeTextListType,
 });
 
 export const createRecipe = createServerFn({ method: 'POST' })
@@ -108,19 +99,12 @@ function recipeImageLinks(tx: DbTransaction, recipeId: string): PhotoLinkTable {
 
 /** Turns recipe form fields into the recipe persistence shape. */
 function validateRecipeFields(formData: FormData) {
-  const ingredientsValue = formData.get('ingredients');
-  const tagsValue = formData.get('tags');
   const validation = uploadRecipeInputType({
-    carbs: formData.get('carbs'),
     description: formData.get('description'),
-    fats: formData.get('fats'),
-    ingredients: typeof ingredientsValue === 'string' ? ingredientsValue.split('\n') : [],
-    kcal: formData.get('kcal'),
+    ingredients: formData.get('ingredients') ?? '[]',
     name: formData.get('name'),
     portions: formData.get('portions'),
-    protein: formData.get('protein'),
     rating: formData.get('rating'),
-    tags: typeof tagsValue === 'string' ? tagsValue.split(',') : [],
   });
 
   if (validation instanceof type.errors) {

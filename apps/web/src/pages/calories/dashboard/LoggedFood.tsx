@@ -1,13 +1,13 @@
 import { Link } from '@tanstack/react-router';
 import { CopyPlusIcon, PencilIcon, SquareCheckIcon, SquareIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
+import { FoodSelectTarget } from '../FoodSelectTarget';
 import { FoodSummary } from '../FoodSummary';
 import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogMutation } from '../calories.query';
 import { type LogsDateMode, LogsDateDialog, logsDateModeIcon } from './LogsDateAction';
 import { MultiplyLogsDialog } from './MultiplyLogsAction';
 import { Btn } from '@/components/ui/btn/Btn';
-import { Checkbox } from '@/components/ui/checkbox/Checkbox';
 import {
   ContextMenuItem,
   ContextMenuLinkItem,
@@ -29,7 +29,7 @@ type LoggedFoodProps = {
 
 /** Logged food row; right click or long press opens per-entry actions. */
 export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFoodProps) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
   const deleteMutation = useDeleteFoodLogMutation();
   const [multiplyOpen, setMultiplyOpen] = useState(false);
   // Mode outlives `open` so the dialog keeps its title while animating closed.
@@ -60,33 +60,30 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
                 variant='ghostDanger'
               />
             }
-            carbs={entry.carbs ?? 0}
+            carbs={entry.carbs}
             density='compact'
-            fat={entry.fat ?? 0}
+            fat={entry.fat}
             category={entry.category}
             imageUrl={entry.imageUrl}
             kcal={entry.kcal}
             mediaOverlay={
-              <label className={css.selectTarget}>
-                <Checkbox
-                  aria-label={t({ en: `Select ${entry.name}`, pl: `Zaznacz: ${entry.name}` })}
-                  checked={selected}
-                  className={css.checkbox}
-                  onCheckedChange={(checked) => onSelectedChange(entry.id, checked)}
-                />
-              </label>
+              <FoodSelectTarget
+                checked={selected}
+                label={t({ en: `Select ${entry.name}`, pl: `Zaznacz: ${entry.name}` })}
+                onCheckedChange={(checked) => onSelectedChange(entry.id, checked)}
+              />
             }
             meta={
               entry.grams === null
                 ? t({ en: 'Custom entry', pl: 'Własny wpis' })
-                : `${formatNumber(Math.round(entry.grams))} g`
+                : `${formatWhole(entry.grams)} g`
             }
             name={
               <Link params={{ logId: entry.id }} to='/calories/logs/$logId'>
                 {entry.name}
               </Link>
             }
-            protein={entry.protein ?? 0}
+            protein={entry.protein}
           />
         </ContextMenuTrigger>
         <ContextMenuPopup

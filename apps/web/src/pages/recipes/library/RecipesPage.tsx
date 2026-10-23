@@ -23,12 +23,11 @@ const recipeScopeItems = [
 
 const recipeSearchFields = [
   (recipe) => recipe.name,
-  (recipe) => recipe.tags,
   (recipe) => recipe.description,
 ] satisfies RankedSearchFields<RecipeLibraryItem>;
 
 export function RecipesPage({ recipes }: RecipesPageProps) {
-  const { formatNumber, t } = useI18n();
+  const { formatNumber, formatWhole, t } = useI18n();
   const [recipeScope, setRecipeScope] = useState<'all' | 'owned'>('all');
   const [searchInputValue, setSearchInputValue] = useState('');
   const [search] = useThrottledValue(searchInputValue, { wait: 200 });
@@ -49,8 +48,8 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
               name='search'
               onValueChange={setSearchInputValue}
               placeholder={t({
-                en: 'Search by name, tags, or description',
-                pl: 'Szukaj po nazwie, tagach lub opisie',
+                en: 'Search by name or description',
+                pl: 'Szukaj po nazwie lub opisie',
               })}
               type='search'
               value={searchInputValue}
@@ -98,16 +97,6 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
                 <div className={css.cardHeader}>
                   <div className={css.titleBlock}>
                     <h2>{recipe.name}</h2>
-
-                    {recipe.tags.length > 0 ? (
-                      <div className={css.tags}>
-                        {recipe.tags.map((tag) => (
-                          <span className={css.tag} key={tag}>
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
                   </div>
                 </div>
 
@@ -119,8 +108,8 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
                   {recipe.rating !== null ? (
                     <span className={css.footerItem}>{formatNumber(recipe.rating)}/5</span>
                   ) : null}
-                  {recipe.kcal !== null ? (
-                    <p className={css.footerItem}>{formatNumber(recipe.kcal)} KCAL</p>
+                  {recipe.nutrition ? (
+                    <p className={css.footerItem}>{formatWhole(recipe.nutrition.kcal)} KCAL</p>
                   ) : null}
                 </div>
               </div>

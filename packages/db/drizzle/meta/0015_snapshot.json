@@ -1,5 +1,5 @@
 {
-  "id": "121593b4-6aa3-4e34-b299-6778c2abc9e6",
+  "id": "d8a83245-e92f-4042-894b-0fb3a41bf203",
   "prevId": "4a23bd7c-1910-4ef0-9714-df237fe3e350",
   "version": "7",
   "dialect": "postgresql",
@@ -1225,6 +1225,129 @@
       },
       "isRLSEnabled": false
     },
+    "public.recipe_ingredient": {
+      "name": "recipe_ingredient",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "recipe_id": {
+          "name": "recipe_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "grams_hundredths": {
+          "name": "grams_hundredths",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "recipe_ingredient_recipe_position_idx": {
+          "name": "recipe_ingredient_recipe_position_idx",
+          "columns": [
+            {
+              "expression": "recipe_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "position",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "recipe_ingredient_product_id_idx": {
+          "name": "recipe_ingredient_product_id_idx",
+          "columns": [
+            {
+              "expression": "product_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "recipe_ingredient_recipe_id_recipe_id_fk": {
+          "name": "recipe_ingredient_recipe_id_recipe_id_fk",
+          "tableFrom": "recipe_ingredient",
+          "tableTo": "recipe",
+          "columnsFrom": [
+            "recipe_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "recipe_ingredient_product_id_food_product_id_fk": {
+          "name": "recipe_ingredient_product_id_food_product_id_fk",
+          "tableFrom": "recipe_ingredient",
+          "tableTo": "food_product",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "recipe_ingredient_position_non_negative_check": {
+          "name": "recipe_ingredient_position_non_negative_check",
+          "value": "\"recipe_ingredient\".\"position\" >= 0"
+        },
+        "recipe_ingredient_grams_positive_check": {
+          "name": "recipe_ingredient_grams_positive_check",
+          "value": "\"recipe_ingredient\".\"grams_hundredths\" IS NULL OR \"recipe_ingredient\".\"grams_hundredths\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
     "public.recipe_last_view": {
       "name": "recipe_last_view",
       "schema": "",
@@ -2072,12 +2195,6 @@
         "product_size_grams_hundredths": {
           "name": "product_size_grams_hundredths",
           "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "unit": {
-          "name": "unit",
-          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
