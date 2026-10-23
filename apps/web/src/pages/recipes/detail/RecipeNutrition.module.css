@@ -61,10 +61,8 @@
   color: var(--c-macro-carb);
 }
 
-.shortcuts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
+.reset {
+  align-self: flex-start;
 }
 
 .actions {

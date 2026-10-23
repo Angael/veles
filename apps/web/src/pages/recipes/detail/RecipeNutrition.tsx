@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { PlusIcon } from 'lucide-react';
+import { PlusIcon, RotateCcwIcon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { SliderInput } from '@/components/ui/slider-input/SliderInput';
 import type { RecipeLibraryItem } from '../recipes.api';
@@ -17,15 +17,11 @@ type Props = {
 
 /** Portion picker with the matching nutrition, and actions that use the picked amount. */
 export function RecipeNutrition({ onPortionsChange, portions, recipe }: Props) {
-  const { t } = useI18n();
+  const { formatNumber, t } = useI18n();
   const basePortions = Math.max(1, recipe.portions);
   const scale = portions / basePortions;
   const nutrition = sumIngredientNutrition(recipe.ingredients, scale);
   const canLog = portions > 0 && recipe.ingredients.some(isLoggableIngredient);
-  const shortcuts = [
-    { label: t({ en: '½ recipe', pl: '½ przepisu' }), portions: basePortions / 2 },
-    { label: t({ en: 'Whole recipe', pl: 'Cały przepis' }), portions: basePortions },
-  ];
 
   return (
     <section
@@ -41,21 +37,21 @@ export function RecipeNutrition({ onPortionsChange, portions, recipe }: Props) {
         step={0.5}
         value={portions}
       />
-      <div className={css.shortcuts} role='group'>
-        {shortcuts.map((shortcut) => (
-          <Btn
-            aria-pressed={portions === shortcut.portions}
-            key={shortcut.label}
-            onClick={() => onPortionsChange(shortcut.portions)}
-            radius='pill'
-            size='sm'
-            type='button'
-            variant={portions === shortcut.portions ? 'main' : 'ghost'}
-          >
-            {shortcut.label}
-          </Btn>
-        ))}
-      </div>
+      {portions === basePortions ? null : (
+        <Btn
+          className={css.reset}
+          icon={<RotateCcwIcon aria-hidden='true' />}
+          onClick={() => onPortionsChange(basePortions)}
+          size='sm'
+          type='button'
+          variant='ghost'
+        >
+          {t({
+            en: `Reset to whole recipe (${formatNumber(basePortions)})`,
+            pl: `Przywróć cały przepis (${formatNumber(basePortions)})`,
+          })}
+        </Btn>
+      )}
 
       {nutrition ? (
         <div className={css.nutritionValues}>
