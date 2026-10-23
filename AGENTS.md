@@ -18,6 +18,7 @@
 - Pushing to `main` makes Dokploy pull, install, and deploy to prod
 - Never run Drizzle commands yourself; leave them to the human user
 - DB migrations need to be run before pushing/merging to `main`
+- Static branch `pr-assets` hosts images for PRs and issues. Clean it periodically (ensure assets are unused).
 
 ## Pull Requests
 - Start each PR description with a `# TL;DR` section.
