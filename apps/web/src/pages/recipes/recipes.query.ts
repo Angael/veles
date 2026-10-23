@@ -76,7 +76,6 @@ export function useAddRecipeToNoteMutation() {
       error: {
         title: t({ en: 'Could not add to the note', pl: 'Nie udało się dodać do notatki' }),
       },
-      success: { title: t({ en: 'Added to the note', pl: 'Dodano do notatki' }) },
     },
     mutationFn: (data: typeof addRecipeToNoteInputType.inferIn) => addRecipeToNote({ data }),
     onSuccess: (_data, _variables, _onMutateResult, context) =>

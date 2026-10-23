@@ -1,3 +1,4 @@
+import type { FoodProductCategory } from '@veles/db/seed/food-products';
 export type Nutrition = {
   kcal: number;
   protein: number | null;
@@ -11,6 +12,8 @@ export type RecipeIngredient = {
   name: string;
   productId: string | null;
   grams: number | null;
+  imageUrl: string | null;
+  category: FoodProductCategory | null;
   per100g: Nutrition | null;
 };
 

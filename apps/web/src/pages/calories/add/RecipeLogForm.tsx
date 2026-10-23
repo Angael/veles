@@ -15,7 +15,7 @@ import { Card } from '@/components/ui/card/Card';
 import { DateInput } from '@/components/ui/date-input/DateInput';
 import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { Label } from '@/components/ui/label/Label';
-import { NumberInput } from '@/components/ui/number-input/NumberInput';
+import { SliderInput } from '@/components/ui/slider-input/SliderInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import css from './RecipeLogForm.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
@@ -37,18 +37,18 @@ export function RecipeLogForm({ initialDate, initialPortions, recipe }: Props) {
   const basePortions = Math.max(1, recipe.portions);
   const loggable = recipe.ingredients.filter(isLoggableIngredient);
   const [date, setDate] = useState(initialDate);
-  const [portions, setPortions] = useState<number | null>(initialPortions ?? basePortions);
+  const [portions, setPortions] = useState(initialPortions ?? basePortions);
   const [checkedIds, setCheckedIds] = useState(() => loggable.map((ingredient) => ingredient.id));
   // Made once, so a retried submit reuses the ids and the server skips rows it already saved.
   const [logIds] = useState(() => new Map(loggable.map((ingredient) => [ingredient.id, uuidv7()])));
   const dashboardQuery = useQuery(calorieDashboardQueryOptions(date));
   const day = dashboardQuery.data?.days.find((candidate) => candidate.date === date);
-  const scale = (portions ?? 0) / basePortions;
+  const scale = portions / basePortions;
   const checked = loggable.filter((ingredient) => checkedIds.includes(ingredient.id));
   const total = sumIngredientNutrition(checked, scale);
 
   async function save() {
-    if (!portions || checked.length === 0) return;
+    if (checked.length === 0) return;
     await logMutation.mutateAsync({
       date,
       items: checked.map((ingredient) => ({
@@ -71,34 +71,21 @@ export function RecipeLogForm({ initialDate, initialPortions, recipe }: Props) {
       <Card as='section'>
         <TypedForm className={css.form} errorMsg={logMutation.error?.message} onSubmit={save}>
           <h1 className={css.title}>{recipe.name}</h1>
-          <div className={css.portions}>
-            <Label
-              text={t({
-                en: `Portions eaten (recipe makes ${formatNumber(basePortions)})`,
-                pl: `Zjedzone porcje (przepis daje ${formatNumber(basePortions)})`,
-              })}
-            >
-              <NumberInput min={0.1} onValueChange={setPortions} required value={portions} />
-            </Label>
-            <div className={css.shortcuts} role='group'>
-              <Btn
-                onClick={() => setPortions(basePortions / 2)}
-                size='sm'
-                type='button'
-                variant='ghost'
-              >
-                {t({ en: '½ recipe', pl: '½ przepisu' })}
-              </Btn>
-              <Btn
-                onClick={() => setPortions(basePortions)}
-                size='sm'
-                type='button'
-                variant='ghost'
-              >
-                {t({ en: 'Whole recipe', pl: 'Cały przepis' })}
-              </Btn>
-            </div>
-          </div>
+          <SliderInput
+            label={t({ en: 'Portions eaten', pl: 'Zjedzone porcje' })}
+            max={Math.max(8, basePortions, portions)}
+            min={0.5}
+            onValueChange={setPortions}
+            reset={{
+              label: t({
+                en: `Reset to whole recipe (${formatNumber(basePortions)})`,
+                pl: `Przywróć cały przepis (${formatNumber(basePortions)})`,
+              }),
+              value: basePortions,
+            }}
+            step={0.5}
+            value={portions}
+          />
           <RecipeIngredientChecklist
             checkedIds={checkedIds}
             ingredients={recipe.ingredients}
@@ -122,11 +109,7 @@ export function RecipeLogForm({ initialDate, initialPortions, recipe }: Props) {
             <Label text={t({ en: 'Date', pl: 'Data' })}>
               <DateInput name='date' onValueChange={setDate} required value={date} />
             </Label>
-            <Btn
-              disabled={!portions || checked.length === 0}
-              loading={logMutation.isPending}
-              type='submit'
-            >
+            <Btn disabled={checked.length === 0} loading={logMutation.isPending} type='submit'>
               {t({ en: 'Add', pl: 'Dodaj' })}
             </Btn>
           </FormSubmitRow>

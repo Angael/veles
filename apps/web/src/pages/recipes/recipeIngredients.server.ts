@@ -1,9 +1,11 @@
 import { asc, eq, inArray } from 'drizzle-orm';
-import { foodProducts, recipeIngredients } from '@veles/db/schema';
+import { foodProducts, recipeIngredients, uploadObjects } from '@veles/db/schema';
+import { foodProductCategory } from '@veles/db/seed/food-products';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { translate } from '@/lib/i18n/getLocale';
 import { fromHundredths, HUNDREDTHS, toHundredths } from '@/lib/nutrition';
 import { db, type DbTransaction } from '@/server/db.server';
+import { storagePathToUrl } from '@/server/storage/config.server';
 import { foodProductNames } from '@/pages/calories/calorieHelpers';
 import type { RecipeIngredient } from './recipeNutrition';
 import type { RecipeIngredientInput } from './recipes.validation';
@@ -20,19 +22,22 @@ export async function getRecipeIngredients(recipeIds: string[], tx: Db = db) {
   if (recipeIds.length === 0) return byRecipeId;
 
   const rows = await tx
-    .select({ ingredient: recipeIngredients, product: foodProducts })
+    .select({ asset: uploadObjects, ingredient: recipeIngredients, product: foodProducts })
     .from(recipeIngredients)
     .leftJoin(foodProducts, eq(foodProducts.id, recipeIngredients.productId))
+    .leftJoin(uploadObjects, eq(uploadObjects.id, foodProducts.imageUploadObjectId))
     .where(inArray(recipeIngredients.recipeId, recipeIds))
     .orderBy(asc(recipeIngredients.position));
 
-  for (const { ingredient, product } of rows) {
+  for (const { asset, ingredient, product } of rows) {
     const list = byRecipeId.get(ingredient.recipeId) ?? [];
     list.push({
       id: ingredient.id,
       name: product ? translate(foodProductNames(product)) : ingredient.name,
       productId: product?.id ?? null,
       grams: fromHundredths(ingredient.gramsHundredths),
+      imageUrl: asset ? storagePathToUrl(asset.key) : null,
+      category: product ? foodProductCategory(product.seedKey) : null,
       per100g: product
         ? {
             kcal: product.kcalPer100gHundredths / HUNDREDTHS,

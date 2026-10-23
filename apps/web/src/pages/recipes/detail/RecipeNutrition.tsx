@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { PlusIcon, RotateCcwIcon } from 'lucide-react';
+import { FlameIcon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { SliderInput } from '@/components/ui/slider-input/SliderInput';
 import type { RecipeLibraryItem } from '../recipes.api';
@@ -34,24 +34,16 @@ export function RecipeNutrition({ onPortionsChange, portions, recipe }: Props) {
         max={Math.max(8, basePortions)}
         min={0.5}
         onValueChange={onPortionsChange}
+        reset={{
+          label: t({
+            en: `Reset to whole recipe (${formatNumber(basePortions)})`,
+            pl: `Przywróć cały przepis (${formatNumber(basePortions)})`,
+          }),
+          value: basePortions,
+        }}
         step={0.5}
         value={portions}
       />
-      {portions === basePortions ? null : (
-        <Btn
-          className={css.reset}
-          icon={<RotateCcwIcon aria-hidden='true' />}
-          onClick={() => onPortionsChange(basePortions)}
-          size='sm'
-          type='button'
-          variant='ghost'
-        >
-          {t({
-            en: `Reset to whole recipe (${formatNumber(basePortions)})`,
-            pl: `Przywróć cały przepis (${formatNumber(basePortions)})`,
-          })}
-        </Btn>
-      )}
 
       {nutrition ? (
         <div className={css.nutritionValues}>
@@ -84,11 +76,11 @@ export function RecipeNutrition({ onPortionsChange, portions, recipe }: Props) {
       <div className={css.actions}>
         {canLog ? (
           <Btn
-            icon={<PlusIcon aria-hidden='true' />}
+            icon={<FlameIcon aria-hidden='true' />}
             isLink
             render={<Link search={{ portions, recipeId: recipe.id }} to='/calories/add' />}
           >
-            {t({ en: 'Add', pl: 'Dodaj' })}
+            {t({ en: 'Log calories', pl: 'Zapisz kalorie' })}
           </Btn>
         ) : null}
         <AddToNoteAction portions={portions} recipe={recipe} />

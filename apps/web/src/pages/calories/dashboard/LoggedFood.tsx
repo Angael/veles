@@ -1,13 +1,13 @@
 import { Link } from '@tanstack/react-router';
 import { CopyPlusIcon, PencilIcon, SquareCheckIcon, SquareIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
+import { FoodSelectTarget } from '../FoodSelectTarget';
 import { FoodSummary } from '../FoodSummary';
 import type { CalorieLog } from '../calories.api';
 import { useDeleteFoodLogMutation } from '../calories.query';
 import { type LogsDateMode, LogsDateDialog, logsDateModeIcon } from './LogsDateAction';
 import { MultiplyLogsDialog } from './MultiplyLogsAction';
 import { Btn } from '@/components/ui/btn/Btn';
-import { Checkbox } from '@/components/ui/checkbox/Checkbox';
 import {
   ContextMenuItem,
   ContextMenuLinkItem,
@@ -67,14 +67,11 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
             imageUrl={entry.imageUrl}
             kcal={entry.kcal}
             mediaOverlay={
-              <label className={css.selectTarget}>
-                <Checkbox
-                  aria-label={t({ en: `Select ${entry.name}`, pl: `Zaznacz: ${entry.name}` })}
-                  checked={selected}
-                  className={css.checkbox}
-                  onCheckedChange={(checked) => onSelectedChange(entry.id, checked)}
-                />
-              </label>
+              <FoodSelectTarget
+                checked={selected}
+                label={t({ en: `Select ${entry.name}`, pl: `Zaznacz: ${entry.name}` })}
+                onCheckedChange={(checked) => onSelectedChange(entry.id, checked)}
+              />
             }
             meta={
               entry.grams === null

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { FileTextIcon, ListChecksIcon, PlusIcon, ShoppingCartIcon } from 'lucide-react';
+import { FileTextIcon, ListChecksIcon, NotebookPenIcon, PlusIcon } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { notesQueryOptions } from '@/pages/todos/notes.query';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -27,7 +28,9 @@ type Props = { portions: number; recipe: RecipeLibraryItem };
 export function AddToNoteAction({ portions, recipe }: Props) {
   const { formatNumber, t } = useI18n();
   const [open, setOpen] = useState(false);
-  const notesQuery = useQuery({ ...notesQueryOptions(), enabled: open });
+  // Fetched with the page so the picker opens with the notes already listed.
+  const notesQuery = useQuery(notesQueryOptions());
+  const navigate = useNavigate();
   const addMutation = useAddRecipeToNoteMutation();
   const scale = portions / Math.max(1, recipe.portions);
   const items = recipe.ingredients.map((ingredient) =>
@@ -37,7 +40,12 @@ export function AddToNoteAction({ portions, recipe }: Props) {
   function add(noteId: string | null) {
     addMutation.mutate(
       { items, noteId, title: t({ en: 'Shopping list', pl: 'Lista zakupów' }) },
-      { onSuccess: () => setOpen(false) },
+      {
+        onSuccess: (note) => {
+          setOpen(false);
+          void navigate({ hash: `note-${note.id}`, to: '/todos' });
+        },
+      },
     );
   }
 
@@ -46,12 +54,12 @@ export function AddToNoteAction({ portions, recipe }: Props) {
   return (
     <>
       <Btn
-        icon={<ShoppingCartIcon aria-hidden='true' />}
+        icon={<NotebookPenIcon aria-hidden='true' />}
         onClick={() => setOpen(true)}
         type='button'
         variant='outlineMain'
       >
-        {t({ en: 'Add to shopping list', pl: 'Dodaj do listy zakupów' })}
+        {t({ en: 'Add to notes', pl: 'Dodaj do notatek' })}
       </Btn>
       <DialogRoot onOpenChange={setOpen} open={open}>
         <DialogPopup>
@@ -63,17 +71,6 @@ export function AddToNoteAction({ portions, recipe }: Props) {
             })}
           </DialogDescription>
           <List aria-busy={notesQuery.isPending || addMutation.isPending}>
-            <ListItem interactive>
-              <button
-                className={css.option}
-                disabled={addMutation.isPending}
-                onClick={() => add(null)}
-                type='button'
-              >
-                <PlusIcon aria-hidden='true' />
-                <span>{t({ en: 'New shopping list', pl: 'Nowa lista zakupów' })}</span>
-              </button>
-            </ListItem>
             {(notesQuery.data ?? []).map((note) => (
               <ListItem interactive key={note.id}>
                 <button
@@ -94,6 +91,17 @@ export function AddToNoteAction({ portions, recipe }: Props) {
                 </button>
               </ListItem>
             ))}
+            <ListItem interactive>
+              <button
+                className={css.option}
+                disabled={addMutation.isPending}
+                onClick={() => add(null)}
+                type='button'
+              >
+                <PlusIcon aria-hidden='true' />
+                <span>{t({ en: 'New shopping list', pl: 'Nowa lista zakupów' })}</span>
+              </button>
+            </ListItem>
           </List>
           <DialogActions>
             <DialogClose render={<Btn type='button' variant='ghost' />}>

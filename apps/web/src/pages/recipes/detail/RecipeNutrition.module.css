@@ -61,10 +61,6 @@
   color: var(--c-macro-carb);
 }
 
-.reset {
-  align-self: flex-start;
-}
-
 .actions {
   display: flex;
   flex-wrap: wrap;
