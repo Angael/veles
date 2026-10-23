@@ -2,6 +2,7 @@ import { Slider, type SliderRootProps } from '@base-ui/react/slider';
 import clsx from 'clsx';
 import { RotateCcwIcon } from 'lucide-react';
 import { Btn } from '../btn/Btn';
+import { Tooltip } from '../tooltip/Tooltip';
 import css from './SliderInput.module.css';
 
 type SliderInputProps = Omit<
@@ -47,17 +48,19 @@ export function SliderInput({
           </Slider.Track>
         </Slider.Control>
         {reset ? (
-          <Btn
-            aria-label={reset.label}
-            disabled={props.value === reset.value}
-            icon={<RotateCcwIcon aria-hidden='true' />}
-            iconOnly
-            onClick={() => onValueChange?.(reset.value)}
-            size='sm'
-            title={reset.label}
-            type='button'
-            variant='ghost'
-          />
+          <Tooltip content={reset.label}>
+            <Btn
+              aria-label={reset.label}
+              disabled={props.value === reset.value}
+              focusableWhenDisabled
+              icon={<RotateCcwIcon aria-hidden='true' />}
+              iconOnly
+              onClick={() => onValueChange?.(reset.value)}
+              size='sm'
+              type='button'
+              variant='ghost'
+            />
+          </Tooltip>
         ) : null}
       </div>
     </Slider.Root>

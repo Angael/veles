@@ -52,6 +52,7 @@ import { TextareaInput } from '@/components/ui/textarea-input/TextareaInput';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { Toggle } from '@/components/ui/toggle/Toggle';
+import { Tooltip } from '@/components/ui/tooltip/Tooltip';
 import css from './ComponentsDemoPage.module.css';
 import { PhotosFieldDemo } from './PhotosFieldDemo';
 import { AutocompleteDemo } from './AutocompleteDemo';
@@ -251,6 +252,13 @@ export function ComponentsDemoPage() {
           <span>Share calories</span>
           <Toggle checked={toggleChecked} onCheckedChange={setToggleChecked} />
         </label>
+      </section>
+
+      <section>
+        <h2>Tooltip</h2>
+        <Tooltip content='Hover, focus, or long press on touch'>
+          <Btn aria-label='Delete' icon={<Trash2Icon />} iconOnly variant='ghost' />
+        </Tooltip>
       </section>
 
       <section>
