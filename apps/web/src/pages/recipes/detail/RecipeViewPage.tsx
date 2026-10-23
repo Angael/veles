@@ -2,7 +2,6 @@ import { Link } from '@tanstack/react-router';
 import { LinkIcon, PencilIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
-import { ingredientLine } from './ingredientLine';
 import { RecipeImgSlider } from './RecipeImgSlider';
 import { RecipeNutrition } from './RecipeNutrition';
 import { RecipeRating } from './RecipeRating';
@@ -78,7 +77,12 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
               <ul className={css.ingredientList}>
                 {recipe.ingredients.map((ingredient) => (
                   <li key={ingredient.id}>
-                    {ingredientLine(ingredient, scale, formatNumber)}
+                    {ingredient.imageUrl ? (
+                      <img alt='' className={css.ingredientImage} src={ingredient.imageUrl} />
+                    ) : (
+                      <span aria-hidden='true' className={css.ingredientDot} />
+                    )}
+                    <span className={css.ingredientName}>{ingredient.name}</span>
                     {ingredient.productId ? (
                       <LinkIcon
                         aria-label={t({ en: 'Linked product', pl: 'Powiązany produkt' })}
@@ -86,6 +90,11 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
                         role='img'
                       />
                     ) : null}
+                    {ingredient.grams === null ? null : (
+                      <span className={css.ingredientGrams}>
+                        {formatNumber(ingredient.grams * scale, { maximumFractionDigits: 0 })} g
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>

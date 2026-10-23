@@ -152,17 +152,48 @@
 
   li {
     display: flex;
+    align-items: center;
     gap: var(--space-xs);
     color: var(--c-muted-soft);
     font-size: var(--text-sm);
     text-wrap: pretty;
   }
+}
 
-  li::before {
-    flex: 0 0 auto;
-    color: var(--c-muted-strong);
-    content: '—';
-  }
+.ingredientImage,
+.ingredientDot {
+  display: grid;
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+}
+
+.ingredientImage {
+  border-radius: var(--radius-pill);
+  background: var(--c-surface-inset);
+  object-fit: cover;
+}
+
+.ingredientDot::before {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: var(--radius-pill);
+  background: var(--c-muted-strong);
+  content: '';
+}
+
+.ingredientName {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ingredientGrams {
+  flex: none;
+  margin-inline-start: auto;
+  color: var(--c-text-strong);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .linkedIcon {
