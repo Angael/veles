@@ -4,8 +4,7 @@ import { ChefHatIcon } from 'lucide-react';
 import { recipeLibraryQueryOptions } from '@/pages/recipes/recipes.query';
 import { isLoggableIngredient, sumIngredientNutrition } from '@/pages/recipes/recipeNutrition';
 import { List, ListItem } from '@/components/ui/list/List';
-import { NutritionInline } from '../NutritionInline';
-import css from './AddFoodPage.module.css';
+import { FoodSummary } from '../FoodSummary';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 const MAX_RECIPES = 3;
@@ -33,35 +32,26 @@ export function RecipeResults({ date, query }: { date: string; query: string }) 
       {recipes.map((recipe) => {
         const perPortion = sumIngredientNutrition(recipe.ingredients, 1 / recipe.portions);
         return (
-          <ListItem interactive key={recipe.id}>
-            <Link
-              className={css.recipeResult}
-              search={{ date, recipeId: recipe.id }}
-              to='/calories/add'
-            >
-              <span className={css.recipeIcon}>
-                <ChefHatIcon aria-hidden='true' />
-              </span>
-              <span className={css.recipeName}>
-                <strong>{recipe.name}</strong>
-                <small>
-                  {t({
-                    en: `Recipe · ${formatNumber(recipe.portions)} portions`,
-                    pl: `Przepis · porcje: ${formatNumber(recipe.portions)}`,
-                  })}
-                </small>
-              </span>
-              {perPortion ? (
-                <NutritionInline
-                  carbs={perPortion.carbs}
-                  energyMeta={t({ en: '/ portion', pl: '/ porcja' })}
-                  fat={perPortion.fat}
-                  kcal={perPortion.kcal}
-                  protein={perPortion.protein}
-                  stacked
-                />
-              ) : null}
-            </Link>
+          <ListItem interactive key={recipe.id} style={{ padding: 0 }}>
+            <FoodSummary
+              carbs={perPortion?.carbs}
+              density='compact'
+              fat={perPortion?.fat}
+              icon={<ChefHatIcon aria-hidden='true' />}
+              imageUrl={null}
+              kcal={perPortion?.kcal}
+              kind={t({
+                en: `Recipe · ${formatNumber(recipe.portions)} portions`,
+                pl: `Przepis · porcje: ${formatNumber(recipe.portions)}`,
+              })}
+              meta={t({ en: '/ portion', pl: '/ porcja' })}
+              name={
+                <Link search={{ date, recipeId: recipe.id }} to='/calories/add'>
+                  {recipe.name}
+                </Link>
+              }
+              protein={perPortion?.protein}
+            />
           </ListItem>
         );
       })}
