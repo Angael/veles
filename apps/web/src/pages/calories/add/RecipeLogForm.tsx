@@ -78,13 +78,7 @@ export function RecipeLogForm({ initialDate, initialPortions, recipe }: Props) {
                 pl: `Zjedzone porcje (przepis daje ${formatNumber(basePortions)})`,
               })}
             >
-              <NumberInput
-                min={0.1}
-                onValueChange={setPortions}
-                required
-                stepperStep={0.5}
-                value={portions}
-              />
+              <NumberInput min={0.1} onValueChange={setPortions} required value={portions} />
             </Label>
             <div className={css.shortcuts} role='group'>
               <Btn
