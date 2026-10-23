@@ -1,5 +1,5 @@
 {
-  "id": "a6eed20c-7be7-479b-9095-ade7cb828641",
+  "id": "d8a83245-e92f-4042-894b-0fb3a41bf203",
   "prevId": "4a23bd7c-1910-4ef0-9714-df237fe3e350",
   "version": "7",
   "dialect": "postgresql",
@@ -1444,6 +1444,18 @@
           "primaryKey": false,
           "notNull": true
         },
+        "ingredients": {
+          "name": "ingredients",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tags": {
+          "name": "tags",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
         "portions": {
           "name": "portions",
           "type": "integer",
@@ -1453,6 +1465,30 @@
         },
         "rating": {
           "name": "rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kcal": {
+          "name": "kcal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "protein": {
+          "name": "protein",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "carbs": {
+          "name": "carbs",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fats": {
+          "name": "fats",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -1515,6 +1551,22 @@
         "recipe_rating_range_check": {
           "name": "recipe_rating_range_check",
           "value": "\"recipe\".\"rating\" IS NULL OR \"recipe\".\"rating\" BETWEEN 1 AND 5"
+        },
+        "recipe_kcal_non_negative_check": {
+          "name": "recipe_kcal_non_negative_check",
+          "value": "\"recipe\".\"kcal\" IS NULL OR \"recipe\".\"kcal\" >= 0"
+        },
+        "recipe_protein_non_negative_check": {
+          "name": "recipe_protein_non_negative_check",
+          "value": "\"recipe\".\"protein\" IS NULL OR \"recipe\".\"protein\" >= 0"
+        },
+        "recipe_carbs_non_negative_check": {
+          "name": "recipe_carbs_non_negative_check",
+          "value": "\"recipe\".\"carbs\" IS NULL OR \"recipe\".\"carbs\" >= 0"
+        },
+        "recipe_fats_non_negative_check": {
+          "name": "recipe_fats_non_negative_check",
+          "value": "\"recipe\".\"fats\" IS NULL OR \"recipe\".\"fats\" >= 0"
         }
       },
       "isRLSEnabled": false
