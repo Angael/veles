@@ -10,14 +10,21 @@ import {
   weightEntries,
   workoutSessions,
 } from '@veles/db/schema';
+import { addDays, format, parseISO } from 'date-fns';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { fromHundredths, HUNDREDTHS, toCalorieGoal } from '@/lib/nutrition';
 import { requireSession } from '@/server/getSession.server';
 import { db } from '@/server/db.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
+import { getMealPlanItems } from '@/pages/meal-plan/mealPlan.server';
+import type { MealPlanItem } from '@/pages/meal-plan/mealPlanEstimate';
+
+/** Days the dashboard previews: today and the next two. */
+const UPCOMING_PLAN_DAYS = 3;
 
 export type HomeDashboardData = {
   date: string;
+  mealPlan: Array<{ date: string; items: MealPlanItem[] }>;
   recipes: Array<{
     id: string;
     name: string;
@@ -56,8 +63,12 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
   .validator(arkTypeValidator(homeDashboardInputType))
   .handler(async ({ data }): Promise<HomeDashboardData> => {
     const session = await requireSession();
-    const [recipeRows, weightRows, diaryRows, foodLogRows, goalRows, workoutRows] =
+    const planDates = Array.from({ length: UPCOMING_PLAN_DAYS }, (_, index) =>
+      format(addDays(parseISO(data.date), index), 'yyyy-MM-dd'),
+    );
+    const [mealPlanItems, recipeRows, weightRows, diaryRows, foodLogRows, goalRows, workoutRows] =
       await Promise.all([
+        getMealPlanItems(session.user.id, data.date, planDates.at(-1) ?? data.date),
         db
           .select({
             kcal: recipes.kcal,
@@ -126,6 +137,10 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
 
     return {
       date: data.date,
+      mealPlan: planDates.map((date) => ({
+        date,
+        items: mealPlanItems.filter((item) => item.date === date),
+      })),
       recipes: recipeRows,
       nutrition: {
         goal: goal
