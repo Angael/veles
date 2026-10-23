@@ -1,8 +1,9 @@
 import { type } from 'arktype';
-import { and, eq } from 'drizzle-orm';
-import { recipes } from '@veles/db/schema';
+import { and, eq, inArray, or } from 'drizzle-orm';
+import { recipes, userSharingSettings } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db, type DbTransaction } from '@/server/db.server';
+import { getSharingFriendsIds } from '@/server/getSharingFriendsIds.server';
 import { replaceRecipeIngredients } from './recipeIngredients.server';
 import {
   recipeFieldsType,
@@ -13,6 +14,14 @@ import {
 import { translate } from '@/lib/i18n/getLocale';
 
 type RecipeFields = typeof recipeFieldsType.infer;
+
+/** Matches recipes the user owns or that a friend shares with them. */
+export function accessibleRecipe(userId: string) {
+  return or(
+    eq(recipes.userId, userId),
+    inArray(recipes.userId, getSharingFriendsIds(userId, userSharingSettings.shareRecipes)),
+  );
+}
 
 export async function createRecipeRow(
   tx: DbTransaction,

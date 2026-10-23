@@ -15,8 +15,8 @@ type RecipeViewPageProps = {
 
 export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
   const { formatNumber, t } = useI18n();
-  const [portions, setPortions] = useState(Math.max(1, recipe.portions));
-  const scale = portions / Math.max(1, recipe.portions);
+  const [portions, setPortions] = useState(recipe.portions);
+  const scale = portions / recipe.portions;
 
   return (
     <main className={css.page}>
@@ -68,7 +68,12 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
 
           <aside className={css.rail}>
             <section className={css.utilityGroup}>
-              <RecipeNutrition onPortionsChange={setPortions} portions={portions} recipe={recipe} />
+              <RecipeNutrition
+                onPortionsChange={setPortions}
+                portions={portions}
+                recipe={recipe}
+                scale={scale}
+              />
             </section>
             <section
               className={css.utilityGroup}

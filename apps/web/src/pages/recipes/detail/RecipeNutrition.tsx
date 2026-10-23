@@ -2,9 +2,9 @@ import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { FlameIcon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
-import { SliderInput } from '@/components/ui/slider-input/SliderInput';
 import type { RecipeLibraryItem } from '../recipes.api';
 import { isLoggableIngredient, sumIngredientNutrition } from '../recipeNutrition';
+import { RecipePortionSlider } from '../RecipePortionSlider';
 import { AddToNoteAction } from './AddToNoteAction';
 import css from './RecipeNutrition.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
@@ -13,13 +13,13 @@ type Props = {
   onPortionsChange: (portions: number) => void;
   portions: number;
   recipe: RecipeLibraryItem;
+  /** Picked portions over the recipe's own portions. */
+  scale: number;
 };
 
 /** Portion picker with the matching nutrition, and actions that use the picked amount. */
-export function RecipeNutrition({ onPortionsChange, portions, recipe }: Props) {
-  const { formatNumber, t } = useI18n();
-  const basePortions = Math.max(1, recipe.portions);
-  const scale = portions / basePortions;
+export function RecipeNutrition({ onPortionsChange, portions, recipe, scale }: Props) {
+  const { t } = useI18n();
   const nutrition = sumIngredientNutrition(recipe.ingredients, scale);
   const canLog = portions > 0 && recipe.ingredients.some(isLoggableIngredient);
 
@@ -28,20 +28,11 @@ export function RecipeNutrition({ onPortionsChange, portions, recipe }: Props) {
       className={css.nutrition}
       aria-label={t({ en: 'Recipe nutrition and portions', pl: 'Wartości odżywcze i porcje' })}
     >
-      <SliderInput
+      <RecipePortionSlider
         className={css.portionSlider}
         label={t({ en: 'Portions', pl: 'Porcje' })}
-        max={Math.max(8, basePortions)}
-        min={0.5}
         onValueChange={onPortionsChange}
-        reset={{
-          label: t({
-            en: `Reset to whole recipe (${formatNumber(basePortions)})`,
-            pl: `Przywróć cały przepis (${formatNumber(basePortions)})`,
-          }),
-          value: basePortions,
-        }}
-        step={0.5}
+        recipePortions={recipe.portions}
         value={portions}
       />
 
@@ -83,7 +74,7 @@ export function RecipeNutrition({ onPortionsChange, portions, recipe }: Props) {
             {t({ en: 'Log calories', pl: 'Zapisz kalorie' })}
           </Btn>
         ) : null}
-        <AddToNoteAction portions={portions} recipe={recipe} />
+        <AddToNoteAction portions={portions} recipe={recipe} scale={scale} />
       </div>
     </section>
   );

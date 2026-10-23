@@ -12,7 +12,6 @@ import { db } from '@/server/db.server';
 import { getRecipeIngredients } from '@/pages/recipes/recipeIngredients.server';
 import {
   ingredientNutrition,
-  isLoggableIngredient,
   type Nutrition,
   sumIngredientNutrition,
 } from '@/pages/recipes/recipeNutrition';
@@ -130,7 +129,7 @@ function agentNutrition(nutrition: Nutrition | null) {
 
 /**
  * Owned recipes, newest first, with nested ingredients and image URLs. Nutrition comes from the
- * linked products at the recipe amounts; custom ingredients have none and are never logged.
+ * linked products at the recipe amounts.
  */
 export async function readRecipes(userId: string, query: ReadQuery) {
   const rows = await db
@@ -173,7 +172,6 @@ export async function readRecipes(userId: string, query: ReadQuery) {
           name: ingredient.name,
           productId: ingredient.productId,
           grams: ingredient.grams,
-          logged: isLoggableIngredient(ingredient),
           nutrition: agentNutrition(ingredientNutrition(ingredient)),
         })),
         total: agentNutrition(sumIngredientNutrition(ingredients)),

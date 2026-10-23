@@ -1,9 +1,9 @@
-import { SearchXIcon } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import type { CalorieFood } from '@/pages/calories/calories.api';
 import { useLookupFoodByBarcodeMutation } from '@/pages/calories/calories.query';
 import { BarcodeScanner } from '@/components/ui/barcode-scanner/BarcodeScanner';
-import { ScanLoadingIcon, ScanNotice } from '@/components/ui/barcode-scanner/ScanNotice';
+import { LookupNotice } from '@/components/ui/barcode-scanner/LookupNotice';
+import { useBarcodeLookup } from '@/components/ui/barcode-scanner/useBarcodeLookup';
 import { Btn } from '@/components/ui/btn/Btn';
 import {
   DialogActions,
@@ -22,8 +22,6 @@ type Props = {
   open: boolean;
 };
 
-type Lookup = { status: 'idle' } | { barcode: string; status: 'lookingUp' | 'notFound' | 'error' };
-
 /**
  * Finds an ingredient's product by barcode with the same scanner and lookup as Add food. It only
  * links the product to the ingredient; nothing is logged. Unknown barcodes keep the row as is.
@@ -31,29 +29,13 @@ type Lookup = { status: 'idle' } | { barcode: string; status: 'lookingUp' | 'not
 export function IngredientScanDialog({ onFound, onOpenChange, open }: Props) {
   const { t } = useI18n();
   const lookupMutation = useLookupFoodByBarcodeMutation();
-  const lookingUp = useRef(false);
-  const [lookup, setLookup] = useState<Lookup>({ status: 'idle' });
+  const { dismiss, lookup, lookupBarcode } = useBarcodeLookup(async (barcode) => {
+    const result = await lookupMutation.mutateAsync({ data: { barcode } });
+    if (result.status !== 'found') return false;
+    onFound(result.food);
+    return true;
+  });
   const [typed, setTyped] = useState('');
-
-  /** Looks up one barcode at a time and hands a match to the ingredient row. */
-  async function lookupBarcode(barcode: string) {
-    if (!barcode || lookingUp.current) return;
-    lookingUp.current = true;
-    setLookup({ barcode, status: 'lookingUp' });
-    try {
-      const result = await lookupMutation.mutateAsync({ data: { barcode } });
-      if (result.status === 'found') {
-        setLookup({ status: 'idle' });
-        onFound(result.food);
-      } else {
-        setLookup({ barcode, status: 'notFound' });
-      }
-    } catch {
-      setLookup({ barcode, status: 'error' });
-    } finally {
-      lookingUp.current = false;
-    }
-  }
 
   return (
     <DialogRoot onOpenChange={onOpenChange} open={open}>
@@ -62,7 +44,11 @@ export function IngredientScanDialog({ onFound, onOpenChange, open }: Props) {
         <div className={css.camera}>
           <BarcodeScanner
             notice={
-              <LookupMessage lookup={lookup} onDismiss={() => setLookup({ status: 'idle' })} />
+              <LookupNotice
+                lookup={lookup}
+                onDismiss={dismiss}
+                onRetry={(barcode) => void lookupBarcode(barcode)}
+              />
             }
             onScan={(barcode) => void lookupBarcode(barcode)}
           />
@@ -92,44 +78,5 @@ export function IngredientScanDialog({ onFound, onOpenChange, open }: Props) {
         </DialogActions>
       </DialogPopup>
     </DialogRoot>
-  );
-}
-
-function LookupMessage({ lookup, onDismiss }: { lookup: Lookup; onDismiss: () => void }) {
-  const { t } = useI18n();
-  if (lookup.status === 'idle') return null;
-  if (lookup.status === 'lookingUp')
-    return (
-      <ScanNotice
-        detail={lookup.barcode}
-        icon={<ScanLoadingIcon />}
-        title={t({ en: 'Looking up product…', pl: 'Wyszukiwanie produktu…' })}
-      />
-    );
-  return (
-    <ScanNotice
-      detail={
-        lookup.status === 'notFound'
-          ? t({
-              en: `No product matches ${lookup.barcode}. Type the ingredient as custom text instead.`,
-              pl: `Brak produktu dla kodu ${lookup.barcode}. Wpisz składnik jako własny tekst.`,
-            })
-          : t({
-              en: `We could not check ${lookup.barcode}. Check your connection and try again.`,
-              pl: `Nie udało się sprawdzić kodu ${lookup.barcode}. Sprawdź połączenie i spróbuj ponownie.`,
-            })
-      }
-      icon={lookup.status === 'notFound' ? <SearchXIcon aria-hidden='true' /> : undefined}
-      title={
-        lookup.status === 'notFound'
-          ? t({ en: 'Product not found', pl: 'Nie znaleziono produktu' })
-          : t({ en: 'Lookup failed', pl: 'Wyszukiwanie nie powiodło się' })
-      }
-      tone={lookup.status === 'error' ? 'danger' : undefined}
-    >
-      <Btn onClick={onDismiss} type='button' variant='ghost'>
-        {t({ en: 'Scan again', pl: 'Skanuj ponownie' })}
-      </Btn>
-    </ScanNotice>
   );
 }

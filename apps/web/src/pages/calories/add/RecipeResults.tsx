@@ -53,11 +53,11 @@ export function RecipeResults({ date, query }: { date: string; query: string }) 
               </span>
               {perPortion ? (
                 <NutritionInline
-                  carbs={perPortion.carbs ?? 0}
+                  carbs={perPortion.carbs}
                   energyMeta={t({ en: '/ portion', pl: '/ porcja' })}
-                  fat={perPortion.fat ?? 0}
+                  fat={perPortion.fat}
                   kcal={perPortion.kcal}
-                  protein={perPortion.protein ?? 0}
+                  protein={perPortion.protein}
                   stacked
                 />
               ) : null}

@@ -1,24 +1,29 @@
-import { Link } from '@tanstack/react-router';
 import { SearchXIcon } from 'lucide-react';
-import { ScanLoadingIcon, ScanNotice } from '@/components/ui/barcode-scanner/ScanNotice';
+import type { ReactNode } from 'react';
+import { ScanLoadingIcon, ScanNotice } from './ScanNotice';
+import type { LookupState } from './useBarcodeLookup';
 import { Btn } from '@/components/ui/btn/Btn';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-export type LookupState =
-  | { status: 'idle' }
-  | { barcode: string; status: 'lookingUp' | 'notFound' | 'error' };
-
 type LookupNoticeProps = {
-  date: string;
-  lookup: Exclude<LookupState, { status: 'idle' }>;
+  lookup: LookupState;
+  /** Extra next step for an unknown barcode, next to "Scan again". */
+  notFoundAction?: (barcode: string) => ReactNode;
   onDismiss: () => void;
   onRetry: (barcode: string) => void;
 };
 
 /** Lookup progress and failures, with the next steps for each. */
-export function LookupNotice({ date, lookup, onDismiss, onRetry }: LookupNoticeProps) {
+export function LookupNotice({ lookup, notFoundAction, onDismiss, onRetry }: LookupNoticeProps) {
   const { t } = useI18n();
+  const scanAgain = (
+    <Btn onClick={onDismiss} type='button' variant='ghost'>
+      {t({ en: 'Scan again', pl: 'Skanuj ponownie' })}
+    </Btn>
+  );
   switch (lookup.status) {
+    case 'idle':
+      return null;
     case 'lookingUp':
       return (
         <ScanNotice
@@ -37,15 +42,8 @@ export function LookupNotice({ date, lookup, onDismiss, onRetry }: LookupNoticeP
           icon={<SearchXIcon aria-hidden='true' />}
           title={t({ en: 'Product not found', pl: 'Nie znaleziono produktu' })}
         >
-          <Btn onClick={onDismiss} variant='ghost'>
-            {t({ en: 'Scan again', pl: 'Skanuj ponownie' })}
-          </Btn>
-          <Btn
-            isLink
-            render={<Link search={{ barcode: lookup.barcode, date }} to='/calories/foods/new' />}
-          >
-            {t({ en: 'Add product', pl: 'Dodaj produkt' })}
-          </Btn>
+          {scanAgain}
+          {notFoundAction?.(lookup.barcode)}
         </ScanNotice>
       );
     case 'error':
@@ -58,10 +56,8 @@ export function LookupNotice({ date, lookup, onDismiss, onRetry }: LookupNoticeP
           title={t({ en: 'Lookup failed', pl: 'Wyszukiwanie nie powiodło się' })}
           tone='danger'
         >
-          <Btn onClick={onDismiss} variant='ghost'>
-            {t({ en: 'Scan again', pl: 'Skanuj ponownie' })}
-          </Btn>
-          <Btn onClick={() => onRetry(lookup.barcode)}>
+          {scanAgain}
+          <Btn onClick={() => onRetry(lookup.barcode)} type='button'>
             {t({ en: 'Try again', pl: 'Spróbuj ponownie' })}
           </Btn>
         </ScanNotice>

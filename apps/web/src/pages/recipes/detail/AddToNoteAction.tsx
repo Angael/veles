@@ -19,20 +19,19 @@ import { ingredientLine } from './ingredientLine';
 import css from './AddToNoteAction.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-type Props = { portions: number; recipe: RecipeLibraryItem };
+type Props = { portions: number; recipe: RecipeLibraryItem; scale: number };
 
 /**
  * Adds the ingredients, scaled to the picked portions, to a note the user picks: an own note, a
  * note a connection shares, or a new shopping list.
  */
-export function AddToNoteAction({ portions, recipe }: Props) {
+export function AddToNoteAction({ portions, recipe, scale }: Props) {
   const { formatNumber, t } = useI18n();
   const [open, setOpen] = useState(false);
   // Fetched with the page so the picker opens with the notes already listed.
   const notesQuery = useQuery(notesQueryOptions());
   const navigate = useNavigate();
   const addMutation = useAddRecipeToNoteMutation();
-  const scale = portions / Math.max(1, recipe.portions);
   const items = recipe.ingredients.map((ingredient) =>
     ingredientLine(ingredient, scale, formatNumber),
   );

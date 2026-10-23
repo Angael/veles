@@ -49,7 +49,7 @@ export function RecipesPage({ recipes }: RecipesPageProps) {
               onValueChange={setSearchInputValue}
               placeholder={t({
                 en: 'Search by name or description',
-                pl: 'Szukaj po nazwie, tagach lub opisie',
+                pl: 'Szukaj po nazwie lub opisie',
               })}
               type='search'
               value={searchInputValue}

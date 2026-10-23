@@ -47,7 +47,7 @@ export const saveRecipeInputType = updateRecipeFieldsInputType
   .omit('id')
   .merge({ 'id?': 'string.uuid' });
 
-/** Logs the chosen recipe ingredients; `logIds` are client ids so a retried submit adds nothing twice. */
+/** Logs the chosen recipe ingredients; each `logId` is a client id for retry safety. */
 export const logRecipeInputType = type({
   '+': 'reject',
   recipeId: 'string.uuid',

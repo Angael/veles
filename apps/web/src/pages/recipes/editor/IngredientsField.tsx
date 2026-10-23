@@ -50,8 +50,8 @@ export function IngredientsField({ ingredients, onChange }: Props) {
       <legend>{t({ en: 'Ingredients', pl: 'Składniki' })}</legend>
       <p className={css.hint}>
         {t({
-          en: 'Amounts are for the whole recipe. Only ingredients linked to a product are added to the food log.',
-          pl: 'Ilości dotyczą całego przepisu. Do dziennika trafiają tylko składniki powiązane z produktem.',
+          en: 'Amounts are for the whole recipe.',
+          pl: 'Ilości dotyczą całego przepisu.',
         })}
       </p>
       <input

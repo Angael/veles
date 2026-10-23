@@ -17,15 +17,17 @@ export type RecipeIngredient = {
   per100g: Nutrition | null;
 };
 
+type NutritionSource = Pick<RecipeIngredient, 'grams' | 'per100g' | 'productId'>;
+
 /** Only linked ingredients with an amount have nutrition, so only they can be logged. */
-export function isLoggableIngredient(
-  ingredient: RecipeIngredient,
-): ingredient is RecipeIngredient & { grams: number; per100g: Nutrition; productId: string } {
+export function isLoggableIngredient<T extends NutritionSource>(
+  ingredient: T,
+): ingredient is T & { grams: number; per100g: Nutrition; productId: string } {
   return ingredient.per100g !== null && ingredient.productId !== null && ingredient.grams !== null;
 }
 
 /** Nutrition of one ingredient at `scale` × its recipe amount, or null when it is not loggable. */
-export function ingredientNutrition(ingredient: RecipeIngredient, scale = 1): Nutrition | null {
+export function ingredientNutrition(ingredient: NutritionSource, scale = 1): Nutrition | null {
   if (!isLoggableIngredient(ingredient)) return null;
   const factor = (ingredient.grams * scale) / 100;
   const at = (value: number | null) => (value === null ? null : value * factor);
@@ -38,7 +40,7 @@ export function ingredientNutrition(ingredient: RecipeIngredient, scale = 1): Nu
   };
 }
 
-function sumNullable(left: number | null, right: number | null) {
+export function sumNullable(left: number | null, right: number | null) {
   return left === null && right === null ? null : (left ?? 0) + (right ?? 0);
 }
 

@@ -1,3 +1,4 @@
+import { sumNullable } from '../recipeNutrition';
 import { emptyRecipeDraft, ingredientDraft, type RecipeFormDraft } from './recipeDraft';
 
 export type RecipeSourceLog = {
@@ -31,8 +32,4 @@ export function recipeDraftFromLogs(logs: RecipeSourceLog[]): RecipeFormDraft {
   }
 
   return { ...emptyRecipeDraft(), ingredients };
-}
-
-function sumNullable(left: number | null, right: number | null) {
-  return left === null && right === null ? null : (left ?? 0) + (right ?? 0);
 }

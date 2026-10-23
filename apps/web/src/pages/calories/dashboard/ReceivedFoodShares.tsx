@@ -78,9 +78,9 @@ export function ReceivedFoodShares({ date }: Props) {
           {share.items.map((item) => (
             <ListItem key={item.id} style={{ padding: 0 }}>
               <FoodSummary
-                carbs={item.carbs ?? 0}
+                carbs={item.carbs}
                 density='compact'
-                fat={item.fat ?? 0}
+                fat={item.fat}
                 category={item.category}
                 imageUrl={item.imageUrl}
                 kcal={item.kcal}
@@ -90,7 +90,7 @@ export function ReceivedFoodShares({ date }: Props) {
                     : `${formatNumber(Math.round(item.grams))} g`
                 }
                 name={item.name}
-                protein={item.protein ?? 0}
+                protein={item.protein}
               />
             </ListItem>
           ))}

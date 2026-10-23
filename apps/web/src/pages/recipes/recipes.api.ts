@@ -1,16 +1,15 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { and, eq, inArray, or } from 'drizzle-orm';
-import { recipeImages, recipes, uploadObjects, userSharingSettings } from '@veles/db/schema';
+import { and, eq, inArray } from 'drizzle-orm';
+import { recipeImages, recipes, uploadObjects } from '@veles/db/schema';
 import { db } from '@/server/db.server';
 import { getSessionUserId, requireSession } from '@/server/getSession.server';
-import { getSharingFriendsIds } from '@/server/getSharingFriendsIds.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { storagePathToUrl } from '@/server/storage/config.server';
 import { getRecipeIngredients } from './recipeIngredients.server';
 import { type Nutrition, type RecipeIngredient, sumIngredientNutrition } from './recipeNutrition';
-import { updateRecipeRatingRecord } from './recipes.server';
+import { accessibleRecipe, updateRecipeRatingRecord } from './recipes.server';
 import { updateRecipeRatingInputType } from './recipes.validation';
 
 type RecipeSelect = typeof recipes.$inferSelect;
@@ -38,12 +37,7 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
       return [];
     }
 
-    const sharingFriendIds = getSharingFriendsIds(userId, userSharingSettings.shareRecipes);
-
-    const recipeRows = await db
-      .select()
-      .from(recipes)
-      .where(or(eq(recipes.userId, userId), inArray(recipes.userId, sharingFriendIds)));
+    const recipeRows = await db.select().from(recipes).where(accessibleRecipe(userId));
 
     const related = await getRecipeRelations(recipeRows.map((recipe) => recipe.id));
     return recipeRows
@@ -63,17 +57,10 @@ export const getRecipeById = createServerFn({ method: 'GET' })
       return null;
     }
 
-    const sharingFriendIds = getSharingFriendsIds(userId, userSharingSettings.shareRecipes);
-
     const [recipe] = await db
       .select()
       .from(recipes)
-      .where(
-        and(
-          eq(recipes.id, data.id),
-          or(eq(recipes.userId, userId), inArray(recipes.userId, sharingFriendIds)),
-        ),
-      )
+      .where(and(eq(recipes.id, data.id), accessibleRecipe(userId)))
       .limit(1);
 
     if (!recipe) {

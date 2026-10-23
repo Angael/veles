@@ -60,9 +60,9 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
                 variant='ghostDanger'
               />
             }
-            carbs={entry.carbs ?? 0}
+            carbs={entry.carbs}
             density='compact'
-            fat={entry.fat ?? 0}
+            fat={entry.fat}
             category={entry.category}
             imageUrl={entry.imageUrl}
             kcal={entry.kcal}
@@ -83,7 +83,7 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
                 {entry.name}
               </Link>
             }
-            protein={entry.protein ?? 0}
+            protein={entry.protein}
           />
         </ContextMenuTrigger>
         <ContextMenuPopup
