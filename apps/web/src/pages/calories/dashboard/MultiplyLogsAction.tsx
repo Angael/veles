@@ -1,4 +1,4 @@
-import { CopyPlusIcon } from 'lucide-react';
+import { ScalingIcon } from 'lucide-react';
 import { useState } from 'react';
 import type { CalorieLog } from '../calories.api';
 import { useMultiplyFoodLogsMutation } from '../calories.query';
@@ -37,7 +37,7 @@ export function MultiplyLogsAction({ logs, onMultiplied }: Props) {
   return (
     <>
       <SelectionBarAction
-        icon={<CopyPlusIcon aria-hidden='true' />}
+        icon={<ScalingIcon aria-hidden='true' />}
         label={t({ en: 'Multiply', pl: 'Pomnóż' })}
         onClick={() => setOpen(true)}
       />
@@ -141,7 +141,7 @@ function MultiplyForm({ logs, onMultiplied }: Props) {
         </DialogClose>
         <Btn
           disabled={!valid}
-          icon={<CopyPlusIcon aria-hidden='true' />}
+          icon={<ScalingIcon aria-hidden='true' />}
           loading={multiplyMutation.isPending}
           type='submit'
         >
