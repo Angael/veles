@@ -1,5 +1,12 @@
 // This component catalog may remain intentionally long; keep all component demos together rather than splitting it needlessly.
-import { CopyPlusIcon, PlusIcon, SearchIcon, SendIcon, Trash2Icon } from 'lucide-react';
+import {
+  CopyPlusIcon,
+  PlusIcon,
+  ScalingIcon,
+  SearchIcon,
+  SendIcon,
+  Trash2Icon,
+} from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Btn, type BtnSize, type BtnVariant } from '@/components/ui/btn/Btn';
@@ -502,7 +509,7 @@ export function ComponentsDemoPage() {
           count={3}
           onClear={() => setDemoSelecting(false)}
         >
-          <SelectionBarAction icon={<CopyPlusIcon aria-hidden='true' />} label='Multiply' />
+          <SelectionBarAction icon={<ScalingIcon aria-hidden='true' />} label='Multiply' />
           <SelectionBarAction
             icon={<Trash2Icon aria-hidden='true' />}
             label='Delete'

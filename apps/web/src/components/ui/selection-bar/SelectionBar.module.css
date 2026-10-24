@@ -17,6 +17,10 @@
   white-space: nowrap;
 }
 
+.badge {
+  display: none;
+}
+
 @keyframes bar-in {
   from {
     opacity: 0;
@@ -36,29 +40,91 @@
     background: var(--c-surface-solid);
     box-shadow: var(--shadow-popup);
   }
-}
 
-/* Phones: MobileDock supplies the navbar's slot and surface. */
-@media (--phone) {
-  .bar {
-    gap: 0.25rem;
-
-    /* Beats Btn's size class so the bar keeps the navbar's height. */
-    & > :is(a, button) {
-      --btn-height: var(--dock-item-height);
-    }
-  }
-
-  .collapsible {
+  /* The count text beside it already says what is cleared. */
+  .bar .clear {
     --btn-padding-x: 0;
     --btn-min-width: var(--btn-height);
 
-    flex: none;
     width: var(--btn-height);
+    gap: 0;
+
+    & .label {
+      display: none;
+    }
+  }
+}
+
+/*
+ * Phones: MobileDock supplies the slot and surface; items copy MobileNavbar's labeled layout
+ * (same dock width and item height), so the takeover keeps the navbar's size.
+ */
+@media (--phone) {
+  .bar {
+    --dock-padding: 0.25rem;
+    --dock-width: min(
+      28rem,
+      calc(100vw - 1rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
+    );
+
+    /* One implicit column per item: long Polish labels take the width they need. */
+    display: grid;
+    grid-auto-columns: minmax(max-content, 1fr);
+    grid-auto-flow: column;
     gap: 0;
   }
 
+  /* Visually hidden; it stays in the tree to announce count changes. The badge shows it. */
+  .count {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* `.bar` raises specificity above Btn's size, radius, and variant classes. */
+  .bar .action {
+    --btn-height: var(--dock-nav-item-height);
+    --btn-padding-x: 0.125rem;
+    --btn-radius: var(--radius-sm);
+
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 2.75rem;
+
+    &:not(.primary) {
+      --btn-bg: transparent;
+    }
+  }
+
   .label {
-    display: none;
+    font-size: 0.6875rem;
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.2;
+  }
+
+  .bar .clear {
+    --btn-color: var(--c-muted);
+
+    /* Btn's icon span is the badge's positioning context. */
+    & .badge {
+      position: absolute;
+      top: -0.4rem;
+      left: 0.7rem;
+      display: block;
+      min-width: 1rem;
+      padding-inline: 0.25rem;
+      border-radius: var(--radius-pill);
+      background: var(--c-primary);
+      color: var(--c-primary-contrast);
+      font-size: 0.625rem;
+      font-variant-numeric: tabular-nums;
+      font-weight: var(--font-weight-semibold);
+      line-height: 1rem;
+      text-align: center;
+    }
   }
 }

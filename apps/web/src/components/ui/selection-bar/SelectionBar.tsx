@@ -17,7 +17,7 @@ type SelectionBarProps = {
 /**
  * Toolbar for bulk actions on selected items. Render it instead of the page's FloatingButton
  * while a selection exists: desktop keeps the button's spot, phones replace the mobile navbar
- * in the bottom dock.
+ * in the bottom dock with labeled items, like the navbar's.
  */
 export function SelectionBar({
   'aria-label': ariaLabel,
@@ -37,12 +37,22 @@ export function SelectionBar({
     >
       <Btn
         aria-label={t({ en: 'Clear selection', pl: 'Wyczyść zaznaczenie' })}
-        icon={<XIcon aria-hidden='true' />}
-        iconOnly
+        className={clsx(css.action, css.clear)}
+        icon={
+          <>
+            <XIcon aria-hidden='true' />
+            {/* Phones show the count here, as the full text doesn't fit beside labeled items. */}
+            <span aria-hidden='true' className={css.badge}>
+              {count}
+            </span>
+          </>
+        }
         onClick={onClear}
         radius='pill'
         variant='ghost'
-      />
+      >
+        <span className={css.label}>{t({ en: 'Clear', pl: 'Odznacz' })}</span>
+      </Btn>
       <span aria-live='polite' className={css.count}>
         {t({ en: `${count} selected`, pl: `Zaznaczono: ${count}` })}
       </span>
@@ -57,10 +67,11 @@ type SelectionBarActionProps = Omit<
 > & {
   icon: ReactNode;
   label: string;
-  /** Keeps its label on phones; secondary actions collapse to icons there. */
+  /** Filled main button; secondary actions are ghost. */
   primary?: boolean;
 };
 
+/** Icon and visible label; phones stack them like the mobile navbar so every icon is named. */
 export function SelectionBarAction({
   icon,
   label,
@@ -70,14 +81,13 @@ export function SelectionBarAction({
 }: SelectionBarActionProps) {
   return (
     <Btn
-      aria-label={primary ? undefined : label}
-      className={primary ? undefined : css.collapsible}
+      className={clsx(css.action, primary && css.primary)}
       icon={icon}
       radius='pill'
       variant={variant}
       {...props}
     >
-      {primary ? label : <span className={css.label}>{label}</span>}
+      <span className={css.label}>{label}</span>
     </Btn>
   );
 }
