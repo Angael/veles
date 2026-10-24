@@ -16,6 +16,10 @@ export type FoodSummaryProps = {
   kcal?: number;
   /** `tight` also shrinks the image and hides macros. */
   density?: 'compact' | 'default' | 'tight';
+  /** Replaces the image with this icon, e.g. for recipes. */
+  icon?: ReactNode;
+  /** Small label under the name that tells what kind of item the row is. */
+  kind?: ReactNode;
   /** Rendered on top of the image, e.g. a selection target covering the whole image. */
   mediaOverlay?: ReactNode;
   meta?: ReactNode;
@@ -30,8 +34,10 @@ export function FoodSummary({
   category = null,
   density = 'default',
   fat,
+  icon,
   imageUrl,
   kcal,
+  kind,
   mediaOverlay,
   meta,
   name,
@@ -45,17 +51,19 @@ export function FoodSummary({
         density === 'tight' && css.tight,
       )}
     >
-      <div className={css.media}>
-        {imageUrl ? (
-          <img alt='' aria-hidden='true' className={css.image} loading='lazy' src={imageUrl} />
-        ) : (
-          <FoodCategoryIcon category={category} />
-        )}
+      <div className={clsx(css.media, icon && css.iconMedia)}>
+        {icon ??
+          (imageUrl ? (
+            <img alt='' aria-hidden='true' className={css.image} loading='lazy' src={imageUrl} />
+          ) : (
+            <FoodCategoryIcon category={category} />
+          ))}
         {mediaOverlay}
       </div>
       <div className={css.body}>
         <div className={css.identity}>
           <strong>{name}</strong>
+          {kind ? <small className={css.kind}>{kind}</small> : null}
         </div>
         {kcal === undefined ? (
           <small className={css.note}>{meta}</small>
