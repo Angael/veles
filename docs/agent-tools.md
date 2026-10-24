@@ -52,7 +52,7 @@ Resources:
 - recipes: Recipes with imageUrls, and ingredients in order. Ingredient grams are for the whole recipe (portions = how many portions it makes). A linked ingredient has productId (from food_products) and nutrition at its grams; a custom one has both null. total (all portions) and perPortion sum the linked ingredients and are null when none has nutrition; kcal is energy; macros are protein, fat, carbs in grams.
 - food_days: Food diary, one item per day with entries or a day note, newest first; id and date are the same YYYY-MM-DD. Each day has entries (with imageUrl or null, and productId when logged from food_products), total, goal (the nutrition goal in effect; null without a goal or without Nutrition goals consent), note (the user's free text or null), and offPlan; kcal is energy; macros are protein, fat, carbs in grams. offPlan true means the user went off the diet and probably overate: total is only what was logged, not the real intake, so use the note to judge how much more was eaten, and leave the day out of averages and trends.
 - calorie_goals: Nutrition goal history by effectiveDate, newest first; each goal applies until the next one. kcal is energy; macros are protein, fat, carbs in grams (limits).
-- food_products: Shared food catalog with imageUrl or null. per100g nutrition: kcal is energy; macros are protein, fat, carbs in grams. productSizeGrams is one package.
+- food_products: Shared food catalog with imageUrl or null. per100g nutrition: kcal is energy; macros are protein, fat, carbs in grams. productSizeGrams is one unit (package, piece, slice or serving).
 - workout_sessions: Workout sessions, newest first, each with its exercises (id of the session exercise, exerciseId from workout_exercises, name, measure, notes) and their sets. Sets: id, type (normal, warmup, drop, failure), done, weightKg, reps, durationSeconds, distanceKm; measure says which apply. durationSeconds is manual or end minus start.
 - workout_routines: Reusable workout plans, each with ordered exercises (name, measure, restSeconds) and setTypes, one per planned set.
 - workout_exercises: Exercise list with measure, restSeconds, notes, archived, lastDoneOn, and sessionCount.
@@ -294,16 +294,17 @@ Find a catalog product by barcode. If it is missing, import it from Open Food Fa
 
 _write, destructive, shared_
 
-Create (no id) or replace all fields (id) of a shared catalog product that all accounts use. Search food_products first to avoid duplicates. kcalPer100g and optional proteinPer100g, fatPer100g, carbsPer100g (grams per 100 g); productSizeGrams is one package. Barcodes must be unique. On update, today is the user's local date (YYYY-MM-DD): entries of that product logged today by any account are recalculated; the image stays. Returns the product.
+Create (no id) or replace all fields (id) of a shared catalog product that all accounts use. Search food_products first to avoid duplicates. kcalPer100g and optional proteinPer100g, fatPer100g, carbsPer100g (grams per 100 g); productSizeGrams is the weight of one unit (package, piece, slice or serving; null unit means package, or the seed default for seeded foods). Barcodes must be unique. On update, today is the user's local date (YYYY-MM-DD): entries of that product logged today by any account are recalculated; the image stays. Returns the product.
 
-| Input              | Type               | Required | Notes |
-| ------------------ | ------------------ | -------- | ----- |
-| `kcalPer100g`      | number ≥ 0         | yes      |       |
-| `name`             | string             | yes      |       |
-| `barcode`          | string \| null     |          |       |
-| `carbsPer100g`     | number ≥ 0 \| null |          |       |
-| `fatPer100g`       | number ≥ 0 \| null |          |       |
-| `id`               | uuid               |          |       |
-| `productSizeGrams` | number > 0 \| null |          |       |
-| `proteinPer100g`   | number ≥ 0 \| null |          |       |
-| `today`            | date YYYY-MM-DD    |          |       |
+| Input              | Type                                                 | Required | Notes |
+| ------------------ | ---------------------------------------------------- | -------- | ----- |
+| `kcalPer100g`      | number ≥ 0                                           | yes      |       |
+| `name`             | string                                               | yes      |       |
+| `barcode`          | string \| null                                       |          |       |
+| `carbsPer100g`     | number ≥ 0 \| null                                   |          |       |
+| `fatPer100g`       | number ≥ 0 \| null                                   |          |       |
+| `id`               | uuid                                                 |          |       |
+| `productSizeGrams` | number > 0 \| null                                   |          |       |
+| `proteinPer100g`   | number ≥ 0 \| null                                   |          |       |
+| `today`            | date YYYY-MM-DD                                      |          |       |
+| `unit`             | "package" \| "piece" \| "serving" \| "slice" \| null |          |       |

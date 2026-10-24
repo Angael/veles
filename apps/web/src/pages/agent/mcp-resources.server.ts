@@ -58,7 +58,7 @@ export const resources = {
   food_products: {
     feature: 'food_products',
     dated: false,
-    description: `Shared food catalog with imageUrl or null. per100g nutrition: ${kcalAndMacros}. productSizeGrams is one package.`,
+    description: `Shared food catalog with imageUrl or null. per100g nutrition: ${kcalAndMacros}. productSizeGrams is one unit (package, piece, slice or serving).`,
     read: readFoodProducts,
   },
   workout_sessions: {
