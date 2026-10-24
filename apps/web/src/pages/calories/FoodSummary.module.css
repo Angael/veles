@@ -39,6 +39,22 @@
   }
 }
 
+.iconMedia {
+  color: var(--c-accent);
+  background: none;
+  border: var(--border-width) dashed var(--c-primary-border-soft);
+
+  & > svg {
+    opacity: 1;
+  }
+}
+
+.kind {
+  display: block;
+  color: var(--c-accent-strong);
+  font-size: var(--text-xs);
+}
+
 .image {
   width: 100%;
   height: 100%;
