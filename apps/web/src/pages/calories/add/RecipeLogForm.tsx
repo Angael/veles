@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { v7 as uuidv7 } from 'uuid';
-import type { RecipeViewItem } from '@/pages/recipes/recipes.api';
+import type { RecipeLibraryItem } from '@/pages/recipes/recipes.api';
 import { useLogRecipeMutation } from '@/pages/recipes/recipes.query';
 import { isLoggableIngredient, sumIngredientNutrition } from '@/pages/recipes/recipeNutrition';
 import { RecipePortionSlider } from '@/pages/recipes/RecipePortionSlider';
@@ -22,7 +22,7 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 type Props = {
   initialDate: string;
   initialPortions?: number;
-  recipe: RecipeViewItem;
+  recipe: RecipeLibraryItem;
 };
 
 /**

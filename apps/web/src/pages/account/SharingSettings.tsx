@@ -25,8 +25,8 @@ const sharingOptions = [
   },
   {
     description: {
-      en: 'Saved recipes and their nutrition',
-      pl: 'Zapisane przepisy i ich wartości odżywcze',
+      en: 'Saved recipes and their nutrition; friends can edit them too',
+      pl: 'Zapisane przepisy i ich wartości odżywcze; znajomi mogą je też edytować',
     },
     key: 'recipes',
     label: { en: 'Share recipes', pl: 'Udostępniaj przepisy' },

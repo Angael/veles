@@ -1,11 +1,11 @@
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { EditRecipePage } from '@/pages/recipes/editor/EditRecipePage';
-import { getOwnedRecipeById } from '@/pages/recipes/recipes.api';
+import { getEditableRecipeById } from '@/pages/recipes/recipes.api';
 import { translate } from '@/lib/i18n/getLocale';
 
 export const Route = createFileRoute('/_authenticated/recipes/view/$id_/edit')({
   loader: async ({ params }) => {
-    const recipe = await getOwnedRecipeById({ data: { id: params.id } });
+    const recipe = await getEditableRecipeById({ data: { id: params.id } });
 
     if (!recipe) {
       // oxlint-disable-next-line typescript/only-throw-error -- Router control flow intentionally throws this object.

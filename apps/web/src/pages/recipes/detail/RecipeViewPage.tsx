@@ -5,12 +5,12 @@ import { Btn } from '@/components/ui/btn/Btn';
 import { RecipeImgSlider } from './RecipeImgSlider';
 import { RecipeNutrition } from './RecipeNutrition';
 import { RecipeRating } from './RecipeRating';
-import type { RecipeViewItem } from '../recipes.api';
+import type { RecipeLibraryItem } from '../recipes.api';
 import css from './RecipeViewPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type RecipeViewPageProps = {
-  recipe: RecipeViewItem;
+  recipe: RecipeLibraryItem;
 };
 
 export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
@@ -26,23 +26,23 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
             <h1>{recipe.name}</h1>
           </div>
 
-          {recipe.canManage ? (
-            <div
-              className={css.actions}
-              aria-label={t({ en: 'Recipe management actions', pl: 'Zarządzanie przepisem' })}
-              role='group'
+          <div
+            className={css.actions}
+            aria-label={t({ en: 'Recipe management actions', pl: 'Zarządzanie przepisem' })}
+            role='group'
+          >
+            <Btn
+              className={css.actionButton}
+              icon={<PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
+              isLink
+              radius='pill'
+              render={<Link params={{ id: recipe.id }} to='/recipes/view/$id/edit' />}
+              size='sm'
+              variant='outlineMain'
             >
-              <Btn
-                className={css.actionButton}
-                icon={<PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
-                isLink
-                radius='pill'
-                render={<Link params={{ id: recipe.id }} to='/recipes/view/$id/edit' />}
-                size='sm'
-                variant='outlineMain'
-              >
-                {t({ en: 'Edit', pl: 'Edytuj' })}
-              </Btn>
+              {t({ en: 'Edit', pl: 'Edytuj' })}
+            </Btn>
+            {recipe.isOwned ? (
               <Btn
                 className={css.actionButton}
                 icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
@@ -56,8 +56,8 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
               >
                 {t({ en: 'Delete', pl: 'Usuń' })}
               </Btn>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </header>
 
         <div className={css.layout}>
@@ -104,7 +104,7 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
                 ))}
               </ul>
             </section>
-            {recipe.canManage ? <RecipeRating rating={recipe.rating} recipeId={recipe.id} /> : null}
+            <RecipeRating rating={recipe.rating} recipeId={recipe.id} />
           </aside>
         </div>
       </article>
