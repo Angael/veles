@@ -26,6 +26,8 @@ import type {
   updateWorkoutSetInputType,
   workoutIdType,
 } from '../workouts.validation';
+import { nextSetRows } from '../exercises/nextSets';
+import { takeNextSets } from '../exercises/nextSets.server';
 import { workoutMovePatch } from './moveWorkout';
 
 type IdInput = typeof workoutIdType.infer;
@@ -79,8 +81,9 @@ export async function deleteWorkoutRecord(userId: string, data: IdInput) {
 }
 
 /**
- * Appends an exercise to the session with as many empty sets as it had last time, so last time's
- * values show as ghosts in every row. Returns the new session exercise id.
+ * Appends an exercise to the session. An open workout uses up the exercise's prescribed next sets
+ * when an agent saved some; otherwise the slot gets as many empty sets as last time, so last
+ * time's values show as ghosts in every row. Returns the new session exercise id.
  */
 export async function addWorkoutExerciseRecord(
   userId: string,
@@ -101,6 +104,17 @@ export async function addWorkoutExerciseRecord(
       .returning({ id: workoutSessionExercises.id });
     if (!slot) throw new Error('Workout exercise insert returned no row.');
 
+    // Logging into a finished workout is backfilling history, not the next time it is done.
+    const prescribed =
+      workout.endedAt === null
+        ? (await takeNextSets(tx, userId, [exerciseId])).get(exerciseId)
+        : undefined;
+    if (prescribed) {
+      await tx
+        .insert(workoutSets)
+        .values(nextSetRows(prescribed.measure, prescribed.sets, slot.id));
+      return { id: slot.id };
+    }
     const count = await previousSetCount(tx, userId, workout, exerciseId);
     await tx.insert(workoutSets).values(
       Array.from({ length: count }, (_, position) => ({

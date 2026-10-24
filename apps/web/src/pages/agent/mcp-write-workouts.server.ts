@@ -1,5 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import { updateExerciseRecord } from '@/pages/workouts/exercises/exercises.server';
+import { setNextSetsRecord } from '@/pages/workouts/exercises/nextSets.server';
 import {
   deleteRoutineRecord,
   saveRoutinePlanRecord,
@@ -9,6 +10,7 @@ import { deleteWorkoutRecord } from '@/pages/workouts/session/session.server';
 import {
   saveRoutinePlanInputType,
   saveWorkoutInputType,
+  setNextSetsInputType,
   updateExerciseInputType,
   workoutIdType,
 } from '@/pages/workouts/workouts.validation';
@@ -49,6 +51,16 @@ export function registerWorkoutTools(server: McpServer, userId: string) {
       annotations: writeAnnotations({ destructive: false, idempotent: true }),
     },
     write(updateExerciseRecord),
+  );
+  server.registerTool(
+    'set_next_sets',
+    {
+      description:
+        "Prescribe the sets the user gets the next time they add this exercise to an open workout in the app (or start a routine with it): in order, editable and not ticked, instead of empty rows. Values must fit the exercise's measure (weight_reps: weightKg, reps; reps: reps; duration: durationSeconds; weight_duration: weightKg, durationSeconds; distance_duration: distanceKm, durationSeconds). Used once, then cleared. Replaces any earlier prescription; sets: null clears it. Pending ones show as nextSets in workout_exercises. Returns { id, nextSets }.",
+      inputSchema: agentInput(setNextSetsInputType),
+      annotations: writeAnnotations({ destructive: true, idempotent: true }),
+    },
+    write(setNextSetsRecord),
   );
   server.registerTool(
     'delete_workout',
