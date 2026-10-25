@@ -4,7 +4,7 @@ import { deleteNoteInputType, saveNoteInputType } from '@/pages/todos/notes.vali
 import { saveNoteRecord } from '@/pages/todos/saveNote.server';
 import { agentInput, agentWriter, writeAnnotations } from './mcp-tools.server';
 
-/** Note and shopping list writes; each call checks current consent and operates on owned notes. */
+/** Note and shopping list writes; each call checks current consent and edits own or friend-shared notes; only owned notes can be deleted. */
 export function registerNoteTools(server: McpServer, userId: string) {
   const write = agentWriter(userId, 'notes');
 
@@ -12,7 +12,7 @@ export function registerNoteTools(server: McpServer, userId: string) {
     'save_note',
     {
       description:
-        'Create (no id; title required) or update (id) an owned note or shopping list. Omitted fields stay. New notes are private; shared shows the note to connected friends. Changing type converts content lines to list items or back. items adds, edits (name, checked), and removes shopping list items. Returns { id }.',
+        'Create (no id; title required) or update (id) an own or friend-shared note or shopping list. Omitted fields stay. New notes are private; shared shows the note to connected friends and only the owner can change it. Changing type converts content lines to list items or back. items adds, edits (name, checked), and removes shopping list items. Returns { id }.',
       inputSchema: agentInput(saveNoteInputType),
       annotations: writeAnnotations({ destructive: true, idempotent: false, openWorld: true }),
     },

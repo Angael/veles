@@ -21,6 +21,9 @@ export function useI18n() {
     dateLocale: dateFnsLocale(locale),
     formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
       formatNumber(locale, value, options),
+    /** Rounds first: kcal, macros, and food grams show as whole numbers. */
+    formatWhole: (value: number, options?: Intl.NumberFormatOptions) =>
+      formatNumber(locale, Math.round(value), options),
     formatDate: (value: Date | string, options: Intl.DateTimeFormatOptions) =>
       formatDate(locale, value, options),
   };

@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react';
-import { BarcodeOutline, ScanGuide } from '@/components/ui/barcode-scanner/ScanOverlay';
-import { useBarcodeScanner } from '@/components/ui/barcode-scanner/useBarcodeScanner';
+import { BarcodeOutline, ScanGuide } from './ScanOverlay';
+import { useBarcodeScanner } from './useBarcodeScanner';
 import { CameraSwitch } from '@/components/ui/camera/CameraSwitch';
 import { CameraView } from '@/components/ui/camera/CameraView';
 import { useCamera } from '@/components/ui/camera/useCamera';
 import { useStoredCameraId } from '@/components/ui/camera/useStoredCameraId';
-import { getFoodBarcode } from '../foodBarcode';
+import { getFoodBarcode } from '@/lib/foodBarcode';
 import css from './BarcodeScanner.module.css';
 import { ScanNotice } from './ScanNotice';
 import { useI18n } from '@/lib/i18n/I18nProvider';

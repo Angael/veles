@@ -12,7 +12,7 @@ import {
 } from '@veles/db/schema';
 import { addDays, format, parseISO } from 'date-fns';
 import { dateOnlyType } from '@/lib/dateOnly';
-import { fromHundredths, HUNDREDTHS, toCalorieGoal } from '@/lib/nutrition';
+import { fromHundredths, HUNDREDTHS, toCalorieGoal, wholeOrNull } from '@/lib/nutrition';
 import { requireSession } from '@/server/getSession.server';
 import { db } from '@/server/db.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
@@ -21,6 +21,8 @@ import type { MealPlanItem } from '@/pages/meal-plan/mealPlanEstimate';
 
 /** Days the dashboard previews: today and the next two. */
 const UPCOMING_PLAN_DAYS = 3;
+import { getRecipeIngredients } from '@/pages/recipes/recipeIngredients.server';
+import { sumIngredientNutrition } from '@/pages/recipes/recipeNutrition';
 
 export type HomeDashboardData = {
   date: string;
@@ -70,14 +72,7 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
       await Promise.all([
         getMealPlanItems(session.user.id, data.date, planDates.at(-1) ?? data.date),
         db
-          .select({
-            kcal: recipes.kcal,
-            protein: recipes.protein,
-            fat: recipes.fats,
-            carbs: recipes.carbs,
-            id: recipes.id,
-            name: recipes.name,
-          })
+          .select({ id: recipes.id, name: recipes.name })
           .from(recipes)
           .where(eq(recipes.userId, session.user.id)),
         db
@@ -134,6 +129,7 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
       { kcal: 0, protein: 0, fat: 0, carbs: 0 },
     );
     const goal = goalRows[0] ? toCalorieGoal(goalRows[0]) : null;
+    const ingredients = await getRecipeIngredients(recipeRows.map((recipe) => recipe.id));
 
     return {
       date: data.date,
@@ -141,7 +137,16 @@ export const getHomeDashboard = createServerFn({ method: 'GET' })
         date,
         items: mealPlanItems.filter((item) => item.date === date),
       })),
-      recipes: recipeRows,
+      recipes: recipeRows.map((recipe) => {
+        const nutrition = sumIngredientNutrition(ingredients.get(recipe.id) ?? []);
+        return {
+          ...recipe,
+          kcal: wholeOrNull(nutrition?.kcal),
+          protein: wholeOrNull(nutrition?.protein),
+          fat: wholeOrNull(nutrition?.fat),
+          carbs: wholeOrNull(nutrition?.carbs),
+        };
+      }),
       nutrition: {
         goal: goal
           ? {

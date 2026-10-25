@@ -81,8 +81,8 @@ export const homeFeatures: HomeFeature[] = [
     icon: CookingPotIcon,
     title: { en: 'Recipes', pl: 'Przepisy' },
     description: {
-      en: 'Save recipes with ingredients and nutrition, and share them with friends.',
-      pl: 'Zapisuj przepisy ze składnikami i wartościami odżywczymi oraz udostępniaj je znajomym.',
+      en: 'Build recipes from scanned or searched products, log what you ate, send ingredients to a shopping list, and share recipes with friends.',
+      pl: 'Twórz przepisy z zeskanowanych lub wyszukanych produktów, zapisuj zjedzone porcje, wysyłaj składniki na listę zakupów i udostępniaj przepisy znajomym.',
     },
     to: '/recipes',
   },

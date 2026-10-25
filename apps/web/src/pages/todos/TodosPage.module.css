@@ -53,6 +53,16 @@
   gap: var(--space-md);
 }
 
+/* A note opened by link, e.g. after adding recipe ingredients to it. */
+.listCard,
+.noteCard {
+  scroll-margin-top: 6rem;
+
+  &:target {
+    box-shadow: 0 0 0 2px var(--c-primary-border);
+  }
+}
+
 .cardHeader {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

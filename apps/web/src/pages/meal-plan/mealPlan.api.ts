@@ -44,5 +44,5 @@ export const deleteMealPlanItem = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(deleteMealPlanItemInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    return deleteMealPlanItemRecord(session.user.id, data.id);
+    return deleteMealPlanItemRecord(session.user.id, data);
   });

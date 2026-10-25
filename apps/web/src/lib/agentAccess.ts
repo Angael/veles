@@ -10,6 +10,7 @@ export const agentFeatures = {
   weight: { label: { en: 'Weight', pl: 'Waga' } },
   workouts: { label: { en: 'Workouts', pl: 'Treningi' } },
   recipes: { label: { en: 'Recipes', pl: 'Przepisy' } },
+  meal_plan: { label: { en: 'Meal plan', pl: 'Plan posiłków' } },
   calories: { label: { en: 'Food diary', pl: 'Dziennik posiłków' } },
   calorie_goals: { label: { en: 'Nutrition goals', pl: 'Cele żywieniowe' } },
   food_products: { label: { en: 'Food catalog', pl: 'Katalog produktów' } },

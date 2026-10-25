@@ -1,5 +1,8 @@
 import { Slider, type SliderRootProps } from '@base-ui/react/slider';
 import clsx from 'clsx';
+import { RotateCcwIcon } from 'lucide-react';
+import { Btn } from '../btn/Btn';
+import { Tooltip } from '../tooltip/Tooltip';
 import css from './SliderInput.module.css';
 
 type SliderInputProps = Omit<
@@ -10,10 +13,18 @@ type SliderInputProps = Omit<
   defaultValue?: number;
   label: string;
   onValueChange?: (value: number) => void;
+  /** Icon button beside the track that sets `value`; disabled while the slider already holds it. */
+  reset?: { label: string; value: number };
   value?: number;
 };
 
-export function SliderInput({ className, label, onValueChange, ...props }: SliderInputProps) {
+export function SliderInput({
+  className,
+  label,
+  onValueChange,
+  reset,
+  ...props
+}: SliderInputProps) {
   return (
     <Slider.Root
       className={clsx(css.root, className)}
@@ -29,12 +40,29 @@ export function SliderInput({ className, label, onValueChange, ...props }: Slide
         <Slider.Value>{(formattedValues) => formattedValues[0] ?? ''}</Slider.Value>
       </div>
 
-      <Slider.Control className={css.control}>
-        <Slider.Track className={css.track}>
-          <Slider.Indicator className={css.indicator} />
-          <Slider.Thumb aria-label={label} className={css.thumb} />
-        </Slider.Track>
-      </Slider.Control>
+      <div className={css.row}>
+        <Slider.Control className={css.control}>
+          <Slider.Track className={css.track}>
+            <Slider.Indicator className={css.indicator} />
+            <Slider.Thumb aria-label={label} className={css.thumb} />
+          </Slider.Track>
+        </Slider.Control>
+        {reset ? (
+          <Tooltip content={reset.label}>
+            <Btn
+              aria-label={reset.label}
+              disabled={props.value === reset.value}
+              focusableWhenDisabled
+              icon={<RotateCcwIcon aria-hidden='true' />}
+              iconOnly
+              onClick={() => onValueChange?.(reset.value)}
+              size='sm'
+              type='button'
+              variant='ghost'
+            />
+          </Tooltip>
+        ) : null}
+      </div>
     </Slider.Root>
   );
 }

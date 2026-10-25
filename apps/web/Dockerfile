@@ -1,4 +1,4 @@
-FROM node:26.2.0-alpine AS builder
+FROM node:26.12.1-alpine AS builder
 
 ARG VITE_APP_NAME=Veles
 ARG VITE_APP_ENV=production
@@ -22,7 +22,7 @@ COPY packages/db packages/db
 
 RUN pnpm --filter @veles/web build
 
-FROM node:26.2.0-alpine AS runner
+FROM node:26.12.1-alpine AS runner
 
 ENV NODE_ENV=production
 ENV PORT=3000

@@ -4,18 +4,33 @@ import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { translate } from '@/lib/i18n/getLocale';
 import { HUNDREDTHS, toHundredths } from '@/lib/nutrition';
 import { db } from '@/server/db.server';
+import { getRecipeIngredients } from '@/pages/recipes/recipeIngredients.server';
+import { sumIngredientNutrition } from '@/pages/recipes/recipeNutrition';
 import type { MealPlanItem, PlannedRecipe } from './mealPlanEstimate';
-import type { saveMealPlanItemInputType } from './mealPlan.validation';
+import type { deleteMealPlanItemInputType, saveMealPlanItemInputType } from './mealPlan.validation';
 
 const plannedRecipeColumns = {
   id: recipes.id,
   name: recipes.name,
   portions: recipes.portions,
-  kcal: recipes.kcal,
-  protein: recipes.protein,
-  fats: recipes.fats,
-  carbs: recipes.carbs,
 };
+
+type RecipeRow = { id: string; name: string; portions: number };
+
+/** Adds each recipe's nutrition from its ingredients, so plans follow recipe and product edits. */
+export async function withRecipeNutrition(rows: RecipeRow[]): Promise<PlannedRecipe[]> {
+  const ingredients = await getRecipeIngredients([...new Set(rows.map((recipe) => recipe.id))]);
+  return rows.map((recipe) => {
+    const nutrition = sumIngredientNutrition(ingredients.get(recipe.id) ?? []);
+    return {
+      ...recipe,
+      kcal: nutrition?.kcal ?? null,
+      protein: nutrition?.protein ?? null,
+      fats: nutrition?.fat ?? null,
+      carbs: nutrition?.carbs ?? null,
+    };
+  });
+}
 
 /** The user's planned meals from `from` to `to` inclusive, oldest first, with their own recipes. */
 export async function getMealPlanItems(
@@ -46,19 +61,25 @@ export async function getMealPlanItems(
     )
     .orderBy(asc(mealPlanItems.date), asc(mealPlanItems.createdAt));
 
-  return rows.map(({ portionsHundredths, ...row }) => ({
+  const plannedRecipes = await withRecipeNutrition(
+    rows.flatMap((row) => (row.recipe ? [row.recipe] : [])),
+  );
+  const recipeById = new Map(plannedRecipes.map((recipe) => [recipe.id, recipe]));
+  return rows.map(({ portionsHundredths, recipe, ...row }) => ({
     ...row,
     portions: portionsHundredths / HUNDREDTHS,
+    recipe: recipe ? (recipeById.get(recipe.id) ?? null) : null,
   }));
 }
 
 /** Recipes the user can plan: only their own, alphabetically. */
-export function getPlannableRecipes(userId: string): Promise<PlannedRecipe[]> {
-  return db
+export async function getPlannableRecipes(userId: string): Promise<PlannedRecipe[]> {
+  const rows = await db
     .select(plannedRecipeColumns)
     .from(recipes)
     .where(eq(recipes.userId, userId))
     .orderBy(asc(recipes.name));
+  return withRecipeNutrition(rows);
 }
 
 /**
@@ -98,7 +119,10 @@ export async function saveMealPlanItemRecord(
   return row;
 }
 
-export async function deleteMealPlanItemRecord(userId: string, id: string) {
+export async function deleteMealPlanItemRecord(
+  userId: string,
+  { id }: typeof deleteMealPlanItemInputType.infer,
+) {
   const [row] = await db
     .delete(mealPlanItems)
     .where(and(eq(mealPlanItems.id, id), eq(mealPlanItems.userId, userId)))
