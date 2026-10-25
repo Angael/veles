@@ -5,10 +5,16 @@ import {
   recipeImages,
   recipes,
   uploadObjects,
+  users,
   weightEntries,
   weightEntryPhotos,
 } from '@veles/db/schema';
 import { db } from '@/server/db.server';
+import { accessibleRecipe } from '@/pages/recipes/recipes.server';
+import { accessibleNote } from '@/pages/todos/notes.server';
+import { getRecipeIngredients } from '@/pages/recipes/recipeIngredients.server';
+import { type Nutrition, wholeOrNull } from '@/lib/nutrition';
+import { ingredientNutrition, sumIngredientNutrition } from '@/pages/recipes/recipeNutrition';
 import {
   byIdDesc,
   groupImageUrls,
@@ -18,7 +24,7 @@ import {
   toPage,
 } from './mcp-read-helpers.server';
 
-/** Owned notes, newest first; shopping lists carry their items instead of text content. */
+/** Own notes and notes friends share, newest first, with the owner's name; shopping lists carry their items instead of text content. */
 export async function readNotes(userId: string, query: ReadQuery) {
   const rows = await db
     .select({
@@ -27,11 +33,14 @@ export async function readNotes(userId: string, query: ReadQuery) {
       title: notes.title,
       content: notes.content,
       shared: notes.shared,
+      ownerId: notes.ownerId,
+      ownerName: users.name,
       createdAt: notes.createdAt,
       updatedAt: notes.updatedAt,
     })
     .from(notes)
-    .where(and(eq(notes.ownerId, userId), byIdDesc(notes.id, query)))
+    .innerJoin(users, eq(users.id, notes.ownerId))
+    .where(and(accessibleNote(userId), byIdDesc(notes.id, query)))
     .orderBy(desc(notes.id))
     .limit(query.limit + 1);
   const page = toPage(rows, query.limit, (note) => note.id);
@@ -47,21 +56,22 @@ export async function readNotes(userId: string, query: ReadQuery) {
         })
         .from(listItems)
         .innerJoin(notes, eq(notes.id, listItems.noteId))
-        .where(and(eq(notes.ownerId, userId), inArray(listItems.noteId, listIds)))
+        .where(and(accessibleNote(userId), inArray(listItems.noteId, listIds)))
         .orderBy(asc(listItems.createdAt), asc(listItems.id))
     : [];
   const itemsByNote = Map.groupBy(items, (item) => item.noteId);
 
   return {
     nextCursor: page.nextCursor,
-    items: page.items.map(({ content, ...note }) =>
-      note.type === 'shopping_list'
+    items: page.items.map(({ content, ownerId, ...rest }) => {
+      const note = { ...rest, isOwned: ownerId === userId };
+      return note.type === 'shopping_list'
         ? {
             ...note,
             items: (itemsByNote.get(note.id) ?? []).map(({ noteId: _noteId, ...item }) => item),
           }
-        : { ...note, content },
-    ),
+        : { ...note, content };
+    }),
   };
 }
 
@@ -106,57 +116,73 @@ export async function readWeights(userId: string, query: ReadQuery) {
   };
 }
 
-const perPortion = (value: number | null, portions: number) =>
-  value === null ? null : Math.round((value / portions) * 100) / 100;
+/** Whole-number nutrition for agents, with macros nested apart from kcal. */
+function agentNutrition(nutrition: Nutrition | null) {
+  if (!nutrition) return null;
+  return {
+    kcal: Math.round(nutrition.kcal),
+    macros: {
+      protein: wholeOrNull(nutrition.protein),
+      fat: wholeOrNull(nutrition.fat),
+      carbs: wholeOrNull(nutrition.carbs),
+    },
+  };
+}
 
-/** Owned recipes, newest first, with whole-recipe and per-portion nutrition and image URLs. */
+/**
+ * Own recipes and recipes friends share, newest first, with the owner's name, with nested ingredients and image URLs. Nutrition comes from the
+ * linked products at the recipe amounts.
+ */
 export async function readRecipes(userId: string, query: ReadQuery) {
   const rows = await db
     .select({
       id: recipes.id,
       name: recipes.name,
       description: recipes.description,
-      ingredients: recipes.ingredients,
-      tags: recipes.tags,
       portions: recipes.portions,
       rating: recipes.rating,
-      kcal: recipes.kcal,
-      protein: recipes.protein,
-      fat: recipes.fats,
-      carbs: recipes.carbs,
+      ownerId: recipes.userId,
+      ownerName: users.name,
       createdAt: recipes.createdAt,
       updatedAt: recipes.updatedAt,
     })
     .from(recipes)
-    .where(and(eq(recipes.userId, userId), byIdDesc(recipes.id, query)))
+    .innerJoin(users, eq(users.id, recipes.userId))
+    .where(and(accessibleRecipe(userId), byIdDesc(recipes.id, query)))
     .orderBy(desc(recipes.id))
     .limit(query.limit + 1);
   const page = toPage(rows, query.limit, (recipe) => recipe.id);
   const recipeIds = page.items.map((recipe) => recipe.id);
-  const imageUrls = groupImageUrls(
+  const [imageRows, ingredientsByRecipe] = await Promise.all([
     recipeIds.length
-      ? await db
+      ? db
           .select({ parentId: recipeImages.recipeId, key: uploadObjects.key })
           .from(recipeImages)
           .innerJoin(uploadObjects, eq(uploadObjects.id, recipeImages.uploadObjectId))
           .where(inArray(recipeImages.recipeId, recipeIds))
           .orderBy(asc(recipeImages.position))
       : [],
-  );
+    getRecipeIngredients(recipeIds),
+  ]);
+  const imageUrls = groupImageUrls(imageRows);
   return {
     nextCursor: page.nextCursor,
-    items: page.items.map(({ kcal, protein, fat, carbs, ...recipe }) => ({
-      ...recipe,
-      imageUrls: imageUrls.get(recipe.id) ?? [],
-      total: { kcal, macros: { protein, fat, carbs } },
-      perPortion: {
-        kcal: perPortion(kcal, recipe.portions),
-        macros: {
-          protein: perPortion(protein, recipe.portions),
-          fat: perPortion(fat, recipe.portions),
-          carbs: perPortion(carbs, recipe.portions),
-        },
-      },
-    })),
+    items: page.items.map(({ ownerId, ...recipe }) => {
+      const ingredients = ingredientsByRecipe.get(recipe.id) ?? [];
+      return {
+        ...recipe,
+        isOwned: ownerId === userId,
+        imageUrls: imageUrls.get(recipe.id) ?? [],
+        ingredients: ingredients.map((ingredient) => ({
+          id: ingredient.id,
+          name: ingredient.name,
+          productId: ingredient.productId,
+          grams: ingredient.grams,
+          nutrition: agentNutrition(ingredientNutrition(ingredient)),
+        })),
+        total: agentNutrition(sumIngredientNutrition(ingredients)),
+        perPortion: agentNutrition(sumIngredientNutrition(ingredients, 1 / recipe.portions)),
+      };
+    }),
   };
 }

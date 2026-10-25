@@ -23,11 +23,11 @@ type Props = {
 
 /** Selection bar Delete action; confirms in a dialog, then deletes every selected log in one request. */
 export function DeleteLogsAction({ logs, onDeleted }: Props) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
   const [open, setOpen] = useState(false);
   const deleteMutation = useDeleteFoodLogsMutation();
   const products = t(productCountText(logs.length));
-  const kcal = formatNumber(Math.round(logs.reduce((sum, entry) => sum + entry.kcal, 0)));
+  const kcal = formatWhole(logs.reduce((sum, entry) => sum + entry.kcal, 0));
 
   function confirm() {
     deleteMutation.mutate(

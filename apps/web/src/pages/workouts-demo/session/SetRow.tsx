@@ -10,7 +10,7 @@ import {
   scrubTuning,
   SET_TYPE_LABELS,
 } from '../../workouts/metrics';
-import { ScrubCell } from '../../workouts/scrub/ScrubCell';
+import { ScrubCell } from '@/components/ui/scrub/ScrubCell';
 import type { MockSet, MockSlot } from '../mockData';
 import { SET_BADGE, SET_TYPE_ORDER, SetMenu } from './SetMenu';
 import type { SessionActions } from './useMockSession';

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { CalorieDashboardDay } from '../calories.api';
+import { CreateRecipeAction } from './CreateRecipeAction';
 import { DailySummary } from './DailySummary';
 import { DayNote } from './DayNote';
 import { DeleteLogsAction } from './DeleteLogsAction';
@@ -46,6 +47,7 @@ export function CalorieOverview({ day }: Props) {
           <MultiplyLogsAction logs={selectedLogs} onMultiplied={clearSelection} />
           <LogsDateAction date={date} logs={selectedLogs} mode='move' onDone={clearSelection} />
           <LogsDateAction date={date} logs={selectedLogs} mode='copy' onDone={clearSelection} />
+          <CreateRecipeAction logs={selectedLogs} />
           <DeleteLogsAction logs={selectedLogs} onDeleted={clearSelection} />
           <ShareLogsAction logs={selectedLogs} onShared={clearSelection} />
         </SelectionBar>
