@@ -15,7 +15,7 @@ import { translate } from '@/lib/i18n/getLocale';
 
 type RecipeFields = typeof recipeFieldsType.infer;
 
-/** Matches recipes the user owns or that a friend shares with them. */
+/** Matches recipes the user owns or that a friend shares with them; both are readable and editable. */
 export function accessibleRecipe(userId: string) {
   return or(
     eq(recipes.userId, userId),
@@ -37,7 +37,7 @@ export async function createRecipeRow(
   return recipe;
 }
 
-/** Updates only the given fields of an owned recipe; given ingredients replace the whole list. */
+/** Updates only the given fields of an own or shared recipe; given ingredients replace the whole list. */
 export async function updateRecipeRow(
   tx: DbTransaction,
   userId: string,
@@ -47,7 +47,7 @@ export async function updateRecipeRow(
   const [recipe] = await tx
     .update(recipes)
     .set({ ...fields, updatedAt: new Date() })
-    .where(and(eq(recipes.id, recipeId), eq(recipes.userId, userId)))
+    .where(and(eq(recipes.id, recipeId), accessibleRecipe(userId)))
     .returning({ id: recipes.id });
   if (!recipe)
     throw new ClientSafeError(
