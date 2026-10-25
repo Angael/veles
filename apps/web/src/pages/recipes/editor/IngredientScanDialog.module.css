@@ -1,0 +1,19 @@
+.popup {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.manual {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.camera {
+  display: grid;
+  height: min(22rem, 50dvh);
+}
+
+.manual > :first-child {
+  flex: 1;
+  min-width: 0;
+}

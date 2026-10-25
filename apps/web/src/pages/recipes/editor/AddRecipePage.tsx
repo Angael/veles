@@ -6,30 +6,23 @@ import { FormSubmitRow } from '@/components/ui/form-submit-row/FormSubmitRow';
 import { PhotosField } from '@/components/ui/photos-field/PhotosField';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
-import { RecipeForm, type RecipeFormDraft } from './RecipeForm';
+import { RecipeForm } from './RecipeForm';
+import { emptyRecipeDraft, type RecipeFormDraft } from './recipeDraft';
 import { RECIPE_PHOTO_MAX_COUNT } from '../recipeUpload.api';
 import css from './AddRecipePage.module.css';
 import { useCreateRecipeMutation } from '../recipes.query';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-const EMPTY_DRAFT: RecipeFormDraft = {
-  carbs: null,
-  description: '',
-  fats: null,
-  ingredients: [],
-  kcal: null,
-  name: '',
-  portions: 1,
-  protein: null,
-  rating: null,
-  tags: [],
+type Props = {
+  /** Prefill, e.g. ingredients taken from selected food logs. */
+  initialDraft?: RecipeFormDraft;
 };
 
-export function AddRecipePage() {
+export function AddRecipePage({ initialDraft }: Props) {
   const { t } = useI18n();
   const createMutation = useCreateRecipeMutation();
-  const [draft, setDraft] = useState<RecipeFormDraft>(EMPTY_DRAFT);
+  const [draft, setDraft] = useState<RecipeFormDraft>(() => initialDraft ?? emptyRecipeDraft());
   const [error, setError] = useState<string | null>(null);
   const { markDirty, markSaved } = useUnsavedChangesGuard();
 

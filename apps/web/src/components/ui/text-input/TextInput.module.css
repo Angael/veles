@@ -65,6 +65,12 @@
   transform: translateY(-50%);
 }
 
+/* A small input has no room around a small button, so its trailing icon button shrinks to fit. */
+.sm ~ .trailing > * {
+  --btn-height: 1.85rem;
+  --btn-icon-size: 0.95rem;
+}
+
 label:has(.root[data-required]) > span:first-child::after {
   content: ' *';
   color: var(--c-danger-text);

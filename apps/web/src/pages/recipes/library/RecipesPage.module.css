@@ -126,17 +126,6 @@
   }
 }
 
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-}
-
-.tag {
-  color: var(--c-muted-strong);
-  font-size: var(--text-xs);
-}
-
 .recipeFooter {
   display: inline-flex;
   align-items: center;

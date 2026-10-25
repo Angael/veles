@@ -87,7 +87,7 @@ export function MultiplyLogsDialog({ logs, onMultiplied, onOpenChange, open }: D
 
 /** Mounts with the popup, so the factor resets to ×2 every time the dialog opens. */
 function MultiplyForm({ logs, onMultiplied }: Props) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
   const [factor, setFactor] = useState<number | null>(2);
   const multiplyMutation = useMultiplyFoodLogsMutation();
   const valid = factor !== null && factor > 0 && factor <= MAX_FOOD_LOG_MULTIPLIER;
@@ -132,8 +132,7 @@ function MultiplyForm({ logs, onMultiplied }: Props) {
         />
       </div>
       <p className={css.kcalPreview}>
-        {formatNumber(Math.round(kcal))} kcal →{' '}
-        <strong>{valid ? formatNumber(Math.round(kcal * factor)) : '–'} kcal</strong>
+        {formatWhole(kcal)} kcal → <strong>{valid ? formatWhole(kcal * factor) : '–'} kcal</strong>
       </p>
       <DialogActions>
         <DialogClose render={<Btn type='button' variant='ghost' />}>
