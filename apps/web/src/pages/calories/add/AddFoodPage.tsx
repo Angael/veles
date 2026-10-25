@@ -8,6 +8,7 @@ import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '../calories.q
 import { foodProductNames } from '../calorieHelpers';
 import { SelectedFoodForm } from './SelectedFoodForm';
 import { filterFoods } from './filterFoods';
+import { RecipeResults } from './RecipeResults';
 import { Btn } from '@/components/ui/btn/Btn';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
 import { List, ListItem } from '@/components/ui/list/List';
@@ -28,7 +29,7 @@ function nutritionAtGrams(valuePer100g: number | null, grams: number) {
 
 /** Food search; picking a food pushes `?foodId` so back returns from the confirm step to the list. */
 export function AddFoodPage({ date, foodId }: Props) {
-  const { formatNumber, locale, t } = useI18n();
+  const { formatWhole, locale, t } = useI18n();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
@@ -75,6 +76,8 @@ export function AddFoodPage({ date, foodId }: Props) {
         />
       </Label>
 
+      <RecipeResults date={date} query={filterQuery} />
+
       <List aria-busy={foodsQuery.isFetching || isFiltering}>
         {foods.map((food) => {
           const productGrams = shownGrams(food);
@@ -89,7 +92,7 @@ export function AddFoodPage({ date, foodId }: Props) {
                 category={food.category}
                 imageUrl={food.imageUrl}
                 kcal={kcal}
-                meta={`${formatNumber(Math.round(productGrams))} g`}
+                meta={`${formatWhole(productGrams)} g`}
                 name={
                   <button
                     className={css.selectButton}

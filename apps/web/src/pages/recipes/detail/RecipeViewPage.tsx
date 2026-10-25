@@ -1,19 +1,22 @@
 import { Link } from '@tanstack/react-router';
-import { PencilIcon, Trash2Icon } from 'lucide-react';
+import { LinkIcon, PencilIcon, Trash2Icon } from 'lucide-react';
+import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { RecipeImgSlider } from './RecipeImgSlider';
 import { RecipeNutrition } from './RecipeNutrition';
 import { RecipeRating } from './RecipeRating';
-import type { RecipeViewItem } from '../recipes.api';
+import type { RecipeLibraryItem } from '../recipes.api';
 import css from './RecipeViewPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type RecipeViewPageProps = {
-  recipe: RecipeViewItem;
+  recipe: RecipeLibraryItem;
 };
 
 export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
-  const { t } = useI18n();
+  const { formatWhole, t } = useI18n();
+  const [portions, setPortions] = useState(recipe.portions);
+  const scale = portions / recipe.portions;
 
   return (
     <main className={css.page}>
@@ -21,34 +24,25 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
         <header className={css.heading}>
           <div className={css.identity}>
             <h1>{recipe.name}</h1>
-            {recipe.tags.length > 0 ? (
-              <div className={css.tags} aria-label={t({ en: 'Recipe tags', pl: 'Tagi przepisu' })}>
-                {recipe.tags.map((tag) => (
-                  <span className={css.tag} key={tag}>
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            ) : null}
           </div>
 
-          {recipe.canManage ? (
-            <div
-              className={css.actions}
-              aria-label={t({ en: 'Recipe management actions', pl: 'Zarządzanie przepisem' })}
-              role='group'
+          <div
+            className={css.actions}
+            aria-label={t({ en: 'Recipe management actions', pl: 'Zarządzanie przepisem' })}
+            role='group'
+          >
+            <Btn
+              className={css.actionButton}
+              icon={<PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
+              isLink
+              radius='pill'
+              render={<Link params={{ id: recipe.id }} to='/recipes/view/$id/edit' />}
+              size='sm'
+              variant='outlineMain'
             >
-              <Btn
-                className={css.actionButton}
-                icon={<PencilIcon aria-hidden='true' size={16} strokeWidth={1.9} />}
-                isLink
-                radius='pill'
-                render={<Link params={{ id: recipe.id }} to='/recipes/view/$id/edit' />}
-                size='sm'
-                variant='outlineMain'
-              >
-                {t({ en: 'Edit', pl: 'Edytuj' })}
-              </Btn>
+              {t({ en: 'Edit', pl: 'Edytuj' })}
+            </Btn>
+            {recipe.isOwned ? (
               <Btn
                 className={css.actionButton}
                 icon={<Trash2Icon aria-hidden='true' size={16} strokeWidth={1.9} />}
@@ -62,8 +56,8 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
               >
                 {t({ en: 'Delete', pl: 'Usuń' })}
               </Btn>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </header>
 
         <div className={css.layout}>
@@ -74,19 +68,43 @@ export function RecipeViewPage({ recipe }: RecipeViewPageProps) {
 
           <aside className={css.rail}>
             <section className={css.utilityGroup}>
-              <RecipeNutrition recipe={recipe} />
+              <RecipeNutrition
+                onPortionsChange={setPortions}
+                portions={portions}
+                recipe={recipe}
+                scale={scale}
+              />
             </section>
             <section
               className={css.utilityGroup}
               aria-label={t({ en: 'Ingredients', pl: 'Składniki' })}
             >
               <ul className={css.ingredientList}>
-                {recipe.ingredients.map((ingredient, index) => (
-                  <li key={`${index}-${ingredient}`}>{ingredient}</li>
+                {recipe.ingredients.map((ingredient) => (
+                  <li key={ingredient.id}>
+                    {ingredient.imageUrl ? (
+                      <img alt='' className={css.ingredientImage} src={ingredient.imageUrl} />
+                    ) : (
+                      <span aria-hidden='true' className={css.ingredientDot} />
+                    )}
+                    <span className={css.ingredientName}>{ingredient.name}</span>
+                    {ingredient.productId ? (
+                      <LinkIcon
+                        aria-label={t({ en: 'Linked product', pl: 'Powiązany produkt' })}
+                        className={css.linkedIcon}
+                        role='img'
+                      />
+                    ) : null}
+                    {ingredient.grams === null ? null : (
+                      <span className={css.ingredientGrams}>
+                        {formatWhole(ingredient.grams * scale)} g
+                      </span>
+                    )}
+                  </li>
                 ))}
               </ul>
             </section>
-            {recipe.canManage ? <RecipeRating rating={recipe.rating} recipeId={recipe.id} /> : null}
+            <RecipeRating rating={recipe.rating} recipeId={recipe.id} />
           </aside>
         </div>
       </article>

@@ -18,8 +18,15 @@
   }
 }
 
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
 .control {
   display: flex;
+  flex: 1;
   min-height: 2.5rem;
   align-items: center;
   touch-action: none;

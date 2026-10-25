@@ -2,7 +2,7 @@ import { and, eq, inArray } from 'drizzle-orm';
 import { listItems, notes } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db, type DbTransaction } from '@/server/db.server';
-import { convertNoteType } from './notes.server';
+import { accessibleNote, convertNoteType } from './notes.server';
 import type { saveNoteInputType } from './notes.validation';
 
 type SaveNoteInput = typeof saveNoteInputType.infer;
@@ -32,8 +32,9 @@ async function changeItems(
 }
 
 /**
- * Creates or updates an owned note with its sharing, type, and list items in one transaction, so
- * agents edit a note or shopping list in one call. A type change converts content and items first.
+ * Creates a note, or updates an own or shared note with its type and list items, in one
+ * transaction, so agents edit a note or shopping list in one call. Only the owner changes sharing.
+ * A type change converts content and items first.
  */
 export async function saveNoteRecord(userId: string, data: SaveNoteInput) {
   return db.transaction(async (tx) => {
@@ -41,11 +42,13 @@ export async function saveNoteRecord(userId: string, data: SaveNoteInput) {
     let type: string;
     if (data.id) {
       const [note] = await tx
-        .select({ content: notes.content, type: notes.type })
+        .select({ content: notes.content, ownerId: notes.ownerId, type: notes.type })
         .from(notes)
-        .where(and(eq(notes.id, data.id), eq(notes.ownerId, userId)))
+        .where(and(eq(notes.id, data.id), accessibleNote(userId)))
         .for('update');
       if (!note) throw new ClientSafeError('Note not found.');
+      if (data.shared !== undefined && note.ownerId !== userId)
+        throw new ClientSafeError('Only the owner can change sharing of a note.');
       noteId = data.id;
       type = note.type;
       if (data.type && data.type !== note.type) {

@@ -1,14 +1,16 @@
 import { type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { and, eq, inArray, or } from 'drizzle-orm';
-import { recipeImages, recipes, uploadObjects, userSharingSettings } from '@veles/db/schema';
+import { and, eq, inArray } from 'drizzle-orm';
+import { recipeImages, recipes, uploadObjects } from '@veles/db/schema';
 import { db } from '@/server/db.server';
 import { getSessionUserId, requireSession } from '@/server/getSession.server';
-import { getSharingFriendsIds } from '@/server/getSharingFriendsIds.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { storagePathToUrl } from '@/server/storage/config.server';
-import { updateRecipeRatingRecord } from './recipes.server';
+import { getRecipeIngredients } from './recipeIngredients.server';
+import type { Nutrition } from '@/lib/nutrition';
+import { type RecipeIngredient, sumIngredientNutrition } from './recipeNutrition';
+import { accessibleRecipe, updateRecipeRatingRecord } from './recipes.server';
 import { updateRecipeRatingInputType } from './recipes.validation';
 
 type RecipeSelect = typeof recipes.$inferSelect;
@@ -16,13 +18,14 @@ type RecipeSelect = typeof recipes.$inferSelect;
 export type RecipeLibraryItem = Omit<RecipeSelect, 'createdAt' | 'updatedAt' | 'userId'> & {
   createdAt: string;
   images: RecipeImage[];
+  ingredients: RecipeIngredient[];
   isOwned: boolean;
+  /** Whole-recipe nutrition of the linked ingredients; null when none has nutrition. */
+  nutrition: Nutrition | null;
   updatedAt: string;
 };
 
 export type RecipeImage = { id: string; url: string };
-
-export type RecipeViewItem = RecipeLibraryItem & { canManage: boolean };
 
 export const getRecipeLibrary = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRecipeLibrary')])
@@ -33,47 +36,11 @@ export const getRecipeLibrary = createServerFn({ method: 'GET' })
       return [];
     }
 
-    const sharingFriendIds = getSharingFriendsIds(userId, userSharingSettings.shareRecipes);
+    const recipeRows = await db.select().from(recipes).where(accessibleRecipe(userId));
 
-    const recipeRows = await db
-      .select({
-        carbs: recipes.carbs,
-        createdAt: recipes.createdAt,
-        description: recipes.description,
-        fats: recipes.fats,
-        id: recipes.id,
-        ingredients: recipes.ingredients,
-        ownerUserId: recipes.userId,
-        kcal: recipes.kcal,
-        name: recipes.name,
-        protein: recipes.protein,
-        portions: recipes.portions,
-        rating: recipes.rating,
-        tags: recipes.tags,
-        updatedAt: recipes.updatedAt,
-      })
-      .from(recipes)
-      .where(or(eq(recipes.userId, userId), inArray(recipes.userId, sharingFriendIds)));
-
-    const imagesByRecipeId = await getImagesByRecipeId(recipeRows.map((recipe) => recipe.id));
+    const related = await getRecipeRelations(recipeRows.map((recipe) => recipe.id));
     return recipeRows
-      .map((recipe): RecipeLibraryItem => ({
-        carbs: recipe.carbs,
-        createdAt: recipe.createdAt.toISOString(),
-        description: recipe.description,
-        fats: recipe.fats,
-        id: recipe.id,
-        images: imagesByRecipeId.get(recipe.id) ?? [],
-        isOwned: recipe.ownerUserId === userId,
-        ingredients: recipe.ingredients,
-        kcal: recipe.kcal,
-        name: recipe.name,
-        portions: recipe.portions,
-        protein: recipe.protein,
-        rating: recipe.rating,
-        tags: recipe.tags,
-        updatedAt: recipe.updatedAt.toISOString(),
-      }))
+      .map((recipe) => toRecipeLibraryItem(recipe, related, recipe.userId === userId))
       .toSorted((left, right) => right.updatedAt.localeCompare(left.updatedAt));
   });
 
@@ -89,40 +56,31 @@ export const getRecipeById = createServerFn({ method: 'GET' })
       return null;
     }
 
-    const sharingFriendIds = getSharingFriendsIds(userId, userSharingSettings.shareRecipes);
-
     const [recipe] = await db
       .select()
       .from(recipes)
-      .where(
-        and(
-          eq(recipes.id, data.id),
-          or(eq(recipes.userId, userId), inArray(recipes.userId, sharingFriendIds)),
-        ),
-      )
+      .where(and(eq(recipes.id, data.id), accessibleRecipe(userId)))
       .limit(1);
 
     if (!recipe) {
       return null;
     }
 
-    const imagesByRecipeId = await getImagesByRecipeId([recipe.id]);
+    const related = await getRecipeRelations([recipe.id]);
 
-    return {
-      ...toRecipeLibraryItem(recipe, imagesByRecipeId, recipe.userId === userId),
-      canManage: recipe.userId === userId,
-    } satisfies RecipeViewItem;
+    return toRecipeLibraryItem(recipe, related, recipe.userId === userId);
   });
 
-export const getOwnedRecipeById = createServerFn({ method: 'GET' })
-  .middleware([logMiddleware('getOwnedRecipeById')])
+/** Loads an own or shared recipe for the editor; friends edit shared recipes too. */
+export const getEditableRecipeById = createServerFn({ method: 'GET' })
+  .middleware([logMiddleware('getEditableRecipeById')])
   .validator(arkTypeValidator(recipeByIdInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
     const recipeRows = await db
       .select()
       .from(recipes)
-      .where(and(eq(recipes.id, data.id), eq(recipes.userId, session.user.id)))
+      .where(and(eq(recipes.id, data.id), accessibleRecipe(session.user.id)))
       .limit(1);
     const recipe = recipeRows[0];
 
@@ -130,9 +88,9 @@ export const getOwnedRecipeById = createServerFn({ method: 'GET' })
       return null;
     }
 
-    const imagesByRecipeId = await getImagesByRecipeId([recipe.id]);
+    const related = await getRecipeRelations([recipe.id]);
 
-    return toRecipeLibraryItem(recipe, imagesByRecipeId, true);
+    return toRecipeLibraryItem(recipe, related, recipe.userId === session.user.id);
   });
 
 export const updateRecipeRating = createServerFn({ method: 'POST' })
@@ -180,26 +138,28 @@ async function getImagesByRecipeId(recipeIds: string[]) {
   return imagesByRecipeId;
 }
 
+/** Loads images and ingredients of the given recipes together. */
+async function getRecipeRelations(recipeIds: string[]) {
+  const [images, ingredients] = await Promise.all([
+    getImagesByRecipeId(recipeIds),
+    getRecipeIngredients(recipeIds),
+  ]);
+  return { images, ingredients };
+}
+
 function toRecipeLibraryItem(
-  recipe: RecipeSelect,
-  imagesByRecipeId: Map<string, RecipeImage[]>,
+  { userId: _userId, ...recipe }: RecipeSelect,
+  related: Awaited<ReturnType<typeof getRecipeRelations>>,
   isOwned: boolean,
 ): RecipeLibraryItem {
+  const ingredients = related.ingredients.get(recipe.id) ?? [];
   return {
-    carbs: recipe.carbs,
+    ...recipe,
     createdAt: recipe.createdAt.toISOString(),
-    description: recipe.description,
-    fats: recipe.fats,
-    id: recipe.id,
-    images: imagesByRecipeId.get(recipe.id) ?? [],
+    images: related.images.get(recipe.id) ?? [],
+    ingredients,
     isOwned,
-    ingredients: recipe.ingredients,
-    kcal: recipe.kcal,
-    name: recipe.name,
-    portions: recipe.portions,
-    protein: recipe.protein,
-    rating: recipe.rating,
-    tags: recipe.tags,
+    nutrition: sumIngredientNutrition(ingredients),
     updatedAt: recipe.updatedAt.toISOString(),
   };
 }

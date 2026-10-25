@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import { rulerStyle } from '../scrub/ScrubCell';
+import { rulerStyle } from '@/components/ui/scrub/ScrubCell';
 import { Pointer } from './Pointer';
 import { phase, useCoarsePointer, useTimeline } from './useHints';
 import css from './Hints.module.css';

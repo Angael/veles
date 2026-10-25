@@ -22,7 +22,7 @@ type Props = {
  * No success toast: accepted products appear in the log and the card disappears either way.
  */
 export function ReceivedFoodShares({ date }: Props) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
   const sharesQuery = useQuery(receivedFoodLogSharesQueryOptions());
   const acceptMutation = useAcceptFoodLogShareMutation();
   const declineMutation = useDeclineFoodLogShareMutation();
@@ -51,19 +51,19 @@ export function ReceivedFoodShares({ date }: Props) {
           {share.items.map((item) => (
             <ListItem key={item.id} style={{ padding: 0 }}>
               <FoodSummary
-                carbs={item.carbs ?? 0}
+                carbs={item.carbs}
                 density='compact'
-                fat={item.fat ?? 0}
+                fat={item.fat}
                 category={item.category}
                 imageUrl={item.imageUrl}
                 kcal={item.kcal}
                 meta={
                   item.grams === null
                     ? t({ en: 'Custom entry', pl: 'Własny wpis' })
-                    : `${formatNumber(Math.round(item.grams))} g`
+                    : `${formatWhole(item.grams)} g`
                 }
                 name={item.name}
-                protein={item.protein ?? 0}
+                protein={item.protein}
               />
             </ListItem>
           ))}
@@ -74,7 +74,7 @@ export function ReceivedFoodShares({ date }: Props) {
             icon={<XIcon aria-hidden='true' />}
             loading={declining}
             onClick={() => declineMutation.mutate(share.id)}
-            variant='ghost'
+            variant='danger'
           >
             {t({ en: 'Decline', pl: 'Odrzuć' })}
           </Btn>
@@ -84,9 +84,7 @@ export function ReceivedFoodShares({ date }: Props) {
             loading={accepting}
             onClick={() => acceptMutation.mutate({ date, id: share.id })}
           >
-            {count === 1
-              ? t({ en: 'Add to diary', pl: 'Dodaj do dziennika' })
-              : t({ en: 'Add all to diary', pl: 'Dodaj wszystkie do dziennika' })}
+            {t({ en: 'Add', pl: 'Dodaj' })}
           </Btn>
         </div>
       </Card>

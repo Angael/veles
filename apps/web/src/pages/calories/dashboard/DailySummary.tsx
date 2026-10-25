@@ -12,7 +12,7 @@ type DailySummaryProps = {
 };
 
 export function DailySummary({ goal, totals }: DailySummaryProps) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
 
   return (
     <Card
@@ -28,10 +28,10 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
       <div className={css.energy}>
         <div className={css.energyTop}>
           <p className={css.energyAmount}>
-            <strong>{formatNumber(Math.round(totals.kcal))}</strong>
+            <strong>{formatWhole(totals.kcal)}</strong>
             <span>
               {goal
-                ? `/ ${formatNumber(Math.round(goal.kcal))} kcal`
+                ? `/ ${formatWhole(goal.kcal)} kcal`
                 : t({ en: 'kcal eaten', pl: 'kcal zjedzone' })}
             </span>
           </p>
@@ -89,13 +89,13 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
 }
 
 function EnergyStatus({ consumed, goal }: { consumed: number; goal: number }) {
-  const { formatNumber, t } = useI18n();
+  const { formatNumber, formatWhole, t } = useI18n();
   const isOver = consumed > goal;
 
   return (
     <p className={css.energyStatus} data-over={isOver || undefined}>
       <span>
-        <strong>{formatNumber(Math.round(Math.abs(goal - consumed)))}</strong> kcal{' '}
+        <strong>{formatWhole(Math.abs(goal - consumed))}</strong> kcal{' '}
         {isOver ? t({ en: 'over goal', pl: 'ponad cel' }) : t({ en: 'left', pl: 'zostało' })}
       </span>
       {goal > 0 ? (
@@ -116,15 +116,15 @@ function Macro({
   tone: 'protein' | 'fat' | 'carbs';
   value: number;
 }) {
-  const { formatNumber } = useI18n();
+  const { formatWhole } = useI18n();
   const hasGoal = goal !== null && goal !== undefined;
 
   return (
     <div className={css.macro} data-over={(hasGoal && value > goal) || undefined} data-tone={tone}>
       <dt>{label}</dt>
       <dd className={css.macroValue}>
-        <strong>{formatNumber(Math.round(value))}</strong>
-        {hasGoal ? ` / ${formatNumber(Math.round(goal))}` : null} g
+        <strong>{formatWhole(value)}</strong>
+        {hasGoal ? ` / ${formatWhole(goal)}` : null} g
       </dd>
       {hasGoal ? (
         <dd className={css.macroMeter}>
