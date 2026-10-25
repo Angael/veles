@@ -26,18 +26,32 @@ function createFakeDb() {
   const query = (call: FakeCall, result: () => unknown) => {
     calls.push(call);
     const chain = {
-      for: (lock: string) => ((call.lock = lock), chain),
-      from: (table: PgTable) => ((call.table = getTableName(table)), chain),
+      for: (lock: string) => {
+        call.lock = lock;
+        return chain;
+      },
+      from: (table: PgTable) => {
+        call.table = getTableName(table);
+        return chain;
+      },
       innerJoin: () => chain,
       limit: () => chain,
       orderBy: () => chain,
       returning: () => chain,
-      set: (values: Record<string, unknown>) => ((call.set = values), chain),
-      values: (values: unknown) => ((call.values = values), chain),
+      set: (values: Record<string, unknown>) => {
+        call.set = values;
+        return chain;
+      },
+      values: (values: unknown) => {
+        call.values = values;
+        return chain;
+      },
       where: (where: SQL | undefined) => {
         if (where) call.where = dialect.sqlToQuery(where);
         return chain;
       },
+      // Drizzle query builders are thenable, so the fake must be awaitable the same way.
+      // oxlint-disable-next-line unicorn/no-thenable
       then: (resolve: (value: unknown) => unknown, reject: (error: unknown) => unknown) =>
         Promise.resolve().then(result).then(resolve, reject),
     };
