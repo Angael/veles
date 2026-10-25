@@ -25,11 +25,17 @@
 
 .actions {
   display: flex;
-  flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
   border-block-start: var(--border-width) solid var(--c-border);
+
+  /* Both actions share one row on phones. */
+  @media (--phone) {
+    & > * {
+      flex: 1;
+    }
+  }
 }
 
 @media (--phone) {

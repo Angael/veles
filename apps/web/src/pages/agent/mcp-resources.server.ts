@@ -27,7 +27,7 @@ export const resources = {
     feature: 'notes',
     dated: false,
     description:
-      'Notes and shopping lists. Notes have content; shopping lists (type "shopping_list") have items (id, name, checked) in list order instead.',
+      'The user\'s notes and shopping lists, plus those connected friends share (isOwned false, ownerName). Notes have content; shopping lists (type "shopping_list") have items (id, name, checked) in list order instead.',
     read: readNotes,
   },
   weights: {
@@ -40,7 +40,7 @@ export const resources = {
   recipes: {
     feature: 'recipes',
     dated: false,
-    description: `Recipes with ingredients, tags, and imageUrls. total is for all portions, perPortion for one; ${kcalAndMacros}.`,
+    description: `The user's recipes plus recipes connected friends share (isOwned false, ownerName), with imageUrls, and ingredients in order. Ingredient grams are for the whole recipe (portions = how many portions it makes). A linked ingredient has productId (from food_products) and nutrition at its grams; a custom one has both null. total (all portions) and perPortion sum the linked ingredients and are null when none has nutrition; ${kcalAndMacros}.`,
     read: readRecipes,
   },
   food_days: {

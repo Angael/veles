@@ -12,7 +12,7 @@ export function TextNoteCard({ note }: { note: NoteSummary }) {
   const updateNote = useUpdateNoteMutation();
 
   return (
-    <Card as='article' className={css.noteCard}>
+    <Card as='article' className={css.noteCard} id={`note-${note.id}`}>
       <div className={css.cardHeader}>
         <h2>
           <SeamlessTextInput

@@ -98,7 +98,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
   };
 
   return (
-    <Card as='article' className={css.listCard}>
+    <Card as='article' className={css.listCard} id={`note-${note.id}`}>
       <div className={css.cardHeader}>
         <h2>
           <SeamlessTextInput

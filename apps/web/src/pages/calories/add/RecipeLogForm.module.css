@@ -1,0 +1,20 @@
+@import '../../../styles/breakpoints.css';
+
+.page,
+.form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+/* Room for the goal preview that is fixed to the bottom on phones. */
+.page {
+  @media (--phone) {
+    padding-bottom: 7rem;
+  }
+}
+
+.title {
+  color: var(--c-text-strong);
+  font-size: var(--text-xl-dynamic);
+  text-wrap: balance;
+}

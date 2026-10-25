@@ -11,7 +11,7 @@ type Props = {
 
 /** Lists the logs being shared with a grams input each, so the sender can share a different portion. */
 export function ShareLogsItems({ gramsById, logs, onGramsChange }: Props) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
 
   return (
     <ul className={css.items}>
@@ -23,7 +23,7 @@ export function ShareLogsItems({ gramsById, logs, onGramsChange }: Props) {
           <li className={css.item} key={entry.id}>
             <div className={css.itemText}>
               <strong>{entry.name}</strong>
-              <span>{formatNumber(Math.round(kcal))} kcal</span>
+              <span>{formatWhole(kcal)} kcal</span>
             </div>
             {entry.grams === null ? (
               <span className={css.custom}>{t({ en: 'Custom entry', pl: 'Własny wpis' })}</span>

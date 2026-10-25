@@ -59,8 +59,11 @@ import { TextareaInput } from '@/components/ui/textarea-input/TextareaInput';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { Toggle } from '@/components/ui/toggle/Toggle';
+import { Tooltip } from '@/components/ui/tooltip/Tooltip';
 import css from './ComponentsDemoPage.module.css';
 import { PhotosFieldDemo } from './PhotosFieldDemo';
+import { AutocompleteDemo } from './AutocompleteDemo';
+import { ScrubDemo } from './ScrubDemo';
 import { CameraDemo } from './CameraDemo';
 
 const SELECT_OPTIONS = [
@@ -259,6 +262,13 @@ export function ComponentsDemoPage() {
       </section>
 
       <section>
+        <h2>Tooltip</h2>
+        <Tooltip content='Hover, focus, or long press on touch'>
+          <Btn aria-label='Delete' icon={<Trash2Icon />} iconOnly variant='ghost' />
+        </Tooltip>
+      </section>
+
+      <section>
         <h2>Checkbox</h2>
         <label className={css.toggleDemo}>
           <span>Share with Maya</span>
@@ -394,6 +404,9 @@ export function ComponentsDemoPage() {
           value={selectValue}
         />
       </section>
+
+      <AutocompleteDemo />
+      <ScrubDemo />
 
       <section>
         <h2>Navbar</h2>
