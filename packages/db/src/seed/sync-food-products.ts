@@ -18,7 +18,7 @@ export async function syncFoodProductSeeds(db: NodePgDatabase<typeof schema>) {
     const inserted = await tx
       .insert(foodProducts)
       .values(
-        foodProductSeeds.map(({ name_en, name_pl, ...seed }) => ({
+        foodProductSeeds.map(({ category: _category, name_en, name_pl, ...seed }) => ({
           ...seed,
           name: name_en,
           namePl: name_pl,

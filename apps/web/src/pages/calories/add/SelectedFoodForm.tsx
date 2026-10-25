@@ -26,7 +26,7 @@ function nutritionAtGrams(valuePer100g: number | null, grams: number) {
 
 /** Confirms a food log while keeping its nutrition preview and daily allowance in sync. */
 export function SelectedFoodForm({ food, initialDate, onSaved }: Props) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
   const recordFoodMutation = useRecordFoodMutation();
   const [date, setDate] = useState(initialDate);
   const [grams, setGrams] = useState<number | null>(food.productSizeGrams ?? 100);
@@ -71,8 +71,8 @@ export function SelectedFoodForm({ food, initialDate, onSaved }: Props) {
           >
             <span className={css.packageLabel}>
               {t({
-                en: `1 package (${formatNumber(Math.round(packageSizeGrams))} g)`,
-                pl: `1 opakowanie (${formatNumber(Math.round(packageSizeGrams))} g)`,
+                en: `1 package (${formatWhole(packageSizeGrams)} g)`,
+                pl: `1 opakowanie (${formatWhole(packageSizeGrams)} g)`,
               })}
             </span>
             <div className={css.packageButtons}>

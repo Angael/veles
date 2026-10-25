@@ -106,6 +106,27 @@
       "when": 1792525791242,
       "tag": "0014_calorie_day_notes",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1792795794470,
+      "tag": "0015_recipe_ingredients",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1792795801015,
+      "tag": "0016_backfill_recipe_ingredients",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792795801467,
+      "tag": "0017_drop_recipe_text_columns",
+      "breakpoints": true
     }
   ]
 }

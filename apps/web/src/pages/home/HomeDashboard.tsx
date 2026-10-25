@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router';
-import { differenceInCalendarDays, parseISO } from 'date-fns';
 import type { ReactNode } from 'react';
 import { Card } from '@/components/ui/card/Card';
 import { DashboardFood } from './DashboardFood';
@@ -8,8 +7,8 @@ import { DashboardWeight } from './DashboardWeight';
 import type { HomeDashboardData } from './home.api';
 import { type HomeFeatureId, homeFeatures } from './homeFeatures';
 import css from './HomeDashboard.module.css';
-import { type I18n, useI18n } from '@/lib/i18n/I18nProvider';
-import { pluralEn, pluralPl } from '@/lib/i18n/locale';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import { formatDaysAgo } from '@/lib/relativeDay';
 
 type HomeDashboardProps = {
   data: HomeDashboardData;
@@ -83,15 +82,4 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
       </div>
     </main>
   );
-}
-
-/** Turns a date into a private, content-free activity signal such as "3 days ago". */
-function formatDaysAgo(date: string, { t }: I18n) {
-  const days = differenceInCalendarDays(new Date(), parseISO(date));
-  if (days <= 0) return t({ en: 'Today', pl: 'Dzisiaj' });
-  if (days === 1) return t({ en: 'Yesterday', pl: 'Wczoraj' });
-  return t({
-    en: `${days} ${pluralEn(days, 'day', 'days')} ago`,
-    pl: `${days} ${pluralPl(days, 'dzień', 'dni', 'dni')} temu`,
-  });
 }

@@ -18,7 +18,6 @@ import {
 } from './notes.validation';
 import {
   accessibleNote,
-  createNoteRecord,
   updateNoteRecord,
   deleteNoteRecord,
   setNoteSharedRecord,
@@ -28,6 +27,7 @@ import {
   setListItemCheckedRecord,
   deleteListItemRecord,
 } from './notes.server';
+import { saveNoteRecord } from './saveNote.server';
 
 /** One shopping list row as synced into the client-side `listItems` collection. */
 export type NoteListItem = {
@@ -109,7 +109,11 @@ export const createNote = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(createNoteInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    return createNoteRecord(session.user.id, data);
+    const { items, ...note } = data;
+    return saveNoteRecord(session.user.id, {
+      ...note,
+      ...(items?.length ? { items: { add: items } } : {}),
+    });
   });
 
 export const updateNote = createServerFn({ method: 'POST' })

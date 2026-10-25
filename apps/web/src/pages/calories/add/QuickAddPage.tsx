@@ -1,6 +1,7 @@
 import type { UseNavigateResult } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useRecordCustomCaloriesMutation } from '../calories.query';
+import { caloriesReturnState } from '../caloriesReturnScroll';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { DateInput } from '@/components/ui/date-input/DateInput';
@@ -47,7 +48,12 @@ export function QuickAddPage({
       ...(photo.photo ? { photo: photo.photo } : {}),
     });
 
-    await navigate({ replace: true, search: { date: logDate }, to: '/calories' });
+    await navigate({
+      replace: true,
+      search: { date: logDate },
+      state: caloriesReturnState(logDate),
+      to: '/calories',
+    });
   }
 
   return (

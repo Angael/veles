@@ -13,6 +13,7 @@ import { useUpdateWorkoutMutation } from '../workouts.query';
 import type { WorkoutSessionData } from '../workouts.server';
 import css from './Session.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
+import { selectOnMount } from '@/lib/selectOnMount';
 
 type RenameWorkoutDialogProps = {
   onOpenChange: (open: boolean) => void;
@@ -38,7 +39,13 @@ export function RenameWorkoutDialog({ onOpenChange, open, session }: RenameWorko
           }}
         >
           <Label text={t({ en: 'Name', pl: 'Nazwa' })}>
-            <TextInput defaultValue={session.name} maxLength={200} name='name' required />
+            <TextInput
+              defaultValue={session.name}
+              maxLength={200}
+              name='name'
+              ref={selectOnMount}
+              required
+            />
           </Label>
           <DialogActions>
             <DialogClose render={<Btn variant='ghost' />}>

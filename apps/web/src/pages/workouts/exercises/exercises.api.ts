@@ -13,6 +13,7 @@ import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { describeSet, type Measure } from '../metrics';
 import { toMetrics } from '../workouts.server';
+import { workoutName } from '../workoutName';
 import { updateExerciseInputType } from '../workouts.validation';
 import { updateExerciseRecord } from './exercises.server';
 import { getLocale } from '@/lib/i18n/getLocale';
@@ -107,16 +108,19 @@ export const getExerciseHistory = createServerFn({ method: 'GET' })
     const [siblings, sets] = await Promise.all([
       db
         .select({
+          name: workoutExercises.name,
           position: workoutSessionExercises.position,
           workoutId: workoutSessionExercises.sessionId,
         })
         .from(workoutSessionExercises)
+        .innerJoin(workoutExercises, eq(workoutExercises.id, workoutSessionExercises.exerciseId))
         .where(
           inArray(
             workoutSessionExercises.sessionId,
             entries.map((entry) => entry.workoutId),
           ),
-        ),
+        )
+        .orderBy(asc(workoutSessionExercises.position)),
       db
         .select()
         .from(workoutSets)
@@ -144,7 +148,11 @@ export const getExerciseHistory = createServerFn({ method: 'GET' })
         sets: sets
           .filter((set) => set.sessionExerciseId === entry.id)
           .map((set) => describeSet(toMetrics(set), locale)),
-        workoutName: entry.workoutName,
+        workoutName: workoutName(
+          { date: entry.date, name: entry.workoutName },
+          positions.map((slot) => slot.name),
+          locale,
+        ),
       };
     });
   });

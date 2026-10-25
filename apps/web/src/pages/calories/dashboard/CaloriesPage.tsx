@@ -8,6 +8,7 @@ import { CalendarDaysIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-reac
 import type { CalorieDashboard, CalorieDashboardDay } from '../calories.api';
 import { calorieDashboardQueryOptions } from '../calories.query';
 import { CalorieOverview } from './CalorieOverview';
+import { useCaloriesReturnScrollOrigin } from '../caloriesReturnScroll';
 import { CALORIE_DATE_FORMAT, calorieWeekDates, calorieWeekStart } from '../calorieHelpers';
 import { todayLocalDate } from '@/lib/dateOnly';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -20,6 +21,7 @@ export function CaloriesPage({ dashboard, date, linkedFoodId }: CaloriesPageProp
   const { dateLocale, t } = useI18n();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  useCaloriesReturnScrollOrigin();
   const todayDate = todayLocalDate();
   const today = parseISO(todayDate);
   const selectedDay = dashboard.days.find((day) => day.date === date);
@@ -152,7 +154,7 @@ function DayProgress({
   isPast: boolean;
   isToday: boolean;
 }) {
-  const { formatNumber, t } = useI18n();
+  const { formatWhole, t } = useI18n();
   if (!dayStatus?.goal) return null;
 
   const goalKcal = dayStatus.goal.kcal;
@@ -165,8 +167,8 @@ function DayProgress({
   return (
     <span
       aria-label={t({
-        en: `${formatNumber(Math.round(consumedKcal))} of ${formatNumber(Math.round(goalKcal))} kcal`,
-        pl: `${formatNumber(Math.round(consumedKcal))} z ${formatNumber(Math.round(goalKcal))} kcal`,
+        en: `${formatWhole(consumedKcal)} of ${formatWhole(goalKcal)} kcal`,
+        pl: `${formatWhole(consumedKcal)} z ${formatWhole(goalKcal)} kcal`,
       })}
       aria-valuemax={goalKcal}
       aria-valuemin={0}

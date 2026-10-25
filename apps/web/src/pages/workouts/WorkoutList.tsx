@@ -17,7 +17,7 @@ import { useDeleteWorkoutMutation } from './workouts.query';
 import css from './WorkoutList.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { pluralEn, pluralPl } from '@/lib/i18n/locale';
-import { SHORT_DAY } from './metrics';
+import { daysAgo, formatDaysAgo } from '@/lib/relativeDay';
 
 /**
  * Workout rows that open the session; long press or right click to save as a routine or delete.
@@ -92,16 +92,14 @@ export function WorkoutList({ workouts }: { workouts: WorkoutSummary[] }) {
 }
 
 function WorkoutRow({ workout }: { workout: WorkoutSummary }) {
-  const { formatDate, formatNumber, t } = useI18n();
+  const { formatNumber, t } = useI18n();
   const open = workout.endedAt === null;
 
   return (
     <Card as='article' className={clsx(css.row, open && css.open)}>
       <div className={css.text}>
         <p className={css.top}>
-          <time className={css.date} dateTime={workout.date}>
-            {formatDate(workout.date, SHORT_DAY)}
-          </time>
+          <WorkoutDate date={workout.date} />
           {open ? (
             <span className={css.live}>{t({ en: 'In progress', pl: 'W trakcie' })}</span>
           ) : null}
@@ -129,5 +127,26 @@ function WorkoutRow({ workout }: { workout: WorkoutSummary }) {
       </div>
       {open ? <ArrowRightIcon aria-hidden='true' className={css.arrow} /> : null}
     </Card>
+  );
+}
+
+/** Days further away than this show only the weekday and date; a relative label adds noise. */
+const RELATIVE_DAYS = 6;
+
+/**
+ * "Monday, 2026-10-19 · 3 days ago": the weekday and an unambiguous ISO date, plus a relative
+ * label for the past week so recent sessions read at a glance.
+ */
+function WorkoutDate({ date }: { date: string }) {
+  const i18n = useI18n();
+  const weekday = i18n.formatDate(date, { weekday: 'long' });
+  const relative = Math.abs(daysAgo(date)) <= RELATIVE_DAYS ? formatDaysAgo(date, i18n) : null;
+
+  return (
+    <time className={css.date} dateTime={date}>
+      <span className={css.weekday}>{weekday.charAt(0).toUpperCase() + weekday.slice(1)}</span>
+      {`, ${date}`}
+      {relative ? <span className={css.relative}>{` · ${relative}`}</span> : null}
+    </time>
   );
 }

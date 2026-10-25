@@ -4,7 +4,6 @@ import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { invariant } from '@/lib/invariant';
 import { db, type DbTransaction } from '@/server/db.server';
 import type {
-  createNoteInputType,
   updateNoteInputType,
   deleteNoteInputType,
   setNoteSharedInputType,
@@ -41,22 +40,6 @@ export function accessibleNote(userId: string, includeShared = true) {
       ),
     ),
   );
-}
-
-/** Creates a note for the authenticated owner. */
-export async function createNoteRecord(userId: string, data: typeof createNoteInputType.infer) {
-  const [created] = await db
-    .insert(notes)
-    .values({
-      content: data.content,
-      ownerId: userId,
-      title: data.title,
-      type: data.type,
-    })
-    .returning({ id: notes.id });
-
-  invariant(created, 'Note could not be created.');
-  return created;
 }
 
 /** Edits note content within the caller's scope. */
@@ -256,4 +239,30 @@ export async function deleteListItemRecord(
 
   await db.delete(listItems).where(eq(listItems.id, item.id));
   await db.update(notes).set({ updatedAt: new Date() }).where(eq(notes.id, item.noteId));
+}
+
+/**
+ * Adds lines to a note the user owns or that a connection shares: list items for a shopping list,
+ * lines after the existing text for a plain note. Used by flows such as a recipe's shopping list.
+ */
+export async function appendNoteLinesRecord(userId: string, noteId: string, lines: string[]) {
+  await db.transaction(async (tx) => {
+    const [note] = await tx
+      .select({ content: notes.content, type: notes.type })
+      .from(notes)
+      .where(and(eq(notes.id, noteId), accessibleNote(userId)))
+      .for('update');
+    if (!note)
+      throw new ClientSafeError(
+        translate({ en: 'Note not found.', pl: 'Nie znaleziono notatki.' }),
+      );
+
+    if (note.type === 'shopping_list') {
+      await tx.insert(listItems).values(lines.map((name) => ({ name, noteId })));
+      await tx.update(notes).set({ updatedAt: new Date() }).where(eq(notes.id, noteId));
+    } else {
+      const content = [note.content.trimEnd(), ...lines].filter(Boolean).join('\n');
+      await tx.update(notes).set({ content, updatedAt: new Date() }).where(eq(notes.id, noteId));
+    }
+  });
 }

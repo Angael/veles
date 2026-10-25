@@ -145,7 +145,7 @@ export async function renderAgentToolsDoc() {
     const tools = (await listTools(permissionsWith({ write: feature }))).filter(
       (tool) => !baseNames.has(tool.name),
     );
-    const label = agentFeatures[feature].label;
+    const label = agentFeatures[feature].label.en;
     groups.push({ title: `Write: ${label}`, consent: `Write on ${label}`, tools });
   }
 

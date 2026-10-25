@@ -7,11 +7,13 @@ import type { CalorieFood } from '../calories.api';
 import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '../calories.query';
 import { FoodSummary } from '../FoodSummary';
 import { filterFoods } from '../add/filterFoods';
+import { RecipeResults } from '../add/RecipeResults';
 import { AddFoodDialog } from './AddFoodDialog';
 import { Btn } from '@/components/ui/btn/Btn';
 import { List, ListItem } from '@/components/ui/list/List';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import css from './FoodSearch.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type Props = {
   date: string;
@@ -30,6 +32,7 @@ function nutritionAtGrams(valuePer100g: number | null, grams: number) {
  * chosen food, so logging happens without leaving the diary.
  */
 export function FoodSearch({ date, linkedFoodId }: Props) {
+  const { formatWhole, t } = useI18n();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
@@ -78,9 +81,12 @@ export function FoodSearch({ date, linkedFoodId }: Props) {
         <div className={css.search}>
           <SearchIcon aria-hidden='true' className={css.searchIcon} />
           <Combobox.Input
-            aria-label='Search foods to log'
+            aria-label={t({ en: 'Search foods to log', pl: 'Szukaj jedzenia do dodania' })}
             className={css.input}
-            placeholder='Add food: banana, bread, yoghurt…'
+            placeholder={t({
+              en: 'Add food: banana, bread, yoghurt…',
+              pl: 'Dodaj jedzenie: banan, chleb, jogurt…',
+            })}
             ref={inputRef}
             render={<TextInput />}
           />
@@ -90,11 +96,19 @@ export function FoodSearch({ date, linkedFoodId }: Props) {
           <Combobox.Positioner className={css.positioner} sideOffset={4}>
             <Combobox.Popup aria-busy={foodsQuery.isFetching} className={css.popup}>
               <Combobox.Status className={css.message}>
-                {foodsQuery.isPending ? 'Loading foods…' : null}
+                {foodsQuery.isPending
+                  ? t({ en: 'Loading foods…', pl: 'Ładowanie jedzenia…' })
+                  : null}
               </Combobox.Status>
               <Combobox.Empty className={css.message}>
-                {!foodsQuery.isPending && trimmedQuery ? `No foods match “${trimmedQuery}”.` : null}
+                {!foodsQuery.isPending && trimmedQuery
+                  ? t({
+                      en: `No foods match “${trimmedQuery}”.`,
+                      pl: `Brak jedzenia pasującego do „${trimmedQuery}”.`,
+                    })
+                  : null}
               </Combobox.Empty>
+              <RecipeResults date={date} query={filterQuery} />
               <Combobox.List className={css.list} render={<List />}>
                 {(food: CalorieFood) => {
                   const grams = food.productSizeGrams ?? 100;
@@ -107,11 +121,12 @@ export function FoodSearch({ date, linkedFoodId }: Props) {
                     >
                       <FoodSummary
                         carbs={nutritionAtGrams(food.carbsPer100g, grams)}
+                        category={food.category}
                         density='compact'
                         fat={nutritionAtGrams(food.fatPer100g, grams)}
                         imageUrl={food.imageUrl}
                         kcal={nutritionAtGrams(food.kcalPer100g, grams)}
-                        meta={`${Math.round(grams)} g`}
+                        meta={`${formatWhole(grams)} g`}
                         name={food.name}
                         protein={nutritionAtGrams(food.proteinPer100g, grams)}
                       />
@@ -132,7 +147,7 @@ export function FoodSearch({ date, linkedFoodId }: Props) {
                   size='sm'
                   variant='ghost'
                 >
-                  Create new food
+                  {t({ en: 'Create new food', pl: 'Utwórz nowe jedzenie' })}
                 </Btn>
                 <Btn
                   icon={<ScanLineIcon aria-hidden='true' />}
@@ -141,7 +156,7 @@ export function FoodSearch({ date, linkedFoodId }: Props) {
                   size='sm'
                   variant='ghost'
                 >
-                  Scan barcode
+                  {t({ en: 'Scan barcode', pl: 'Skanuj kod kreskowy' })}
                 </Btn>
               </div>
             </Combobox.Popup>

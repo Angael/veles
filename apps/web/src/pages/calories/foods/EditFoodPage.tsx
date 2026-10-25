@@ -2,6 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import type { CalorieFood } from '../calories.api';
 import { useUpdateFoodProductMutation } from '../calories.query';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
+import { caloriesReturnState } from '../caloriesReturnScroll';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 import { todayLocalDate } from '@/lib/dateOnly';
 import { useI18n } from '@/lib/i18n/I18nProvider';
@@ -29,7 +30,13 @@ export function EditFoodPage({ addFoodDate, food }: Props) {
       });
       return;
     }
-    await navigate({ replace: true, search: { date: todayLocalDate() }, to: '/calories' });
+    const date = todayLocalDate();
+    await navigate({
+      replace: true,
+      search: { date },
+      state: caloriesReturnState(date),
+      to: '/calories',
+    });
   }
 
   return (

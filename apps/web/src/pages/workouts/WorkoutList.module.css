@@ -133,6 +133,14 @@
   font-variant-numeric: tabular-nums;
 }
 
+.weekday {
+  font-weight: var(--font-weight-semibold);
+}
+
+.relative {
+  color: var(--c-muted);
+}
+
 .meta {
   display: flex;
   flex-wrap: wrap;

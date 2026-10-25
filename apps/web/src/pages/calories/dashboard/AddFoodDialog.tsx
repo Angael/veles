@@ -5,6 +5,7 @@ import { SelectedFoodForm } from '../add/SelectedFoodForm';
 import { Btn } from '@/components/ui/btn/Btn';
 import { DialogClose, DialogPopup, DialogRoot, DialogTitle } from '@/components/ui/dialog/Dialog';
 import css from './AddFoodDialog.module.css';
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type Props = {
   date: string;
@@ -16,6 +17,7 @@ type Props = {
 
 /** Collects the amount for a picked food without leaving the diary; full height on phones. */
 export function AddFoodDialog({ date, finalFocus, food, onClose, onSaved }: Props) {
+  const { t } = useI18n();
   // Keep the last food rendered while the dialog animates out.
   const [shownFood, setShownFood] = useState(food);
   if (food && food !== shownFood) setShownFood(food);
@@ -29,11 +31,11 @@ export function AddFoodDialog({ date, finalFocus, food, onClose, onSaved }: Prop
     >
       <DialogPopup className={css.popup} finalFocus={finalFocus}>
         <header className={css.header}>
-          <DialogTitle>Add food</DialogTitle>
+          <DialogTitle>{t({ en: 'Add food', pl: 'Dodaj jedzenie' })}</DialogTitle>
           <DialogClose
             render={
               <Btn
-                aria-label='Close'
+                aria-label={t({ en: 'Close', pl: 'Zamknij' })}
                 icon={<XIcon aria-hidden='true' />}
                 iconOnly
                 size='sm'
