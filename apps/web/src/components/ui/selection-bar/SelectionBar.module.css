@@ -17,7 +17,8 @@
   white-space: nowrap;
 }
 
-.badge {
+.badge,
+.phoneOnly {
   display: none;
 }
 
@@ -88,7 +89,8 @@
   /* `.bar` raises specificity above Btn's size, radius, and variant classes. */
   .bar .action {
     --btn-height: var(--dock-nav-item-height);
-    --btn-padding-x: 0.125rem;
+    /* No side padding: seven Polish labels must fit a 384px-wide phone. */
+    --btn-padding-x: 0;
     --btn-radius: var(--radius-sm);
 
     flex-direction: column;
@@ -98,6 +100,19 @@
     &:not(.primary) {
       --btn-bg: transparent;
     }
+
+    /* The filled pill needs room so its label doesn't touch the edges. */
+    &.primary {
+      --btn-padding-x: 0.25rem;
+    }
+  }
+
+  .desktopOnly {
+    display: none;
+  }
+
+  .phoneOnly {
+    display: inline;
   }
 
   .label {

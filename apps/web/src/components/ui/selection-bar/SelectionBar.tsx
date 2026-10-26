@@ -67,6 +67,8 @@ type SelectionBarActionProps = Omit<
 > & {
   icon: ReactNode;
   label: string;
+  /** Shorter label for phones, where every item shares the navbar's width; `label` stays the accessible name. */
+  phoneLabel?: string;
   /** Filled main button; secondary actions are ghost. */
   primary?: boolean;
 };
@@ -75,19 +77,26 @@ type SelectionBarActionProps = Omit<
 export function SelectionBarAction({
   icon,
   label,
+  phoneLabel,
   primary = false,
   variant = primary ? 'main' : 'ghost',
   ...props
 }: SelectionBarActionProps) {
   return (
     <Btn
+      aria-label={phoneLabel ? label : undefined}
       className={clsx(css.action, primary && css.primary)}
       icon={icon}
       radius='pill'
       variant={variant}
       {...props}
     >
-      <span className={css.label}>{label}</span>
+      <span className={clsx(css.label, phoneLabel && css.desktopOnly)}>{label}</span>
+      {phoneLabel ? (
+        <span aria-hidden='true' className={clsx(css.label, css.phoneOnly)}>
+          {phoneLabel}
+        </span>
+      ) : null}
     </Btn>
   );
 }
