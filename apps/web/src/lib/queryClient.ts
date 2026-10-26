@@ -9,16 +9,12 @@ type MutationNotification = {
   title: string;
 };
 
-type SuccessfulMutationNotification = MutationNotification & {
-  type?: 'success' | 'warning';
-};
-
 declare module '@tanstack/react-query' {
   interface Register {
     mutationMeta: {
       error?: MutationNotification;
       invalidateQueryKey?: QueryKey;
-      success?: SuccessfulMutationNotification;
+      success?: MutationNotification;
     };
   }
 }
@@ -35,7 +31,7 @@ export function createQueryClient() {
       },
       onSuccess: async (_data, _variables, _onMutateResult, mutation) => {
         if (mutation.meta?.success) {
-          addMutationToast(mutation.meta.success.type ?? 'success', mutation.meta.success);
+          addMutationToast('success', mutation.meta.success);
         }
         if (mutation.meta?.invalidateQueryKey) {
           await queryClient.invalidateQueries({ queryKey: mutation.meta.invalidateQueryKey });
@@ -47,10 +43,7 @@ export function createQueryClient() {
   return queryClient;
 }
 
-function addMutationToast(
-  type: 'error' | 'success' | 'warning',
-  notification: MutationNotification,
-) {
+function addMutationToast(type: 'error' | 'success', notification: MutationNotification) {
   toastManager.add({
     description: notification.message,
     id: notification.id,

@@ -66,7 +66,7 @@ export function ShareLogsAction({ logs, onShared }: Props) {
           toastManager.add({
             title: t({
               en: `Shared ${products} with ${names.join(', ')}`,
-              pl: `Udostępniono ${products}: ${names.join(', ')}`,
+              pl: `Udostępniono ${products} dla: ${names.join(', ')}`,
             }),
             type: 'success',
           });
