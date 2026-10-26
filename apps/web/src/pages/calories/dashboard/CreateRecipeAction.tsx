@@ -13,6 +13,7 @@ export function CreateRecipeAction({ logs }: { logs: CalorieLog[] }) {
       icon={<ChefHatIcon aria-hidden='true' />}
       isLink
       label={t({ en: 'Create recipe', pl: 'Utwórz przepis' })}
+      phoneLabel={t({ en: 'Recipe', pl: 'Przepis' })}
       render={<Link search={{ fromLogs: logs.map((entry) => entry.id) }} to='/recipes/add' />}
     />
   );
