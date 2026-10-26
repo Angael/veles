@@ -4,28 +4,30 @@
 
 Every tool the Veles MCP server (`/api/mcp`) can list, grouped by the consent that lists it. An agent sees only the tools that its key owner allows in **Account → Agent access**. The read tool descriptions below show all resources; a key sees only the resources it may read. Setup and consent rules: [agent-integration.md](./agent-integration.md).
 
-| Tool                                          | Consent                           | Kind                       |
-| --------------------------------------------- | --------------------------------- | -------------------------- |
-| [`get_access`](#get_access)                   | none                              | read                       |
-| [`list_records`](#list_records)               | Read on any feature               | read                       |
-| [`get_record`](#get_record)                   | Read on any feature               | read                       |
-| [`get_days`](#get_days)                       | Read on any feature               | read                       |
-| [`save_note`](#save_note)                     | Write on Notes and shopping lists | write, destructive, shared |
-| [`delete_note`](#delete_note)                 | Write on Notes and shopping lists | write, destructive         |
-| [`save_weight`](#save_weight)                 | Write on Weight                   | write, destructive         |
-| [`save_workout`](#save_workout)               | Write on Workouts                 | write, destructive         |
-| [`save_routine`](#save_routine)               | Write on Workouts                 | write, destructive         |
-| [`update_exercise`](#update_exercise)         | Write on Workouts                 | write                      |
-| [`delete_workout`](#delete_workout)           | Write on Workouts                 | write, destructive         |
-| [`delete_routine`](#delete_routine)           | Write on Workouts                 | write, destructive         |
-| [`save_recipe`](#save_recipe)                 | Write on Recipes                  | write                      |
-| [`log_food`](#log_food)                       | Write on Food diary               | write                      |
-| [`update_food_log`](#update_food_log)         | Write on Food diary               | write                      |
-| [`change_food_logs`](#change_food_logs)       | Write on Food diary               | write, destructive         |
-| [`set_food_day_note`](#set_food_day_note)     | Write on Food diary               | write, destructive         |
-| [`set_calorie_goal`](#set_calorie_goal)       | Write on Nutrition goals          | write, destructive         |
-| [`lookup_food_barcode`](#lookup_food_barcode) | Write on Food catalog             | write, shared              |
-| [`save_food_product`](#save_food_product)     | Write on Food catalog             | write, destructive, shared |
+| Tool                                              | Consent                           | Kind                       |
+| ------------------------------------------------- | --------------------------------- | -------------------------- |
+| [`get_access`](#get_access)                       | none                              | read                       |
+| [`list_records`](#list_records)                   | Read on any feature               | read                       |
+| [`get_record`](#get_record)                       | Read on any feature               | read                       |
+| [`get_days`](#get_days)                           | Read on any feature               | read                       |
+| [`save_note`](#save_note)                         | Write on Notes and shopping lists | write, destructive, shared |
+| [`delete_note`](#delete_note)                     | Write on Notes and shopping lists | write, destructive         |
+| [`save_weight`](#save_weight)                     | Write on Weight                   | write, destructive         |
+| [`save_workout`](#save_workout)                   | Write on Workouts                 | write, destructive         |
+| [`save_routine`](#save_routine)                   | Write on Workouts                 | write, destructive         |
+| [`update_exercise`](#update_exercise)             | Write on Workouts                 | write                      |
+| [`delete_workout`](#delete_workout)               | Write on Workouts                 | write, destructive         |
+| [`delete_routine`](#delete_routine)               | Write on Workouts                 | write, destructive         |
+| [`save_recipe`](#save_recipe)                     | Write on Recipes                  | write                      |
+| [`save_meal_plan_item`](#save_meal_plan_item)     | Write on Meal plan                | write, destructive         |
+| [`delete_meal_plan_item`](#delete_meal_plan_item) | Write on Meal plan                | write, destructive         |
+| [`log_food`](#log_food)                           | Write on Food diary               | write                      |
+| [`update_food_log`](#update_food_log)             | Write on Food diary               | write                      |
+| [`change_food_logs`](#change_food_logs)           | Write on Food diary               | write, destructive         |
+| [`set_food_day_note`](#set_food_day_note)         | Write on Food diary               | write, destructive         |
+| [`set_calorie_goal`](#set_calorie_goal)           | Write on Nutrition goals          | write, destructive         |
+| [`lookup_food_barcode`](#lookup_food_barcode)     | Write on Food catalog             | write, shared              |
+| [`save_food_product`](#save_food_product)         | Write on Food catalog             | write, destructive, shared |
 
 ## Always listed
 
@@ -50,6 +52,7 @@ Resources:
 - notes: The user's notes and shopping lists, plus those connected friends share (isOwned false, ownerName). Notes have content; shopping lists (type "shopping_list") have items (id, name, checked) in list order instead.
 - weights: Weight history in kg, newest date first, with photoUrls (progress photos). Cursor and from/to are dates.
 - recipes: The user's recipes plus recipes connected friends share (isOwned false, ownerName), with imageUrls, and ingredients in order. Ingredient grams are for the whole recipe (portions = how many portions it makes). A linked ingredient has productId (from food_products) and nutrition at its grams; a custom one has both null. total (all portions) and perPortion sum the linked ingredients and are null when none has nutrition; kcal is energy; macros are protein, fat, carbs in grams.
+- meal_plan: Planned meals (not eaten; they never change the food diary), newest first, filtered by date. Each has date, name, portions, and recipe (id, name, portions it makes) or null for a free-text meal. estimate is the recipe's nutrition scaled to the planned portions, or null when unknown; kcal is energy; macros are protein, fat, carbs in grams.
 - food_days: Food diary, one item per day with entries or a day note, newest first; id and date are the same YYYY-MM-DD. Each day has entries (with imageUrl or null, and productId when logged from food_products), total, goal (the nutrition goal in effect; null without a goal or without Nutrition goals consent), note (the user's free text or null), and offPlan; kcal is energy; macros are protein, fat, carbs in grams. offPlan true means the user went off the diet and probably overate: total is only what was logged, not the real intake, so use the note to judge how much more was eaten, and leave the day out of averages and trends.
 - calorie_goals: Nutrition goal history by effectiveDate, newest first; each goal applies until the next one. kcal is energy; macros are protein, fat, carbs in grams (limits).
 - food_products: Shared food catalog with imageUrl or null. per100g nutrition: kcal is energy; macros are protein, fat, carbs in grams. productSizeGrams is one package.
@@ -57,13 +60,13 @@ Resources:
 - workout_routines: Reusable workout plans, each with ordered exercises (name, measure, restSeconds) and setTypes, one per planned set.
 - workout_exercises: Exercise list with measure, restSeconds, notes, archived, lastDoneOn, and sessionCount.
 
-| Input      | Type                                                                                                                                                      | Required | Notes                                           |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
-| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" | yes      |                                                 |
-| `cursor`   | string                                                                                                                                                    |          | nextCursor from the previous page               |
-| `from`     | date YYYY-MM-DD                                                                                                                                           |          | earliest date, inclusive (dated resources only) |
-| `limit`    | integer                                                                                                                                                   |          |                                                 |
-| `to`       | date YYYY-MM-DD                                                                                                                                           |          | latest date, inclusive (dated resources only)   |
+| Input      | Type                                                                                                                                                                     | Required | Notes                                           |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ----------------------------------------------- |
+| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "meal_plan" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" | yes      |                                                 |
+| `cursor`   | string                                                                                                                                                                   |          | nextCursor from the previous page               |
+| `from`     | date YYYY-MM-DD                                                                                                                                                          |          | earliest date, inclusive (dated resources only) |
+| `limit`    | integer                                                                                                                                                                  |          |                                                 |
+| `to`       | date YYYY-MM-DD                                                                                                                                                          |          | latest date, inclusive (dated resources only)   |
 
 ### `get_record`
 
@@ -71,10 +74,10 @@ _read_
 
 Fetch one permitted record by resource and id. Returns null if not found or not yours.
 
-| Input      | Type                                                                                                                                                      | Required | Notes                                        |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------- |
-| `id`       | string                                                                                                                                                    | yes      | record UUID; a YYYY-MM-DD date for food_days |
-| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" | yes      |                                              |
+| Input      | Type                                                                                                                                                                     | Required | Notes                                        |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | -------------------------------------------- |
+| `id`       | string                                                                                                                                                                   | yes      | record UUID; a YYYY-MM-DD date for food_days |
+| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "meal_plan" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" | yes      |                                              |
 
 ### `get_days`
 
@@ -206,6 +209,32 @@ Create (no id; name required) or update (id) an own or friend-shared recipe. Omi
 | `name`        | string                       |          |               |
 | `portions`    | integer                      |          |               |
 | `rating`      | integer \| null              |          |               |
+
+## Write: Meal plan
+
+### `save_meal_plan_item`
+
+_write, destructive_
+
+Create (no id) or update (id) a planned meal on a date. Set recipeId to an own recipe (name may be empty; the recipe name is used) or null with a name for a free-text meal. portions is how many portions to eat. Changing date moves the meal. Does not log food. Returns { id }.
+
+| Input      | Type            | Required | Notes |
+| ---------- | --------------- | -------- | ----- |
+| `date`     | date YYYY-MM-DD | yes      |       |
+| `name`     | string          | yes      |       |
+| `portions` | number 0–50     | yes      |       |
+| `recipeId` | uuid \| null    | yes      |       |
+| `id`       | uuid            |          |       |
+
+### `delete_meal_plan_item`
+
+_write, destructive_
+
+Delete one planned meal. The food diary does not change.
+
+| Input | Type | Required | Notes |
+| ----- | ---- | -------- | ----- |
+| `id`  | uuid | yes      |       |
 
 ## Write: Food diary
 
