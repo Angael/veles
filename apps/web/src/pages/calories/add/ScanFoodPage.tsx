@@ -21,7 +21,7 @@ export function ScanFoodPage({ initialDate: date }: { initialDate: string }) {
     const result = await lookupMutation.mutateAsync({ data: { barcode } });
     if (result.status !== 'found') return false;
     queryClient.setQueryData(calorieFoodQueryOptions(result.food.id).queryKey, result.food);
-    await navigate({ search: { date, foodId: result.food.id }, to: '/calories/add' });
+    await navigate({ replace: true, search: { date, foodId: result.food.id }, to: '/calories' });
     return true;
   });
 

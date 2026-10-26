@@ -4,6 +4,7 @@ import { CreateRecipeAction } from './CreateRecipeAction';
 import { DailySummary } from './DailySummary';
 import { DayNote } from './DayNote';
 import { DeleteLogsAction } from './DeleteLogsAction';
+import { FoodSearch } from './FoodSearch';
 import { LogFoodMenu } from './LogFoodMenu';
 import { LoggedFood } from './LoggedFood';
 import { LogsDateAction } from './LogsDateAction';
@@ -17,10 +18,14 @@ import { SelectionBar } from '@/components/ui/selection-bar/SelectionBar';
 import css from './CaloriesPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-type Props = { day: CalorieDashboardDay };
+type Props = {
+  day: CalorieDashboardDay;
+  /** Food to open in the add dialog, e.g. after scanning or creating it. */
+  linkedFoodId?: string;
+};
 
 /** Day overview; selecting logs via their images swaps the Log food button for bulk actions. */
-export function CalorieOverview({ day }: Props) {
+export function CalorieOverview({ day, linkedFoodId }: Props) {
   const { date, goal, logs, totals } = day;
   const { t } = useI18n();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -72,6 +77,7 @@ export function CalorieOverview({ day }: Props) {
             </Btn>
           ) : null}
         </div>
+        <FoodSearch date={date} linkedFoodId={linkedFoodId} />
         <ReceivedFoodShares date={date} />
         {logs.length ? (
           <List as='ol' data-selecting={selecting || undefined}>

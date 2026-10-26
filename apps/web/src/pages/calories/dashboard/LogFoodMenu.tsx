@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { AppleIcon, PlusIcon, ScanLineIcon, SearchIcon, SparklesIcon } from 'lucide-react';
+import { AppleIcon, PlusIcon, ScanLineIcon, SparklesIcon } from 'lucide-react';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
 import {
   MenuBtn,
@@ -15,15 +15,6 @@ import type { Localized } from '@/lib/i18n/locale';
 type Props = { date: string };
 
 const loggingActions = [
-  {
-    description: {
-      en: 'Search your foods and choose a serving',
-      pl: 'Wyszukaj produkt i wybierz porcję',
-    },
-    icon: SearchIcon,
-    label: { en: 'Find food', pl: 'Znajdź jedzenie' },
-    to: '/calories/add' as const,
-  },
   {
     description: {
       en: 'Use the camera or enter a barcode',
