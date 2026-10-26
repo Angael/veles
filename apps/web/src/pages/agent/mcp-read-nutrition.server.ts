@@ -10,6 +10,7 @@ import { fromHundredths } from '@/lib/nutrition';
 import { readAgentPermissions } from '@/server/agentAccess.server';
 import { db } from '@/server/db.server';
 import { storagePathToUrl } from '@/server/storage/config.server';
+import { listedFoodProduct } from '@/pages/calories/foodProducts.server';
 import {
   byIdDesc,
   inDateRange,
@@ -164,7 +165,7 @@ export async function readFoodProducts(_userId: string, query: ReadQuery) {
     .select({ product: foodProducts, imageKey: uploadObjects.key })
     .from(foodProducts)
     .leftJoin(uploadObjects, eq(uploadObjects.id, foodProducts.imageUploadObjectId))
-    .where(byIdDesc(foodProducts.id, query))
+    .where(and(query.id ? undefined : listedFoodProduct, byIdDesc(foodProducts.id, query)))
     .orderBy(desc(foodProducts.id))
     .limit(query.limit + 1);
   const page = toPage(rows, query.limit, ({ product }) => product.id);

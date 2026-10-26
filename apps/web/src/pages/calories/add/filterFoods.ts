@@ -41,7 +41,10 @@ function foodNameScore(food: CalorieFood, terms: string[]) {
 
 type RankedFood = { food: CalorieFood; score: number };
 
-/** Finds the best catalog matches in one pass while retaining only the requested result count. */
+/**
+ * Finds the best catalog matches in one pass while retaining only the requested result count.
+ * Skips retired seeds, which stay in the list only so old logs and recipes can show them.
+ */
 export function filterFoods(
   foods: CalorieFood[],
   query: string,
@@ -51,13 +54,14 @@ export function filterFoods(
   if (limit <= 0) return [];
 
   const normalizedQuery = query.trim().toLocaleLowerCase();
-  if (!normalizedQuery) return foods.slice(0, limit);
+  if (!normalizedQuery) return foods.filter((food) => !food.retired).slice(0, limit);
 
   const terms = normalizedQuery.split(/\s+/);
   const shownName = (food: CalorieFood) => foodProductNames(food)[locale];
   const rankedFoods: RankedFood[] = [];
 
   for (const food of foods) {
+    if (food.retired) continue;
     const score = foodNameScore(food, terms);
     if (score === null) continue;
 
