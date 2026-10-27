@@ -17,7 +17,7 @@
 ## CI/CD
 - Avoid GitHub Actions and GitHub CI/CD for sensitive prod workflows; this repo is public
 - Pushing to `main` makes Dokploy pull, install, and deploy to prod
-- Never run Drizzle commands yourself; leave them to the human user
+- Do not run any dev/prod reset, push, or migration commands unless explicitly told to do so
 - DB migrations need to be run before pushing/merging to `main`
 - Static branch `pr-assets` hosts images for PRs and issues. Clean it periodically (ensure assets are unused).
 
