@@ -10,19 +10,17 @@ import { calorieDashboardQueryOptions } from '../calories.query';
 import { CalorieOverview } from './CalorieOverview';
 import { useCaloriesReturnScrollOrigin } from '../caloriesReturnScroll';
 import { CALORIE_DATE_FORMAT, calorieWeekDates, calorieWeekStart } from '../calorieHelpers';
-import { todayLocalDate } from '@/lib/dateOnly';
 import { Btn } from '@/components/ui/btn/Btn';
 import css from './CaloriesPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-type CaloriesPageProps = { dashboard: CalorieDashboard; date: string };
+type CaloriesPageProps = { dashboard: CalorieDashboard; date: string; today: string };
 
-export function CaloriesPage({ dashboard, date }: CaloriesPageProps) {
+export function CaloriesPage({ dashboard, date, today: todayDate }: CaloriesPageProps) {
   const { dateLocale, t } = useI18n();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   useCaloriesReturnScrollOrigin();
-  const todayDate = todayLocalDate();
   const today = parseISO(todayDate);
   const selectedDay = dashboard.days.find((day) => day.date === date);
 
