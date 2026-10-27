@@ -511,6 +511,9 @@ export function ComponentsDemoPage() {
           aria-label='Selected demo items'
           count={3}
           onClear={() => setDemoSelecting(false)}
+          primaryAction={
+            <SelectionBarAction icon={<SendIcon aria-hidden='true' />} label='Share' primary />
+          }
         >
           <SelectionBarAction icon={<ScalingIcon aria-hidden='true' />} label='Multiply' />
           <SelectionBarAction icon={<CalendarArrowUpIcon aria-hidden='true' />} label='Move' />
@@ -525,7 +528,6 @@ export function ComponentsDemoPage() {
             label='Delete'
             variant='ghostDanger'
           />
-          <SelectionBarAction icon={<SendIcon aria-hidden='true' />} label='Share' primary />
         </SelectionBar>
       ) : (
         <FloatingButton

@@ -129,6 +129,8 @@
   --dock-padding: 0.3rem;
   /* Two-row takeover bars (the selection tray) override it with a card radius. */
   --dock-radius: calc(var(--radius-pill) - 2px);
+  /* Desktop bottom space for the selection tray: 7.5rem + borders, its 1rem offset, and a gap. */
+  --selection-tray-clearance: 9.5rem;
   /* Labeled mobile navbar item height, and the bottom space its dock and a gap occupy. */
   --dock-nav-item-height: 3rem;
   --dock-nav-clearance: 4.75rem;

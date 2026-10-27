@@ -43,13 +43,13 @@ export function CalorieOverview({ day }: Props) {
           aria-label={t({ en: 'Selected products', pl: 'Wybrane produkty' })}
           count={selectedLogs.length}
           onClear={clearSelection}
+          primaryAction={<ShareLogsAction logs={selectedLogs} onShared={clearSelection} />}
         >
           <MultiplyLogsAction logs={selectedLogs} onMultiplied={clearSelection} />
           <LogsDateAction date={date} logs={selectedLogs} mode='move' onDone={clearSelection} />
           <LogsDateAction date={date} logs={selectedLogs} mode='copy' onDone={clearSelection} />
           <CreateRecipeAction logs={selectedLogs} />
           <DeleteLogsAction logs={selectedLogs} onDeleted={clearSelection} />
-          <ShareLogsAction logs={selectedLogs} onShared={clearSelection} />
         </SelectionBar>
       ) : (
         <LogFoodMenu date={date} />
