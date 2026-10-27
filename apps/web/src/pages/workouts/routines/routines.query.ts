@@ -89,7 +89,6 @@ export function useDeleteRoutineMutation() {
     meta: {
       error: { title: t({ en: 'Routine was not deleted', pl: 'Nie udało się usunąć planu' }) },
       invalidateQueryKey: routinesKey,
-      success: { title: t({ en: 'Routine deleted', pl: 'Usunięto plan' }) },
     },
     mutationFn: (variables: { id: string }) => deleteRoutine({ data: variables }),
   });

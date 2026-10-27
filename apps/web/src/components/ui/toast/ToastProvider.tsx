@@ -1,5 +1,5 @@
 import { Toast } from '@base-ui/react/toast';
-import { XIcon } from 'lucide-react';
+import { CircleAlertIcon, CircleCheckIcon, InfoIcon, XIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { toastManager } from './toastManager';
 import css from './ToastProvider.module.css';
@@ -27,14 +27,16 @@ function ToastList() {
   const { t } = useI18n();
 
   return toasts.map((toast) => (
-    // Phones anchor toasts to the top (swipe up), desktop to the bottom (swipe down).
+    // Toasts drop in from the top on every screen, so swiping up dismisses them.
     <Toast.Root
       className={css.toast}
+      data-type={toast.type}
       key={toast.id}
-      swipeDirection={['up', 'down', 'left', 'right']}
+      swipeDirection={['up', 'left', 'right']}
       toast={toast}
     >
       <Toast.Content className={css.content}>
+        <ToastIcon type={toast.type} />
         <div className={css.text}>
           <Toast.Title className={css.title} />
           <Toast.Description className={css.description} />
@@ -48,4 +50,11 @@ function ToastList() {
       </Toast.Content>
     </Toast.Root>
   ));
+}
+
+const TOAST_ICONS = { error: CircleAlertIcon, success: CircleCheckIcon };
+
+function ToastIcon({ type }: { type: string | undefined }) {
+  const Icon = type === 'error' || type === 'success' ? TOAST_ICONS[type] : InfoIcon;
+  return <Icon aria-hidden='true' className={css.icon} size={18} strokeWidth={2.25} />;
 }

@@ -127,6 +127,13 @@
       "when": 1792795801467,
       "tag": "0017_drop_recipe_text_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792796136548,
+      "tag": "0018_food_product_unit",
+      "breakpoints": true
     }
   ]
 }

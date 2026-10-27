@@ -4,7 +4,11 @@ import { createMiddleware, createServerFn } from '@tanstack/react-start';
 import { and, desc, eq, gte, inArray, lte } from 'drizzle-orm';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { calorieDayNotes, calorieGoals, foodLogs, foodProducts } from '@veles/db/schema';
-import { foodProductCategory, type FoodProductCategory } from '@veles/db/seed/food-products';
+import {
+  foodProductCategory,
+  type FoodProductCategory,
+  type FoodProductUnit,
+} from '@veles/db/seed/food-products';
 import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
@@ -218,6 +222,8 @@ export type CalorieFood = {
   imageUrl: string | null;
   category: FoodProductCategory | null;
   productSizeGrams: number | null;
+  /** What one `productSizeGrams` is; always resolved, "package" when nothing more fitting is known. */
+  unit: FoodProductUnit;
   kcalPer100g: number;
   proteinPer100g: number | null;
   fatPer100g: number | null;

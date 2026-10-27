@@ -1,5 +1,6 @@
 import { queryOptions, useMutation } from '@tanstack/react-query';
 import { toastManager } from '@/components/ui/toast/toastManager';
+import type { FoodProductUnit } from '@veles/db/seed/food-products';
 import { todayLocalDate } from '@/lib/dateOnly';
 import {
   copyFoodLogs,
@@ -73,6 +74,7 @@ type FoodProductVariables = ImageFields & {
   barcode?: string;
   name: string;
   productSizeGrams?: number;
+  unit?: FoodProductUnit;
   kcalPer100g: number;
   proteinPer100g?: number;
   fatPer100g?: number;

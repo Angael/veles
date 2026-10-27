@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { CopyPlusIcon, PencilIcon, SquareCheckIcon, SquareIcon, Trash2Icon } from 'lucide-react';
+import { ScalingIcon, PencilIcon, SquareCheckIcon, SquareIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
 import { FoodSelectTarget } from '../FoodSelectTarget';
 import { FoodSummary } from '../FoodSummary';
@@ -95,7 +95,7 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
             render={<Link params={{ logId: entry.id }} to='/calories/logs/$logId' />}
           />
           <ContextMenuItem
-            icon={<CopyPlusIcon aria-hidden='true' />}
+            icon={<ScalingIcon aria-hidden='true' />}
             label={t({ en: 'Multiply…', pl: 'Pomnóż…' })}
             onClick={() => setMultiplyOpen(true)}
           />

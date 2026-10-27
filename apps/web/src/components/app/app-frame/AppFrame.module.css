@@ -35,6 +35,17 @@
       );
     }
   }
+
+  /*
+   * The two-row selection tray outgrows the desktop 4rem. Phones keep the FloatingButton clearance
+   * above, which already covers the tray, so the swap doesn't resize the page there.
+   */
+  @media not (--phone) {
+    /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+    &:has(:global(.selectionTray)) {
+      padding-bottom: var(--selection-tray-clearance);
+    }
+  }
 }
 
 /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
