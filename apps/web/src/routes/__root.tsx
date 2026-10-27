@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import { AppUpdateNotice } from '@/components/app/app-update/AppUpdateNotice';
 import { AppFrame } from '@/components/app/app-frame/AppFrame';
 import { DefaultCatchBoundary } from '@/components/app/default-catch-boundary/DefaultCatchBoundary';
 import { NotFound } from '@/components/app/not-found/NotFound';
@@ -85,6 +86,7 @@ function RootComponent() {
     <RootDocument>
       <ToastProvider>
         <AppFrame user={user} />
+        <AppUpdateNotice />
       </ToastProvider>
     </RootDocument>
   );

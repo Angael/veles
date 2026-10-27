@@ -40,6 +40,7 @@ function ToastList() {
         <div className={css.text}>
           <Toast.Title className={css.title} />
           <Toast.Description className={css.description} />
+          <Toast.Action className={css.action} />
         </div>
         <Toast.Close
           aria-label={t({ en: 'Dismiss notification', pl: 'Zamknij powiadomienie' })}

@@ -162,6 +162,23 @@
   white-space: pre-wrap;
 }
 
+.action {
+  justify-self: start;
+  margin-top: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border: var(--border-width) solid var(--c-primary-border);
+  border-radius: var(--radius-pill);
+  background: var(--c-primary);
+  color: var(--c-primary-contrast);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 2px;
+  }
+}
+
 .close {
   display: inline-grid;
   align-self: flex-start;
@@ -185,6 +202,10 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .action:hover {
+    border-color: var(--c-primary-focus);
+  }
+
   .close:hover {
     background: var(--c-surface-inset);
     color: var(--c-text-strong);

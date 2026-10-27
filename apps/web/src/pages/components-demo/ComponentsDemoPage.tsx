@@ -504,6 +504,20 @@ export function ComponentsDemoPage() {
         >
           Show toast
         </Btn>
+        <Btn
+          onClick={() =>
+            toastManager.add({
+              actionProps: { children: 'Refresh', onClick: () => window.location.reload() },
+              description: 'Refresh the page to use the latest version.',
+              timeout: 0,
+              title: 'New version available',
+            })
+          }
+          type='button'
+          variant='outlineMain'
+        >
+          Show toast with action
+        </Btn>
       </section>
 
       {demoSelecting ? (
