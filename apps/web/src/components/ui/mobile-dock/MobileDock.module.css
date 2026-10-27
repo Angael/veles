@@ -2,6 +2,7 @@
  * Phone bottom dock shared by MobileNavbar and SelectionBar, which takes over the slot while
  * items are selected. Takeover bars size controls with `--dock-item-height`; the labeled navbar
  * uses `--dock-nav-item-height` and overrides `--dock-width` and `--dock-padding` on its own dock.
+ * `.surface` is the dock's look without its slot, for bars that split into several pieces.
  */
 @media (--phone) {
   .dock {
@@ -11,11 +12,15 @@
     z-index: 20;
     width: var(--dock-width);
     padding: var(--dock-padding);
+    transform: translateX(-50%);
+  }
+
+  .dock,
+  .surface {
     border: 1px solid rgba(148, 163, 184, 0.26);
     border-radius: calc(var(--radius-pill) - 2px);
     background: rgba(15, 23, 42, 0.82);
     backdrop-filter: var(--blur-surface);
     box-shadow: 0 18px 48px rgba(2, 6, 23, 0.42);
-    transform: translateX(-50%);
   }
 }

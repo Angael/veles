@@ -8,22 +8,26 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type SelectionBarProps = {
   'aria-label': string;
-  /** `SelectionBarAction`s, secondary first and the primary action last. */
+  /** Secondary `SelectionBarAction`s, grouped in one pill. */
   children: ReactNode;
   count: number;
   onClear: () => void;
+  /** The main `SelectionBarAction` (with `primary`); it gets its own tile beside the pill. */
+  primary: ReactNode;
 };
 
 /**
  * Toolbar for bulk actions on selected items. Render it instead of the page's FloatingButton
- * while a selection exists: desktop keeps the button's spot, phones replace the mobile navbar
- * in the bottom dock with labeled items, like the navbar's.
+ * while a selection exists. It splits into three pieces so no group is crowded: a count chip
+ * with Clear, a pill of secondary actions, and a separate tile for the main action. Desktop keeps
+ * the button's spot; phones replace the mobile navbar in the bottom dock, with the chip above it.
  */
 export function SelectionBar({
   'aria-label': ariaLabel,
   children,
   count,
   onClear,
+  primary,
 }: SelectionBarProps) {
   const { t } = useI18n();
 
@@ -32,31 +36,26 @@ export function SelectionBar({
     // `selectionBar` hides the mobile navbar while this bar owns the dock.
     <div
       aria-label={ariaLabel}
-      className={clsx(dock.dock, css.bar, 'floatingButton', 'selectionBar')}
+      className={clsx(css.bar, 'floatingButton', 'selectionBar')}
       role='toolbar'
     >
-      <Btn
-        aria-label={t({ en: 'Clear selection', pl: 'Wyczyść zaznaczenie' })}
-        className={clsx(css.action, css.clear)}
-        icon={
-          <>
-            <XIcon aria-hidden='true' />
-            {/* Phones show the count here, as the full text doesn't fit beside labeled items. */}
-            <span aria-hidden='true' className={css.badge}>
-              {count}
-            </span>
-          </>
-        }
-        onClick={onClear}
-        radius='pill'
-        variant='ghost'
-      >
-        <span className={css.label}>{t({ en: 'Clear', pl: 'Odznacz' })}</span>
-      </Btn>
-      <span aria-live='polite' className={css.count}>
-        {t({ en: `${count} selected`, pl: `Zaznaczono: ${count}` })}
-      </span>
-      {children}
+      <div className={clsx(dock.surface, css.status)}>
+        <span aria-live='polite' className={css.count}>
+          {t({ en: `${count} selected`, pl: `Zaznaczono: ${count}` })}
+        </span>
+        <Btn
+          aria-label={t({ en: 'Clear selection', pl: 'Wyczyść zaznaczenie' })}
+          className={css.clear}
+          icon={<XIcon aria-hidden='true' />}
+          iconOnly
+          onClick={onClear}
+          radius='pill'
+          size='sm'
+          variant='ghost'
+        />
+      </div>
+      <div className={clsx(dock.surface, css.actions)}>{children}</div>
+      <div className={css.primary}>{primary}</div>
     </div>
   );
 }
@@ -69,7 +68,7 @@ type SelectionBarActionProps = Omit<
   label: string;
   /** Shorter label for phones, where every item shares the navbar's width; `label` stays the accessible name. */
   phoneLabel?: string;
-  /** Filled main button; secondary actions are ghost. */
+  /** Filled main button for the bar's `primary` slot; secondary actions are ghost. */
   primary?: boolean;
 };
 
@@ -85,7 +84,7 @@ export function SelectionBarAction({
   return (
     <Btn
       aria-label={phoneLabel ? label : undefined}
-      className={clsx(css.action, primary && css.primary)}
+      className={css.action}
       icon={icon}
       radius='pill'
       variant={variant}

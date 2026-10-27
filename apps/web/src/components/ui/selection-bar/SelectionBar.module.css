@@ -1,23 +1,61 @@
+/*
+ * Three detached pieces instead of one crowded pill: the count chip, the secondary actions pill,
+ * and the main action's tile. Each surface holds only what fits its own rounding.
+ */
 .bar {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: var(--space-xs);
   animation: bar-in var(--duration-fast) var(--ease-out);
 }
 
-.count {
-  flex: 1;
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
   min-width: 0;
-  padding-inline-end: var(--space-sm);
+  padding-inline: 0.875rem 0.25rem;
+}
+
+.count {
+  min-width: 0;
   overflow: hidden;
   color: var(--c-text-strong);
   font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.badge,
+/* `.bar` raises specificity above Btn's size and variant classes. */
+.bar .clear {
+  --btn-color: var(--c-muted);
+
+  flex-shrink: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.25rem;
+}
+
+.actions .action {
+  --btn-bg: transparent;
+}
+
+.primary {
+  display: flex;
+
+  & .action {
+    flex: 1;
+    height: auto;
+    box-shadow: 0 12px 32px rgba(37, 99, 235, 0.35);
+  }
+}
+
 .phoneOnly {
   display: none;
 }
@@ -25,40 +63,35 @@
 @keyframes bar-in {
   from {
     opacity: 0;
+    transform: translateY(0.5rem);
   }
 }
 
-/* Desktop: sits exactly where FloatingButton does so the swap doesn't move the user's target. */
+/* Desktop: sits where FloatingButton does, growing leftwards, so the main action stays put. */
 @media not (--phone) {
   .bar {
     position: fixed;
     right: max(var(--space-md), calc((100vw - 1100px) / 2));
     bottom: var(--space-md);
     z-index: 2;
-    padding: 0.25rem;
+  }
+
+  .status,
+  .actions {
     border: var(--border-width) solid var(--c-border-popup);
     border-radius: var(--radius-pill);
     background: var(--c-surface-solid);
     box-shadow: var(--shadow-popup);
   }
 
-  /* The count text beside it already says what is cleared. */
-  .bar .clear {
-    --btn-padding-x: 0;
-    --btn-min-width: var(--btn-height);
-
-    width: var(--btn-height);
-    gap: 0;
-
-    & .label {
-      display: none;
-    }
+  .bar .primary .action {
+    --btn-padding-x: 1.35rem;
   }
 }
 
 /*
- * Phones: MobileDock supplies the slot and surface; items copy MobileNavbar's labeled layout
- * (same dock width and item height), so the takeover keeps the navbar's size.
+ * Phones: the chip floats above a dock row the navbar's size. The actions pill copies
+ * MobileNavbar's labeled items, and the main tile matches the pill's height beside it.
  */
 @media (--phone) {
   .bar {
@@ -68,43 +101,62 @@
       calc(100vw - 1rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
     );
 
+    position: fixed;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 0.35rem);
+    left: 50%;
+    z-index: 20;
+    display: grid;
+    grid-template-areas:
+      'status .'
+      'actions primary';
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.375rem var(--space-xs);
+    width: var(--dock-width);
+    translate: -50% 0;
+  }
+
+  .status {
+    grid-area: status;
+    justify-self: start;
+    max-width: 100%;
+    padding-block: 0.125rem;
+
+    & .clear {
+      --btn-height: 2rem;
+    }
+  }
+
+  .actions {
+    grid-area: actions;
     /* One implicit column per item: long Polish labels take the width they need. */
     display: grid;
     grid-auto-columns: minmax(max-content, 1fr);
     grid-auto-flow: column;
     gap: 0;
+    padding: var(--dock-padding);
   }
 
-  /* Visually hidden; it stays in the tree to announce count changes. The badge shows it. */
-  .count {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+  .primary {
+    grid-area: primary;
   }
 
-  /* `.bar` raises specificity above Btn's size, radius, and variant classes. */
   .bar .action {
     --btn-height: var(--dock-nav-item-height);
-    /* No side padding: seven Polish labels must fit a 384px-wide phone. */
+    /* No side padding: five Polish labels share the pill on a 384px-wide phone. */
     --btn-padding-x: 0;
-    --btn-radius: var(--radius-sm);
+    --btn-radius: var(--radius-pill);
 
     flex-direction: column;
     gap: 0.125rem;
     min-width: 2.75rem;
+  }
 
-    &:not(.primary) {
-      --btn-bg: transparent;
-    }
+  /* Same rounding as the pill beside it: a circle in English, a stadium for longer labels. */
+  .bar .primary .action {
+    --btn-padding-x: 0.875rem;
+    --btn-radius: calc(var(--radius-pill) - 2px);
 
-    /* The filled pill needs room so its label doesn't touch the edges. */
-    &.primary {
-      --btn-padding-x: 0.25rem;
-    }
+    min-width: calc(var(--dock-nav-item-height) + 2 * var(--dock-padding) + 2px);
   }
 
   .desktopOnly {
@@ -119,27 +171,5 @@
     font-size: 0.6875rem;
     font-weight: var(--font-weight-semibold);
     line-height: 1.2;
-  }
-
-  .bar .clear {
-    --btn-color: var(--c-muted);
-
-    /* Btn's icon span is the badge's positioning context. */
-    & .badge {
-      position: absolute;
-      top: -0.4rem;
-      left: 0.7rem;
-      display: block;
-      min-width: 1rem;
-      padding-inline: 0.25rem;
-      border-radius: var(--radius-pill);
-      background: var(--c-primary);
-      color: var(--c-primary-contrast);
-      font-size: 0.625rem;
-      font-variant-numeric: tabular-nums;
-      font-weight: var(--font-weight-semibold);
-      line-height: 1rem;
-      text-align: center;
-    }
   }
 }
