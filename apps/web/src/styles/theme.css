@@ -127,6 +127,8 @@
   /* Phone dock box; the labeled mobile navbar overrides both on its own dock. */
   --dock-width: min(22rem, calc(100vw - 1.5rem));
   --dock-padding: 0.3rem;
+  /* Two-row takeover bars (the selection tray) override it with a card radius. */
+  --dock-radius: calc(var(--radius-pill) - 2px);
   /* Labeled mobile navbar item height, and the bottom space its dock and a gap occupy. */
   --dock-nav-item-height: 3rem;
   --dock-nav-clearance: 4.75rem;

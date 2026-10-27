@@ -17,7 +17,8 @@ type SelectionBarProps = {
 /**
  * Toolbar for bulk actions on selected items. Render it instead of the page's FloatingButton
  * while a selection exists: desktop keeps the button's spot, phones replace the mobile navbar
- * in the bottom dock with labeled items, like the navbar's.
+ * in the bottom dock. It is a two-tier tray: the count, Clear, and the primary action share the
+ * top row; secondary actions get equal, labeled cells in the row below, so nothing is squeezed.
  */
 export function SelectionBar({
   'aria-label': ariaLabel,
@@ -35,27 +36,21 @@ export function SelectionBar({
       className={clsx(dock.dock, css.bar, 'floatingButton', 'selectionBar')}
       role='toolbar'
     >
-      <Btn
-        aria-label={t({ en: 'Clear selection', pl: 'Wyczyść zaznaczenie' })}
-        className={clsx(css.action, css.clear)}
-        icon={
-          <>
-            <XIcon aria-hidden='true' />
-            {/* Phones show the count here, as the full text doesn't fit beside labeled items. */}
-            <span aria-hidden='true' className={css.badge}>
-              {count}
-            </span>
-          </>
-        }
-        onClick={onClear}
-        radius='pill'
-        variant='ghost'
-      >
-        <span className={css.label}>{t({ en: 'Clear', pl: 'Odznacz' })}</span>
-      </Btn>
-      <span aria-live='polite' className={css.count}>
-        {t({ en: `${count} selected`, pl: `Zaznaczono: ${count}` })}
-      </span>
+      <div className={css.summary}>
+        <Btn
+          aria-label={t({ en: 'Clear selection', pl: 'Wyczyść zaznaczenie' })}
+          className={css.clear}
+          icon={<XIcon aria-hidden='true' />}
+          iconOnly
+          onClick={onClear}
+          radius='pill'
+          size='sm'
+          variant='ghost'
+        />
+        <span aria-live='polite' className={css.count}>
+          {t({ en: `${count} selected`, pl: `Zaznaczono: ${count}` })}
+        </span>
+      </div>
       {children}
     </div>
   );
@@ -67,13 +62,13 @@ type SelectionBarActionProps = Omit<
 > & {
   icon: ReactNode;
   label: string;
-  /** Shorter label for phones, where every item shares the navbar's width; `label` stays the accessible name. */
+  /** Shorter label for phones, where secondary actions share the tray's width; `label` stays the accessible name. */
   phoneLabel?: string;
-  /** Filled main button; secondary actions are ghost. */
+  /** Filled main button in the tray's top row; secondary actions are ghost cells below. */
   primary?: boolean;
 };
 
-/** Icon and visible label; phones stack them like the mobile navbar so every icon is named. */
+/** Icon and visible label; secondary actions stack them so every icon is named in an even cell. */
 export function SelectionBarAction({
   icon,
   label,
@@ -87,7 +82,6 @@ export function SelectionBarAction({
       aria-label={phoneLabel ? label : undefined}
       className={clsx(css.action, primary && css.primary)}
       icon={icon}
-      radius='pill'
       variant={variant}
       {...props}
     >
