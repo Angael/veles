@@ -1,15 +1,12 @@
-import { and, inArray, notExists, sql } from 'drizzle-orm';
+import { inArray, sql } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { foodLogs, foodProducts } from '../schema/calories.schema.ts';
-import { recipeIngredients } from '../schema/recipes.schema.ts';
+import { foodProducts } from '../schema/calories.schema.ts';
 import type * as schema from '../schema/index.ts';
 import { foodProductSeeds, retiredFoodProductSeedKeys } from './food-products.ts';
 
 /**
- * Makes the shared catalog match `foodProductSeeds`: adds missing seeds and deletes retired ones
- * that no food log or recipe links. Linked retired rows stay, hidden from the catalog, so recipes
- * keep their nutrition. Existing seeded rows are not changed, so user edits stay. Safe to run on
- * every deploy.
+ * Makes the shared catalog match `foodProductSeeds`: adds missing seeds and deletes retired ones.
+ * Existing seeded rows are not changed, so user edits stay. Safe to run on every deploy.
  */
 export async function syncFoodProductSeeds(db: NodePgDatabase<typeof schema>) {
   return db.transaction(async (tx) => {
@@ -34,23 +31,7 @@ export async function syncFoodProductSeeds(db: NodePgDatabase<typeof schema>) {
       retiredFoodProductSeedKeys.length > 0
         ? await tx
             .delete(foodProducts)
-            .where(
-              and(
-                inArray(foodProducts.seedKey, retiredFoodProductSeedKeys),
-                notExists(
-                  tx
-                    .select()
-                    .from(foodLogs)
-                    .where(sql`${foodLogs.productId} = ${foodProducts.id}`),
-                ),
-                notExists(
-                  tx
-                    .select()
-                    .from(recipeIngredients)
-                    .where(sql`${recipeIngredients.productId} = ${foodProducts.id}`),
-                ),
-              ),
-            )
+            .where(inArray(foodProducts.seedKey, retiredFoodProductSeedKeys))
             .returning({ id: foodProducts.id })
         : [];
 

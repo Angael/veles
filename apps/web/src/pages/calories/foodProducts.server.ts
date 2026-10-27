@@ -1,6 +1,6 @@
-import { and, eq, inArray, isNotNull, isNull, notInArray, or, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNotNull, sql } from 'drizzle-orm';
 import { foodLogs, foodProducts, uploadObjects } from '@veles/db/schema';
-import { foodProductCategory, retiredFoodProductSeedKeys } from '@veles/db/seed/food-products';
+import { foodProductCategory } from '@veles/db/seed/food-products';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { fromHundredths, HUNDREDTHS, optionalHundredths, toHundredths } from '@/lib/nutrition';
 import { db } from '@/server/db.server';
@@ -23,14 +23,6 @@ import {
 } from './foodImages.server';
 import { getOpenFoodFactsProduct, type OpenFoodFactsProduct } from './openFoodFacts';
 import { translate } from '@/lib/i18n/getLocale';
-
-const retiredSeedKeys = new Set(retiredFoodProductSeedKeys);
-
-/** Hides retired seeds that the deploy sync kept because old logs or recipes still link them. */
-export const listedFoodProduct = or(
-  isNull(foodProducts.seedKey),
-  notInArray(foodProducts.seedKey, retiredFoodProductSeedKeys),
-);
 
 function productValues(data: typeof createFoodProductValuesType.infer) {
   return {
@@ -55,7 +47,6 @@ export function toFoodProduct(
     barcode: product.barcode,
     imageUrl: asset ? storagePathToUrl(asset.key) : null,
     category: foodProductCategory(product.seedKey),
-    retired: product.seedKey !== null && retiredSeedKeys.has(product.seedKey),
     productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
     kcalPer100g: product.kcalPer100gHundredths / HUNDREDTHS,
     proteinPer100g: fromHundredths(product.proteinPer100gHundredths),

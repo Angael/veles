@@ -57,9 +57,12 @@ export type FoodProductSeed = Pick<
 };
 
 /**
- * Seed keys hidden from the shared catalog. The deploy sync deletes their rows unless a food log
- * or recipe still links them, so old logs and recipes keep their product and nutrition.
- * Move a seed's key here when you remove it from `foodProductSeeds`.
+ * Seed keys whose rows the deploy sync deletes. Move a seed's key here when you remove it from
+ * `foodProductSeeds`. Food logs keep their nutrition snapshot, but recipe ingredients read
+ * nutrition from the product and lose it. Before you add a key, check prod:
+ *   select p.seed_key, count(r.id) from food_product p
+ *   join recipe_ingredient r on r.product_id = p.id where p.seed_key in (...) group by 1;
+ * If any row comes back, ask the human before you retire the key.
  */
 export const retiredFoodProductSeedKeys: string[] = [
   // Whole-egg preparations within ~8% of `egg-whole-raw`, or differing only by frying fat.

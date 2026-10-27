@@ -217,8 +217,6 @@ export type CalorieFood = {
   barcode: string | null;
   imageUrl: string | null;
   category: FoodProductCategory | null;
-  /** Retired seed still linked by old logs or recipes; search hides it. */
-  retired: boolean;
   productSizeGrams: number | null;
   kcalPer100g: number;
   proteinPer100g: number | null;
