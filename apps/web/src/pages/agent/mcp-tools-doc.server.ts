@@ -13,6 +13,7 @@ type JsonSchema = {
   format?: string;
   pattern?: string;
   enum?: unknown[];
+  const?: unknown;
   anyOf?: JsonSchema[];
   items?: JsonSchema;
   properties?: Record<string, JsonSchema>;
@@ -78,6 +79,7 @@ function numberRange(schema: JsonSchema) {
 /** Short readable type, e.g. `number 0–300`, `date`, `"up" | "down"`. */
 function typeLabel(schema: JsonSchema): string {
   if (schema.enum) return schema.enum.map((value) => JSON.stringify(value)).join(' | ');
+  if (schema.const !== undefined) return JSON.stringify(schema.const);
   if (schema.anyOf) {
     const labels = schema.anyOf.filter((branch) => !branch.not).map(typeLabel);
     return [...new Set(labels)].join(' | ');

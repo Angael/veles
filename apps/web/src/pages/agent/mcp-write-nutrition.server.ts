@@ -81,7 +81,7 @@ export function registerCalorieGoalTools(server: McpServer, userId: string) {
 /** Shared catalog writes: changes are visible to every Veles account. */
 export function registerFoodCatalogTools(server: McpServer, userId: string) {
   const write = agentWriter(userId, 'food_products');
-  const per100g = `kcalPer100g and optional proteinPer100g, fatPer100g, carbsPer100g (grams per 100 g); productSizeGrams is one package`;
+  const per100g = `kcalPer100g and optional proteinPer100g, fatPer100g, carbsPer100g (grams per 100 g); productSizeGrams is the weight of one unit (package, piece, slice or serving; null unit means package, or the seed default for seeded foods)`;
 
   server.registerTool(
     'lookup_food_barcode',

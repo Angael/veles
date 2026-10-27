@@ -1,4 +1,5 @@
 import { type } from 'arktype';
+import { foodProductUnits } from '@veles/db/seed/food-products';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { HUNDREDTHS } from '@/lib/nutrition';
 import { MAX_FOOD_LOG_MULTIPLIER } from './calorieHelpers';
@@ -16,11 +17,16 @@ const optionalNonEmptyTextType = nonEmptyTextType.or('null').or('undefined');
 const optionalPositiveAmountType = type('number > 0 | null | undefined');
 const optionalNonNegativeAmountType = nonNegativeAmountType.or('null').or('undefined');
 export const imageActionType = type("'keep' | 'replace' | 'remove'");
+const optionalFoodUnitType = type
+  .enumerated(...foodProductUnits)
+  .or('null')
+  .or('undefined');
 
 export const createFoodProductValuesType = type({
   name: nonEmptyTextType,
   'barcode?': optionalNonEmptyTextType,
   'productSizeGrams?': optionalPositiveAmountType,
+  'unit?': optionalFoodUnitType,
   kcalPer100g: nonNegativeAmountType,
   'proteinPer100g?': optionalNonNegativeAmountType,
   'fatPer100g?': optionalNonNegativeAmountType,

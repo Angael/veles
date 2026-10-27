@@ -26,6 +26,11 @@ export const foodProductCategories = [
 
 export type FoodProductCategory = (typeof foodProductCategories)[number];
 
+/** What one product size is, so quick amounts read "1 piece" instead of "1 package". */
+export const foodProductUnits = ['package', 'piece', 'slice', 'serving'] as const;
+
+export type FoodProductUnit = (typeof foodProductUnits)[number];
+
 /**
  * Searchable starter foods with practical single-item or typical-serving sizes.
  *
@@ -4379,4 +4384,144 @@ const categoryBySeedKey = new Map(foodProductSeeds.map((seed) => [seed.seedKey, 
 /** Category of a seeded catalog product; null for user-created products. */
 export function foodProductCategory(seedKey: string | null): FoodProductCategory | null {
   return seedKey ? (categoryBySeedKey.get(seedKey) ?? null) : null;
+}
+
+/** Seeds whose size is one whole item or one slice; every other seed size is a typical serving. */
+const seedUnitByKey = new Map<string, FoodProductUnit>([
+  ...[
+    'avocado',
+    'beetroot',
+    'bell-pepper-green',
+    'bell-pepper-red',
+    'bell-pepper-yellow',
+    'bok-choy',
+    'cabbage-green',
+    'cabbage-red',
+    'carrot',
+    'cauliflower',
+    'celery',
+    'celeriac-raw',
+    'cucumber',
+    'eggplant',
+    'fennel',
+    'garlic',
+    'leek',
+    'lettuce-iceberg',
+    'lettuce-romaine',
+    'mushrooms-button',
+    'mushrooms-cremini',
+    'mushrooms-portobello',
+    'mushrooms-shiitake',
+    'onion-red',
+    'onion-yellow',
+    'onion-white',
+    'parsnip',
+    'parsley-root-raw',
+    'potatoes-raw',
+    'potatoes-boiled',
+    'potatoes-baked',
+    'pumpkin',
+    'radish',
+    'rutabaga',
+    'zucchini',
+    'squash-butternut',
+    'squash-spaghetti',
+    'sweet-potato',
+    'tomato-roma',
+    'tomato-fresh',
+    'turnip',
+    'corn-on-the-cob',
+    'dill-pickles',
+    'apple',
+    'apple-fuji',
+    'apple-gala',
+    'apple-granny-smith',
+    'apricot',
+    'banana',
+    'cherries',
+    'cantaloupe',
+    'figs-dried',
+    'grapefruit',
+    'grapes-red',
+    'grapes-green',
+    'kiwi',
+    'lemon',
+    'mango',
+    'persimmon',
+    'mandarin',
+    'nectarine',
+    'orange',
+    'papaya',
+    'pear',
+    'peach',
+    'pineapple',
+    'plum',
+    'pomegranate',
+    'raspberries',
+    'strawberries',
+    'watermelon',
+    'poznan-wheat-roll',
+    'morning-wheat-roll',
+    'graham-wheat-roll',
+    'breakfast-roll-with-seeds',
+    'kaiser-roll',
+    'spelt-roll-with-seeds',
+    'flaxseed-and-sesame-roll',
+    'pita-bread',
+    'bagel',
+    'flour-tortilla',
+    'corn-tortilla',
+    'chicken-breast-raw',
+    'chicken-breast-cooked',
+    'chicken-thigh-raw',
+    'chicken-thigh-cooked',
+    'chicken-drumstick-raw',
+    'chicken-drumstick-cooked',
+    'chicken-wing-raw',
+    'chicken-wing-cooked',
+    'duck-breast-raw',
+    'pork-chop-raw',
+    'pork-sausage-cooked',
+    'italian-sausage-cooked',
+    'frankfurter-sausage-boiled',
+    'egg-whole-raw',
+    'egg-whole-hard-boiled',
+    'egg-white-raw',
+    'egg-yolk-raw',
+    'egg-fried',
+    'egg-poached',
+    'butter-croissant',
+    'doughnut-jam-filled',
+    'waffles-plain',
+    'brownie',
+    'blueberry-muffin',
+    'hamburger-with-condiments',
+    'cheeseburger-with-condiments',
+    'hot-dog-plain-no-sauces',
+    'burrito-beans-and-cheese',
+  ].map((key) => [key, 'piece'] as const),
+  ...[
+    'white-bread',
+    'whole-wheat-bread',
+    'rye-bread',
+    'sourdough-bread',
+    'wheat-rye-bread',
+    'spelt-bread',
+    'wheat-rye-bread-with-seeds',
+    'bacon-cooked',
+  ].map((key) => [key, 'slice'] as const),
+]);
+
+function isFoodProductUnit(value: string): value is FoodProductUnit {
+  return (foodProductUnits as readonly string[]).includes(value);
+}
+
+/**
+ * Unit of one product size: the saved unit, else the seed default, else "package".
+ * Seed defaults live here instead of the row because the deploy sync never updates seeded rows.
+ */
+export function foodProductUnit(unit: string | null, seedKey: string | null): FoodProductUnit {
+  if (unit && isFoodProductUnit(unit)) return unit;
+  if (!seedKey || !categoryBySeedKey.has(seedKey)) return 'package';
+  return seedUnitByKey.get(seedKey) ?? 'serving';
 }
