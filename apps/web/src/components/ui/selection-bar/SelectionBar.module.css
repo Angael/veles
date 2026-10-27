@@ -14,7 +14,8 @@
   align-items: center;
   gap: 0.25rem;
   min-width: 0;
-  padding-inline: 0.875rem 0.25rem;
+  /* The ✕ fills the chip's height and end, so the chip is only as tall as its touch target. */
+  padding-inline: 0.875rem 0;
 }
 
 .count {
@@ -31,6 +32,7 @@
 /* `.bar` raises specificity above Btn's size and variant classes. */
 .bar .clear {
   --btn-color: var(--c-muted);
+  --btn-height: var(--button-min-height);
 
   flex-shrink: 0;
 }
@@ -119,11 +121,6 @@
     grid-area: status;
     justify-self: start;
     max-width: 100%;
-    padding-block: 0.125rem;
-
-    & .clear {
-      --btn-height: 2rem;
-    }
   }
 
   .actions {
