@@ -17,14 +17,21 @@
   white-space: nowrap;
 }
 
-.badge,
-.phoneOnly {
+.tally,
+.toggle {
   display: none;
 }
 
 @keyframes bar-in {
   from {
     opacity: 0;
+  }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
   }
 }
 
@@ -42,23 +49,16 @@
     box-shadow: var(--shadow-popup);
   }
 
-  /* The count text beside it already says what is cleared. */
-  .bar .clear {
-    --btn-padding-x: 0;
-    --btn-min-width: var(--btn-height);
-
-    width: var(--btn-height);
-    gap: 0;
-
-    & .label {
-      display: none;
-    }
+  /* There is room for every action, so the phone panel's wrapper drops out of the layout. */
+  .more {
+    display: contents;
   }
 }
 
 /*
- * Phones: MobileDock supplies the slot and surface; items copy MobileNavbar's labeled layout
- * (same dock width and item height), so the takeover keeps the navbar's size.
+ * Phones: one row the navbar's height (clear, count, More, primary), so the takeover keeps the
+ * dock's size and the filled primary pill sits concentric inside the dock's rounded ends.
+ * Secondary actions open as tiles in a panel above the dock.
  */
 @media (--phone) {
   .bar {
@@ -68,14 +68,12 @@
       calc(100vw - 1rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
     );
 
-    /* One implicit column per item: long Polish labels take the width they need. */
     display: grid;
-    grid-auto-columns: minmax(max-content, 1fr);
-    grid-auto-flow: column;
-    gap: 0;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    gap: 0.125rem;
   }
 
-  /* Visually hidden; it stays in the tree to announce count changes. The badge shows it. */
+  /* Visually hidden; it stays in the tree to announce count changes. `.tally` shows it. */
   .count {
     position: absolute;
     width: 1px;
@@ -86,60 +84,117 @@
     white-space: nowrap;
   }
 
-  /* `.bar` raises specificity above Btn's size, radius, and variant classes. */
-  .bar .action {
-    --btn-height: var(--dock-nav-item-height);
-    /* No side padding: seven Polish labels must fit a 384px-wide phone. */
-    --btn-padding-x: 0;
-    --btn-radius: var(--radius-sm);
-
+  .tally {
+    display: flex;
+    min-width: 0;
     flex-direction: column;
-    gap: 0.125rem;
-    min-width: 2.75rem;
-
-    &:not(.primary) {
-      --btn-bg: transparent;
-    }
-
-    /* The filled pill needs room so its label doesn't touch the edges. */
-    &.primary {
-      --btn-padding-x: 0.25rem;
-    }
+    justify-content: center;
+    padding-inline-start: 0.125rem;
+    line-height: 1.15;
+    white-space: nowrap;
   }
 
-  .desktopOnly {
-    display: none;
+  .tallyNumber {
+    overflow: hidden;
+    color: var(--c-text-strong);
+    font-size: var(--text-md);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--font-weight-semibold);
+    text-overflow: ellipsis;
   }
 
-  .phoneOnly {
-    display: inline;
-  }
-
-  .label {
+  .tallyCaption {
+    overflow: hidden;
+    color: var(--c-muted);
     font-size: 0.6875rem;
     font-weight: var(--font-weight-semibold);
-    line-height: 1.2;
+    text-overflow: ellipsis;
   }
 
-  .bar .clear {
-    --btn-color: var(--c-muted);
+  /* `.bar` raises specificity above Btn's size and variant classes. */
+  .bar .clear,
+  .bar .toggle,
+  .bar .primary {
+    --btn-height: var(--dock-nav-item-height);
+    --btn-font-size: var(--text-sm);
+    --btn-font-weight: var(--font-weight-semibold);
 
-    /* Btn's icon span is the badge's positioning context. */
-    & .badge {
-      position: absolute;
-      top: -0.4rem;
-      left: 0.7rem;
-      display: block;
-      min-width: 1rem;
-      padding-inline: 0.25rem;
-      border-radius: var(--radius-pill);
-      background: var(--c-primary);
-      color: var(--c-primary-contrast);
-      font-size: 0.625rem;
-      font-variant-numeric: tabular-nums;
-      font-weight: var(--font-weight-semibold);
-      line-height: 1rem;
-      text-align: center;
+    gap: 0.375rem;
+  }
+
+  .bar .clear,
+  .bar .toggle {
+    --btn-bg: transparent;
+    --btn-color: var(--c-muted);
+  }
+
+  .bar .toggle {
+    --btn-padding-x: 0.75rem;
+
+    display: inline-flex;
+
+    & svg {
+      transition: transform var(--duration-fast) var(--ease-out);
+    }
+
+    &[aria-expanded='true'] {
+      --btn-bg: var(--c-primary-surface);
+      --btn-color: var(--c-text-strong);
+
+      & svg {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .bar .primary {
+    --btn-padding-x: 1rem;
+  }
+
+  .more {
+    position: absolute;
+    right: -1px;
+    bottom: calc(100% + var(--space-xs));
+    left: -1px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem;
+    padding: 0.375rem;
+    border: 1px solid rgba(148, 163, 184, 0.26);
+    border-radius: var(--radius-md);
+    background: var(--c-surface-solid);
+    box-shadow: var(--shadow-popup);
+    animation: panel-in var(--duration-fast) var(--ease-out);
+
+    .bar:not([data-expanded]) & {
+      display: none;
+    }
+
+    /* Tiles follow the panel's corners: outer radius minus its padding. */
+    & .action {
+      --btn-height: var(--dock-nav-item-height);
+      --btn-bg: rgba(148, 163, 184, 0.08);
+      --btn-font-size: var(--text-sm);
+      --btn-padding-x: 0.875rem;
+      --btn-radius: calc(var(--radius-md) - 0.375rem);
+
+      justify-content: flex-start;
+      gap: 0.625rem;
+    }
+
+    /* An odd action out spans the row instead of leaving a hole. */
+    & .action:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .more {
+      animation-name: bar-in;
+    }
+
+    .bar .toggle svg {
+      transition: none;
     }
   }
 }
