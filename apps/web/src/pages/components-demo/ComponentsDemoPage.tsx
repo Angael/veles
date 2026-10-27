@@ -1,5 +1,15 @@
 // This component catalog may remain intentionally long; keep all component demos together rather than splitting it needlessly.
-import { CopyPlusIcon, PlusIcon, SearchIcon, SendIcon, Trash2Icon } from 'lucide-react';
+import {
+  CalendarArrowUpIcon,
+  ChefHatIcon,
+  CopyIcon,
+  CopyPlusIcon,
+  PlusIcon,
+  ScalingIcon,
+  SearchIcon,
+  SendIcon,
+  Trash2Icon,
+} from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Btn, type BtnSize, type BtnVariant } from '@/components/ui/btn/Btn';
@@ -501,14 +511,23 @@ export function ComponentsDemoPage() {
           aria-label='Selected demo items'
           count={3}
           onClear={() => setDemoSelecting(false)}
+          primaryAction={
+            <SelectionBarAction icon={<SendIcon aria-hidden='true' />} label='Share' primary />
+          }
         >
-          <SelectionBarAction icon={<CopyPlusIcon aria-hidden='true' />} label='Multiply' />
+          <SelectionBarAction icon={<ScalingIcon aria-hidden='true' />} label='Multiply' />
+          <SelectionBarAction icon={<CalendarArrowUpIcon aria-hidden='true' />} label='Move' />
+          <SelectionBarAction icon={<CopyIcon aria-hidden='true' />} label='Copy' />
+          <SelectionBarAction
+            icon={<ChefHatIcon aria-hidden='true' />}
+            label='Create recipe'
+            phoneLabel='Recipe'
+          />
           <SelectionBarAction
             icon={<Trash2Icon aria-hidden='true' />}
             label='Delete'
             variant='ghostDanger'
           />
-          <SelectionBarAction icon={<SendIcon aria-hidden='true' />} label='Share' primary />
         </SelectionBar>
       ) : (
         <FloatingButton
