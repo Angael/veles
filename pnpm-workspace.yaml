@@ -27,6 +27,11 @@ minimumReleaseAgeExclude:
   - '@tanstack/query-devtools@5.103.1'
   - '@tanstack/react-query-devtools@5.103.1'
   - '@tanstack/react-query@5.103.1'
+  - '@tanstack/db-ivm@1.0.0-rc.1'
+  - '@tanstack/db@1.0.0-rc.1'
+  - '@tanstack/query-db-collection@1.5.0'
+  - '@tanstack/react-db@1.0.0-rc.1'
+  - '@tanstack/react-router-with-db@1.0.0-rc.1'
 
 overrides:
   'brace-expansion@^1.1.7': 1.1.21
