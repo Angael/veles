@@ -22,20 +22,23 @@ Reference implementation: `apps/web/src/pages/todos/listItems.collection.ts` and
 - **Split the loader.** TanStack Router code-splits `component` but keeps `loader` in the main bundle. A loader that imports a `.collection.ts` file ships `@tanstack/query-db-collection` and the feature API to every page. Routes that preload a collection need `codeSplitGroupings: [['loader'], ['component']]`.
 - **File:** `<feature>/<rows>.collection.ts` beside the owning page. It owns the descriptor, its handlers, and a `useXCollection()` hook: `useDbClient().collection<Row, string, QueryCollectionUtils<Row, string>>(xCollection)`. The explicit type arguments are necessary; without them the schema overload matches first and the rows are typed `never`.
 - **Server stays the same.** Reads: a `GET` server function returning **flat rows** (no nesting; group/join in live queries). Writes: existing feature server functions with `logMiddleware` + arktype validators. Handlers call them; keep business rules and access checks on the server.
-- **Refetch by hand.** Automatic refetch after a handler is deprecated and goes away in v1.0. Handlers `await collection.utils.refetch()` and return `{ refetch: false }` (see `persist` in `listItems.collection.ts`).
+- **Refetch by hand.** Since the 1.0 RC, handlers return `Promise<void>` and never refetch by themselves; `{ refetch: false }` is rejected by the types. Handlers `await collection.utils.refetch()` (or an awaited `utils.writeUpsert(...)` with the confirmed rows) before they return (see `persist` in `listItems.collection.ts`). Otherwise the optimistic change reverts when the transaction settles.
 - **Client-generated ids.** For optimistic inserts, generate UUIDv7 with `v7` from `uuid`, not `crypto.randomUUID()` (UUIDv4). Pass that same UUIDv7 to the create server function, validate it, and persist it unchanged as the database primary key. Keep the same id in the optimistic collection, backend insert, and refetched row; do not replace it with a second server-generated id or introduce temporary-id mapping. The database `uuidv7()` default remains a fallback for inserts that omit the id. The server must still enforce access checks and primary-key uniqueness; an id conflict must not overwrite another row. Keep authoritative timestamps server-generated, rather than trusting the client UUID's timestamp.
 - **Errors:** a failed handler shows one toast and then rethrows; rethrowing triggers the rollback.
-- **Components:** read with `useLiveQuery({ query: (q) => q.from({ row: xCollection }).where(...).orderBy(...) })`, using the descriptor in `from`. Do not pass a dependency array; it is deprecated, and the query identity comes from the query itself (add `queryKey` only for `.fn.*` queries). Write with `useXCollection().update(id, (draft) => { ... })`. Do not mirror rows into `useState`, add `isPending` guards, or write manual rollbacks.
+- **Components:** read with `useLiveQuery({ query: (q) => q.from({ row: xCollection }).where(...).orderBy(...) })`, using the descriptor in `from`. Do not pass a dependency array; the RC removed it, and the query identity comes from the query itself (add `queryKey` only for `.fn.*` queries). Write with `useXCollection().update(id, (draft) => { ... })`. Do not mirror rows into `useState`, add `isPending` guards, or write manual rollbacks.
 - **Server-side side effects:** when a React Query mutation changes the collection's rows on the server (cascade delete, type conversion), take `useXCollection()` in the mutation hook and call `collection.utils.refetch()` in `onSuccess`.
+- **Load and sync errors:** live-query hooks have no `isError`. Use `isLoadingError` (first load failed), `isCrashed`, or `isSyncError` (ready rows stay visible; details in `health`). Retry with `collection.reload()`, not `cleanup()` + `preload()`.
 - **Freshness:** shared data uses the same `refetchInterval` / `refetchOnWindowFocus` / `staleTime` as other shared queries.
 
 ## API details
 
-The API is pre-1.0 and changes between minors; do not rely on memory. Read the official docs for the installed version first:
+Veles uses the 1.0 release candidate (`@tanstack/db`, `@tanstack/react-db`, `@tanstack/react-router-with-db` on `1.0.0-rc.x`; `@tanstack/query-db-collection` stays on 1.x and takes `@tanstack/db` as a peer, so keep `@tanstack/db` a direct dependency on the same version as `@tanstack/react-db`). Upgrade these packages together. The API can still change between candidates; do not rely on memory. Read the official docs for the installed version first:
 
 - SSR and `DbClient`: https://github.com/TanStack/db/blob/main/docs/guides/ssr.md
 - Query collection: https://github.com/TanStack/db/blob/main/docs/collections/query-collection.md
 - Live queries: https://github.com/TanStack/db/blob/main/docs/guides/live-queries.md
+- RC migration (breaking changes from 0.x): https://github.com/TanStack/db/blob/main/docs/guides/migrate-to-1-0-rc.md
+- Loading and sync errors: https://github.com/TanStack/db/blob/main/docs/guides/error-handling.md
 
 The npm packages also ship guides:
 
