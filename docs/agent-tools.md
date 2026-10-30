@@ -16,6 +16,7 @@ Every tool the Veles MCP server (`/api/mcp`) can list, grouped by the consent th
 | [`save_workout`](#save_workout)               | Write on Workouts                 | write, destructive         |
 | [`save_routine`](#save_routine)               | Write on Workouts                 | write, destructive         |
 | [`update_exercise`](#update_exercise)         | Write on Workouts                 | write                      |
+| [`set_next_sets`](#set_next_sets)             | Write on Workouts                 | write, destructive         |
 | [`delete_workout`](#delete_workout)           | Write on Workouts                 | write, destructive         |
 | [`delete_routine`](#delete_routine)           | Write on Workouts                 | write, destructive         |
 | [`save_recipe`](#save_recipe)                 | Write on Recipes                  | write                      |
@@ -55,7 +56,7 @@ Resources:
 - food_products: Shared food catalog with imageUrl or null. per100g nutrition: kcal is energy; macros are protein, fat, carbs in grams. productSizeGrams is one unit (package, piece, slice or serving).
 - workout_sessions: Workout sessions, newest first, each with its exercises (id of the session exercise, exerciseId from workout_exercises, name, measure, notes) and their sets. Sets: id, type (normal, warmup, drop, failure), done, weightKg, reps, durationSeconds, distanceKm; measure says which apply. durationSeconds is manual or end minus start.
 - workout_routines: Reusable workout plans, each with ordered exercises (name, measure, restSeconds) and setTypes, one per planned set.
-- workout_exercises: Exercise list with measure, restSeconds, notes, archived, lastDoneOn, and sessionCount.
+- workout_exercises: Exercise list with measure, restSeconds, notes, archived, lastDoneOn, sessionCount, and nextSets (sets prescribed for the next time it is added, or null; see set_next_sets).
 
 | Input      | Type                                                                                                                                                      | Required | Notes                                           |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
@@ -169,6 +170,17 @@ Rename an exercise or change its measure or restSeconds (null for none); applies
 | `measure`     | "distance_duration" \| "duration" \| "reps" \| "weight_duration" \| "weight_reps" |          |               |
 | `name`        | string                                                                            |          | max 200 chars |
 | `restSeconds` | integer \| null                                                                   |          |               |
+
+### `set_next_sets`
+
+_write, destructive_
+
+Prescribe the sets the user gets the next time they add this exercise to an open workout in the app (or start a routine with it): in order, editable and not ticked, instead of empty rows. Values must fit the exercise's measure (weight_reps: weightKg, reps; reps: reps; duration: durationSeconds; weight_duration: weightKg, durationSeconds; distance_duration: distanceKm, durationSeconds). Used once, then cleared. Replaces any earlier prescription; sets: null clears it. Pending ones show as nextSets in workout_exercises. Returns { id, nextSets }.
+
+| Input        | Type                                                            | Required | Notes |
+| ------------ | --------------------------------------------------------------- | -------- | ----- |
+| `exerciseId` | uuid                                                            | yes      |       |
+| `sets`       | { distanceKm, durationSeconds, reps, type, weightKg }[] \| null | yes      |       |
 
 ### `delete_workout`
 

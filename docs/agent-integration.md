@@ -51,7 +51,7 @@ Read resources. Related rows are nested, so agents never match children to paren
 | `food_products`     | Food catalog    | Shared product with `per100g` nutrition, `imageUrl`                                   |
 | `workout_sessions`  | Workouts        | Session with its routine, exercises, and sets                                         |
 | `workout_routines`  | Workouts        | Routine with its exercises and planned set types                                      |
-| `workout_exercises` | Workouts        | Exercise with `lastDoneOn` and `sessionCount`                                         |
+| `workout_exercises` | Workouts        | Exercise with `lastDoneOn`, `sessionCount`, and pending `nextSets`                    |
 
 Lists are newest first. `weights`, `food_days`, `calorie_goals`, and `workout_sessions` accept inclusive `from`/`to` dates (`YYYY-MM-DD`). Nutrition is `{ kcal, macros: { protein, fat, carbs } }` in kcal and grams. `food_days.goal` is `null` unless Nutrition goals read consent is on. Diary entries are not available: they are end-to-end encrypted in the browser.
 
@@ -63,17 +63,19 @@ Write consent needs read consent: granting write also grants read, and revoking 
 
 Every feature has write tools. Each feature's tools appear only while its Write switch is on. Inputs: [agent-tools.md](./agent-tools.md).
 
-| Feature                  | Tools                                                                                 |
-| ------------------------ | ------------------------------------------------------------------------------------- |
-| Notes and shopping lists | `save_note` (fields, sharing, type, and list items in one call), `delete_note`        |
-| Weight                   | `save_weight`                                                                         |
-| Recipes                  | `save_recipe`                                                                         |
-| Food diary               | `log_food` (many entries on one date), `update_food_log`, `change_food_logs`          |
-| Nutrition goals          | `set_calorie_goal`                                                                    |
-| Food catalog (shared)    | `lookup_food_barcode`, `save_food_product`                                            |
-| Workouts                 | `save_workout`, `save_routine`, `update_exercise`, `delete_workout`, `delete_routine` |
+| Feature                  | Tools                                                                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------ |
+| Notes and shopping lists | `save_note` (fields, sharing, type, and list items in one call), `delete_note`                         |
+| Weight                   | `save_weight`                                                                                          |
+| Recipes                  | `save_recipe`                                                                                          |
+| Food diary               | `log_food` (many entries on one date), `update_food_log`, `change_food_logs`                           |
+| Nutrition goals          | `set_calorie_goal`                                                                                     |
+| Food catalog (shared)    | `lookup_food_barcode`, `save_food_product`                                                             |
+| Workouts                 | `save_workout`, `save_routine`, `update_exercise`, `set_next_sets`, `delete_workout`, `delete_routine` |
 
 Tools take whole objects, not one field or step per call. `save_*` tools create without `id` and update with `id`; omitted fields stay. `save_workout` and `save_routine` replace all exercises (and sets) when `exercises` is given, in one transaction. This keeps the tool list short: agents load it into context even in sessions that do not use Veles.
+
+`set_next_sets` prescribes the ordered sets for an exercise's next use. They fill the slot the next time the user adds that exercise to an open workout in the app, or starts a routine with it, then the prescription is cleared. The sets stay editable and unticked; finished workouts and agent-built sessions (`save_workout`) never use it. Passing `sets: null` clears a pending prescription.
 
 Creates return `{ id }` or the saved record; other writes return `{ success: true }`. Permission denials and operation failures are MCP tool errors (`isError: true`). Write tools call the features' shared validators and server operations. MCP can change only data that the key owner owns, plus the shared food catalog. It cannot change a friend's shared note. Ownership, IDs, and timestamps are set by the server. Keys cannot act as browser sessions or change account consent.
 
