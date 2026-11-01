@@ -50,6 +50,23 @@ export function HomeFeaturePreview({ feature }: { feature: HomeFeatureId }) {
           <span>{t({ en: 'LOG', pl: 'POSTĘP' })}</span>
         </div>
       );
+    case 'mealPlan':
+      return (
+        <ol aria-hidden='true' className={css.planPreview}>
+          <li>
+            <span>{t({ en: 'Mon', pl: 'Pon' })}</span>
+            {t({ en: 'Chicken curry', pl: 'Curry z kurczakiem' })}
+          </li>
+          <li>
+            <span>{t({ en: 'Tue', pl: 'Wt' })}</span>
+            {t({ en: 'Lentil soup', pl: 'Zupa z soczewicy' })}
+          </li>
+          <li>
+            <span>{t({ en: 'Wed', pl: 'Śr' })}</span>
+            {t({ en: 'Salmon bowl', pl: 'Miska z łososiem' })}
+          </li>
+        </ol>
+      );
     case 'recipes':
     case 'notes':
     case 'diary':

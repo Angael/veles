@@ -1,6 +1,7 @@
 import { type } from 'arktype';
 import type { AgentFeature } from '@/lib/agentAccess';
 import { readFoodDays, readCalorieGoals, readFoodProducts } from './mcp-read-nutrition.server';
+import { readMealPlan } from './mcp-read-meal-plan.server';
 import { readNotes, readRecipes, readWeights } from './mcp-read-personal.server';
 import { isoDate, type ReadPage, type ReadQuery } from './mcp-read-helpers.server';
 import {
@@ -42,6 +43,12 @@ export const resources = {
     dated: false,
     description: `The user's recipes plus recipes connected friends share (isOwned false, ownerName), with imageUrls, and ingredients in order. Ingredient grams are for the whole recipe (portions = how many portions it makes). A linked ingredient has productId (from food_products) and nutrition at its grams; a custom one has both null. total (all portions) and perPortion sum the linked ingredients and are null when none has nutrition; ${kcalAndMacros}.`,
     read: readRecipes,
+  },
+  meal_plan: {
+    feature: 'meal_plan',
+    dated: true,
+    description: `Planned meals (not eaten; they never change the food diary), newest first, filtered by date. Each has date, name, portions, and recipe (id, name, portions it makes) or null for a free-text meal. estimate is the recipe's nutrition scaled to the planned portions, or null when unknown; ${kcalAndMacros}.`,
+    read: readMealPlan,
   },
   food_days: {
     feature: 'calories',

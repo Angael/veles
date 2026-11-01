@@ -8,12 +8,14 @@ import {
   ScaleIcon,
   UsersRoundIcon,
   CookingPotIcon,
+  CalendarDaysIcon,
 } from 'lucide-react';
 import type { Localized } from '@/lib/i18n/locale';
 
 export type HomeFeatureId =
   | 'food'
   | 'weight'
+  | 'mealPlan'
   | 'workouts'
   | 'recipes'
   | 'notes'
@@ -26,7 +28,15 @@ export type HomeFeature = {
   icon: LucideIcon;
   title: Localized;
   description: Localized;
-  to: '/calories' | '/weight' | '/workouts' | '/recipes' | '/todos' | '/diary' | '/account';
+  to:
+    | '/calories'
+    | '/meal-plan'
+    | '/weight'
+    | '/workouts'
+    | '/recipes'
+    | '/todos'
+    | '/diary'
+    | '/account';
   /** Section of the target page, used when several features share one page. */
   hash?: string;
 };
@@ -55,6 +65,16 @@ export const homeFeatures: HomeFeature[] = [
       pl: 'Zapisuj prywatnie i obserwuj długoterminowy kierunek bez utraty codziennych szczegółów.',
     },
     to: '/weight',
+  },
+  {
+    id: 'mealPlan',
+    icon: CalendarDaysIcon,
+    title: { en: 'Meal plan', pl: 'Plan posiłków' },
+    description: {
+      en: 'Plan meals for the coming days from your recipes and see the estimated calories.',
+      pl: 'Planuj posiłki na kolejne dni z własnych przepisów i sprawdzaj szacowane kalorie.',
+    },
+    to: '/meal-plan',
   },
   {
     id: 'recipes',

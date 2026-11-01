@@ -5,6 +5,7 @@ import type { AgentPermissions } from '@/lib/agentAccess';
 import { readAgentPermissions } from '@/server/agentAccess.server';
 import { db } from '@/server/db.server';
 import { registerReadTools } from './mcp-read-tools.server';
+import { registerMealPlanTools } from './mcp-write-meal-plan.server';
 import { registerNoteTools } from './mcp-write-notes.server';
 import {
   registerCalorieGoalTools,
@@ -31,6 +32,7 @@ export function buildAgentServer(userId: string, ownerName: string, permissions:
   if (permissions.notes.write) registerNoteTools(server, userId);
   if (permissions.weight.write) registerWeightTools(server, userId);
   if (permissions.recipes.write) registerRecipeTools(server, userId);
+  if (permissions.meal_plan.write) registerMealPlanTools(server, userId);
   if (permissions.calories.write) registerFoodDiaryTools(server, userId);
   if (permissions.calorie_goals.write) registerCalorieGoalTools(server, userId);
   if (permissions.food_products.write) registerFoodCatalogTools(server, userId);

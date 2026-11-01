@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedCaloriesRouteImport } from './routes/_authenticated/calories'
+import { Route as AuthenticatedMealPlanRouteImport } from './routes/_authenticated/meal-plan'
 import { Route as AuthenticatedTodosRouteImport } from './routes/_authenticated/todos'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
@@ -70,6 +71,11 @@ const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
 const AuthenticatedCaloriesRoute = AuthenticatedCaloriesRouteImport.update({
   id: '/calories',
   path: '/calories',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedMealPlanRoute = AuthenticatedMealPlanRouteImport.update({
+  id: '/meal-plan',
+  path: '/meal-plan',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedTodosRoute = AuthenticatedTodosRouteImport.update({
@@ -257,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/account': typeof AuthenticatedAccountRoute
   '/calories': typeof AuthenticatedCaloriesRoute
+  '/meal-plan': typeof AuthenticatedMealPlanRoute
   '/todos': typeof AuthenticatedTodosRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/api/health': typeof ApiHealthRoute
@@ -296,6 +303,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/account': typeof AuthenticatedAccountRoute
   '/calories': typeof AuthenticatedCaloriesRoute
+  '/meal-plan': typeof AuthenticatedMealPlanRoute
   '/todos': typeof AuthenticatedTodosRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/api/health': typeof ApiHealthRoute
@@ -337,6 +345,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/calories': typeof AuthenticatedCaloriesRoute
+  '/_authenticated/meal-plan': typeof AuthenticatedMealPlanRoute
   '/_authenticated/todos': typeof AuthenticatedTodosRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/api/health': typeof ApiHealthRoute
@@ -378,6 +387,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/account'
     | '/calories'
+    | '/meal-plan'
     | '/todos'
     | '/weight'
     | '/api/health'
@@ -417,6 +427,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/account'
     | '/calories'
+    | '/meal-plan'
     | '/todos'
     | '/weight'
     | '/api/health'
@@ -457,6 +468,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/account'
     | '/_authenticated/calories'
+    | '/_authenticated/meal-plan'
     | '/_authenticated/todos'
     | '/_authenticated/weight'
     | '/api/health'
@@ -544,6 +556,13 @@ declare module '@tanstack/react-router' {
       path: '/calories'
       fullPath: '/calories'
       preLoaderRoute: typeof AuthenticatedCaloriesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/meal-plan': {
+      id: '/_authenticated/meal-plan'
+      path: '/meal-plan'
+      fullPath: '/meal-plan'
+      preLoaderRoute: typeof AuthenticatedMealPlanRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/todos': {
@@ -783,6 +802,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedCaloriesRoute: typeof AuthenticatedCaloriesRoute
+  AuthenticatedMealPlanRoute: typeof AuthenticatedMealPlanRoute
   AuthenticatedTodosRoute: typeof AuthenticatedTodosRoute
   AuthenticatedWeightRoute: typeof AuthenticatedWeightRoute
   AuthenticatedCaloriesAddRoute: typeof AuthenticatedCaloriesAddRoute
@@ -810,6 +830,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedCaloriesRoute: AuthenticatedCaloriesRoute,
+  AuthenticatedMealPlanRoute: AuthenticatedMealPlanRoute,
   AuthenticatedTodosRoute: AuthenticatedTodosRoute,
   AuthenticatedWeightRoute: AuthenticatedWeightRoute,
   AuthenticatedCaloriesAddRoute: AuthenticatedCaloriesAddRoute,

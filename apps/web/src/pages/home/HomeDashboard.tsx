@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 import { Card } from '@/components/ui/card/Card';
 import { DashboardFood } from './DashboardFood';
+import { DashboardMealPlan } from './DashboardMealPlan';
 import { DashboardRecipes } from './DashboardRecipes';
 import { DashboardWeight } from './DashboardWeight';
 import type { HomeDashboardData } from './home.api';
@@ -21,6 +22,7 @@ export function HomeDashboard({ data }: HomeDashboardProps) {
   const summaries: Record<HomeFeatureId, ReactNode> = {
     food: <DashboardFood nutrition={data.nutrition} />,
     weight: <DashboardWeight entries={data.weightEntries} />,
+    mealPlan: <DashboardMealPlan days={data.mealPlan} />,
     recipes: <DashboardRecipes date={data.date} recipes={data.recipes} />,
     workouts: (
       <div className={css.readout}>
