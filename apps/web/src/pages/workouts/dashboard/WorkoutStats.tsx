@@ -24,7 +24,6 @@ function computeStats(workouts: WorkoutSummary[], today: string) {
   const thisWeek = weekOf(today);
   const thisMonth = today.slice(0, 7);
   const weeks = new Set(workouts.map((workout) => weekOf(workout.date)));
-  const monthWorkouts = workouts.filter((workout) => workout.date.startsWith(thisMonth));
 
   let streak = 0;
   let week = parseISO(
@@ -43,8 +42,7 @@ function computeStats(workouts: WorkoutSummary[], today: string) {
     averageSeconds: lengths.length
       ? lengths.reduce((sum, value) => sum + value, 0) / lengths.length
       : null,
-    monthCount: monthWorkouts.length,
-    monthVolumeKg: monthWorkouts.reduce((sum, workout) => sum + workout.volumeKg, 0),
+    monthCount: workouts.filter((workout) => workout.date.startsWith(thisMonth)).length,
     streak,
     weekCount: workouts.filter((workout) => weekOf(workout.date) === thisWeek).length,
     weekSets: workouts
@@ -57,7 +55,7 @@ function computeStats(workouts: WorkoutSummary[], today: string) {
 export function WorkoutStats() {
   const { data: workouts } = useSuspenseQuery(workoutsQueryOptions());
   const stats = computeStats(workouts, todayLocalDate());
-  const { formatNumber, t } = useI18n();
+  const { t } = useI18n();
   const workoutCount = (count: number) =>
     t({
       en: `${count} ${pluralEn(count, 'workout', 'workouts')}`,
@@ -83,14 +81,6 @@ export function WorkoutStats() {
       <div>
         <dt>{t({ en: 'This month', pl: 'Ten miesiąc' })}</dt>
         <dd>{workoutCount(stats.monthCount)}</dd>
-        {stats.monthVolumeKg > 0 ? (
-          <dd className={css.sub}>
-            {t({
-              en: `${formatNumber(stats.monthVolumeKg)} kg lifted`,
-              pl: `${formatNumber(stats.monthVolumeKg)} kg podniesione`,
-            })}
-          </dd>
-        ) : null}
       </div>
       <div>
         <dt>{t({ en: 'Streak', pl: 'Seria' })}</dt>
