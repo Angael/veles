@@ -56,7 +56,7 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
 
   return (
     <div className={css.session}>
-      <SessionSummary onFinish={timer.skip} session={session} />
+      <SessionSummary session={session} />
 
       {session.slots.length === 0 ? (
         <p className={css.empty}>
