@@ -27,6 +27,19 @@ function readStored(): TimerState {
 }
 
 /**
+ * Drops the stored rest so a timer started in a just-finished workout never comes back. For callers
+ * outside the page that owns the live `useRestTimer` state, such as the task header. Blocked storage
+ * is ignored: a leftover timer is harmless, a stuck Finish is not.
+ */
+export function clearStoredRestTimer() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Nothing to clear when storage is unavailable.
+  }
+}
+
+/**
  * Rest countdown stored as an end timestamp, not a ticking number, so it survives reloads,
  * background tabs and phone sleep. Vibrates once when the rest ends (Android only; iOS ignores it).
  */
