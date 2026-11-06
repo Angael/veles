@@ -22,6 +22,8 @@ import type {
   updateRoutineInputType,
   workoutIdType,
 } from '../workouts.validation';
+import { nextSetRows } from '../exercises/nextSets';
+import { takeNextSets } from '../exercises/nextSets.server';
 import { translate } from '@/lib/i18n/getLocale';
 
 export async function requireOwnedRoutine(tx: DbTransaction, userId: string, routineId: string) {
@@ -75,11 +77,16 @@ export async function copySessionToRoutine(
   );
 }
 
-/** Fills a new session with the routine's exercises and one empty set per stored set type. */
+/**
+ * Fills a new session with the routine's exercises and one empty set per stored set type. With
+ * `nextSetsUserId`, an exercise's prescribed next sets replace its planned sets (first slot only)
+ * and are used up; agent-built sessions leave them for the user's next workout.
+ */
 export async function copyRoutineToSession(
   tx: DbTransaction,
   routineId: string,
   sessionId: string,
+  nextSetsUserId?: string,
 ) {
   const slots = await tx
     .select({
@@ -97,9 +104,17 @@ export async function copyRoutineToSession(
     .returning({ id: workoutSessionExercises.id, position: workoutSessionExercises.position });
   const newIdByPosition = new Map(created.map((slot) => [slot.position, slot.id]));
 
+  const prescribed = nextSetsUserId
+    ? await takeNextSets(tx, nextSetsUserId, [...new Set(slots.map((slot) => slot.exerciseId))])
+    : undefined;
   const rows = slots.flatMap((slot, position) => {
     const sessionExerciseId = newIdByPosition.get(position);
     if (!sessionExerciseId) return [];
+    const next = prescribed?.get(slot.exerciseId);
+    if (next) {
+      prescribed?.delete(slot.exerciseId);
+      return nextSetRows(next.measure, next.sets, sessionExerciseId);
+    }
     return slot.setTypes.map((type, index) => ({ position: index, sessionExerciseId, type }));
   });
   if (rows.length > 0) await tx.insert(workoutSets).values(rows);
@@ -174,7 +189,7 @@ export async function startRoutineRecord(userId: string, data: typeof startRouti
       })
       .returning({ id: workoutSessions.id });
     if (!workout) throw new Error('Workout insert returned no row.');
-    await copyRoutineToSession(tx, routine.id, workout.id);
+    await copyRoutineToSession(tx, routine.id, workout.id, userId);
     return { id: workout.id };
   });
 }

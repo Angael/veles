@@ -4,6 +4,7 @@ import {
   date,
   index,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -26,6 +27,15 @@ export const exerciseMeasures = [
 
 export const workoutSetTypes = ['normal', 'warmup', 'drop', 'failure'] as const;
 
+/** A prescribed set in stored units (grams, meters), like a `workout_set` row without its ids. */
+export type WorkoutNextSet = {
+  type: (typeof workoutSetTypes)[number];
+  weightGrams: number | null;
+  reps: number | null;
+  durationSeconds: number | null;
+  distanceMeters: number | null;
+};
+
 /** User-named exercise. There is no shared catalog: "Bench (the flat one)" is a valid name. */
 export const workoutExercises = pgTable(
   'workout_exercise',
@@ -41,6 +51,11 @@ export const workoutExercises = pgTable(
     /** Rest timer after a completed set; null turns the timer off for this exercise. */
     restSeconds: integer('rest_seconds').default(120),
     notes: text('notes').notNull().default(''),
+    /**
+     * Sets an agent prescribed for the next time this exercise is added to an open workout. They
+     * replace the empty rows once and are then cleared; null means the normal behaviour.
+     */
+    nextSets: jsonb('next_sets').$type<WorkoutNextSet[]>(),
     /** Hidden from the picker but kept so old sessions still resolve their exercise. */
     archivedAt: timestamp('archived_at'),
     createdAt: timestamp('created_at').notNull().defaultNow(),

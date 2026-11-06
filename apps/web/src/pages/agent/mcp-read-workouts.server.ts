@@ -9,6 +9,7 @@ import {
 } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { sessionsBefore, toMetrics } from '@/pages/workouts/workouts.server';
+import { fromNextSets } from '@/pages/workouts/exercises/nextSets';
 import { workoutName } from '@/pages/workouts/workoutName';
 import { getLocale } from '@/lib/i18n/getLocale';
 import { db } from '@/server/db.server';
@@ -187,6 +188,7 @@ export async function readWorkoutExercises(userId: string, query: ReadQuery) {
       measure: workoutExercises.measure,
       restSeconds: workoutExercises.restSeconds,
       notes: workoutExercises.notes,
+      nextSets: workoutExercises.nextSets,
       archivedAt: workoutExercises.archivedAt,
     })
     .from(workoutExercises)
@@ -216,9 +218,10 @@ export async function readWorkoutExercises(userId: string, query: ReadQuery) {
 
   return {
     nextCursor: page.nextCursor,
-    items: page.items.map(({ archivedAt, ...exercise }) => ({
+    items: page.items.map(({ archivedAt, nextSets, ...exercise }) => ({
       ...exercise,
       archived: archivedAt !== null,
+      nextSets: nextSets && fromNextSets(nextSets),
       lastDoneOn: usageByExercise.get(exercise.id)?.lastDoneOn ?? null,
       sessionCount: usageByExercise.get(exercise.id)?.sessionCount ?? 0,
     })),
