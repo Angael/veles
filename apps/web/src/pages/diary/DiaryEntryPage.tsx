@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { Card } from '@/components/ui/card/Card';
 import { Btn } from '@/components/ui/btn/Btn';
 import { DateInput } from '@/components/ui/date-input/DateInput';
-import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
+import { SeamlessSingleLineTextarea } from '@/components/ui/seamless-single-line-textarea/SeamlessSingleLineTextarea';
 import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import { useAutoSaveState } from './useAutoSaveState';
 import type { EncryptedDiaryEntry } from './diary.api';
@@ -159,7 +159,7 @@ function DiaryEntryEditor({ diaryKey, entry, onLock }: DiaryEntryEditorProps) {
             </div>
           </div>
           <h1>
-            <SeamlessTextInput
+            <SeamlessSingleLineTextarea
               aria-label={t({ en: 'Diary entry title', pl: 'Tytuł wpisu' })}
               className={css.titleInput}
               maxLength={160}

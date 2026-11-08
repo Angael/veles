@@ -115,7 +115,6 @@
 .itemName {
   /* Margin, not padding, so the focus ring hugs the text. */
   margin-block: calc((2.5rem - 1lh) / 2);
-  overflow-wrap: anywhere;
 }
 
 .item input[type='checkbox']:focus-visible {
