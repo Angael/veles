@@ -36,6 +36,7 @@ import {
 import {
   createFoodProductRecord,
   lookupFoodByBarcodeRecord,
+  getLastLoggedAtByProduct,
   toFoodProduct,
   updateFoodProductRecord,
 } from './foodProducts.server';
@@ -222,6 +223,8 @@ export type CalorieFood = {
   proteinPer100g: number | null;
   fatPer100g: number | null;
   carbsPer100g: number | null;
+  /** ISO time of the current user's latest log of this food; only set by the foods list. */
+  lastLoggedAt?: string | null;
 };
 
 export type CalorieGoal = {
@@ -258,11 +261,17 @@ export type CalorieTotals = {
 export const getFoodProducts = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getFoodProducts')])
   .handler(async () => {
-    await requireSession();
+    const session = await requireSession();
 
-    const foods = await db.select().from(foodProducts).orderBy(desc(foodProducts.updatedAt));
+    const [foods, lastLoggedAtById] = await Promise.all([
+      db.select().from(foodProducts).orderBy(desc(foodProducts.updatedAt)),
+      getLastLoggedAtByProduct(session.user.id),
+    ]);
     const assetsById = await getFoodImageAssets(foods.map((food) => food.imageUploadObjectId));
-    return foods.map((food) => toFoodProduct(food, assetsById.get(food.imageUploadObjectId ?? '')));
+    return foods.map((food) => ({
+      ...toFoodProduct(food, assetsById.get(food.imageUploadObjectId ?? '')),
+      lastLoggedAt: lastLoggedAtById.get(food.id) ?? null,
+    }));
   });
 
 export const getFoodProduct = createServerFn({ method: 'GET' })

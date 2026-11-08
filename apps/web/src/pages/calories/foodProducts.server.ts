@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNotNull, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNotNull, max, sql } from 'drizzle-orm';
 import { foodLogs, foodProducts, uploadObjects } from '@veles/db/schema';
 import { foodProductCategory } from '@veles/db/seed/food-products';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
@@ -53,6 +53,21 @@ export function toFoodProduct(
     fatPer100g: fromHundredths(product.fatPer100gHundredths),
     carbsPer100g: fromHundredths(product.carbsPer100gHundredths),
   };
+}
+
+/** Aggregates in the DB so the browser gets one last-use time per food, not the log history. */
+export async function getLastLoggedAtByProduct(userId: string) {
+  const rows = await db
+    .select({ productId: foodLogs.productId, lastLoggedAt: max(foodLogs.consumedAt) })
+    .from(foodLogs)
+    .where(and(eq(foodLogs.userId, userId), isNotNull(foodLogs.productId)))
+    .groupBy(foodLogs.productId);
+
+  const lastLoggedAtById = new Map<string, string>();
+  for (const { productId, lastLoggedAt } of rows) {
+    if (productId && lastLoggedAt) lastLoggedAtById.set(productId, lastLoggedAt.toISOString());
+  }
+  return lastLoggedAtById;
 }
 
 async function withImage(product: typeof foodProducts.$inferSelect) {

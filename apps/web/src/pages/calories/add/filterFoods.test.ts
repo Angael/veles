@@ -41,8 +41,8 @@ describe('filterFoods', () => {
     expect(filterFoods(foods, 'ot mlk', foods.length).map((food) => food.id)).toEqual(['1']);
   });
 
-  it('preserves catalog order for an empty query', () => {
-    expect(filterFoods(foods, '', foods.length)).toEqual(foods);
+  it('orders foods by name for an empty query without log history', () => {
+    expect(filterFoods(foods, '', foods.length).map((food) => food.id)).toEqual(['2', '1']);
   });
 
   it('caps both unfiltered and ranked results', () => {
