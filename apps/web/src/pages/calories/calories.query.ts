@@ -24,7 +24,8 @@ import { type I18n, useI18n } from '@/lib/i18n/I18nProvider';
 
 export const calorieDashboardKey = ['calorie-dashboard'] as const;
 const calorieFoodKey = ['calorie-food'] as const;
-const calorieFoodsKey = ['calorie-foods'] as const;
+// Nested so every food log change also refreshes the foods' last-logged order.
+const calorieFoodsKey = [...calorieDashboardKey, 'foods'] as const;
 
 type DeleteFoodLogVariables = {
   date: string;

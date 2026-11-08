@@ -2,46 +2,38 @@ import type { CalorieFood } from '../calories.api';
 import { foodProductNames } from '../calorieHelpers';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 
-function fuzzyTermScore(value: string, term: string) {
-  const substringIndex = value.indexOf(term);
-  if (substringIndex >= 0) return substringIndex === 0 ? 0 : substringIndex + 1;
-
+/** Checks that the term's characters appear in order; this also covers plain substrings. */
+function fuzzyTermMatches(value: string, term: string) {
   let valueIndex = 0;
-  let firstMatch = -1;
-  let gaps = 0;
   for (const character of term) {
     const matchIndex = value.indexOf(character, valueIndex);
-    if (matchIndex < 0) return null;
-    if (firstMatch < 0) firstMatch = matchIndex;
-    gaps += matchIndex - valueIndex;
+    if (matchIndex < 0) return false;
     valueIndex = matchIndex + 1;
   }
-
-  return 20 + firstMatch + gaps;
+  return true;
 }
 
-function foodNameScore(food: CalorieFood, terms: string[]) {
-  let bestScore: number | null = null;
-  for (const name of [food.name, food.namePl]) {
-    if (!name) continue;
+function foodMatches(food: CalorieFood, terms: string[]) {
+  return [food.name, food.namePl].some((name) => {
+    if (!name) return false;
     const value = name.toLocaleLowerCase();
-    let score = 0;
-    for (const term of terms) {
-      const termScore = fuzzyTermScore(value, term);
-      if (termScore === null) {
-        score = -1;
-        break;
-      }
-      score += termScore;
-    }
-    if (score >= 0 && (bestScore === null || score < bestScore)) bestScore = score;
-  }
-  return bestScore;
+    return terms.every((term) => fuzzyTermMatches(value, term));
+  });
 }
 
-type RankedFood = { food: CalorieFood; score: number };
+/** Orders recently logged foods first, then by shown name and ID so ties stay stable. */
+function compareFoods(first: CalorieFood, second: CalorieFood, locale: Locale) {
+  const firstLoggedAt = first.lastLoggedAt ?? '';
+  const secondLoggedAt = second.lastLoggedAt ?? '';
+  if (firstLoggedAt !== secondLoggedAt) return firstLoggedAt > secondLoggedAt ? -1 : 1;
 
-/** Finds the best catalog matches in one pass while retaining only the requested result count. */
+  return (
+    foodProductNames(first)[locale].localeCompare(foodProductNames(second)[locale], locale) ||
+    first.id.localeCompare(second.id)
+  );
+}
+
+/** Finds matching foods, most recently logged first, retaining only the requested result count. */
 export function filterFoods(
   foods: CalorieFood[],
   query: string,
@@ -51,35 +43,22 @@ export function filterFoods(
   if (limit <= 0) return [];
 
   const normalizedQuery = query.trim().toLocaleLowerCase();
-  if (!normalizedQuery) return foods.slice(0, limit);
-
-  const terms = normalizedQuery.split(/\s+/);
-  const shownName = (food: CalorieFood) => foodProductNames(food)[locale];
-  const rankedFoods: RankedFood[] = [];
+  const terms = normalizedQuery ? normalizedQuery.split(/\s+/) : [];
+  const matches: CalorieFood[] = [];
 
   for (const food of foods) {
-    const score = foodNameScore(food, terms);
-    if (score === null) continue;
+    if (!foodMatches(food, terms)) continue;
 
     let insertionIndex = 0;
-    for (const rankedFood of rankedFoods) {
-      const scoreComparison = score - rankedFood.score;
-      if (
-        scoreComparison < 0 ||
-        (scoreComparison === 0 &&
-          shownName(food).localeCompare(shownName(rankedFood.food), locale) < 0)
-      ) {
-        break;
-      }
+    for (const match of matches) {
+      if (compareFoods(food, match, locale) < 0) break;
       insertionIndex += 1;
     }
 
     if (insertionIndex >= limit) continue;
-    rankedFoods.splice(insertionIndex, 0, { food, score });
-    if (rankedFoods.length > limit) rankedFoods.pop();
+    matches.splice(insertionIndex, 0, food);
+    if (matches.length > limit) matches.pop();
   }
 
-  const matches: CalorieFood[] = [];
-  for (const rankedFood of rankedFoods) matches.push(rankedFood.food);
   return matches;
 }
