@@ -98,7 +98,3 @@
   color: var(--c-danger-text);
   background: var(--c-danger-surface);
 }
-
-.delete {
-  justify-self: start;
-}

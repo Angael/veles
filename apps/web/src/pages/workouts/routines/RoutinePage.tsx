@@ -1,8 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { PlayIcon, Trash2Icon } from 'lucide-react';
-import { Btn } from '@/components/ui/btn/Btn';
+import { PlayIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card/Card';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
@@ -12,7 +11,6 @@ import { MEASURE_LABELS, SET_BADGE, SHORT_DAY, workingSetNumbers } from '../metr
 import { workoutsQueryOptions } from '../workouts.query';
 import {
   routineQueryOptions,
-  useDeleteRoutineMutation,
   useStartRoutineMutation,
   useUpdateRoutineMutation,
 } from './routines.query';
@@ -21,7 +19,7 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /**
  * One routine: rename it and edit its description in place, see its exercises with their set
- * types, delete it, or start it. Starting waits while another workout is open.
+ * types, or start it. Starting waits while another workout is open.
  */
 export function RoutinePage({ routineId }: { routineId: string }) {
   const { formatDate, t } = useI18n();
@@ -29,7 +27,6 @@ export function RoutinePage({ routineId }: { routineId: string }) {
   const { data: workouts } = useSuspenseQuery(workoutsQueryOptions());
   const navigate = useNavigate();
   const updateRoutine = useUpdateRoutineMutation();
-  const deleteRoutine = useDeleteRoutineMutation();
   const startRoutine = useStartRoutineMutation();
   const active = workouts.find((workout) => workout.endedAt === null);
 
@@ -115,26 +112,6 @@ export function RoutinePage({ routineId }: { routineId: string }) {
           pl: 'Aby zmienić ćwiczenia, rozpocznij ten plan, edytuj trening, a potem wybierz „Zaktualizuj plan” w menu ⋯.',
         })}
       </p>
-
-      <Btn
-        className={css.delete}
-        icon={<Trash2Icon aria-hidden='true' />}
-        onClick={() => {
-          const message = t({
-            en: `Delete routine “${routine.name}”? Past workouts stay.`,
-            pl: `Usunąć plan „${routine.name}”? Wcześniejsze treningi zostaną.`,
-          });
-          if (!window.confirm(message)) return;
-          // Leave first, so the deleted routine is not refetched on this page.
-          void navigate({ replace: true, to: '/workouts' });
-          deleteRoutine.mutate({ id: routine.id });
-        }}
-        radius='pill'
-        size='sm'
-        variant='ghostDanger'
-      >
-        {t({ en: 'Delete routine', pl: 'Usuń plan' })}
-      </Btn>
 
       {active ? (
         <FloatingButton
