@@ -1,27 +1,15 @@
-import {
-  DeleteObjectCommand,
-  GetObjectCommand,
-  type GetObjectCommandOutput,
-  PutObjectCommand,
-  S3Client,
-} from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getStorageConfig } from './config.server';
-
-type StorageBucket = 'private' | 'public';
 
 type UploadFileByKeyInput = {
   body: Blob | Buffer | Uint8Array;
   contentType?: string;
   key: string;
-  bucket: StorageBucket;
 };
 
 let r2Client: S3Client | null = null;
 
-export async function uploadFileByKey({ body, bucket, contentType, key }: UploadFileByKeyInput) {
-  // TODO: Add private bucket storage when it is needed.
-  if (bucket === 'private') return;
-
+export async function uploadFileByKey({ body, contentType, key }: UploadFileByKeyInput) {
   await getR2Client().send(
     new PutObjectCommand({
       Body: body,
@@ -32,24 +20,9 @@ export async function uploadFileByKey({ body, bucket, contentType, key }: Upload
   );
 }
 
-export async function deleteFileByKey(key: string, bucket: StorageBucket) {
-  // TODO: Add private bucket storage when it is needed.
-  if (bucket === 'private') return;
-
+export async function deleteFileByKey(key: string) {
   await getR2Client().send(
     new DeleteObjectCommand({ Bucket: getStorageConfig().bucketName, Key: key }),
-  );
-}
-
-export async function getFileByKey(
-  key: string,
-  bucket: StorageBucket,
-): Promise<GetObjectCommandOutput | undefined> {
-  // TODO: Add private bucket storage when it is needed.
-  if (bucket === 'private') return;
-
-  return getR2Client().send(
-    new GetObjectCommand({ Bucket: getStorageConfig().bucketName, Key: key }),
   );
 }
 

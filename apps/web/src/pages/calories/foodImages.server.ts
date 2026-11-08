@@ -48,7 +48,6 @@ export async function prepareFoodImage(
     body: optimized.buffer,
     contentType: optimized.type,
     key,
-    bucket: 'public',
   });
 
   return {
@@ -65,7 +64,7 @@ export async function prepareFoodImage(
 }
 
 export async function deletePreparedFoodImage(image: PreparedFoodImage) {
-  await deleteFileByKey(image.key, 'public');
+  await deleteFileByKey(image.key);
 }
 
 /** Uploads the photo only when the action replaces the image; keep and remove upload nothing. */
