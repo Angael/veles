@@ -200,7 +200,6 @@ async function uploadOptimizedImages(files: File[], keyPrefix: string): Promise<
 
       await uploadFileByKey({
         body: optimizedImage.buffer,
-        bucket: 'public',
         contentType: optimizedImage.type,
         key: image.key,
       });
@@ -216,7 +215,7 @@ async function uploadOptimizedImages(files: File[], keyPrefix: string): Promise<
 
 /** Best-effort removal of public objects; failures are only logged so DB changes stay committed. */
 async function deleteImageFiles(keys: string[]) {
-  const results = await Promise.allSettled(keys.map((key) => deleteFileByKey(key, 'public')));
+  const results = await Promise.allSettled(keys.map((key) => deleteFileByKey(key)));
 
   results.forEach((result, index) => {
     if (result.status === 'rejected') {
