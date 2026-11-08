@@ -1,6 +1,7 @@
 import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import type { createDatabaseConnection } from '@veles/db';
 import {
+  foodLogShareItems,
   foodLogs,
   foodProducts,
   recipeImages,
@@ -35,6 +36,12 @@ function unusedUploadCondition(db: Pick<Database, 'select'>) {
         .select({ id: foodLogs.id })
         .from(foodLogs)
         .where(eq(foodLogs.imageUploadObjectId, uploadObjects.id)),
+    ),
+    notExists(
+      db
+        .select({ id: foodLogShareItems.id })
+        .from(foodLogShareItems)
+        .where(eq(foodLogShareItems.imageUploadObjectId, uploadObjects.id)),
     ),
     notExists(
       db
