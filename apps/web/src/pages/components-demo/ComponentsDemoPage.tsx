@@ -41,6 +41,7 @@ import { Navbar } from '@/components/app/navbar/Navbar';
 import { NotFound } from '@/components/app/not-found/NotFound';
 import { PillBtn } from '@/components/ui/pill-btn/PillBtn';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
+import { SeamlessSingleLineTextarea } from '@/components/ui/seamless-single-line-textarea/SeamlessSingleLineTextarea';
 import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
 import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import { SelectInput } from '@/components/ui/select-input/SelectInput';
@@ -451,6 +452,10 @@ export function ComponentsDemoPage() {
         <h2>Seamless fields</h2>
         <Card className={css.seamlessCard}>
           <SeamlessTextInput aria-label='Demo seamless title' defaultValue='Editable card title' />
+          <SeamlessSingleLineTextarea
+            aria-label='Demo seamless wrapping title'
+            defaultValue='Long title that wraps visually but stays one line when saved'
+          />
           <SeamlessTextarea
             aria-label='Demo seamless description'
             defaultValue='These controls inherit the surrounding surface instead of drawing their own.'

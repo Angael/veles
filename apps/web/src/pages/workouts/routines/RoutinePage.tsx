@@ -5,7 +5,7 @@ import { PlayIcon, Trash2Icon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
-import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
+import { SeamlessSingleLineTextarea } from '@/components/ui/seamless-single-line-textarea/SeamlessSingleLineTextarea';
 import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import { todayLocalDate } from '@/lib/dateOnly';
 import { MEASURE_LABELS, SET_BADGE, SHORT_DAY, workingSetNumbers } from '../metrics';
@@ -36,7 +36,7 @@ export function RoutinePage({ routineId }: { routineId: string }) {
   return (
     <main className={css.page}>
       <Card className={css.header}>
-        <SeamlessTextInput
+        <SeamlessSingleLineTextarea
           aria-label={t({ en: 'Routine name', pl: 'Nazwa planu' })}
           className={css.name}
           defaultValue={routine.name}
@@ -45,7 +45,7 @@ export function RoutinePage({ routineId }: { routineId: string }) {
             const name = event.target.value.trim();
             if (name && name !== routine.name) updateRoutine.mutate({ id: routine.id, name });
           }}
-          onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.blur()}
+          onEnter={(field) => field.blur()}
         />
         <SeamlessTextarea
           aria-label={t({ en: 'Routine description', pl: 'Opis planu' })}

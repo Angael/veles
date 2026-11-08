@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import { v7 as uuidv7 } from 'uuid';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
-import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
+import { SeamlessSingleLineTextarea } from '@/components/ui/seamless-single-line-textarea/SeamlessSingleLineTextarea';
 import { CheckedNoteItem } from './CheckedNoteItem';
 import { focusField } from './ChecklistItemInput';
 import { listItemsCollection, useListItemsCollection } from './listItems.collection';
@@ -17,7 +17,7 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 export function CheckedNoteCard({ note }: { note: NoteSummary }) {
   const { t } = useI18n();
   const [newItemId, setNewItemId] = useState<string | null>(null);
-  const titleRef = useRef<HTMLInputElement>(null);
+  const titleRef = useRef<HTMLTextAreaElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const listItems = useListItemsCollection();
   const updateNote = useUpdateNoteMutation();
@@ -101,7 +101,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
     <Card as='article' className={css.listCard} id={`note-${note.id}`}>
       <div className={css.cardHeader}>
         <h2>
-          <SeamlessTextInput
+          <SeamlessSingleLineTextarea
             aria-label={t({ en: 'Checklist title', pl: 'Tytuł listy' })}
             className={css.titleInput}
             defaultValue={note.title}
@@ -112,12 +112,7 @@ export function CheckedNoteCard({ note }: { note: NoteSummary }) {
               if (!title) event.currentTarget.value = note.title;
               else if (title !== note.title) updateNote.mutate({ id: note.id, title });
             }}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
-                event.preventDefault();
-                addItem();
-              }
-            }}
+            onEnter={addItem}
             ref={titleRef}
             required
           />
