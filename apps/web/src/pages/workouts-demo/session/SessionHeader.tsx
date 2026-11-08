@@ -2,7 +2,7 @@ import { CircleHelpIcon, FlagIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
-import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
+import { SeamlessSingleLineTextarea } from '@/components/ui/seamless-single-line-textarea/SeamlessSingleLineTextarea';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import { formatDuration } from '../../workouts/metrics';
 import type { MockSlot } from '../mockData';
@@ -20,7 +20,7 @@ export function SessionHeader({ onShowHints, slots }: SessionHeaderProps) {
 
   return (
     <Card className={css.sessionHeader}>
-      <SeamlessTextInput aria-label='Workout name' defaultValue='Push-ish Monday' />
+      <SeamlessSingleLineTextarea aria-label='Workout name' defaultValue='Push-ish Monday' />
       <dl className={css.stats}>
         <div>
           <dt>Time</dt>
