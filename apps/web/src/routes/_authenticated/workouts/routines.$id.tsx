@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { RoutineActions } from '@/pages/workouts/routines/RoutineActions';
 import { RoutinePage } from '@/pages/workouts/routines/RoutinePage';
 import { routineQueryOptions } from '@/pages/workouts/routines/routines.query';
 import { workoutsQueryOptions } from '@/pages/workouts/workouts.query';
@@ -18,7 +19,11 @@ export const Route = createFileRoute('/_authenticated/workouts/routines/$id')({
   }),
   staticData: {
     layout: 'task',
-    navbar: { backFallback: { to: '/workouts' }, label: { en: 'Routine', pl: 'Plan' } },
+    navbar: {
+      Actions: RoutineActions,
+      backFallback: { to: '/workouts' },
+      label: { en: 'Routine', pl: 'Plan' },
+    },
   },
 });
 
