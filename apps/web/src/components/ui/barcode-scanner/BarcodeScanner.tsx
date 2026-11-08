@@ -41,8 +41,8 @@ export function BarcodeScanner({ notice, onScan }: BarcodeScannerProps) {
         {scanner.failed ? (
           <ScanNotice
             detail={t({
-              en: 'Type the barcode below instead.',
-              pl: 'Zamiast tego wpisz kod kreskowy poniżej.',
+              en: 'Type the barcode by hand instead.',
+              pl: 'Zamiast tego wpisz kod kreskowy ręcznie.',
             })}
             title={t({ en: 'Scanner stopped', pl: 'Skaner zatrzymany' })}
             tone='danger'

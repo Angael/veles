@@ -13,7 +13,9 @@ import { PhotoPicker, type PhotoPickerValue } from '../PhotoPicker';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
+import { BarcodeIcon } from 'lucide-react';
 import { useState } from 'react';
+import { FoodBarcodeScanDialog } from './FoodBarcodeScanDialog';
 import css from '../CalorieFlows.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
@@ -53,6 +55,15 @@ export function FoodEditor({
   const { t } = useI18n();
   const [photo, setPhoto] = useState<PhotoPickerValue>({ imageAction: 'keep' });
   const [unit, setUnit] = useState<FoodProductUnit>(food?.unit ?? 'package');
+  const [barcode, setBarcode] = useState(food?.barcode ?? initialBarcode ?? '');
+  const [scanning, setScanning] = useState(false);
+
+  function handleScan(scanned: string) {
+    setBarcode(scanned);
+    setScanning(false);
+    // A value set from code fires no change event on the form.
+    onDirty();
+  }
 
   async function handleSubmit(formData: TypedFormData) {
     await onSubmit({
@@ -97,9 +108,22 @@ export function FoodEditor({
         </div>
         <Label text={t({ en: 'Barcode', pl: 'Kod kreskowy' })}>
           <TextInput
-            defaultValue={food?.barcode ?? initialBarcode}
             inputMode='numeric'
             name='barcode'
+            onValueChange={setBarcode}
+            trailing={
+              <Btn
+                aria-label={t({ en: 'Scan barcode', pl: 'Skanuj kod kreskowy' })}
+                disabled={pending}
+                icon={<BarcodeIcon aria-hidden='true' />}
+                iconOnly
+                onClick={() => setScanning(true)}
+                size='sm'
+                type='button'
+                variant='ghost'
+              />
+            }
+            value={barcode}
           />
         </Label>
         <KcalMacrosForm
@@ -133,6 +157,7 @@ export function FoodEditor({
           </Btn>
         </FormSubmitRow>
       </TypedForm>
+      <FoodBarcodeScanDialog onOpenChange={setScanning} onScan={handleScan} open={scanning} />
     </Card>
   );
 }
