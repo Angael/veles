@@ -26,7 +26,8 @@ export function useVisibleViewport(active: boolean): CSSProperties | undefined {
     if (!active || !viewport || !window.matchMedia('(pointer: coarse)').matches) return;
     const restoreViewport = resizeLayoutForKeyboard();
     const update = () =>
-      setStyle({ height: Math.floor(viewport.height), top: Math.ceil(viewport.offsetTop) });
+      // Round outward: a sub-pixel overlap hides under the keyboard, a gap shows the page through.
+      setStyle({ height: Math.ceil(viewport.height) + 1, top: Math.floor(viewport.offsetTop) });
     update();
     viewport.addEventListener('resize', update);
     viewport.addEventListener('scroll', update);
