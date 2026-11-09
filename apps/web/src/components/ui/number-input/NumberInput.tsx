@@ -1,6 +1,6 @@
 import { NumberField, type NumberFieldRootProps } from '@base-ui/react/number-field';
 import clsx from 'clsx';
-import { useState, type ComponentProps } from 'react';
+import { useState, type ComponentProps, type Ref } from 'react';
 import { flushSync } from 'react-dom';
 import { MinusIcon, PlusIcon } from 'lucide-react';
 import type { InputSize } from '@/components/ui/text-input/TextInput';
@@ -15,6 +15,7 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 type NumberInputProps = Omit<NumberFieldRootProps, 'className' | 'step'> & {
   className?: string;
   inputClassName?: string;
+  inputRef?: Ref<HTMLInputElement>;
   placeholder?: string;
   enterKeyHint?: ComponentProps<'input'>['enterKeyHint'];
   /** Visual size matching `Btn` heights. */
@@ -26,6 +27,7 @@ type NumberInputProps = Omit<NumberFieldRootProps, 'className' | 'step'> & {
 export function NumberInput({
   className,
   inputClassName,
+  inputRef,
   enterKeyHint,
   placeholder,
   size = 'md',
@@ -80,6 +82,7 @@ export function NumberInput({
         </NumberField.Decrement>
 
         <NumberField.Input
+          autoComplete='off'
           className={clsx(css.input, inputClassName)}
           enterKeyHint={enterKeyHint}
           {...(expression !== null && { value: expression })}
@@ -117,6 +120,7 @@ export function NumberInput({
             }
           }}
           placeholder={placeholder}
+          ref={inputRef}
         />
 
         <NumberField.Increment

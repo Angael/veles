@@ -1,5 +1,6 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useCreateFoodProductMutation } from '../calories.query';
+import { caloriesReturnState } from '../caloriesReturnScroll';
 import { FoodEditor, type FoodEditorValue } from './FoodEditor';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 import { useI18n } from '@/lib/i18n/I18nProvider';
@@ -14,7 +15,12 @@ export function CreateFoodPage({ barcode, date, name }: Props) {
   async function save(value: FoodEditorValue) {
     const product = await createMutation.mutateAsync(value);
     markSaved();
-    await navigate({ replace: true, search: { date, foodId: product.id }, to: '/calories/add' });
+    await navigate({
+      replace: true,
+      search: { date, foodId: product.id },
+      state: caloriesReturnState(date),
+      to: '/calories',
+    });
   }
 
   return (

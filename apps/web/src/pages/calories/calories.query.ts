@@ -216,9 +216,14 @@ export function useCopyFoodLogsMutation() {
 
 export function useRecordFoodMutation() {
   return useMutation({
-    meta: { invalidateQueryKey: calorieDashboardKey },
     mutationFn: (variables: RecordFoodVariables) =>
       recordFood({ data: toMultipartFormData({ ...variables }) }),
+    // The foods list changes too: the diary's search ranks by last logged time.
+    onSuccess: (_data, _variables, _onMutateResult, context) =>
+      Promise.all([
+        context.client.invalidateQueries({ queryKey: calorieDashboardKey }),
+        context.client.invalidateQueries({ queryKey: calorieFoodsKey }),
+      ]),
   });
 }
 

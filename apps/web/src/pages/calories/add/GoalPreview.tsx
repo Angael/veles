@@ -11,52 +11,32 @@ type GoalPreviewProps = {
 /** Previews how the selected food changes the day's calorie goal. */
 export function GoalPreview({ consumedKcal, foodKcal, goalKcal, pending }: GoalPreviewProps) {
   const { formatWhole, t } = useI18n();
-  const kcal = (value: number) => `${formatWhole(value)} kcal`;
 
-  if (pending) {
+  if (pending || goalKcal === null) {
     return (
-      <div aria-live='polite' className={css.goalPreview}>
-        <p className={css.goalMessage}>
-          {t({ en: 'Checking daily calories…', pl: 'Sprawdzanie dziennych kalorii…' })}
-        </p>
-      </div>
+      <p aria-live='polite' className={css.goalMessage}>
+        {pending
+          ? t({ en: 'Checking daily calories…', pl: 'Sprawdzanie dziennych kalorii…' })
+          : t({
+              en: 'Set a calorie goal to preview this day.',
+              pl: 'Ustaw cel kaloryczny, aby zobaczyć podgląd dnia.',
+            })}
+      </p>
     );
   }
 
-  if (goalKcal === null) {
-    return (
-      <div aria-live='polite' className={css.goalPreview}>
-        <p className={css.goalMessage}>
-          {t({
-            en: 'Set a calorie goal to preview this day.',
-            pl: 'Ustaw cel kaloryczny, aby zobaczyć podgląd dnia.',
-          })}
-        </p>
-      </div>
-    );
-  }
-
-  const projectedKcal = consumedKcal + foodKcal;
+  const addedKcal = Math.max(0, foodKcal);
+  const projectedKcal = consumedKcal + addedKcal;
   const wouldExceedGoal = projectedKcal > goalKcal;
   const consumedPercent = Math.min(100, (consumedKcal / goalKcal) * 100);
-  const addedPercent = Math.min(100 - consumedPercent, (Math.max(0, foodKcal) / goalKcal) * 100);
+  const addedPercent = Math.min(100 - consumedPercent, (addedKcal / goalKcal) * 100);
 
   return (
     <div aria-live='polite' className={css.goalPreview}>
-      <div className={css.goalCaption}>
-        <span>
-          <i aria-hidden='true' className={css.dotConsumed} />
-          <strong>{kcal(consumedKcal)}</strong> {t({ en: 'eaten', pl: 'zjedzone' })}
-        </span>
-        <span>
-          <i aria-hidden='true' className={wouldExceedGoal ? css.dotAddedOver : css.dotAdded} />
-          <strong>+{kcal(foodKcal)}</strong> {t({ en: 'this food', pl: 'ten produkt' })}
-        </span>
-      </div>
       <div
         aria-label={t({
-          en: `${formatWhole(projectedKcal)} of ${kcal(goalKcal)} after adding this food${wouldExceedGoal ? ', over goal' : ''}`,
-          pl: `${formatWhole(projectedKcal)} z ${kcal(goalKcal)} po dodaniu tego produktu${wouldExceedGoal ? ', ponad cel' : ''}`,
+          en: `${formatWhole(projectedKcal)} of ${formatWhole(goalKcal)} kcal after adding this food`,
+          pl: `${formatWhole(projectedKcal)} z ${formatWhole(goalKcal)} kcal po dodaniu tego produktu`,
         })}
         aria-valuemax={goalKcal}
         aria-valuemin={0}
@@ -65,13 +45,18 @@ export function GoalPreview({ consumedKcal, foodKcal, goalKcal, pending }: GoalP
         role='progressbar'
       >
         <span className={css.consumedBar} style={{ width: `${consumedPercent}%` }} />
-        <span
-          className={wouldExceedGoal ? css.addedBarOver : css.addedBar}
-          style={{ width: `${addedPercent}%` }}
-        />
+        <span className={css.addedBar} style={{ width: `${addedPercent}%` }} />
       </div>
-      <p className={wouldExceedGoal ? css.goalResultOver : css.goalResult}>
-        {kcal(projectedKcal)} / {kcal(goalKcal)}
+      <p aria-hidden='true' className={css.goalEquation}>
+        <span>{formatWhole(consumedKcal)} kcal</span>
+        {' + '}
+        <span className={css.addedText}>{formatWhole(addedKcal)} kcal</span>
+        {' = '}
+        <span className={wouldExceedGoal ? css.sumTextOver : css.sumText}>
+          {formatWhole(projectedKcal)} kcal
+        </span>
+        {' / '}
+        <span>{formatWhole(goalKcal)} kcal</span>
       </p>
     </div>
   );
