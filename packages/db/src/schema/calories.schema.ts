@@ -162,3 +162,42 @@ export const calorieDayNotes = pgTable(
   },
   (table) => [uniqueIndex('calorie_day_note_user_id_date_idx').on(table.userId, table.date)],
 );
+
+/**
+ * Photo logging queue: the worker reads the photos, creates a catalog product and logs it.
+ * Rows stay after success so the daily limit can count them; the label photo is then released.
+ */
+export const foodPhotoScans = pgTable(
+  'food_photo_scan',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`uuidv7()`),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    logDate: date('log_date', { mode: 'string' }).notNull(),
+    gramsHundredths: integer('grams_hundredths').notNull(),
+    /** Barcode the browser found on the photos; the AI product gets it when it is still free. */
+    barcode: text('barcode'),
+    frontUploadObjectId: text('front_upload_object_id')
+      .notNull()
+      .references(() => uploadObjects.id, { onDelete: 'restrict' }),
+    labelUploadObjectId: text('label_upload_object_id').references(() => uploadObjects.id, {
+      onDelete: 'set null',
+    }),
+    /** `pending` → `processing` → `done` or `failed`. */
+    status: text('status').notNull().default('pending'),
+    attempts: integer('attempts').notNull().default(0),
+    error: text('error'),
+    foodLogId: uuid('food_log_id').references(() => foodLogs.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (table) => [
+    index('food_photo_scan_user_id_log_date_idx').on(table.userId, table.logDate),
+    index('food_photo_scan_status_idx').on(table.status, table.updatedAt),
+    index('food_photo_scan_front_upload_object_id_idx').on(table.frontUploadObjectId),
+    index('food_photo_scan_label_upload_object_id_idx').on(table.labelUploadObjectId),
+  ],
+);

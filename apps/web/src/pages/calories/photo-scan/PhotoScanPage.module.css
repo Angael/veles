@@ -1,0 +1,23 @@
+.form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.hint {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}
+
+.sent {
+  margin-inline-end: auto;
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+}

@@ -8,6 +8,7 @@ import { LogFoodMenu } from './LogFoodMenu';
 import { LoggedFood } from './LoggedFood';
 import { LogsDateAction } from './LogsDateAction';
 import { MultiplyLogsAction } from './MultiplyLogsAction';
+import { PendingPhotoScans } from './PendingPhotoScans';
 import { ReceivedFoodShares } from './ReceivedFoodShares';
 import { ShareLogsAction } from './ShareLogsAction';
 import { useCancelSelectionOnBack } from './useCancelSelectionOnBack';
@@ -73,6 +74,7 @@ export function CalorieOverview({ day }: Props) {
           ) : null}
         </div>
         <ReceivedFoodShares date={date} />
+        <PendingPhotoScans date={date} />
         {logs.length ? (
           <List as='ol' data-selecting={selecting || undefined}>
             {logs.map((entry) => (

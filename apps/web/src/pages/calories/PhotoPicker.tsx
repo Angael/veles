@@ -13,6 +13,8 @@ type PhotoPickerProps = {
   allowUpload?: boolean;
   disabled?: boolean;
   existingUrl?: string | null;
+  /** Defaults to "Photo". */
+  legend?: string;
   onChange: (value: PhotoPickerValue) => void;
   value: PhotoPickerValue;
 };
@@ -51,6 +53,7 @@ export function PhotoPicker({
   allowUpload = true,
   disabled = false,
   existingUrl = null,
+  legend,
   onChange,
   value,
 }: PhotoPickerProps) {
@@ -81,7 +84,7 @@ export function PhotoPicker({
 
   return (
     <fieldset className={css.root} disabled={disabled}>
-      <legend className={css.legend}>{t({ en: 'Photo', pl: 'Zdjęcie' })}</legend>
+      <legend className={css.legend}>{legend ?? t({ en: 'Photo', pl: 'Zdjęcie' })}</legend>
       <div className={css.card} data-has-image={visibleUrl ? '' : undefined}>
         {visibleUrl ? (
           <img

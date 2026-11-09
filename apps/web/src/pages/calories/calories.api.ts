@@ -48,22 +48,24 @@ import { translate } from '@/lib/i18n/getLocale';
 
 const FOOD_UPLOAD_MAX_REQUEST_BYTES = 12 * 1024 * 1024;
 
-const nonEmptyPhotoType = type('File').narrow((photo, ctx) =>
+export const nonEmptyPhotoType = type('File').narrow((photo, ctx) =>
   photo.size > 0 ? true : ctx.mustBe('a non-empty file'),
 );
 const foodLogIdInputType = type({ id: 'string.uuid' });
 
-const limitFoodUploadRequestMiddleware = createMiddleware().server(async ({ next, request }) => {
-  const contentLength = type('string.numeric.parse |> number.integer >= 0')(
-    request.headers.get('content-length') ?? '',
-  );
-  if (contentLength instanceof type.errors || contentLength > FOOD_UPLOAD_MAX_REQUEST_BYTES) {
-    throw new ClientSafeError(
-      translate({ en: 'Upload request is too large.', pl: 'Przesyłane dane są za duże.' }),
+export const limitFoodUploadRequestMiddleware = createMiddleware().server(
+  async ({ next, request }) => {
+    const contentLength = type('string.numeric.parse |> number.integer >= 0')(
+      request.headers.get('content-length') ?? '',
     );
-  }
-  return next();
-});
+    if (contentLength instanceof type.errors || contentLength > FOOD_UPLOAD_MAX_REQUEST_BYTES) {
+      throw new ClientSafeError(
+        translate({ en: 'Upload request is too large.', pl: 'Przesyłane dane są za duże.' }),
+      );
+    }
+    return next();
+  },
+);
 
 type LogProduct = { imageUploadObjectId: string | null; seedKey: string | null };
 

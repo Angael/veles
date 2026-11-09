@@ -1,5 +1,12 @@
 import { Link } from '@tanstack/react-router';
-import { AppleIcon, PlusIcon, ScanLineIcon, SearchIcon, SparklesIcon } from 'lucide-react';
+import {
+  AppleIcon,
+  CameraIcon,
+  PlusIcon,
+  ScanLineIcon,
+  SearchIcon,
+  SparklesIcon,
+} from 'lucide-react';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
 import {
   MenuBtn,
@@ -32,6 +39,15 @@ const loggingActions = [
     icon: ScanLineIcon,
     label: { en: 'Scan barcode', pl: 'Skanuj kod kreskowy' },
     to: '/calories/scan' as const,
+  },
+  {
+    description: {
+      en: 'Snap the package; AI adds it in the background',
+      pl: 'Zrób zdjęcie opakowania; AI doda je w tle',
+    },
+    icon: CameraIcon,
+    label: { en: 'Log from photos', pl: 'Dodaj ze zdjęć' },
+    to: '/calories/photo' as const,
   },
   {
     description: {
