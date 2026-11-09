@@ -18,6 +18,8 @@ type CaloriesPageProps = {
   dashboard: CalorieDashboard;
   date: string;
   linkedFoodId?: string;
+  /** The phone search takeover is open; kept in the URL so back closes it. */
+  searchOpen: boolean;
   today: string;
 };
 
@@ -25,6 +27,7 @@ export function CaloriesPage({
   dashboard,
   date,
   linkedFoodId,
+  searchOpen,
   today: todayDate,
 }: CaloriesPageProps) {
   const { dateLocale, t } = useI18n();
@@ -145,7 +148,12 @@ export function CaloriesPage({
         </div>
       </div>
 
-      <CalorieOverview day={selectedDay} key={date} linkedFoodId={linkedFoodId} />
+      <CalorieOverview
+        day={selectedDay}
+        key={date}
+        linkedFoodId={linkedFoodId}
+        searchOpen={searchOpen}
+      />
     </main>
   );
 }

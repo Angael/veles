@@ -9,7 +9,7 @@ import { translate } from '@/lib/i18n/getLocale';
 import { useTodayLocalDate } from '@/lib/useTodayLocalDate';
 
 export const Route = createFileRoute('/_authenticated/calories')({
-  validateSearch: type({ 'date?': 'string', 'foodId?': 'string' }),
+  validateSearch: type({ 'date?': 'string', 'foodId?': 'string', 'sheet?': "'search'" }),
   loaderDeps: ({ search }) => ({
     weekStart: calorieWeekStart(normalizeCalorieDate(search.date)),
   }),
@@ -34,6 +34,12 @@ function RouteComponent() {
   const { data: dashboard } = useSuspenseQuery(calorieDashboardQueryOptions(date));
 
   return (
-    <CaloriesPage dashboard={dashboard} date={date} linkedFoodId={search.foodId} today={today} />
+    <CaloriesPage
+      dashboard={dashboard}
+      date={date}
+      linkedFoodId={search.foodId}
+      searchOpen={search.sheet === 'search'}
+      today={today}
+    />
   );
 }

@@ -65,11 +65,14 @@
   height: 100dvh;
   padding: calc(env(safe-area-inset-top) + var(--space-sm)) var(--space-sm) 0;
   outline: none;
-  background: var(--c-surface-solid);
+  /* The surface token is translucent; layer it over the page colour so the diary can't show through. */
+  background: linear-gradient(var(--c-surface-solid), var(--c-surface-solid)), #060816;
   color: var(--c-text);
 }
 
 .inlineResults {
+  display: flex;
+  flex-direction: column;
   grid-column: 1 / -1;
   align-self: stretch;
   overflow-y: auto;
@@ -85,7 +88,15 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
 
+  /* Fill the sheet so "Create" stays at the bottom even with few results. */
+  & .list {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+  }
+
   & .list > .createOption {
+    margin-top: auto;
     padding-bottom: calc(var(--space-sm) + env(safe-area-inset-bottom));
   }
 }

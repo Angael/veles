@@ -22,10 +22,11 @@ type Props = {
   day: CalorieDashboardDay;
   /** Food to open in the add dialog, e.g. after scanning or creating it. */
   linkedFoodId?: string;
+  searchOpen: boolean;
 };
 
 /** Day overview; selecting logs via their images swaps the Log food button for bulk actions. */
-export function CalorieOverview({ day, linkedFoodId }: Props) {
+export function CalorieOverview({ day, linkedFoodId, searchOpen }: Props) {
   const { date, goal, logs, totals } = day;
   const { t } = useI18n();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -77,7 +78,9 @@ export function CalorieOverview({ day, linkedFoodId }: Props) {
             </Btn>
           ) : null}
         </div>
-        {selecting ? null : <FoodSearch date={date} linkedFoodId={linkedFoodId} />}
+        {selecting ? null : (
+          <FoodSearch date={date} linkedFoodId={linkedFoodId} searchOpen={searchOpen} />
+        )}
         <ReceivedFoodShares date={date} />
         {logs.length ? (
           <List as='ol' data-selecting={selecting || undefined}>

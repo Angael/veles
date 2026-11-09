@@ -14,6 +14,7 @@
     padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-md));
     border: 0;
     border-radius: 0;
+    background: linear-gradient(var(--c-surface-solid), var(--c-surface-solid)), #060816;
   }
 }
 
