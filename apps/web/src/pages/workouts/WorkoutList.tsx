@@ -1,19 +1,10 @@
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { ArrowRightIcon, BookmarkPlusIcon, Trash2Icon } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRightIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card/Card';
-import {
-  ContextMenuItem,
-  ContextMenuPopup,
-  ContextMenuRoot,
-  ContextMenuTrigger,
-} from '@/components/ui/context-menu/ContextMenu';
 import { ElapsedTime, formatElapsed } from './ElapsedTime';
-import { RoutineDialog } from './routines/RoutineDialog';
-import { useSaveRoutineFromWorkoutMutation } from './routines/routines.query';
-import type { WorkoutSummary } from './workouts.api';
-import { useDeleteWorkoutMutation } from './workouts.query';
+import { WorkoutContextMenu } from './WorkoutContextMenu';
+import type { WorkoutSummary } from './workouts.server';
 import css from './WorkoutList.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { pluralEn, pluralPl } from '@/lib/i18n/locale';
@@ -25,69 +16,20 @@ import { daysAgo, formatDaysAgo } from '@/lib/relativeDay';
  */
 export function WorkoutList({ workouts }: { workouts: WorkoutSummary[] }) {
   const { t } = useI18n();
-  const deleteWorkout = useDeleteWorkoutMutation();
-  const saveRoutine = useSaveRoutineFromWorkoutMutation();
-  const [savingFrom, setSavingFrom] = useState<WorkoutSummary | null>(null);
 
   return (
-    <>
-      <ul aria-label={t({ en: 'Workouts', pl: 'Treningi' })} className={css.list}>
-        {workouts.map((workout) => (
-          <li key={workout.id}>
-            <ContextMenuRoot>
-              <ContextMenuTrigger
-                render={
-                  <Link className={css.link} params={{ id: workout.id }} to='/workouts/$id' />
-                }
-              >
-                <WorkoutRow workout={workout} />
-              </ContextMenuTrigger>
-              <ContextMenuPopup
-                aria-label={t({ en: `${workout.name} actions`, pl: `Akcje: ${workout.name}` })}
-              >
-                <ContextMenuItem
-                  disabled={workout.exerciseCount === 0}
-                  icon={<BookmarkPlusIcon aria-hidden='true' />}
-                  label={t({ en: 'Save as routine', pl: 'Zapisz jako plan' })}
-                  onClick={() => setSavingFrom(workout)}
-                />
-                <ContextMenuItem
-                  icon={<Trash2Icon aria-hidden='true' />}
-                  label={t({ en: 'Delete workout', pl: 'Usuń trening' })}
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        t({
-                          en: `Delete “${workout.name}” and its sets?`,
-                          pl: `Usunąć „${workout.name}” razem z seriami?`,
-                        }),
-                      )
-                    ) {
-                      deleteWorkout.mutate({ id: workout.id });
-                    }
-                  }}
-                  variant='danger'
-                />
-              </ContextMenuPopup>
-            </ContextMenuRoot>
-          </li>
-        ))}
-      </ul>
-      <RoutineDialog
-        defaults={{ description: '', name: savingFrom?.name ?? '' }}
-        key={savingFrom?.id}
-        onOpenChange={(open) => !open && setSavingFrom(null)}
-        onSubmit={(values) =>
-          savingFrom
-            ? saveRoutine.mutateAsync({ ...values, workoutId: savingFrom.id })
-            : Promise.resolve()
-        }
-        open={savingFrom !== null}
-        pending={saveRoutine.isPending}
-        submitLabel={t({ en: 'Save routine', pl: 'Zapisz plan' })}
-        title={t({ en: 'Save as routine', pl: 'Zapisz jako plan' })}
-      />
-    </>
+    <ul aria-label={t({ en: 'Workouts', pl: 'Treningi' })} className={css.list}>
+      {workouts.map((workout) => (
+        <li key={workout.id}>
+          <WorkoutContextMenu
+            trigger={<Link className={css.link} params={{ id: workout.id }} to='/workouts/$id' />}
+            workout={workout}
+          >
+            <WorkoutRow workout={workout} />
+          </WorkoutContextMenu>
+        </li>
+      ))}
+    </ul>
   );
 }
 

@@ -1,0 +1,105 @@
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  color: var(--c-muted-strong);
+  font-size: var(--text-xs);
+  text-transform: capitalize;
+
+  & span {
+    padding-inline: var(--space-xs);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-xs);
+  background: var(--c-surface);
+  list-style: none;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  min-height: 5.75rem;
+  padding: 0.3rem;
+  border-inline-end: var(--border-width) solid var(--c-border);
+  border-block-end: var(--border-width) solid var(--c-border);
+
+  &:nth-child(7n) {
+    border-inline-end: 0;
+  }
+
+  &:nth-last-child(-n + 7) {
+    border-block-end: 0;
+  }
+
+  & time {
+    display: grid;
+    place-items: center;
+    align-self: flex-start;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: var(--radius-pill);
+    color: var(--c-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+}
+
+.outside {
+  background: var(--c-surface-inset);
+
+  & time {
+    color: var(--c-muted-strong);
+    opacity: 0.55;
+  }
+}
+
+.today time {
+  background: var(--c-primary);
+  color: var(--c-primary-contrast);
+  font-weight: var(--font-weight-semibold);
+}
+
+.block {
+  display: grid;
+  gap: 0.05rem;
+  min-width: 0;
+  padding: 0.25rem 0.4rem;
+  border-radius: 0.5rem;
+  color: var(--c-text-strong);
+  font-size: var(--text-xs);
+  text-decoration: none;
+  -webkit-touch-callout: none;
+  transition: filter 140ms var(--ease-out);
+
+  & strong,
+  & span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  & span {
+    color: var(--c-muted-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 1px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      filter: brightness(1.25);
+    }
+  }
+}

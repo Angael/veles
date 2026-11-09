@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { format, parseISO, startOfWeek, subWeeks } from 'date-fns';
 import { todayLocalDate } from '@/lib/dateOnly';
-import type { WorkoutSummary } from '../workouts.api';
+import type { WorkoutSummary } from '../workouts.server';
 import { workoutsQueryOptions } from '../workouts.query';
 import css from './WorkoutStats.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
@@ -51,7 +51,7 @@ function computeStats(workouts: WorkoutSummary[], today: string) {
   };
 }
 
-/** 2×2 grid of headline numbers beside the calendar. */
+/** Row of headline numbers below the routines; two columns on phones. */
 export function WorkoutStats() {
   const { data: workouts } = useSuspenseQuery(workoutsQueryOptions());
   const stats = computeStats(workouts, todayLocalDate());

@@ -1,58 +1,27 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Link } from '@tanstack/react-router';
-import { ArrowRightIcon } from 'lucide-react';
 import { RoutineList } from '../routines/RoutineList';
-import { WorkoutList } from '../WorkoutList';
 import { workoutsQueryOptions } from '../workouts.query';
-import { StartWorkoutButton } from './StartWorkoutButton';
-import { WorkoutCalendar } from './WorkoutCalendar';
+import { WorkoutCalendar } from './calendar/WorkoutCalendar';
+import { StartWorkoutMenu } from './StartWorkoutMenu';
 import { WorkoutStats } from './WorkoutStats';
 import css from './WorkoutsDashboardPage.module.css';
-import { useI18n } from '@/lib/i18n/I18nProvider';
 
-const RECENT = 10;
+type WorkoutsDashboardPageProps = {
+  initialDate: string | undefined;
+  onDateChange: (date: string | undefined) => void;
+};
 
-/**
- * Workouts home: one list with the open workout (highlighted) on top and recent ones below; the
- * calendar, stats and routines on the side. Starting an empty workout lives in the floating button.
- */
-export function WorkoutsDashboardPage() {
-  const { t } = useI18n();
+/** Workouts home: the calendar first, then routines and headline numbers. */
+export function WorkoutsDashboardPage({ initialDate, onDateChange }: WorkoutsDashboardPageProps) {
   const { data: workouts } = useSuspenseQuery(workoutsQueryOptions());
   const active = workouts.find((workout) => workout.endedAt === null);
-  const shown = [
-    ...(active ? [active] : []),
-    ...workouts.filter((workout) => workout !== active).slice(0, RECENT),
-  ];
 
   return (
     <main className={css.page}>
-      <section aria-label={t({ en: 'Workouts', pl: 'Treningi' })} className={css.main} data-appear>
-        {shown.length > 0 ? (
-          <WorkoutList workouts={shown} />
-        ) : (
-          <p className={css.hint}>
-            {t({
-              en: 'No workouts yet. Start one with the button below.',
-              pl: 'Brak treningów. Rozpocznij pierwszy przyciskiem poniżej.',
-            })}
-          </p>
-        )}
-        {workouts.length > shown.length ? (
-          <Link className={css.more} to='/workouts/history'>
-            {t({ en: 'All workouts', pl: 'Wszystkie treningi' })}{' '}
-            <ArrowRightIcon aria-hidden='true' />
-          </Link>
-        ) : null}
-      </section>
-
-      <div className={css.side}>
-        <WorkoutCalendar />
-        <WorkoutStats />
-        <RoutineList />
-      </div>
-
-      <StartWorkoutButton active={active} />
+      <WorkoutCalendar initialDate={initialDate} onDateChange={onDateChange} />
+      <RoutineList />
+      <WorkoutStats />
+      <StartWorkoutMenu active={active} />
     </main>
   );
 }
