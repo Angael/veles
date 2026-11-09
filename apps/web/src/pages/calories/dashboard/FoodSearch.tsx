@@ -13,6 +13,8 @@ import { recipeLibraryQueryOptions } from '@/pages/recipes/recipes.query';
 
 type Props = {
   date: string;
+  /** Keeps the field in place but inert, e.g. while logged foods are selected. */
+  disabled?: boolean;
   /** Food whose amount dialog is open: picked here, or linked after scanning or creating it. */
   linkedFoodId?: string;
   /** The phone search takeover is open. */
@@ -25,7 +27,7 @@ type Props = {
  * log stays on the diary. Both sheets live in the URL, so the back gesture closes them like a
  * native app.
  */
-export function FoodSearch({ date, linkedFoodId, searchOpen }: Props) {
+export function FoodSearch({ date, disabled = false, linkedFoodId, searchOpen }: Props) {
   const { locale } = useI18n();
   const navigate = useNavigate();
   const router = useRouter();
@@ -102,6 +104,7 @@ export function FoodSearch({ date, linkedFoodId, searchOpen }: Props) {
 
   const comboboxProps = {
     date,
+    disabled,
     fetching: foodsQuery.isFetching,
     loading: foodsQuery.isPending,
     onPick: openResult,

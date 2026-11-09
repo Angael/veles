@@ -7,17 +7,21 @@ import {
   ContextMenuRoot,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu/ContextMenu';
+import type { RoutineSummary } from './routines.api';
 import { routinesQueryOptions, useDeleteRoutineMutation } from './routines.query';
 import css from './Routines.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { SHORT_DAY } from '../metrics';
 
+/** How many exercise names a card shows before summing up the rest. */
+const SHOWN_EXERCISES = 6;
+
 /**
- * Routines panel: each row shows what the routine holds and opens its page. Long press or right
- * click deletes it.
+ * Routines as a grid of cards: each shows what the routine holds and opens its page. Long press or
+ * right click deletes it. Starting one straight away lives in the floating button.
  */
 export function RoutineList() {
-  const { formatDate, t } = useI18n();
+  const { t } = useI18n();
   const { data: routines } = useSuspenseQuery(routinesQueryOptions());
   const deleteRoutine = useDeleteRoutineMutation();
 
@@ -32,35 +36,20 @@ export function RoutineList() {
           })}
         </p>
       ) : (
-        <ul className={css.list}>
+        <ul className={css.grid}>
           {routines.map((routine) => (
             <li key={routine.id}>
               <ContextMenuRoot>
                 <ContextMenuTrigger
                   render={
                     <Link
-                      className={css.row}
+                      className={css.card}
                       params={{ id: routine.id }}
                       to='/workouts/routines/$id'
                     />
                   }
                 >
-                  <span className={css.rowText}>
-                    <span className={css.rowName}>{routine.name}</span>
-                    <span className={css.exercises}>
-                      {routine.exerciseNames.join(' · ') ||
-                        t({ en: 'No exercises', pl: 'Brak ćwiczeń' })}
-                    </span>
-                    <span className={css.lastUsed}>
-                      {routine.lastUsed
-                        ? t({
-                            en: `Last done ${formatDate(routine.lastUsed, SHORT_DAY)}`,
-                            pl: `Ostatnio ${formatDate(routine.lastUsed, SHORT_DAY)}`,
-                          })
-                        : t({ en: 'Not done yet', pl: 'Jeszcze nie wykonany' })}
-                    </span>
-                  </span>
-                  <ChevronRightIcon aria-hidden='true' />
+                  <RoutineCardContent routine={routine} />
                 </ContextMenuTrigger>
                 <ContextMenuPopup
                   aria-label={t({ en: `${routine.name} actions`, pl: `Akcje: ${routine.name}` })}
@@ -89,5 +78,42 @@ export function RoutineList() {
         </ul>
       )}
     </section>
+  );
+}
+
+function RoutineCardContent({ routine }: { routine: RoutineSummary }) {
+  const { formatDate, t } = useI18n();
+  const hidden = routine.exerciseNames.length - SHOWN_EXERCISES;
+
+  return (
+    <>
+      <span className={css.name}>{routine.name}</span>
+      {routine.description ? (
+        <span className={css.description}>{routine.description}</span>
+      ) : (
+        <span />
+      )}
+      {routine.exerciseNames.length > 0 ? (
+        <ul className={css.exercises}>
+          {routine.exerciseNames.slice(0, SHOWN_EXERCISES).map((name, index) => (
+            <li key={`${name}-${index}`}>{name}</li>
+          ))}
+          {hidden > 0 ? <li>+{hidden}</li> : null}
+        </ul>
+      ) : (
+        <span className={css.description}>{t({ en: 'No exercises', pl: 'Brak ćwiczeń' })}</span>
+      )}
+      <span className={css.footer}>
+        <span>
+          {routine.lastUsed
+            ? t({
+                en: `Last done ${formatDate(routine.lastUsed, SHORT_DAY)}`,
+                pl: `Ostatnio ${formatDate(routine.lastUsed, SHORT_DAY)}`,
+              })
+            : t({ en: 'Not done yet', pl: 'Jeszcze nie wykonany' })}
+        </span>
+        <ChevronRightIcon aria-hidden='true' />
+      </span>
+    </>
   );
 }

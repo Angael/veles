@@ -33,7 +33,7 @@ export function useStartWorkoutMutation() {
       error: {
         title: t({ en: 'Could not start a workout', pl: 'Nie udało się rozpocząć treningu' }),
       },
-      invalidateQueryKey: workoutKeys.list,
+      invalidateQueryKey: workoutKeys.all,
     },
     mutationFn: (variables: { date: string }) => startWorkout({ data: variables }),
   });
@@ -71,7 +71,7 @@ export function useDeleteWorkoutMutation() {
   return useMutation({
     meta: {
       error: { title: t({ en: 'Workout was not deleted', pl: 'Nie udało się usunąć treningu' }) },
-      invalidateQueryKey: workoutKeys.list,
+      invalidateQueryKey: workoutKeys.all,
     },
     mutationFn: (variables: { id: string }) => deleteWorkout({ data: variables }),
   });

@@ -16,6 +16,7 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type Props = {
   date: string;
+  disabled?: boolean;
   /** Renders the results under the input instead of in a floating popup (phone takeover). */
   inline?: boolean;
   inputRef: RefObject<HTMLInputElement | null>;
@@ -30,6 +31,7 @@ type Props = {
 /** The search field and its result list, as a floating dropdown or inline in the phone takeover. */
 export function FoodSearchCombobox({
   date,
+  disabled = false,
   fetching,
   inline = false,
   inputRef,
@@ -65,6 +67,7 @@ export function FoodSearchCombobox({
   return (
     <Combobox.Root<FoodSearchResult>
       autoHighlight
+      disabled={disabled}
       filter={null}
       inline={inline}
       inputValue={query}
@@ -87,7 +90,7 @@ export function FoodSearchCombobox({
             pl: 'Dodaj jedzenie: banan, chleb, jogurt…',
           })}
           ref={inputRef}
-          render={<TextInput trailing={<ScanButton date={date} />} />}
+          render={<TextInput trailing={<ScanButton date={date} disabled={disabled} />} />}
         />
       </div>
 
@@ -108,11 +111,25 @@ export function FoodSearchCombobox({
   );
 }
 
-export function ScanButton({ date }: { date: string }) {
+export function ScanButton({ date, disabled = false }: { date: string; disabled?: boolean }) {
   const { t } = useI18n();
+  const label = t({ en: 'Scan barcode', pl: 'Skanuj kod kreskowy' });
+  // A disabled link would still navigate, so this renders a real disabled button instead.
+  if (disabled) {
+    return (
+      <Btn
+        aria-label={label}
+        disabled
+        icon={<BarcodeIcon aria-hidden='true' />}
+        iconOnly
+        size='sm'
+        variant='ghost'
+      />
+    );
+  }
   return (
     <Btn
-      aria-label={t({ en: 'Scan barcode', pl: 'Skanuj kod kreskowy' })}
+      aria-label={label}
       icon={<BarcodeIcon aria-hidden='true' />}
       iconOnly
       isLink

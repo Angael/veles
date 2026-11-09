@@ -1,0 +1,123 @@
+.calendar {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.heading {
+  display: grid;
+  min-width: 0;
+
+  & h2 {
+    font-size: var(--text-xl);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+
+    @media (--phone) {
+      font-size: var(--text-lg);
+    }
+
+    &::first-letter {
+      text-transform: uppercase;
+    }
+  }
+
+  & p {
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.controls {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* `pan-y` leaves vertical page scrolling to the browser while Embla reads horizontal swipes. */
+.viewport {
+  overflow: hidden;
+  min-width: 0;
+  touch-action: pan-y pinch-zoom;
+}
+
+.track {
+  display: flex;
+  align-items: flex-start;
+}
+
+.page {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+/* Brightness of a trained day, shared by month blocks and week tiles. */
+.level1 {
+  border: var(--border-width) solid color-mix(in srgb, var(--c-accent) 20%, transparent);
+  background: color-mix(in srgb, var(--c-primary) 20%, var(--c-surface-raised));
+}
+
+.level2 {
+  border: var(--border-width) solid color-mix(in srgb, var(--c-accent) 34%, transparent);
+  background: color-mix(in srgb, var(--c-primary) 34%, var(--c-surface-raised));
+}
+
+.level3 {
+  border: var(--border-width) solid color-mix(in srgb, var(--c-accent) 50%, transparent);
+  background: color-mix(in srgb, var(--c-primary) 50%, var(--c-surface-raised));
+}
+
+.level4 {
+  border: var(--border-width) solid color-mix(in srgb, var(--c-accent) 70%, transparent);
+  background: color-mix(in srgb, var(--c-primary) 70%, var(--c-surface-raised));
+}
+
+/* The open workout: green, so it reads apart from the blue finished ones. */
+.live {
+  border-color: var(--c-success-border);
+  background: var(--c-success-surface);
+  animation: live-glow 2.4s ease-in-out infinite alternate;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes live-glow {
+  to {
+    box-shadow: 0 0 0.9rem -0.15rem var(--c-success-border);
+  }
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  justify-self: end;
+  gap: 0.3rem;
+  color: var(--c-accent);
+  font-size: var(--text-sm);
+  text-decoration: none;
+
+  /* On phones the floating button sits at the right edge and would cover it. */
+  @media (--phone) {
+    justify-self: start;
+  }
+
+  & svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
