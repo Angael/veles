@@ -3,7 +3,6 @@ import { ArrowRightIcon } from 'lucide-react';
 import { useState } from 'react';
 import css from './Calendar.module.css';
 import { MonthView } from './MonthView';
-import { WeekView } from './WeekView';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { useTodayLocalDate } from '@/lib/useTodayLocalDate';
 
@@ -12,10 +11,7 @@ type WorkoutCalendarProps = {
   onDateChange: (date: string | undefined) => void;
 };
 
-/**
- * Month grid on wider screens, swipeable week on phones. CSS picks the view, so the server renders
- * the right one without a layout flash. One chosen day drives both; without a choice it is today.
- */
+/** Holds the chosen day, which selects the month on screen. Without a choice it is today. */
 export function WorkoutCalendar({ initialDate, onDateChange }: WorkoutCalendarProps) {
   const { t } = useI18n();
   const today = useTodayLocalDate();
@@ -23,16 +19,12 @@ export function WorkoutCalendar({ initialDate, onDateChange }: WorkoutCalendarPr
   const [origin] = useState(today);
   const [picked, setPicked] = useState(initialDate ?? null);
   const anchor = picked ?? today;
-  const view = {
-    anchor,
-    onSelect: (date: string) => {
-      if (date === anchor) return;
-      const next = date === today ? null : date;
-      setPicked(next);
-      onDateChange(next ?? undefined);
-    },
-    origin,
-    today,
+
+  const select = (date: string) => {
+    if (date === anchor) return;
+    const next = date === today ? null : date;
+    setPicked(next);
+    onDateChange(next ?? undefined);
   };
 
   return (
@@ -41,8 +33,7 @@ export function WorkoutCalendar({ initialDate, onDateChange }: WorkoutCalendarPr
       className={css.calendar}
       data-appear
     >
-      <MonthView {...view} />
-      <WeekView {...view} />
+      <MonthView anchor={anchor} onSelect={select} origin={origin} today={today} />
       <Link className={css.more} to='/workouts/history'>
         {t({ en: 'All workouts', pl: 'Wszystkie treningi' })} <ArrowRightIcon aria-hidden='true' />
       </Link>

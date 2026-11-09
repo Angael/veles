@@ -4,28 +4,6 @@
   min-width: 0;
 }
 
-/* CSS chooses the view, so server rendering never flashes the wrong one. */
-.monthView,
-.weekView {
-  display: grid;
-  gap: var(--space-sm);
-  min-width: 0;
-}
-
-.weekView {
-  display: none;
-}
-
-@media (--phone) {
-  .monthView {
-    display: none;
-  }
-
-  .weekView {
-    display: grid;
-  }
-}
-
 .header {
   display: flex;
   align-items: center;
@@ -40,6 +18,11 @@
   & h2 {
     font-size: var(--text-xl);
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+
+    @media (--phone) {
+      font-size: var(--text-lg);
+    }
 
     &::first-letter {
       text-transform: uppercase;
@@ -123,6 +106,11 @@
   color: var(--c-accent);
   font-size: var(--text-sm);
   text-decoration: none;
+
+  /* On phones the floating button sits at the right edge and would cover it. */
+  @media (--phone) {
+    justify-self: start;
+  }
 
   & svg {
     width: 1rem;

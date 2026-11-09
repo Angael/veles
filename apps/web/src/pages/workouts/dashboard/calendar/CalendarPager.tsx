@@ -47,7 +47,7 @@ export function CalendarPager({
       known.current = selected;
       report.current(selected);
     };
-    // Embla remeasures on resize and rotation, and on the view CSS has just revealed; keep the page.
+    // Embla remeasures on resize and rotation and would otherwise return to its first page.
     const onReInit = () => api.scrollTo(known.current, true);
     api.on('select', onSelect);
     api.on('reInit', onReInit);

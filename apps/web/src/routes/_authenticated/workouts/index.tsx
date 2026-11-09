@@ -1,6 +1,6 @@
 import { type } from 'arktype';
 import { createFileRoute } from '@tanstack/react-router';
-import { monthOfDate } from '@/pages/workouts/dashboard/calendar/calendarDates';
+import { monthOf } from '@/pages/workouts/dashboard/calendar/calendarDates';
 import { workoutCalendarQueryOptions } from '@/pages/workouts/dashboard/dashboard.query';
 import { WorkoutsDashboardPage } from '@/pages/workouts/dashboard/WorkoutsDashboardPage';
 import { routinesQueryOptions } from '@/pages/workouts/routines/routines.query';
@@ -16,7 +16,7 @@ const validDate = (date: string | undefined) => (dateOnlyType.allows(date) ? dat
 export const Route = createFileRoute('/_authenticated/workouts/')({
   validateSearch: searchType,
   beforeLoad: ({ search }) => ({
-    calendarMonth: monthOfDate(validDate(search.date) ?? todayLocalDate()),
+    calendarMonth: monthOf(validDate(search.date) ?? todayLocalDate()),
   }),
   loader: ({ context: { calendarMonth, queryClient } }) =>
     Promise.all([
