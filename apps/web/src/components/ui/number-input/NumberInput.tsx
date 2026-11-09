@@ -82,6 +82,7 @@ export function NumberInput({
         </NumberField.Decrement>
 
         <NumberField.Input
+          autoComplete='off'
           className={clsx(css.input, inputClassName)}
           enterKeyHint={enterKeyHint}
           {...(expression !== null && { value: expression })}

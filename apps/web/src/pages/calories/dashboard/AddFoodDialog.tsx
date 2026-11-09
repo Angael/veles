@@ -2,6 +2,7 @@ import { XIcon } from 'lucide-react';
 import { type RefObject, useRef, useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { SelectedFoodForm } from '../add/SelectedFoodForm';
+import { useVisibleViewport } from './useVisibleViewport';
 import { Btn } from '@/components/ui/btn/Btn';
 import { DialogClose, DialogPopup, DialogRoot, DialogTitle } from '@/components/ui/dialog/Dialog';
 import css from './AddFoodDialog.module.css';
@@ -15,18 +16,19 @@ type Props = {
   onSaved: (date: string) => void;
 };
 
-/** Touch devices skip returning focus to the search, so its keyboard does not reopen. */
+/** Touch devices get a full-screen sheet and skip refocusing the search behind it. */
 function hasCoarsePointer() {
   return window.matchMedia('(pointer: coarse)').matches;
 }
 
-/** Collects the amount for a picked food without leaving the diary; full height on phones. */
+/** Collects the amount for a picked food without leaving the diary; full screen on touch. */
 export function AddFoodDialog({ date, finalFocus, food, onClose, onSaved }: Props) {
   const { t } = useI18n();
   const amountInputRef = useRef<HTMLInputElement>(null);
   // Keep the last food rendered while the dialog animates out.
   const [shownFood, setShownFood] = useState(food);
   if (food && food !== shownFood) setShownFood(food);
+  const viewportStyle = useVisibleViewport(food !== null);
 
   return (
     <DialogRoot
@@ -37,6 +39,7 @@ export function AddFoodDialog({ date, finalFocus, food, onClose, onSaved }: Prop
     >
       <DialogPopup
         className={css.popup}
+        style={viewportStyle}
         finalFocus={() => (hasCoarsePointer() ? false : finalFocus.current)}
         initialFocus={() => {
           const input = amountInputRef.current;
