@@ -1,5 +1,6 @@
 .search {
   position: relative;
+  scroll-margin-top: calc(env(safe-area-inset-top) + var(--space-sm));
 }
 
 .searchIcon {
