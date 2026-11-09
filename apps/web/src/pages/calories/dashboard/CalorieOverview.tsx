@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useState } from 'react';
 import type { CalorieDashboardDay } from '../calories.api';
 import { CreateRecipeAction } from './CreateRecipeAction';
@@ -43,7 +44,8 @@ export function CalorieOverview({ day, linkedFoodId, searchOpen }: Props) {
   }
 
   return (
-    <div className={css.overviewStack}>
+    // `selectionTray` keeps the tray's bottom clearance on, so the page height never changes on select.
+    <div className={clsx(css.overviewStack, 'selectionTray')}>
       {selecting ? (
         <SelectionBar
           aria-label={t({ en: 'Selected products', pl: 'Wybrane produkty' })}
@@ -78,9 +80,12 @@ export function CalorieOverview({ day, linkedFoodId, searchOpen }: Props) {
             </Btn>
           ) : null}
         </div>
-        {selecting ? null : (
-          <FoodSearch date={date} linkedFoodId={linkedFoodId} searchOpen={searchOpen} />
-        )}
+        <FoodSearch
+          date={date}
+          disabled={selecting}
+          linkedFoodId={linkedFoodId}
+          searchOpen={searchOpen}
+        />
         <ReceivedFoodShares date={date} />
         {logs.length ? (
           <List as='ol' data-selecting={selecting || undefined}>

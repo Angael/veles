@@ -43,6 +43,11 @@
     box-shadow: 0 0 0 2px var(--c-primary-focus);
     outline: none;
   }
+
+  &[data-disabled] {
+    opacity: 0.56;
+    cursor: default;
+  }
 }
 
 .triggerScan {
@@ -114,6 +119,15 @@
 
 .search .input {
   padding-inline-start: calc(var(--space-sm) + 1.6rem);
+
+  &:disabled {
+    opacity: 0.56;
+    cursor: default;
+  }
+}
+
+.search:has(.input:disabled) .searchIcon {
+  opacity: 0.56;
 }
 
 .positioner {

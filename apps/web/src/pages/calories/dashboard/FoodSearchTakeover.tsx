@@ -31,12 +31,13 @@ export function FoodSearchTakeover({ open, onOpenChange, ...comboboxProps }: Pro
         <Dialog.Trigger
           aria-label={t({ en: 'Search foods to log', pl: 'Szukaj jedzenia do dodania' })}
           className={css.triggerButton}
+          disabled={comboboxProps.disabled}
         >
           <SearchIcon aria-hidden='true' className={css.searchIcon} />
           <span>{placeholder}</span>
         </Dialog.Trigger>
         <div className={css.triggerScan}>
-          <ScanButton date={comboboxProps.date} />
+          <ScanButton date={comboboxProps.date} disabled={comboboxProps.disabled} />
         </div>
       </div>
 
