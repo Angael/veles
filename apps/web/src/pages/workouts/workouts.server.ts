@@ -1,4 +1,18 @@
-import { and, asc, desc, eq, inArray, isNotNull, isNull, lt, ne, or, sql } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  gte,
+  inArray,
+  isNotNull,
+  isNull,
+  lt,
+  lte,
+  ne,
+  or,
+  sql,
+} from 'drizzle-orm';
 import {
   type exerciseMeasures,
   workoutExercises,
@@ -9,7 +23,7 @@ import {
 } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db, type DbTransaction } from '@/server/db.server';
-import type { Measure, SetMetrics, SetType } from './metrics';
+import { floorDuration, type Measure, type SetMetrics, type SetType } from './metrics';
 import { defaultWorkoutName as localizedDefaultWorkoutName, workoutName } from './workoutName';
 import { getLocale, translate } from '@/lib/i18n/getLocale';
 
@@ -446,6 +460,74 @@ export async function resolveExerciseId(tx: Db, userId: string, ref: ExerciseRef
   throw new ClientSafeError(
     translate({ en: 'Pick or name an exercise.', pl: 'Wybierz lub nazwij ćwiczenie.' }),
   );
+}
+
+export type WorkoutSummary = {
+  id: string;
+  name: string;
+  date: string;
+  startedAt: string | null;
+  endedAt: string | null;
+  /** Finished duration, floored at time entered on sets. Null while open. */
+  durationSeconds: number | null;
+  exerciseCount: number;
+  doneSets: number;
+  volumeKg: number;
+};
+
+/**
+ * Workout rows with their totals, newest first. A range limits them to those local days, which is
+ * how the calendar reads one month at a time, however old that month is.
+ */
+export async function listWorkoutSummaries(
+  userId: string,
+  range?: { from: string; to: string },
+): Promise<WorkoutSummary[]> {
+  const done = sql`${workoutSets.completedAt} IS NOT NULL`;
+  const rows = await db
+    .select({
+      setSeconds: setSecondsSql,
+      date: workoutSessions.date,
+      doneSets: sql<number>`count(${workoutSets.id}) FILTER (WHERE ${done})::int`,
+      endedAt: workoutSessions.endedAt,
+      exerciseCount: sql<number>`count(DISTINCT ${workoutSessionExercises.id})::int`,
+      id: workoutSessions.id,
+      name: workoutSessions.name,
+      startedAt: workoutSessions.startedAt,
+      volumeGrams: sql<number>`coalesce(sum(${workoutSets.weightGrams}::bigint * ${workoutSets.reps}) FILTER (WHERE ${done}), 0)::float8`,
+    })
+    .from(workoutSessions)
+    .leftJoin(workoutSessionExercises, eq(workoutSessionExercises.sessionId, workoutSessions.id))
+    .leftJoin(workoutSets, eq(workoutSets.sessionExerciseId, workoutSessionExercises.id))
+    .where(
+      and(
+        eq(workoutSessions.userId, userId),
+        range ? gte(workoutSessions.date, range.from) : undefined,
+        range ? lte(workoutSessions.date, range.to) : undefined,
+      ),
+    )
+    .groupBy(workoutSessions.id)
+    .orderBy(desc(workoutSessions.date), desc(workoutSessions.id))
+    .limit(200);
+  const exerciseNames = await exerciseNamesBySession(rows.map((row) => row.id));
+
+  const locale = getLocale();
+  return rows.map((row) => ({
+    date: row.date,
+    doneSets: row.doneSets,
+    durationSeconds: row.endedAt
+      ? floorDuration(
+          row.startedAt ? (row.endedAt.getTime() - row.startedAt.getTime()) / 1000 : null,
+          row.setSeconds,
+        )
+      : null,
+    endedAt: row.endedAt?.toISOString() ?? null,
+    exerciseCount: row.exerciseCount,
+    id: row.id,
+    name: workoutName(row, exerciseNames.get(row.id) ?? [], locale),
+    startedAt: row.startedAt?.toISOString() ?? null,
+    volumeKg: Math.round(row.volumeGrams / 1_000),
+  }));
 }
 
 /** Exercise names of each session in workout order, for names derived from the exercises. */
