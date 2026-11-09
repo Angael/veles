@@ -15,7 +15,7 @@ type Props = {
   onSaved: (date: string) => void;
 };
 
-/** Focusing an input on a touch device opens the on-screen keyboard, which should stay hidden. */
+/** Touch devices skip returning focus to the search, so its keyboard does not reopen. */
 function hasCoarsePointer() {
   return window.matchMedia('(pointer: coarse)').matches;
 }
@@ -39,7 +39,6 @@ export function AddFoodDialog({ date, finalFocus, food, onClose, onSaved }: Prop
         className={css.popup}
         finalFocus={() => (hasCoarsePointer() ? false : finalFocus.current)}
         initialFocus={() => {
-          if (hasCoarsePointer()) return true;
           const input = amountInputRef.current;
           // Base UI puts the caret at the end on first focus; select after it so typing replaces
           // the suggested amount.
