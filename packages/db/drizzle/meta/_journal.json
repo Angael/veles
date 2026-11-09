@@ -134,6 +134,13 @@
       "when": 1792796136548,
       "tag": "0018_food_product_unit",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794239826000,
+      "tag": "0019_food_log_share_item_snapshot",
+      "breakpoints": true
     }
   ]
 }
