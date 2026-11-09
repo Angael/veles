@@ -11,6 +11,7 @@ import {
   retryFoodPhotoScanRecord,
 } from './foodPhotoScans.server';
 import {
+  FOOD_PHOTO_SCAN_MAX_PHOTOS,
   foodPhotoScanIdInputType,
   foodPhotoScansInputType,
   foodPhotoScanValuesType,
@@ -18,8 +19,8 @@ import {
 
 const enqueueMultipartType = type('FormData.parse').to({
   values: type('string.json.parse').to(foodPhotoScanValuesType),
-  front: nonEmptyPhotoType,
-  'label?': nonEmptyPhotoType,
+  // FormData.parse returns one value for a single entry and an array for several.
+  photos: nonEmptyPhotoType.or(nonEmptyPhotoType.array().atMostLength(FOOD_PHOTO_SCAN_MAX_PHOTOS)),
 });
 
 export const enqueueFoodPhotoScan = createServerFn({ method: 'POST' })
@@ -27,7 +28,7 @@ export const enqueueFoodPhotoScan = createServerFn({ method: 'POST' })
   .validator(arkTypeValidator(enqueueMultipartType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    return enqueueFoodPhotoScanRecord(session.user.id, data.values, data.front, data.label ?? null);
+    return enqueueFoodPhotoScanRecord(session.user.id, data.values, [data.photos].flat());
   });
 
 export const getFoodPhotoScans = createServerFn({ method: 'GET' })

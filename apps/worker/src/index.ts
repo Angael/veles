@@ -45,7 +45,7 @@ const photoS3 = new S3Client({
 const foodPhotoJob = aiApiKey
   ? startJob({
       name: 'food photo scan',
-      intervalMs: 5000,
+      intervalMs: 2000,
       run: createFoodPhotoScanner(connection.db, photoS3, {
         apiKey: aiApiKey,
         baseUrl: process.env.AI_BASE_URL || 'https://openrouter.ai/api/v1',

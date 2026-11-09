@@ -32,7 +32,7 @@ The default is `z-ai/glm-5.3-flash` on OpenRouter. It accepts image input and is
 
 - **Always review:** safe, but the user must come back and confirm each product.
 - **Confidence gate:** auto-log only when the macros match the kcal.
-- **Always auto-log (chosen):** the owner wants no extra steps. A wrong entry can be edited or deleted like any other log.
+- **Always auto-log (chosen):** the owner wants no extra steps. Reviewing every field is almost as much work as typing it. A wrong entry can be edited or deleted like any other log.
 
 ### Where the work runs
 
@@ -43,29 +43,31 @@ The default is `z-ai/glm-5.3-flash` on OpenRouter. It accepts image input and is
 
 ### User flow
 
-1. Log food menu → **Log from photos** (`/calories/photo`).
-2. The user types the eaten grams, takes a front photo and, optionally, a nutrition label photo.
-3. **Send and scan next** clears the form at once. The upload runs in the background. A counter shows how many products were sent.
-4. On the daily log page, the product shows with a spinner while the AI works. When it is done, it becomes a normal log entry. If it fails, it shows Retry and Delete.
+1. Log food menu → **Log from photos**, or **Create a new food**. Both open `/calories/foods/new`, which has **Photos** and **Manual** tabs. Photos is the default unless the user already typed a name.
+2. The user takes up to 6 photos of anything readable. The phone camera opens directly (`capture="environment"`).
+3. The user scans or types a barcode (optional). A known barcode offers the existing product.
+4. On the logging path only (`log=true`), the user types the eaten grams.
+5. The page returns to the log at once. A pending row with the user's photo appears and animates. When the AI finishes, the row becomes a normal log entry and the kcal total counts up. If it fails, the row shows Retry and Delete.
+6. Without an amount, the row says "Adding product" and ends with a toast.
 
 ### Pipeline
 
-1. **Browser:** makes each photo smaller (max 1600 px JPEG) and looks for a barcode on the photos with the existing barcode decoder.
+1. **Browser:** makes each photo smaller (max 1600 px JPEG) right after it is taken. The upload runs in the background, and mutation state drives the first pending row.
 2. **Server (`enqueueFoodPhotoScan`):**
-   - If a barcode was found and the product is in the catalog or in Open Food Facts, the server logs it at once. No AI call.
-   - Otherwise it checks the daily limit, stores the photos in R2, and inserts a `food_photo_scan` row with status `pending`.
-3. **Worker (`food-photo-scan.ts`, every 5 s):**
+   - If the barcode is in the catalog or in Open Food Facts, the server logs it at once, or reports that it exists. No AI call.
+   - Otherwise it checks the daily limit, stores the photos in R2 (max 1600 px WebP), and inserts a `food_photo_scan` row with status `pending`.
+3. **Worker (`food-photo-scan.ts`, every 2 s):**
    - Locks the oldest `pending` scan (`FOR UPDATE SKIP LOCKED`) and sets it to `processing`.
-   - Downloads the photos from R2 and sends one chat request with the photos as data URLs.
-   - The prompt asks for name, package size, and kcal, protein, fat and carbs per 100 g, and to convert per-serving values. Without a label photo, OpenRouter web search is turned on so the model can look up typical values.
-   - In one transaction: creates a shared catalog product (front photo as its image, the barcode if it is still free), creates the food log scaled to the grams, and sets the scan to `done`.
-4. **Browser:** the pending list polls every 4 s while something is in progress. When a scan leaves the list, the day log reloads.
+   - Sends all photos in one chat request. The model returns the name, unit, unit weight, nutrition per 100 g, and the best cover photo.
+   - If no nutrition table is readable, a second text-only request uses OpenRouter web search to find typical values.
+   - In one transaction: creates a shared catalog product, creates the food log when grams exist, and sets the scan to `done`.
+4. **Browser:** the pending list polls every 2 s while something is in progress. A finished scan stays visible until its log entry has loaded, so the swap has no gap.
 
 ### Cost control
 
 - Barcode match first, so known products cost nothing.
-- Smaller photos, one request per product, `max_tokens: 400`.
-- Web search only when there is no label photo.
+- Smaller photos, max 6 per product, one request per product (two with web search), `max_tokens: 400`.
+- Web search only when the photos show no readable nutrition table.
 - Each result becomes a catalog product, so the same barcode never needs AI again.
 - Limit: 30 scans per user per 24 h (`FOOD_PHOTO_SCANS_PER_DAY`).
 
@@ -78,9 +80,9 @@ The default is `z-ai/glm-5.3-flash` on OpenRouter. It accepts image input and is
 
 ### Data and storage
 
-- `food_photo_scan` stores the user, log date, grams, barcode, the photo references, status, attempts, error, and the created log.
+- `food_photo_scan` stores the user, log date, optional grams, barcode, the list of photos, status, attempts, error, and the created log.
 - Rows stay after success, so the daily limit can count them.
-- On success, the label photo reference is removed, so upload cleanup deletes the photo. The front photo stays as the product image.
+- On success, only the cover photo stays referenced, so upload cleanup deletes the others. The cover photo is the product image.
 - Upload cleanup treats photos referenced by a scan as used.
 
 ## Configuration
@@ -95,9 +97,11 @@ Worker env (also in `compose.yaml` and `.env.example`):
 
 ## Known limits
 
-- Auto-logging means a misread label (per serving vs per 100 g) goes straight into the log. The user must fix it by hand.
+- There is no review step: a misread label (per serving vs per 100 g) goes straight into the log. The user must fix it by hand.
 - AI-created products are shared with all users.
-- Photos are stored as 1080 px WebP. Very small label text may be hard to read, and not every model accepts WebP.
+- Photos are stored as 1600 px WebP. Very small label text may be hard to read, and not every model accepts WebP.
+- Locking the phone or closing the tab during the upload can lose that product.
+- A product without a barcode cannot be matched, so scanning it twice creates two catalog products.
 - No MCP tool: agents cannot send photos. Finished scans are normal food logs, so MCP reads them already.
 
 ## Code

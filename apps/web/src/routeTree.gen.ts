@@ -26,7 +26,6 @@ import { Route as DemoWorkoutsRouteImport } from './routes/demo.workouts'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as AuthenticatedCaloriesAddRouteImport } from './routes/_authenticated/calories_/add'
 import { Route as AuthenticatedCaloriesGoalsRouteImport } from './routes/_authenticated/calories_/goals'
-import { Route as AuthenticatedCaloriesPhotoRouteImport } from './routes/_authenticated/calories_/photo'
 import { Route as AuthenticatedCaloriesQuickAddRouteImport } from './routes/_authenticated/calories_/quick-add'
 import { Route as AuthenticatedCaloriesScanRouteImport } from './routes/_authenticated/calories_/scan'
 import { Route as AuthenticatedDiaryIndexRouteImport } from './routes/_authenticated/diary/index'
@@ -133,12 +132,6 @@ const AuthenticatedCaloriesGoalsRoute =
   AuthenticatedCaloriesGoalsRouteImport.update({
     id: '/calories_/goals',
     path: '/calories/goals',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedCaloriesPhotoRoute =
-  AuthenticatedCaloriesPhotoRouteImport.update({
-    id: '/calories_/photo',
-    path: '/calories/photo',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedCaloriesQuickAddRoute =
@@ -276,7 +269,6 @@ export interface FileRoutesByFullPath {
   '/invite/$token': typeof InviteTokenRoute
   '/calories/add': typeof AuthenticatedCaloriesAddRoute
   '/calories/goals': typeof AuthenticatedCaloriesGoalsRoute
-  '/calories/photo': typeof AuthenticatedCaloriesPhotoRoute
   '/calories/quick-add': typeof AuthenticatedCaloriesQuickAddRoute
   '/calories/scan': typeof AuthenticatedCaloriesScanRoute
   '/diary/$id': typeof AuthenticatedDiaryIdRoute
@@ -316,7 +308,6 @@ export interface FileRoutesByTo {
   '/invite/$token': typeof InviteTokenRoute
   '/calories/add': typeof AuthenticatedCaloriesAddRoute
   '/calories/goals': typeof AuthenticatedCaloriesGoalsRoute
-  '/calories/photo': typeof AuthenticatedCaloriesPhotoRoute
   '/calories/quick-add': typeof AuthenticatedCaloriesQuickAddRoute
   '/calories/scan': typeof AuthenticatedCaloriesScanRoute
   '/diary/$id': typeof AuthenticatedDiaryIdRoute
@@ -358,7 +349,6 @@ export interface FileRoutesById {
   '/invite/$token': typeof InviteTokenRoute
   '/_authenticated/calories_/add': typeof AuthenticatedCaloriesAddRoute
   '/_authenticated/calories_/goals': typeof AuthenticatedCaloriesGoalsRoute
-  '/_authenticated/calories_/photo': typeof AuthenticatedCaloriesPhotoRoute
   '/_authenticated/calories_/quick-add': typeof AuthenticatedCaloriesQuickAddRoute
   '/_authenticated/calories_/scan': typeof AuthenticatedCaloriesScanRoute
   '/_authenticated/diary/$id': typeof AuthenticatedDiaryIdRoute
@@ -400,7 +390,6 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/calories/add'
     | '/calories/goals'
-    | '/calories/photo'
     | '/calories/quick-add'
     | '/calories/scan'
     | '/diary/$id'
@@ -440,7 +429,6 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/calories/add'
     | '/calories/goals'
-    | '/calories/photo'
     | '/calories/quick-add'
     | '/calories/scan'
     | '/diary/$id'
@@ -481,7 +469,6 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/_authenticated/calories_/add'
     | '/_authenticated/calories_/goals'
-    | '/_authenticated/calories_/photo'
     | '/_authenticated/calories_/quick-add'
     | '/_authenticated/calories_/scan'
     | '/_authenticated/diary/$id'
@@ -643,13 +630,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCaloriesGoalsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/calories_/photo': {
-      id: '/_authenticated/calories_/photo'
-      path: '/calories/photo'
-      fullPath: '/calories/photo'
-      preLoaderRoute: typeof AuthenticatedCaloriesPhotoRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/calories_/quick-add': {
       id: '/_authenticated/calories_/quick-add'
       path: '/calories/quick-add'
@@ -807,7 +787,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedWeightRoute: typeof AuthenticatedWeightRoute
   AuthenticatedCaloriesAddRoute: typeof AuthenticatedCaloriesAddRoute
   AuthenticatedCaloriesGoalsRoute: typeof AuthenticatedCaloriesGoalsRoute
-  AuthenticatedCaloriesPhotoRoute: typeof AuthenticatedCaloriesPhotoRoute
   AuthenticatedCaloriesQuickAddRoute: typeof AuthenticatedCaloriesQuickAddRoute
   AuthenticatedCaloriesScanRoute: typeof AuthenticatedCaloriesScanRoute
   AuthenticatedDiaryIdRoute: typeof AuthenticatedDiaryIdRoute
@@ -835,7 +814,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedWeightRoute: AuthenticatedWeightRoute,
   AuthenticatedCaloriesAddRoute: AuthenticatedCaloriesAddRoute,
   AuthenticatedCaloriesGoalsRoute: AuthenticatedCaloriesGoalsRoute,
-  AuthenticatedCaloriesPhotoRoute: AuthenticatedCaloriesPhotoRoute,
   AuthenticatedCaloriesQuickAddRoute: AuthenticatedCaloriesQuickAddRoute,
   AuthenticatedCaloriesScanRoute: AuthenticatedCaloriesScanRoute,
   AuthenticatedDiaryIdRoute: AuthenticatedDiaryIdRoute,

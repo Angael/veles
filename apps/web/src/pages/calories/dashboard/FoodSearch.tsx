@@ -98,7 +98,11 @@ export function FoodSearch({ date, disabled = false, linkedFoodId, searchOpen }:
       void navigate({ replace, search: { date, recipeId: result.recipe.id }, to: '/calories/add' });
     } else {
       pushedSheet.current = false;
-      void navigate({ replace, search: { date, name: result.name }, to: '/calories/foods/new' });
+      void navigate({
+        replace,
+        search: { date, log: true, name: result.name },
+        to: '/calories/foods/new',
+      });
     }
   }
 

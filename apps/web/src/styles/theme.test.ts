@@ -20,6 +20,7 @@ describe('theme tokens', () => {
       '--popup-',
       '--transform-origin',
       '--anchor-width',
+      '--active-tab-',
       '--card-padding',
       '--card-tone',
       '--toast-',

@@ -141,6 +141,13 @@
       "when": 1794239826000,
       "tag": "0019_food_log_share_item_snapshot",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794264260482,
+      "tag": "0020_food_photo_scans",
+      "breakpoints": true
     }
   ]
 }

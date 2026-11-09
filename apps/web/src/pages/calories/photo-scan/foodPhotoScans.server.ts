@@ -1,4 +1,4 @@
-import { and, count, eq, gt, inArray, ne } from 'drizzle-orm';
+import { and, count, eq, gt, inArray, ne, or } from 'drizzle-orm';
 import { foodPhotoScans, uploadObjects } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { translate } from '@/lib/i18n/getLocale';
@@ -17,27 +17,35 @@ import type { foodPhotoScanValuesType } from './foodPhotoScans.validation';
 
 /** Each scan is one paid AI call; the cap keeps a bug or a busy user from draining the budget. */
 export const FOOD_PHOTO_SCANS_PER_DAY = 30;
+/** Keeps finished scans visible long enough for the log to swap the pending row for the entry. */
+const DONE_SCAN_VISIBLE_MS = 15_000;
+/** Label text must stay readable for the AI, so scans keep more detail than catalog uploads. */
+const SCAN_PHOTO_MAX_SIDE = 1600;
 
 export type FoodPhotoScan = {
   id: string;
-  grams: number;
+  foodLogId: string | null;
+  /** Null when the scan only adds the product to the catalog. */
+  grams: number | null;
   imageUrl: string | null;
-  status: 'pending' | 'processing' | 'failed';
+  status: 'pending' | 'processing' | 'failed' | 'done';
 };
 
 /**
- * Logs a known barcode at once; otherwise stores the photos and queues them for the worker's AI.
- * Returns `logged` or `queued` so the page can tell the user which happened.
+ * Uses a known barcode at once; otherwise stores the photos and queues them for the worker's AI.
+ * The status tells the page whether the product was logged, already exists, or was queued.
  */
 export async function enqueueFoodPhotoScanRecord(
   userId: string,
   values: typeof foodPhotoScanValuesType.infer,
-  front: File,
-  label: File | null,
+  photos: File[],
 ) {
   if (values.barcode) {
     const lookup = await lookupFoodByBarcodeRecord(userId, { barcode: values.barcode });
     if (lookup.status === 'found') {
+      if (values.grams === undefined) {
+        return { name: lookup.food.name, status: 'exists' as const };
+      }
       await recordFoodRecord(userId, {
         date: values.date,
         grams: values.grams,
@@ -67,20 +75,18 @@ export async function enqueueFoodPhotoScanRecord(
 
   const images: PreparedFoodImage[] = [];
   try {
-    const frontImage = await prepareFoodImage(front, userId);
-    images.push(frontImage);
-    const labelImage = label ? await prepareFoodImage(label, userId) : null;
-    if (labelImage) images.push(labelImage);
+    for (const photo of photos) {
+      images.push(await prepareFoodImage(photo, userId, SCAN_PHOTO_MAX_SIDE));
+    }
 
     await db.transaction(async (tx) => {
       await tx.insert(uploadObjects).values(images.map((image) => image.asset));
       await tx.insert(foodPhotoScans).values({
         userId,
         logDate: values.date,
-        gramsHundredths: toHundredths(values.grams),
+        gramsHundredths: values.grams === undefined ? null : toHundredths(values.grams),
         barcode: values.barcode ?? null,
-        frontUploadObjectId: frontImage.asset.id,
-        labelUploadObjectId: labelImage?.asset.id ?? null,
+        photoUploadObjectIds: images.map((image) => image.asset.id),
       });
     });
   } catch (error) {
@@ -90,7 +96,7 @@ export async function enqueueFoodPhotoScanRecord(
   return { status: 'queued' as const };
 }
 
-/** Scans of the day that are not in the log yet: still analyzing, or failed. */
+/** Scans of the day still analyzing or failed, plus just-finished ones for the swap animation. */
 export async function getFoodPhotoScansRecord(userId: string, date: string) {
   const rows = await db
     .select()
@@ -99,17 +105,22 @@ export async function getFoodPhotoScansRecord(userId: string, date: string) {
       and(
         eq(foodPhotoScans.userId, userId),
         eq(foodPhotoScans.logDate, date),
-        ne(foodPhotoScans.status, 'done'),
+        or(
+          ne(foodPhotoScans.status, 'done'),
+          gt(foodPhotoScans.updatedAt, new Date(Date.now() - DONE_SCAN_VISIBLE_MS)),
+        ),
       ),
     )
     .orderBy(foodPhotoScans.createdAt);
-  const assets = await getFoodImageAssets(rows.map((row) => row.frontUploadObjectId));
+  const assets = await getFoodImageAssets(rows.map((row) => row.photoUploadObjectIds[0]));
 
   return rows.map((row): FoodPhotoScan => {
-    const asset = assets.get(row.frontUploadObjectId);
+    const coverId = row.photoUploadObjectIds[0];
+    const asset = coverId ? assets.get(coverId) : undefined;
     return {
       id: row.id,
-      grams: row.gramsHundredths / 100,
+      foodLogId: row.foodLogId,
+      grams: row.gramsHundredths === null ? null : row.gramsHundredths / 100,
       imageUrl: asset ? storagePathToUrl(asset.key) : null,
       status: scanStatus(row.status),
     };
@@ -117,7 +128,7 @@ export async function getFoodPhotoScansRecord(userId: string, date: string) {
 }
 
 function scanStatus(status: string): FoodPhotoScan['status'] {
-  if (status === 'failed' || status === 'processing') return status;
+  if (status === 'failed' || status === 'processing' || status === 'done') return status;
   return 'pending';
 }
 

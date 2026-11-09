@@ -1,0 +1,73 @@
+.root {
+  display: grid;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.list {
+  position: relative;
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  padding: 0.25rem;
+  border: var(--border-width) solid var(--c-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--c-surface-inset);
+}
+
+.indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--active-tab-width);
+  height: var(--active-tab-height);
+  border-radius: var(--radius-pill);
+  background: var(--c-primary);
+  translate: var(--active-tab-left) var(--active-tab-top);
+  transition:
+    translate var(--duration-fast) var(--ease-out),
+    width var(--duration-fast) var(--ease-out);
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.tab {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-height: 2.75rem;
+  padding-inline: var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--c-muted);
+  font-weight: var(--font-weight-semibold);
+  transition: color var(--duration-fast) var(--ease-out);
+
+  &[data-active] {
+    color: var(--c-primary-contrast);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 2px;
+  }
+
+  & svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+.panel {
+  min-width: 0;
+
+  &[hidden] {
+    display: none;
+  }
+}

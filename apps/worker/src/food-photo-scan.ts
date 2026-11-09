@@ -13,6 +13,7 @@ import { errorMessage } from './job.ts';
 
 type Database = ReturnType<typeof createDatabaseConnection>['db'];
 type Scan = typeof foodPhotoScans.$inferSelect;
+type ScanPhoto = FoodPhotoImage & { id: string };
 
 const maxAttempts = 3;
 /** A scan stuck in `processing` this long belongs to a worker that died; it is retried. */
@@ -57,17 +58,15 @@ export function createFoodPhotoScanner(db: Database, s3: S3Client, ai: AiConfig)
     });
   }
 
-  async function loadImages(scan: Scan, signal: AbortSignal): Promise<FoodPhotoImage[]> {
-    const ids = [scan.frontUploadObjectId, scan.labelUploadObjectId].filter((id): id is string =>
-      Boolean(id),
-    );
-    const assets = await db.select().from(uploadObjects).where(inArray(uploadObjects.id, ids));
-    const images: FoodPhotoImage[] = [];
+  /** Downloads the scan's photos in shooting order, keeping each id for the cover photo. */
+  async function loadImages(scan: Scan, signal: AbortSignal): Promise<ScanPhoto[]> {
+    const assets = await db
+      .select()
+      .from(uploadObjects)
+      .where(inArray(uploadObjects.id, scan.photoUploadObjectIds));
+    const photos: ScanPhoto[] = [];
 
-    for (const [role, id] of [
-      ['front', scan.frontUploadObjectId],
-      ['label', scan.labelUploadObjectId],
-    ] as const) {
+    for (const id of scan.photoUploadObjectIds) {
       const asset = assets.find((candidate) => candidate.id === id);
       if (!asset) continue;
       const object = await s3.send(new GetObjectCommand({ Bucket: asset.bucket, Key: asset.key }), {
@@ -76,17 +75,15 @@ export function createFoodPhotoScanner(db: Database, s3: S3Client, ai: AiConfig)
       const bytes = await object.Body?.transformToByteArray();
       if (!bytes) throw new Error(`Photo ${asset.id} is empty`);
       const base64 = Buffer.from(bytes).toString('base64');
-      images.push({ dataUrl: `data:${asset.mimeType ?? 'image/webp'};base64,${base64}`, role });
+      photos.push({ dataUrl: `data:${asset.mimeType ?? 'image/webp'};base64,${base64}`, id });
     }
 
-    if (!images.some((image) => image.role === 'front')) {
-      throw new FoodPhotoRejectedError('Front photo is missing');
-    }
-    return images;
+    if (photos.length === 0) throw new FoodPhotoRejectedError('Photos are missing');
+    return photos;
   }
 
-  /** Creates the shared product and the user's log in one transaction, then marks the scan done. */
-  async function saveResult(scan: Scan, result: FoodPhotoResult) {
+  /** Creates the shared product and, with an amount, the user's log in one transaction. */
+  async function saveResult(scan: Scan, result: FoodPhotoResult, coverPhotoId: string) {
     await db.transaction(async (tx) => {
       const [barcodeOwner] = scan.barcode
         ? await tx
@@ -101,8 +98,9 @@ export function createFoodPhotoScanner(db: Database, s3: S3Client, ai: AiConfig)
         .values({
           name: result.name,
           barcode: barcodeOwner ? null : scan.barcode,
-          imageUploadObjectId: scan.frontUploadObjectId,
+          imageUploadObjectId: coverPhotoId,
           productSizeGramsHundredths: optionalHundredths(result.productSizeGrams),
+          unit: result.unit,
           kcalPer100gHundredths: hundredths(result.kcalPer100g),
           proteinPer100gHundredths: optionalHundredths(result.proteinPer100g),
           fatPer100gHundredths: optionalHundredths(result.fatPer100g),
@@ -111,34 +109,38 @@ export function createFoodPhotoScanner(db: Database, s3: S3Client, ai: AiConfig)
         .returning({ id: foodProducts.id });
       if (!product) throw new Error('Food product could not be created');
 
-      const grams = scan.gramsHundredths / 100;
-      const scaled = (per100g: number | null) =>
-        per100g === null ? null : hundredths((per100g * grams) / 100);
-      const [log] = await tx
-        .insert(foodLogs)
-        .values({
-          userId: scan.userId,
-          productId: product.id,
-          imageUploadObjectId: scan.frontUploadObjectId,
-          name: result.name,
-          gramsHundredths: scan.gramsHundredths,
-          logDate: scan.logDate,
-          kcalHundredths: scaled(result.kcalPer100g) ?? 0,
-          proteinHundredths: scaled(result.proteinPer100g),
-          fatHundredths: scaled(result.fatPer100g),
-          carbsHundredths: scaled(result.carbsPer100g),
-        })
-        .returning({ id: foodLogs.id });
-      if (!log) throw new Error('Food log could not be created');
+      let foodLogId: string | null = null;
+      if (scan.gramsHundredths !== null) {
+        const grams = scan.gramsHundredths / 100;
+        const scaled = (per100g: number | null) =>
+          per100g === null ? null : hundredths((per100g * grams) / 100);
+        const [log] = await tx
+          .insert(foodLogs)
+          .values({
+            userId: scan.userId,
+            productId: product.id,
+            imageUploadObjectId: coverPhotoId,
+            name: result.name,
+            gramsHundredths: scan.gramsHundredths,
+            logDate: scan.logDate,
+            kcalHundredths: scaled(result.kcalPer100g) ?? 0,
+            proteinHundredths: scaled(result.proteinPer100g),
+            fatHundredths: scaled(result.fatPer100g),
+            carbsHundredths: scaled(result.carbsPer100g),
+          })
+          .returning({ id: foodLogs.id });
+        if (!log) throw new Error('Food log could not be created');
+        foodLogId = log.id;
+      }
 
-      // Releasing the label photo lets upload cleanup delete it; the front photo is the product image.
+      // Releasing the other photos lets upload cleanup delete them.
       await tx
         .update(foodPhotoScans)
         .set({
           status: 'done',
           error: null,
-          foodLogId: log.id,
-          labelUploadObjectId: null,
+          foodLogId,
+          photoUploadObjectIds: [coverPhotoId],
           updatedAt: new Date(),
         })
         .where(eq(foodPhotoScans.id, scan.id));
@@ -147,9 +149,11 @@ export function createFoodPhotoScanner(db: Database, s3: S3Client, ai: AiConfig)
 
   async function processScan(scan: Scan, signal: AbortSignal) {
     try {
-      const images = await loadImages(scan, signal);
-      const result = await analyzeFoodPhotos(ai, images, signal);
-      await saveResult(scan, result);
+      const photos = await loadImages(scan, signal);
+      const result = await analyzeFoodPhotos(ai, photos, signal);
+      const cover = photos[result.coverPhotoIndex] ?? photos[0];
+      if (!cover) throw new FoodPhotoRejectedError('Photos are missing');
+      await saveResult(scan, result, cover.id);
       console.info('food photo scan done', { id: scan.id });
     } catch (error) {
       if (signal.aborted) {

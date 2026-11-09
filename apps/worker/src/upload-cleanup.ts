@@ -9,7 +9,7 @@ import {
   uploadObjects,
   weightEntryPhotos,
 } from '@veles/db/schema';
-import { and, asc, eq, gt, notExists, or } from 'drizzle-orm';
+import { and, asc, eq, gt, notExists, sql } from 'drizzle-orm';
 import { errorMessage } from './job.ts';
 
 type Database = ReturnType<typeof createDatabaseConnection>['db'];
@@ -42,12 +42,7 @@ function unusedUploadCondition(db: Pick<Database, 'select'>) {
       db
         .select({ id: foodPhotoScans.id })
         .from(foodPhotoScans)
-        .where(
-          or(
-            eq(foodPhotoScans.frontUploadObjectId, uploadObjects.id),
-            eq(foodPhotoScans.labelUploadObjectId, uploadObjects.id),
-          ),
-        ),
+        .where(sql`${uploadObjects.id} = any(${foodPhotoScans.photoUploadObjectIds})`),
     ),
     notExists(
       db

@@ -4,7 +4,12 @@ import { CreateFoodPage } from '@/pages/calories/foods/CreateFoodPage';
 import { caloriesDayTarget, normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 
 export const Route = createFileRoute('/_authenticated/calories_/foods_/new')({
-  validateSearch: type({ 'barcode?': 'string', 'date?': 'string', 'name?': 'string' }),
+  validateSearch: type({
+    'barcode?': 'string',
+    'date?': 'string',
+    'log?': 'boolean',
+    'name?': 'string',
+  }),
   component: Component,
   staticData: {
     layout: 'task',
@@ -21,6 +26,7 @@ function Component() {
     <CreateFoodPage
       barcode={search.barcode}
       date={normalizeCalorieDate(search.date)}
+      log={search.log ?? false}
       name={search.name}
     />
   );

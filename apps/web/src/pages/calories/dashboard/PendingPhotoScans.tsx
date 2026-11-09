@@ -1,86 +1,69 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ImageIcon, LoaderCircleIcon, RotateCwIcon, Trash2Icon } from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import { Btn } from '@/components/ui/btn/Btn';
-import { List, ListItem } from '@/components/ui/list/List';
+import { List } from '@/components/ui/list/List';
+import { toastManager } from '@/components/ui/toast/toastManager';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { calorieDashboardKey } from '../calories.query';
 import {
   foodPhotoScansQueryOptions,
-  useDeleteFoodPhotoScanMutation,
-  useRetryFoodPhotoScanMutation,
+  usePhotoScanUploads,
 } from '../photo-scan/foodPhotoScans.query';
-import css from './PendingPhotoScans.module.css';
+import { PhotoScanRow } from './PhotoScanRow';
+
+type Props = { date: string; logIds: ReadonlySet<string> };
 
 /**
- * Photo products the AI still analyzes, or could not read. When one finishes it leaves this
- * list, so the day log is refreshed to show the new entry.
+ * Products the AI still works on, from the moment the user sends them. A finished scan stays
+ * until its log entry has loaded, so the row turns into the entry without a gap.
  */
-export function PendingPhotoScans({ date }: { date: string }) {
-  const { formatWhole, t } = useI18n();
+export function PendingPhotoScans({ date, logIds }: Props) {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
-  const scansQuery = useQuery(foodPhotoScansQueryOptions(date));
-  const retryMutation = useRetryFoodPhotoScanMutation();
-  const deleteMutation = useDeleteFoodPhotoScanMutation();
-  const scans = scansQuery.data ?? [];
-  const activeCount = scans.filter((scan) => scan.status !== 'failed').length;
-  const previousActiveCount = useRef(activeCount);
+  const scans = useQuery(foodPhotoScansQueryOptions(date)).data;
+  const uploads = usePhotoScanUploads(date);
+  const seenStatuses = useRef(new Map<string, string>());
 
   useEffect(() => {
-    if (activeCount < previousActiveCount.current) {
-      void queryClient.invalidateQueries({ queryKey: calorieDashboardKey });
+    let finished = false;
+    for (const scan of scans ?? []) {
+      const previous = seenStatuses.current.get(scan.id);
+      seenStatuses.current.set(scan.id, scan.status);
+      if (scan.status !== 'done' || previous === 'done') continue;
+      finished = true;
+      if (previous && scan.grams === null) {
+        toastManager.add({
+          title: t({ en: 'Product added', pl: 'Dodano produkt' }),
+          type: 'success',
+        });
+      }
     }
-    previousActiveCount.current = activeCount;
-  }, [activeCount, queryClient]);
+    if (finished) void queryClient.invalidateQueries({ queryKey: calorieDashboardKey });
+  }, [queryClient, scans, t]);
 
-  if (scans.length === 0) return null;
+  const visibleScans = (scans ?? []).filter(
+    (scan) => scan.status !== 'done' || (scan.foodLogId && !logIds.has(scan.foodLogId)),
+  );
+  if (uploads.length === 0 && visibleScans.length === 0) return null;
 
   return (
     <List aria-label={t({ en: 'Products from photos', pl: 'Produkty ze zdjęć' })} as='ol'>
-      {scans.map((scan) => {
-        const failed = scan.status === 'failed';
-        return (
-          <ListItem className={css.row} key={scan.id}>
-            {scan.imageUrl ? (
-              <img alt='' className={css.thumb} src={scan.imageUrl} />
-            ) : (
-              <ImageIcon aria-hidden='true' className={css.thumb} />
-            )}
-            <div className={css.text}>
-              <strong>
-                {failed
-                  ? t({ en: 'Could not read this product', pl: 'Nie udało się odczytać produktu' })
-                  : t({ en: 'Analyzing photos…', pl: 'Analizowanie zdjęć…' })}
-              </strong>
-              <span className={css.meta}>{`${formatWhole(scan.grams)} g`}</span>
-            </div>
-            {failed ? (
-              <div className={css.actions}>
-                <Btn
-                  aria-label={t({ en: 'Try again', pl: 'Spróbuj ponownie' })}
-                  icon={<RotateCwIcon aria-hidden='true' />}
-                  iconOnly
-                  loading={retryMutation.isPending && retryMutation.variables === scan.id}
-                  onClick={() => retryMutation.mutate(scan.id)}
-                  size='sm'
-                  variant='ghost'
-                />
-                <Btn
-                  aria-label={t({ en: 'Delete', pl: 'Usuń' })}
-                  icon={<Trash2Icon aria-hidden='true' />}
-                  iconOnly
-                  loading={deleteMutation.isPending && deleteMutation.variables === scan.id}
-                  onClick={() => deleteMutation.mutate(scan.id)}
-                  size='sm'
-                  variant='ghost'
-                />
-              </div>
-            ) : (
-              <LoaderCircleIcon aria-hidden='true' className={css.spinner} />
-            )}
-          </ListItem>
-        );
-      })}
+      {visibleScans.map((scan) => (
+        <PhotoScanRow
+          grams={scan.grams}
+          imageUrl={scan.imageUrl}
+          key={scan.id}
+          scanId={scan.id}
+          status={scan.status}
+        />
+      ))}
+      {uploads.map((upload) => (
+        <PhotoScanRow
+          grams={upload.grams ?? null}
+          imageUrl={upload.previewUrl}
+          key={`upload-${upload.id}`}
+          status='uploading'
+        />
+      ))}
     </List>
   );
 }

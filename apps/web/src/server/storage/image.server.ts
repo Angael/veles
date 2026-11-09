@@ -6,7 +6,10 @@ import { IMAGE_MAX_INPUT_BYTES, IMAGE_MAX_INPUT_PIXELS } from '@/lib/storage/ima
 import { translate } from '@/lib/i18n/getLocale';
 
 /** Converts a validated image into a metadata-free, consistently sized WebP. */
-export async function optimizeImage(file: File): Promise<{ buffer: Buffer; type: string }> {
+export async function optimizeImage(
+  file: File,
+  maxSide = 1080,
+): Promise<{ buffer: Buffer; type: string }> {
   if (!file.type.startsWith('image/')) {
     throw new ClientSafeError(
       translate({
@@ -38,8 +41,8 @@ export async function optimizeImage(file: File): Promise<{ buffer: Buffer; type:
       .rotate()
       .resize({
         fit: 'inside',
-        height: 1080,
-        width: 1080,
+        height: maxSide,
+        width: maxSide,
         withoutEnlargement: true,
       })
       .webp({ quality: 82 })

@@ -42,7 +42,10 @@ export function ScanFoodPage({ initialDate: date }: { initialDate: string }) {
           <LookupNotice
             lookup={lookup}
             notFoundAction={(barcode) => (
-              <Btn isLink render={<Link search={{ barcode, date }} to='/calories/foods/new' />}>
+              <Btn
+                isLink
+                render={<Link search={{ barcode, date, log: true }} to='/calories/foods/new' />}
+              >
                 {t({ en: 'Add product', pl: 'Dodaj produkt' })}
               </Btn>
             )}
