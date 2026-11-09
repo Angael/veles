@@ -1,21 +1,12 @@
-import { Combobox } from '@base-ui/react/combobox';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { BarcodeIcon, SearchIcon } from 'lucide-react';
-import { type MouseEvent, useDeferredValue, useRef, useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { useDeferredValue, useRef, useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '../calories.query';
 import { AddFoodDialog } from './AddFoodDialog';
-import { FoodSearchOption } from './FoodSearchOption';
-import {
-  foodSearchResultKey,
-  foodSearchResultLabel,
-  foodSearchResults,
-  type FoodSearchResult,
-} from './foodSearchResults';
-import { Btn } from '@/components/ui/btn/Btn';
-import { List } from '@/components/ui/list/List';
-import { TextInput } from '@/components/ui/text-input/TextInput';
+import { FoodSearchCombobox } from './FoodSearchCombobox';
+import { FoodSearchTakeover } from './FoodSearchTakeover';
+import { foodSearchResults, type FoodSearchResult } from './foodSearchResults';
 import css from './FoodSearch.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { recipeLibraryQueryOptions } from '@/pages/recipes/recipes.query';
@@ -27,15 +18,17 @@ type Props = {
 };
 
 /**
- * Searches foods and recipes through an accessible Base UI combobox. Picking a food opens the
- * amount dialog, so the most common way to log stays on the diary.
+ * Searches foods and recipes through an accessible Base UI combobox: a dropdown with a mouse, a
+ * full-screen takeover on touch. Picking a food opens the amount dialog, so the most common way to
+ * log stays on the diary.
  */
 export function FoodSearch({ date, linkedFoodId }: Props) {
-  const { locale, t } = useI18n();
+  const { locale } = useI18n();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const filterQuery = useDeferredValue(query);
+  const [takeoverOpen, setTakeoverOpen] = useState(false);
   const [pickedFood, setPickedFood] = useState<CalorieFood | null>(null);
   const foodsQuery = useQuery(calorieFoodsQueryOptions());
   const recipesQuery = useQuery(recipeLibraryQueryOptions());
@@ -51,19 +44,9 @@ export function FoodSearch({ date, linkedFoodId }: Props) {
   );
   const linkedFood = linkedFoodId === undefined ? undefined : linkedFoodQuery.data;
 
-  /**
-   * Android Chrome smooth-scrolls a focused input into view once the keyboard opens, which drags
-   * the already open results along. Jumping the field to the top on touch leaves the browser
-   * nothing to scroll. It runs on click, after the finger lifts, so the moved list cannot catch the
-   * release as an option tap.
-   */
-  function pinSearchToTop(event: MouseEvent<HTMLDivElement>) {
-    if (!window.matchMedia('(pointer: coarse)').matches) return;
-    event.currentTarget.scrollIntoView({ behavior: 'instant', block: 'start' });
-  }
-
   function openResult(result: FoodSearchResult) {
     setQuery('');
+    setTakeoverOpen(false);
     if (result.kind === 'food') {
       setPickedFood(result.food);
     } else if (result.kind === 'recipe') {
@@ -90,73 +73,29 @@ export function FoodSearch({ date, linkedFoodId }: Props) {
     });
   }
 
+  const comboboxProps = {
+    date,
+    fetching: foodsQuery.isFetching,
+    loading: foodsQuery.isPending,
+    onPick: openResult,
+    onQueryChange: setQuery,
+    query,
+    results,
+  };
+
   return (
     <>
-      <Combobox.Root<FoodSearchResult>
-        autoHighlight
-        filter={null}
-        inputValue={query}
-        itemToStringLabel={(result) => foodSearchResultLabel(result, locale)}
-        items={results}
-        onInputValueChange={setQuery}
-        onValueChange={(result) => {
-          if (result) openResult(result);
+      <div className={css.desktopOnly}>
+        <FoodSearchCombobox {...comboboxProps} inputRef={inputRef} />
+      </div>
+      <FoodSearchTakeover
+        {...comboboxProps}
+        onOpenChange={(open) => {
+          setTakeoverOpen(open);
+          if (!open) setQuery('');
         }}
-        value={null}
-      >
-        <div className={css.search} onClick={pinSearchToTop}>
-          <SearchIcon aria-hidden='true' className={css.searchIcon} />
-          <Combobox.Input
-            aria-label={t({ en: 'Search foods to log', pl: 'Szukaj jedzenia do dodania' })}
-            className={css.input}
-            placeholder={t({
-              en: 'Add food: banana, bread, yoghurt…',
-              pl: 'Dodaj jedzenie: banan, chleb, jogurt…',
-            })}
-            ref={inputRef}
-            render={
-              <TextInput
-                trailing={
-                  <Btn
-                    aria-label={t({ en: 'Scan barcode', pl: 'Skanuj kod kreskowy' })}
-                    icon={<BarcodeIcon aria-hidden='true' />}
-                    iconOnly
-                    isLink
-                    render={<Link search={{ date }} to='/calories/scan' />}
-                    size='sm'
-                    variant='ghost'
-                  />
-                }
-              />
-            }
-          />
-        </div>
-
-        <Combobox.Portal>
-          <Combobox.Positioner className={css.positioner} sideOffset={4}>
-            <Combobox.Popup aria-busy={foodsQuery.isFetching} className={css.popup}>
-              <Combobox.Status className={css.message}>
-                {foodsQuery.isPending
-                  ? t({ en: 'Loading foods…', pl: 'Ładowanie jedzenia…' })
-                  : null}
-              </Combobox.Status>
-              <Combobox.Empty className={css.message}>
-                {foodsQuery.isPending
-                  ? null
-                  : t({
-                      en: 'No foods yet. Type a name to create one.',
-                      pl: 'Brak produktów. Wpisz nazwę, aby utworzyć nowy.',
-                    })}
-              </Combobox.Empty>
-              <Combobox.List className={css.list} render={<List />}>
-                {(result: FoodSearchResult) => (
-                  <FoodSearchOption key={foodSearchResultKey(result)} result={result} />
-                )}
-              </Combobox.List>
-            </Combobox.Popup>
-          </Combobox.Positioner>
-        </Combobox.Portal>
-      </Combobox.Root>
+        open={takeoverOpen}
+      />
 
       <AddFoodDialog
         date={date}
