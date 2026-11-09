@@ -135,6 +135,9 @@
     align-items: center;
     gap: var(--space-sm);
     padding: var(--space-sm) var(--space-md);
+    /* Results scroll behind this footer, so give it a clear edge instead of slicing them. */
+    border-top: var(--border-width) solid var(--c-border-strong);
+    box-shadow: 0 -0.5rem 1rem -0.5rem rgba(2, 6, 23, 0.8);
     background: var(--c-surface-solid);
     color: var(--c-text-strong);
     font-weight: var(--font-weight-semibold);
