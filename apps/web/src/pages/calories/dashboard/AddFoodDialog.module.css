@@ -11,6 +11,7 @@
     height: 100dvh;
     max-height: none;
     padding-top: calc(env(safe-area-inset-top) + var(--space-md));
+    padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-md));
     border: 0;
     border-radius: 0;
   }

@@ -75,8 +75,19 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   margin-inline: calc(-1 * var(--space-sm));
-  padding-bottom: env(safe-area-inset-bottom);
   border-top: var(--border-width) solid var(--c-border);
+
+  /*
+   * Clear a transparent Android nav bar. The pinned "Create" row absorbs the inset itself; padding
+   * on the scroller would leave a see-through strip below it that results scroll through.
+   */
+  & .list:not(:has(> .createOption)) {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  & .list > .createOption {
+    padding-bottom: calc(var(--space-sm) + env(safe-area-inset-bottom));
+  }
 }
 
 .searchIcon {
