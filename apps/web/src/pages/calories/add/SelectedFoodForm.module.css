@@ -35,63 +35,37 @@
 }
 
 .goalPreview {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: var(--space-xs);
   font-variant-numeric: tabular-nums;
 }
 
 .goalMessage,
-.goalResult,
-.goalResultOver {
+.goalEquation {
   color: var(--c-muted);
   font-size: var(--text-sm);
-  text-wrap: pretty;
 }
 
-.goalCaption {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-  color: var(--c-muted);
-  font-size: var(--text-sm);
-
-  & span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    white-space: nowrap;
-  }
-
-  & strong {
-    color: var(--c-text-strong);
-    font-weight: var(--font-weight-semibold);
-  }
-}
-
-.dotConsumed,
-.dotAdded,
-.dotAddedOver {
-  flex: none;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: var(--radius-pill);
-}
-
-.dotConsumed,
 .consumedBar {
+  background: var(--c-muted-strong);
+}
+
+.addedBar {
   background: var(--c-accent);
 }
 
-.dotAdded,
-.addedBar {
-  background: var(--c-macro-carb);
+.addedText {
+  color: var(--c-accent);
 }
 
-.dotAddedOver,
-.addedBarOver {
-  background: var(--c-danger-text);
+.sumText,
+.sumTextOver {
+  color: var(--c-text-strong);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sumTextOver {
+  color: var(--c-danger-text);
 }
 
 .goalTrack {
@@ -107,20 +81,5 @@
     display: block;
     height: 100%;
     transition: width var(--duration-fast) var(--ease-out);
-  }
-}
-
-.goalResult,
-.goalResultOver {
-  align-self: flex-end;
-}
-
-.goalResultOver {
-  color: var(--c-danger-text);
-}
-
-@media (--phone) {
-  .goalCaption {
-    gap: var(--space-xs) var(--space-sm);
   }
 }

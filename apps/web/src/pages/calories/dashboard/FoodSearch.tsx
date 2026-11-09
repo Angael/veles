@@ -82,6 +82,7 @@ export function FoodSearch({ date, linkedFoodId }: Props) {
   return (
     <>
       <Combobox.Root<FoodSearchResult>
+        autoHighlight
         filter={null}
         inputValue={query}
         itemToStringLabel={(result) => foodSearchResultLabel(result, locale)}
