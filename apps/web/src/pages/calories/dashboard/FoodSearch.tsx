@@ -2,7 +2,7 @@ import { Combobox } from '@base-ui/react/combobox';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { BarcodeIcon, SearchIcon } from 'lucide-react';
-import { type PointerEvent, useDeferredValue, useRef, useState } from 'react';
+import { type MouseEvent, useDeferredValue, useRef, useState } from 'react';
 import type { CalorieFood } from '../calories.api';
 import { calorieFoodQueryOptions, calorieFoodsQueryOptions } from '../calories.query';
 import { AddFoodDialog } from './AddFoodDialog';
@@ -53,11 +53,12 @@ export function FoodSearch({ date, linkedFoodId }: Props) {
 
   /**
    * Android Chrome smooth-scrolls a focused input into view once the keyboard opens, which drags
-   * the already open results along. Jumping the field to the top on touch, before focus, leaves the
-   * browser nothing to scroll.
+   * the already open results along. Jumping the field to the top on touch leaves the browser
+   * nothing to scroll. It runs on click, after the finger lifts, so the moved list cannot catch the
+   * release as an option tap.
    */
-  function pinSearchToTop(event: PointerEvent<HTMLDivElement>) {
-    if (event.pointerType !== 'touch') return;
+  function pinSearchToTop(event: MouseEvent<HTMLDivElement>) {
+    if (!window.matchMedia('(pointer: coarse)').matches) return;
     event.currentTarget.scrollIntoView({ behavior: 'instant', block: 'start' });
   }
 
@@ -103,7 +104,7 @@ export function FoodSearch({ date, linkedFoodId }: Props) {
         }}
         value={null}
       >
-        <div className={css.search} onPointerDown={pinSearchToTop}>
+        <div className={css.search} onClick={pinSearchToTop}>
           <SearchIcon aria-hidden='true' className={css.searchIcon} />
           <Combobox.Input
             aria-label={t({ en: 'Search foods to log', pl: 'Szukaj jedzenia do dodania' })}
