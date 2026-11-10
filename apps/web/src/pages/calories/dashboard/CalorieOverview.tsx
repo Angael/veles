@@ -56,7 +56,9 @@ export function CalorieOverview({ day, linkedFoodId, searchOpen }: Props) {
           aria-label={t({ en: 'Selected products', pl: 'Wybrane produkty' })}
           count={selectedLogs.length}
           onClear={clearSelection}
-          primaryAction={<ShareLogsAction logs={selectedLogs} onShared={clearSelection} />}
+          primaryAction={
+            <ShareLogsAction date={date} logs={selectedLogs} onShared={clearSelection} />
+          }
         >
           <MultiplyLogsAction logs={selectedLogs} onMultiplied={clearSelection} />
           <LogsDateAction date={date} logs={selectedLogs} mode='move' onDone={clearSelection} />
@@ -91,7 +93,7 @@ export function CalorieOverview({ day, linkedFoodId, searchOpen }: Props) {
           linkedFoodId={linkedFoodId}
           searchOpen={searchOpen}
         />
-        <ReceivedFoodShares date={date} />
+        <ReceivedFoodShares />
         <PendingPhotoScans date={date} logIds={new Set(logs.map((entry) => entry.id))} />
         {logs.length ? (
           <List as='ol' data-selecting={selecting || undefined}>

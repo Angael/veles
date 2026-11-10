@@ -1,0 +1,1 @@
+ALTER TABLE "food_log_share" ADD COLUMN "log_date" date DEFAULT now() NOT NULL;

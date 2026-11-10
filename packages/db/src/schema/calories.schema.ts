@@ -91,6 +91,8 @@ export const foodLogShares = pgTable(
     recipientUserId: text('recipient_user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
+    /** Diary day the recipient gets the products on. The default only fills rows from before this column. */
+    logDate: date('log_date', { mode: 'string' }).notNull().defaultNow(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (table) => [
