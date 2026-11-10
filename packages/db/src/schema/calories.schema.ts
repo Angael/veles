@@ -169,3 +169,37 @@ export const calorieDayNotes = pgTable(
   },
   (table) => [uniqueIndex('calorie_day_note_user_id_date_idx').on(table.userId, table.date)],
 );
+
+/**
+ * Photo product queue: the worker reads the photos, creates a catalog product and logs it when
+ * the user gave an amount. Rows stay after success so the daily limit can count them.
+ */
+export const foodPhotoScans = pgTable(
+  'food_photo_scan',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`uuidv7()`),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    logDate: date('log_date', { mode: 'string' }).notNull(),
+    /** Eaten amount; null only adds the product to the catalog. */
+    gramsHundredths: integer('grams_hundredths'),
+    /** Barcode the user scanned or typed; the AI product gets it when it is still free. */
+    barcode: text('barcode'),
+    /** Uploaded photos in shooting order. After success only the product's cover photo stays. */
+    photoUploadObjectIds: text('photo_upload_object_ids').array().notNull(),
+    /** `pending` → `processing` → `done` or `failed`. */
+    status: text('status').notNull().default('pending'),
+    attempts: integer('attempts').notNull().default(0),
+    error: text('error'),
+    foodLogId: uuid('food_log_id').references(() => foodLogs.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (table) => [
+    index('food_photo_scan_user_id_log_date_idx').on(table.userId, table.logDate),
+    index('food_photo_scan_status_idx').on(table.status, table.updatedAt),
+  ],
+);

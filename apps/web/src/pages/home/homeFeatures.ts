@@ -41,8 +41,8 @@ export const homeFeatures: HomeFeature[] = [
     icon: FlameIcon,
     title: { en: 'Food logging', pl: 'Dziennik jedzenia' },
     description: {
-      en: 'Log meals, scan barcodes, and track calories and macros against your goals.',
-      pl: 'Zapisuj posiłki, skanuj kody kreskowe i śledź kalorie oraz makroskładniki względem celów.',
+      en: 'Log meals, scan barcodes, snap package photos for AI to read, and track calories and macros against your goals.',
+      pl: 'Zapisuj posiłki, skanuj kody kreskowe, rób zdjęcia opakowań do odczytu przez AI i śledź kalorie oraz makroskładniki względem celów.',
     },
     to: '/calories',
   },

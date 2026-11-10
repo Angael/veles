@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useState } from 'react';
 import type { CalorieDashboardDay } from '../calories.api';
@@ -10,6 +11,8 @@ import { LogFoodMenu } from './LogFoodMenu';
 import { LoggedFood } from './LoggedFood';
 import { LogsDateAction } from './LogsDateAction';
 import { MultiplyLogsAction } from './MultiplyLogsAction';
+import { PendingPhotoScans } from './PendingPhotoScans';
+import { foodPhotoScansQueryOptions } from '../photo-scan/foodPhotoScans.query';
 import { ReceivedFoodShares } from './ReceivedFoodShares';
 import { ShareLogsAction } from './ShareLogsAction';
 import { useCancelSelectionOnBack } from './useCancelSelectionOnBack';
@@ -36,6 +39,8 @@ export function CalorieOverview({ day, linkedFoodId, searchOpen }: Props) {
   const allSelected = selectedLogs.length === logs.length;
   const clearSelection = () => setSelectedIds([]);
   useCancelSelectionOnBack(selecting, clearSelection);
+  const scans = useQuery(foodPhotoScansQueryOptions(date)).data;
+  const aiLogIds = new Set(scans?.flatMap((scan) => scan.foodLogId ?? []));
 
   function setSelected(id: string, selected: boolean) {
     setSelectedIds((current) =>
@@ -87,10 +92,12 @@ export function CalorieOverview({ day, linkedFoodId, searchOpen }: Props) {
           searchOpen={searchOpen}
         />
         <ReceivedFoodShares date={date} />
+        <PendingPhotoScans date={date} logIds={new Set(logs.map((entry) => entry.id))} />
         {logs.length ? (
           <List as='ol' data-selecting={selecting || undefined}>
             {logs.map((entry) => (
               <LoggedFood
+                aiReveal={aiLogIds.has(entry.id)}
                 date={date}
                 entry={entry}
                 key={entry.id}

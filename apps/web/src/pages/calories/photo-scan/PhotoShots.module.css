@@ -1,0 +1,158 @@
+.root {
+  position: relative;
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.hero {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--space-xs);
+  min-height: 17rem;
+  padding: var(--space-lg);
+  border: var(--border-width) solid var(--c-primary-border-soft);
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(circle at 50% 30%, var(--c-primary-surface-strong), transparent 65%),
+    var(--c-surface-inset);
+  color: var(--c-text-strong);
+  font-size: var(--text-lg);
+  text-align: center;
+  transition: scale var(--duration-fast) var(--ease-out);
+
+  &:active {
+    scale: 0.98;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 2px;
+  }
+}
+
+.heroIcon {
+  display: grid;
+  place-items: center;
+  width: 5rem;
+  height: 5rem;
+  margin-bottom: var(--space-xs);
+  border-radius: var(--radius-pill);
+  background: var(--c-primary);
+  color: var(--c-primary-contrast);
+  animation: invite 2.4s ease-out infinite;
+
+  & svg {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes invite {
+  from {
+    box-shadow: 0 0 0 0 var(--c-primary-border);
+  }
+
+  70%,
+  to {
+    box-shadow: 0 0 0 1.25rem transparent;
+  }
+}
+
+.hint {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  font-weight: normal;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-xs);
+  padding: 0;
+  list-style: none;
+}
+
+.tile,
+.processing,
+.add {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+}
+
+.tile {
+  position: relative;
+  overflow: hidden;
+  animation: shot-in var(--duration-fast) var(--ease-out);
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes shot-in {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove {
+  --btn-height: 2.25rem;
+
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+}
+
+.processing {
+  background: var(--c-surface-raised);
+  animation: developing 1s ease-in-out infinite alternate;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes developing {
+  to {
+    opacity: 0.45;
+  }
+}
+
+.add {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.15rem;
+  width: 100%;
+  border: var(--border-width) dashed var(--c-border-strong);
+  background: var(--c-surface-inset);
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+
+  &:focus-visible {
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 2px;
+  }
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { AppleIcon, PlusIcon, ScanLineIcon, SparklesIcon } from 'lucide-react';
+import { AppleIcon, CameraIcon, PlusIcon, ScanLineIcon, SparklesIcon } from 'lucide-react';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
 import {
   MenuBtn,
@@ -22,7 +22,16 @@ const loggingActions = [
     },
     icon: ScanLineIcon,
     label: { en: 'Scan barcode', pl: 'Skanuj kod kreskowy' },
-    to: '/calories/scan' as const,
+    render: (date: string) => <Link search={{ date }} to='/calories/scan' />,
+  },
+  {
+    description: {
+      en: 'Take photos; AI fills in the product and logs it',
+      pl: 'Zrób zdjęcia; AI uzupełni produkt i doda wpis',
+    },
+    icon: CameraIcon,
+    label: { en: 'Log from photos', pl: 'Dodaj ze zdjęć' },
+    render: (date: string) => <Link search={{ date, log: true }} to='/calories/foods/new' />,
   },
   {
     description: {
@@ -31,7 +40,7 @@ const loggingActions = [
     },
     icon: SparklesIcon,
     label: { en: 'Quick add', pl: 'Szybkie dodawanie' },
-    to: '/calories/quick-add' as const,
+    render: (date: string) => <Link search={{ date }} to='/calories/quick-add' />,
   },
 ] satisfies Array<{ description: Localized; label: Localized; [key: string]: unknown }>;
 
@@ -59,9 +68,9 @@ export function LogFoodMenu({ date }: Props) {
             <MenuBtnItem
               description={t(action.description)}
               icon={<ActionIcon aria-hidden='true' />}
-              key={action.to}
+              key={action.label.en}
               label={t(action.label)}
-              render={<Link search={{ date }} to={action.to} />}
+              render={action.render(date)}
             />
           );
         })}

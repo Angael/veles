@@ -65,6 +65,7 @@ import { Toggle } from '@/components/ui/toggle/Toggle';
 import { Tooltip } from '@/components/ui/tooltip/Tooltip';
 import css from './ComponentsDemoPage.module.css';
 import { PhotosFieldDemo } from './PhotosFieldDemo';
+import { TabsDemo } from './TabsDemo';
 import { AutocompleteDemo } from './AutocompleteDemo';
 import { ScrubDemo } from './ScrubDemo';
 import { CameraDemo } from './CameraDemo';
@@ -337,6 +338,7 @@ export function ComponentsDemoPage() {
       </section>
 
       <PhotosFieldDemo />
+      <TabsDemo />
       <CameraDemo />
 
       <section>

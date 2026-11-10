@@ -15,7 +15,7 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import clsx from 'clsx';
-import { UploadIcon } from 'lucide-react';
+import { CameraIcon } from 'lucide-react';
 import { type DragEvent, useId, useRef, useState } from 'react';
 import { IMAGE_MAX_INPUT_BYTES } from '@/lib/storage/imageLimits';
 import css from './PhotosField.module.css';
@@ -151,6 +151,7 @@ export function PhotosField({
             {/* No `name`: picked files are submitted by the tiles, in tile order. */}
             <input
               accept='image/*'
+              capture='environment'
               className={css.fileInput}
               id={inputId}
               multiple
@@ -161,8 +162,8 @@ export function PhotosField({
               type='file'
             />
 
-            <UploadIcon aria-hidden='true' size={20} strokeWidth={1.9} />
-            <strong>{t({ en: 'Add images', pl: 'Dodaj zdjęcia' })}</strong>
+            <CameraIcon aria-hidden='true' size={20} strokeWidth={1.9} />
+            <strong>{t({ en: 'Take a photo', pl: 'Zrób zdjęcie' })}</strong>
             <span>
               {photos.length
                 ? t({ en: 'Drop here or browse', pl: 'Upuść tutaj lub wybierz' })

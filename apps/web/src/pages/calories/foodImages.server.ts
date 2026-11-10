@@ -34,12 +34,13 @@ export async function getFoodImageAssets(ids: Array<string | null | undefined>) 
 export async function prepareFoodImage(
   file: File,
   userId: string | null,
+  maxSide?: number,
 ): Promise<PreparedFoodImage> {
   if (file.size <= 0 || file.size > FOOD_IMAGE_MAX_BYTES) {
     throw new Error('Food image must be no larger than 10 MiB.');
   }
 
-  const optimized = await optimizeImage(file);
+  const optimized = await optimizeImage(file, maxSide);
   const id = randomUUID();
   const key = `food-images/${randomUUID()}.webp`;
   const { bucketName } = getStorageConfig();
