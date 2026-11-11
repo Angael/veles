@@ -137,6 +137,27 @@
   font-weight: var(--font-weight-semibold);
 }
 
+/* Day cards under the calendar: date and length on one line, a little tighter. */
+.detailed {
+  border-color: var(--c-primary-border);
+
+  & .text {
+    gap: var(--space-xs);
+  }
+
+  & .top {
+    justify-content: space-between;
+  }
+
+  & .duration,
+  & .top time[datetime^='PT'] {
+    color: var(--c-text-strong);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--font-weight-semibold);
+  }
+}
+
 .relative {
   color: var(--c-muted);
 }

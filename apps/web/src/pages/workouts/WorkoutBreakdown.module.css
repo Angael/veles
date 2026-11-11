@@ -1,31 +1,19 @@
 .loading {
-  height: 4.5rem;
-}
-
-.breakdown {
-  display: grid;
-  gap: var(--space-sm);
-  padding-top: var(--space-sm);
-  border-top: var(--border-width) solid var(--c-border);
-}
-
-.clock {
-  color: var(--c-muted);
-  font-size: var(--text-sm);
-  font-variant-numeric: tabular-nums;
+  height: 4rem;
 }
 
 .exercises {
   display: grid;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   margin: 0;
-  padding: 0;
+  padding: var(--space-xs) 0 0;
+  border-top: var(--border-width) solid var(--c-border);
   list-style: none;
 }
 
 .exercise {
   display: grid;
-  gap: 0.3rem;
+  gap: 0.2rem;
   min-width: 0;
 
   & strong {
@@ -38,7 +26,7 @@
 .sets {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
+  gap: 0.25rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -46,8 +34,8 @@
   & li {
     display: inline-flex;
     align-items: baseline;
-    gap: 0.3rem;
-    padding: 0.1rem 0.5rem;
+    gap: 0.25rem;
+    padding: 0.05rem 0.45rem;
     border-radius: var(--radius-pill);
     background: var(--c-surface-inset);
     color: var(--c-text);
@@ -72,13 +60,13 @@
 }
 
 .note {
+  display: -webkit-box;
+  overflow: hidden;
   color: var(--c-muted);
   font-size: var(--text-xs);
   font-style: italic;
   overflow-wrap: anywhere;
   white-space: pre-line;
-  display: -webkit-box;
-  overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }

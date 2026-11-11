@@ -8,45 +8,20 @@ import css from './WorkoutBreakdown.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /**
- * What a workout held: its clock times and each exercise with the sets done and its note. Reads
+ * What a workout held: each exercise with the sets done and its note. Reads
  * the session the workout page loads, so opening the workout after this is instant.
  */
 export function WorkoutBreakdown({ workoutId }: { workoutId: string }) {
   const { data } = useQuery(workoutSessionQueryOptions(workoutId));
 
   if (!data) return <Skeleton className={css.loading} />;
+  if (data.slots.length === 0) return null;
   return (
-    <div className={css.breakdown}>
-      <ClockRange session={data} />
-      {data.slots.length > 0 ? (
-        <ol className={css.exercises}>
-          {data.slots.map((slot) => (
-            <ExerciseLine key={slot.id} slot={slot} />
-          ))}
-        </ol>
-      ) : null}
-    </div>
-  );
-}
-
-/** "18:02 – 19:17", or only the start while the workout runs. */
-function ClockRange({ session }: { session: WorkoutSessionData }) {
-  const { formatDate, t } = useI18n();
-  if (!session.startedAt) return null;
-  const clock = (value: string) => formatDate(value, { hour: '2-digit', minute: '2-digit' });
-
-  return (
-    <p className={css.clock}>
-      <time dateTime={session.startedAt}>{clock(session.startedAt)}</time>
-      {session.endedAt ? (
-        <>
-          {' – '}
-          <time dateTime={session.endedAt}>{clock(session.endedAt)}</time>
-        </>
-      ) : (
-        ` – ${t({ en: 'now', pl: 'teraz' })}`
-      )}
-    </p>
+    <ol className={css.exercises}>
+      {data.slots.map((slot) => (
+        <ExerciseLine key={slot.id} slot={slot} />
+      ))}
+    </ol>
   );
 }
 

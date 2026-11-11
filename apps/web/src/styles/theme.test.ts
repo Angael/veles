@@ -27,6 +27,7 @@ describe('theme tokens', () => {
       '--rest-',
       '--scrub-',
       '--badge-',
+      '--agenda-',
     ];
     const errors: string[] = [];
 

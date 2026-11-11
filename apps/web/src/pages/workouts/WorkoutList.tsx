@@ -45,38 +45,53 @@ function WorkoutRow({ detailed, workout }: { detailed: boolean; workout: Workout
   const open = workout.endedAt === null;
 
   return (
-    <Card as='article' className={clsx(css.row, open && css.open)}>
+    <Card
+      as='article'
+      className={clsx(css.row, open && css.open, detailed && css.detailed)}
+      data-open={open || undefined}
+    >
       <div className={css.text}>
         <p className={css.top}>
-          <WorkoutDate date={workout.date} />
+          <WorkoutDate date={workout.date} relative={!detailed} />
+          {detailed ? <WorkoutDuration workout={workout} /> : null}
           {open ? (
             <span className={css.live}>{t({ en: 'In progress', pl: 'W trakcie' })}</span>
           ) : null}
         </p>
         <h3>{workout.name}</h3>
-        <p className={css.meta}>
-          {open && workout.startedAt ? <ElapsedTime startedAt={workout.startedAt} /> : null}
-          {workout.durationSeconds === null ? null : (
-            <span>{formatElapsed(workout.durationSeconds)}</span>
-          )}
-          <span>
-            {t({
-              en: `${workout.exerciseCount} ${pluralEn(workout.exerciseCount, 'exercise', 'exercises')}`,
-              pl: `${workout.exerciseCount} ${pluralPl(workout.exerciseCount, 'ćwiczenie', 'ćwiczenia', 'ćwiczeń')}`,
-            })}
-          </span>
-          <span>
-            {t({
-              en: `${workout.doneSets} sets`,
-              pl: `${workout.doneSets} ${pluralPl(workout.doneSets, 'seria', 'serie', 'serii')}`,
-            })}
-          </span>
-          {workout.volumeKg > 0 ? <span>{formatNumber(workout.volumeKg)} kg</span> : null}
-        </p>
-        {detailed ? <WorkoutBreakdown workoutId={workout.id} /> : null}
+        {detailed ? (
+          <WorkoutBreakdown workoutId={workout.id} />
+        ) : (
+          <p className={css.meta}>
+            <WorkoutDuration workout={workout} />
+            <span>
+              {t({
+                en: `${workout.exerciseCount} ${pluralEn(workout.exerciseCount, 'exercise', 'exercises')}`,
+                pl: `${workout.exerciseCount} ${pluralPl(workout.exerciseCount, 'ćwiczenie', 'ćwiczenia', 'ćwiczeń')}`,
+              })}
+            </span>
+            <span>
+              {t({
+                en: `${workout.doneSets} sets`,
+                pl: `${workout.doneSets} ${pluralPl(workout.doneSets, 'seria', 'serie', 'serii')}`,
+              })}
+            </span>
+            {workout.volumeKg > 0 ? <span>{formatNumber(workout.volumeKg)} kg</span> : null}
+          </p>
+        )}
       </div>
       {open ? <ArrowRightIcon aria-hidden='true' className={css.arrow} /> : null}
     </Card>
+  );
+}
+
+/** Live clock while the workout runs, its final length once finished. */
+function WorkoutDuration({ workout }: { workout: WorkoutSummary }) {
+  if (workout.endedAt === null) {
+    return workout.startedAt ? <ElapsedTime startedAt={workout.startedAt} /> : null;
+  }
+  return workout.durationSeconds === null ? null : (
+    <span className={css.duration}>{formatElapsed(workout.durationSeconds)}</span>
   );
 }
 
@@ -87,10 +102,11 @@ const RELATIVE_DAYS = 6;
  * "Monday, 2026-10-19 · 3 days ago": the weekday and an unambiguous ISO date, plus a relative
  * label for the past week so recent sessions read at a glance.
  */
-function WorkoutDate({ date }: { date: string }) {
+function WorkoutDate({ date, relative: withRelative }: { date: string; relative: boolean }) {
   const i18n = useI18n();
   const weekday = i18n.formatDate(date, { weekday: 'long' });
-  const relative = Math.abs(daysAgo(date)) <= RELATIVE_DAYS ? formatDaysAgo(date, i18n) : null;
+  const relative =
+    withRelative && Math.abs(daysAgo(date)) <= RELATIVE_DAYS ? formatDaysAgo(date, i18n) : null;
 
   return (
     <time className={css.date} dateTime={date}>

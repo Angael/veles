@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { addDays, format, parseISO } from 'date-fns';
+import type { CSSProperties } from 'react';
 import { WorkoutList } from '../../WorkoutList';
 import { workoutCalendarQueryOptions } from '../dashboard.query';
 import { CalendarHeader, usePeriodSummary } from './CalendarHeader';
@@ -109,15 +110,21 @@ function MonthGrid({ month, onSelect, selected, today }: MonthGridProps) {
   );
 }
 
-/** The chosen day's workouts on phones, with the names and details that do not fit in a cell. */
+/**
+ * The chosen day's workouts on phones, with the names and details that do not fit in a cell. A
+ * notch points up at the chosen day's column, so the card reads as that day's.
+ */
 function DayAgenda({ date, month, today }: { date: string; month: string; today: string }) {
   const { formatDate, t } = useI18n();
   const { data, isPending } = useQuery(workoutCalendarQueryOptions(month));
   const workouts = groupByDay(data ?? []).get(date) ?? [];
+  const column: CSSProperties & { '--agenda-column': number } = {
+    '--agenda-column': (parseISO(date).getDay() + 6) % 7,
+  };
 
   if (isPending) return <div className={css.agenda} />;
   return (
-    <div className={css.agenda}>
+    <div className={css.agenda} style={column}>
       {workouts.length > 0 ? (
         <WorkoutList detailed workouts={workouts} />
       ) : (
