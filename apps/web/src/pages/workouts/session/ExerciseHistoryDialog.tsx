@@ -16,7 +16,7 @@ type ExerciseHistoryDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** The current workout, left out of its own history. */
-  workoutId: string;
+  workoutId?: string;
 };
 
 /**

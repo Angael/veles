@@ -37,6 +37,7 @@ import { Route as AuthenticatedWeightAddRouteImport } from './routes/_authentica
 import { Route as AuthenticatedWeightImportRouteImport } from './routes/_authenticated/weight_/import'
 import { Route as AuthenticatedWorkoutsIndexRouteImport } from './routes/_authenticated/workouts/index'
 import { Route as AuthenticatedWorkoutsIdRouteImport } from './routes/_authenticated/workouts/$id'
+import { Route as AuthenticatedWorkoutsExercisesRouteImport } from './routes/_authenticated/workouts/exercises'
 import { Route as AuthenticatedWorkoutsHistoryRouteImport } from './routes/_authenticated/workouts/history'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiDemoPingRouteImport } from './routes/api/demo/ping'
@@ -194,6 +195,12 @@ const AuthenticatedWorkoutsIdRoute = AuthenticatedWorkoutsIdRouteImport.update({
   path: '/workouts/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedWorkoutsExercisesRoute =
+  AuthenticatedWorkoutsExercisesRouteImport.update({
+    id: '/workouts/exercises',
+    path: '/workouts/exercises',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedWorkoutsHistoryRoute =
   AuthenticatedWorkoutsHistoryRouteImport.update({
     id: '/workouts/history',
@@ -277,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/weight/add': typeof AuthenticatedWeightAddRoute
   '/weight/import': typeof AuthenticatedWeightImportRoute
   '/workouts/$id': typeof AuthenticatedWorkoutsIdRoute
+  '/workouts/exercises': typeof AuthenticatedWorkoutsExercisesRoute
   '/workouts/history': typeof AuthenticatedWorkoutsHistoryRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
@@ -316,6 +324,7 @@ export interface FileRoutesByTo {
   '/weight/add': typeof AuthenticatedWeightAddRoute
   '/weight/import': typeof AuthenticatedWeightImportRoute
   '/workouts/$id': typeof AuthenticatedWorkoutsIdRoute
+  '/workouts/exercises': typeof AuthenticatedWorkoutsExercisesRoute
   '/workouts/history': typeof AuthenticatedWorkoutsHistoryRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
@@ -357,6 +366,7 @@ export interface FileRoutesById {
   '/_authenticated/weight_/add': typeof AuthenticatedWeightAddRoute
   '/_authenticated/weight_/import': typeof AuthenticatedWeightImportRoute
   '/_authenticated/workouts/$id': typeof AuthenticatedWorkoutsIdRoute
+  '/_authenticated/workouts/exercises': typeof AuthenticatedWorkoutsExercisesRoute
   '/_authenticated/workouts/history': typeof AuthenticatedWorkoutsHistoryRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
@@ -398,6 +408,7 @@ export interface FileRouteTypes {
     | '/weight/add'
     | '/weight/import'
     | '/workouts/$id'
+    | '/workouts/exercises'
     | '/workouts/history'
     | '/api/auth/$'
     | '/api/demo/ping'
@@ -437,6 +448,7 @@ export interface FileRouteTypes {
     | '/weight/add'
     | '/weight/import'
     | '/workouts/$id'
+    | '/workouts/exercises'
     | '/workouts/history'
     | '/api/auth/$'
     | '/api/demo/ping'
@@ -477,6 +489,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weight_/add'
     | '/_authenticated/weight_/import'
     | '/_authenticated/workouts/$id'
+    | '/_authenticated/workouts/exercises'
     | '/_authenticated/workouts/history'
     | '/api/auth/$'
     | '/api/demo/ping'
@@ -707,6 +720,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkoutsIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/workouts/exercises': {
+      id: '/_authenticated/workouts/exercises'
+      path: '/workouts/exercises'
+      fullPath: '/workouts/exercises'
+      preLoaderRoute: typeof AuthenticatedWorkoutsExercisesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/workouts/history': {
       id: '/_authenticated/workouts/history'
       path: '/workouts/history'
@@ -795,6 +815,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedWeightAddRoute: typeof AuthenticatedWeightAddRoute
   AuthenticatedWeightImportRoute: typeof AuthenticatedWeightImportRoute
   AuthenticatedWorkoutsIdRoute: typeof AuthenticatedWorkoutsIdRoute
+  AuthenticatedWorkoutsExercisesRoute: typeof AuthenticatedWorkoutsExercisesRoute
   AuthenticatedWorkoutsHistoryRoute: typeof AuthenticatedWorkoutsHistoryRoute
   AuthenticatedDiaryIndexRoute: typeof AuthenticatedDiaryIndexRoute
   AuthenticatedRecipesIndexRoute: typeof AuthenticatedRecipesIndexRoute
@@ -822,6 +843,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedWeightAddRoute: AuthenticatedWeightAddRoute,
   AuthenticatedWeightImportRoute: AuthenticatedWeightImportRoute,
   AuthenticatedWorkoutsIdRoute: AuthenticatedWorkoutsIdRoute,
+  AuthenticatedWorkoutsExercisesRoute: AuthenticatedWorkoutsExercisesRoute,
   AuthenticatedWorkoutsHistoryRoute: AuthenticatedWorkoutsHistoryRoute,
   AuthenticatedDiaryIndexRoute: AuthenticatedDiaryIndexRoute,
   AuthenticatedRecipesIndexRoute: AuthenticatedRecipesIndexRoute,

@@ -16,6 +16,7 @@ Every tool the Veles MCP server (`/api/mcp`) can list, grouped by the consent th
 | [`save_workout`](#save_workout)               | Write on Workouts                 | write, destructive         |
 | [`save_routine`](#save_routine)               | Write on Workouts                 | write, destructive         |
 | [`update_exercise`](#update_exercise)         | Write on Workouts                 | write                      |
+| [`delete_exercise`](#delete_exercise)         | Write on Workouts                 | write, destructive         |
 | [`delete_workout`](#delete_workout)           | Write on Workouts                 | write, destructive         |
 | [`delete_routine`](#delete_routine)           | Write on Workouts                 | write, destructive         |
 | [`save_recipe`](#save_recipe)                 | Write on Recipes                  | write                      |
@@ -161,14 +162,25 @@ Create (no id; name required) or update (id) a workout routine. Omitted fields s
 
 _write_
 
-Rename an exercise or change its measure or restSeconds (null for none); applies to all sessions. Names are unique per account.
+Rename an exercise, change its measure or restSeconds (null for none), or archive it (archived: true hides it from the picker, false restores it); applies to all sessions. Names are unique per account.
 
 | Input         | Type                                                                              | Required | Notes         |
 | ------------- | --------------------------------------------------------------------------------- | -------- | ------------- |
 | `id`          | uuid                                                                              | yes      |               |
+| `archived`    | boolean                                                                           |          |               |
 | `measure`     | "distance_duration" \| "duration" \| "reps" \| "weight_duration" \| "weight_reps" |          |               |
 | `name`        | string                                                                            |          | max 200 chars |
 | `restSeconds` | integer \| null                                                                   |          |               |
+
+### `delete_exercise`
+
+_write, destructive_
+
+Delete an exercise that no workout session or routine uses. Archive used exercises with update_exercise instead.
+
+| Input | Type | Required | Notes |
+| ----- | ---- | -------- | ----- |
+| `id`  | uuid | yes      |       |
 
 ### `delete_workout`
 
