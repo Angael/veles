@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { DialogClose, DialogPopup, DialogRoot, DialogTitle } from '@/components/ui/dialog/Dialog';
 import {
-  DEFAULT_METRICS,
   describeSet,
   formatMetric,
+  hintValue,
   MEASURE_FIELDS,
   parseMetric,
   scrubTuning,
@@ -67,7 +67,7 @@ export function SetSheet({ onClose, onSave, target }: SetSheetProps) {
             <div className={css.fields}>
               {MEASURE_FIELDS[target.slot.measure].map((field) => (
                 <ScrubField
-                  fallback={set.previous?.[field.key] ?? DEFAULT_METRICS[field.key]}
+                  fallback={hintValue(set, field.key)}
                   format={(value) => formatMetric(field, value, locale)}
                   key={field.key}
                   label={t(field.label)}
@@ -86,10 +86,7 @@ export function SetSheet({ onClose, onSave, target }: SetSheetProps) {
                 const shown = Object.fromEntries(
                   MEASURE_FIELDS[target.slot.measure].map((field) => [
                     field.key,
-                    draft[field.key] ??
-                      set[field.key] ??
-                      set.previous?.[field.key] ??
-                      DEFAULT_METRICS[field.key],
+                    draft[field.key] ?? set[field.key] ?? hintValue(set, field.key),
                   ]),
                 );
                 onSave(shown);
