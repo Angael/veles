@@ -203,15 +203,10 @@ export function hintValue(set: { previous: SetMetrics | null }, key: MetricKey) 
   return set.previous?.[key] ?? DEFAULT_METRICS[key];
 }
 
-/** True when the user entered no value at all, so the set holds nothing worth keeping. */
-export function isBlankSet(set: SetMetrics) {
-  return (Object.keys(EMPTY_METRICS) as MetricKey[]).every((key) => set[key] === null);
-}
-
 /**
  * The grey hints of an unticked set's empty cells, as a patch. Grey hints look like real values,
- * so Finish asks about these sets instead of silently saving them empty. Null when the set is
- * ticked or every cell has a value.
+ * so Finish saves them instead of leaving the sets empty. Null when the set is ticked or every
+ * cell has a value.
  */
 export function hintFill(
   set: SetMetrics & { done: boolean; previous: SetMetrics | null },

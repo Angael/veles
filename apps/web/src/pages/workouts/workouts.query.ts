@@ -51,7 +51,7 @@ export function useUpdateWorkoutMutation() {
       id: string;
       name?: string;
       finished?: boolean;
-      unfilledSets?: 'fill' | 'skip';
+      fillHints?: boolean;
     }) => updateWorkout({ data: variables }),
   });
 }

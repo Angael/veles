@@ -1,8 +1,8 @@
-import { and, asc, desc, eq, gt, inArray, lt, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, lt, sql } from 'drizzle-orm';
 import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
-import { hintFill, isBlankSet } from '../metrics';
+import { hintFill } from '../metrics';
 import {
   autoFinishIdleWorkouts,
   completeFilledSets,
@@ -50,34 +50,18 @@ export async function startWorkoutRecord(userId: string, data: typeof startWorko
 }
 
 /**
- * Settles unticked sets with empty cells before a workout ends. `fill` saves the grey hints the
- * user saw, since they read like real values; `skip` deletes blank sets, plus exercises left
- * with no sets and no note, and keeps partly typed sets as they are.
+ * Saves the grey hints of unticked sets' empty cells before a workout ends. Hints read like real
+ * values, so finishing keeps what the user saw instead of empty sets.
  */
-async function settleUnfilledSets(userId: string, workoutId: string, mode: 'fill' | 'skip') {
+async function fillHintSets(userId: string, workoutId: string) {
   const session = await loadWorkoutSession(userId, workoutId);
   await db.transaction(async (tx) => {
     for (const slot of session.slots) {
-      if (mode === 'fill') {
-        for (const set of slot.sets) {
-          const patch = hintFill(set, slot.measure);
-          if (patch)
-            await tx.update(workoutSets).set(toSetColumns(patch)).where(eq(workoutSets.id, set.id));
-        }
-        continue;
+      for (const set of slot.sets) {
+        const patch = hintFill(set, slot.measure);
+        if (patch)
+          await tx.update(workoutSets).set(toSetColumns(patch)).where(eq(workoutSets.id, set.id));
       }
-      const blank = slot.sets.filter((set) => !set.done && isBlankSet(set));
-      if (blank.length === 0) continue;
-      if (blank.length === slot.sets.length && !slot.note.trim()) {
-        await tx.delete(workoutSessionExercises).where(eq(workoutSessionExercises.id, slot.id));
-        continue;
-      }
-      await tx.delete(workoutSets).where(
-        inArray(
-          workoutSets.id,
-          blank.map((set) => set.id),
-        ),
-      );
     }
   });
 }
@@ -96,9 +80,7 @@ export async function updateWorkoutRecord(
     await autoFinishIdleWorkouts(db, userId);
     await requireNoOpenWorkout(db, userId, data.id);
   }
-  if (data.finished && data.unfilledSets) {
-    await settleUnfilledSets(userId, workout.id, data.unfilledSets);
-  }
+  if (data.finished && data.fillHints) await fillHintSets(userId, workout.id);
   await db
     .update(workoutSessions)
     .set({
