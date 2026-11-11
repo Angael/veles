@@ -119,7 +119,7 @@ function DayAgenda({ date, month, today }: { date: string; month: string; today:
   return (
     <div className={css.agenda}>
       {workouts.length > 0 ? (
-        <WorkoutList workouts={workouts} />
+        <WorkoutList detailed workouts={workouts} />
       ) : (
         <p className={css.rest}>
           {date === today

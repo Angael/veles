@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { ArrowRightIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card/Card';
 import { ElapsedTime, formatElapsed } from './ElapsedTime';
+import { WorkoutBreakdown } from './WorkoutBreakdown';
 import { WorkoutContextMenu } from './WorkoutContextMenu';
 import type { WorkoutSummary } from './workouts.server';
 import css from './WorkoutList.module.css';
@@ -10,11 +11,17 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 import { pluralEn, pluralPl } from '@/lib/i18n/locale';
 import { daysAgo, formatDaysAgo } from '@/lib/relativeDay';
 
+type WorkoutListProps = {
+  workouts: WorkoutSummary[];
+  /** Also list each workout's exercises and sets; for short lists such as one day. */
+  detailed?: boolean;
+};
+
 /**
  * Workout rows that open the session; long press or right click to save as a routine or delete.
  * An open workout gets a highlighted, animated row with a live clock.
  */
-export function WorkoutList({ workouts }: { workouts: WorkoutSummary[] }) {
+export function WorkoutList({ detailed = false, workouts }: WorkoutListProps) {
   const { t } = useI18n();
 
   return (
@@ -25,7 +32,7 @@ export function WorkoutList({ workouts }: { workouts: WorkoutSummary[] }) {
             trigger={<Link className={css.link} params={{ id: workout.id }} to='/workouts/$id' />}
             workout={workout}
           >
-            <WorkoutRow workout={workout} />
+            <WorkoutRow detailed={detailed} workout={workout} />
           </WorkoutContextMenu>
         </li>
       ))}
@@ -33,7 +40,7 @@ export function WorkoutList({ workouts }: { workouts: WorkoutSummary[] }) {
   );
 }
 
-function WorkoutRow({ workout }: { workout: WorkoutSummary }) {
+function WorkoutRow({ detailed, workout }: { detailed: boolean; workout: WorkoutSummary }) {
   const { formatNumber, t } = useI18n();
   const open = workout.endedAt === null;
 
@@ -66,6 +73,7 @@ function WorkoutRow({ workout }: { workout: WorkoutSummary }) {
           </span>
           {workout.volumeKg > 0 ? <span>{formatNumber(workout.volumeKg)} kg</span> : null}
         </p>
+        {detailed ? <WorkoutBreakdown workoutId={workout.id} /> : null}
       </div>
       {open ? <ArrowRightIcon aria-hidden='true' className={css.arrow} /> : null}
     </Card>
