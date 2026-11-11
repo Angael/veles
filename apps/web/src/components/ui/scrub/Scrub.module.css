@@ -55,9 +55,11 @@
   }
 }
 
+/* Hints are not saved; italics keep them from reading as logged values. */
 .empty .cellValue,
 .empty .fieldNumber {
   color: var(--c-placeholder);
+  font-style: italic;
 }
 
 /* Chevrons say "this slides" on touch screens; desktop shows them on hover only. */

@@ -3,9 +3,9 @@ import { CheckIcon } from 'lucide-react';
 import { useState } from 'react';
 import { ContextMenuRoot, ContextMenuTrigger } from '@/components/ui/context-menu/ContextMenu';
 import {
-  DEFAULT_METRICS,
   filledFromPrevious,
   formatMetric,
+  hintValue,
   MEASURE_FIELDS,
   parseMetric,
   scrubTuning,
@@ -105,7 +105,7 @@ export function SetRow({
             key={field.key}
             onChange={(value) => update({ [field.key]: value })}
             parse={(text) => parseMetric(field, text)}
-            placeholder={set.previous?.[field.key] ?? DEFAULT_METRICS[field.key]}
+            placeholder={hintValue(set, field.key)}
             unit={field.cellUnit && t(field.cellUnit)}
             value={set[field.key]}
             {...scrubTuning(field)}

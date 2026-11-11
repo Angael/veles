@@ -26,6 +26,8 @@ export const updateWorkoutInputType = type({
   'date?': dateOnlyType,
   'name?': name,
   'finished?': 'boolean',
+  /** On finish: save the grey hints of unfilled sets, or drop blank sets and keep typed values. */
+  'unfilledSets?': "'fill' | 'skip'",
 });
 
 export const addWorkoutExerciseInputType = type({

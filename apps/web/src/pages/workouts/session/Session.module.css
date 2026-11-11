@@ -399,3 +399,21 @@
   display: grid;
   gap: var(--space-md);
 }
+
+.unfilledList {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  & li {
+    display: grid;
+    gap: 0.125rem;
+  }
+
+  & span {
+    color: var(--c-muted-soft);
+    font-variant-numeric: tabular-nums;
+  }
+}

@@ -47,8 +47,12 @@ export function useUpdateWorkoutMutation() {
       error: { title: t({ en: 'Workout was not saved', pl: 'Nie udało się zapisać treningu' }) },
       invalidateQueryKey: workoutKeys.all,
     },
-    mutationFn: (variables: { id: string; name?: string; finished?: boolean }) =>
-      updateWorkout({ data: variables }),
+    mutationFn: (variables: {
+      id: string;
+      name?: string;
+      finished?: boolean;
+      unfilledSets?: 'fill' | 'skip';
+    }) => updateWorkout({ data: variables }),
   });
 }
 

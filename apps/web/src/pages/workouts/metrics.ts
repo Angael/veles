@@ -198,6 +198,33 @@ export function filledFromPrevious(
   return patch;
 }
 
+/** Grey hint an empty cell shows: last time's value, else a generic starting value. */
+export function hintValue(set: { previous: SetMetrics | null }, key: MetricKey) {
+  return set.previous?.[key] ?? DEFAULT_METRICS[key];
+}
+
+/** True when the user entered no value at all, so the set holds nothing worth keeping. */
+export function isBlankSet(set: SetMetrics) {
+  return (Object.keys(EMPTY_METRICS) as MetricKey[]).every((key) => set[key] === null);
+}
+
+/**
+ * The grey hints of an unticked set's empty cells, as a patch. Grey hints look like real values,
+ * so Finish asks about these sets instead of silently saving them empty. Null when the set is
+ * ticked or every cell has a value.
+ */
+export function hintFill(
+  set: SetMetrics & { done: boolean; previous: SetMetrics | null },
+  measure: Measure,
+): Partial<SetMetrics> | null {
+  if (set.done) return null;
+  const patch: Partial<SetMetrics> = {};
+  for (const field of MEASURE_FIELDS[measure]) {
+    if (set[field.key] === null) patch[field.key] = hintValue(set, field.key);
+  }
+  return Object.keys(patch).length > 0 ? patch : null;
+}
+
 /** Short label for a logged set, such as `80 × 5` or `5.2 km · 28:10`. */
 export function describeSet(set: SetMetrics, locale: Locale) {
   const num = (value: number) => formatSetNumber(value, locale);
