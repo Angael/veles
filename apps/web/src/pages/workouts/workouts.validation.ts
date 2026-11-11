@@ -63,6 +63,8 @@ export const updateRoutineInputType = type({
   id: 'string.uuid',
   'name?': name,
   'description?': description,
+  /** True archives the routine, false restores it. */
+  'archived?': 'boolean',
 });
 
 export const updateExerciseInputType = type({
@@ -95,6 +97,7 @@ export const saveRoutinePlanInputType = type({
   'id?': 'string.uuid',
   'name?': name,
   'description?': description,
+  'archived?': 'boolean',
   'exercises?': type({
     ...exerciseRef,
     setTypes: type(setType).array().atLeastLength(1).atMostLength(30),

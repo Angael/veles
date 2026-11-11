@@ -138,6 +138,7 @@ export async function readWorkoutRoutines(userId: string, query: ReadQuery) {
       id: workoutRoutines.id,
       name: workoutRoutines.name,
       description: workoutRoutines.description,
+      archivedAt: workoutRoutines.archivedAt,
     })
     .from(workoutRoutines)
     .where(and(eq(workoutRoutines.userId, userId), byIdDesc(workoutRoutines.id, query)))
@@ -169,8 +170,9 @@ export async function readWorkoutRoutines(userId: string, query: ReadQuery) {
 
   return {
     nextCursor: page.nextCursor,
-    items: page.items.map((routine) => ({
+    items: page.items.map(({ archivedAt, ...routine }) => ({
       ...routine,
+      archived: archivedAt !== null,
       exercises: (slotsByRoutine.get(routine.id) ?? []).map(
         ({ routineId: _routineId, ...slot }) => slot,
       ),

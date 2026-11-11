@@ -71,7 +71,7 @@ export const resources = {
     feature: 'workouts',
     dated: false,
     description:
-      'Reusable workout plans, each with ordered exercises (name, measure, restSeconds) and setTypes, one per planned set.',
+      'Reusable workout plans, each with archived (hidden in the app) and ordered exercises (name, measure, restSeconds) and setTypes, one per planned set.',
     read: readWorkoutRoutines,
   },
   workout_exercises: {
