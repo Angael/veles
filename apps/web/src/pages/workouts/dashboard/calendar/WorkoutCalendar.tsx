@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { ArrowRightIcon } from 'lucide-react';
+import { ArrowRightIcon, SparklesIcon } from 'lucide-react';
 import { useState } from 'react';
 import css from './Calendar.module.css';
 import { MonthView } from './MonthView';
@@ -34,9 +34,16 @@ export function WorkoutCalendar({ initialDate, onDateChange }: WorkoutCalendarPr
       data-appear
     >
       <MonthView anchor={anchor} onSelect={select} origin={origin} today={today} />
-      <Link className={css.more} to='/workouts/history'>
-        {t({ en: 'All workouts', pl: 'Wszystkie treningi' })} <ArrowRightIcon aria-hidden='true' />
-      </Link>
+      <div className={css.links}>
+        <Link className={css.more} to='/workouts/stats'>
+          <SparklesIcon aria-hidden='true' />{' '}
+          {t({ en: 'Training replay', pl: 'Podsumowanie treningów' })}
+        </Link>
+        <Link className={css.more} to='/workouts/history'>
+          {t({ en: 'All workouts', pl: 'Wszystkie treningi' })}{' '}
+          <ArrowRightIcon aria-hidden='true' />
+        </Link>
+      </div>
     </section>
   );
 }

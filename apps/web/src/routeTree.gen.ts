@@ -38,6 +38,7 @@ import { Route as AuthenticatedWeightImportRouteImport } from './routes/_authent
 import { Route as AuthenticatedWorkoutsIndexRouteImport } from './routes/_authenticated/workouts/index'
 import { Route as AuthenticatedWorkoutsIdRouteImport } from './routes/_authenticated/workouts/$id'
 import { Route as AuthenticatedWorkoutsHistoryRouteImport } from './routes/_authenticated/workouts/history'
+import { Route as AuthenticatedWorkoutsStatsRouteImport } from './routes/_authenticated/workouts/stats'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiDemoPingRouteImport } from './routes/api/demo/ping'
 import { Route as RecipesViewIdRouteImport } from './routes/recipes.view.$id'
@@ -200,6 +201,12 @@ const AuthenticatedWorkoutsHistoryRoute =
     path: '/workouts/history',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedWorkoutsStatsRoute =
+  AuthenticatedWorkoutsStatsRouteImport.update({
+    id: '/workouts/stats',
+    path: '/workouts/stats',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -278,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/weight/import': typeof AuthenticatedWeightImportRoute
   '/workouts/$id': typeof AuthenticatedWorkoutsIdRoute
   '/workouts/history': typeof AuthenticatedWorkoutsHistoryRoute
+  '/workouts/stats': typeof AuthenticatedWorkoutsStatsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
   '/recipes/view/$id': typeof RecipesViewIdRoute
@@ -317,6 +325,7 @@ export interface FileRoutesByTo {
   '/weight/import': typeof AuthenticatedWeightImportRoute
   '/workouts/$id': typeof AuthenticatedWorkoutsIdRoute
   '/workouts/history': typeof AuthenticatedWorkoutsHistoryRoute
+  '/workouts/stats': typeof AuthenticatedWorkoutsStatsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
   '/recipes/view/$id': typeof RecipesViewIdRoute
@@ -358,6 +367,7 @@ export interface FileRoutesById {
   '/_authenticated/weight_/import': typeof AuthenticatedWeightImportRoute
   '/_authenticated/workouts/$id': typeof AuthenticatedWorkoutsIdRoute
   '/_authenticated/workouts/history': typeof AuthenticatedWorkoutsHistoryRoute
+  '/_authenticated/workouts/stats': typeof AuthenticatedWorkoutsStatsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/demo/ping': typeof ApiDemoPingRoute
   '/recipes/view/$id': typeof RecipesViewIdRoute
@@ -399,6 +409,7 @@ export interface FileRouteTypes {
     | '/weight/import'
     | '/workouts/$id'
     | '/workouts/history'
+    | '/workouts/stats'
     | '/api/auth/$'
     | '/api/demo/ping'
     | '/recipes/view/$id'
@@ -438,6 +449,7 @@ export interface FileRouteTypes {
     | '/weight/import'
     | '/workouts/$id'
     | '/workouts/history'
+    | '/workouts/stats'
     | '/api/auth/$'
     | '/api/demo/ping'
     | '/recipes/view/$id'
@@ -478,6 +490,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weight_/import'
     | '/_authenticated/workouts/$id'
     | '/_authenticated/workouts/history'
+    | '/_authenticated/workouts/stats'
     | '/api/auth/$'
     | '/api/demo/ping'
     | '/recipes/view/$id'
@@ -714,6 +727,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkoutsHistoryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/workouts/stats': {
+      id: '/_authenticated/workouts/stats'
+      path: '/workouts/stats'
+      fullPath: '/workouts/stats'
+      preLoaderRoute: typeof AuthenticatedWorkoutsStatsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -796,6 +816,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedWeightImportRoute: typeof AuthenticatedWeightImportRoute
   AuthenticatedWorkoutsIdRoute: typeof AuthenticatedWorkoutsIdRoute
   AuthenticatedWorkoutsHistoryRoute: typeof AuthenticatedWorkoutsHistoryRoute
+  AuthenticatedWorkoutsStatsRoute: typeof AuthenticatedWorkoutsStatsRoute
   AuthenticatedDiaryIndexRoute: typeof AuthenticatedDiaryIndexRoute
   AuthenticatedRecipesIndexRoute: typeof AuthenticatedRecipesIndexRoute
   AuthenticatedWorkoutsIndexRoute: typeof AuthenticatedWorkoutsIndexRoute
@@ -823,6 +844,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedWeightImportRoute: AuthenticatedWeightImportRoute,
   AuthenticatedWorkoutsIdRoute: AuthenticatedWorkoutsIdRoute,
   AuthenticatedWorkoutsHistoryRoute: AuthenticatedWorkoutsHistoryRoute,
+  AuthenticatedWorkoutsStatsRoute: AuthenticatedWorkoutsStatsRoute,
   AuthenticatedDiaryIndexRoute: AuthenticatedDiaryIndexRoute,
   AuthenticatedRecipesIndexRoute: AuthenticatedRecipesIndexRoute,
   AuthenticatedWorkoutsIndexRoute: AuthenticatedWorkoutsIndexRoute,
@@ -857,6 +879,7 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
 
 import type { getRouter } from './router.tsx'
 import type { startInstance } from './start.ts'
