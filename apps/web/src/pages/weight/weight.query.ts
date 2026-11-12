@@ -16,6 +16,7 @@ export function useSaveWeightMutation() {
         }),
         title: t({ en: 'Could not save weight', pl: 'Nie udało się zapisać wagi' }),
       },
+      success: { title: t({ en: 'Weight saved', pl: 'Zapisano wagę' }) },
     },
     mutationFn: saveWeight,
   });

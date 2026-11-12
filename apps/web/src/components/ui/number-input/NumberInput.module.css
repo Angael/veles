@@ -69,6 +69,24 @@ label:has(.root[data-required]) > span:first-child::after {
   }
 }
 
+.withSuffix {
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) auto;
+
+  .input {
+    padding-right: 0.3em;
+    text-align: right;
+  }
+}
+
+.suffix {
+  display: flex;
+  align-items: center;
+  color: var(--c-muted);
+  font-size: var(--input-font-size);
+  cursor: text;
+  user-select: none;
+}
+
 .stepper {
   display: inline-flex;
   align-items: center;

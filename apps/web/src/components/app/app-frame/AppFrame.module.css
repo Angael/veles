@@ -81,6 +81,13 @@
   }
 }
 
+.headerEnd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
 .logoLink {
   display: inline-flex;
   width: clamp(7.5rem, 14vw, 10rem);
