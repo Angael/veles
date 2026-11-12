@@ -34,12 +34,13 @@ export async function getFoodImageAssets(ids: Array<string | null | undefined>) 
 export async function prepareFoodImage(
   file: File,
   userId: string | null,
+  maxSide?: number,
 ): Promise<PreparedFoodImage> {
   if (file.size <= 0 || file.size > FOOD_IMAGE_MAX_BYTES) {
     throw new Error('Food image must be no larger than 10 MiB.');
   }
 
-  const optimized = await optimizeImage(file);
+  const optimized = await optimizeImage(file, maxSide);
   const id = randomUUID();
   const key = `food-images/${randomUUID()}.webp`;
   const { bucketName } = getStorageConfig();
@@ -48,7 +49,6 @@ export async function prepareFoodImage(
     body: optimized.buffer,
     contentType: optimized.type,
     key,
-    bucket: 'public',
   });
 
   return {
@@ -65,7 +65,7 @@ export async function prepareFoodImage(
 }
 
 export async function deletePreparedFoodImage(image: PreparedFoodImage) {
-  await deleteFileByKey(image.key, 'public');
+  await deleteFileByKey(image.key);
 }
 
 /** Uploads the photo only when the action replaces the image; keep and remove upload nothing. */

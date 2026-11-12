@@ -1,0 +1,9 @@
+.popup {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.camera {
+  display: grid;
+  height: min(22rem, 50dvh);
+}

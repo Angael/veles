@@ -22,6 +22,7 @@ export type FoodShareRecipient = {
 };
 
 export type ReceivedFoodLogShare = {
+  date: string;
   id: string;
   items: ReceivedFoodLogShareItem[];
   senderName: string;
@@ -72,6 +73,7 @@ function scaleSharedLog<T extends SharedFoodLogValues>(
 }
 
 const shareFoodLogsInputType = type({
+  date: dateOnlyType,
   items: type({ logId: 'string.uuid', grams: '0 < number <= 100000 | null' })
     .array()
     .atLeastLength(1)
@@ -80,8 +82,8 @@ const shareFoodLogsInputType = type({
 });
 
 /**
- * Offers the sender's selected logs to each connected recipient. Only the chosen grams are stored;
- * values are read from the live log, so deleting it withdraws the item from pending shares.
+ * Offers the sender's selected logs to each connected recipient for one diary day. Each item stores its own copy of
+ * the log at the chosen grams, so later edits or deletes of the original cannot change the share.
  */
 export const shareFoodLogs = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('shareFoodLogs')])
@@ -103,7 +105,7 @@ export const shareFoodLogs = createServerFn({ method: 'POST' })
 
     const gramsByLogId = new Map(data.items.map((item) => [item.logId, item.grams]));
     const logs = await db
-      .select({ id: foodLogs.id, gramsHundredths: foodLogs.gramsHundredths })
+      .select()
       .from(foodLogs)
       .where(
         and(inArray(foodLogs.id, [...gramsByLogId.keys()]), eq(foodLogs.userId, session.user.id)),
@@ -123,6 +125,7 @@ export const shareFoodLogs = createServerFn({ method: 'POST' })
         .insert(foodLogShares)
         .values(
           recipientUserIds.map((recipientUserId) => ({
+            logDate: data.date,
             recipientUserId,
             senderUserId: session.user.id,
           })),
@@ -133,11 +136,17 @@ export const shareFoodLogs = createServerFn({ method: 'POST' })
         shares.flatMap((share) =>
           logs.map((logEntry) => {
             const grams = gramsByLogId.get(logEntry.id) ?? null;
+            const shared = scaleSharedLog(logEntry, grams === null ? null : toHundredths(grams));
             return {
               shareId: share.id,
-              foodLogId: logEntry.id,
-              gramsHundredths:
-                logEntry.gramsHundredths && grams !== null ? toHundredths(grams) : null,
+              productId: shared.productId,
+              imageUploadObjectId: shared.imageUploadObjectId,
+              name: shared.name,
+              gramsHundredths: shared.gramsHundredths,
+              kcalHundredths: shared.kcalHundredths,
+              proteinHundredths: shared.proteinHundredths,
+              fatHundredths: shared.fatHundredths,
+              carbsHundredths: shared.carbsHundredths,
             };
           }),
         ),
@@ -153,39 +162,42 @@ export const getReceivedFoodLogShares = createServerFn({ method: 'GET' })
     const rows = await db
       .select({
         item: foodLogShareItems,
-        logEntry: foodLogs,
         productImageUploadObjectId: foodProducts.imageUploadObjectId,
         productSeedKey: foodProducts.seedKey,
         senderName: users.name,
+        shareDate: foodLogShares.logDate,
         shareId: foodLogShares.id,
       })
       .from(foodLogShares)
       .innerJoin(users, eq(users.id, foodLogShares.senderUserId))
       .innerJoin(foodLogShareItems, eq(foodLogShareItems.shareId, foodLogShares.id))
-      .innerJoin(foodLogs, eq(foodLogs.id, foodLogShareItems.foodLogId))
-      .leftJoin(foodProducts, eq(foodProducts.id, foodLogs.productId))
+      .leftJoin(foodProducts, eq(foodProducts.id, foodLogShareItems.productId))
       .where(eq(foodLogShares.recipientUserId, session.user.id))
       .orderBy(desc(foodLogShares.createdAt), asc(foodLogShareItems.id));
 
     const assetsById = await getFoodImageAssets(
-      rows.map((row) => row.logEntry.imageUploadObjectId ?? row.productImageUploadObjectId),
+      rows.map((row) => row.item.imageUploadObjectId ?? row.productImageUploadObjectId),
     );
     const sharesById = new Map<string, ReceivedFoodLogShare>();
 
     for (const row of rows) {
-      const { item, logEntry, productImageUploadObjectId, senderName, shareId } = row;
-      const shared = scaleSharedLog(logEntry, item.gramsHundredths);
-      const asset = assetsById.get(shared.imageUploadObjectId ?? productImageUploadObjectId ?? '');
-      const share = sharesById.get(shareId) ?? { id: shareId, items: [], senderName };
+      const { item, productImageUploadObjectId, senderName, shareDate, shareId } = row;
+      const asset = assetsById.get(item.imageUploadObjectId ?? productImageUploadObjectId ?? '');
+      const share = sharesById.get(shareId) ?? {
+        date: shareDate,
+        id: shareId,
+        items: [],
+        senderName,
+      };
       sharesById.set(shareId, share);
       share.items.push({
         id: item.id,
-        name: shared.name,
-        grams: fromHundredths(shared.gramsHundredths),
-        kcal: shared.kcalHundredths / HUNDREDTHS,
-        protein: fromHundredths(shared.proteinHundredths),
-        fat: fromHundredths(shared.fatHundredths),
-        carbs: fromHundredths(shared.carbsHundredths),
+        name: item.name,
+        grams: fromHundredths(item.gramsHundredths),
+        kcal: item.kcalHundredths / HUNDREDTHS,
+        protein: fromHundredths(item.proteinHundredths),
+        fat: fromHundredths(item.fatHundredths),
+        carbs: fromHundredths(item.carbsHundredths),
         imageUrl: asset ? storagePathToUrl(asset.key) : null,
         category: foodProductCategory(row.productSeedKey),
       });
@@ -194,15 +206,15 @@ export const getReceivedFoodLogShares = createServerFn({ method: 'GET' })
     return [...sharesById.values()];
   });
 
-const acceptFoodLogShareInputType = type({ date: dateOnlyType, id: 'string.uuid' });
+const foodLogShareIdInputType = type({ id: 'string.uuid' });
 
 /**
- * Copies a pending share into the recipient's diary on the chosen date. Deleting the share before
+ * Copies a pending share into the recipient's diary on the day the sender chose. Deleting the share before
  * inserting logs makes concurrent accepts fail instead of adding the products twice.
  */
 export const acceptFoodLogShare = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('acceptFoodLogShare')])
-  .validator(arkTypeValidator(acceptFoodLogShareInputType))
+  .validator(arkTypeValidator(foodLogShareIdInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
     const shareOwnedByRecipient = and(
@@ -212,10 +224,9 @@ export const acceptFoodLogShare = createServerFn({ method: 'POST' })
 
     await db.transaction(async (tx) => {
       const items = await tx
-        .select({ item: foodLogShareItems, logEntry: foodLogs })
+        .select({ item: foodLogShareItems, logDate: foodLogShares.logDate })
         .from(foodLogShareItems)
         .innerJoin(foodLogShares, eq(foodLogShares.id, foodLogShareItems.shareId))
-        .innerJoin(foodLogs, eq(foodLogs.id, foodLogShareItems.foodLogId))
         .where(shareOwnedByRecipient)
         .orderBy(asc(foodLogShareItems.id));
       const deleted = await tx
@@ -234,27 +245,22 @@ export const acceptFoodLogShare = createServerFn({ method: 'POST' })
 
       const consumedAt = new Date();
       await tx.insert(foodLogs).values(
-        items.map(({ item, logEntry }) => {
-          const shared = scaleSharedLog(logEntry, item.gramsHundredths);
-          return {
-            userId: session.user.id,
-            productId: shared.productId,
-            imageUploadObjectId: shared.imageUploadObjectId,
-            name: shared.name,
-            gramsHundredths: shared.gramsHundredths,
-            kcalHundredths: shared.kcalHundredths,
-            proteinHundredths: shared.proteinHundredths,
-            fatHundredths: shared.fatHundredths,
-            carbsHundredths: shared.carbsHundredths,
-            logDate: data.date,
-            consumedAt,
-          };
-        }),
+        items.map(({ item, logDate }) => ({
+          userId: session.user.id,
+          productId: item.productId,
+          imageUploadObjectId: item.imageUploadObjectId,
+          name: item.name,
+          gramsHundredths: item.gramsHundredths,
+          kcalHundredths: item.kcalHundredths,
+          proteinHundredths: item.proteinHundredths,
+          fatHundredths: item.fatHundredths,
+          carbsHundredths: item.carbsHundredths,
+          logDate,
+          consumedAt,
+        })),
       );
     });
   });
-
-const foodLogShareIdInputType = type({ id: 'string.uuid' });
 
 /** Discards a pending share addressed to the signed-in user. */
 export const declineFoodLogShare = createServerFn({ method: 'POST' })

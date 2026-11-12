@@ -1,18 +1,13 @@
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { and, desc, eq, sql } from 'drizzle-orm';
-import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db/schema';
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
-import { getLocale } from '@/lib/i18n/getLocale';
-import { floorDuration } from './metrics';
-import { workoutName } from './workoutName';
 import {
   autoFinishIdleWorkouts,
-  exerciseNamesBySession,
-  setSecondsSql,
+  listWorkoutSummaries,
   loadWorkoutSession,
+  type WorkoutSummary,
 } from './workouts.server';
 import {
   deleteWorkoutRecord,
@@ -25,63 +20,12 @@ import {
   workoutIdType,
 } from './workouts.validation';
 
-export type WorkoutSummary = {
-  id: string;
-  name: string;
-  date: string;
-  startedAt: string | null;
-  endedAt: string | null;
-  /** Finished duration, floored at time entered on sets. Null while open. */
-  durationSeconds: number | null;
-  exerciseCount: number;
-  doneSets: number;
-  volumeKg: number;
-};
-
 export const getWorkouts = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getWorkouts')])
   .handler(async (): Promise<WorkoutSummary[]> => {
     const session = await requireSession();
     await autoFinishIdleWorkouts(db, session.user.id);
-    const done = sql`${workoutSets.completedAt} IS NOT NULL`;
-    const rows = await db
-      .select({
-        setSeconds: setSecondsSql,
-        date: workoutSessions.date,
-        doneSets: sql<number>`count(${workoutSets.id}) FILTER (WHERE ${done})::int`,
-        endedAt: workoutSessions.endedAt,
-        exerciseCount: sql<number>`count(DISTINCT ${workoutSessionExercises.id})::int`,
-        id: workoutSessions.id,
-        name: workoutSessions.name,
-        startedAt: workoutSessions.startedAt,
-        volumeGrams: sql<number>`coalesce(sum(${workoutSets.weightGrams}::bigint * ${workoutSets.reps}) FILTER (WHERE ${done}), 0)::float8`,
-      })
-      .from(workoutSessions)
-      .leftJoin(workoutSessionExercises, eq(workoutSessionExercises.sessionId, workoutSessions.id))
-      .leftJoin(workoutSets, eq(workoutSets.sessionExerciseId, workoutSessionExercises.id))
-      .where(and(eq(workoutSessions.userId, session.user.id)))
-      .groupBy(workoutSessions.id)
-      .orderBy(desc(workoutSessions.date), desc(workoutSessions.id))
-      .limit(200);
-    const exerciseNames = await exerciseNamesBySession(rows.map((row) => row.id));
-
-    const locale = getLocale();
-    return rows.map((row) => ({
-      date: row.date,
-      doneSets: row.doneSets,
-      durationSeconds: row.endedAt
-        ? floorDuration(
-            row.startedAt ? (row.endedAt.getTime() - row.startedAt.getTime()) / 1000 : null,
-            row.setSeconds,
-          )
-        : null,
-      endedAt: row.endedAt?.toISOString() ?? null,
-      exerciseCount: row.exerciseCount,
-      id: row.id,
-      name: workoutName(row, exerciseNames.get(row.id) ?? [], locale),
-      startedAt: row.startedAt?.toISOString() ?? null,
-      volumeKg: Math.round(row.volumeGrams / 1_000),
-    }));
+    return listWorkoutSummaries(session.user.id);
   });
 
 export const getWorkoutSession = createServerFn({ method: 'GET' })

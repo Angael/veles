@@ -1,5 +1,6 @@
 import { queryOptions, useMutation } from '@tanstack/react-query';
 import { toastManager } from '@/components/ui/toast/toastManager';
+import type { FoodProductUnit } from '@veles/db/seed/food-products';
 import { todayLocalDate } from '@/lib/dateOnly';
 import {
   copyFoodLogs,
@@ -23,7 +24,8 @@ import { type I18n, useI18n } from '@/lib/i18n/I18nProvider';
 
 export const calorieDashboardKey = ['calorie-dashboard'] as const;
 const calorieFoodKey = ['calorie-food'] as const;
-const calorieFoodsKey = ['calorie-foods'] as const;
+// Nested so every food log change also refreshes the foods' last-logged order.
+const calorieFoodsKey = [...calorieDashboardKey, 'foods'] as const;
 
 type DeleteFoodLogVariables = {
   date: string;
@@ -73,6 +75,7 @@ type FoodProductVariables = ImageFields & {
   barcode?: string;
   name: string;
   productSizeGrams?: number;
+  unit?: FoodProductUnit;
   kcalPer100g: number;
   proteinPer100g?: number;
   fatPer100g?: number;
@@ -213,9 +216,14 @@ export function useCopyFoodLogsMutation() {
 
 export function useRecordFoodMutation() {
   return useMutation({
-    meta: { invalidateQueryKey: calorieDashboardKey },
     mutationFn: (variables: RecordFoodVariables) =>
       recordFood({ data: toMultipartFormData({ ...variables }) }),
+    // The foods list changes too: the diary's search ranks by last logged time.
+    onSuccess: (_data, _variables, _onMutateResult, context) =>
+      Promise.all([
+        context.client.invalidateQueries({ queryKey: calorieDashboardKey }),
+        context.client.invalidateQueries({ queryKey: calorieFoodsKey }),
+      ]),
   });
 }
 

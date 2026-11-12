@@ -4,7 +4,11 @@ import { createMiddleware, createServerFn } from '@tanstack/react-start';
 import { and, desc, eq, gte, inArray, lte } from 'drizzle-orm';
 import { dateOnlyType } from '@/lib/dateOnly';
 import { calorieDayNotes, calorieGoals, foodLogs, foodProducts } from '@veles/db/schema';
-import { foodProductCategory, type FoodProductCategory } from '@veles/db/seed/food-products';
+import {
+  foodProductCategory,
+  type FoodProductCategory,
+  type FoodProductUnit,
+} from '@veles/db/seed/food-products';
 import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
@@ -36,6 +40,7 @@ import {
 import {
   createFoodProductRecord,
   lookupFoodByBarcodeRecord,
+  getLastLoggedAtByProduct,
   toFoodProduct,
   updateFoodProductRecord,
 } from './foodProducts.server';
@@ -43,22 +48,24 @@ import { translate } from '@/lib/i18n/getLocale';
 
 const FOOD_UPLOAD_MAX_REQUEST_BYTES = 12 * 1024 * 1024;
 
-const nonEmptyPhotoType = type('File').narrow((photo, ctx) =>
+export const nonEmptyPhotoType = type('File').narrow((photo, ctx) =>
   photo.size > 0 ? true : ctx.mustBe('a non-empty file'),
 );
 const foodLogIdInputType = type({ id: 'string.uuid' });
 
-const limitFoodUploadRequestMiddleware = createMiddleware().server(async ({ next, request }) => {
-  const contentLength = type('string.numeric.parse |> number.integer >= 0')(
-    request.headers.get('content-length') ?? '',
-  );
-  if (contentLength instanceof type.errors || contentLength > FOOD_UPLOAD_MAX_REQUEST_BYTES) {
-    throw new ClientSafeError(
-      translate({ en: 'Upload request is too large.', pl: 'Przesyłane dane są za duże.' }),
+export const limitFoodUploadRequestMiddleware = createMiddleware().server(
+  async ({ next, request }) => {
+    const contentLength = type('string.numeric.parse |> number.integer >= 0')(
+      request.headers.get('content-length') ?? '',
     );
-  }
-  return next();
-});
+    if (contentLength instanceof type.errors || contentLength > FOOD_UPLOAD_MAX_REQUEST_BYTES) {
+      throw new ClientSafeError(
+        translate({ en: 'Upload request is too large.', pl: 'Przesyłane dane są za duże.' }),
+      );
+    }
+    return next();
+  },
+);
 
 type LogProduct = { imageUploadObjectId: string | null; seedKey: string | null };
 
@@ -218,10 +225,14 @@ export type CalorieFood = {
   imageUrl: string | null;
   category: FoodProductCategory | null;
   productSizeGrams: number | null;
+  /** What one `productSizeGrams` is; always resolved, "package" when nothing more fitting is known. */
+  unit: FoodProductUnit;
   kcalPer100g: number;
   proteinPer100g: number | null;
   fatPer100g: number | null;
   carbsPer100g: number | null;
+  /** ISO time of the current user's latest log of this food; only set by the foods list. */
+  lastLoggedAt?: string | null;
 };
 
 export type CalorieGoal = {
@@ -258,11 +269,17 @@ export type CalorieTotals = {
 export const getFoodProducts = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getFoodProducts')])
   .handler(async () => {
-    await requireSession();
+    const session = await requireSession();
 
-    const foods = await db.select().from(foodProducts).orderBy(desc(foodProducts.updatedAt));
+    const [foods, lastLoggedAtById] = await Promise.all([
+      db.select().from(foodProducts).orderBy(desc(foodProducts.updatedAt)),
+      getLastLoggedAtByProduct(session.user.id),
+    ]);
     const assetsById = await getFoodImageAssets(foods.map((food) => food.imageUploadObjectId));
-    return foods.map((food) => toFoodProduct(food, assetsById.get(food.imageUploadObjectId ?? '')));
+    return foods.map((food) => ({
+      ...toFoodProduct(food, assetsById.get(food.imageUploadObjectId ?? '')),
+      lastLoggedAt: lastLoggedAtById.get(food.id) ?? null,
+    }));
   });
 
 export const getFoodProduct = createServerFn({ method: 'GET' })

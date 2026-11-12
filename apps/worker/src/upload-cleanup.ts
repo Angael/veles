@@ -1,13 +1,15 @@
 import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import type { createDatabaseConnection } from '@veles/db';
 import {
+  foodLogShareItems,
   foodLogs,
+  foodPhotoScans,
   foodProducts,
   recipeImages,
   uploadObjects,
   weightEntryPhotos,
 } from '@veles/db/schema';
-import { and, asc, eq, gt, notExists } from 'drizzle-orm';
+import { and, asc, eq, gt, notExists, sql } from 'drizzle-orm';
 import { errorMessage } from './job.ts';
 
 type Database = ReturnType<typeof createDatabaseConnection>['db'];
@@ -35,6 +37,18 @@ function unusedUploadCondition(db: Pick<Database, 'select'>) {
         .select({ id: foodLogs.id })
         .from(foodLogs)
         .where(eq(foodLogs.imageUploadObjectId, uploadObjects.id)),
+    ),
+    notExists(
+      db
+        .select({ id: foodPhotoScans.id })
+        .from(foodPhotoScans)
+        .where(sql`${uploadObjects.id} = any(${foodPhotoScans.photoUploadObjectIds})`),
+    ),
+    notExists(
+      db
+        .select({ id: foodLogShareItems.id })
+        .from(foodLogShareItems)
+        .where(eq(foodLogShareItems.imageUploadObjectId, uploadObjects.id)),
     ),
     notExists(
       db

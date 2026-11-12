@@ -17,7 +17,7 @@
 ## CI/CD
 - Avoid GitHub Actions and GitHub CI/CD for sensitive prod workflows; this repo is public
 - Pushing to `main` makes Dokploy pull, install, and deploy to prod
-- Never run Drizzle commands yourself; leave them to the human user
+- Never run Drizzle commands yourself; leave them to the human user. Exception: the `sync` skill (`sync down` / `sync up`) runs `db:generate`, `db:reset` and `db:migrate:prod` when the user invokes it.
 - DB migrations need to be run before pushing/merging to `main`
 - Static branch `pr-assets` hosts images for PRs and issues. Clean it periodically (ensure assets are unused).
 
@@ -69,6 +69,7 @@
 - Prefer css modules, prefer syntax `import css from ...`
 - In css modules, prefer nested selectors when it keeps related styles together.
 - This app uses css reset and theme.css
+- Target phones: Samsung Galaxy S20 FE (412 × 914 CSS px) and Galaxy S21+ (384 × 854). Phone layouts must fit 384px wide in both English and Polish.
 - Shared responsive breakpoints live in `apps/web/src/styles/breakpoints.css`; use its custom media names instead of repeating raw width queries.
 - Respect the css reset first: margins for text blocks, base font inheritance, and default line-height are already normalized there, so only restyle them when a component intentionally needs to diverge.
 - All user-facing copy needs both English and Polish translations.

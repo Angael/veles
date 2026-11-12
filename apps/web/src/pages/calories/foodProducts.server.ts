@@ -1,10 +1,11 @@
-import { and, eq, inArray, isNotNull, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNotNull, max, sql } from 'drizzle-orm';
 import { foodLogs, foodProducts, uploadObjects } from '@veles/db/schema';
-import { foodProductCategory } from '@veles/db/seed/food-products';
+import { foodProductCategory, foodProductUnit } from '@veles/db/seed/food-products';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { fromHundredths, HUNDREDTHS, optionalHundredths, toHundredths } from '@/lib/nutrition';
 import { db } from '@/server/db.server';
 import { downloadFile } from '@/server/downloadFile.server';
+import { IMAGE_MAX_INPUT_BYTES } from '@/lib/storage/imageLimits';
 import { storagePathToUrl } from '@/server/storage/config.server';
 import type { CalorieFood } from './calories.api';
 import type {
@@ -29,6 +30,7 @@ function productValues(data: typeof createFoodProductValuesType.infer) {
     name: data.name.trim(),
     barcode: data.barcode?.trim() ?? null,
     productSizeGramsHundredths: optionalHundredths(data.productSizeGrams),
+    unit: data.unit ?? null,
     kcalPer100gHundredths: toHundredths(data.kcalPer100g),
     proteinPer100gHundredths: optionalHundredths(data.proteinPer100g),
     fatPer100gHundredths: optionalHundredths(data.fatPer100g),
@@ -48,11 +50,27 @@ export function toFoodProduct(
     imageUrl: asset ? storagePathToUrl(asset.key) : null,
     category: foodProductCategory(product.seedKey),
     productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
+    unit: foodProductUnit(product.unit, product.seedKey),
     kcalPer100g: product.kcalPer100gHundredths / HUNDREDTHS,
     proteinPer100g: fromHundredths(product.proteinPer100gHundredths),
     fatPer100g: fromHundredths(product.fatPer100gHundredths),
     carbsPer100g: fromHundredths(product.carbsPer100gHundredths),
   };
+}
+
+/** Aggregates in the DB so the browser gets one last-use time per food, not the log history. */
+export async function getLastLoggedAtByProduct(userId: string) {
+  const rows = await db
+    .select({ productId: foodLogs.productId, lastLoggedAt: max(foodLogs.consumedAt) })
+    .from(foodLogs)
+    .where(and(eq(foodLogs.userId, userId), isNotNull(foodLogs.productId)))
+    .groupBy(foodLogs.productId);
+
+  const lastLoggedAtById = new Map<string, string>();
+  for (const { productId, lastLoggedAt } of rows) {
+    if (productId && lastLoggedAt) lastLoggedAtById.set(productId, lastLoggedAt.toISOString());
+  }
+  return lastLoggedAtById;
 }
 
 async function withImage(product: typeof foodProducts.$inferSelect) {
@@ -77,7 +95,10 @@ async function insertImportedFoodProduct(product: OpenFoodFactsProduct) {
   let image: PreparedFoodImage | null = null;
   if (product.imageUrl) {
     try {
-      image = await prepareFoodImage(await downloadFile(product.imageUrl), null);
+      image = await prepareFoodImage(
+        await downloadFile(product.imageUrl, IMAGE_MAX_INPUT_BYTES),
+        null,
+      );
     } catch {}
   }
   try {

@@ -1,0 +1,129 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  animation: row-in 0.4s var(--ease-out);
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes row-in {
+  from {
+    opacity: 0;
+    translate: 0 -0.5rem;
+  }
+}
+
+.media {
+  position: relative;
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  overflow: hidden;
+  border-radius: var(--space-xs);
+}
+
+.thumb {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  color: var(--c-muted);
+}
+
+.text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.sparkle {
+  flex: none;
+  color: var(--c-accent);
+  animation: twinkle 1.4s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes twinkle {
+  50% {
+    opacity: 0.45;
+    scale: 0.82;
+    rotate: 12deg;
+  }
+}
+
+.row[data-working] {
+  & .media::after {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 45%;
+    background: linear-gradient(transparent, var(--c-accent));
+    content: '';
+    opacity: 0.55;
+    animation: beam 1.6s ease-in-out infinite alternate;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+      opacity: 0.2;
+    }
+  }
+
+  & .title {
+    background: linear-gradient(
+        100deg,
+        var(--c-text-strong) 35%,
+        var(--c-accent) 50%,
+        var(--c-text-strong) 65%
+      )
+      0 0 / 250% 100%;
+    background-clip: text;
+    color: transparent;
+    animation: sheen 2.2s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+@keyframes beam {
+  from {
+    translate: 0 -100%;
+  }
+
+  to {
+    translate: 0 225%;
+  }
+}
+
+@keyframes sheen {
+  from {
+    background-position: 125% 0;
+  }
+
+  to {
+    background-position: -125% 0;
+  }
+}

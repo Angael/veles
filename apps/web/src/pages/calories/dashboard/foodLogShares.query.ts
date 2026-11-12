@@ -38,6 +38,7 @@ export function useShareFoodLogsMutation() {
       },
     },
     mutationFn: (data: {
+      date: string;
       items: { grams: number | null; logId: string }[];
       recipientUserIds: string[];
     }) => shareFoodLogs({ data }),
@@ -56,7 +57,7 @@ export function useAcceptFoodLogShareMutation() {
         }),
       },
     },
-    mutationFn: (data: { date: string; id: string }) => acceptFoodLogShare({ data }),
+    mutationFn: (id: string) => acceptFoodLogShare({ data: { id } }),
     // Settled, not success: a share accepted elsewhere must disappear here too.
     onSettled: (_data, _error, _variables, _onMutateResult, context) =>
       Promise.all([

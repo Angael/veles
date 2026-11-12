@@ -1,5 +1,15 @@
 // This component catalog may remain intentionally long; keep all component demos together rather than splitting it needlessly.
-import { CopyPlusIcon, PlusIcon, SearchIcon, SendIcon, Trash2Icon } from 'lucide-react';
+import {
+  CalendarArrowUpIcon,
+  ChefHatIcon,
+  CopyIcon,
+  CopyPlusIcon,
+  PlusIcon,
+  ScalingIcon,
+  SearchIcon,
+  SendIcon,
+  Trash2Icon,
+} from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Btn, type BtnSize, type BtnVariant } from '@/components/ui/btn/Btn';
@@ -41,7 +51,7 @@ import { Navbar } from '@/components/app/navbar/Navbar';
 import { NotFound } from '@/components/app/not-found/NotFound';
 import { PillBtn } from '@/components/ui/pill-btn/PillBtn';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
-import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
+import { SeamlessSingleLineTextarea } from '@/components/ui/seamless-single-line-textarea/SeamlessSingleLineTextarea';
 import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import { SelectInput } from '@/components/ui/select-input/SelectInput';
 import { Skeleton } from '@/components/ui/skeleton/Skeleton';
@@ -55,6 +65,7 @@ import { Toggle } from '@/components/ui/toggle/Toggle';
 import { Tooltip } from '@/components/ui/tooltip/Tooltip';
 import css from './ComponentsDemoPage.module.css';
 import { PhotosFieldDemo } from './PhotosFieldDemo';
+import { TabsDemo } from './TabsDemo';
 import { AutocompleteDemo } from './AutocompleteDemo';
 import { ScrubDemo } from './ScrubDemo';
 import { CameraDemo } from './CameraDemo';
@@ -327,6 +338,7 @@ export function ComponentsDemoPage() {
       </section>
 
       <PhotosFieldDemo />
+      <TabsDemo />
       <CameraDemo />
 
       <section>
@@ -450,7 +462,10 @@ export function ComponentsDemoPage() {
       <section>
         <h2>Seamless fields</h2>
         <Card className={css.seamlessCard}>
-          <SeamlessTextInput aria-label='Demo seamless title' defaultValue='Editable card title' />
+          <SeamlessSingleLineTextarea
+            aria-label='Demo seamless wrapping title'
+            defaultValue='Long title that wraps visually but stays one line when saved'
+          />
           <SeamlessTextarea
             aria-label='Demo seamless description'
             defaultValue='These controls inherit the surrounding surface instead of drawing their own.'
@@ -494,6 +509,20 @@ export function ComponentsDemoPage() {
         >
           Show toast
         </Btn>
+        <Btn
+          onClick={() =>
+            toastManager.add({
+              actionProps: { children: 'Refresh', onClick: () => window.location.reload() },
+              description: 'Refresh the page to use the latest version.',
+              timeout: 0,
+              title: 'New version available',
+            })
+          }
+          type='button'
+          variant='outlineMain'
+        >
+          Show toast with action
+        </Btn>
       </section>
 
       {demoSelecting ? (
@@ -501,14 +530,23 @@ export function ComponentsDemoPage() {
           aria-label='Selected demo items'
           count={3}
           onClear={() => setDemoSelecting(false)}
+          primaryAction={
+            <SelectionBarAction icon={<SendIcon aria-hidden='true' />} label='Share' primary />
+          }
         >
-          <SelectionBarAction icon={<CopyPlusIcon aria-hidden='true' />} label='Multiply' />
+          <SelectionBarAction icon={<ScalingIcon aria-hidden='true' />} label='Multiply' />
+          <SelectionBarAction icon={<CalendarArrowUpIcon aria-hidden='true' />} label='Move' />
+          <SelectionBarAction icon={<CopyIcon aria-hidden='true' />} label='Copy' />
+          <SelectionBarAction
+            icon={<ChefHatIcon aria-hidden='true' />}
+            label='Create recipe'
+            phoneLabel='Recipe'
+          />
           <SelectionBarAction
             icon={<Trash2Icon aria-hidden='true' />}
             label='Delete'
             variant='ghostDanger'
           />
-          <SelectionBarAction icon={<SendIcon aria-hidden='true' />} label='Share' primary />
         </SelectionBar>
       ) : (
         <FloatingButton

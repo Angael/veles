@@ -51,8 +51,8 @@ export const homeFeatures: HomeFeature[] = [
     icon: FlameIcon,
     title: { en: 'Food logging', pl: 'Dziennik jedzenia' },
     description: {
-      en: 'Log meals, scan barcodes, and track calories and macros against your goals.',
-      pl: 'Zapisuj posiłki, skanuj kody kreskowe i śledź kalorie oraz makroskładniki względem celów.',
+      en: 'Log meals, scan barcodes, snap package photos for AI to read, and track calories and macros against your goals.',
+      pl: 'Zapisuj posiłki, skanuj kody kreskowe, rób zdjęcia opakowań do odczytu przez AI i śledź kalorie oraz makroskładniki względem celów.',
     },
     to: '/calories',
   },
@@ -91,8 +91,8 @@ export const homeFeatures: HomeFeature[] = [
     icon: DumbbellIcon,
     title: { en: 'Workouts', pl: 'Treningi' },
     description: {
-      en: 'Log sessions and sets, reuse routines, and review your training history.',
-      pl: 'Zapisuj treningi i serie, korzystaj z planów i przeglądaj historię treningów.',
+      en: 'Log sessions and sets, reuse routines, and replay your year: favourite exercises, days, and streaks.',
+      pl: 'Zapisuj treningi i serie, korzystaj z planów i przeglądaj podsumowanie roku: ulubione ćwiczenia, dni i regularność.',
     },
     to: '/workouts',
   },

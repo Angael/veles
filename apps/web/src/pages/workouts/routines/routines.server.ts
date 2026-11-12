@@ -8,6 +8,16 @@ import {
 } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db, type DbTransaction } from '@/server/db.server';
+
+/** Column changes shared by the app and agents: trimmed name and description, archive state. */
+function routineChanges(data: { name?: string; description?: string; archived?: boolean }) {
+  return {
+    ...(data.name?.trim() ? { name: data.name.trim() } : {}),
+    ...(data.description === undefined ? {} : { description: data.description.trim() }),
+    ...(data.archived === undefined ? {} : { archivedAt: data.archived ? new Date() : null }),
+    updatedAt: new Date(),
+  };
+}
 import {
   autoFinishIdleWorkouts,
   requireNoOpenWorkout,
@@ -36,7 +46,8 @@ export async function requireOwnedRoutine(tx: DbTransaction, userId: string, rou
 
 /**
  * Stores a session's shape in a routine: exercises in order and the set types of each. Values
- * are dropped on purpose; last time's numbers already show what to aim for.
+ * are dropped on purpose; last time's numbers already show what to aim for. Refuses an empty
+ * session, so a stale menu can never wipe a routine's plan.
  */
 export async function copySessionToRoutine(
   tx: DbTransaction,
@@ -48,7 +59,13 @@ export async function copySessionToRoutine(
     .from(workoutSessionExercises)
     .where(eq(workoutSessionExercises.sessionId, sessionId))
     .orderBy(asc(workoutSessionExercises.position));
-  if (slots.length === 0) return;
+  if (slots.length === 0)
+    throw new ClientSafeError(
+      translate({
+        en: 'Add an exercise before saving a routine.',
+        pl: 'Dodaj ćwiczenie przed zapisaniem planu.',
+      }),
+    );
 
   const sets = await tx
     .select({ slotId: workoutSets.sessionExerciseId, type: workoutSets.type })
@@ -187,11 +204,7 @@ export async function updateRoutineRecord(
     await requireOwnedRoutine(tx, userId, data.id);
     await tx
       .update(workoutRoutines)
-      .set({
-        ...(data.name?.trim() ? { name: data.name.trim() } : {}),
-        ...(data.description === undefined ? {} : { description: data.description.trim() }),
-        updatedAt: new Date(),
-      })
+      .set(routineChanges(data))
       .where(eq(workoutRoutines.id, data.id));
   });
 }
@@ -219,17 +232,18 @@ export async function saveRoutinePlanRecord(
       routineId = (await requireOwnedRoutine(tx, userId, data.id)).id;
       await tx
         .update(workoutRoutines)
-        .set({
-          ...(data.name?.trim() ? { name: data.name.trim() } : {}),
-          ...(data.description === undefined ? {} : { description: data.description.trim() }),
-          updatedAt: new Date(),
-        })
+        .set(routineChanges(data))
         .where(eq(workoutRoutines.id, routineId));
     } else {
       if (!data.name?.trim()) throw new ClientSafeError('A new routine needs a name.');
       const [created] = await tx
         .insert(workoutRoutines)
-        .values({ description: data.description?.trim() ?? '', name: data.name.trim(), userId })
+        .values({
+          archivedAt: data.archived ? new Date() : null,
+          description: data.description?.trim() ?? '',
+          name: data.name.trim(),
+          userId,
+        })
         .returning({ id: workoutRoutines.id });
       if (!created) throw new Error('Routine insert returned no row.');
       routineId = created.id;

@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { type QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { exerciseKeys } from '../exercises/exercises.query';
 import { updateExercise } from '../exercises/exercises.api';
@@ -24,6 +24,30 @@ export type SessionActions = ReturnType<typeof useSessionActions>;
 
 /** Typing pauses this long before a dragged value is sent, so a drag is one request. */
 const SAVE_DELAY_MS = 600;
+
+const sessionMutationKey = (workoutId: string) => ['workouts', 'session-mutation', workoutId];
+
+/** The open session page's "send waiting edits now", reachable from the task header. */
+const editFlushers = new Map<string, () => void>();
+
+/**
+ * Sends edits still waiting for their typing pause and waits for every session request in
+ * flight. Finish and routine saves read the sets on the server, so they call this first;
+ * otherwise a value typed a moment before would arrive after them.
+ */
+export async function settleSessionEdits(client: QueryClient, workoutId: string) {
+  editFlushers.get(workoutId)?.();
+  const mutationKey = sessionMutationKey(workoutId);
+  const idle = () => client.isMutating({ mutationKey }) === 0;
+  if (idle()) return;
+  await new Promise<void>((resolve) => {
+    const unsubscribe = client.getMutationCache().subscribe(() => {
+      if (!idle()) return;
+      unsubscribe();
+      resolve();
+    });
+  });
+}
 
 const mapSlots = (
   session: WorkoutSessionData,
@@ -62,7 +86,7 @@ function useSessionMutation<V>(
 ) {
   const { t } = useI18n();
   const queryKey = workoutKeys.session(workoutId);
-  const mutationKey = ['workouts', 'session-mutation', workoutId];
+  const mutationKey = sessionMutationKey(workoutId);
   return useMutation({
     meta: { error: { title: t(options.error) } },
     mutationFn: options.mutationFn,
@@ -169,11 +193,13 @@ export function useSessionActions(workoutId: string) {
   useEffect(() => {
     const onHide = () => document.visibilityState === 'hidden' && flushAll.current();
     document.addEventListener('visibilitychange', onHide);
+    editFlushers.set(workoutId, () => flushAll.current());
     return () => {
       document.removeEventListener('visibilitychange', onHide);
+      editFlushers.delete(workoutId);
       flushAll.current();
     };
-  }, []);
+  }, [workoutId]);
 
   return {
     addExercise: addExercise.mutate,
