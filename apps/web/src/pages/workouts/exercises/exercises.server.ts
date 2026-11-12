@@ -1,4 +1,4 @@
-import { and, asc, eq, ne, sql } from 'drizzle-orm';
+import { and, asc, type Column, eq, ne, sql, type Table } from 'drizzle-orm';
 import {
   workoutExercises,
   workoutRoutineExercises,
@@ -63,30 +63,40 @@ export type ExerciseLibraryEntry = {
   lastDate: string | null;
 };
 
+/** Table-qualified column for raw SQL. */
+function col(table: Table, column: Column) {
+  return sql`${table}.${sql.identifier(column.name)}`;
+}
+
 /**
  * Every exercise of the user, archived ones too, with usage counts. Subqueries keep the session
  * and routine counts from multiplying each other, as two joins would.
  */
 export async function listExerciseLibrary(userId: string): Promise<ExerciseLibraryEntry[]> {
+  // Drizzle drops table names from columns in a single-table select, so subqueries qualify them.
+  const exerciseId = col(workoutExercises, workoutExercises.id);
+  const sessionExerciseId = col(workoutSessionExercises, workoutSessionExercises.exerciseId);
+  const routineExerciseId = col(workoutRoutineExercises, workoutRoutineExercises.exerciseId);
   const rows = await db
     .select({
       archivedAt: workoutExercises.archivedAt,
       id: workoutExercises.id,
       lastDate: sql<string | null>`(
-        SELECT max(${workoutSessions.date})::text FROM ${workoutSessionExercises}
-        INNER JOIN ${workoutSessions} ON ${workoutSessions.id} = ${workoutSessionExercises.sessionId}
-        WHERE ${workoutSessionExercises.exerciseId} = ${workoutExercises.id}
+        SELECT max(${col(workoutSessions, workoutSessions.date)})::text FROM ${workoutSessionExercises}
+        INNER JOIN ${workoutSessions}
+          ON ${col(workoutSessions, workoutSessions.id)} = ${col(workoutSessionExercises, workoutSessionExercises.sessionId)}
+        WHERE ${sessionExerciseId} = ${exerciseId}
       )`,
       measure: workoutExercises.measure,
       name: workoutExercises.name,
       restSeconds: workoutExercises.restSeconds,
       routineCount: sql<number>`(
-        SELECT count(DISTINCT ${workoutRoutineExercises.routineId})::int FROM ${workoutRoutineExercises}
-        WHERE ${workoutRoutineExercises.exerciseId} = ${workoutExercises.id}
+        SELECT count(DISTINCT ${col(workoutRoutineExercises, workoutRoutineExercises.routineId)})::int
+        FROM ${workoutRoutineExercises} WHERE ${routineExerciseId} = ${exerciseId}
       )`,
       sessionCount: sql<number>`(
-        SELECT count(DISTINCT ${workoutSessionExercises.sessionId})::int FROM ${workoutSessionExercises}
-        WHERE ${workoutSessionExercises.exerciseId} = ${workoutExercises.id}
+        SELECT count(DISTINCT ${col(workoutSessionExercises, workoutSessionExercises.sessionId)})::int
+        FROM ${workoutSessionExercises} WHERE ${sessionExerciseId} = ${exerciseId}
       )`,
     })
     .from(workoutExercises)
