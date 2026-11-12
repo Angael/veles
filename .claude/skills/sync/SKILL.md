@@ -1,7 +1,6 @@
 ---
 name: sync
 description: Manual PR sync flow. "sync down" = merge main, regenerate migrations, db:reset, check:fix, push, verify PR. "sync up" = sync down + migrate prod DB + squash-merge PR. Use only when the user says "sync down" or "sync up".
-disable-model-invocation: true
 argument-hint: down | up
 ---
 
