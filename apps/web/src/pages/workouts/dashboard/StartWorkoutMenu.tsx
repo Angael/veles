@@ -22,13 +22,14 @@ import { pluralEn, pluralPl } from '@/lib/i18n/locale';
 /**
  * Floating button whose only job is getting into a workout. While one is open it continues that
  * workout. Otherwise it offers an empty workout or a routine, and either choice starts right away.
- * Without routines there is nothing to choose, so it starts an empty workout directly.
+ * Archived routines are left out. Without routines there is nothing to choose, so it starts an empty workout directly.
  */
 export function StartWorkoutMenu({ active }: { active: WorkoutSummary | undefined }) {
   const { t } = useI18n();
   const navigate = useNavigate();
   const today = useTodayLocalDate();
-  const { data: routines } = useSuspenseQuery(routinesQueryOptions());
+  const { data: allRoutines } = useSuspenseQuery(routinesQueryOptions());
+  const routines = allRoutines.filter((routine) => !routine.archived);
   const startWorkout = useStartWorkoutMutation();
   const startRoutine = useStartRoutineMutation();
   const open = ({ id }: { id: string }) => void navigate({ params: { id }, to: '/workouts/$id' });

@@ -125,3 +125,39 @@
     height: 1rem;
   }
 }
+
+.archived {
+  display: grid;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+
+  & > summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    width: fit-content;
+    color: var(--c-muted-strong);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    & > svg {
+      width: 1rem;
+      height: 1rem;
+      transition: rotate 180ms var(--ease-out);
+    }
+  }
+
+  &[open] > summary > svg {
+    rotate: 180deg;
+  }
+
+  & .card {
+    opacity: 0.75;
+  }
+}

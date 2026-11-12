@@ -97,6 +97,19 @@ export function useUpdateRoutineMutation() {
   });
 }
 
+export function useArchiveRoutineMutation() {
+  const { t } = useI18n();
+
+  return useMutation({
+    meta: {
+      error: { title: t({ en: 'Routine was not changed', pl: 'Nie udało się zmienić planu' }) },
+      invalidateQueryKey: routinesKey,
+    },
+    mutationFn: (variables: { id: string; archived: boolean }) =>
+      updateRoutine({ data: variables }),
+  });
+}
+
 export function useDeleteRoutineMutation() {
   const { t } = useI18n();
 
