@@ -37,7 +37,7 @@ export function registerWorkoutTools(server: McpServer, userId: string) {
   server.registerTool(
     'save_routine',
     {
-      description: `Create (no id; name required) or update (id) a workout routine. Omitted fields stay; exercises, when given, replace the plan. setTypes has one entry per planned set. ${exerciseRef} Returns { id }.`,
+      description: `Create (no id; name required) or update (id) a workout routine. Omitted fields stay; exercises, when given, replace the plan. archived true hides it in the app, false restores it. setTypes has one entry per planned set. ${exerciseRef} Returns { id }.`,
       inputSchema: agentInput(saveRoutinePlanInputType),
       annotations: destructive,
     },

@@ -22,6 +22,8 @@ type NumberInputProps = Omit<NumberFieldRootProps, 'className' | 'step'> & {
   size?: InputSize;
   /** Stepper amount; also limits typed precision to this step. Defaults to 1 with any precision. */
   stepperStep?: number;
+  /** Unit shown right after the value, e.g. `kg`; the value then centers in the field. */
+  suffix?: string;
 };
 
 export function NumberInput({
@@ -32,7 +34,9 @@ export function NumberInput({
   placeholder,
   size = 'md',
   stepperStep,
+  suffix,
   onValueChange,
+  value,
   ...props
 }: NumberInputProps) {
   const { locale, t } = useI18n();
@@ -67,13 +71,14 @@ export function NumberInput({
       locale={locale}
       data-required={props.required ? '' : undefined}
       step={stepperStep ?? 'any'}
-      onValueChange={(value, eventDetails) => {
+      onValueChange={(nextValue, eventDetails) => {
         setExpression(null);
-        onValueChange?.(value, eventDetails);
+        onValueChange?.(snapToStep(nextValue, stepperStep), eventDetails);
       }}
+      value={snapToStep(value, stepperStep)}
       {...props}
     >
-      <NumberField.Group className={css.group}>
+      <NumberField.Group className={clsx(css.group, suffix && css.withSuffix)}>
         <NumberField.Decrement
           aria-label={t({ en: 'Decrease value', pl: 'Zmniejsz wartość' })}
           className={clsx(css.stepper, css.decrement)}
@@ -123,6 +128,23 @@ export function NumberInput({
           ref={inputRef}
         />
 
+        {suffix ? (
+          <span
+            aria-hidden='true'
+            className={css.suffix}
+            onPointerDown={(event) => {
+              // The unit is part of the field, so a tap on it should focus the value.
+              const input = event.currentTarget.previousElementSibling;
+              if (input instanceof HTMLInputElement) {
+                event.preventDefault();
+                input.focus();
+              }
+            }}
+          >
+            {suffix}
+          </span>
+        ) : null}
+
         <NumberField.Increment
           aria-label={t({ en: 'Increase value', pl: 'Zwiększ wartość' })}
           className={clsx(css.stepper, css.increment)}
@@ -132,6 +154,25 @@ export function NumberInput({
       </NumberField.Group>
     </NumberField.Root>
   );
+}
+
+/**
+ * Rounds to the step's decimal places. Base UI mirrors the value into a hidden native
+ * `<input type="number" step>`, so a value such as `84.15` (imported) or `84.10000000000001`
+ * (float drift from stepper taps) fails the browser's step check and blocks form submit.
+ */
+function snapToStep<Value extends number | null | undefined>(
+  value: Value,
+  step: number | undefined,
+) {
+  if (typeof value !== 'number' || step === undefined) {
+    return value;
+  }
+
+  const decimals = String(step).split('.')[1]?.length ?? 0;
+  const factor = 10 ** decimals;
+
+  return Math.round(value * factor) / factor;
 }
 
 /** Base UI parses with the app locale, so typed `.` or `,` must match that locale's decimal separator. */

@@ -15,8 +15,11 @@ vi.mock('@tanstack/react-router', () => ({
 vi.mock('../workouts.query', () => ({
   useMoveWorkoutMutation: () => ({ isPending: false, mutateAsync: vi.fn() }),
   useUpdateWorkoutMutation: () => ({ isPending: false, mutate: vi.fn() }),
+  workoutKeys: { session: (id: string) => ['session', id] },
   workoutSessionQueryOptions: (id: string) => ({ queryFn: vi.fn(), queryKey: ['session', id] }),
 }));
+
+vi.mock('./session.query', () => ({ settleSessionEdits: vi.fn() }));
 
 vi.mock('../routines/routines.query', () => ({
   useSaveRoutineFromWorkoutMutation: () => ({ isPending: false, mutateAsync: vi.fn() }),

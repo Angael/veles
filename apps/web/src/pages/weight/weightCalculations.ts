@@ -1,4 +1,4 @@
-import { formatISO, parseISO, subDays, subMonths } from 'date-fns';
+import { formatISO, parseISO, subMonths } from 'date-fns';
 import type { WeightEntry } from './weight.api';
 export const WEIGHT_CHART_RANGE_COOKIE = 'weight-chart-range';
 export const DEFAULT_WEIGHT_CHART_RANGE = '1m' as const;
@@ -65,20 +65,58 @@ export function getWeightAtDate(entries: WeightEntry[], date: string) {
   return before.weightKg + (after.weightKg - before.weightKg) * progress;
 }
 
-/** Calculates change from an interpolated weight on the requested day. */
-export function getChangeFromDaysAgo(entries: WeightEntry[], days: number) {
-  const latestEntry = entries.at(-1);
+/** Days over which the smoothed trend forgets roughly two thirds of older readings. */
+const TREND_TIME_CONSTANT_DAYS = 7;
+const DAY_IN_MS = 24 * 60 * 60 * 1_000;
 
-  if (!latestEntry) {
+/**
+ * Smooths daily water and food swings with a time-weighted moving average, so the chart shows the
+ * real direction instead of noise. Gaps between entries weigh the new reading more.
+ */
+export function getWeightTrend(entries: WeightEntry[]): WeightEntry[] {
+  let trendKg: number | undefined;
+  let previousTime = 0;
+
+  return entries.map((entry) => {
+    const time = parseISO(entry.date).getTime();
+
+    if (trendKg === undefined) {
+      trendKg = entry.weightKg;
+    } else {
+      const days = (time - previousTime) / DAY_IN_MS;
+      const weight = 1 - Math.exp(-days / TREND_TIME_CONSTANT_DAYS);
+      trendKg += (entry.weightKg - trendKg) * weight;
+    }
+
+    previousTime = time;
+
+    return { date: entry.date, weightKg: trendKg };
+  });
+}
+
+/** Change from the first to the last visible weight, plus the matching pace per week. */
+export function getRangeChange(visibleEntries: WeightEntry[]) {
+  const first = visibleEntries.at(0);
+  const last = visibleEntries.at(-1);
+
+  if (!first || !last || first.date === last.date) {
     return undefined;
   }
 
-  const targetDate = formatISO(subDays(parseISO(latestEntry.date), days), {
-    representation: 'date',
-  });
-  const previousWeight = getWeightAtDate(entries, targetDate);
+  const days = (parseISO(last.date).getTime() - parseISO(first.date).getTime()) / DAY_IN_MS;
+  const changeKg = last.weightKg - first.weightKg;
 
-  return previousWeight === undefined
-    ? undefined
-    : Math.round((latestEntry.weightKg - previousWeight) * 10) / 10;
+  return {
+    changeKg: Math.round(changeKg * 10) / 10,
+    perWeekKg: Math.round((changeKg / days) * 7 * 10) / 10,
+  };
+}
+
+/** Direction label for styling a weight change; losing is styled as progress. */
+export function getChangeDirection(changeKg: number | undefined) {
+  if (changeKg === undefined || changeKg === 0) {
+    return 'flat';
+  }
+
+  return changeKg < 0 ? 'down' : 'up';
 }

@@ -57,6 +57,14 @@ export function RoutinePage({ routineId }: { routineId: string }) {
           placeholder={t({ en: 'Add a description…', pl: 'Dodaj opis…' })}
           rows={1}
         />
+        {routine.archived ? (
+          <p className={css.meta}>
+            {t({
+              en: 'Archived. It is hidden from your routines and the start menu.',
+              pl: 'Zarchiwizowany. Nie widać go na liście planów ani w menu startu.',
+            })}
+          </p>
+        ) : null}
         <p className={css.meta}>
           {routine.lastUsed
             ? t({

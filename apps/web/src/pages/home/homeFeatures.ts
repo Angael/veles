@@ -71,8 +71,8 @@ export const homeFeatures: HomeFeature[] = [
     icon: DumbbellIcon,
     title: { en: 'Workouts', pl: 'Treningi' },
     description: {
-      en: 'Log sessions and sets, reuse routines, manage your exercises, and review your training history.',
-      pl: 'Zapisuj treningi i serie, korzystaj z planów, zarządzaj ćwiczeniami i przeglądaj historię treningów.',
+      en: 'Log sessions and sets, reuse routines, manage your exercises, and replay your year: favourite exercises, days, and streaks.',
+      pl: 'Zapisuj treningi i serie, korzystaj z planów, zarządzaj ćwiczeniami i przeglądaj podsumowanie roku: ulubione ćwiczenia, dni i regularność.',
     },
     to: '/workouts',
   },

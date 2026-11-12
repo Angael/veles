@@ -5,6 +5,7 @@ import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { fromHundredths, HUNDREDTHS, optionalHundredths, toHundredths } from '@/lib/nutrition';
 import { db } from '@/server/db.server';
 import { downloadFile } from '@/server/downloadFile.server';
+import { IMAGE_MAX_INPUT_BYTES } from '@/lib/storage/imageLimits';
 import { storagePathToUrl } from '@/server/storage/config.server';
 import type { CalorieFood } from './calories.api';
 import type {
@@ -94,7 +95,10 @@ async function insertImportedFoodProduct(product: OpenFoodFactsProduct) {
   let image: PreparedFoodImage | null = null;
   if (product.imageUrl) {
     try {
-      image = await prepareFoodImage(await downloadFile(product.imageUrl), null);
+      image = await prepareFoodImage(
+        await downloadFile(product.imageUrl, IMAGE_MAX_INPUT_BYTES),
+        null,
+      );
     } catch {}
   }
   try {

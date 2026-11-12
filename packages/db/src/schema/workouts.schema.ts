@@ -70,6 +70,8 @@ export const workoutRoutines = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     name: text('name').notNull(),
     description: text('description').notNull().default(''),
+    /** Hidden from the routine list and start menu; past sessions keep their link. */
+    archivedAt: timestamp('archived_at'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
   },

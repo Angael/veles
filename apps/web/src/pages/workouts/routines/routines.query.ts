@@ -1,4 +1,5 @@
-import { queryOptions, useMutation } from '@tanstack/react-query';
+import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
+import { settleSessionEdits } from '../session/session.query';
 import { workoutKeys } from '../workouts.query';
 import {
   deleteRoutine,
@@ -39,9 +40,13 @@ export function useStartRoutineMutation() {
   });
 }
 
-/** Also refreshes the session, which is now linked to the new routine. */
+/**
+ * Also refreshes the session, which is now linked to the new routine. Waits for set edits still
+ * on their way first, so the routine gets the sets the user sees.
+ */
 export function useSaveRoutineFromWorkoutMutation() {
   const { t } = useI18n();
+  const queryClient = useQueryClient();
 
   return useMutation({
     meta: {
@@ -49,13 +54,20 @@ export function useSaveRoutineFromWorkoutMutation() {
       invalidateQueryKey: workoutKeys.all,
       success: { title: t({ en: 'Saved as a routine', pl: 'Zapisano jako plan' }) },
     },
-    mutationFn: (variables: { workoutId: string; name: string; description?: string }) =>
-      saveRoutineFromWorkout({ data: variables }),
+    mutationFn: async (variables: { workoutId: string; name: string; description?: string }) => {
+      await settleSessionEdits(queryClient, variables.workoutId);
+      return saveRoutineFromWorkout({ data: variables });
+    },
   });
 }
 
+/**
+ * Overwrites the session's routine mid-workout or later. Only routine rows change, so the open
+ * session keeps its sets; pending set edits are sent first so the routine matches the screen.
+ */
 export function useUpdateRoutineFromWorkoutMutation() {
   const { t } = useI18n();
+  const queryClient = useQueryClient();
 
   return useMutation({
     meta: {
@@ -65,7 +77,10 @@ export function useUpdateRoutineFromWorkoutMutation() {
       invalidateQueryKey: routinesKey,
       success: { title: t({ en: 'Routine updated', pl: 'Zaktualizowano plan' }) },
     },
-    mutationFn: (variables: { workoutId: string }) => updateRoutineFromWorkout({ data: variables }),
+    mutationFn: async (variables: { workoutId: string }) => {
+      await settleSessionEdits(queryClient, variables.workoutId);
+      return updateRoutineFromWorkout({ data: variables });
+    },
   });
 }
 
@@ -78,6 +93,19 @@ export function useUpdateRoutineMutation() {
       invalidateQueryKey: workoutKeys.all,
     },
     mutationFn: (variables: { id: string; name?: string; description?: string }) =>
+      updateRoutine({ data: variables }),
+  });
+}
+
+export function useArchiveRoutineMutation() {
+  const { t } = useI18n();
+
+  return useMutation({
+    meta: {
+      error: { title: t({ en: 'Routine was not changed', pl: 'Nie udało się zmienić planu' }) },
+      invalidateQueryKey: routinesKey,
+    },
+    mutationFn: (variables: { id: string; archived: boolean }) =>
       updateRoutine({ data: variables }),
   });
 }

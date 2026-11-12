@@ -55,16 +55,17 @@ Resources:
 - calorie_goals: Nutrition goal history by effectiveDate, newest first; each goal applies until the next one. kcal is energy; macros are protein, fat, carbs in grams (limits).
 - food_products: Shared food catalog with imageUrl or null. per100g nutrition: kcal is energy; macros are protein, fat, carbs in grams. productSizeGrams is one unit (package, piece, slice or serving).
 - workout_sessions: Workout sessions, newest first, each with its exercises (id of the session exercise, exerciseId from workout_exercises, name, measure, notes) and their sets. Sets: id, type (normal, warmup, drop, failure), done, weightKg, reps, durationSeconds, distanceKm; measure says which apply. durationSeconds is manual or end minus start.
-- workout_routines: Reusable workout plans, each with ordered exercises (name, measure, restSeconds) and setTypes, one per planned set.
+- workout_routines: Reusable workout plans, each with archived (hidden in the app) and ordered exercises (name, measure, restSeconds) and setTypes, one per planned set.
 - workout_exercises: Exercise list with measure, restSeconds, notes, archived, lastDoneOn, and sessionCount.
+- workout_stats: Training summary per period; id is "all" (listed first) or a year, then years newest first. Counts sessions, activeDays, totalSeconds, exercises (different ones with a done set), newExercises (first ever done in the period), topExercises (sessions with a done set and share of all sessions), weekdays (sessions per weekday, Monday first), timeline (sessions per YYYY-MM month, or per YYYY year for all time), weekStreak and dayStreak (longest run, from/to dates), favouriteRoutine, longestSession (seconds), and firstSession.
 
-| Input      | Type                                                                                                                                                      | Required | Notes                                           |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
-| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" | yes      |                                                 |
-| `cursor`   | string                                                                                                                                                    |          | nextCursor from the previous page               |
-| `from`     | date YYYY-MM-DD                                                                                                                                           |          | earliest date, inclusive (dated resources only) |
-| `limit`    | integer                                                                                                                                                   |          |                                                 |
-| `to`       | date YYYY-MM-DD                                                                                                                                           |          | latest date, inclusive (dated resources only)   |
+| Input      | Type                                                                                                                                                                         | Required | Notes                                           |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
+| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" \| "workout_stats" | yes      |                                                 |
+| `cursor`   | string                                                                                                                                                                       |          | nextCursor from the previous page               |
+| `from`     | date YYYY-MM-DD                                                                                                                                                              |          | earliest date, inclusive (dated resources only) |
+| `limit`    | integer                                                                                                                                                                      |          |                                                 |
+| `to`       | date YYYY-MM-DD                                                                                                                                                              |          | latest date, inclusive (dated resources only)   |
 
 ### `get_record`
 
@@ -72,10 +73,10 @@ _read_
 
 Fetch one permitted record by resource and id. Returns null if not found or not yours.
 
-| Input      | Type                                                                                                                                                      | Required | Notes                                        |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------- |
-| `id`       | string                                                                                                                                                    | yes      | record UUID; a YYYY-MM-DD date for food_days |
-| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" | yes      |                                              |
+| Input      | Type                                                                                                                                                                         | Required | Notes                                                                           |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------- |
+| `id`       | string                                                                                                                                                                       | yes      | record UUID; a YYYY-MM-DD date for food_days; "all" or a year for workout_stats |
+| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" \| "workout_stats" | yes      |                                                                                 |
 
 ### `get_days`
 
@@ -149,10 +150,11 @@ Create (no id; date required) or update (id) a workout session. Omitted fields s
 
 _write, destructive_
 
-Create (no id; name required) or update (id) a workout routine. Omitted fields stay; exercises, when given, replace the plan. setTypes has one entry per planned set. Each exercise is exerciseId from workout_exercises (read it first to reuse existing ones), or newExercise { name, measure }, which reuses an exercise with that exact name or creates it. Returns { id }.
+Create (no id; name required) or update (id) a workout routine. Omitted fields stay; exercises, when given, replace the plan. archived true hides it in the app, false restores it. setTypes has one entry per planned set. Each exercise is exerciseId from workout_exercises (read it first to reuse existing ones), or newExercise { name, measure }, which reuses an exercise with that exact name or creates it. Returns { id }.
 
 | Input         | Type                                    | Required | Notes          |
 | ------------- | --------------------------------------- | -------- | -------------- |
+| `archived`    | boolean                                 |          |                |
 | `description` | string                                  |          | max 2000 chars |
 | `exercises`   | { setTypes, exerciseId, newExercise }[] |          | max 40 items   |
 | `id`          | uuid                                    |          |                |
