@@ -74,6 +74,8 @@ export const updateExerciseInputType = type({
   'name?': name,
   'measure?': measure,
   'restSeconds?': '(number.integer >= 0) | null',
+  /** Archived exercises leave the picker but keep their history. */
+  'archived?': 'boolean',
 });
 
 /** A whole session at once; given exercises replace the session's exercises and sets. */

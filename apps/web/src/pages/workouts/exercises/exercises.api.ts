@@ -14,8 +14,13 @@ import { logMiddleware } from '@/server/middleware/logMiddleware';
 import { describeSet, type Measure } from '../metrics';
 import { toMetrics } from '../workouts.server';
 import { workoutName } from '../workoutName';
-import { updateExerciseInputType } from '../workouts.validation';
-import { updateExerciseRecord } from './exercises.server';
+import { updateExerciseInputType, workoutIdType } from '../workouts.validation';
+import {
+  deleteExerciseRecord,
+  type ExerciseLibraryEntry,
+  listExerciseLibrary,
+  updateExerciseRecord,
+} from './exercises.server';
 import { getLocale } from '@/lib/i18n/getLocale';
 
 export type ExerciseOption = {
@@ -70,6 +75,23 @@ export const updateExercise = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const session = await requireSession();
     await updateExerciseRecord(session.user.id, data);
+  });
+
+/** Every exercise, archived ones too, for the exercise list page. */
+export const getExerciseLibrary = createServerFn({ method: 'GET' })
+  .middleware([logMiddleware('getExerciseLibrary')])
+  .handler(async (): Promise<ExerciseLibraryEntry[]> => {
+    const session = await requireSession();
+    return listExerciseLibrary(session.user.id);
+  });
+
+/** Only unused exercises can be deleted; used ones are archived. */
+export const deleteExercise = createServerFn({ method: 'POST' })
+  .middleware([logMiddleware('deleteExercise')])
+  .validator(arkTypeValidator(workoutIdType))
+  .handler(async ({ data }) => {
+    const session = await requireSession();
+    await deleteExerciseRecord(session.user.id, data);
   });
 
 const exerciseHistoryInputType = type({

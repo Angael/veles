@@ -1,5 +1,8 @@
 import type { McpServer } from '@modelcontextprotocol/server';
-import { updateExerciseRecord } from '@/pages/workouts/exercises/exercises.server';
+import {
+  deleteExerciseRecord,
+  updateExerciseRecord,
+} from '@/pages/workouts/exercises/exercises.server';
 import {
   deleteRoutineRecord,
   saveRoutinePlanRecord,
@@ -44,11 +47,21 @@ export function registerWorkoutTools(server: McpServer, userId: string) {
     'update_exercise',
     {
       description:
-        'Rename an exercise or change its measure or restSeconds (null for none); applies to all sessions. Names are unique per account.',
+        'Rename an exercise, change its measure or restSeconds (null for none), or archive it (archived: true hides it from the picker, false restores it); applies to all sessions. Names are unique per account.',
       inputSchema: agentInput(updateExerciseInputType),
       annotations: writeAnnotations({ destructive: false, idempotent: true }),
     },
     write(updateExerciseRecord),
+  );
+  server.registerTool(
+    'delete_exercise',
+    {
+      description:
+        'Delete an exercise that no workout session or routine uses. Archive used exercises with update_exercise instead.',
+      inputSchema: agentInput(workoutIdType),
+      annotations: destructive,
+    },
+    write(deleteExerciseRecord),
   );
   server.registerTool(
     'delete_workout',

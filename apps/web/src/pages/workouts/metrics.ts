@@ -16,6 +16,9 @@ export const MEASURES: Measure[] = [
   'distance_duration',
 ];
 
+/** Rest timer choices in seconds; null turns the timer off. */
+export const REST_PRESETS = [null, 45, 60, 90, 120, 180] as const;
+
 export const MEASURE_LABELS: Record<Measure, Localized> = {
   distance_duration: { en: 'Distance + time', pl: 'Dystans + czas' },
   duration: { en: 'Time', pl: 'Czas' },

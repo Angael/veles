@@ -14,12 +14,10 @@ import {
   ContextMenuSubmenuRoot,
   ContextMenuSubmenuTrigger,
 } from '@/components/ui/context-menu/ContextMenu';
-import { formatDuration, MEASURE_LABELS, MEASURES } from '../metrics';
+import { formatDuration, MEASURE_LABELS, MEASURES, REST_PRESETS } from '../metrics';
 import type { WorkoutSlotData } from '../workouts.server';
 import type { SessionActions } from './session.query';
 import { useI18n } from '@/lib/i18n/I18nProvider';
-
-const REST_PRESETS = [null, 45, 60, 90, 120, 180] as const;
 
 type ExerciseMenuProps = {
   actions: SessionActions;
