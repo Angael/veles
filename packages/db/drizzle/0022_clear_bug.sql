@@ -1,0 +1,1 @@
+ALTER TABLE "workout_routine" ADD COLUMN "archived_at" timestamp;
