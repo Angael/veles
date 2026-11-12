@@ -22,6 +22,8 @@ type NumberInputProps = Omit<NumberFieldRootProps, 'className' | 'step'> & {
   size?: InputSize;
   /** Stepper amount; also limits typed precision to this step. Defaults to 1 with any precision. */
   stepperStep?: number;
+  /** Unit shown right after the value, e.g. `kg`; the value then centers in the field. */
+  suffix?: string;
 };
 
 export function NumberInput({
@@ -32,6 +34,7 @@ export function NumberInput({
   placeholder,
   size = 'md',
   stepperStep,
+  suffix,
   onValueChange,
   ...props
 }: NumberInputProps) {
@@ -73,7 +76,7 @@ export function NumberInput({
       }}
       {...props}
     >
-      <NumberField.Group className={css.group}>
+      <NumberField.Group className={clsx(css.group, suffix && css.withSuffix)}>
         <NumberField.Decrement
           aria-label={t({ en: 'Decrease value', pl: 'Zmniejsz wartość' })}
           className={clsx(css.stepper, css.decrement)}
@@ -122,6 +125,23 @@ export function NumberInput({
           placeholder={placeholder}
           ref={inputRef}
         />
+
+        {suffix ? (
+          <span
+            aria-hidden='true'
+            className={css.suffix}
+            onPointerDown={(event) => {
+              // The unit is part of the field, so a tap on it should focus the value.
+              const input = event.currentTarget.previousElementSibling;
+              if (input instanceof HTMLInputElement) {
+                event.preventDefault();
+                input.focus();
+              }
+            }}
+          >
+            {suffix}
+          </span>
+        ) : null}
 
         <NumberField.Increment
           aria-label={t({ en: 'Increase value', pl: 'Zwiększ wartość' })}

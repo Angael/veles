@@ -1,20 +1,11 @@
-import { Link, useRouter } from '@tanstack/react-router';
-import { format } from 'date-fns';
-import { CalendarPlusIcon, FileUpIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
-import { NumberInput } from '@/components/ui/number-input/NumberInput';
-import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { RecentWeightEntries } from './RecentWeightEntries';
+import { TodayWeightForm } from './TodayWeightForm';
 import css from './WeightPage.module.css';
-import { WeightTrendChart } from './WeightTrendChart';
-import { getChangeFromDaysAgo, type WeightChartRange } from './weightCalculations';
+import { WeightOverview } from './WeightOverview';
+import type { WeightChartRange } from './weightCalculations';
 import type { WeightHistoryEntry } from './weight.api';
-import { useSaveWeightMutation } from './weight.query';
-import { type I18n, useI18n } from '@/lib/i18n/I18nProvider';
-
-const KG_DIGITS = { maximumFractionDigits: 1, minimumFractionDigits: 1 };
+import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type WeightPageProps = {
   entries: WeightHistoryEntry[];
@@ -22,167 +13,38 @@ type WeightPageProps = {
 };
 
 export function WeightPage({ entries, initialChartRange }: WeightPageProps) {
-  const { formatNumber, t } = useI18n();
-  const router = useRouter();
-  const latestEntry = entries.at(-1);
-  const [weightKg, setWeightKg] = useState<number | null>(latestEntry?.weightKg ?? null);
-  const saveMutation = useSaveWeightMutation();
+  const { t } = useI18n();
 
-  useEffect(() => {
-    setWeightKg(latestEntry?.weightKg ?? null);
-  }, [latestEntry?.weightKg]);
-
-  const twoWeekChange = getChangeFromDaysAgo(entries, 14);
-  const oneMonthChange = getChangeFromDaysAgo(entries, 30);
-
-  function submitWeight() {
-    if (weightKg === null) {
-      return;
-    }
-
-    saveMutation.mutate(
-      { data: { date: format(new Date(), 'yyyy-MM-dd'), weightKg } },
-      {
-        onSuccess: () => {
-          void router.invalidate().catch(() => undefined);
-        },
-      },
+  if (entries.length === 0) {
+    return (
+      <main className={css.page}>
+        <Card as='section' className={css.emptyState} data-appear>
+          <h1>{t({ en: 'Start tracking your weight', pl: 'Zacznij śledzić wagę' })}</h1>
+          <p>
+            {t({
+              en: 'Log today’s weight below. Coming from another app? Import your history from the ⋯ menu.',
+              pl: 'Zapisz dzisiejszą wagę poniżej. Masz dane z innej aplikacji? Zaimportuj historię z menu ⋯.',
+            })}
+          </p>
+        </Card>
+        <div data-appear='1'>
+          <TodayWeightForm latestEntry={undefined} />
+        </div>
+      </main>
     );
   }
 
   return (
     <main className={css.page}>
-      {entries.length > 0 && (
-        <div data-appear>
-          <WeightTrendChart entries={entries} initialRange={initialChartRange} />
-        </div>
-      )}
-
-      <section
-        aria-label={t({ en: 'Today’s weight', pl: 'Dzisiejsza waga' })}
-        className={css.captureContainer}
-        data-appear='1'
-      >
-        <WeightForm
-          isSaving={saveMutation.isPending}
-          onChange={setWeightKg}
-          onSubmit={submitWeight}
-          value={weightKg}
-        />
-        <div className={css.captureActions}>
-          <Btn
-            icon={<FileUpIcon aria-hidden='true' />}
-            isLink
-            render={<Link to='/weight/import' />}
-            size='md'
-            variant='outlineMain'
-          >
-            {t({ en: 'Import', pl: 'Importuj' })}
-          </Btn>
-          <Btn
-            icon={<CalendarPlusIcon aria-hidden='true' />}
-            isLink
-            render={<Link to='/weight/add' />}
-            size='md'
-            variant='outlineMain'
-          >
-            {t({ en: 'Add for date', pl: 'Dodaj dla daty' })}
-          </Btn>
-        </div>
-      </section>
-
-      {entries.length > 0 ? (
-        <>
-          <div className={css.summaryRail} data-appear='2'>
-            <Card
-              as='section'
-              aria-label={t({ en: 'Weight summary', pl: 'Podsumowanie wagi' })}
-              className={css.summaryGrid}
-            >
-              <SummaryStat
-                label={t({ en: 'Current', pl: 'Obecnie' })}
-                value={latestEntry ? `${formatNumber(latestEntry.weightKg, KG_DIGITS)} kg` : '—'}
-              />
-              <SummaryStat
-                change={twoWeekChange}
-                label={t({ en: '2 weeks', pl: '2 tygodnie' })}
-                value={formatChange(twoWeekChange, formatNumber)}
-              />
-              <SummaryStat
-                change={oneMonthChange}
-                label={t({ en: '1 month', pl: '1 miesiąc' })}
-                value={formatChange(oneMonthChange, formatNumber)}
-              />
-            </Card>
-          </div>
-
-          <div data-appear='3'>
-            <RecentWeightEntries entries={entries} />
-          </div>
-        </>
-      ) : (
-        <Card as='section' className={css.emptyState} data-appear='2'>
-          <h1>{t({ en: 'Start tracking your weight', pl: 'Zacznij śledzić wagę' })}</h1>
-          <p>
-            {t({
-              en: 'Add today’s weight or import your history to begin building your trend.',
-              pl: 'Dodaj dzisiejszą wagę lub zaimportuj historię, aby zobaczyć trend.',
-            })}
-          </p>
-        </Card>
-      )}
+      <div data-appear>
+        <WeightOverview entries={entries} initialRange={initialChartRange} />
+      </div>
+      <div data-appear='1'>
+        <TodayWeightForm latestEntry={entries.at(-1)} />
+      </div>
+      <div data-appear='2'>
+        <RecentWeightEntries entries={entries} />
+      </div>
     </main>
   );
-}
-
-type WeightFormProps = {
-  isSaving: boolean;
-  onChange: (value: number | null) => void;
-  onSubmit: () => void;
-  value: number | null;
-};
-
-function WeightForm({ isSaving, onChange, onSubmit, value }: WeightFormProps) {
-  const { t } = useI18n();
-
-  return (
-    <TypedForm className={css.entryForm} onSubmit={onSubmit}>
-      <label className={css.captureField}>
-        <span>{t({ en: 'Today’s weight', pl: 'Dzisiejsza waga' })}</span>
-        <NumberInput
-          enterKeyHint='done'
-          aria-label={t({ en: 'Today’s weight in kilograms', pl: 'Dzisiejsza waga w kilogramach' })}
-          max={300}
-          min={30}
-          onValueChange={onChange}
-          placeholder='kg'
-          required
-          stepperStep={0.1}
-          value={value}
-        />
-      </label>
-      <Btn disabled={value === null} loading={isSaving} radius='pill' size='md' type='submit'>
-        {t({ en: 'Save', pl: 'Zapisz' })}
-      </Btn>
-    </TypedForm>
-  );
-}
-
-function SummaryStat({ change, label, value }: { change?: number; label: string; value: string }) {
-  const isImprovement = change !== undefined && change < 0;
-
-  return (
-    <div className={css.summaryStat}>
-      <span className={css.statLabel}>{label}</span>
-      <strong className={isImprovement ? css.deltaBetter : css.deltaNeutral}>{value}</strong>
-    </div>
-  );
-}
-
-function formatChange(value: number | undefined, formatNumber: I18n['formatNumber']) {
-  if (value === undefined) {
-    return '—';
-  }
-
-  return `${formatNumber(value, { ...KG_DIGITS, signDisplay: 'exceptZero' })} kg`;
 }

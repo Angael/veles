@@ -27,7 +27,7 @@ type NavbarData = {
    * `href`, and its presence is what makes the route show a back button.
    */
   backFallback?: NavbarTarget | ((match: NavbarTargetMatch) => NavbarTarget);
-  /** Task header buttons after the title, e.g. a menu of rare page actions. */
+  /** Header buttons for rare page actions, e.g. a menu. Task headers show them after the title; section headers before the account button. */
   Actions?: ComponentType;
 };
 
