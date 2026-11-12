@@ -3,9 +3,9 @@ import { resolve } from 'node:path';
 import process from 'node:process';
 import { describe, expect, it } from 'vitest';
 
-// Skipped components are already visible throughout the app or are too large or impractical to
-// showcase meaningfully on the components demo page.
-const SKIPPED_COMPONENTS: Record<string, true> = { 'app-frame': true };
+// Skipped components are already visible throughout the app, render nothing of their own, or are
+// too large or impractical to showcase meaningfully on the components demo page.
+const SKIPPED_COMPONENTS: Record<string, true> = { 'app-frame': true, 'app-update': true };
 
 describe('components demo', () => {
   it('showcases every shared component directory', async () => {

@@ -1,0 +1,20 @@
+.form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.known {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border: var(--border-width) solid var(--c-primary-border-soft);
+  border-radius: var(--radius-sm);
+  background: var(--c-primary-surface);
+  font-size: var(--text-sm);
+}
+
+.submit {
+  width: 100%;
+}

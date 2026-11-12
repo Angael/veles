@@ -34,6 +34,7 @@ export type RoutineSummary = {
   description: string;
   exerciseNames: string[];
   lastUsed: string | null;
+  archived: boolean;
 };
 
 export type RoutineDetail = {
@@ -41,10 +42,11 @@ export type RoutineDetail = {
   name: string;
   description: string;
   lastUsed: string | null;
+  archived: boolean;
   exercises: { id: string; name: string; measure: Measure; setTypes: SetType[] }[];
 };
 
-/** Routines with their exercise names, most recently used first. */
+/** Routines with their exercise names, most recently used first. Archived ones are flagged. */
 export const getRoutines = createServerFn({ method: 'GET' })
   .middleware([logMiddleware('getRoutines')])
   .handler(async (): Promise<RoutineSummary[]> => {
@@ -61,6 +63,7 @@ export const getRoutines = createServerFn({ method: 'GET' })
       .as('last_used');
     const routines = await db
       .select({
+        archived: sql<boolean>`${workoutRoutines.archivedAt} IS NOT NULL`,
         description: workoutRoutines.description,
         id: workoutRoutines.id,
         lastUsed: lastUsed.date,
@@ -99,6 +102,7 @@ export const getRoutine = createServerFn({ method: 'GET' })
     const userId = session.user.id;
     const [routine] = await db
       .select({
+        archived: sql<boolean>`${workoutRoutines.archivedAt} IS NOT NULL`,
         description: workoutRoutines.description,
         id: workoutRoutines.id,
         name: workoutRoutines.name,

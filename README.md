@@ -3,7 +3,7 @@
 Veles is a pnpm monorepo with three deployable applications and one shared database package:
 
 - `apps/web` — the TanStack Start application.
-- `apps/worker` — a background worker. It checks PostgreSQL and cleans up unreferenced upload objects in independent loops every ten seconds.
+- `apps/worker` — a background worker. On start it syncs the shared food product seeds. It then cleans up unreferenced upload objects every six hours and, when `AI_API_KEY` is set, processes queued food photo scans every two seconds.
 - `apps/preview` — the standalone PR preview controller.
 - `packages/db` — the shared Drizzle client, schema, migrations, and migration tooling.
 - `infra/nginx` — the small reverse-proxy image used by Compose.

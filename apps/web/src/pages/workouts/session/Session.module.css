@@ -12,7 +12,7 @@
   }
 }
 
-/* Day and time on the left, Finish (or the finished mark) on the right. */
+/* Day and time on the left, the finished mark on the right. */
 .summary {
   display: flex;
   flex-wrap: wrap;
@@ -45,6 +45,11 @@
 .timeValue {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+}
+
+/* Header Finish: matches the header's small controls, grown to a 40px touch target. */
+.finish {
+  --btn-height: 2.5rem;
 }
 
 .finishedBadge {

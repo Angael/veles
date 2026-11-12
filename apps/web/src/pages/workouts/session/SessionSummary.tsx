@@ -1,27 +1,16 @@
-import { useNavigate } from '@tanstack/react-router';
-import { FlagIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { floorDuration, formatDuration } from '../metrics';
-import { useUpdateWorkoutMutation } from '../workouts.query';
 import type { WorkoutSessionData } from '../workouts.server';
 import css from './Session.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-type SessionSummaryProps = {
-  onFinish: () => void;
-  session: WorkoutSessionData;
-};
-
 /**
- * Day and elapsed time of the session, with Finish while it runs. Name and rare actions (rename,
- * reopen, move) live in the task header above.
+ * Day and elapsed time of the session, marked once it is finished. Name, Finish and rare actions
+ * (rename, reopen, move) live in the sticky task header above, so they stay in reach while scrolling.
  */
-export function SessionSummary({ onFinish, session }: SessionSummaryProps) {
+export function SessionSummary({ session }: { session: WorkoutSessionData }) {
   const { formatDate, t } = useI18n();
-  const navigate = useNavigate();
-  const updateWorkout = useUpdateWorkoutMutation();
   const setSeconds = session.slots
     .flatMap((slot) => slot.sets)
     .reduce((sum, set) => sum + (set.durationSeconds ?? 0), 0);
@@ -46,26 +35,7 @@ export function SessionSummary({ onFinish, session }: SessionSummaryProps) {
       </dl>
       {finished ? (
         <span className={css.finishedBadge}>{t({ en: 'Finished', pl: 'Zakończony' })}</span>
-      ) : (
-        <Btn
-          disabled={updateWorkout.isPending}
-          icon={<FlagIcon aria-hidden='true' />}
-          onClick={() =>
-            updateWorkout.mutate(
-              { finished: true, id: session.id },
-              {
-                onSuccess: () => {
-                  onFinish();
-                  void navigate({ replace: true, to: '/workouts' });
-                },
-              },
-            )
-          }
-          radius='pill'
-        >
-          {t({ en: 'Finish', pl: 'Zakończ' })}
-        </Btn>
-      )}
+      ) : null}
     </Card>
   );
 }

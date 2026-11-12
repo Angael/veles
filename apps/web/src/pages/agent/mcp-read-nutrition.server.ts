@@ -6,6 +6,7 @@ import {
   foodProducts,
   uploadObjects,
 } from '@veles/db/schema';
+import { foodProductUnit } from '@veles/db/seed/food-products';
 import { fromHundredths } from '@/lib/nutrition';
 import { readAgentPermissions } from '@/server/agentAccess.server';
 import { db } from '@/server/db.server';
@@ -176,6 +177,7 @@ export async function readFoodProducts(_userId: string, query: ReadQuery) {
       namePl: product.namePl,
       barcode: product.barcode,
       productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
+      unit: foodProductUnit(product.unit, product.seedKey),
       imageUrl: storagePathToUrl(imageKey),
       per100g: toNutrition({
         kcal: product.kcalPer100gHundredths,

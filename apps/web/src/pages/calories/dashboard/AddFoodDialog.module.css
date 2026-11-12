@@ -1,0 +1,26 @@
+@import '../../../styles/breakpoints.css';
+
+.popup {
+  align-content: start;
+
+  /* Touch devices get a full-screen sheet sized above the keyboard, like the search takeover. */
+  @media (pointer: coarse) {
+    position: fixed;
+    inset: 0 0 auto;
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    padding-top: calc(env(safe-area-inset-top) + var(--space-md));
+    padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-md));
+    border: 0;
+    border-radius: 0;
+    background: linear-gradient(var(--c-surface-solid), var(--c-surface-solid)), #060816;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}

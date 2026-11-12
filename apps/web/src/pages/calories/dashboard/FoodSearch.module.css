@@ -1,0 +1,211 @@
+.search {
+  position: relative;
+}
+
+/* Touch devices search in a full-screen takeover; mouse devices use the dropdown. */
+.desktopOnly {
+  @media (pointer: coarse) {
+    display: none;
+  }
+}
+
+.trigger {
+  position: relative;
+
+  @media not (pointer: coarse) {
+    display: none;
+  }
+}
+
+/* Mirrors TextInput so the closed phone search looks like the field it opens. */
+.triggerButton {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--button-min-height);
+  padding-inline: calc(var(--space-sm) + 1.6rem) calc(var(--button-min-height) + var(--space-xs));
+  border: var(--border-width) solid var(--c-border-strong);
+  border-radius: var(--radius-xs);
+  background: rgba(2, 6, 23, 0.4);
+  color: var(--c-placeholder);
+  font-size: var(--text-md);
+  text-align: start;
+  cursor: text;
+
+  & span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &:focus-visible {
+    border-color: var(--c-primary-border);
+    box-shadow: 0 0 0 2px var(--c-primary-focus);
+    outline: none;
+  }
+
+  &[data-disabled] {
+    opacity: 0.56;
+    cursor: default;
+  }
+}
+
+.triggerScan {
+  position: absolute;
+  top: 50%;
+  right: 0.3rem;
+  display: flex;
+  transform: translateY(-50%);
+}
+
+.takeover {
+  position: fixed;
+  z-index: 40;
+  inset: 0 0 auto;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-sm) var(--space-xs);
+  height: 100dvh;
+  padding: calc(env(safe-area-inset-top) + var(--space-sm)) var(--space-sm) 0;
+  outline: none;
+  /* The surface token is translucent; layer it over the page colour so the diary can't show through. */
+  background: linear-gradient(var(--c-surface-solid), var(--c-surface-solid)), #060816;
+  color: var(--c-text);
+}
+
+.inlineResults {
+  display: flex;
+  flex-direction: column;
+  grid-column: 1 / -1;
+  align-self: stretch;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin-inline: calc(-1 * var(--space-sm));
+  border-top: var(--border-width) solid var(--c-border);
+
+  /*
+   * Clear a transparent Android nav bar. The pinned "Create" row absorbs the inset itself; padding
+   * on the scroller would leave a see-through strip below it that results scroll through.
+   */
+  & .list:not(:has(> .createOption)) {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Fill the sheet so "Create" stays at the bottom even with few results. */
+  & .list {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+  }
+
+  & .list > .createOption {
+    margin-top: auto;
+    padding-bottom: calc(var(--space-sm) + env(safe-area-inset-bottom));
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: var(--space-sm);
+  width: 1.1rem;
+  color: var(--c-muted);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.search .input {
+  padding-inline-start: calc(var(--space-sm) + 1.6rem);
+
+  &:disabled {
+    opacity: 0.56;
+    cursor: default;
+  }
+}
+
+.search:has(.input:disabled) .searchIcon {
+  opacity: 0.56;
+}
+
+.positioner {
+  z-index: 30;
+  width: var(--anchor-width);
+  outline: none;
+}
+
+.popup {
+  display: grid;
+  max-height: min(28rem, var(--available-height));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: var(--border-width) solid var(--c-border-popup);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-solid);
+  box-shadow: var(--shadow-popup);
+  color: var(--c-text);
+}
+
+.list {
+  outline: none;
+
+  & > :first-child {
+    border-block-start: 0;
+  }
+
+  & > :last-child {
+    border-block-end: 0;
+  }
+
+  /* The food summary has its own padding. */
+  & > .option {
+    padding: 0;
+  }
+
+  & > .createOption {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    /* Results scroll behind this footer, so give it a clear edge instead of slicing them. */
+    border-top: var(--border-width) solid var(--c-border-strong);
+    box-shadow: 0 -0.5rem 1rem -0.5rem rgba(2, 6, 23, 0.8);
+    background: var(--c-surface-solid);
+    color: var(--c-text-strong);
+    font-weight: var(--font-weight-semibold);
+
+    & svg {
+      flex: none;
+      width: 1.1rem;
+    }
+
+    & span {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+  }
+}
+
+.option {
+  cursor: pointer;
+
+  &[data-highlighted] {
+    background-color: var(--c-primary-surface);
+    box-shadow: inset 3px 0 0 var(--c-primary-border);
+  }
+}
+
+.message {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+  text-wrap: pretty;
+
+  &:not(:empty) {
+    padding: var(--space-md);
+  }
+}

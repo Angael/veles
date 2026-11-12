@@ -1,4 +1,4 @@
-import { ImageIcon, Trash2Icon, UploadIcon } from 'lucide-react';
+import { CameraIcon, ImageIcon, Trash2Icon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
 import css from './PhotoPicker.module.css';
@@ -13,6 +13,8 @@ type PhotoPickerProps = {
   allowUpload?: boolean;
   disabled?: boolean;
   existingUrl?: string | null;
+  /** Defaults to "Photo". */
+  legend?: string;
   onChange: (value: PhotoPickerValue) => void;
   value: PhotoPickerValue;
 };
@@ -51,6 +53,7 @@ export function PhotoPicker({
   allowUpload = true,
   disabled = false,
   existingUrl = null,
+  legend,
   onChange,
   value,
 }: PhotoPickerProps) {
@@ -81,7 +84,7 @@ export function PhotoPicker({
 
   return (
     <fieldset className={css.root} disabled={disabled}>
-      <legend className={css.legend}>{t({ en: 'Photo', pl: 'Zdjęcie' })}</legend>
+      <legend className={css.legend}>{legend ?? t({ en: 'Photo', pl: 'Zdjęcie' })}</legend>
       <div className={css.card} data-has-image={visibleUrl ? '' : undefined}>
         {visibleUrl ? (
           <img
@@ -106,15 +109,15 @@ export function PhotoPicker({
           {allowUpload ? (
             <Btn
               className={css.action}
-              icon={<UploadIcon aria-hidden='true' />}
+              icon={<CameraIcon aria-hidden='true' />}
               onClick={() => inputRef.current?.click()}
               size='sm'
               type='button'
               variant='white'
             >
               {visibleUrl
-                ? t({ en: 'Replace', pl: 'Zamień' })
-                : t({ en: 'Upload', pl: 'Prześlij' })}
+                ? t({ en: 'Retake', pl: 'Zrób nowe' })
+                : t({ en: 'Take photo', pl: 'Zrób zdjęcie' })}
             </Btn>
           ) : null}
           {visibleUrl ? (
@@ -138,7 +141,7 @@ export function PhotoPicker({
         ref={inputRef}
         accept='image/*'
         capture='environment'
-        aria-label={t({ en: 'Upload photo', pl: 'Prześlij zdjęcie' })}
+        aria-label={t({ en: 'Take photo', pl: 'Zrób zdjęcie' })}
         className={css.fileInput}
         onChange={(event) => {
           const [photo] = Array.from(event.target.files ?? []);

@@ -9,6 +9,7 @@ import {
   readWorkoutRoutines,
   readWorkoutSessions,
 } from './mcp-read-workouts.server';
+import { readWorkoutStats } from './mcp-read-workout-stats.server';
 
 export interface AgentResource {
   feature: AgentFeature;
@@ -65,7 +66,7 @@ export const resources = {
   food_products: {
     feature: 'food_products',
     dated: false,
-    description: `Shared food catalog with imageUrl or null. per100g nutrition: ${kcalAndMacros}. productSizeGrams is one package.`,
+    description: `Shared food catalog with imageUrl or null. per100g nutrition: ${kcalAndMacros}. productSizeGrams is one unit (package, piece, slice or serving).`,
     read: readFoodProducts,
   },
   workout_sessions: {
@@ -78,7 +79,7 @@ export const resources = {
     feature: 'workouts',
     dated: false,
     description:
-      'Reusable workout plans, each with ordered exercises (name, measure, restSeconds) and setTypes, one per planned set.',
+      'Reusable workout plans, each with archived (hidden in the app) and ordered exercises (name, measure, restSeconds) and setTypes, one per planned set.',
     read: readWorkoutRoutines,
   },
   workout_exercises: {
@@ -87,6 +88,13 @@ export const resources = {
     description:
       'Exercise list with measure, restSeconds, notes, archived, lastDoneOn, and sessionCount.',
     read: readWorkoutExercises,
+  },
+  workout_stats: {
+    feature: 'workouts',
+    dated: false,
+    description:
+      'Training summary per period; id is "all" (listed first) or a year, then years newest first. Counts sessions, activeDays, totalSeconds, exercises (different ones with a done set), newExercises (first ever done in the period), topExercises (sessions with a done set and share of all sessions), weekdays (sessions per weekday, Monday first), timeline (sessions per YYYY-MM month, or per YYYY year for all time), weekStreak and dayStreak (longest run, from/to dates), favouriteRoutine, longestSession (seconds), and firstSession.',
+    read: readWorkoutStats,
   },
 } satisfies Record<string, AgentResource>;
 
@@ -102,5 +110,7 @@ export const listInput = type({
 });
 export const getInput = type({
   resource: resourceName,
-  id: type('string > 0').describe('record UUID; a YYYY-MM-DD date for food_days'),
+  id: type('string > 0').describe(
+    'record UUID; a YYYY-MM-DD date for food_days; "all" or a year for workout_stats',
+  ),
 });

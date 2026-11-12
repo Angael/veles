@@ -30,6 +30,8 @@ export const foodProducts = pgTable(
       onDelete: 'restrict',
     }),
     productSizeGramsHundredths: integer('product_size_grams_hundredths'),
+    /** What one product size is (`FoodProductUnit`); null uses the seed default or "package". */
+    unit: text('unit'),
     kcalPer100gHundredths: integer('kcal_per_100g_hundredths').notNull(),
     proteinPer100gHundredths: integer('protein_per_100g_hundredths'),
     fatPer100gHundredths: integer('fat_per_100g_hundredths'),
@@ -89,6 +91,8 @@ export const foodLogShares = pgTable(
     recipientUserId: text('recipient_user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
+    /** Diary day the recipient gets the products on. The default only fills rows from before this column. */
+    logDate: date('log_date', { mode: 'string' }).notNull().defaultNow(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (table) => [
@@ -97,7 +101,7 @@ export const foodLogShares = pgTable(
   ],
 );
 
-/** Sender's logs offered in a share; values are read and rescaled from the log when listed or accepted. */
+/** Copy of a sender's log taken when shared, so later edits or deletes of the log cannot change a pending share. */
 export const foodLogShareItems = pgTable(
   'food_log_share_item',
   {
@@ -107,15 +111,22 @@ export const foodLogShareItems = pgTable(
     shareId: uuid('share_id')
       .notNull()
       .references(() => foodLogShares.id, { onDelete: 'cascade' }),
-    foodLogId: uuid('food_log_id')
-      .notNull()
-      .references(() => foodLogs.id, { onDelete: 'cascade' }),
-    /** Amount chosen in the share dialog; null copies the log as is (custom entries without grams). */
+    productId: uuid('product_id').references(() => foodProducts.id, { onDelete: 'set null' }),
+    imageUploadObjectId: text('image_upload_object_id').references(() => uploadObjects.id, {
+      onDelete: 'restrict',
+    }),
+    name: text('name').notNull(),
+    /** Amount chosen in the share dialog; null for custom entries without grams. */
     gramsHundredths: integer('grams_hundredths'),
+    kcalHundredths: integer('kcal_hundredths').notNull(),
+    proteinHundredths: integer('protein_hundredths'),
+    fatHundredths: integer('fat_hundredths'),
+    carbsHundredths: integer('carbs_hundredths'),
   },
   (table) => [
     index('food_log_share_item_share_id_idx').on(table.shareId),
-    index('food_log_share_item_food_log_id_idx').on(table.foodLogId),
+    index('food_log_share_item_product_id_idx').on(table.productId),
+    index('food_log_share_item_image_upload_object_id_idx').on(table.imageUploadObjectId),
   ],
 );
 
@@ -159,4 +170,38 @@ export const calorieDayNotes = pgTable(
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
   },
   (table) => [uniqueIndex('calorie_day_note_user_id_date_idx').on(table.userId, table.date)],
+);
+
+/**
+ * Photo product queue: the worker reads the photos, creates a catalog product and logs it when
+ * the user gave an amount. Rows stay after success so the daily limit can count them.
+ */
+export const foodPhotoScans = pgTable(
+  'food_photo_scan',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`uuidv7()`),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    logDate: date('log_date', { mode: 'string' }).notNull(),
+    /** Eaten amount; null only adds the product to the catalog. */
+    gramsHundredths: integer('grams_hundredths'),
+    /** Barcode the user scanned or typed; the AI product gets it when it is still free. */
+    barcode: text('barcode'),
+    /** Uploaded photos in shooting order. After success only the product's cover photo stays. */
+    photoUploadObjectIds: text('photo_upload_object_ids').array().notNull(),
+    /** `pending` → `processing` → `done` or `failed`. */
+    status: text('status').notNull().default('pending'),
+    attempts: integer('attempts').notNull().default(0),
+    error: text('error'),
+    foodLogId: uuid('food_log_id').references(() => foodLogs.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (table) => [
+    index('food_photo_scan_user_id_log_date_idx').on(table.userId, table.logDate),
+    index('food_photo_scan_status_idx').on(table.status, table.updatedAt),
+  ],
 );

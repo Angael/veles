@@ -6,7 +6,6 @@ import {
   useAcceptFoodLogShareMutation,
   useDeclineFoodLogShareMutation,
 } from './foodLogShares.query';
-import type { ReceivedFoodLogShare } from './foodLogShares.api';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import { List, ListItem } from '@/components/ui/list/List';
@@ -15,50 +14,22 @@ import css from './ReceivedFoodShares.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { productCountText } from '../calorieHelpers';
 
-type Props = {
-  date: string;
-};
-
-/** Incoming logs shown like the user's own, wrapped in a card that accepts or declines them all at once. */
-export function ReceivedFoodShares({ date }: Props) {
-  const { formatWhole, t } = useI18n();
+/**
+ * Incoming logs shown like the user's own, wrapped in a card that accepts or declines them all at once.
+ * Accepting adds them to the day the sender chose, which may not be the viewed day, so a toast names it.
+ */
+export function ReceivedFoodShares() {
+  const { formatDate, formatWhole, t } = useI18n();
   const sharesQuery = useQuery(receivedFoodLogSharesQueryOptions());
   const acceptMutation = useAcceptFoodLogShareMutation();
   const declineMutation = useDeclineFoodLogShareMutation();
 
-  function accept(share: ReceivedFoodLogShare) {
-    acceptMutation.mutate(
-      { date, id: share.id },
-      {
-        onSuccess: () =>
-          toastManager.add({
-            title: t({
-              en: `Added ${t(productCountText(share.items.length))} from ${share.senderName}`,
-              pl: `Dodano ${t(productCountText(share.items.length))} od: ${share.senderName}`,
-            }),
-            type: 'success',
-          }),
-      },
-    );
-  }
-
-  function decline(share: ReceivedFoodLogShare) {
-    declineMutation.mutate(share.id, {
-      onSuccess: () =>
-        toastManager.add({
-          title: t({
-            en: `Declined ${t(productCountText(share.items.length))} from ${share.senderName}`,
-            pl: `Odrzucono ${t(productCountText(share.items.length))} od: ${share.senderName}`,
-          }),
-        }),
-    });
-  }
-
   return (sharesQuery.data ?? []).map((share) => {
     const count = share.items.length;
     const headingId = `share-${share.id}`;
-    const accepting = acceptMutation.isPending && acceptMutation.variables.id === share.id;
+    const accepting = acceptMutation.isPending && acceptMutation.variables === share.id;
     const declining = declineMutation.isPending && declineMutation.variables === share.id;
+    const day = formatDate(share.date, { day: 'numeric', month: 'short', weekday: 'short' });
     return (
       <Card
         aria-labelledby={headingId}
@@ -74,6 +45,7 @@ export function ReceivedFoodShares({ date }: Props) {
             pl: `${share.senderName} udostępnia Ci ${t(productCountText(count))}`,
           })}
         </h3>
+        <p className={css.date}>{t({ en: `For ${day}`, pl: `Na dzień: ${day}` })}</p>
         <List as='ol'>
           {share.items.map((item) => (
             <ListItem key={item.id} style={{ padding: 0 }}>
@@ -100,7 +72,7 @@ export function ReceivedFoodShares({ date }: Props) {
             disabled={accepting}
             icon={<XIcon aria-hidden='true' />}
             loading={declining}
-            onClick={() => decline(share)}
+            onClick={() => declineMutation.mutate(share.id)}
             variant='danger'
           >
             {t({ en: 'Decline', pl: 'Odrzuć' })}
@@ -109,7 +81,15 @@ export function ReceivedFoodShares({ date }: Props) {
             disabled={declining}
             icon={<CheckIcon aria-hidden='true' />}
             loading={accepting}
-            onClick={() => accept(share)}
+            onClick={() =>
+              acceptMutation.mutate(share.id, {
+                onSuccess: () =>
+                  toastManager.add({
+                    title: t({ en: `Added to ${day}`, pl: `Dodano: ${day}` }),
+                    type: 'success',
+                  }),
+              })
+            }
           >
             {t({ en: 'Add', pl: 'Dodaj' })}
           </Btn>

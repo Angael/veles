@@ -63,7 +63,7 @@ export const listItemsCollection = collectionOptions('list-items', (client) =>
 
 /**
  * Waits for all server calls, toasts once on failure, and rethrows so TanStack DB rolls back.
- * On success it refetches by hand and turns off the deprecated automatic refetch (removed in 1.0).
+ * On success it refetches, so the optimistic change is replaced by server rows.
  */
 async function persist(
   collection: { utils: { refetch: () => Promise<unknown> } },
@@ -77,7 +77,6 @@ async function persist(
     throw error;
   }
   await collection.utils.refetch();
-  return { refetch: false };
 }
 
 /** The list items collection of the current `DbClient`, for writes and `utils.refetch()`. */

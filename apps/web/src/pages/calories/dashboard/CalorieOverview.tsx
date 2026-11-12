@@ -1,13 +1,18 @@
+import { useQuery } from '@tanstack/react-query';
+import clsx from 'clsx';
 import { useState } from 'react';
 import type { CalorieDashboardDay } from '../calories.api';
 import { CreateRecipeAction } from './CreateRecipeAction';
 import { DailySummary } from './DailySummary';
 import { DayNote } from './DayNote';
 import { DeleteLogsAction } from './DeleteLogsAction';
+import { FoodSearch } from './FoodSearch';
 import { LogFoodMenu } from './LogFoodMenu';
 import { LoggedFood } from './LoggedFood';
 import { LogsDateAction } from './LogsDateAction';
 import { MultiplyLogsAction } from './MultiplyLogsAction';
+import { PendingPhotoScans } from './PendingPhotoScans';
+import { foodPhotoScansQueryOptions } from '../photo-scan/foodPhotoScans.query';
 import { ReceivedFoodShares } from './ReceivedFoodShares';
 import { ShareLogsAction } from './ShareLogsAction';
 import { useCancelSelectionOnBack } from './useCancelSelectionOnBack';
@@ -17,10 +22,15 @@ import { SelectionBar } from '@/components/ui/selection-bar/SelectionBar';
 import css from './CaloriesPage.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
-type Props = { day: CalorieDashboardDay };
+type Props = {
+  day: CalorieDashboardDay;
+  /** Food to open in the add dialog, e.g. after scanning or creating it. */
+  linkedFoodId?: string;
+  searchOpen: boolean;
+};
 
 /** Day overview; selecting logs via their images swaps the Log food button for bulk actions. */
-export function CalorieOverview({ day }: Props) {
+export function CalorieOverview({ day, linkedFoodId, searchOpen }: Props) {
   const { date, goal, logs, totals } = day;
   const { t } = useI18n();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -29,6 +39,8 @@ export function CalorieOverview({ day }: Props) {
   const allSelected = selectedLogs.length === logs.length;
   const clearSelection = () => setSelectedIds([]);
   useCancelSelectionOnBack(selecting, clearSelection);
+  const scans = useQuery(foodPhotoScansQueryOptions(date)).data;
+  const aiLogIds = new Set(scans?.flatMap((scan) => scan.foodLogId ?? []));
 
   function setSelected(id: string, selected: boolean) {
     setSelectedIds((current) =>
@@ -37,19 +49,22 @@ export function CalorieOverview({ day }: Props) {
   }
 
   return (
-    <div className={css.overviewStack}>
+    // `selectionTray` keeps the tray's bottom clearance on, so the page height never changes on select.
+    <div className={clsx(css.overviewStack, 'selectionTray')}>
       {selecting ? (
         <SelectionBar
           aria-label={t({ en: 'Selected products', pl: 'Wybrane produkty' })}
           count={selectedLogs.length}
           onClear={clearSelection}
+          primaryAction={
+            <ShareLogsAction date={date} logs={selectedLogs} onShared={clearSelection} />
+          }
         >
           <MultiplyLogsAction logs={selectedLogs} onMultiplied={clearSelection} />
           <LogsDateAction date={date} logs={selectedLogs} mode='move' onDone={clearSelection} />
           <LogsDateAction date={date} logs={selectedLogs} mode='copy' onDone={clearSelection} />
           <CreateRecipeAction logs={selectedLogs} />
           <DeleteLogsAction logs={selectedLogs} onDeleted={clearSelection} />
-          <ShareLogsAction logs={selectedLogs} onShared={clearSelection} />
         </SelectionBar>
       ) : (
         <LogFoodMenu date={date} />
@@ -72,11 +87,19 @@ export function CalorieOverview({ day }: Props) {
             </Btn>
           ) : null}
         </div>
-        <ReceivedFoodShares date={date} />
+        <FoodSearch
+          date={date}
+          disabled={selecting}
+          linkedFoodId={linkedFoodId}
+          searchOpen={searchOpen}
+        />
+        <ReceivedFoodShares />
+        <PendingPhotoScans date={date} logIds={new Set(logs.map((entry) => entry.id))} />
         {logs.length ? (
           <List as='ol' data-selecting={selecting || undefined}>
             {logs.map((entry) => (
               <LoggedFood
+                aiReveal={aiLogIds.has(entry.id)}
                 date={date}
                 entry={entry}
                 key={entry.id}

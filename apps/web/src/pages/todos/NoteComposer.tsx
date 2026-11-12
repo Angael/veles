@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog/Dialog';
 import { FloatingButton } from '@/components/ui/floating-button/FloatingButton';
-import { SeamlessTextInput } from '@/components/ui/seamless-text-input/SeamlessTextInput';
+import { SeamlessSingleLineTextarea } from '@/components/ui/seamless-single-line-textarea/SeamlessSingleLineTextarea';
 import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
 import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { DraftChecklist, linesToDraftItems, newDraftItem, type DraftItem } from './DraftChecklist';
@@ -98,19 +98,14 @@ function NoteComposerForm({
       ref={formRef}
     >
       <div className={css.cardHeader}>
-        <SeamlessTextInput
+        <SeamlessSingleLineTextarea
           aria-label={t({ en: 'Note title', pl: 'Tytuł notatki' })}
           autoFocus
           className={css.titleInput}
           enterKeyHint='next'
           maxLength={160}
           name='title'
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
-              event.preventDefault();
-              formRef.current?.querySelector<HTMLElement>('[data-draft-body]')?.focus();
-            }
-          }}
+          onEnter={() => formRef.current?.querySelector<HTMLElement>('[data-draft-body]')?.focus()}
           placeholder={t({ en: 'Note title', pl: 'Tytuł notatki' })}
           required
         />

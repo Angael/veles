@@ -6,9 +6,10 @@ import { calorieDashboardQueryOptions } from '@/pages/calories/calories.query';
 import { receivedFoodLogSharesQueryOptions } from '@/pages/calories/dashboard/foodLogShares.query';
 import { calorieWeekStart, normalizeCalorieDate } from '@/pages/calories/calorieHelpers';
 import { translate } from '@/lib/i18n/getLocale';
+import { useTodayLocalDate } from '@/lib/useTodayLocalDate';
 
 export const Route = createFileRoute('/_authenticated/calories')({
-  validateSearch: type({ 'date?': 'string' }),
+  validateSearch: type({ 'date?': 'string', 'foodId?': 'string', 'sheet?': "'search'" }),
   loaderDeps: ({ search }) => ({
     weekStart: calorieWeekStart(normalizeCalorieDate(search.date)),
   }),
@@ -27,8 +28,18 @@ export const Route = createFileRoute('/_authenticated/calories')({
 });
 function RouteComponent() {
   const search = Route.useSearch();
-  const date = normalizeCalorieDate(search.date);
+  // Without `?date=` the diary follows today, also when a frozen PWA resumes on a new day.
+  const today = useTodayLocalDate();
+  const date = search.date ? normalizeCalorieDate(search.date) : today;
   const { data: dashboard } = useSuspenseQuery(calorieDashboardQueryOptions(date));
 
-  return <CaloriesPage dashboard={dashboard} date={date} />;
+  return (
+    <CaloriesPage
+      dashboard={dashboard}
+      date={date}
+      linkedFoodId={search.foodId}
+      searchOpen={search.sheet === 'search'}
+      today={today}
+    />
+  );
 }

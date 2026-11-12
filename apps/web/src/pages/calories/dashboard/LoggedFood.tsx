@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { CopyPlusIcon, PencilIcon, SquareCheckIcon, SquareIcon, Trash2Icon } from 'lucide-react';
+import { ScalingIcon, PencilIcon, SquareCheckIcon, SquareIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
 import { FoodSelectTarget } from '../FoodSelectTarget';
 import { FoodSummary } from '../FoodSummary';
@@ -21,6 +21,8 @@ import css from './LoggedFood.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 type LoggedFoodProps = {
+  /** Plays a one-time glow, because the AI just turned a pending row into this entry. */
+  aiReveal: boolean;
   date: string;
   entry: CalorieLog;
   onSelectedChange: (id: string, selected: boolean) => void;
@@ -28,7 +30,7 @@ type LoggedFoodProps = {
 };
 
 /** Logged food row; right click or long press opens per-entry actions. */
-export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFoodProps) {
+export function LoggedFood({ aiReveal, date, entry, onSelectedChange, selected }: LoggedFoodProps) {
   const { formatWhole, t } = useI18n();
   const deleteMutation = useDeleteFoodLogMutation();
   const [multiplyOpen, setMultiplyOpen] = useState(false);
@@ -46,7 +48,14 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
     <>
       <ContextMenuRoot>
         <ContextMenuTrigger
-          render={<ListItem className={css.item} selected={selected} style={{ padding: 0 }} />}
+          render={
+            <ListItem
+              className={css.item}
+              data-ai-reveal={aiReveal || undefined}
+              selected={selected}
+              style={{ padding: 0 }}
+            />
+          }
         >
           <FoodSummary
             action={
@@ -95,7 +104,7 @@ export function LoggedFood({ date, entry, onSelectedChange, selected }: LoggedFo
             render={<Link params={{ logId: entry.id }} to='/calories/logs/$logId' />}
           />
           <ContextMenuItem
-            icon={<CopyPlusIcon aria-hidden='true' />}
+            icon={<ScalingIcon aria-hidden='true' />}
             label={t({ en: 'Multiply…', pl: 'Pomnóż…' })}
             onClick={() => setMultiplyOpen(true)}
           />

@@ -1,11 +1,11 @@
 import clsx from 'clsx';
 import type { ComponentProps } from 'react';
-import { SeamlessTextarea } from '@/components/ui/seamless-textarea/SeamlessTextarea';
+import { SeamlessSingleLineTextarea } from '@/components/ui/seamless-single-line-textarea/SeamlessSingleLineTextarea';
 import css from './TodosPage.module.css';
 
 type ChecklistItemInputProps = Omit<
-  ComponentProps<typeof SeamlessTextarea>,
-  'enterKeyHint' | 'maxLength' | 'onKeyDown' | 'rows'
+  ComponentProps<typeof SeamlessSingleLineTextarea>,
+  'enterKeyHint' | 'maxLength' | 'onEnter' | 'onKeyDown'
 > & {
   /** Enter: go to the next item. */
   onEnter: () => void;
@@ -21,34 +21,21 @@ type ChecklistItemInputProps = Omit<
  */
 export function ChecklistItemInput({
   className,
-  onChange,
   onEnter,
   onMergeIntoPrevious,
   onRemoveEmpty,
   ...props
 }: ChecklistItemInputProps) {
   return (
-    <SeamlessTextarea
+    <SeamlessSingleLineTextarea
       {...props}
       className={clsx(css.itemName, className)}
       enterKeyHint='next'
       maxLength={240}
-      onChange={(event) => {
-        const field = event.currentTarget;
-        if (/[\r\n]/.test(field.value)) {
-          // Same length, so the caret stays where it was.
-          const caret = field.selectionStart;
-          field.value = field.value.replace(/[\r\n]/g, ' ');
-          field.setSelectionRange(caret, caret);
-        }
-        onChange?.(event);
-      }}
+      onEnter={() => onEnter()}
       onKeyDown={(event) => {
         const field = event.currentTarget;
-        if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
-          event.preventDefault();
-          onEnter();
-        } else if ((event.key === 'Backspace' || event.key === 'Delete') && !field.value.trim()) {
+        if ((event.key === 'Backspace' || event.key === 'Delete') && !field.value.trim()) {
           event.preventDefault();
           onRemoveEmpty(event.key === 'Backspace' ? 'previous' : 'next');
         } else if (
@@ -61,7 +48,6 @@ export function ChecklistItemInput({
           onMergeIntoPrevious(field.value);
         }
       }}
-      rows={1}
     />
   );
 }

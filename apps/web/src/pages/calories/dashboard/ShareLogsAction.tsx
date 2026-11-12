@@ -7,6 +7,7 @@ import type { CalorieLog } from '../calories.api';
 import { foodShareRecipientsQueryOptions, useShareFoodLogsMutation } from './foodLogShares.query';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Checkbox } from '@/components/ui/checkbox/Checkbox';
+import { DateInput } from '@/components/ui/date-input/DateInput';
 import {
   DialogActions,
   DialogClose,
@@ -16,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog/Dialog';
+import { Label } from '@/components/ui/label/Label';
 import { SelectionBarAction } from '@/components/ui/selection-bar/SelectionBar';
 import { toastManager } from '@/components/ui/toast/toastManager';
 import { getInitials } from '@/lib/getInitials';
@@ -25,6 +27,7 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 import { productCountText } from '../calorieHelpers';
 
 type Props = {
+  date: string;
   logs: CalorieLog[];
   onShared: () => void;
 };
@@ -35,15 +38,17 @@ const gramsByLogId = (logs: CalorieLog[]) =>
   );
 
 /**
- * Picks friends who each receive a copy of the selected logs to accept into their own diary. The
- * sender can adjust each log's grams first, e.g. to share only the friend's half of a meal.
+ * Picks friends who each receive a copy of the selected logs to accept into their own diary, on
+ * the day chosen here (by default the viewed day). The sender can adjust each log's grams first,
+ * e.g. to share only the friend's half of a meal.
  */
-export function ShareLogsAction({ logs, onShared }: Props) {
+export function ShareLogsAction({ date, logs, onShared }: Props) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   // null until the user picks: a lone friend is preselected without waiting for an effect.
   const [pickedIds, setPickedIds] = useState<string[] | null>(null);
   const [gramsById, setGramsById] = useState<Record<string, number | null>>({});
+  const [shareDate, setShareDate] = useState(date);
   const friendsQuery = useQuery(foodShareRecipientsQueryOptions());
   const shareMutation = useShareFoodLogsMutation();
   const friends = friendsQuery.data ?? [];
@@ -58,6 +63,7 @@ export function ShareLogsAction({ logs, onShared }: Props) {
       .map((friend) => friend.name);
     shareMutation.mutate(
       {
+        date: shareDate,
         items: logs.map((entry) => ({ grams: gramsById[entry.id] ?? null, logId: entry.id })),
         recipientUserIds: recipientIds,
       },
@@ -66,7 +72,7 @@ export function ShareLogsAction({ logs, onShared }: Props) {
           toastManager.add({
             title: t({
               en: `Shared ${products} with ${names.join(', ')}`,
-              pl: `Udostępniono ${products}: ${names.join(', ')}`,
+              pl: `Udostępniono ${products} dla: ${names.join(', ')}`,
             }),
             type: 'success',
           });
@@ -105,6 +111,7 @@ export function ShareLogsAction({ logs, onShared }: Props) {
         if (!nextOpen) return;
         setPickedIds(null);
         setGramsById(gramsByLogId(logs));
+        setShareDate(date);
       }}
       open={open}
     >
@@ -122,6 +129,9 @@ export function ShareLogsAction({ logs, onShared }: Props) {
             pl: `Otrzymają kopię (${products}), którą dodadzą do własnego dziennika.`,
           })}
         </DialogDescription>
+        <Label text={t({ en: 'Date', pl: 'Data' })}>
+          <DateInput onValueChange={setShareDate} required value={shareDate} />
+        </Label>
         <ShareLogsItems
           gramsById={gramsById}
           logs={logs}
@@ -161,7 +171,7 @@ export function ShareLogsAction({ logs, onShared }: Props) {
             {t({ en: 'Cancel', pl: 'Anuluj' })}
           </DialogClose>
           <Btn
-            disabled={recipientIds.length === 0 || !gramsValid}
+            disabled={recipientIds.length === 0 || !gramsValid || !shareDate}
             icon={<SendIcon aria-hidden='true' />}
             loading={shareMutation.isPending}
             onClick={share}

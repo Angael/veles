@@ -33,7 +33,7 @@ export function useStartWorkoutMutation() {
       error: {
         title: t({ en: 'Could not start a workout', pl: 'Nie udało się rozpocząć treningu' }),
       },
-      invalidateQueryKey: workoutKeys.list,
+      invalidateQueryKey: workoutKeys.all,
     },
     mutationFn: (variables: { date: string }) => startWorkout({ data: variables }),
   });
@@ -47,8 +47,12 @@ export function useUpdateWorkoutMutation() {
       error: { title: t({ en: 'Workout was not saved', pl: 'Nie udało się zapisać treningu' }) },
       invalidateQueryKey: workoutKeys.all,
     },
-    mutationFn: (variables: { id: string; name?: string; finished?: boolean }) =>
-      updateWorkout({ data: variables }),
+    mutationFn: (variables: {
+      id: string;
+      name?: string;
+      finished?: boolean;
+      fillHints?: boolean;
+    }) => updateWorkout({ data: variables }),
   });
 }
 
@@ -60,7 +64,6 @@ export function useMoveWorkoutMutation() {
     meta: {
       error: { title: t({ en: 'Workout was not moved', pl: 'Nie udało się przenieść treningu' }) },
       invalidateQueryKey: workoutKeys.all,
-      success: { title: t({ en: 'Workout moved', pl: 'Przeniesiono trening' }) },
     },
     mutationFn: (variables: { id: string; date: string }) => updateWorkout({ data: variables }),
   });
@@ -72,8 +75,7 @@ export function useDeleteWorkoutMutation() {
   return useMutation({
     meta: {
       error: { title: t({ en: 'Workout was not deleted', pl: 'Nie udało się usunąć treningu' }) },
-      invalidateQueryKey: workoutKeys.list,
-      success: { title: t({ en: 'Workout deleted', pl: 'Usunięto trening' }) },
+      invalidateQueryKey: workoutKeys.all,
     },
     mutationFn: (variables: { id: string }) => deleteWorkout({ data: variables }),
   });

@@ -127,6 +127,41 @@
       "when": 1792795801467,
       "tag": "0017_drop_recipe_text_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792796136548,
+      "tag": "0018_food_product_unit",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794239826000,
+      "tag": "0019_food_log_share_item_snapshot",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794264260482,
+      "tag": "0020_food_photo_scans",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1794315129350,
+      "tag": "0021_careful_weapon_omega",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1794488799355,
+      "tag": "0022_clear_bug",
+      "breakpoints": true
     }
   ]
 }

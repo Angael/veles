@@ -1,6 +1,9 @@
 /// <reference types="vite/client" />
 
 declare global {
+  /** Set by `define` in vite.config.ts; unique per build. */
+  const __BUILD_ID__: string;
+
   interface ImportMetaEnv {
     readonly VITE_APP_NAME: string;
     readonly VITE_APP_ENV?: 'production' | 'development' | 'localhost';

@@ -3,6 +3,7 @@ import { GoalIcon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
 import { Card } from '@/components/ui/card/Card';
 import type { CalorieGoal, CalorieTotals } from '../calories.api';
+import { useCountUp } from './useCountUp';
 import css from './DailySummary.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
@@ -13,6 +14,7 @@ type DailySummaryProps = {
 
 export function DailySummary({ goal, totals }: DailySummaryProps) {
   const { formatWhole, t } = useI18n();
+  const shownKcal = useCountUp(totals.kcal);
 
   return (
     <Card
@@ -28,7 +30,7 @@ export function DailySummary({ goal, totals }: DailySummaryProps) {
       <div className={css.energy}>
         <div className={css.energyTop}>
           <p className={css.energyAmount}>
-            <strong>{formatWhole(totals.kcal)}</strong>
+            <strong>{formatWhole(shownKcal)}</strong>
             <span>
               {goal
                 ? `/ ${formatWhole(goal.kcal)} kcal`

@@ -15,7 +15,7 @@
   align-items: center;
   gap: var(--space-sm) var(--space-lg);
 
-  & > input {
+  & > textarea {
     flex: 1 1 12rem;
     font-size: var(--text-lg);
     font-weight: var(--font-weight-semibold);

@@ -33,7 +33,7 @@ Atwater calculation.
 - **Falafel / Falafel** — [FDC 172455](https://fdc.nal.usda.gov/food-details/172455/nutrients): Falafel, home-prepared. Default 100 g.
 - **Potato pancakes / Placki ziemniaczane** — [FDC 170092](https://fdc.nal.usda.gov/food-details/170092/nutrients): Potato pancakes. Default 150 g.
 - **Mashed potatoes, with milk and butter / Puree ziemniaczane z mlekiem i masłem** — [FDC 168555](https://fdc.nal.usda.gov/food-details/168555/nutrients): Potatoes, mashed, home-prepared, whole milk and butter added. Default 200 g.
-- **Rice noodles, cooked / Makaron ryżowy gotowany** — [FDC 168914](https://fdc.nal.usda.gov/food-details/168914/nutrients): Rice noodles, cooked. Default 150 g.
+- **Rice noodles, dry / Makaron ryżowy suchy** — [FDC 169742](https://fdc.nal.usda.gov/food-details/169742/nutrients): Rice noodles, dry. Default 50 g.
 - **Butter croissant / Croissant maślany** — [FDC 174987](https://fdc.nal.usda.gov/food-details/174987/nutrients): Croissants, butter. Default 60 g.
 - **Doughnut, jam-filled / Pączek z dżemem** — [FDC 172759](https://fdc.nal.usda.gov/food-details/172759/nutrients): Doughnuts, yeast-leavened, with jelly filling. Default 70 g.
 - **Pancakes, plain / Pancakes, placuszki bez dodatków** — [FDC 175009](https://fdc.nal.usda.gov/food-details/175009/nutrients): Pancakes, plain, prepared from recipe. Default 150 g.
