@@ -77,7 +77,7 @@ export const auth = betterAuth({
           return { data: user };
         },
         after: async (user) => {
-          log.info('New user signed up', { userId: user.id, email: user.email });
+          log.info('New user signed up', { userId: user.id });
         },
       },
     },
