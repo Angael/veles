@@ -7,163 +7,51 @@
   display: grid;
   gap: var(--space-xs);
   padding: var(--space-xl);
-}
 
-.emptyState h1 {
-  font-size: var(--text-xl-dynamic);
-  text-wrap: balance;
-}
-
-.emptyState p {
-  color: var(--c-muted);
-  text-wrap: pretty;
-}
-
-.captureContainer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  justify-content: space-between;
-  gap: var(--space-lg);
-}
-
-.captureActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-}
-
-.captureContainer .entryForm {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-
-.summaryGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  min-width: 0;
-  padding: 0;
-}
-
-.summaryRail {
-  min-width: 0;
-}
-
-.summaryStat {
-  display: grid;
-  gap: 0.35rem;
-  min-width: 0;
-  padding: var(--space-lg);
-  border-right: var(--border-width) solid var(--c-border);
-}
-
-.summaryStat:last-child {
-  border-right: 0;
-}
-
-.summaryStat strong {
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.statLabel,
-.captureField span {
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: var(--text-xs);
-  color: var(--c-accent-strong);
-}
-
-.deltaBetter {
-  color: #86efac;
-}
-
-.deltaNeutral {
-  color: var(--c-text);
-}
-
-.entriesCard {
-  display: grid;
-  gap: var(--space-lg);
-}
-
-.entryForm {
-  display: grid;
-  grid-template-columns: minmax(0, 18rem) auto;
-  align-items: end;
-  justify-content: start;
-  gap: var(--space-sm);
-  padding-bottom: var(--space-lg);
-  border-bottom: var(--border-width) solid var(--c-border);
-}
-
-.captureField {
-  display: grid;
-  gap: var(--space-xs);
-}
-
-.entryLink {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xs);
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-color: var(--c-border);
-  text-underline-offset: 0.2em;
-
-  &:hover {
-    text-decoration-color: currentColor;
-  }
-}
-
-.photoBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.2rem;
-  color: var(--c-muted);
-  font-size: var(--text-xs);
-
-  svg {
-    width: 0.9rem;
-    height: 0.9rem;
-  }
-}
-
-.tableFrame {
-  min-width: 0;
-  overflow-x: auto;
-}
-
-.entriesTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-variant-numeric: tabular-nums;
-
-  & th,
-  & td {
-    padding: 0.75rem 0;
-    border-bottom: var(--border-width) solid var(--c-border);
-    text-align: right;
-    white-space: nowrap;
+  & h1 {
+    font-size: var(--text-xl-dynamic);
+    text-wrap: balance;
   }
 
-  & th {
+  & p {
     color: var(--c-muted);
-    font-size: var(--text-xs);
-    font-weight: var(--font-weight-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    text-wrap: pretty;
   }
+}
 
-  & th:first-child,
-  & td:first-child {
-    text-align: left;
-  }
+.capture {
+  padding: var(--space-md);
+}
 
-  & tbody tr:last-child td {
-    border-bottom: 0;
+.captureForm {
+  display: grid;
+  grid-template-columns: minmax(0, 22rem) auto;
+  align-items: end;
+  gap: var(--space-sm);
+}
+
+.captureLabel {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  color: var(--c-muted-soft);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.savedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--c-success-text);
+  font-weight: var(--font-weight-regular);
+  white-space: nowrap;
+
+  & svg {
+    width: 1rem;
+    height: 1rem;
   }
 }
 
@@ -172,40 +60,7 @@
     padding: var(--space-lg) var(--space-md);
   }
 
-  .captureContainer {
-    align-items: stretch;
-    flex-direction: column;
-    gap: var(--space-md);
-  }
-
-  .captureActions > * {
-    flex: 1;
-  }
-
-  .entriesCard {
-    padding: var(--space-md);
-  }
-
-  .summaryGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .summaryStat {
-    gap: 0.2rem;
-    padding: var(--space-md) var(--space-sm);
-  }
-
-  .summaryStat strong {
-    font-size: clamp(1rem, 5vw, 1.45rem);
-  }
-
-  .statLabel {
-    letter-spacing: 0.08em;
-    font-size: 0.65rem;
-  }
-
-  .entryForm {
+  .captureForm {
     grid-template-columns: minmax(0, 1fr) auto;
-    padding-bottom: var(--space-md);
   }
 }

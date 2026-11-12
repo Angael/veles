@@ -70,6 +70,9 @@ function parseProduct(
   };
 }
 
+/** Keeps a slow Open Food Facts response from holding the barcode lookup. */
+const OPEN_FOOD_FACTS_TIMEOUT_MS = 8_000;
+
 /** Looks up a barcode using Open Food Facts v3, falling back to v2. */
 export async function getOpenFoodFactsProduct(
   barcode: string,
@@ -91,7 +94,10 @@ export async function getOpenFoodFactsProduct(
 
   for (const endpoint of endpoints) {
     try {
-      const response = await fetch(endpoint, { headers: { accept: 'application/json' } });
+      const response = await fetch(endpoint, {
+        headers: { accept: 'application/json' },
+        signal: AbortSignal.timeout(OPEN_FOOD_FACTS_TIMEOUT_MS),
+      });
       if (!response.ok) continue;
 
       const parsedResponse = openFoodFactsResponseType(await response.json());

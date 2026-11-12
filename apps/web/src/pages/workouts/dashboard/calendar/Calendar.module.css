@@ -98,19 +98,25 @@
   }
 }
 
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-xs) var(--space-lg);
+
+  /* On phones the floating button sits at the right edge and would cover them. */
+  @media (--phone) {
+    justify-content: flex-start;
+  }
+}
+
 .more {
   display: inline-flex;
   align-items: center;
-  justify-self: end;
   gap: 0.3rem;
   color: var(--c-accent);
   font-size: var(--text-sm);
   text-decoration: none;
-
-  /* On phones the floating button sits at the right edge and would cover it. */
-  @media (--phone) {
-    justify-self: start;
-  }
 
   & svg {
     width: 1rem;

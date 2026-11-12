@@ -46,7 +46,8 @@ export async function requireOwnedRoutine(tx: DbTransaction, userId: string, rou
 
 /**
  * Stores a session's shape in a routine: exercises in order and the set types of each. Values
- * are dropped on purpose; last time's numbers already show what to aim for.
+ * are dropped on purpose; last time's numbers already show what to aim for. Refuses an empty
+ * session, so a stale menu can never wipe a routine's plan.
  */
 export async function copySessionToRoutine(
   tx: DbTransaction,
@@ -58,7 +59,13 @@ export async function copySessionToRoutine(
     .from(workoutSessionExercises)
     .where(eq(workoutSessionExercises.sessionId, sessionId))
     .orderBy(asc(workoutSessionExercises.position));
-  if (slots.length === 0) return;
+  if (slots.length === 0)
+    throw new ClientSafeError(
+      translate({
+        en: 'Add an exercise before saving a routine.',
+        pl: 'Dodaj ćwiczenie przed zapisaniem planu.',
+      }),
+    );
 
   const sets = await tx
     .select({ slotId: workoutSets.sessionExerciseId, type: workoutSets.type })

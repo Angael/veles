@@ -60,7 +60,10 @@ export function AppFrame({
                 <VelesLogo />
               </Link>
             )}
-            <Navbar user={user} />
+            <div className={css.headerEnd}>
+              {navbar?.Actions ? <navbar.Actions /> : null}
+              <Navbar user={user} />
+            </div>
           </header>
         )}
         {children === undefined ? <Outlet /> : children}

@@ -56,14 +56,15 @@ Resources:
 - workout_sessions: Workout sessions, newest first, each with its exercises (id of the session exercise, exerciseId from workout_exercises, name, measure, notes) and their sets. Sets: id, type (normal, warmup, drop, failure), done, weightKg, reps, durationSeconds, distanceKm; measure says which apply. durationSeconds is manual or end minus start.
 - workout_routines: Reusable workout plans, each with archived (hidden in the app) and ordered exercises (name, measure, restSeconds) and setTypes, one per planned set.
 - workout_exercises: Exercise list with measure, restSeconds, notes, archived, lastDoneOn, and sessionCount.
+- workout_stats: Training summary per period; id is "all" (listed first) or a year, then years newest first. Counts sessions, activeDays, totalSeconds, exercises (different ones with a done set), newExercises (first ever done in the period), topExercises (sessions with a done set and share of all sessions), weekdays (sessions per weekday, Monday first), timeline (sessions per YYYY-MM month, or per YYYY year for all time), weekStreak and dayStreak (longest run, from/to dates), favouriteRoutine, longestSession (seconds), and firstSession.
 
-| Input      | Type                                                                                                                                                      | Required | Notes                                           |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
-| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" | yes      |                                                 |
-| `cursor`   | string                                                                                                                                                    |          | nextCursor from the previous page               |
-| `from`     | date YYYY-MM-DD                                                                                                                                           |          | earliest date, inclusive (dated resources only) |
-| `limit`    | integer                                                                                                                                                   |          |                                                 |
-| `to`       | date YYYY-MM-DD                                                                                                                                           |          | latest date, inclusive (dated resources only)   |
+| Input      | Type                                                                                                                                                                         | Required | Notes                                           |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
+| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" \| "workout_stats" | yes      |                                                 |
+| `cursor`   | string                                                                                                                                                                       |          | nextCursor from the previous page               |
+| `from`     | date YYYY-MM-DD                                                                                                                                                              |          | earliest date, inclusive (dated resources only) |
+| `limit`    | integer                                                                                                                                                                      |          |                                                 |
+| `to`       | date YYYY-MM-DD                                                                                                                                                              |          | latest date, inclusive (dated resources only)   |
 
 ### `get_record`
 
@@ -71,10 +72,10 @@ _read_
 
 Fetch one permitted record by resource and id. Returns null if not found or not yours.
 
-| Input      | Type                                                                                                                                                      | Required | Notes                                        |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------- |
-| `id`       | string                                                                                                                                                    | yes      | record UUID; a YYYY-MM-DD date for food_days |
-| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" | yes      |                                              |
+| Input      | Type                                                                                                                                                                         | Required | Notes                                                                           |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------- |
+| `id`       | string                                                                                                                                                                       | yes      | record UUID; a YYYY-MM-DD date for food_days; "all" or a year for workout_stats |
+| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" \| "workout_stats" | yes      |                                                                                 |
 
 ### `get_days`
 

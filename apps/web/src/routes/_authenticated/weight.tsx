@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { WeightPage } from '@/pages/weight/WeightPage';
+import { WeightPageActions } from '@/pages/weight/WeightPageActions';
 import { getWeightChartRange, getWeightEntries } from '@/pages/weight/weight.api';
 
 export const Route = createFileRoute('/_authenticated/weight')({
@@ -12,7 +13,7 @@ export const Route = createFileRoute('/_authenticated/weight')({
     return { entries, initialChartRange };
   },
   component: RouteComponent,
-  staticData: { navbar: { label: { en: 'Weight', pl: 'Waga' } } },
+  staticData: { navbar: { Actions: WeightPageActions, label: { en: 'Weight', pl: 'Waga' } } },
 });
 
 function RouteComponent() {

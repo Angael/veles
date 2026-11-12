@@ -12,15 +12,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@9fd676a19091d4595eefd76e4bd31c97133911f1 # v4.2.0
         with:
           version: 12.3.4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
@@ -30,6 +30,12 @@ jobs:
 
       - name: Check formatting
         run: pnpm fmt:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Lint CSS
+        run: pnpm lint:css
 
       - name: Check types
         run: pnpm typecheck

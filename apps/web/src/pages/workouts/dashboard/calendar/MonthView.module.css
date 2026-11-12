@@ -167,16 +167,37 @@
   display: none;
 
   @media (--phone) {
+    position: relative;
     display: block;
     min-height: 5rem;
-    margin-top: var(--space-xs);
+    padding-top: 0.55rem;
+
+    /* Notch under the chosen day's column; its lower half covers the card's top border. */
+    &[style]::before {
+      position: absolute;
+      top: 0.15rem;
+      left: calc((var(--agenda-column) + 0.5) / 7 * 100%);
+      z-index: 1;
+      width: 0.8rem;
+      height: 0.8rem;
+      border-block-start: 1.5px solid var(--c-primary-border);
+      border-inline-start: 1.5px solid var(--c-primary-border);
+      background: var(--c-surface);
+      content: '';
+      transform: translateX(-50%) rotate(45deg);
+    }
+
+    &:has([data-open])::before {
+      background: var(--c-primary-surface-strong);
+    }
   }
 }
 
 .rest {
   padding: var(--space-md);
-  border: var(--border-width) dashed var(--c-border);
+  border: var(--border-width) dashed var(--c-primary-border);
   border-radius: var(--radius-xs);
+  background: var(--c-surface);
   color: var(--c-muted);
   font-size: var(--text-sm);
   text-align: center;

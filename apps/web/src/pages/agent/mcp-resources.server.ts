@@ -8,6 +8,7 @@ import {
   readWorkoutRoutines,
   readWorkoutSessions,
 } from './mcp-read-workouts.server';
+import { readWorkoutStats } from './mcp-read-workout-stats.server';
 
 export interface AgentResource {
   feature: AgentFeature;
@@ -81,6 +82,13 @@ export const resources = {
       'Exercise list with measure, restSeconds, notes, archived, lastDoneOn, and sessionCount.',
     read: readWorkoutExercises,
   },
+  workout_stats: {
+    feature: 'workouts',
+    dated: false,
+    description:
+      'Training summary per period; id is "all" (listed first) or a year, then years newest first. Counts sessions, activeDays, totalSeconds, exercises (different ones with a done set), newExercises (first ever done in the period), topExercises (sessions with a done set and share of all sessions), weekdays (sessions per weekday, Monday first), timeline (sessions per YYYY-MM month, or per YYYY year for all time), weekStreak and dayStreak (longest run, from/to dates), favouriteRoutine, longestSession (seconds), and firstSession.',
+    read: readWorkoutStats,
+  },
 } satisfies Record<string, AgentResource>;
 
 type ResourceName = keyof typeof resources;
@@ -95,5 +103,7 @@ export const listInput = type({
 });
 export const getInput = type({
   resource: resourceName,
-  id: type('string > 0').describe('record UUID; a YYYY-MM-DD date for food_days'),
+  id: type('string > 0').describe(
+    'record UUID; a YYYY-MM-DD date for food_days; "all" or a year for workout_stats',
+  ),
 });

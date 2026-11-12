@@ -2,10 +2,12 @@ import { and, asc, desc, eq, gt, lt, sql } from 'drizzle-orm';
 import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
+import { hintFill } from '../metrics';
 import {
   autoFinishIdleWorkouts,
   completeFilledSets,
   defaultWorkoutName,
+  loadWorkoutSession,
   nextPosition,
   previousSetCount,
   requireNoOpenWorkout,
@@ -48,6 +50,23 @@ export async function startWorkoutRecord(userId: string, data: typeof startWorko
 }
 
 /**
+ * Saves the grey hints of unticked sets' empty cells before a workout ends. Hints read like real
+ * values, so finishing keeps what the user saw instead of empty sets.
+ */
+async function fillHintSets(userId: string, workoutId: string) {
+  const session = await loadWorkoutSession(userId, workoutId);
+  await db.transaction(async (tx) => {
+    for (const slot of session.slots) {
+      for (const set of slot.sets) {
+        const patch = hintFill(set, slot.measure);
+        if (patch)
+          await tx.update(workoutSets).set(toSetColumns(patch)).where(eq(workoutSets.id, set.id));
+      }
+    }
+  });
+}
+
+/**
  * Renames a session, moves it to another day, or finishes / reopens it. Reopening is refused while
  * another is open. Moving updates only the session row, so its exercises and sets stay.
  */
@@ -61,6 +80,7 @@ export async function updateWorkoutRecord(
     await autoFinishIdleWorkouts(db, userId);
     await requireNoOpenWorkout(db, userId, data.id);
   }
+  if (data.finished && data.fillHints) await fillHintSets(userId, workout.id);
   await db
     .update(workoutSessions)
     .set({
