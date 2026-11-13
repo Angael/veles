@@ -169,17 +169,33 @@ export function formatMetric(field: MetricField, value: number, locale: Locale) 
   return field.kind === 'time' ? formatDuration(value) : formatSetNumber(value, locale);
 }
 
-/** Accepts `90`, `1:30` or `1.5m` for time; plain decimals with `,` or `.` for numbers. */
-export function parseMetric(field: MetricField, text: string): number | null {
-  const trimmed = text.trim().replace(',', '.');
-  if (!trimmed) return null;
-  if (field.kind === 'time') {
-    const clock = /^(\d+):(\d{1,2})$/.exec(trimmed);
-    if (clock) return Number(clock[1]) * 60 + Number(clock[2]);
-    const minutes = /^(\d+(?:\.\d+)?)m$/.exec(trimmed);
-    if (minutes) return Math.round(Number(minutes[1]) * 60);
+/**
+ * Reads typed time the way a kitchen timer does, because phone keypads have no colon:
+ * `130` is 1:30, `2810` is 28:10, `45` is 0:45. Any of `:`, `.`, `,` or a space also splits
+ * minutes from seconds (`1.30`, `1,30`). Suffixes stay explicit: `90s` is 90 seconds, `1.5m` 90.
+ */
+function parseDuration(text: string): number | null {
+  const compact = text.replace(/\s+/g, ' ');
+  const minutes = /^(\d+(?:[.,]\d+)?) ?m(?:in)?$/.exec(compact);
+  if (minutes) return Math.round(Number(minutes[1]?.replace(',', '.')) * 60);
+  const seconds = /^(\d+) ?s$/.exec(compact);
+  if (seconds) return Number(seconds[1]);
+  const clock = /^(\d*)[:., ](\d{1,2})$/.exec(compact);
+  if (clock) {
+    const secs = Number(clock[2]);
+    return secs < 60 ? Number(clock[1] || 0) * 60 + secs : null;
   }
-  const value = Number(trimmed.replace(/s$/, ''));
+  const digits = /^\d+$/.exec(compact)?.[0];
+  if (!digits) return null;
+  return Number(digits.slice(0, -2) || 0) * 60 + Number(digits.slice(-2));
+}
+
+/** Accepts timer-style time (see `parseDuration`); plain decimals with `,` or `.` for numbers. */
+export function parseMetric(field: MetricField, text: string): number | null {
+  const trimmed = text.trim();
+  if (!trimmed) return null;
+  if (field.kind === 'time') return parseDuration(trimmed.toLowerCase());
+  const value = Number(trimmed.replace(',', '.'));
   return Number.isFinite(value) && value >= 0 ? value : null;
 }
 
