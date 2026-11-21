@@ -8,6 +8,8 @@ import {
 } from '@veles/db/schema';
 import { foodProductUnit } from '@veles/db/seed/food-products';
 import { fromHundredths } from '@/lib/nutrition';
+import { filterFoods } from '@/pages/calories/add/filterFoods';
+import { getLastLoggedAtByProduct } from '@/pages/calories/foodProducts.server';
 import { readAgentPermissions } from '@/server/agentAccess.server';
 import { db } from '@/server/db.server';
 import { storagePathToUrl } from '@/server/storage/config.server';
@@ -159,32 +161,56 @@ export async function readCalorieGoals(userId: string, query: ReadQuery) {
   };
 }
 
-/** Shared catalog, newest first; not owner-scoped because every account reads the same rows. */
-export async function readFoodProducts(_userId: string, query: ReadQuery) {
-  const rows = await db
+type ProductRow = { product: typeof foodProducts.$inferSelect; imageKey: string | null };
+
+const productRows = () =>
+  db
     .select({ product: foodProducts, imageKey: uploadObjects.key })
     .from(foodProducts)
-    .leftJoin(uploadObjects, eq(uploadObjects.id, foodProducts.imageUploadObjectId))
+    .leftJoin(uploadObjects, eq(uploadObjects.id, foodProducts.imageUploadObjectId));
+
+/**
+ * Shared catalog, newest first; every account reads the same rows, and `lastLoggedAt` is the key
+ * owner's latest log. `search` ranks like the app's food picker (recently logged strong matches
+ * first) and returns one page, so agents find real products for recipes and logs by name.
+ */
+export async function readFoodProducts(userId: string, query: ReadQuery) {
+  const lastLoggedAtById = await getLastLoggedAtByProduct(userId);
+  const toItem = ({ product, imageKey }: ProductRow) => ({
+    id: product.id,
+    name: product.name,
+    namePl: product.namePl,
+    barcode: product.barcode,
+    productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
+    unit: foodProductUnit(product.unit, product.seedKey),
+    imageUrl: storagePathToUrl(imageKey),
+    lastLoggedAt: lastLoggedAtById.get(product.id) ?? null,
+    per100g: toNutrition({
+      kcal: product.kcalPer100gHundredths,
+      protein: product.proteinPer100gHundredths,
+      fat: product.fatPer100gHundredths,
+      carbs: product.carbsPer100gHundredths,
+    }),
+  });
+
+  if (query.search) {
+    const searchable = (await productRows()).map((row) => ({
+      row,
+      id: row.product.id,
+      name: row.product.name,
+      namePl: row.product.namePl,
+      lastLoggedAt: lastLoggedAtById.get(row.product.id) ?? null,
+    }));
+    const found = filterFoods(searchable, query.search, query.limit, 'en', {
+      fuzzy: false,
+    });
+    return { nextCursor: null, items: found.map(({ row }) => toItem(row)) };
+  }
+
+  const rows = await productRows()
     .where(byIdDesc(foodProducts.id, query))
     .orderBy(desc(foodProducts.id))
     .limit(query.limit + 1);
   const page = toPage(rows, query.limit, ({ product }) => product.id);
-  return {
-    nextCursor: page.nextCursor,
-    items: page.items.map(({ product, imageKey }) => ({
-      id: product.id,
-      name: product.name,
-      namePl: product.namePl,
-      barcode: product.barcode,
-      productSizeGrams: fromHundredths(product.productSizeGramsHundredths),
-      unit: foodProductUnit(product.unit, product.seedKey),
-      imageUrl: storagePathToUrl(imageKey),
-      per100g: toNutrition({
-        kcal: product.kcalPer100gHundredths,
-        protein: product.proteinPer100gHundredths,
-        fat: product.fatPer100gHundredths,
-        carbs: product.carbsPer100gHundredths,
-      }),
-    })),
-  };
+  return { nextCursor: page.nextCursor, items: page.items.map(toItem) };
 }

@@ -1,6 +1,8 @@
 import { type } from 'arktype';
 import { dateOnlyType } from '@/lib/dateOnly';
 
+export const RECIPE_PHOTO_MAX_COUNT = 8;
+
 /** One ingredient for the whole recipe: a linked product, or a custom line with no nutrition. */
 export const recipeIngredientInputType = type({
   '+': 'reject',
@@ -42,10 +44,17 @@ export const updateRecipeRatingInputType = type({
   rating: '1 <= number.integer <= 5',
 });
 
-/** Create without id (name required), or update only the given fields with id. */
-export const saveRecipeInputType = updateRecipeFieldsInputType
-  .omit('id')
-  .merge({ 'id?': 'string.uuid' });
+/**
+ * Create without id (name required), or update only the given fields with id. `imageUrls` is the
+ * whole photo list in order: URLs of stored photos keep them, other https URLs are downloaded.
+ */
+export const saveRecipeInputType = updateRecipeFieldsInputType.omit('id').merge({
+  'id?': 'string.uuid',
+  'imageUrls?': type('string.url')
+    .narrow((url, ctx) => url.startsWith('https://') || ctx.mustBe('an https URL'))
+    .array()
+    .atMostLength(RECIPE_PHOTO_MAX_COUNT),
+});
 
 /** Logs the chosen recipe ingredients; each `logId` is a client id for retry safety. */
 export const logRecipeInputType = type({

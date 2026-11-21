@@ -1,11 +1,18 @@
 import { type } from 'arktype';
 import { and, eq, inArray, or } from 'drizzle-orm';
-import { recipes, userSharingSettings } from '@veles/db/schema';
+import { recipeImages, recipes, uploadObjects, userSharingSettings } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db, type DbTransaction } from '@/server/db.server';
 import { getSharingFriendsIds } from '@/server/getSharingFriendsIds.server';
+import { persistWithPhotos } from '@/server/storage/photoSync.server';
+import {
+  RECIPE_IMAGE_KEY_PREFIX,
+  recipeImageLinks,
+  recipePhotosFromUrls,
+} from './recipeImages.server';
 import { replaceRecipeIngredients } from './recipeIngredients.server';
 import {
+  RECIPE_PHOTO_MAX_COUNT,
   recipeFieldsType,
   type saveRecipeInputType,
   type updateRecipeFieldsInputType,
@@ -64,15 +71,50 @@ export async function updateRecipeRecord(
   await db.transaction((tx) => updateRecipeRow(tx, userId, id, fields));
 }
 
-/** Creates a recipe without id (defaults fill missing fields) or patches the given fields. */
+/**
+ * Agent save: creates a recipe without id (defaults fill missing fields) or patches the given
+ * fields. Given `imageUrls` replace the photo list in the same transaction, like the app's form.
+ */
 export async function saveRecipeRecord(
   userId: string,
-  { id, ...fields }: typeof saveRecipeInputType.infer,
+  { id, imageUrls, ...fields }: typeof saveRecipeInputType.infer,
 ) {
-  if (id) return db.transaction((tx) => updateRecipeRow(tx, userId, id, fields));
+  const write = recipeWriter(userId, id, fields);
+  if (!imageUrls) return db.transaction(write);
+  const formData = await recipePhotosFromUrls(
+    imageUrls,
+    id ? await storedRecipeImages(userId, id) : [],
+  );
+  return persistWithPhotos(
+    { formData, keyPrefix: RECIPE_IMAGE_KEY_PREFIX, maxCount: RECIPE_PHOTO_MAX_COUNT, userId },
+    async (tx, photos) => {
+      const recipe = await write(tx);
+      await photos.sync(recipeImageLinks(tx, recipe.id));
+      return { id: recipe.id };
+    },
+  );
+}
+
+/** Validates up front, so a bad create fails before any image is downloaded. */
+function recipeWriter(
+  userId: string,
+  id: string | undefined,
+  fields: Omit<typeof saveRecipeInputType.infer, 'id' | 'imageUrls'>,
+) {
+  if (id) return (tx: DbTransaction) => updateRecipeRow(tx, userId, id, fields);
   const created = recipeFieldsType(fields);
   if (created instanceof type.errors) throw new ClientSafeError(created.summary);
-  return db.transaction((tx) => createRecipeRow(tx, userId, created));
+  return (tx: DbTransaction) => createRecipeRow(tx, userId, created);
+}
+
+/** Stored photo links of an accessible recipe, to match image URLs the agent read back. */
+function storedRecipeImages(userId: string, recipeId: string) {
+  return db
+    .select({ id: recipeImages.id, key: uploadObjects.key })
+    .from(recipeImages)
+    .innerJoin(uploadObjects, eq(uploadObjects.id, recipeImages.uploadObjectId))
+    .innerJoin(recipes, eq(recipes.id, recipeImages.recipeId))
+    .where(and(eq(recipeImages.recipeId, recipeId), accessibleRecipe(userId)));
 }
 
 export async function updateRecipeRatingRecord(

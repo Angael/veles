@@ -12,6 +12,8 @@ export interface ReadQuery {
   id?: string;
   from?: string;
   to?: string;
+  /** Name search; only resources marked `searchable` accept it. */
+  search?: string;
 }
 
 export interface ReadPage {

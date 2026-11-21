@@ -1,21 +1,15 @@
 import { ArkErrors, type } from 'arktype';
 import { arkTypeValidator } from '@tanstack/arktype-adapter';
 import { createServerFn } from '@tanstack/react-start';
-import { eq } from 'drizzle-orm';
-import { recipeImages, uploadObjects } from '@veles/db/schema';
-import type { DbTransaction } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { limitRequestSizeMiddleware } from '@/server/middleware/limitRequestSizeMiddleware';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
-import { type PhotoLinkTable, persistWithPhotos } from '@/server/storage/photoSync.server';
+import { persistWithPhotos } from '@/server/storage/photoSync.server';
+import { RECIPE_IMAGE_KEY_PREFIX, recipeImageLinks } from './recipeImages.server';
 import { createRecipeRow, updateRecipeRow } from './recipes.server';
-import { recipeFieldsType } from './recipes.validation';
+import { RECIPE_PHOTO_MAX_COUNT, recipeFieldsType } from './recipes.validation';
 import { translate } from '@/lib/i18n/getLocale';
-
-const RECIPE_IMAGE_KEY_PREFIX = 'recipe-images';
-
-export const RECIPE_PHOTO_MAX_COUNT = 8;
 
 const formDataType = type('FormData');
 const recipeIdType = type('string.uuid');
@@ -77,24 +71,6 @@ async function persistRecipeUpload(formData: FormData, userId: string, existingR
       return { id: recipe.id };
     },
   );
-}
-
-function recipeImageLinks(tx: DbTransaction, recipeId: string): PhotoLinkTable {
-  return {
-    deleteAll: () => tx.delete(recipeImages).where(eq(recipeImages.recipeId, recipeId)),
-    insert: (links) => tx.insert(recipeImages).values(links.map((link) => ({ ...link, recipeId }))),
-    selectStored: () =>
-      tx
-        .select({
-          createdAt: recipeImages.createdAt,
-          id: recipeImages.id,
-          key: uploadObjects.key,
-          uploadObjectId: recipeImages.uploadObjectId,
-        })
-        .from(recipeImages)
-        .innerJoin(uploadObjects, eq(uploadObjects.id, recipeImages.uploadObjectId))
-        .where(eq(recipeImages.recipeId, recipeId)),
-  };
 }
 
 /** Turns recipe form fields into the recipe persistence shape. */

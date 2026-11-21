@@ -21,7 +21,7 @@ export function registerWeightTools(server: McpServer, userId: string) {
   );
 }
 
-/** Recipe writes; images are managed in the app and are kept on update. */
+/** Recipe writes; images change only when the agent sends `imageUrls`. */
 export function registerRecipeTools(server: McpServer, userId: string) {
   const write = agentWriter(userId, 'recipes');
 
@@ -29,9 +29,9 @@ export function registerRecipeTools(server: McpServer, userId: string) {
     'save_recipe',
     {
       description:
-        'Create (no id; name required) or update (id) an own or friend-shared recipe. Omitted fields stay; images stay. portions is how many portions the recipe makes. ingredients replace the whole list. Each ingredient is { productId, grams } for a food_products product (name is optional and defaults to the product name; nutrition comes from the product), or { name, grams? } for a custom line with no nutrition. grams are for the whole recipe. rating is 1–5. Returns { id }.',
+        'Create (no id; name required) or update (id) an own or friend-shared recipe. Omitted fields stay. portions is how many portions the recipe makes. ingredients replace the whole list; grams are for the whole recipe. Link each ingredient to a product so the recipe gets kcal and macros: search food_products by name, then send { productId, grams } (name defaults to the product name). Send { name, grams? } only when no product fits; that line has no nutrition. imageUrls replace the whole photo list in order: keep a photo with its URL from recipes, add one with a public https image URL. rating is 1–5. Returns { id }.',
       inputSchema: agentInput(saveRecipeInputType),
-      annotations: writeAnnotations({ destructive: false, idempotent: false }),
+      annotations: writeAnnotations({ destructive: false, idempotent: false, openWorld: true }),
     },
     write(saveRecipeRecord),
   );
