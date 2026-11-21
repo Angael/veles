@@ -18,7 +18,8 @@
     "@tanstack/eslint-plugin-query",
     "@tanstack/eslint-plugin-router",
     { "name": "veles", "specifier": "./.oxlint/env-vars.mjs" },
-    { "name": "veles-react", "specifier": "./.oxlint/react-types.mjs" }
+    { "name": "veles-react", "specifier": "./.oxlint/react-types.mjs" },
+    { "name": "veles-photos", "specifier": "./.oxlint/photo-inputs.mjs" }
   ],
   "rules": {
     "@tanstack/query/exhaustive-deps": "error",
@@ -31,6 +32,7 @@
     "@tanstack/router/route-param-names": "error",
     "veles/env-vars": "error",
     "veles-react/no-component-props-ref-variants": "error",
+    "veles-photos/use-photo-source": "error",
     "eqeqeq": "error",
     "no-nested-ternary": "error",
     "no-shadow": "error",

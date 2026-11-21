@@ -15,8 +15,9 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import clsx from 'clsx';
-import { CameraIcon } from 'lucide-react';
+import { CameraIcon, ImagesIcon } from 'lucide-react';
 import { type DragEvent, useId, useRef, useState } from 'react';
+import { usePhotoSource } from '@/components/ui/photo-source/usePhotoSource';
 import { IMAGE_MAX_INPUT_BYTES } from '@/lib/storage/imageLimits';
 import css from './PhotosField.module.css';
 import { type FieldPhoto, PhotoTile } from './PhotoTile';
@@ -47,7 +48,6 @@ export function PhotosField({
 }: PhotosFieldProps) {
   const { t } = useI18n();
   const dndContextId = useId();
-  const inputId = useId();
   const dragDepthRef = useRef(0);
   const [isFileDragActive, setIsFileDragActive] = useState(false);
   const [photos, setPhotos] = useState<FieldPhoto[]>(defaultPhotos);
@@ -57,6 +57,7 @@ export function PhotosField({
     useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
+  const photoSource = usePhotoSource({ multiple: true, onFiles: addFiles });
 
   function changePhotos(nextPhotos: FieldPhoto[]) {
     setPhotos(nextPhotos);
@@ -147,31 +148,30 @@ export function PhotosField({
         </DndContext>
 
         {photos.length < maxCount ? (
-          <label className={clsx(css.tile, css.uploadTile)} htmlFor={inputId}>
-            {/* No `name`: picked files are submitted by the tiles, in tile order. */}
-            <input
-              accept='image/*'
-              className={css.fileInput}
-              id={inputId}
-              multiple
-              onChange={(event) => {
-                addFiles(Array.from(event.currentTarget.files ?? []));
-                event.currentTarget.value = '';
-              }}
-              type='file'
-            />
-
-            <CameraIcon aria-hidden='true' size={20} strokeWidth={1.9} />
-            <strong>{t({ en: 'Add a photo', pl: 'Dodaj zdjęcie' })}</strong>
+          // No `name` on the inputs: picked files are submitted by the tiles, in tile order.
+          <div className={clsx(css.tile, css.uploadTile)}>
+            <button
+              className={clsx(css.sourceButton, photoSource.cameraClassName)}
+              onClick={photoSource.openCamera}
+              type='button'
+            >
+              <CameraIcon aria-hidden='true' />
+              {t({ en: 'Camera', pl: 'Aparat' })}
+            </button>
+            <button className={css.sourceButton} onClick={photoSource.openGallery} type='button'>
+              <ImagesIcon aria-hidden='true' />
+              {t({ en: 'Gallery', pl: 'Galeria' })}
+            </button>
             <span>
               {photos.length
-                ? t({ en: 'Drop here or browse', pl: 'Upuść tutaj lub wybierz' })
+                ? t({ en: 'or drop files here', pl: 'lub upuść pliki tutaj' })
                 : t({
                     en: `Up to ${maxCount} images`,
                     pl: `Maksymalnie ${maxCount} ${pluralPl(maxCount, 'zdjęcie', 'zdjęcia', 'zdjęć')}`,
                   })}
             </span>
-          </label>
+            {photoSource.inputs}
+          </div>
         ) : null}
       </div>
     </div>

@@ -1,6 +1,8 @@
-import { CameraIcon, ImageIcon, Trash2Icon } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import clsx from 'clsx';
+import { CameraIcon, ImageIcon, ImagesIcon, Trash2Icon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
+import { usePhotoSource } from '@/components/ui/photo-source/usePhotoSource';
 import css from './PhotoPicker.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
@@ -58,7 +60,11 @@ export function PhotoPicker({
   value,
 }: PhotoPickerProps) {
   const { t } = useI18n();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const photoSource = usePhotoSource({
+    onFiles: ([photo]) => {
+      if (photo) onChange({ imageAction: 'replace', photo });
+    },
+  });
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const visibleUrl = value.imageAction === 'remove' ? null : (previewUrl ?? existingUrl);
 
@@ -107,18 +113,28 @@ export function PhotoPicker({
         </div>
         <div className={css.actions}>
           {allowUpload ? (
-            <Btn
-              className={css.action}
-              icon={<CameraIcon aria-hidden='true' />}
-              onClick={() => inputRef.current?.click()}
-              size='sm'
-              type='button'
-              variant='white'
-            >
-              {visibleUrl
-                ? t({ en: 'Change photo', pl: 'Zmień zdjęcie' })
-                : t({ en: 'Add photo', pl: 'Dodaj zdjęcie' })}
-            </Btn>
+            <>
+              <Btn
+                className={clsx(css.action, photoSource.cameraClassName)}
+                icon={<CameraIcon aria-hidden='true' />}
+                onClick={photoSource.openCamera}
+                size='sm'
+                type='button'
+                variant='white'
+              >
+                {t({ en: 'Camera', pl: 'Aparat' })}
+              </Btn>
+              <Btn
+                className={css.action}
+                icon={<ImagesIcon aria-hidden='true' />}
+                onClick={photoSource.openGallery}
+                size='sm'
+                type='button'
+                variant='white'
+              >
+                {t({ en: 'Gallery', pl: 'Galeria' })}
+              </Btn>
+            </>
           ) : null}
           {visibleUrl ? (
             <Btn
@@ -126,10 +142,7 @@ export function PhotoPicker({
               className={css.action}
               icon={<Trash2Icon aria-hidden='true' />}
               iconOnly
-              onClick={() => {
-                if (inputRef.current) inputRef.current.value = '';
-                onChange({ imageAction: 'remove' });
-              }}
+              onClick={() => onChange({ imageAction: 'remove' })}
               size='sm'
               type='button'
               variant='white'
@@ -137,18 +150,7 @@ export function PhotoPicker({
           ) : null}
         </div>
       </div>
-      <input
-        ref={inputRef}
-        accept='image/*'
-        aria-label={t({ en: 'Add photo', pl: 'Dodaj zdjęcie' })}
-        className={css.fileInput}
-        onChange={(event) => {
-          const [photo] = Array.from(event.target.files ?? []);
-          if (photo) onChange({ imageAction: 'replace', photo });
-        }}
-        tabIndex={-1}
-        type='file'
-      />
+      {photoSource.inputs}
     </fieldset>
   );
 }

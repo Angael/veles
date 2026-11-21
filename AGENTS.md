@@ -77,6 +77,7 @@
 - Components should not have more than soft cap 200 lines of code, hard cap 300 lines. It's a code smell that file does too much.
 - `apps/web/src/routes/**/*.tsx` files should stay small. They can contain up to soft cap ~200, hard cap 300 lines. Beyond that export the feature implementation from `apps/web/src/pages`.
 - Keep demo route code outside reusable `apps/web/src/components`.
+- Photo uploads must offer both camera and gallery on phones. Use `usePhotoSource` (`apps/web/src/components/ui/photo-source`) and show both buttons; never render a raw image `<input>` (lint rule `veles-photos/use-photo-source`). One input can't do both: `capture` = camera only, no `capture` = Android gallery-only picker.
 - For icons use `lucide-react`, always renaming imports with an `Icon` suffix to avoid naming conflicts.
 
 ## Agent MCP

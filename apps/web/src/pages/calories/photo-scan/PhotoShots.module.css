@@ -19,16 +19,14 @@
   color: var(--c-text-strong);
   font-size: var(--text-lg);
   text-align: center;
-  transition: scale var(--duration-fast) var(--ease-out);
+}
 
-  &:active {
-    scale: 0.98;
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--c-primary-focus);
-    outline-offset: 2px;
-  }
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
 }
 
 .heroIcon {
@@ -133,26 +131,31 @@
 
 .add {
   display: grid;
-  place-items: center;
   align-content: center;
-  gap: 0.15rem;
-  width: 100%;
+  gap: 0.25rem;
+  padding: 0.25rem;
   border: var(--border-width) dashed var(--c-border-strong);
   background: var(--c-surface-inset);
-  color: var(--c-muted);
-  font-size: var(--text-sm);
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 2.25rem;
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-raised);
+  color: var(--c-text);
+  font-size: var(--text-xs);
+
+  & svg {
+    width: 1rem;
+    height: 1rem;
+  }
 
   &:focus-visible {
     outline: 2px solid var(--c-primary-focus);
     outline-offset: 2px;
   }
-}
-
-.fileInput {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
 }

@@ -1,6 +1,7 @@
-import { CameraIcon, PlusIcon, XIcon } from 'lucide-react';
-import { useRef } from 'react';
+import clsx from 'clsx';
+import { CameraIcon, ImagesIcon, XIcon } from 'lucide-react';
 import { Btn } from '@/components/ui/btn/Btn';
+import { usePhotoSource } from '@/components/ui/photo-source/usePhotoSource';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import type { PhotoShot } from './usePhotoShots';
 import css from './PhotoShots.module.css';
@@ -13,17 +14,16 @@ type Props = {
   shots: PhotoShot[];
 };
 
-/** One big camera button at first, then a grid of the taken photos with a tile for one more. */
+/** A big camera/gallery prompt at first, then a grid of the added photos with a tile for one more. */
 export function PhotoShots({ maxCount, onAdd, onRemove, processing, shots }: Props) {
   const { t } = useI18n();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const openCamera = () => inputRef.current?.click();
+  const photoSource = usePhotoSource({ multiple: true, onFiles: onAdd });
   const empty = shots.length === 0 && processing === 0;
 
   return (
     <div className={css.root}>
       {empty ? (
-        <button className={css.hero} onClick={openCamera} type='button'>
+        <div className={css.hero}>
           <span className={css.heroIcon}>
             <CameraIcon aria-hidden='true' />
           </span>
@@ -34,7 +34,25 @@ export function PhotoShots({ maxCount, onAdd, onRemove, processing, shots }: Pro
               pl: 'Przód, tył, tabela wartości. AI odczyta wszystko, co widać.',
             })}
           </span>
-        </button>
+          <div className={css.heroActions}>
+            <Btn
+              className={photoSource.cameraClassName}
+              icon={<CameraIcon aria-hidden='true' />}
+              onClick={photoSource.openCamera}
+              type='button'
+            >
+              {t({ en: 'Camera', pl: 'Aparat' })}
+            </Btn>
+            <Btn
+              icon={<ImagesIcon aria-hidden='true' />}
+              onClick={photoSource.openGallery}
+              type='button'
+              variant='white'
+            >
+              {t({ en: 'Gallery', pl: 'Galeria' })}
+            </Btn>
+          </div>
+        </div>
       ) : (
         <>
           <ul className={css.grid}>
@@ -65,10 +83,18 @@ export function PhotoShots({ maxCount, onAdd, onRemove, processing, shots }: Pro
               <li aria-hidden='true' className={css.processing} key={index} />
             ))}
             {shots.length + processing < maxCount ? (
-              <li>
-                <button className={css.add} onClick={openCamera} type='button'>
-                  <PlusIcon aria-hidden='true' />
-                  {t({ en: 'Another', pl: 'Kolejne' })}
+              <li className={css.add}>
+                <button
+                  className={clsx(css.addButton, photoSource.cameraClassName)}
+                  onClick={photoSource.openCamera}
+                  type='button'
+                >
+                  <CameraIcon aria-hidden='true' />
+                  {t({ en: 'Camera', pl: 'Aparat' })}
+                </button>
+                <button className={css.addButton} onClick={photoSource.openGallery} type='button'>
+                  <ImagesIcon aria-hidden='true' />
+                  {t({ en: 'Gallery', pl: 'Galeria' })}
                 </button>
               </li>
             ) : null}
@@ -81,19 +107,7 @@ export function PhotoShots({ maxCount, onAdd, onRemove, processing, shots }: Pro
           </p>
         </>
       )}
-      <input
-        accept='image/*'
-        aria-label={t({ en: 'Add a photo', pl: 'Dodaj zdjęcie' })}
-        className={css.fileInput}
-        multiple
-        onChange={(event) => {
-          onAdd(Array.from(event.currentTarget.files ?? []));
-          event.currentTarget.value = '';
-        }}
-        ref={inputRef}
-        tabIndex={-1}
-        type='file'
-      />
+      {photoSource.inputs}
     </div>
   );
 }

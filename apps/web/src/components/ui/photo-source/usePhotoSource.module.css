@@ -1,0 +1,15 @@
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  /* Overrides the button's own display; desktop browsers ignore `capture`. */
+  .camera {
+    display: none !important;
+  }
+}
