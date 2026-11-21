@@ -16,6 +16,24 @@ const MAX_RECENT_FOODS = 5;
 const MatchTier = { Exact: 0, Prefix: 1, WordPrefix: 2, Substring: 3, Fuzzy: 4 } as const;
 type MatchTier = (typeof MatchTier)[keyof typeof MatchTier];
 
+/** Search options; the app picker keeps fuzzy matching, agents turn it off to avoid noise. */
+type FilterFoodsOptions = { fuzzy?: boolean };
+
+/** Lowercases and drops diacritics, so "zolty" finds "żółty". `ł` has no decomposed form. */
+function normalizeSearchText(value: string) {
+  return value.toLocaleLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replaceAll('ł', 'l');
+}
+
+/** Splits a query into `|` alternatives of space-separated terms; an empty query matches all. */
+function parseQuery(query: string) {
+  const alternatives = normalizeSearchText(query)
+    .split('|')
+    .map((alternative) => alternative.trim())
+    .filter(Boolean)
+    .map((alternative) => alternative.split(/\s+/));
+  return alternatives.length ? alternatives : [[]];
+}
+
 /** Checks that the term's characters appear in order; this also covers plain substrings. */
 function fuzzyTermMatches(value: string, term: string) {
   let valueIndex = 0;
@@ -27,7 +45,7 @@ function fuzzyTermMatches(value: string, term: string) {
   return true;
 }
 
-function termTier(value: string, term: string): MatchTier | null {
+function termTier(value: string, term: string, fuzzy: boolean): MatchTier | null {
   if (value === term) return MatchTier.Exact;
   if (value.startsWith(term)) return MatchTier.Prefix;
   const index = value.indexOf(term);
@@ -35,27 +53,34 @@ function termTier(value: string, term: string): MatchTier | null {
     const previous = value[index - 1] ?? '';
     return /[\p{L}\p{N}]/u.test(previous) ? MatchTier.Substring : MatchTier.WordPrefix;
   }
-  return fuzzyTermMatches(value, term) ? MatchTier.Fuzzy : null;
+  return fuzzy && fuzzyTermMatches(value, term) ? MatchTier.Fuzzy : null;
 }
 
 /** Scores one name by its weakest term, so every term must match. */
-function nameTier(value: string, terms: string[]): MatchTier | null {
+function nameTier(value: string, terms: string[], fuzzy: boolean): MatchTier | null {
   let worst: MatchTier = MatchTier.Exact;
   for (const term of terms) {
-    const tier = termTier(value, term);
+    const tier = termTier(value, term, fuzzy);
     if (tier === null) return null;
     if (tier > worst) worst = tier;
   }
   return worst;
 }
 
-/** Returns the best match tier across the English and Polish names. */
-function foodTier(food: SearchableFood, terms: string[]): MatchTier | null {
+/** Returns the best match tier across the English and Polish names and all alternatives. */
+function foodTier(
+  food: SearchableFood,
+  alternatives: string[][],
+  fuzzy: boolean,
+): MatchTier | null {
   let best: MatchTier | null = null;
   for (const name of [food.name, food.namePl]) {
     if (!name) continue;
-    const tier = nameTier(name.toLocaleLowerCase(), terms);
-    if (tier !== null && (best === null || tier < best)) best = tier;
+    const value = normalizeSearchText(name);
+    for (const terms of alternatives) {
+      const tier = nameTier(value, terms, fuzzy);
+      if (tier !== null && (best === null || tier < best)) best = tier;
+    }
   }
   return best;
 }
@@ -71,21 +96,22 @@ function compareNames(first: SearchableFood, second: SearchableFood, locale: Loc
  * Finds matching foods for the picker. Up to five recently logged foods come first, but only when
  * they match the query strongly (contiguous substring or better), so a loose fuzzy hit on a recent
  * food never pushes down a clearly better match. The rest is ordered by match quality, then name.
+ * `a|b` matches either alternative; letters match with or without diacritics.
  */
 export function filterFoods<Food extends SearchableFood>(
   foods: Food[],
   query: string,
   limit: number,
   locale: Locale = DEFAULT_LOCALE,
+  { fuzzy = true }: FilterFoodsOptions = {},
 ) {
   if (limit <= 0) return [];
 
-  const normalizedQuery = query.trim().toLocaleLowerCase();
-  const terms = normalizedQuery ? normalizedQuery.split(/\s+/) : [];
+  const alternatives = parseQuery(query);
   const matches: { food: Food; tier: MatchTier }[] = [];
 
   for (const food of foods) {
-    const tier = foodTier(food, terms);
+    const tier = foodTier(food, alternatives, fuzzy);
     if (tier !== null) matches.push({ food, tier });
   }
 

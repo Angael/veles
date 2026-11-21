@@ -201,7 +201,9 @@ export async function readFoodProducts(userId: string, query: ReadQuery) {
       namePl: row.product.namePl,
       lastLoggedAt: lastLoggedAtById.get(row.product.id) ?? null,
     }));
-    const found = filterFoods(searchable, query.search, query.limit);
+    const found = filterFoods(searchable, query.search, query.limit, 'en', {
+      fuzzy: false,
+    });
     return { nextCursor: null, items: found.map(({ row }) => toItem(row)) };
   }
 

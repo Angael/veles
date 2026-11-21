@@ -62,7 +62,7 @@ export const resources = {
     feature: 'food_products',
     dated: false,
     searchable: true,
-    description: `Shared food catalog with imageUrl or null, and lastLoggedAt (the user's latest log of it, or null). per100g nutrition: ${kcalAndMacros}. productSizeGrams is one unit (package, piece, slice or serving). Use search to find a product by name (English or Polish, one food per search, e.g. "tomato"); results put the user's recently logged products first.`,
+    description: `Shared food catalog with imageUrl or null, and lastLoggedAt (the user's latest log of it, or null). per100g nutrition: ${kcalAndMacros}. productSizeGrams is one unit (package, piece, slice or serving). Use search to find products by name (English or Polish, diacritics optional); "|" separates alternatives, e.g. "fries|chips|potato". Results put the user's recently logged products first.`,
     read: readFoodProducts,
   },
   workout_sessions: {
@@ -104,7 +104,7 @@ export const listInput = type({
   'from?': isoDate.describe('earliest date, inclusive (dated resources only)'),
   'to?': isoDate.describe('latest date, inclusive (dated resources only)'),
   'search?': type('string.trim |> string >= 1').describe(
-    'words that must all be in the name (food_products only); returns the best matches, no next page',
+    'food_products only: words that must all be in the name, "|" between alternatives; best matches first, no next page',
   ),
 });
 export const getInput = type({
