@@ -10,7 +10,7 @@ import { RecipeForm } from './RecipeForm';
 import { ingredientsFromRecipe, type RecipeFormDraft } from './recipeDraft';
 import type { RecipeLibraryItem } from '../recipes.api';
 import { useUpdateRecipeMutation } from '../recipes.query';
-import { RECIPE_PHOTO_MAX_COUNT } from '../recipeUpload.api';
+import { RECIPE_PHOTO_MAX_COUNT } from '../recipes.validation';
 import css from './EditRecipePage.module.css';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
 import { useI18n } from '@/lib/i18n/I18nProvider';

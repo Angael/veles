@@ -96,7 +96,7 @@ export function registerFoodCatalogTools(server: McpServer, userId: string) {
   server.registerTool(
     'save_food_product',
     {
-      description: `Create (no id) or replace all fields (id) of a shared catalog product that all accounts use. Search food_products first to avoid duplicates. ${per100g}. Barcodes must be unique. On update, today is the user's local date (YYYY-MM-DD): entries of that product logged today by any account are recalculated; the image stays. Returns the product.`,
+      description: `Create (no id) or replace all fields (id) of a shared catalog product that all accounts use. Search food_products by name first to avoid duplicates. ${per100g}. Barcodes must be unique. On update, today is the user's local date (YYYY-MM-DD): entries of that product logged today by any account are recalculated; the image stays. Returns the product.`,
       inputSchema: agentInput(saveFoodProductInputType),
       annotations: writeAnnotations({ destructive: true, idempotent: false, openWorld: true }),
     },

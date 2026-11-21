@@ -19,7 +19,7 @@ Every tool the Veles MCP server (`/api/mcp`) can list, grouped by the consent th
 | [`delete_exercise`](#delete_exercise)         | Write on Workouts                 | write, destructive         |
 | [`delete_workout`](#delete_workout)           | Write on Workouts                 | write, destructive         |
 | [`delete_routine`](#delete_routine)           | Write on Workouts                 | write, destructive         |
-| [`save_recipe`](#save_recipe)                 | Write on Recipes                  | write                      |
+| [`save_recipe`](#save_recipe)                 | Write on Recipes                  | write, shared              |
 | [`log_food`](#log_food)                       | Write on Food diary               | write                      |
 | [`update_food_log`](#update_food_log)         | Write on Food diary               | write                      |
 | [`change_food_logs`](#change_food_logs)       | Write on Food diary               | write, destructive         |
@@ -53,19 +53,20 @@ Resources:
 - recipes: The user's recipes plus recipes connected friends share (isOwned false, ownerName), with imageUrls, and ingredients in order. Ingredient grams are for the whole recipe (portions = how many portions it makes). A linked ingredient has productId (from food_products) and nutrition at its grams; a custom one has both null. total (all portions) and perPortion sum the linked ingredients and are null when none has nutrition; kcal is energy; macros are protein, fat, carbs in grams.
 - food_days: Food diary, one item per day with entries or a day note, newest first; id and date are the same YYYY-MM-DD. Each day has entries (with imageUrl or null, and productId when logged from food_products), total, goal (the nutrition goal in effect; null without a goal or without Nutrition goals consent), note (the user's free text or null), and offPlan; kcal is energy; macros are protein, fat, carbs in grams. offPlan true means the user went off the diet and probably overate: total is only what was logged, not the real intake, so use the note to judge how much more was eaten, and leave the day out of averages and trends.
 - calorie_goals: Nutrition goal history by effectiveDate, newest first; each goal applies until the next one. kcal is energy; macros are protein, fat, carbs in grams (limits).
-- food_products: Shared food catalog with imageUrl or null. per100g nutrition: kcal is energy; macros are protein, fat, carbs in grams. productSizeGrams is one unit (package, piece, slice or serving).
+- food_products: Shared food catalog with imageUrl or null, and lastLoggedAt (the user's latest log of it, or null). per100g nutrition: kcal is energy; macros are protein, fat, carbs in grams. productSizeGrams is one unit (package, piece, slice or serving). Use search to find a product by name (English or Polish, one food per search, e.g. "tomato"); results put the user's recently logged products first.
 - workout_sessions: Workout sessions, newest first, each with its exercises (id of the session exercise, exerciseId from workout_exercises, name, measure, notes) and their sets. Sets: id, type (normal, warmup, drop, failure), done, weightKg, reps, durationSeconds, distanceKm; measure says which apply. durationSeconds is manual or end minus start.
 - workout_routines: Reusable workout plans, each with archived (hidden in the app) and ordered exercises (name, measure, restSeconds) and setTypes, one per planned set.
 - workout_exercises: Exercise list with measure, restSeconds, notes, archived, lastDoneOn, and sessionCount.
 - workout_stats: Training summary per period; id is "all" (listed first) or a year, then years newest first. Counts sessions, activeDays, totalSeconds, exercises (different ones with a done set), newExercises (first ever done in the period), topExercises (sessions with a done set and share of all sessions), weekdays (sessions per weekday, Monday first), timeline (sessions per YYYY-MM month, or per YYYY year for all time), weekStreak and dayStreak (longest run, from/to dates), favouriteRoutine, longestSession (seconds), and firstSession.
 
-| Input      | Type                                                                                                                                                                         | Required | Notes                                           |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
-| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" \| "workout_stats" | yes      |                                                 |
-| `cursor`   | string                                                                                                                                                                       |          | nextCursor from the previous page               |
-| `from`     | date YYYY-MM-DD                                                                                                                                                              |          | earliest date, inclusive (dated resources only) |
-| `limit`    | integer                                                                                                                                                                      |          |                                                 |
-| `to`       | date YYYY-MM-DD                                                                                                                                                              |          | latest date, inclusive (dated resources only)   |
+| Input      | Type                                                                                                                                                                         | Required | Notes                                                                                           |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| `resource` | "calorie_goals" \| "food_days" \| "food_products" \| "notes" \| "recipes" \| "weights" \| "workout_exercises" \| "workout_routines" \| "workout_sessions" \| "workout_stats" | yes      |                                                                                                 |
+| `cursor`   | string                                                                                                                                                                       |          | nextCursor from the previous page                                                               |
+| `from`     | date YYYY-MM-DD                                                                                                                                                              |          | earliest date, inclusive (dated resources only)                                                 |
+| `limit`    | integer                                                                                                                                                                      |          |                                                                                                 |
+| `search`   | string                                                                                                                                                                       |          | words that must all be in the name (food_products only); returns the best matches, no next page |
+| `to`       | date YYYY-MM-DD                                                                                                                                                              |          | latest date, inclusive (dated resources only)                                                   |
 
 ### `get_record`
 
@@ -208,14 +209,15 @@ Delete a routine. Sessions started from it stay and lose the link.
 
 ### `save_recipe`
 
-_write_
+_write, shared_
 
-Create (no id; name required) or update (id) an own or friend-shared recipe. Omitted fields stay; images stay. portions is how many portions the recipe makes. ingredients replace the whole list. Each ingredient is { productId, grams } for a food_products product (name is optional and defaults to the product name; nutrition comes from the product), or { name, grams? } for a custom line with no nutrition. grams are for the whole recipe. rating is 1–5. Returns { id }.
+Create (no id; name required) or update (id) an own or friend-shared recipe. Omitted fields stay. portions is how many portions the recipe makes. ingredients replace the whole list; grams are for the whole recipe. Link each ingredient to a product so the recipe gets kcal and macros: search food_products by name, then send { productId, grams } (name defaults to the product name). Send { name, grams? } only when no product fits; that line has no nutrition. imageUrls replace the whole photo list in order: keep a photo with its URL from recipes, add one with a public https image URL. rating is 1–5. Returns { id }.
 
 | Input         | Type                         | Required | Notes         |
 | ------------- | ---------------------------- | -------- | ------------- |
 | `description` | string                       |          |               |
 | `id`          | uuid                         |          |               |
+| `imageUrls`   | string[]                     |          | max 8 items   |
 | `ingredients` | { grams, name, productId }[] |          | max 100 items |
 | `name`        | string                       |          |               |
 | `portions`    | integer                      |          |               |
@@ -308,7 +310,7 @@ Find a catalog product by barcode. If it is missing, import it from Open Food Fa
 
 _write, destructive, shared_
 
-Create (no id) or replace all fields (id) of a shared catalog product that all accounts use. Search food_products first to avoid duplicates. kcalPer100g and optional proteinPer100g, fatPer100g, carbsPer100g (grams per 100 g); productSizeGrams is the weight of one unit (package, piece, slice or serving; null unit means package, or the seed default for seeded foods). Barcodes must be unique. On update, today is the user's local date (YYYY-MM-DD): entries of that product logged today by any account are recalculated; the image stays. Returns the product.
+Create (no id) or replace all fields (id) of a shared catalog product that all accounts use. Search food_products by name first to avoid duplicates. kcalPer100g and optional proteinPer100g, fatPer100g, carbsPer100g (grams per 100 g); productSizeGrams is the weight of one unit (package, piece, slice or serving; null unit means package, or the seed default for seeded foods). Barcodes must be unique. On update, today is the user's local date (YYYY-MM-DD): entries of that product logged today by any account are recalculated; the image stays. Returns the product.
 
 | Input              | Type                                                 | Required | Notes |
 | ------------------ | ---------------------------------------------------- | -------- | ----- |

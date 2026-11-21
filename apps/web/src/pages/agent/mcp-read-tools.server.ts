@@ -66,6 +66,9 @@ export function registerReadTools(
           if (!config.dated && (query.from || query.to)) {
             throw new ClientSafeError(`${resource} has no dates; remove from and to.`);
           }
+          if (!config.searchable && query.search) {
+            throw new ClientSafeError(`${resource} has no search; remove search.`);
+          }
           return config.read(userId, { ...query, limit });
         }),
     );

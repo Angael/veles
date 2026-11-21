@@ -15,6 +15,8 @@ export interface AgentResource {
   description: string;
   /** Accepts `from`/`to` date filters. */
   dated: boolean;
+  /** Accepts a `search` name filter. */
+  searchable?: boolean;
   /** Owner-scoped read that returns nested, readable records; `query.id` selects one. */
   read: (userId: string, query: ReadQuery) => Promise<ReadPage>;
 }
@@ -59,7 +61,8 @@ export const resources = {
   food_products: {
     feature: 'food_products',
     dated: false,
-    description: `Shared food catalog with imageUrl or null. per100g nutrition: ${kcalAndMacros}. productSizeGrams is one unit (package, piece, slice or serving).`,
+    searchable: true,
+    description: `Shared food catalog with imageUrl or null, and lastLoggedAt (the user's latest log of it, or null). per100g nutrition: ${kcalAndMacros}. productSizeGrams is one unit (package, piece, slice or serving). Use search to find a product by name (English or Polish, one food per search, e.g. "tomato"); results put the user's recently logged products first.`,
     read: readFoodProducts,
   },
   workout_sessions: {
@@ -100,6 +103,9 @@ export const listInput = type({
   'limit?': '1 <= number.integer <= 100',
   'from?': isoDate.describe('earliest date, inclusive (dated resources only)'),
   'to?': isoDate.describe('latest date, inclusive (dated resources only)'),
+  'search?': type('string.trim |> string >= 1').describe(
+    'words that must all be in the name (food_products only); returns the best matches, no next page',
+  ),
 });
 export const getInput = type({
   resource: resourceName,

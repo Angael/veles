@@ -1,6 +1,13 @@
-import type { CalorieFood } from '../calories.api';
 import { foodProductNames } from '../calorieHelpers';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
+
+/** The fields food search reads; the app passes `CalorieFood`, the agent MCP its own rows. */
+type SearchableFood = {
+  id: string;
+  name: string;
+  namePl: string | null;
+  lastLoggedAt?: string | null;
+};
 
 /** At most this many recently logged foods are boosted to the top. */
 const MAX_RECENT_FOODS = 5;
@@ -43,7 +50,7 @@ function nameTier(value: string, terms: string[]): MatchTier | null {
 }
 
 /** Returns the best match tier across the English and Polish names. */
-function foodTier(food: CalorieFood, terms: string[]): MatchTier | null {
+function foodTier(food: SearchableFood, terms: string[]): MatchTier | null {
   let best: MatchTier | null = null;
   for (const name of [food.name, food.namePl]) {
     if (!name) continue;
@@ -53,7 +60,7 @@ function foodTier(food: CalorieFood, terms: string[]): MatchTier | null {
   return best;
 }
 
-function compareNames(first: CalorieFood, second: CalorieFood, locale: Locale) {
+function compareNames(first: SearchableFood, second: SearchableFood, locale: Locale) {
   return (
     foodProductNames(first)[locale].localeCompare(foodProductNames(second)[locale], locale) ||
     first.id.localeCompare(second.id)
@@ -65,8 +72,8 @@ function compareNames(first: CalorieFood, second: CalorieFood, locale: Locale) {
  * they match the query strongly (contiguous substring or better), so a loose fuzzy hit on a recent
  * food never pushes down a clearly better match. The rest is ordered by match quality, then name.
  */
-export function filterFoods(
-  foods: CalorieFood[],
+export function filterFoods<Food extends SearchableFood>(
+  foods: Food[],
   query: string,
   limit: number,
   locale: Locale = DEFAULT_LOCALE,
@@ -75,7 +82,7 @@ export function filterFoods(
 
   const normalizedQuery = query.trim().toLocaleLowerCase();
   const terms = normalizedQuery ? normalizedQuery.split(/\s+/) : [];
-  const matches: { food: CalorieFood; tier: MatchTier }[] = [];
+  const matches: { food: Food; tier: MatchTier }[] = [];
 
   for (const food of foods) {
     const tier = foodTier(food, terms);

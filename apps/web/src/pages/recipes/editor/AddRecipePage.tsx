@@ -8,7 +8,7 @@ import { TypedForm } from '@/components/ui/typed-form/TypedForm';
 import { TypedFormData } from '@/components/ui/typed-form/TypedFormData';
 import { RecipeForm } from './RecipeForm';
 import { emptyRecipeDraft, type RecipeFormDraft } from './recipeDraft';
-import { RECIPE_PHOTO_MAX_COUNT } from '../recipeUpload.api';
+import { RECIPE_PHOTO_MAX_COUNT } from '../recipes.validation';
 import css from './AddRecipePage.module.css';
 import { useCreateRecipeMutation } from '../recipes.query';
 import { useUnsavedChangesGuard } from '@/lib/useUnsavedChangesGuard';
