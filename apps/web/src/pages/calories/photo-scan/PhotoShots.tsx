@@ -27,7 +27,7 @@ export function PhotoShots({ maxCount, onAdd, onRemove, processing, shots }: Pro
           <span className={css.heroIcon}>
             <CameraIcon aria-hidden='true' />
           </span>
-          <strong>{t({ en: 'Take a photo', pl: 'Zrób zdjęcie' })}</strong>
+          <strong>{t({ en: 'Add a photo', pl: 'Dodaj zdjęcie' })}</strong>
           <span className={css.hint}>
             {t({
               en: 'Front, back, nutrition table. AI reads everything it can see.',
@@ -83,8 +83,7 @@ export function PhotoShots({ maxCount, onAdd, onRemove, processing, shots }: Pro
       )}
       <input
         accept='image/*'
-        aria-label={t({ en: 'Take a photo', pl: 'Zrób zdjęcie' })}
-        capture='environment'
+        aria-label={t({ en: 'Add a photo', pl: 'Dodaj zdjęcie' })}
         className={css.fileInput}
         multiple
         onChange={(event) => {

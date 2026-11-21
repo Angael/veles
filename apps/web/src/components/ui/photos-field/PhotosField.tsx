@@ -151,7 +151,6 @@ export function PhotosField({
             {/* No `name`: picked files are submitted by the tiles, in tile order. */}
             <input
               accept='image/*'
-              capture='environment'
               className={css.fileInput}
               id={inputId}
               multiple
@@ -163,7 +162,7 @@ export function PhotosField({
             />
 
             <CameraIcon aria-hidden='true' size={20} strokeWidth={1.9} />
-            <strong>{t({ en: 'Take a photo', pl: 'Zrób zdjęcie' })}</strong>
+            <strong>{t({ en: 'Add a photo', pl: 'Dodaj zdjęcie' })}</strong>
             <span>
               {photos.length
                 ? t({ en: 'Drop here or browse', pl: 'Upuść tutaj lub wybierz' })

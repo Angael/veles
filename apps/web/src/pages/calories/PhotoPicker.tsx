@@ -116,8 +116,8 @@ export function PhotoPicker({
               variant='white'
             >
               {visibleUrl
-                ? t({ en: 'Retake', pl: 'Zrób nowe' })
-                : t({ en: 'Take photo', pl: 'Zrób zdjęcie' })}
+                ? t({ en: 'Change photo', pl: 'Zmień zdjęcie' })
+                : t({ en: 'Add photo', pl: 'Dodaj zdjęcie' })}
             </Btn>
           ) : null}
           {visibleUrl ? (
@@ -140,8 +140,7 @@ export function PhotoPicker({
       <input
         ref={inputRef}
         accept='image/*'
-        capture='environment'
-        aria-label={t({ en: 'Take photo', pl: 'Zrób zdjęcie' })}
+        aria-label={t({ en: 'Add photo', pl: 'Dodaj zdjęcie' })}
         className={css.fileInput}
         onChange={(event) => {
           const [photo] = Array.from(event.target.files ?? []);
