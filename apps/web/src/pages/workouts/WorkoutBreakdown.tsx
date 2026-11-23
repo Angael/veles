@@ -32,7 +32,10 @@ function ExerciseLine({ slot }: { slot: WorkoutSessionData['slots'][number] }) {
   return (
     <li className={css.exercise}>
       <strong>{slot.name}</strong>
-      {done.length > 0 ? (
+      {slot.skipped ? (
+        <span className={css.none}>{t({ en: 'Skipped', pl: 'Pominięte' })}</span>
+      ) : null}
+      {!slot.skipped && done.length > 0 ? (
         <ul className={css.sets}>
           {done.map((set) => (
             <li
@@ -45,9 +48,10 @@ function ExerciseLine({ slot }: { slot: WorkoutSessionData['slots'][number] }) {
             </li>
           ))}
         </ul>
-      ) : (
+      ) : null}
+      {!slot.skipped && done.length === 0 ? (
         <span className={css.none}>{t({ en: 'No sets done', pl: 'Brak zrobionych serii' })}</span>
-      )}
+      ) : null}
       {slot.note ? <p className={css.note}>{slot.note}</p> : null}
     </li>
   );

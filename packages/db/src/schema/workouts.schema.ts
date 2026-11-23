@@ -167,6 +167,11 @@ export const workoutSessionExercises = pgTable(
     position: integer('position').notNull(),
     /** Per session, per exercise. The last session's note is the next session's placeholder. */
     notes: text('notes').notNull().default(''),
+    /**
+     * Set when the user skipped the exercise. Finishing does not save hints into or tick its sets,
+     * and it is never the "last time" source for the next session.
+     */
+    skippedAt: timestamp('skipped_at'),
   },
   (table) => [
     uniqueIndex('workout_session_exercise_session_position_idx').on(

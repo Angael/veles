@@ -30,14 +30,20 @@ async function replaceExercises(
     const exerciseId = await resolveExerciseId(tx, userId, exercise);
     const [slot] = await tx
       .insert(workoutSessionExercises)
-      .values({ exerciseId, notes: exercise.notes?.trim() ?? '', position, sessionId: workoutId })
+      .values({
+        exerciseId,
+        notes: exercise.notes?.trim() ?? '',
+        position,
+        sessionId: workoutId,
+        skippedAt: exercise.skipped ? now : null,
+      })
       .returning({ id: workoutSessionExercises.id });
     if (!slot) throw new Error('Workout exercise insert returned no row.');
     if (exercise.sets.length === 0) continue;
     await tx.insert(workoutSets).values(
       exercise.sets.map(({ done, type, ...metrics }, index) => ({
         ...toSetColumns(metrics),
-        completedAt: done ? now : null,
+        completedAt: done && !exercise.skipped ? now : null,
         position: index,
         sessionExerciseId: slot.id,
         type: type ?? 'normal',

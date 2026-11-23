@@ -65,7 +65,7 @@ export const resources = {
   workout_sessions: {
     feature: 'workouts',
     dated: true,
-    description: `Workout sessions, newest first, each with its exercises (id of the session exercise, exerciseId from workout_exercises, name, measure, notes) and their sets. ${setFields} durationSeconds is manual or end minus start.`,
+    description: `Workout sessions, newest first, each with its exercises (id of the session exercise, exerciseId from workout_exercises, name, measure, notes, skipped: the user skipped it, so no set is done) and their sets. ${setFields} durationSeconds is manual or end minus start.`,
     read: readWorkoutSessions,
   },
   workout_routines: {

@@ -37,6 +37,7 @@ async function loadSessionExercises(userId: string, sessionIds: string[]) {
         name: workoutExercises.name,
         measure: workoutExercises.measure,
         notes: workoutSessionExercises.notes,
+        skippedAt: workoutSessionExercises.skippedAt,
       })
       .from(workoutSessionExercises)
       .innerJoin(workoutSessions, eq(workoutSessions.id, workoutSessionExercises.sessionId))
@@ -58,10 +59,11 @@ async function loadSessionExercises(userId: string, sessionIds: string[]) {
     sets.map(({ set }) => set),
     (set) => set.sessionExerciseId,
   );
-  const exercises = slots.map(({ sessionId, ...slot }) => ({
+  const exercises = slots.map(({ sessionId, skippedAt, ...slot }) => ({
     sessionId,
     exercise: {
       ...slot,
+      skipped: skippedAt !== null,
       sets: (setsBySlot.get(slot.id) ?? []).map((set) => ({
         id: set.id,
         type: set.type,

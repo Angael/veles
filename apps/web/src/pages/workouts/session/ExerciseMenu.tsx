@@ -3,6 +3,8 @@ import {
   ArrowUpIcon,
   CheckIcon,
   PencilIcon,
+  SkipForwardIcon,
+  Undo2Icon,
   RulerIcon,
   TimerIcon,
   Trash2Icon,
@@ -29,7 +31,7 @@ type ExerciseMenuProps = {
 
 /**
  * Everything you rarely need mid-set lives here instead of as buttons on the card: rename,
- * tracking mode, rest length, ordering, removal. Name, tracking and rest belong to the exercise,
+ * tracking mode, rest length, ordering, skipping, removal. Name, tracking and rest belong to the exercise,
  * so they carry over to the next workout.
  */
 export function ExerciseMenu({ actions, isFirst, isLast, onRename, slot }: ExerciseMenuProps) {
@@ -86,6 +88,17 @@ export function ExerciseMenu({ actions, isFirst, isLast, onRename, slot }: Exerc
         icon={<ArrowDownIcon aria-hidden='true' />}
         label={t({ en: 'Move down', pl: 'Przesuń w dół' })}
         onClick={() => actions.moveSlot(slot.id, 'down')}
+      />
+      <ContextMenuItem
+        icon={
+          slot.skipped ? <Undo2Icon aria-hidden='true' /> : <SkipForwardIcon aria-hidden='true' />
+        }
+        label={
+          slot.skipped
+            ? t({ en: 'Undo skip', pl: 'Cofnij pominięcie' })
+            : t({ en: 'Skip exercise', pl: 'Pomiń ćwiczenie' })
+        }
+        onClick={() => actions.skipSlot(slot.id, !slot.skipped)}
       />
       <ContextMenuSeparator />
       <ContextMenuItem

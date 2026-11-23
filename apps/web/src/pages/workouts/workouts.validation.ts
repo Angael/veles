@@ -35,7 +35,12 @@ export const addWorkoutExerciseInputType = type({
   ...exerciseRef,
 });
 
-export const updateWorkoutExerciseInputType = type({ id: 'string.uuid', notes: description });
+export const updateWorkoutExerciseInputType = type({
+  id: 'string.uuid',
+  'notes?': description,
+  /** True skips the exercise in this session (unticks its sets), false brings it back. */
+  'skipped?': 'boolean',
+});
 
 export const moveWorkoutExerciseInputType = type({
   id: 'string.uuid',
@@ -88,6 +93,8 @@ export const saveWorkoutInputType = type({
   'exercises?': type({
     ...exerciseRef,
     'notes?': description,
+    /** A skipped exercise keeps its sets but none count as done. */
+    'skipped?': 'boolean',
     sets: type({ 'type?': setType, ...setValues, 'done?': 'boolean' })
       .array()
       .atMostLength(30),

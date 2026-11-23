@@ -44,6 +44,8 @@ export type WorkoutSlotData = {
   note: string;
   /** Latest non-empty note from an earlier session, used as the note placeholder. */
   previousNote: string | null;
+  /** The user skipped this exercise; its sets are not done and not saved on finish. */
+  skipped: boolean;
   sets: WorkoutSetData[];
 };
 
@@ -202,7 +204,12 @@ export async function completeFilledSets(tx: Db, workoutIds: string[]) {
           tx
             .select({ id: workoutSessionExercises.id })
             .from(workoutSessionExercises)
-            .where(inArray(workoutSessionExercises.sessionId, workoutIds)),
+            .where(
+              and(
+                inArray(workoutSessionExercises.sessionId, workoutIds),
+                isNull(workoutSessionExercises.skippedAt),
+              ),
+            ),
         ),
       ),
     );
@@ -281,7 +288,9 @@ async function latestEarlierSlots(
       and(
         sessionsBefore(userId, workout),
         inArray(workoutSessionExercises.exerciseId, exerciseIds),
-        withNote ? ne(workoutSessionExercises.notes, '') : undefined,
+        withNote
+          ? ne(workoutSessionExercises.notes, '')
+          : isNull(workoutSessionExercises.skippedAt),
       ),
     )
     .orderBy(
@@ -330,6 +339,7 @@ export async function loadWorkoutSession(
       name: workoutExercises.name,
       notes: workoutSessionExercises.notes,
       restSeconds: workoutExercises.restSeconds,
+      skippedAt: workoutSessionExercises.skippedAt,
     })
     .from(workoutSessionExercises)
     .innerJoin(workoutExercises, eq(workoutExercises.id, workoutSessionExercises.exerciseId))
@@ -374,6 +384,7 @@ export async function loadWorkoutSession(
         note: slot.notes,
         previousNote: noteByExercise.get(slot.exerciseId) ?? null,
         restSeconds: slot.restSeconds,
+        skipped: slot.skippedAt !== null,
         sets: (sets.get(slot.id) ?? []).map((set, index) => {
           const previous = previousSets[index];
           return {
@@ -401,7 +412,13 @@ export async function previousSetCount(
     .select({ id: workoutSessionExercises.id })
     .from(workoutSessionExercises)
     .innerJoin(workoutSessions, eq(workoutSessions.id, workoutSessionExercises.sessionId))
-    .where(and(sessionsBefore(userId, workout), eq(workoutSessionExercises.exerciseId, exerciseId)))
+    .where(
+      and(
+        sessionsBefore(userId, workout),
+        eq(workoutSessionExercises.exerciseId, exerciseId),
+        isNull(workoutSessionExercises.skippedAt),
+      ),
+    )
     .orderBy(desc(workoutSessions.date), desc(workoutSessions.id))
     .limit(1);
   if (!previous) return 1;

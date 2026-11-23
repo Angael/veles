@@ -151,6 +151,21 @@ export function useSessionActions(workoutId: string) {
     optimistic: (session, { id, notes }) =>
       mapSlots(session, (slot) => (slot.id === id ? { ...slot, note: notes } : slot)),
   });
+  const skipSlot = useSessionMutation(workoutId, hasPendingEdits, {
+    error: { en: 'Exercise was not saved', pl: 'Nie udało się zapisać ćwiczenia' },
+    mutationFn: (variables: { id: string; skipped: boolean }) =>
+      updateWorkoutExercise({ data: variables }),
+    optimistic: (session, { id, skipped }) =>
+      mapSlots(session, (slot) =>
+        slot.id === id
+          ? {
+              ...slot,
+              sets: skipped ? slot.sets.map((set) => ({ ...set, done: false })) : slot.sets,
+              skipped,
+            }
+          : slot,
+      ),
+  });
   const moveSlot = useSessionMutation(workoutId, hasPendingEdits, {
     error: { en: 'Exercise was not moved', pl: 'Nie udało się przesunąć ćwiczenia' },
     mutationFn: (variables: { id: string; direction: 'up' | 'down' }) =>
@@ -213,6 +228,8 @@ export function useSessionActions(workoutId: string) {
       removeSet.mutate(id);
     },
     removeSlot: removeSlot.mutate,
+    /** Skipping marks the exercise as not done; finishing leaves its sets alone. */
+    skipSlot: (id: string, skipped: boolean) => skipSlot.mutate({ id, skipped }),
     updateExercise: (id: string, patch: ExercisePatch) => exerciseMutation.mutate({ id, ...patch }),
     updateNote: (id: string, notes: string) => updateNote.mutate({ id, notes }),
     /**

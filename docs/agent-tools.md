@@ -54,7 +54,7 @@ Resources:
 - food_days: Food diary, one item per day with entries or a day note, newest first; id and date are the same YYYY-MM-DD. Each day has entries (with imageUrl or null, and productId when logged from food_products), total, goal (the nutrition goal in effect; null without a goal or without Nutrition goals consent), note (the user's free text or null), and offPlan; kcal is energy; macros are protein, fat, carbs in grams. offPlan true means the user went off the diet and probably overate: total is only what was logged, not the real intake, so use the note to judge how much more was eaten, and leave the day out of averages and trends.
 - calorie_goals: Nutrition goal history by effectiveDate, newest first; each goal applies until the next one. kcal is energy; macros are protein, fat, carbs in grams (limits).
 - food_products: Shared food catalog with imageUrl or null. per100g nutrition: kcal is energy; macros are protein, fat, carbs in grams. productSizeGrams is one unit (package, piece, slice or serving).
-- workout_sessions: Workout sessions, newest first, each with its exercises (id of the session exercise, exerciseId from workout_exercises, name, measure, notes) and their sets. Sets: id, type (normal, warmup, drop, failure), done, weightKg, reps, durationSeconds, distanceKm; measure says which apply. durationSeconds is manual or end minus start.
+- workout_sessions: Workout sessions, newest first, each with its exercises (id of the session exercise, exerciseId from workout_exercises, name, measure, notes, skipped: the user skipped it, so no set is done) and their sets. Sets: id, type (normal, warmup, drop, failure), done, weightKg, reps, durationSeconds, distanceKm; measure says which apply. durationSeconds is manual or end minus start.
 - workout_routines: Reusable workout plans, each with archived (hidden in the app) and ordered exercises (name, measure, restSeconds) and setTypes, one per planned set.
 - workout_exercises: Exercise list with measure, restSeconds, notes, archived, lastDoneOn, and sessionCount.
 - workout_stats: Training summary per period; id is "all" (listed first) or a year, then years newest first. Counts sessions, activeDays, totalSeconds, exercises (different ones with a done set), newExercises (first ever done in the period), topExercises (sessions with a done set and share of all sessions), weekdays (sessions per weekday, Monday first), timeline (sessions per YYYY-MM month, or per YYYY year for all time), weekStreak and dayStreak (longest run, from/to dates), favouriteRoutine, longestSession (seconds), and firstSession.
@@ -135,16 +135,16 @@ Save the weight in kg for one date. Replaces the weight already saved for that d
 
 _write, destructive_
 
-Create (no id; date required) or update (id) a workout session. Omitted fields stay; exercises, when given, replace all exercises and sets in order. To move a session to another day, send id and date only. Each exercise is exerciseId from workout_exercises (read it first to reuse existing ones), or newExercise { name, measure }, which reuses an exercise with that exact name or creates it. A new session is finished unless finished is false (only one open session at a time); with routineId and no exercises it copies the routine. Returns { id }.
+Create (no id; date required) or update (id) a workout session. Omitted fields stay; exercises, when given, replace all exercises and sets in order. To move a session to another day, send id and date only. Each exercise is exerciseId from workout_exercises (read it first to reuse existing ones), or newExercise { name, measure }, which reuses an exercise with that exact name or creates it. A new session is finished unless finished is false (only one open session at a time); with routineId and no exercises it copies the routine. An exercise with skipped true was not done; none of its sets count as done. Returns { id }.
 
-| Input       | Type                                       | Required | Notes         |
-| ----------- | ------------------------------------------ | -------- | ------------- |
-| `date`      | date YYYY-MM-DD                            |          |               |
-| `exercises` | { sets, exerciseId, newExercise, notes }[] |          | max 40 items  |
-| `finished`  | boolean                                    |          |               |
-| `id`        | uuid                                       |          |               |
-| `name`      | string                                     |          | max 200 chars |
-| `routineId` | uuid \| null                               |          |               |
+| Input       | Type                                                | Required | Notes         |
+| ----------- | --------------------------------------------------- | -------- | ------------- |
+| `date`      | date YYYY-MM-DD                                     |          |               |
+| `exercises` | { sets, exerciseId, newExercise, notes, skipped }[] |          | max 40 items  |
+| `finished`  | boolean                                             |          |               |
+| `id`        | uuid                                                |          |               |
+| `name`      | string                                              |          | max 200 chars |
+| `routineId` | uuid \| null                                        |          |               |
 
 ### `save_routine`
 

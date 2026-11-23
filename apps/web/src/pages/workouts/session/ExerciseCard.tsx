@@ -1,13 +1,13 @@
-import { HistoryIcon, PlusIcon } from 'lucide-react';
+import clsx from 'clsx';
+import { HistoryIcon, Undo2Icon } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { ContextMenuRoot, ContextMenuTrigger } from '@/components/ui/context-menu/ContextMenu';
-import { workingSetNumbers } from '../metrics';
 import type { WorkoutSetData, WorkoutSlotData } from '../workouts.server';
 import { ExerciseHistoryDialog } from './ExerciseHistoryDialog';
 import { ExerciseMenu } from './ExerciseMenu';
 import { ExerciseNote } from './ExerciseNote';
+import { ExerciseSets } from './ExerciseSets';
 import type { SessionActions } from './session.query';
-import { SetRow } from './SetRow';
 import css from './Session.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { selectOnMount } from '@/lib/selectOnMount';
@@ -28,7 +28,7 @@ type ExerciseCardProps = {
   workoutId: string;
 };
 
-/** One exercise in a session: order number, wrapping title with history, note, set rows. */
+/** One exercise in a session: order number, wrapping title with history, note, set rows or a skipped notice. */
 export function ExerciseCard({
   actions,
   finished,
@@ -44,10 +44,9 @@ export function ExerciseCard({
   const { t } = useI18n();
   const [renaming, setRenaming] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const numbers = workingSetNumbers(slot.sets);
 
   return (
-    <section className={css.card}>
+    <section className={clsx(css.card, slot.skipped && css.skippedCard)}>
       <ContextMenuRoot>
         <ContextMenuTrigger className={css.cardHeader}>
           <span className={css.exerciseNumber}>{number}</span>
@@ -86,36 +85,29 @@ export function ExerciseCard({
       </ContextMenuRoot>
 
       <ExerciseNote actions={actions} slot={slot} />
-      {tip}
-
-      <div className={css.sets} role='table'>
-        {slot.sets.map((set, index) => (
-          <SetRow
+      {slot.skipped ? (
+        <div className={css.skippedRow}>
+          <span>{t({ en: 'Skipped', pl: 'Pominięte' })}</span>
+          <button
+            className={css.addSet}
+            onClick={() => actions.skipSlot(slot.id, false)}
+            type='button'
+          >
+            <Undo2Icon aria-hidden='true' /> {t({ en: 'Undo skip', pl: 'Cofnij pominięcie' })}
+          </button>
+        </div>
+      ) : (
+        <>
+          {tip}
+          <ExerciseSets
             actions={actions}
             finished={finished}
-            key={set.id}
-            number={numbers[index] ?? 0}
-            onCompleted={(done) => onSetCompleted(slot, done)}
-            onOpenSheet={(complete) => onOpenSheet(set.id, complete)}
-            set={set}
+            onOpenSheet={onOpenSheet}
+            onSetCompleted={onSetCompleted}
             slot={slot}
           />
-        ))}
-      </div>
-
-      <div className={css.cardFooter}>
-        <button
-          className={css.addSet}
-          onClick={() => actions.addSet(slot.id)}
-          title={t({
-            en: 'Adds one set, copying the last one',
-            pl: 'Dodaje jedną serię, kopiując ostatnią',
-          })}
-          type='button'
-        >
-          <PlusIcon aria-hidden='true' /> {t({ en: 'Add set', pl: 'Dodaj serię' })}
-        </button>
-      </div>
+        </>
+      )}
 
       <ExerciseHistoryDialog
         exerciseId={slot.exerciseId}

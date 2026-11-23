@@ -57,6 +57,7 @@ async function fillHintSets(userId: string, workoutId: string) {
   const session = await loadWorkoutSession(userId, workoutId);
   await db.transaction(async (tx) => {
     for (const slot of session.slots) {
+      if (slot.skipped) continue;
       for (const set of slot.sets) {
         const patch = hintFill(set, slot.measure);
         if (patch)
@@ -137,11 +138,22 @@ export async function updateWorkoutExerciseRecord(
   data: typeof updateWorkoutExerciseInputType.infer,
 ) {
   const slot = await requireOwnedSlot(db, userId, data.id);
-  await touchWorkout(db, slot.workoutId);
-  await db
-    .update(workoutSessionExercises)
-    .set({ notes: data.notes.trim() })
-    .where(eq(workoutSessionExercises.id, data.id));
+  await db.transaction(async (tx) => {
+    await touchWorkout(tx, slot.workoutId);
+    await tx
+      .update(workoutSessionExercises)
+      .set({
+        ...(data.notes === undefined ? {} : { notes: data.notes.trim() }),
+        ...(data.skipped === undefined ? {} : { skippedAt: data.skipped ? new Date() : null }),
+      })
+      .where(eq(workoutSessionExercises.id, data.id));
+    // A skipped exercise was not done, so its ticks go too.
+    if (data.skipped)
+      await tx
+        .update(workoutSets)
+        .set({ completedAt: null })
+        .where(eq(workoutSets.sessionExerciseId, data.id));
+  });
 }
 
 /** Swaps the slot with its neighbour; -1 parks one row so the unique position index holds. */

@@ -83,6 +83,33 @@
   background: var(--c-surface);
 }
 
+.skippedCard {
+  border-style: dashed;
+  background: transparent;
+
+  & h3 {
+    color: var(--c-muted);
+    text-decoration: line-through;
+  }
+}
+
+.skippedRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+
+  & > span {
+    flex: 1;
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+  }
+
+  & > button {
+    flex: 0 0 auto;
+    padding-inline: var(--space-sm);
+  }
+}
+
 .cardHeader {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) 2.5rem;
