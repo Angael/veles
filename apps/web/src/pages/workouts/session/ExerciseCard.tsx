@@ -8,6 +8,7 @@ import { ExerciseMenu } from './ExerciseMenu';
 import { ExerciseNote } from './ExerciseNote';
 import type { SessionActions } from './session.query';
 import { SetRow } from './SetRow';
+import { SkippedExerciseNote } from './SkippedExerciseNote';
 import css from './Session.module.css';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { selectOnMount } from '@/lib/selectOnMount';
@@ -22,6 +23,8 @@ type ExerciseCardProps = {
   number: number;
   onOpenSheet: (setId: string, complete: boolean) => void;
   onSetCompleted: (slot: WorkoutSlotData, set: WorkoutSetData) => void;
+  /** Untouched exercise after the last touched one; Finish drops it. */
+  skipped: boolean;
   slot: WorkoutSlotData;
   /** First-use tip shown right above the set rows it explains. */
   tip?: ReactNode;
@@ -37,6 +40,7 @@ export function ExerciseCard({
   number,
   onOpenSheet,
   onSetCompleted,
+  skipped,
   slot,
   tip,
   workoutId,
@@ -86,6 +90,7 @@ export function ExerciseCard({
       </ContextMenuRoot>
 
       <ExerciseNote actions={actions} slot={slot} />
+      {skipped && !finished && <SkippedExerciseNote actions={actions} slot={slot} />}
       {tip}
 
       <div className={css.sets} role='table'>

@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, lt, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, inArray, isNull, lt, notExists, sql } from 'drizzle-orm';
 import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
@@ -28,6 +28,7 @@ import type {
   updateWorkoutSetInputType,
   workoutIdType,
 } from '../workouts.validation';
+import { skippedSlotIds } from './endedEarly';
 import { workoutMovePatch } from './moveWorkout';
 
 type IdInput = typeof workoutIdType.infer;
@@ -50,19 +51,50 @@ export async function startWorkoutRecord(userId: string, data: typeof startWorko
 }
 
 /**
- * Saves the grey hints of unticked sets' empty cells before a workout ends. Hints read like real
- * values, so finishing keeps what the user saw instead of empty sets.
+ * Prepares a workout for Finish. Exercises after the last touched one were skipped (ended early):
+ * their empty unticked sets go, and so do slots left with no sets, so they never read as done or
+ * feed later hints. Other unticked sets get their grey hints saved, because hints read like real
+ * values and the user likely did them as suggested.
  */
 async function fillHintSets(userId: string, workoutId: string) {
   const session = await loadWorkoutSession(userId, workoutId);
+  const skipped = new Set(skippedSlotIds(session.slots));
   await db.transaction(async (tx) => {
     for (const slot of session.slots) {
+      if (skipped.has(slot.id)) continue;
       for (const set of slot.sets) {
         const patch = hintFill(set, slot.measure);
         if (patch)
           await tx.update(workoutSets).set(toSetColumns(patch)).where(eq(workoutSets.id, set.id));
       }
     }
+    if (skipped.size === 0) return;
+    const skippedIds = [...skipped];
+    await tx
+      .delete(workoutSets)
+      .where(
+        and(
+          inArray(workoutSets.sessionExerciseId, skippedIds),
+          isNull(workoutSets.completedAt),
+          isNull(workoutSets.weightGrams),
+          isNull(workoutSets.reps),
+          isNull(workoutSets.durationSeconds),
+          isNull(workoutSets.distanceMeters),
+        ),
+      );
+    await tx
+      .delete(workoutSessionExercises)
+      .where(
+        and(
+          inArray(workoutSessionExercises.id, skippedIds),
+          notExists(
+            tx
+              .select({ id: workoutSets.id })
+              .from(workoutSets)
+              .where(eq(workoutSets.sessionExerciseId, workoutSessionExercises.id)),
+          ),
+        ),
+      );
   });
 }
 

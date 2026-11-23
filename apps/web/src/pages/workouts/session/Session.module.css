@@ -399,3 +399,18 @@
   display: grid;
   gap: var(--space-md);
 }
+
+.skippedNote {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  align-items: center;
+  justify-content: space-between;
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+}
+
+.skippedDone {
+  color: var(--c-accent);
+  font-weight: var(--font-weight-semibold);
+}

@@ -9,6 +9,7 @@ import { RestDock } from '../rest/RestTimer';
 import { useRestTimer } from '../rest/useRestTimer';
 import { workoutSessionQueryOptions } from '../workouts.query';
 import type { WorkoutSetData, WorkoutSlotData } from '../workouts.server';
+import { skippedSlotIds } from './endedEarly';
 import { ExerciseCard } from './ExerciseCard';
 import { SessionSummary } from './SessionSummary';
 import { useSessionActions } from './session.query';
@@ -31,6 +32,7 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
     null,
   );
 
+  const skipped = new Set(skippedSlotIds(session.slots));
   const sheetSlot = session.slots.find((slot) => slot.id === sheet?.slotId);
   const sheetSet = sheetSlot?.sets.find((set) => set.id === sheet?.setId);
   const nextHint = HINTS.find((hint) => hints.seen !== null && !hints.seen.includes(hint.key));
@@ -77,6 +79,7 @@ export function WorkoutSessionPage({ workoutId }: { workoutId: string }) {
               number={index + 1}
               onOpenSheet={(setId, complete) => setSheet({ complete, setId, slotId: slot.id })}
               onSetCompleted={onSetCompleted}
+              skipped={skipped.has(slot.id)}
               slot={slot}
               tip={
                 index === 0 && nextHint ? (
