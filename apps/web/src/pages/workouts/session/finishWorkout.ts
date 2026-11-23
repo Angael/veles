@@ -2,7 +2,7 @@ import { clearStoredRestTimer } from '../rest/useRestTimer';
 
 type FinishWorkoutDeps = {
   /** `useMutation().mutateAsync`; its promise settles even if the caller unmounted meanwhile. */
-  finish: (variables: { finished: true; id: string }) => Promise<unknown>;
+  finish: (variables: { finished: true; id: string; skipSlotIds?: string[] }) => Promise<unknown>;
   leave: () => void;
 };
 
@@ -11,9 +11,13 @@ type FinishWorkoutDeps = {
  * per-call `mutate` callbacks: the invalidation refetch can end the workout in the cache and
  * unmount the Finish button first, and TanStack Query drops callbacks of unmounted observers.
  */
-export async function finishWorkout(id: string, { finish, leave }: FinishWorkoutDeps) {
+export async function finishWorkout(
+  id: string,
+  { finish, leave }: FinishWorkoutDeps,
+  skipSlotIds: string[] = [],
+) {
   try {
-    await finish({ finished: true, id });
+    await finish(skipSlotIds.length ? { finished: true, id, skipSlotIds } : { finished: true, id });
   } catch {
     // The mutation meta shows the error toast; the user stays on the workout.
     return;

@@ -399,3 +399,20 @@
   display: grid;
   gap: var(--space-md);
 }
+
+.reviewHint {
+  color: var(--c-muted);
+}
+
+.reviewList {
+  display: grid;
+  gap: var(--space-sm);
+  padding: 0;
+  list-style: none;
+}
+
+.reviewItem {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}

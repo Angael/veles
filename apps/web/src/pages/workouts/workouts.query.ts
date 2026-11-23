@@ -52,6 +52,7 @@ export function useUpdateWorkoutMutation() {
       name?: string;
       finished?: boolean;
       fillHints?: boolean;
+      skipSlotIds?: string[];
     }) => updateWorkout({ data: variables }),
   });
 }

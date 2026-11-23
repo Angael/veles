@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, lt, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, inArray, isNull, lt, notExists, sql } from 'drizzle-orm';
 import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db } from '@/server/db.server';
@@ -67,6 +67,43 @@ async function fillHintSets(userId: string, workoutId: string) {
 }
 
 /**
+ * Drops exercises the user marked as not done on finish: their unticked sets go, then each slot
+ * left without sets. A never-done exercise then neither stays in history nor becomes "last time".
+ */
+async function dropSkippedSlots(workoutId: string, slotIds: string[]) {
+  if (!slotIds.length) return;
+  await db.transaction(async (tx) => {
+    const slots = await tx
+      .select({ id: workoutSessionExercises.id })
+      .from(workoutSessionExercises)
+      .where(
+        and(
+          eq(workoutSessionExercises.sessionId, workoutId),
+          inArray(workoutSessionExercises.id, slotIds),
+        ),
+      );
+    const ids = slots.map((slot) => slot.id);
+    if (!ids.length) return;
+    await tx
+      .delete(workoutSets)
+      .where(and(inArray(workoutSets.sessionExerciseId, ids), isNull(workoutSets.completedAt)));
+    await tx
+      .delete(workoutSessionExercises)
+      .where(
+        and(
+          inArray(workoutSessionExercises.id, ids),
+          notExists(
+            tx
+              .select({ id: workoutSets.id })
+              .from(workoutSets)
+              .where(eq(workoutSets.sessionExerciseId, workoutSessionExercises.id)),
+          ),
+        ),
+      );
+  });
+}
+
+/**
  * Renames a session, moves it to another day, or finishes / reopens it. Reopening is refused while
  * another is open. Moving updates only the session row, so its exercises and sets stay.
  */
@@ -80,6 +117,7 @@ export async function updateWorkoutRecord(
     await autoFinishIdleWorkouts(db, userId);
     await requireNoOpenWorkout(db, userId, data.id);
   }
+  if (data.finished && data.skipSlotIds) await dropSkippedSlots(workout.id, data.skipSlotIds);
   if (data.finished && data.fillHints) await fillHintSets(userId, workout.id);
   await db
     .update(workoutSessions)

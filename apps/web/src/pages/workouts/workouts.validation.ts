@@ -28,6 +28,8 @@ export const updateWorkoutInputType = type({
   'finished?': 'boolean',
   /** On finish: save the grey hints shown in empty cells of unticked sets. */
   'fillHints?': 'boolean',
+  /** On finish: exercises the user did not do; their unticked sets and then empty slots go. */
+  'skipSlotIds?': 'string.uuid[]',
 });
 
 export const addWorkoutExerciseInputType = type({
