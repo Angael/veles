@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label/Label';
 import { NumberInput } from '@/components/ui/number-input/NumberInput';
 import { TextInput } from '@/components/ui/text-input/TextInput';
 import { useI18n } from '@/lib/i18n/I18nProvider';
+import { getFoodBarcode } from '@/lib/foodBarcode';
 import { calorieFoodQueryOptions, useLookupFoodByBarcodeMutation } from '../calories.query';
 import { caloriesReturnState } from '../caloriesReturnScroll';
 import { FoodBarcodeScanDialog } from '../foods/FoodBarcodeScanDialog';
@@ -49,8 +50,12 @@ export function PhotoScanForm({ date, initialBarcode, log, onDirty, onLeaving }:
       : null;
   const ready = shots.length > 0 && processing === 0 && (!log || Boolean(grams));
 
-  function lookup(value: string) {
-    if (barcodePattern.test(value)) lookupMutation.mutate({ data: { barcode: value } });
+  /** Swaps typed GS1 data (the printed `(01)…` line) for its GTIN, then looks the product up. */
+  function lookup(typed: string) {
+    const value = getFoodBarcode(typed) ?? typed;
+    if (!barcodePattern.test(value)) return;
+    setBarcode(value);
+    lookupMutation.mutate({ data: { barcode: value } });
   }
 
   function leave(search: { date: string; foodId?: string }) {
