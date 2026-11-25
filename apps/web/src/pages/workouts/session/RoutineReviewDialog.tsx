@@ -57,8 +57,8 @@ export function RoutineReviewDialog({
             </DialogTitle>
             <DialogDescription>
               {t({
-                en: 'Workout saved. It differs from the routine as below. Weights and reps never go into the routine.',
-                pl: 'Trening zapisany. Różni się od planu jak poniżej. Ciężary i powtórzenia nie trafiają do planu.',
+                en: 'Workout saved, but it differs from the routine. Overwrite the routine?',
+                pl: 'Trening zapisany, ale różni się od planu. Czy nadpisać istniejący plan?',
               })}
             </DialogDescription>
             <ul className={css.changes}>
@@ -95,21 +95,15 @@ export function RoutineReviewDialog({
   );
 }
 
-/** One exercise: what happened to it, then its sets before → after where that helps. */
+/**
+ * One exercise: icon and name, then its sets before → after where that helps. The icon already
+ * says what happened, so only a move gets text (its positions).
+ */
 function ChangeRow({ change }: { change: RoutineChange }) {
   const { t } = useI18n();
   const { after, before, move, setsChanged } = change;
-  const labels = [
-    before === null ? t({ en: 'Added', pl: 'Dodane' }) : null,
-    after === null ? t({ en: 'Removed', pl: 'Usunięte' }) : null,
-    setsChanged ? t({ en: 'Sets changed', pl: 'Zmienione serie' }) : null,
-    move
-      ? t({
-          en: `Moved from #${move.from} to #${move.to}`,
-          pl: `Przeniesione z ${move.from}. na ${move.to}. miejsce`,
-        })
-      : null,
-  ].filter((label) => label !== null);
+  const showBefore = before !== null && (after === null || setsChanged);
+  const showAfter = after !== null && (before === null || setsChanged);
 
   return (
     <li className={clsx(css.change, after === null && css.removed)}>
@@ -118,13 +112,24 @@ function ChangeRow({ change }: { change: RoutineChange }) {
       </span>
       <span className={css.text}>
         <strong>{change.name}</strong>
-        <small>{labels.join(' · ')}</small>
+        {move ? (
+          <small>
+            {t({
+              en: `Moved from #${move.from} to #${move.to}`,
+              pl: `Przeniesione z ${move.from}. na ${move.to}. miejsce`,
+            })}
+          </small>
+        ) : null}
       </span>
-      <span className={css.sets}>
-        {before !== null && (after === null || setsChanged) ? <SetChips types={before} /> : null}
-        {setsChanged ? <ArrowRightIcon aria-hidden='true' className={css.arrow} /> : null}
-        {after !== null && (before === null || setsChanged) ? <SetChips types={after} /> : null}
-      </span>
+      {showBefore || showAfter ? (
+        <>
+          <span className={css.before}>{showBefore ? <SetChips types={before} /> : null}</span>
+          <span className={css.arrow}>
+            {setsChanged ? <ArrowRightIcon aria-hidden='true' /> : null}
+          </span>
+          <span className={css.after}>{showAfter ? <SetChips types={after} /> : null}</span>
+        </>
+      ) : null}
     </li>
   );
 }

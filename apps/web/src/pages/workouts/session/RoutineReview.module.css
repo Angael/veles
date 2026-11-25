@@ -7,20 +7,23 @@
   text-wrap: pretty;
 }
 
+/* Icon | before | arrow | after. Rows share the columns, so every arrow sits in one column. */
 .changes {
   display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);
   gap: var(--space-xs);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* Icon | name and what changed | sets before → after. Sets drop below on narrow phones. */
+/* Name beside the icon; sets on the row below, under the name. */
 .change {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
   align-items: center;
-  gap: 0.25rem var(--space-sm);
+  row-gap: 0.25rem;
   padding: var(--space-xs) var(--space-sm);
   border: var(--border-width) solid var(--c-border);
   border-radius: var(--radius-xs);
@@ -48,6 +51,7 @@
 
 .text {
   display: grid;
+  grid-column: 2 / -1;
   min-width: 0;
 
   & strong {
@@ -61,22 +65,36 @@
   }
 }
 
-.sets {
+.before,
+.after {
   display: flex;
-  flex-wrap: wrap;
-  grid-column: 2;
-  align-items: center;
-  gap: 0.25rem var(--space-xs);
+  min-width: 0;
+}
 
-  &:empty {
-    display: none;
+.before {
+  grid-column: 2;
+  justify-content: flex-end;
+
+  & .chips {
+    justify-content: flex-end;
   }
 }
 
+.after {
+  grid-column: 4;
+}
+
 .arrow {
+  display: grid;
+  grid-column: 3;
+  place-items: center;
   width: 1rem;
-  height: 1rem;
   color: var(--c-muted);
+
+  & svg {
+    width: 1rem;
+    height: 1rem;
+  }
 }
 
 .chips {
