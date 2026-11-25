@@ -223,23 +223,28 @@ export function hintValue(set: { previous: SetMetrics | null }, key: MetricKey) 
 }
 
 /**
- * Last time's values for an unticked set's empty cells, as a patch. Finish offers these sets one
- * by one and saves only the ones the user accepts, so skipped sets never become done. Null when
- * the set is ticked, has no empty cell, or last time lacks a value to copy.
+ * How an unticked set would be saved if the user confirms it on Finish: entered values plus last
+ * time's for the empty cells (when last time has them all). Only ticked sets count as done, so
+ * Finish asks about every set this returns. Null when the set is ticked or has nothing to save.
  */
-export function suggestedFill(
+export function unconfirmedFill(
   set: SetMetrics & { done: boolean; previous: SetMetrics | null },
   measure: Measure,
-): Partial<SetMetrics> | null {
+): SetMetrics | null {
   if (set.done) return null;
-  const patch = filledFromPrevious(set, measure);
-  return patch && Object.keys(patch).length > 0 ? patch : null;
+  const merged = { ...set, ...filledFromPrevious(set, measure) };
+  const filled: SetMetrics = {
+    distanceKm: merged.distanceKm,
+    durationSeconds: merged.durationSeconds,
+    reps: merged.reps,
+    weightKg: merged.weightKg,
+  };
+  return Object.values(filled).some((value) => value !== null) ? filled : null;
 }
 
 /**
- * Whether ending a workout ticks this unticked set: it holds an entered value and has no empty
- * cell that last time could fill. A set still waiting on a suggestion is the user's call, so it
- * stays not done unless accepted; values stay as entered either way.
+ * Whether a workout ending without the user (auto-finish, agent save) ticks this unticked set: it
+ * holds an entered value and has no empty cell that last time could fill.
  */
 export function completesOnFinish(
   set: SetMetrics & { done: boolean; previous: SetMetrics | null },
@@ -249,7 +254,8 @@ export function completesOnFinish(
   const entered = [set.weightKg, set.reps, set.durationSeconds, set.distanceKm].some(
     (value) => value !== null,
   );
-  return entered && suggestedFill(set, measure) === null;
+  const suggestion = filledFromPrevious(set, measure);
+  return entered && !(suggestion && Object.keys(suggestion).length > 0);
 }
 
 /** Short label for a logged set, such as `80 × 5` or `5.2 km · 28:10`. */
