@@ -97,7 +97,7 @@ export function ExerciseHistoryEntry({ entry, measure }: { entry: Entry; measure
   );
 }
 
-/** `35 kg × 20 reps`, `5.2 km · 28:10 min`, `no weight · 12 reps`. */
+/** `35 kg × 20`, `5.2 km · 28:10 min`, `no weight · 12 reps`. */
 function SetValues({ measure, set }: { measure: Measure; set: SetMetrics }) {
   const { locale, t } = useI18n();
   const values = setValues(set, measure);
@@ -120,8 +120,9 @@ function SetValues({ measure, set }: { measure: Measure; set: SetMetrics }) {
               <span className={css.missing}>{t(NOT_LOGGED[field.key])}</span>
             ) : (
               <span>
-                <strong>{formatMetric(field, value, locale)}</strong>{' '}
-                {t(field.cellUnit ?? TIME_UNIT)}
+                <strong>{formatMetric(field, value, locale)}</strong>
+                {/* After "60 kg ×" the count is plainly reps; the unit only adds noise. */}
+                {times && bothLogged ? null : ` ${t(field.cellUnit ?? TIME_UNIT)}`}
               </span>
             )}
           </Fragment>

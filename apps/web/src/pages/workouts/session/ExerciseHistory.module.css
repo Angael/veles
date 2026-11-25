@@ -1,3 +1,35 @@
+@import '../../../styles/breakpoints.css';
+
+/* Pinned to the top of the scrolling popup so the close button never scrolls away. */
+.dialogHeader {
+  --popup-padding: var(--space-lg);
+
+  position: sticky;
+  top: calc(-1 * var(--popup-padding));
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin: calc(-1 * var(--popup-padding)) calc(-1 * var(--popup-padding)) 0;
+  padding: var(--popup-padding) var(--popup-padding) var(--space-sm);
+  background: var(--c-surface-solid);
+
+  @media (--phone) {
+    --popup-padding: var(--space-md);
+  }
+}
+
+.heading {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+
+  & p {
+    font-size: var(--text-sm);
+  }
+}
+
 .entries {
   display: grid;
   gap: var(--space-sm);

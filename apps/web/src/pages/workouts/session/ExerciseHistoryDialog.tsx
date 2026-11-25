@@ -1,5 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
+import { XIcon } from 'lucide-react';
+import { Btn } from '@/components/ui/btn/Btn';
 import {
+  DialogClose,
   DialogDescription,
   DialogPopup,
   DialogRoot,
@@ -41,7 +44,27 @@ export function ExerciseHistoryDialog({
   return (
     <DialogRoot onOpenChange={onOpenChange} open={open}>
       <DialogPopup>
-        <DialogTitle>{exerciseName}</DialogTitle>
+        <header className={css.dialogHeader}>
+          <div className={css.heading}>
+            <DialogTitle>{exerciseName}</DialogTitle>
+            {entries.length > 0 ? (
+              <DialogDescription>
+                {t({ en: 'Newest first', pl: 'Od najnowszych' })}
+              </DialogDescription>
+            ) : null}
+          </div>
+          <DialogClose
+            render={
+              <Btn
+                aria-label={t({ en: 'Close', pl: 'Zamknij' })}
+                icon={<XIcon aria-hidden='true' />}
+                iconOnly
+                size='sm'
+                variant='ghost'
+              />
+            }
+          />
+        </header>
         {history.isPending ? (
           <DialogDescription>{t({ en: 'Loading…', pl: 'Wczytywanie…' })}</DialogDescription>
         ) : null}
