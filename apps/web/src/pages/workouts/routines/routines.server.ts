@@ -18,17 +18,19 @@ function routineChanges(data: { name?: string; description?: string; archived?: 
     updatedAt: new Date(),
   };
 }
+import type { SetType } from '../metrics';
 import {
   autoFinishIdleWorkouts,
+  type ExerciseRef,
   requireNoOpenWorkout,
   requireOwnedWorkout,
   resolveExerciseId,
 } from '../workouts.server';
 import type {
-  routineWorkoutIdInputType,
   saveRoutineInputType,
   saveRoutinePlanInputType,
   startRoutineInputType,
+  updateRoutineFromWorkoutInputType,
   updateRoutineInputType,
   workoutIdType,
 } from '../workouts.validation';
@@ -47,7 +49,7 @@ export async function requireOwnedRoutine(tx: DbTransaction, userId: string, rou
 /**
  * Stores a session's shape in a routine: exercises in order and the set types of each. Values
  * are dropped on purpose; last time's numbers already show what to aim for. Refuses an empty
- * session, so a stale menu can never wipe a routine's plan.
+ * session, so a routine is never saved without exercises.
  */
 export async function copySessionToRoutine(
   tx: DbTransaction,
@@ -147,31 +149,81 @@ export async function saveRoutineFromWorkoutRecord(
   });
 }
 
-/** Overwrites the linked routine's exercises with this session's. */
+type RoutinePlan = { exerciseId: string; setTypes: SetType[] }[];
+
+/** Two plans match when they list the same exercises in the same order with the same set types. */
+export function samePlan(a: RoutinePlan, b: RoutinePlan) {
+  return (
+    a.length === b.length &&
+    a.every((exercise, index) => {
+      const other = b[index];
+      return (
+        other?.exerciseId === exercise.exerciseId &&
+        other.setTypes.length === exercise.setTypes.length &&
+        other.setTypes.every((type, setIndex) => type === exercise.setTypes[setIndex])
+      );
+    })
+  );
+}
+
+/**
+ * Writes the plan the user reviewed on Finish to the routine the workout started from, but only
+ * if that routine still is what the review showed as "before": same link and same exercises.
+ * Otherwise it writes nothing and reports a conflict, so a routine edited elsewhere (another tab,
+ * an agent) meanwhile is never replaced by a stale plan. The routine row is locked first, so an
+ * edit committing at the same moment is either seen here or waits for this write. Name,
+ * description and archive changes do not conflict; they are kept.
+ */
 export async function updateRoutineFromWorkoutRecord(
   userId: string,
-  data: typeof routineWorkoutIdInputType.infer,
-) {
-  await db.transaction(async (tx) => {
+  data: typeof updateRoutineFromWorkoutInputType.infer,
+): Promise<{ conflict: boolean }> {
+  return db.transaction(async (tx) => {
     const workout = await requireOwnedWorkout(tx, userId, data.workoutId);
     const [linked] = await tx
       .select({ routineId: workoutSessions.routineId })
       .from(workoutSessions)
       .where(eq(workoutSessions.id, workout.id));
-    if (!linked?.routineId)
-      throw new ClientSafeError(
-        translate({ en: 'This workout has no routine.', pl: 'Ten trening nie ma planu.' }),
-      );
-    const routine = await requireOwnedRoutine(tx, userId, linked.routineId);
-    await tx
-      .delete(workoutRoutineExercises)
-      .where(eq(workoutRoutineExercises.routineId, routine.id));
-    await copySessionToRoutine(tx, workout.id, routine.id);
+    if (linked?.routineId !== data.routineId) return { conflict: true };
+    const [routine] = await tx
+      .select({ id: workoutRoutines.id })
+      .from(workoutRoutines)
+      .where(and(eq(workoutRoutines.id, data.routineId), eq(workoutRoutines.userId, userId)))
+      .for('update');
+    if (!routine) return { conflict: true };
+    const current = await tx
+      .select({
+        exerciseId: workoutRoutineExercises.exerciseId,
+        setTypes: workoutRoutineExercises.setTypes,
+      })
+      .from(workoutRoutineExercises)
+      .where(eq(workoutRoutineExercises.routineId, routine.id))
+      .orderBy(asc(workoutRoutineExercises.position));
+    if (!samePlan(current, data.reviewed)) return { conflict: true };
+
+    await replaceRoutineExercises(tx, userId, routine.id, data.exercises);
     await tx
       .update(workoutRoutines)
       .set({ updatedAt: new Date() })
       .where(eq(workoutRoutines.id, routine.id));
+    return { conflict: false };
   });
+}
+
+/** Replaces the routine's exercises with the given ones, in order. Exercises must be the user's. */
+async function replaceRoutineExercises(
+  tx: DbTransaction,
+  userId: string,
+  routineId: string,
+  exercises: (ExerciseRef & { setTypes: SetType[] })[],
+) {
+  await tx.delete(workoutRoutineExercises).where(eq(workoutRoutineExercises.routineId, routineId));
+  for (const [position, exercise] of exercises.entries()) {
+    const exerciseId = await resolveExerciseId(tx, userId, exercise);
+    await tx
+      .insert(workoutRoutineExercises)
+      .values({ exerciseId, position, routineId, setTypes: exercise.setTypes });
+  }
 }
 
 /** Starts a session for the given day with the routine's exercises and empty sets. */
@@ -249,17 +301,7 @@ export async function saveRoutinePlanRecord(
       routineId = created.id;
     }
 
-    if (data.exercises) {
-      await tx
-        .delete(workoutRoutineExercises)
-        .where(eq(workoutRoutineExercises.routineId, routineId));
-      for (const [position, exercise] of data.exercises.entries()) {
-        const exerciseId = await resolveExerciseId(tx, userId, exercise);
-        await tx
-          .insert(workoutRoutineExercises)
-          .values({ exerciseId, position, routineId, setTypes: exercise.setTypes });
-      }
-    }
+    if (data.exercises) await replaceRoutineExercises(tx, userId, routineId, data.exercises);
     return { id: routineId };
   });
 }

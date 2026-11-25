@@ -14,7 +14,7 @@ import type {
   saveFoodProductInputType,
   updateFoodProductValuesType,
 } from './calories.validation';
-import { foodBarcodeAliases } from '@/lib/foodBarcode';
+import { foodBarcodeAliases, getFoodBarcode } from '@/lib/foodBarcode';
 import {
   getFoodImageAssets,
   prepareFoodImage,
@@ -125,7 +125,9 @@ export async function lookupFoodByBarcodeRecord(
   _userId: string,
   data: typeof barcodeInputType.infer,
 ) {
-  const barcode = data.barcode.trim();
+  // Printed or raw GS1 data (e.g. a DataBar label typed by hand) looks up its GTIN.
+  const barcode = getFoodBarcode(data.barcode);
+  if (!barcode) return { status: 'notFound' as const };
   const existingProduct = await findFoodProductByBarcode(barcode);
   if (existingProduct) return { food: await withImage(existingProduct), status: 'found' as const };
 
@@ -136,12 +138,36 @@ export async function lookupFoodByBarcodeRecord(
   return { food: await withImage(product), status: 'found' as const };
 }
 
+/**
+ * Saves the GTIN of typed GS1 data (e.g. the printed `(01)…(17)…` line under a DataBar), like a
+ * scan would. Other barcodes stay as typed, and so does an `unchanged` saved one; malformed GS1
+ * data is rejected instead of saved.
+ */
+function withFoodBarcode<T extends { barcode?: string | null }>(
+  values: T,
+  unchanged?: string | null,
+) {
+  const typed = values.barcode?.trim();
+  if (!typed || typed === unchanged) return values;
+  const barcode = getFoodBarcode(typed);
+  if (!barcode) {
+    throw new ClientSafeError(
+      translate({
+        en: 'This barcode has no valid product number.',
+        pl: 'Ten kod kreskowy nie zawiera poprawnego numeru produktu.',
+      }),
+    );
+  }
+  return { ...values, barcode };
+}
+
 /** Adds a shared catalog product; barcodes stay unique across GTIN padding. */
 export async function createFoodProductRecord(
   userId: string,
-  values: typeof createFoodProductValuesType.infer,
+  input: typeof createFoodProductValuesType.infer,
   photo: File | null = null,
 ) {
+  const values = withFoodBarcode(input);
   if (values.barcode && (await findFoodProductByBarcode(values.barcode))) {
     throw new ClientSafeError(
       translate({
@@ -176,18 +202,19 @@ export async function createFoodProductRecord(
 /** Saves the product and refreshes all users' matching logs for the editor's local today atomically. */
 export async function updateFoodProductRecord(
   userId: string,
-  values: typeof updateFoodProductValuesType.infer,
+  input: typeof updateFoodProductValuesType.infer,
   photo: File | null = null,
 ) {
   const [existing] = await db
     .select()
     .from(foodProducts)
-    .where(eq(foodProducts.id, values.id))
+    .where(eq(foodProducts.id, input.id))
     .limit(1);
   if (!existing)
     throw new ClientSafeError(
       translate({ en: 'Food product not found.', pl: 'Nie znaleziono produktu.' }),
     );
+  const values = withFoodBarcode(input, existing.barcode);
   if (values.barcode) {
     const barcodeProduct = await findFoodProductByBarcode(values.barcode);
     if (barcodeProduct && barcodeProduct.id !== values.id) {

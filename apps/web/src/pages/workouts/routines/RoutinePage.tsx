@@ -116,8 +116,8 @@ export function RoutinePage({ routineId }: { routineId: string }) {
 
       <p className={css.hint}>
         {t({
-          en: 'To change exercises, start this routine, edit the workout, then pick “Update routine” in its ⋯ menu.',
-          pl: 'Aby zmienić ćwiczenia, rozpocznij ten plan, edytuj trening, a potem wybierz „Zaktualizuj plan” w menu ⋯.',
+          en: 'To change exercises or sets, start this routine and edit the workout. Finish offers to update the routine.',
+          pl: 'Aby zmienić ćwiczenia lub serie, rozpocznij ten plan i edytuj trening. Po zakończeniu możesz zaktualizować plan.',
         })}
       </p>
 

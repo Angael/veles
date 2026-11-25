@@ -25,7 +25,6 @@ vi.mock('@/server/db.server', () => {
 
 vi.mock('../workouts.server', () => ({
   autoFinishIdleWorkouts: vi.fn(),
-  completeFilledSets: vi.fn(),
   defaultWorkoutName: (date: string) => `${date} workout`,
   requireNoOpenWorkout: vi.fn(),
   requireOwnedWorkout: vi.fn(async () => ({

@@ -87,7 +87,7 @@ export function registerFoodCatalogTools(server: McpServer, userId: string) {
     'lookup_food_barcode',
     {
       description:
-        'Find a catalog product by barcode. If it is missing, import it from Open Food Facts into the shared catalog. Returns { status: "found", food } or { status: "notFound" }.',
+        'Find a catalog product by barcode (EAN/UPC/GTIN, or GS1 data such as "(01)05901398083123(17)261124", reduced to its GTIN). If it is missing, import it from Open Food Facts into the shared catalog. Returns { status: "found", food } or { status: "notFound" }.',
       inputSchema: agentInput(barcodeInputType),
       annotations: writeAnnotations({ destructive: false, idempotent: true, openWorld: true }),
     },

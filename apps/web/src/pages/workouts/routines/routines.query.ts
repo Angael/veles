@@ -1,4 +1,5 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { SetType } from '../metrics';
 import { settleSessionEdits } from '../session/session.query';
 import { workoutKeys } from '../workouts.query';
 import {
@@ -61,13 +62,21 @@ export function useSaveRoutineFromWorkoutMutation() {
   });
 }
 
+/** The routine changed elsewhere after the review opened, so nothing was written. */
+export class RoutineChangedError extends Error {
+  constructor() {
+    super('The routine changed after it was reviewed.');
+    this.name = 'RoutineChangedError';
+  }
+}
+
 /**
- * Overwrites the session's routine mid-workout or later. Only routine rows change, so the open
- * session keeps its sets; pending set edits are sent first so the routine matches the screen.
+ * Writes the plan reviewed on Finish to the workout's routine. The workout is already saved, so
+ * a failure only leaves the routine as it was; the caller keeps the review open. A routine that
+ * changed since the review rejects with `RoutineChangedError` instead of being overwritten.
  */
 export function useUpdateRoutineFromWorkoutMutation() {
   const { t } = useI18n();
-  const queryClient = useQueryClient();
 
   return useMutation({
     meta: {
@@ -77,9 +86,14 @@ export function useUpdateRoutineFromWorkoutMutation() {
       invalidateQueryKey: routinesKey,
       success: { title: t({ en: 'Routine updated', pl: 'Zaktualizowano plan' }) },
     },
-    mutationFn: async (variables: { workoutId: string }) => {
-      await settleSessionEdits(queryClient, variables.workoutId);
-      return updateRoutineFromWorkout({ data: variables });
+    mutationFn: async (variables: {
+      workoutId: string;
+      routineId: string;
+      reviewed: { exerciseId: string; setTypes: SetType[] }[];
+      exercises: { exerciseId: string; setTypes: SetType[] }[];
+    }) => {
+      const { conflict } = await updateRoutineFromWorkout({ data: variables });
+      if (conflict) throw new RoutineChangedError();
     },
   });
 }
