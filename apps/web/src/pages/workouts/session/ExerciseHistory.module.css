@@ -1,0 +1,213 @@
+@import '../../../styles/breakpoints.css';
+
+/* Pinned to the top of the scrolling popup so the close button never scrolls away. */
+.dialogHeader {
+  --popup-padding: var(--space-lg);
+
+  position: sticky;
+  top: calc(-1 * var(--popup-padding));
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin: calc(-1 * var(--popup-padding)) calc(-1 * var(--popup-padding)) 0;
+  padding: var(--popup-padding) var(--popup-padding) var(--space-sm);
+  background: var(--c-surface-solid);
+
+  @media (--phone) {
+    --popup-padding: var(--space-md);
+  }
+}
+
+.heading {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+
+  & p {
+    font-size: var(--text-sm);
+  }
+}
+
+.entries {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry {
+  display: grid;
+  gap: var(--space-xs);
+  min-width: 0;
+  padding: var(--space-sm);
+  border: var(--border-width) solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-inset);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0 var(--space-sm);
+}
+
+.date {
+  color: var(--c-text-strong);
+  font-weight: var(--font-weight-semibold);
+}
+
+.position {
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: var(--c-primary-surface);
+  color: var(--c-muted-strong);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.header > .clampedText {
+  grid-column: 1 / -1;
+}
+
+.workout {
+  color: var(--c-muted);
+  font-size: var(--text-xs);
+  overflow-wrap: anywhere;
+}
+
+.clampWorkout {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.sets {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.set {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 1.75rem;
+}
+
+.warmup {
+  opacity: 0.65;
+}
+
+.badge {
+  display: grid;
+  place-content: center;
+  height: 1.5rem;
+  border-radius: var(--radius-xs);
+  background: var(--c-surface-strong);
+  color: var(--c-muted-strong);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+
+  &:not([data-type='normal']) {
+    color: var(--c-accent-strong);
+  }
+}
+
+.values {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.4rem;
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+
+  /* A value never splits from its unit; only whole values wrap. */
+  & > span {
+    white-space: nowrap;
+  }
+
+  & strong {
+    color: var(--c-text-strong);
+    font-size: var(--text-md);
+    font-weight: var(--font-weight-semibold);
+  }
+}
+
+.separator {
+  color: var(--c-muted-soft);
+}
+
+.missing {
+  color: var(--c-muted-soft);
+  font-size: var(--text-xs);
+  font-style: italic;
+}
+
+.none {
+  color: var(--c-muted);
+  font-size: var(--text-sm);
+}
+
+.note {
+  padding-top: var(--space-xs);
+  border-top: var(--border-width) solid var(--c-border);
+
+  & p {
+    color: var(--c-muted);
+    font-size: var(--text-sm);
+    font-style: italic;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+  }
+}
+
+.clampNote {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.clampedText {
+  display: grid;
+  justify-items: start;
+  min-width: 0;
+}
+
+/* Small text, but a finger-sized hit area. */
+.toggle {
+  min-height: 1.75rem;
+  padding: 0 var(--space-xs) 0 0;
+  border: 0;
+  background: none;
+  color: var(--c-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+
+  &:focus-visible {
+    border-radius: var(--radius-xs);
+    outline: 2px solid var(--c-primary-focus);
+    outline-offset: 2px;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

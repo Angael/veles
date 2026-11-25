@@ -11,7 +11,7 @@ import {
 import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
-import { describeSet, type Measure } from '../metrics';
+import type { Measure, SetMetrics, SetType } from '../metrics';
 import { toMetrics } from '../workouts.server';
 import { workoutName } from '../workoutName';
 import { updateExerciseInputType, workoutIdType } from '../workouts.validation';
@@ -39,7 +39,8 @@ export type ExerciseHistoryEntry = {
   /** 1-based order in that workout: "it went great because it was first". */
   position: number;
   exerciseCount: number;
-  sets: string[];
+  /** Done sets in display units, so the dialog can label each value with its unit. */
+  sets: (SetMetrics & { id: string; type: SetType })[];
   note: string;
 };
 
@@ -169,7 +170,7 @@ export const getExerciseHistory = createServerFn({ method: 'GET' })
         position: positions.filter((slot) => slot.position <= entry.position).length,
         sets: sets
           .filter((set) => set.sessionExerciseId === entry.id)
-          .map((set) => describeSet(toMetrics(set), locale)),
+          .map((set) => ({ ...toMetrics(set), id: set.id, type: set.type })),
         workoutName: workoutName(
           { date: entry.date, name: entry.workoutName },
           positions.map((slot) => slot.name),

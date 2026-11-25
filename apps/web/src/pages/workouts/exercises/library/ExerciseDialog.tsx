@@ -153,6 +153,7 @@ export function ExerciseDialog({ exercise, onClose }: ExerciseDialogProps) {
         <ExerciseHistoryDialog
           exerciseId={exercise.id}
           exerciseName={exercise.name}
+          measure={exercise.measure}
           onOpenChange={setHistoryOpen}
           open={historyOpen}
         />
