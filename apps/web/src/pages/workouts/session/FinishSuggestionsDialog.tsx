@@ -23,8 +23,8 @@ type FinishSuggestionsDialogProps = {
 };
 
 /**
- * Lists unticked sets that only show last time's values and lets the user tick the ones done.
- * Nothing starts ticked, so finishing early leaves skipped sets empty instead of inventing them.
+ * Lists every unticked set with values (typed or last time's) and lets the user tick the ones done.
+ * Nothing starts ticked, so a set counts as done only after an explicit tick.
  * The parent remounts it per review (`key`), so ticks from a dismissed review never carry over.
  */
 export function FinishSuggestionsDialog({
@@ -56,8 +56,8 @@ export function FinishSuggestionsDialog({
         <DialogTitle>{t({ en: 'Unticked sets', pl: 'Nieodhaczone serie' })}</DialogTitle>
         <DialogDescription>
           {t({
-            en: 'Tick the sets you did to save last time’s values. Others stay empty and not done.',
-            pl: 'Zaznacz wykonane serie, aby zapisać wartości z ostatniego razu. Reszta zostanie pusta i niewykonana.',
+            en: 'Only ticked sets count as done. Tick the sets you did; empty cells take last time’s values. Others stay not done.',
+            pl: 'Tylko odhaczone serie są wykonane. Zaznacz wykonane serie; puste pola dostaną wartości z ostatniego razu. Reszta zostanie niewykonana.',
           })}
         </DialogDescription>
         <ul className={css.list}>

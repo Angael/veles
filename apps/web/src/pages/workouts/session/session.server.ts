@@ -2,10 +2,9 @@ import { and, asc, desc, eq, gt, lt, sql } from 'drizzle-orm';
 import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db, type DbTransaction } from '@/server/db.server';
-import { suggestedFill } from '../metrics';
+import { unconfirmedFill } from '../metrics';
 import {
   autoFinishIdleWorkouts,
-  completeFilledSets,
   defaultWorkoutName,
   loadWorkoutSession,
   nextPosition,
@@ -50,8 +49,8 @@ export async function startWorkoutRecord(userId: string, data: typeof startWorko
 }
 
 /**
- * Copies last time's values into the empty cells of the sets the user accepted on Finish and
- * ticks them. Values come from the server's own "last time", and sets that no longer qualify
+ * Ticks the unticked sets the user confirmed on Finish, copying last time's values into their
+ * empty cells. Values come from the server's own "last time", and sets that no longer qualify
  * (ticked or filled meanwhile, or from another workout) are ignored.
  */
 async function acceptSuggestedSets(
@@ -65,11 +64,11 @@ async function acceptSuggestedSets(
   const session = await loadWorkoutSession(userId, workoutId, tx);
   for (const slot of session.slots) {
     for (const set of slot.sets) {
-      const patch = accepted.has(set.id) ? suggestedFill(set, slot.measure) : null;
-      if (!patch) continue;
+      const filled = accepted.has(set.id) ? unconfirmedFill(set, slot.measure) : null;
+      if (!filled) continue;
       await tx
         .update(workoutSets)
-        .set({ ...toSetColumns(patch), completedAt: new Date() })
+        .set({ ...toSetColumns(filled), completedAt: new Date() })
         .where(eq(workoutSets.id, set.id));
     }
   }
@@ -102,8 +101,8 @@ export async function updateWorkoutRecord(
   }
   await db.transaction(async (tx) => {
     await acceptSuggestedSets(tx, userId, workout.id, data.acceptSetIds ?? []);
+    // Only ticked or confirmed sets are done; the rest keep their values but stay not done.
     await tx.update(workoutSessions).set(changes).where(eq(workoutSessions.id, workout.id));
-    await completeFilledSets(tx, userId, [workout.id]);
   });
 }
 

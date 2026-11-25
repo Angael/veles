@@ -13,8 +13,8 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 
 /**
  * Finish for a running workout. It sits in the sticky task header, so it stays in reach at any
- * scroll position. It first sends edits still waiting to save. When unticked sets only show last
- * time's values, it asks which were done; otherwise it finishes at once, drops the rest timer and
+ * scroll position. It first sends edits still waiting to save. When unticked sets hold values
+ * (typed or last time's), it asks which were done; otherwise it finishes at once, drops the rest timer and
  * leaves for the workouts list.
  */
 export function FinishWorkoutButton({ workoutId }: { workoutId: string }) {
