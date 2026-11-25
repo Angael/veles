@@ -13,7 +13,7 @@ import { db } from '@/server/db.server';
 import { requireSession } from '@/server/getSession.server';
 import { logMiddleware } from '@/server/middleware/logMiddleware';
 import {
-  routineWorkoutIdInputType,
+  updateRoutineFromWorkoutInputType,
   saveRoutineInputType,
   startRoutineInputType,
   updateRoutineInputType,
@@ -43,7 +43,13 @@ export type RoutineDetail = {
   description: string;
   lastUsed: string | null;
   archived: boolean;
-  exercises: { id: string; name: string; measure: Measure; setTypes: SetType[] }[];
+  exercises: {
+    id: string;
+    exerciseId: string;
+    name: string;
+    measure: Measure;
+    setTypes: SetType[];
+  }[];
 };
 
 /** Routines with their exercise names, most recently used first. Archived ones are flagged. */
@@ -117,6 +123,7 @@ export const getRoutine = createServerFn({ method: 'GET' })
     const [slots, [lastUsed]] = await Promise.all([
       db
         .select({
+          exerciseId: workoutRoutineExercises.exerciseId,
           id: workoutRoutineExercises.id,
           measure: workoutExercises.measure,
           name: workoutExercises.name,
@@ -144,13 +151,13 @@ export const saveRoutineFromWorkout = createServerFn({ method: 'POST' })
     return saveRoutineFromWorkoutRecord(session.user.id, data);
   });
 
-/** Overwrites the linked routine's exercises with this session's. */
+/** Writes the plan reviewed on Finish to the routine the workout started from. */
 export const updateRoutineFromWorkout = createServerFn({ method: 'POST' })
   .middleware([logMiddleware('updateRoutineFromWorkout')])
-  .validator(arkTypeValidator(routineWorkoutIdInputType))
+  .validator(arkTypeValidator(updateRoutineFromWorkoutInputType))
   .handler(async ({ data }) => {
     const session = await requireSession();
-    await updateRoutineFromWorkoutRecord(session.user.id, data);
+    return updateRoutineFromWorkoutRecord(session.user.id, data);
   });
 
 /** Starts a session for the given day with the routine's exercises and empty sets. */

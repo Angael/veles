@@ -57,7 +57,24 @@ export const saveRoutineInputType = type({
   'description?': description,
 });
 
-export const routineWorkoutIdInputType = type({ workoutId: 'string.uuid' });
+/** One routine exercise: which exercise and its set types in order, never values. */
+const routinePlanExercise = {
+  setTypes: type(setType).array().atLeastLength(1).atMostLength(30),
+} as const;
+
+const routinePlan = type({ exerciseId: 'string.uuid', ...routinePlanExercise }).array();
+
+/**
+ * The plan the user reviewed on Finish, written to the routine the workout started from.
+ * `routineId` and `reviewed` are the routine as the review showed it; if it changed since,
+ * nothing is written.
+ */
+export const updateRoutineFromWorkoutInputType = type({
+  workoutId: 'string.uuid',
+  routineId: 'string.uuid',
+  reviewed: routinePlan.atMostLength(40),
+  exercises: routinePlan.atLeastLength(1).atMostLength(40),
+});
 
 export const startRoutineInputType = type({ routineId: 'string.uuid', date: dateOnlyType });
 
@@ -102,10 +119,7 @@ export const saveRoutinePlanInputType = type({
   'name?': name,
   'description?': description,
   'archived?': 'boolean',
-  'exercises?': type({
-    ...exerciseRef,
-    setTypes: type(setType).array().atLeastLength(1).atMostLength(30),
-  })
+  'exercises?': type({ ...exerciseRef, ...routinePlanExercise })
     .array()
     .atMostLength(40),
 });
