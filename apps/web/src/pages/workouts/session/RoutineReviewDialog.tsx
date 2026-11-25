@@ -121,15 +121,11 @@ function ChangeRow({ change }: { change: RoutineChange }) {
           </small>
         ) : null}
       </span>
-      {showBefore || showAfter ? (
-        <>
-          <span className={css.before}>{showBefore ? <SetChips types={before} /> : null}</span>
-          <span className={css.arrow}>
-            {setsChanged ? <ArrowRightIcon aria-hidden='true' /> : null}
-          </span>
-          <span className={css.after}>{showAfter ? <SetChips types={after} /> : null}</span>
-        </>
-      ) : null}
+      <span className={css.sets}>
+        {showBefore ? <SetChips types={before} /> : null}
+        {setsChanged ? <ArrowRightIcon aria-hidden='true' className={css.arrow} /> : null}
+        {showAfter ? <SetChips types={after} /> : null}
+      </span>
     </li>
   );
 }
