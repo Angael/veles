@@ -17,6 +17,7 @@ import { BarcodeIcon } from 'lucide-react';
 import { useState } from 'react';
 import { FoodBarcodeScanDialog } from './FoodBarcodeScanDialog';
 import css from '../CalorieFlows.module.css';
+import { getFoodBarcode } from '@/lib/foodBarcode';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 
 export type FoodEditorValue = {
@@ -110,6 +111,8 @@ export function FoodEditor({
           <TextInput
             inputMode='numeric'
             name='barcode'
+            // Typed GS1 data (the printed `(01)…` line) shows the GTIN that will be saved.
+            onBlur={() => setBarcode((typed) => getFoodBarcode(typed) ?? typed)}
             onValueChange={setBarcode}
             trailing={
               <Btn

@@ -1,19 +1,26 @@
 import { useRef, useState } from 'react';
+import { getFoodBarcode } from '@/lib/foodBarcode';
 
 export type LookupState =
   | { status: 'idle' }
-  | { barcode: string; status: 'lookingUp' | 'notFound' | 'error' };
+  | { barcode: string; status: 'lookingUp' | 'notFound' | 'error' | 'invalid' };
 
 /**
- * Runs one barcode lookup at a time and tracks its progress for `LookupNotice`. `find` resolves
+ * Runs one barcode lookup at a time and tracks its progress for `LookupNotice`. Typed GS1 data
+ * (e.g. the `(01)…(17)…` line under a DataBar) is reduced to its GTIN first. `find` resolves
  * `true` when it handled a match, `false` for an unknown barcode, and throws on failure.
  */
 export function useBarcodeLookup(find: (barcode: string) => Promise<boolean>) {
   const busy = useRef(false);
   const [lookup, setLookup] = useState<LookupState>({ status: 'idle' });
 
-  async function lookupBarcode(barcode: string) {
-    if (!barcode || busy.current) return;
+  async function lookupBarcode(input: string) {
+    if (!input.trim() || busy.current) return;
+    const barcode = getFoodBarcode(input);
+    if (!barcode) {
+      setLookup({ barcode: input.trim(), status: 'invalid' });
+      return;
+    }
     busy.current = true;
     setLookup({ barcode, status: 'lookingUp' });
     try {

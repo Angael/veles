@@ -19,15 +19,26 @@ function unpadGtin(gtin: string) {
   return gtin;
 }
 
-/** Extracts the product GTIN from GS1 element strings or Digital Links, ignoring lot/expiry/serial. */
+/** GS1 DataBar always carries a GTIN, so other values from it are not food barcodes. */
+const dataBarFormats = new Set(['databar', 'databar_expanded', 'databar_limited']);
+/** 2D codes also carry URLs and text; only accept retail numbers from them. */
+const matrixFormats = new Set(['data_matrix', 'qr_code']);
+
+/**
+ * Extracts the product GTIN from GS1 element strings (raw or printed `(01)…` form), Digital Links
+ * or DataBar, ignoring lot/expiry/weight. Returns `null` for malformed GS1 data so scanners skip it.
+ */
 export function getFoodBarcode(rawValue: string, format?: string): string | null {
   const value = rawValue.trim();
   if (!value) return null;
-  const withoutIdentifier = value.replace(/^\](?:d2|Q3|C1)/, '');
+  // Symbology identifiers sent by hardware scanners: GS1-128, DataMatrix, QR Code and DataBar.
+  const withoutIdentifier = value.replace(/^\](?:d2|Q3|C1|e0)/, '');
   const data = withoutIdentifier.startsWith(String.fromCharCode(29))
     ? withoutIdentifier.slice(1)
     : withoutIdentifier;
-  let gtin = data.match(/^01([0-9]{14})/)?.[1] ?? data.match(/\(01\)([0-9]{14})(?=\(|$)/)?.[1];
+  let gtin =
+    data.match(/^01([0-9]{14})/)?.[1] ??
+    data.replace(/\s+/g, '').match(/\(01\)([0-9]{14})(?=\(|$)/)?.[1];
 
   if (!gtin && /^https?:\/\//i.test(value)) {
     try {
@@ -40,7 +51,10 @@ export function getFoodBarcode(rawValue: string, format?: string): string | null
   }
 
   if (gtin) return gtinType.allows(gtin) ? unpadGtin(gtin) : null;
-  if (format === 'data_matrix' || format === 'qr_code') {
+  // Printed GS1 data without a usable `(01)` GTIN.
+  if (/^\([0-9]{2,4}\)/.test(data)) return null;
+  if (format && dataBarFormats.has(format)) return gtinType.allows(data) ? unpadGtin(data) : null;
+  if (format && matrixFormats.has(format)) {
     if (!retailBarcodeType.allows(value)) return null;
     if (value.length === 14) return gtinType.allows(value) ? unpadGtin(value) : null;
   }

@@ -46,6 +46,19 @@ export function LookupNotice({ lookup, notFoundAction, onDismiss, onRetry }: Loo
           {notFoundAction?.(lookup.barcode)}
         </ScanNotice>
       );
+    case 'invalid':
+      return (
+        <ScanNotice
+          detail={t({
+            en: `${lookup.barcode} has no valid product number.`,
+            pl: `${lookup.barcode} nie zawiera poprawnego numeru produktu.`,
+          })}
+          title={t({ en: 'Invalid barcode', pl: 'Niepoprawny kod kreskowy' })}
+          tone='danger'
+        >
+          {scanAgain}
+        </ScanNotice>
+      );
     case 'error':
       return (
         <ScanNotice
