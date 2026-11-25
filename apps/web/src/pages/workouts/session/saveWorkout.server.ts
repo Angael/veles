@@ -97,8 +97,9 @@ export async function saveWorkoutRecord(userId: string, data: SaveWorkoutInput) 
     }
 
     if (data.exercises) await replaceExercises(tx, userId, workoutId, data.exercises);
-    // Sets of a finished session count as done once they have values, as in the app.
-    if (finished) await completeFilledSets(tx, [workoutId]);
+    // Sets of a finished session count as done once they have values, as in the app; a set with
+    // an empty cell that last time could fill stays not done unless it says `done: true`.
+    if (finished) await completeFilledSets(tx, userId, [workoutId]);
     return { id: workoutId };
   });
 }

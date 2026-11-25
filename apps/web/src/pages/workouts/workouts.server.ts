@@ -1,18 +1,4 @@
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  gte,
-  inArray,
-  isNotNull,
-  isNull,
-  lt,
-  lte,
-  ne,
-  or,
-  sql,
-} from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, isNull, lt, lte, ne, sql } from 'drizzle-orm';
 import {
   type exerciseMeasures,
   workoutExercises,
@@ -23,7 +9,13 @@ import {
 } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
 import { db, type DbTransaction } from '@/server/db.server';
-import { floorDuration, type Measure, type SetMetrics, type SetType } from './metrics';
+import {
+  completesOnFinish,
+  floorDuration,
+  type Measure,
+  type SetMetrics,
+  type SetType,
+} from './metrics';
 import { defaultWorkoutName as localizedDefaultWorkoutName, workoutName } from './workoutName';
 import { getLocale, translate } from '@/lib/i18n/getLocale';
 
@@ -158,6 +150,7 @@ export async function autoFinishIdleWorkouts(tx: Db, userId: string) {
     .returning({ id: workoutSessions.id });
   await completeFilledSets(
     tx,
+    userId,
     idle.map((row) => row.id),
   );
   const [, ...older] = await tx
@@ -177,35 +170,32 @@ export async function autoFinishIdleWorkouts(tx: Db, userId: string) {
       );
     await completeFilledSets(
       tx,
+      userId,
       older.map((row) => row.id),
     );
   }
 }
 
-/** Ticks every filled set when workouts end; ticks only track progress during a session. */
-export async function completeFilledSets(tx: Db, workoutIds: string[]) {
-  if (workoutIds.length === 0) return;
+/**
+ * Ticks sets holding values the user entered when workouts end; ticks only track progress during
+ * a session. Sets left with an empty cell that last time could fill stay not done, like the ones
+ * declined on Finish: grey hints are never saved or counted silently.
+ */
+export async function completeFilledSets(tx: Db, userId: string, workoutIds: string[]) {
+  const setIds: string[] = [];
+  for (const workoutId of workoutIds) {
+    const session = await loadWorkoutSession(userId, workoutId, tx);
+    for (const slot of session.slots) {
+      for (const set of slot.sets) {
+        if (completesOnFinish(set, slot.measure)) setIds.push(set.id);
+      }
+    }
+  }
+  if (setIds.length === 0) return;
   await tx
     .update(workoutSets)
     .set({ completedAt: new Date() })
-    .where(
-      and(
-        isNull(workoutSets.completedAt),
-        or(
-          isNotNull(workoutSets.weightGrams),
-          isNotNull(workoutSets.reps),
-          isNotNull(workoutSets.durationSeconds),
-          isNotNull(workoutSets.distanceMeters),
-        ),
-        inArray(
-          workoutSets.sessionExerciseId,
-          tx
-            .select({ id: workoutSessionExercises.id })
-            .from(workoutSessionExercises)
-            .where(inArray(workoutSessionExercises.sessionId, workoutIds)),
-        ),
-      ),
-    );
+    .where(inArray(workoutSets.id, setIds));
 }
 
 /** Seconds entered on sets, ticked or not, for queries joined to sets and grouped by session. */
@@ -263,13 +253,14 @@ export function sessionsBefore(userId: string, workout: { date: string; id: stri
 
 /** Latest earlier slot per exercise, optionally only slots that have a note. */
 async function latestEarlierSlots(
+  tx: Db,
   userId: string,
   workout: { date: string; id: string },
   exerciseIds: string[],
   withNote: boolean,
 ) {
   if (exerciseIds.length === 0) return [];
-  return db
+  return tx
     .selectDistinctOn([workoutSessionExercises.exerciseId], {
       exerciseId: workoutSessionExercises.exerciseId,
       id: workoutSessionExercises.id,
@@ -291,11 +282,11 @@ async function latestEarlierSlots(
     );
 }
 
-async function setsBySlot(slotIds: string[]) {
+async function setsBySlot(tx: Db, slotIds: string[]) {
   const rows =
     slotIds.length === 0
       ? []
-      : await db
+      : await tx
           .select()
           .from(workoutSets)
           .where(inArray(workoutSets.sessionExerciseId, slotIds))
@@ -307,12 +298,16 @@ async function setsBySlot(slotIds: string[]) {
   return map;
 }
 
-/** Everything the live session screen shows, including last time's values and notes. */
+/**
+ * Everything the live session screen shows, including last time's values and notes. Pass a
+ * transaction to see its own uncommitted writes.
+ */
 export async function loadWorkoutSession(
   userId: string,
   workoutId: string,
+  tx: Db = db,
 ): Promise<WorkoutSessionData> {
-  const [workout] = await db
+  const [workout] = await tx
     .select()
     .from(workoutSessions)
     .where(and(eq(workoutSessions.id, workoutId), eq(workoutSessions.userId, userId)));
@@ -322,7 +317,7 @@ export async function loadWorkoutSession(
     );
   const current = { date: workout.date, id: workout.id };
 
-  const slots = await db
+  const slots = await tx
     .select({
       exerciseId: workoutSessionExercises.exerciseId,
       id: workoutSessionExercises.id,
@@ -338,15 +333,15 @@ export async function loadWorkoutSession(
 
   const exerciseIds = [...new Set(slots.map((slot) => slot.exerciseId))];
   const [previousSlots, previousNotes] = await Promise.all([
-    latestEarlierSlots(userId, current, exerciseIds, false),
-    latestEarlierSlots(userId, current, exerciseIds, true),
+    latestEarlierSlots(tx, userId, current, exerciseIds, false),
+    latestEarlierSlots(tx, userId, current, exerciseIds, true),
   ]);
   const previousSlotByExercise = new Map(previousSlots.map((slot) => [slot.exerciseId, slot.id]));
   const noteByExercise = new Map(previousNotes.map((slot) => [slot.exerciseId, slot.notes]));
   const [sets, [routine]] = await Promise.all([
-    setsBySlot([...slots.map((slot) => slot.id), ...previousSlots.map((slot) => slot.id)]),
+    setsBySlot(tx, [...slots.map((slot) => slot.id), ...previousSlots.map((slot) => slot.id)]),
     workout.routineId
-      ? db
+      ? tx
           .select({ id: workoutRoutines.id, name: workoutRoutines.name })
           .from(workoutRoutines)
           .where(and(eq(workoutRoutines.id, workout.routineId), eq(workoutRoutines.userId, userId)))

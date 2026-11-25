@@ -223,20 +223,39 @@ export function hintValue(set: { previous: SetMetrics | null }, key: MetricKey) 
 }
 
 /**
- * The grey hints of an unticked set's empty cells, as a patch. Grey hints look like real values,
- * so Finish saves them instead of leaving the sets empty. Null when the set is ticked or every
- * cell has a value.
+ * How an unticked set would be saved if the user confirms it on Finish: entered values plus last
+ * time's for the empty cells (when last time has them all). Only ticked sets count as done, so
+ * Finish asks about every set this returns. Null when the set is ticked or has nothing to save.
  */
-export function hintFill(
+export function unconfirmedFill(
   set: SetMetrics & { done: boolean; previous: SetMetrics | null },
   measure: Measure,
-): Partial<SetMetrics> | null {
+): SetMetrics | null {
   if (set.done) return null;
-  const patch: Partial<SetMetrics> = {};
-  for (const field of MEASURE_FIELDS[measure]) {
-    if (set[field.key] === null) patch[field.key] = hintValue(set, field.key);
-  }
-  return Object.keys(patch).length > 0 ? patch : null;
+  const merged = { ...set, ...filledFromPrevious(set, measure) };
+  const filled: SetMetrics = {
+    distanceKm: merged.distanceKm,
+    durationSeconds: merged.durationSeconds,
+    reps: merged.reps,
+    weightKg: merged.weightKg,
+  };
+  return Object.values(filled).some((value) => value !== null) ? filled : null;
+}
+
+/**
+ * Whether a workout ending without the user (auto-finish, agent save) ticks this unticked set: it
+ * holds an entered value and has no empty cell that last time could fill.
+ */
+export function completesOnFinish(
+  set: SetMetrics & { done: boolean; previous: SetMetrics | null },
+  measure: Measure,
+) {
+  if (set.done) return false;
+  const entered = [set.weightKg, set.reps, set.durationSeconds, set.distanceKm].some(
+    (value) => value !== null,
+  );
+  const suggestion = filledFromPrevious(set, measure);
+  return entered && !(suggestion && Object.keys(suggestion).length > 0);
 }
 
 /** Short label for a logged set, such as `80 × 5` or `5.2 km · 28:10`. */

@@ -26,8 +26,8 @@ export const updateWorkoutInputType = type({
   'date?': dateOnlyType,
   'name?': name,
   'finished?': 'boolean',
-  /** On finish: save the grey hints shown in empty cells of unticked sets. */
-  'fillHints?': 'boolean',
+  /** On finish: unticked sets the user confirmed; they become done, empty cells take last time's values. */
+  'acceptSetIds?': type('string.uuid[]').atMostLength(500),
 });
 
 export const addWorkoutExerciseInputType = type({
