@@ -45,7 +45,7 @@ export type WorkoutSessionData = {
   date: string;
   startedAt: string | null;
   endedAt: string | null;
-  /** Routine this session started from or was saved as; offers "Update routine". */
+  /** Routine this session started from or was saved as; Finish offers to update it. */
   routine: { id: string; name: string } | null;
   slots: WorkoutSlotData[];
 };

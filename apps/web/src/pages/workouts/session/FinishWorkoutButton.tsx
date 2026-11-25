@@ -1,5 +1,4 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
 import { FlagIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/btn/Btn';
@@ -14,12 +13,17 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 /**
  * Finish for a running workout. It sits in the sticky task header, so it stays in reach at any
  * scroll position. It first sends edits still waiting to save. When unticked sets only show last
- * time's values, it asks which were done; otherwise it finishes at once, drops the rest timer and
- * leaves for the workouts list.
+ * time's values, it asks which were done; otherwise it finishes at once. After saving it drops the
+ * rest timer and hands over to `onFinished`, which may review routine changes before leaving.
  */
-export function FinishWorkoutButton({ workoutId }: { workoutId: string }) {
+export function FinishWorkoutButton({
+  onFinished,
+  workoutId,
+}: {
+  onFinished: () => Promise<void>;
+  workoutId: string;
+}) {
   const { t } = useI18n();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const updateWorkout = useUpdateWorkoutMutation();
   const [settling, setSettling] = useState(false);
@@ -33,7 +37,7 @@ export function FinishWorkoutButton({ workoutId }: { workoutId: string }) {
   async function finish(acceptSetIds: string[] = []) {
     await finishWorkout(workoutId, {
       finish: (variables) => updateWorkout.mutateAsync({ ...variables, acceptSetIds }),
-      leave: () => void navigate({ replace: true, to: '/workouts' }),
+      leave: () => void onFinished(),
     });
   }
 
