@@ -1,8 +1,8 @@
 import { and, asc, desc, eq, gt, lt, sql } from 'drizzle-orm';
 import { workoutSessionExercises, workoutSessions, workoutSets } from '@veles/db/schema';
 import { ClientSafeError } from '@/lib/errors/ClientSafeError';
-import { db } from '@/server/db.server';
-import { hintFill } from '../metrics';
+import { db, type DbTransaction } from '@/server/db.server';
+import { suggestedFill } from '../metrics';
 import {
   autoFinishIdleWorkouts,
   completeFilledSets,
@@ -50,25 +50,35 @@ export async function startWorkoutRecord(userId: string, data: typeof startWorko
 }
 
 /**
- * Saves the grey hints of unticked sets' empty cells before a workout ends. Hints read like real
- * values, so finishing keeps what the user saw instead of empty sets.
+ * Copies last time's values into the empty cells of the sets the user accepted on Finish and
+ * ticks them. Values come from the server's own "last time", and sets that no longer qualify
+ * (ticked or filled meanwhile, or from another workout) are ignored.
  */
-async function fillHintSets(userId: string, workoutId: string) {
-  const session = await loadWorkoutSession(userId, workoutId);
-  await db.transaction(async (tx) => {
-    for (const slot of session.slots) {
-      for (const set of slot.sets) {
-        const patch = hintFill(set, slot.measure);
-        if (patch)
-          await tx.update(workoutSets).set(toSetColumns(patch)).where(eq(workoutSets.id, set.id));
-      }
+async function acceptSuggestedSets(
+  tx: DbTransaction,
+  userId: string,
+  workoutId: string,
+  setIds: string[],
+) {
+  if (setIds.length === 0) return;
+  const accepted = new Set(setIds);
+  const session = await loadWorkoutSession(userId, workoutId, tx);
+  for (const slot of session.slots) {
+    for (const set of slot.sets) {
+      const patch = accepted.has(set.id) ? suggestedFill(set, slot.measure) : null;
+      if (!patch) continue;
+      await tx
+        .update(workoutSets)
+        .set({ ...toSetColumns(patch), completedAt: new Date() })
+        .where(eq(workoutSets.id, set.id));
     }
-  });
+  }
 }
 
 /**
  * Renames a session, moves it to another day, or finishes / reopens it. Reopening is refused while
- * another is open. Moving updates only the session row, so its exercises and sets stay.
+ * another is open. Moving updates only the session row, so its exercises and sets stay. Finishing
+ * is one transaction, so a failed Finish leaves the sets as they were and can be retried.
  */
 export async function updateWorkoutRecord(
   userId: string,
@@ -80,17 +90,21 @@ export async function updateWorkoutRecord(
     await autoFinishIdleWorkouts(db, userId);
     await requireNoOpenWorkout(db, userId, data.id);
   }
-  if (data.finished && data.fillHints) await fillHintSets(userId, workout.id);
-  await db
-    .update(workoutSessions)
-    .set({
-      ...move,
-      ...(data.name?.trim() ? { name: data.name.trim() } : {}),
-      ...(data.finished === undefined ? {} : { endedAt: data.finished ? new Date() : null }),
-      updatedAt: new Date(),
-    })
-    .where(eq(workoutSessions.id, data.id));
-  if (data.finished) await completeFilledSets(db, [data.id]);
+  const changes = {
+    ...move,
+    ...(data.name?.trim() ? { name: data.name.trim() } : {}),
+    ...(data.finished === undefined ? {} : { endedAt: data.finished ? new Date() : null }),
+    updatedAt: new Date(),
+  };
+  if (!data.finished) {
+    await db.update(workoutSessions).set(changes).where(eq(workoutSessions.id, workout.id));
+    return;
+  }
+  await db.transaction(async (tx) => {
+    await acceptSuggestedSets(tx, userId, workout.id, data.acceptSetIds ?? []);
+    await tx.update(workoutSessions).set(changes).where(eq(workoutSessions.id, workout.id));
+    await completeFilledSets(tx, userId, [workout.id]);
+  });
 }
 
 export async function deleteWorkoutRecord(userId: string, data: IdInput) {

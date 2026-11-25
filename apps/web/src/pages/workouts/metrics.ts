@@ -223,20 +223,33 @@ export function hintValue(set: { previous: SetMetrics | null }, key: MetricKey) 
 }
 
 /**
- * The grey hints of an unticked set's empty cells, as a patch. Grey hints look like real values,
- * so Finish saves them instead of leaving the sets empty. Null when the set is ticked or every
- * cell has a value.
+ * Last time's values for an unticked set's empty cells, as a patch. Finish offers these sets one
+ * by one and saves only the ones the user accepts, so skipped sets never become done. Null when
+ * the set is ticked, has no empty cell, or last time lacks a value to copy.
  */
-export function hintFill(
+export function suggestedFill(
   set: SetMetrics & { done: boolean; previous: SetMetrics | null },
   measure: Measure,
 ): Partial<SetMetrics> | null {
   if (set.done) return null;
-  const patch: Partial<SetMetrics> = {};
-  for (const field of MEASURE_FIELDS[measure]) {
-    if (set[field.key] === null) patch[field.key] = hintValue(set, field.key);
-  }
-  return Object.keys(patch).length > 0 ? patch : null;
+  const patch = filledFromPrevious(set, measure);
+  return patch && Object.keys(patch).length > 0 ? patch : null;
+}
+
+/**
+ * Whether ending a workout ticks this unticked set: it holds an entered value and has no empty
+ * cell that last time could fill. A set still waiting on a suggestion is the user's call, so it
+ * stays not done unless accepted; values stay as entered either way.
+ */
+export function completesOnFinish(
+  set: SetMetrics & { done: boolean; previous: SetMetrics | null },
+  measure: Measure,
+) {
+  if (set.done) return false;
+  const entered = [set.weightKg, set.reps, set.durationSeconds, set.distanceKm].some(
+    (value) => value !== null,
+  );
+  return entered && suggestedFill(set, measure) === null;
 }
 
 /** Short label for a logged set, such as `80 × 5` or `5.2 km · 28:10`. */
