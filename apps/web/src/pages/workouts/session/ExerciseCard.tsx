@@ -120,6 +120,7 @@ export function ExerciseCard({
       <ExerciseHistoryDialog
         exerciseId={slot.exerciseId}
         exerciseName={slot.name}
+        measure={slot.measure}
         onOpenChange={setHistoryOpen}
         open={historyOpen}
         workoutId={workoutId}

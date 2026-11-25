@@ -118,6 +118,8 @@ const distance: MetricField = {
   unit: km,
 };
 
+const ALL_FIELDS = [weight, reps, distance, time];
+
 export const MEASURE_FIELDS: Record<Measure, MetricField[]> = {
   distance_duration: [distance, time],
   duration: [time],
@@ -250,6 +252,17 @@ export function describeSet(set: SetMetrics, locale: Locale) {
   if (set.distanceKm !== null) parts.push(`${num(set.distanceKm)} km`);
   if (set.durationSeconds !== null) parts.push(formatDuration(set.durationSeconds));
   return parts.join(' · ') || '—';
+}
+
+/**
+ * A logged set's values with their fields, in the exercise's measure order, for read-only lists
+ * that label every unit. Fields the measure expects but the set lacks stay null so the list can say
+ * "not logged" instead of implying a value; values outside the measure (changed later) still show.
+ */
+export function setValues(set: SetMetrics, measure: Measure) {
+  const expected = MEASURE_FIELDS[measure];
+  const extra = ALL_FIELDS.filter((field) => !expected.includes(field) && set[field.key] !== null);
+  return [...expected, ...extra].map((field) => ({ field, value: set[field.key] }));
 }
 
 /** Working-set number per row; warm-ups and drops don't count, like Strong and Hevy. */
